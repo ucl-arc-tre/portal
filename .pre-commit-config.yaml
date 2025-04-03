@@ -14,6 +14,12 @@ repos:
         args:
           - "--timeout=5m"
 
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".github/.secrets.baseline"]
+
   - repo: local
     hooks:
       - id: codegen
