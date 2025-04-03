@@ -13,7 +13,7 @@ servcies.
 make dev
 ```
 
-then go to http://localhost:8000.
+then go to http://localhost:8000. To destroy it run `make dev-destroy`.
 
 ## 🏗️ Development
 

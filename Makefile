@@ -1,4 +1,5 @@
 .PHONY: *
+DEV_PROJECT_NAME := "ucl-arc-tre-portal-dev"
 
 help: ## Show this help
 	@echo
@@ -6,6 +7,16 @@ help: ## Show this help
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%s\033[0m|%s\n", $$1, $$2}' \
         | column -t -s '|'
 	@echo
+
+
+dev: codegen  ## Create dev environment
+	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) up --build
+
+dev-up: ## Docker compose up on the dev environment
+	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) up
+
+dev-destroy: ## Destroy the dev environment
+	cd deploy/dev &&  docker compose -p $(DEV_PROJECT_NAME) down
 
 codegen:  ## Run the code generation
 	oapi-codegen -package openapi -generate "gin,types" api.web.yaml > "internal/openapi/web/main.gen.go"
