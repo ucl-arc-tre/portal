@@ -7,7 +7,8 @@ servcies.
 
 ### dev
 
-1. To spin up the development environment run
+1. Create `deploy/dev/oauth2-proxy.cfg` from [deploy/dev/oauth2-proxy.sample.cfg](./deploy/dev/oauth2-proxy.sample.cfg)
+1. Spin up a development environment by running
 
 ```bash
 make dev

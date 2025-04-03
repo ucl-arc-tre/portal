@@ -14,6 +14,16 @@ services:
         source: ../..
         target: /repo
 
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.2
+    command: --config /oauth2-proxy.cfg
+    hostname: oauth2-proxy
+    volumes:
+      - "./oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
+    restart: unless-stopped
+    depends_on:
+      - web-api
+
   web-frontend:
     build:
       context: ../..

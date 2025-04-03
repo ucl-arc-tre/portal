@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
@@ -17,6 +18,6 @@ func New() *Handler {
 
 func (h *Handler) GetHello(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, openapi.HelloResponse{
-		Message: "world",
+		Message: middleware.GetUser(ctx).Username,
 	})
 }

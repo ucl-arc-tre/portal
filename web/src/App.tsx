@@ -6,14 +6,14 @@ import { getHello } from "./openapi";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [message, setMessage] = useState<string>("");
+  const [helloMessage, setHelloMessage] = useState<string>("");
 
   useEffect(() => {
     getHello().then((res) => {
-      if (res.data) {
-        setMessage(res.data.message);
+      if (res.response.status == 200 && res.data) {
+        setHelloMessage(res.data.message);
       } else {
-        console.log(res.error);
+        console.log("error:", res.error);
       }
     });
   });
@@ -30,11 +30,16 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
+        <button>
+          <a href="/oauth2/start">Login</a>
+        </button>
+      </div>
+      <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
         <p>
-          Backend response is <strong>{message}</strong>
+          GET /hello <strong>{helloMessage}</strong>
         </p>
       </div>
     </>

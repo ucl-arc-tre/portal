@@ -1,6 +1,6 @@
 services:
   test:
-    # This is just a stub – cypress intended
+    # This is just a stub - cypress intended
     image: curlimages/curl:8.12.1
     command: ["curl", "--fail", "--connect-timeout", "10", "http://nginx/"]
     depends_on:
@@ -12,12 +12,18 @@ services:
       target: web-api-release
     environment:
       PORT: "8080"
+      IS_TESTING: true
       DATABASE_DSN: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
+    depends_on:
+      - postgres
 
   web-frontend:
     build:
       context: ..
       target: web-frontend-release
+    environment:
+      PORT: "8080"
+      IS_TESTING: true
 
   nginx:
     image: nginx:latest
