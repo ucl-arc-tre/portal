@@ -9,6 +9,10 @@ func ServerAddress() string {
 	return fmt.Sprintf(":%s", env("PORT"))
 }
 
+func IsDevDeploy() bool {
+	return os.Getenv("IS_DEV_DEPLOY") == "true"
+}
+
 func env(key string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
