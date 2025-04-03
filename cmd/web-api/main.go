@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	_ = graceful.NewDB()
 	router := router.New()
 	openapi.RegisterHandlersWithOptions(router, handler.New(), openapi.GinServerOptions{
 		BaseURL: "api/v0",

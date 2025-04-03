@@ -8,13 +8,11 @@ services:
       DEBUG: true
       PORT: "8080"
       IS_DEV_DEPLOY: true
-      DATABASE_URL: postgres://postgres:postgres@db:5432/dev?sslmode=disable # pragma: allowlist secret
+      DATABASE_DSN: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
     volumes:
       - type: bind
         source: ../..
         target: /repo
-    depends_on:
-      - db
 
   web-frontend:
     build:
@@ -38,7 +36,7 @@ services:
       - web-api
       - web-frontend
 
-  db:
+  postgres:
     image: postgres:17
     environment:
       POSTGRES_PASSWORD: postgres # pragma: allowlist secret

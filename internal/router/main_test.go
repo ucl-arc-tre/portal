@@ -9,6 +9,7 @@ import (
 )
 
 func TestPingRoute(t *testing.T) {
+	t.Setenv("IS_TESTING", "true")
 	router := New()
 
 	response := httptest.NewRecorder()

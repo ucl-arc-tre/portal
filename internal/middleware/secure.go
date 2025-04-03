@@ -8,7 +8,7 @@ import (
 
 func NewSecure() gin.HandlerFunc {
 	return secure.New(secure.Config{
-		IsDevelopment:         config.IsDevDeploy(),
+		IsDevelopment:         config.IsDevDeploy() || config.IsTesting(),
 		SSLRedirect:           true,
 		STSSeconds:            315360000,
 		STSIncludeSubdomains:  true,

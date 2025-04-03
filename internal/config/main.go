@@ -13,6 +13,14 @@ func IsDevDeploy() bool {
 	return os.Getenv("IS_DEV_DEPLOY") == "true"
 }
 
+func IsTesting() bool {
+	return os.Getenv("IS_TESTING") == "true"
+}
+
+func DBDataSourceName() string {
+	return env("DATABASE_DSN")
+}
+
 func env(key string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
