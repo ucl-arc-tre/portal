@@ -8,7 +8,6 @@ help: ## Show this help
         | column -t -s '|'
 	@echo
 
-
 dev: codegen  ## Create dev environment
 	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) up --build
 
@@ -20,6 +19,7 @@ dev-destroy: ## Destroy the dev environment
 
 codegen:  ## Run the code generation
 	oapi-codegen -package openapi -generate "gin,types" api.web.yaml > "internal/openapi/web/main.gen.go"
+	cd web && npm run openapi-ts
 
 test:  ## Run all tests
 	$(MAKE) test-unit
