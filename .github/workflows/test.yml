@@ -1,0 +1,34 @@
+---
+name: Test
+on:
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Run unit tests
+        run: make test-unit
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [unit]
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run e2e tests
+        run: make test-e2e
