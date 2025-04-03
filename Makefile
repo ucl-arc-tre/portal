@@ -29,4 +29,7 @@ test-unit:  ## Run unit tests
 	go test ./...
 
 test-e2e:  ## Run end-to-end tests
-	cd _test && docker compose build && docker compose run test && docker compose down --remove-orphans
+	cd e2e && docker compose build && docker compose run test && docker compose down --remove-orphans
+
+web-lint: ## Lint frontend web things
+	cd web && npm run lint

@@ -42,3 +42,10 @@ repos:
         entry: go mod tidy
         pass_filenames: false
         types: [go]
+
+      - id: web-lint
+        name: web-lint
+        language: system
+        entry: make web-lint
+        pass_filenames: false
+        always_run: true
