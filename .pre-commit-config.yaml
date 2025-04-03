@@ -1,0 +1,38 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: internal/openapi
+
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.0.2
+    hooks:
+      - id: golangci-lint
+        args:
+          - "--timeout=5m"
+
+  - repo: local
+    hooks:
+      - id: codegen
+        name: codegen
+        language: system
+        entry: make codegen
+        pass_filenames: false
+        always_run: true
+
+      - id: go-fmt
+        name: go-fmt
+        language: system
+        entry: gofmt -s -w
+        pass_filenames: true
+        types: [go]
+
+      - id: go-mod-tidy
+        name: go-mod-tidy
+        language: system
+        entry: go mod tidy
+        pass_filenames: false
+        types: [go]
