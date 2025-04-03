@@ -11,7 +11,8 @@ COPY internal ./internal
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
   --mount=type=cache,target=/go/pkg/mod \
-  CGO_ENABLED=0 go build -v -o web-api cmd/web-api/main.go
+  CGO_ENABLED=0 go build -v -o web-api cmd/web-api/main.go && \
+  CGO_ENABLED=0 go build -v -o web-frontend cmd/web-frontend/main.go
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
@@ -40,7 +41,7 @@ FROM node:22-alpine3.20 AS web-frontend-builder
 WORKDIR /app
 COPY web .
 
-RUN --mount=type=cache,target=/app/.next/cache \
+RUN --mount=type=cache,target=/app/node_modules/.vite \
   npm install vite@6.2.5 && \
   npm run build
 
@@ -55,3 +56,15 @@ USER user
 ENV PORT=8080
 ENV GIN_MODE=release
 ENTRYPOINT ["./web-api"]
+
+# --------------------------------------------------------
+FROM scratch AS web-frontend-release
+
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder --chmod=777 /app/web-frontend web-frontend
+COPY --from=web-frontend-builder /app/dist .
+
+USER user
+ENV PORT=8080
+ENV GIN_MODE=release
+ENTRYPOINT ["./web-frontend"]
