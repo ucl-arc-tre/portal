@@ -26,6 +26,14 @@ jobs:
       - name: Install go dependencies
         run: go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install node dependencies
+        working-directory: web
+        run: npm ci
+
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
         with:
