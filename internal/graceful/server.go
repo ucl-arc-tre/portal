@@ -16,6 +16,7 @@ const (
 	serverShutdownGraceDuration = 10 * time.Second
 )
 
+// Serve a http handler with graceful shutdown of connections
 func Serve(handler http.Handler) {
 	server := &http.Server{
 		Addr:              config.ServerAddress(),

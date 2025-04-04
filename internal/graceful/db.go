@@ -13,7 +13,7 @@ const (
 	initConnectRetryDelay = 1 * time.Second
 )
 
-// Create a new gorm DB blocking until a connection is made
+// Create a new gorm DB, blocking until a connection is made
 func NewDB() *gorm.DB {
 	connectRetryDelay := initConnectRetryDelay
 	for {

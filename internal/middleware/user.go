@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	usernameHeaderKey = "X-Forwarded-Preferred-Username"
+	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
 
+// Get the user for a request
 func SetUser(ctx *gin.Context) {
 	username := ctx.GetHeader(usernameHeaderKey)
 	if username == "" {
@@ -17,6 +18,7 @@ func SetUser(ctx *gin.Context) {
 	ctx.Set("user", types.User{Username: username})
 }
 
+// Get the user from the gin context
 func GetUser(ctx *gin.Context) types.User {
 	return ctx.MustGet("user").(types.User)
 }

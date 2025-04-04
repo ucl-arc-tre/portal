@@ -8,6 +8,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 )
 
+// Create a new gin Router with middleware and a /ping route attached
 func New() *gin.Engine {
 	log.Info().Msg("Creating router")
 	router := gin.Default()

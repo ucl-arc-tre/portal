@@ -7,6 +7,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 )
 
+// Create secure middleware. Disabled in dev/testing
 func NewSecure() gin.HandlerFunc {
 	isDevelopment := config.IsDevDeploy() || config.IsTesting()
 	if isDevelopment {

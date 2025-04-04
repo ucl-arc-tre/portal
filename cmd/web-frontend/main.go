@@ -12,6 +12,7 @@ func main() {
 	router := router.New()
 	router.LoadHTMLFiles("./index.html")
 	router.Static("/assets", "./assets")
+	router.StaticFile("favicon.ico", "./favicon.ico")
 	router.GET("", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
