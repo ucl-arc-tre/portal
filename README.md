@@ -4,7 +4,7 @@ Management portal for [UCL ARC](https://www.ucl.ac.uk/advanced-research-computin
 services.
 
 <p align="center">
-  <img src="docs/media/architecture.png" alt="architecture" width="700">
+  <img src="docs/media/architecture.png" alt="architecture" width="600">
 </p>
 
 ## ⚙️ Deployment
