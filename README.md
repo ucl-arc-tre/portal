@@ -22,4 +22,5 @@ Contributions are very welcome. To suggest a change please:
 
 - Fork this repository and create a branch.
 - Run `pre-commit install` to install [pre-commit](https://pre-commit.com/).
+- If not already present install: [node](https://nodejs.org/en/download), [go](https://go.dev/doc/install) and [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`.
 - Modify, commit, push and open a pull request against `main` for review.
