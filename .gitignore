@@ -5,3 +5,5 @@ build
 dist
 *.cfg
 !*.sample.cfg
+*.bkp
+*.dtmp
