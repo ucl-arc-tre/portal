@@ -3,10 +3,6 @@
 Management portal for [UCL ARC](https://www.ucl.ac.uk/advanced-research-computing/)
 services.
 
-<p align="center">
-  <img src="docs/media/architecture.png" alt="architecture" width="600">
-</p>
-
 ## ⚙️ Deployment
 
 ### dev
@@ -28,3 +24,9 @@ Contributions are very welcome. To suggest a change please:
 - Run `pre-commit install` to install [pre-commit](https://pre-commit.com/).
 - If not already present install: [node](https://nodejs.org/en/download), [go](https://go.dev/doc/install) and [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`.
 - Modify, commit, push and open a pull request against `main` for review.
+
+## 🏛️ Architecture
+
+<p align="center">
+  <img src="docs/media/architecture.png" alt="architecture" width="650">
+</p>
