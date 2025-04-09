@@ -18,3 +18,7 @@ updates:
     directory: /web
     schedule:
       interval: "monthly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
