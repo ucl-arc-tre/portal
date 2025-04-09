@@ -26,7 +26,7 @@ CMD ["air", "--build.cmd", "go build -o bin/web-api cmd/web-api/main.go", "--bui
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
-FROM node:22-alpine3.20 AS web-frontend-dev
+FROM node:23-alpine3.20 AS web-frontend-dev
 
 WORKDIR /repo/web
 COPY web/package.json .
@@ -36,7 +36,7 @@ RUN npm install
 CMD [ "npm", "run", "dev", "--", "--host", "0.0.0.0" ]
 
 # -------------------------------------------
-FROM node:22-alpine3.20 AS web-frontend-builder
+FROM node:23-alpine3.20 AS web-frontend-builder
 
 WORKDIR /app
 COPY web .
