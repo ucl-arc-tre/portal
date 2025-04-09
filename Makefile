@@ -33,3 +33,6 @@ test-e2e:  ## Run end-to-end tests
 
 web-lint: ## Lint frontend web things
 	cd web && npm run lint
+
+web-format:
+	cd web && npx prettier --write .
