@@ -13,7 +13,7 @@ import (
 func main() {
 	rbac.Init()
 	router := router.New()
-	router.Use(middleware.SetUser, middleware.NewAuthz())
+	router.Use(middleware.NewSetUser(), middleware.NewAuthz())
 	openapi.RegisterHandlersWithOptions(router, handler.New(), openapi.GinServerOptions{
 		BaseURL: config.BaseURL,
 	})

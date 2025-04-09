@@ -1,6 +1,8 @@
 package types
 
+type Username string
+
 type User struct {
 	Model
-	Username string `gorm:"uniqueIndex"`
+	Username Username `gorm:"uniqueIndex"`
 }

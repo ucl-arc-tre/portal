@@ -18,6 +18,6 @@ func New() *Handler {
 
 func (h *Handler) GetHello(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, openapi.HelloResponse{
-		Message: middleware.GetUser(ctx).Username,
+		Message: string(middleware.GetUser(ctx).Username),
 	})
 }

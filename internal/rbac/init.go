@@ -31,13 +31,11 @@ func persistedAdminUsers() []types.User {
 				CreatedAt: time.Now(),
 			},
 		}
-		result := db.Where("username = ?", username).FirstOrCreate(&user)
-		if result.Error != nil {
-			panic(result.Error)
-		} else if result.RowsAffected > 0 {
-			log.Info().Str("username", username).Msg("Found admin user")
+		result := db.Where("username = ?", username).FirstOrInit(&user)
+		if result.RowsAffected > 0 {
+			log.Info().Any("username", username).Msg("Created admin user")
 		} else if result.RowsAffected == 0 {
-			log.Info().Str("username", username).Msg("Created admin user")
+			log.Info().Any("username", username).Msg("Found admin user")
 		}
 		users = append(users, user)
 	}

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
@@ -26,9 +28,12 @@ func DBDataSourceName() string {
 	return env("DATABASE_DSN")
 }
 
-func AdminUsernames() []string {
-	adminUsernames := os.Getenv("ADMIN_USERNAMES")
-	return strings.Split(adminUsernames, ",")
+func AdminUsernames() []types.Username {
+	usernames := []types.Username{}
+	for username := range strings.SplitSeq(os.Getenv("ADMIN_USERNAMES"), ",") {
+		usernames = append(usernames, types.Username(username))
+	}
+	return usernames
 }
 
 func env(key string) string {

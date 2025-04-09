@@ -31,15 +31,15 @@ func (a *Authorizer) eval(ctx *gin.Context) {
 }
 
 func (a *Authorizer) isAuthorized(ctx *gin.Context) (bool, error) {
-	user := GetUser(ctx)
+	userId := GetUser(ctx).ID.String()
 	resource := trimBaseURL(ctx.Request.URL.Path)
 	method := "write"
 	if ctx.Request.Method == "GET" || ctx.Request.Method == "HEAD" {
 		method = "read"
 	}
-	roles, _ := a.enforcer.GetRolesForUser(user.Username)
-	log.Debug().Any("roles", roles).Any("resource", resource).Any("user", user).Any("method", method).Msg("authz")
-	return a.enforcer.Enforce(user.Username, resource, method)
+	// roles, _ := a.enforcer.GetRolesForUser(userId)
+	// slog.Debug().Any("roles", roles).Any("resource", resource).Any("userId", userId).Any("method", method).Msg("authz")
+	return a.enforcer.Enforce(userId, resource, method)
 }
 
 func trimBaseURL(url string) string {
