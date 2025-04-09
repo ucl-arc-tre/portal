@@ -1,0 +1,30 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.0
+  title: portal
+  description: UCL ARC portal web API
+servers:
+  - url: /api/v0
+
+paths:
+  /hello:
+    get:
+      description: Demo endpoint
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HelloResponse"
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    HelloResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

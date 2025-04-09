@@ -1,0 +1,9 @@
+tmp*
+bin
+build
+.DS_Store
+dist
+*.cfg
+!*.sample.cfg
+*.bkp
+*.dtmp
