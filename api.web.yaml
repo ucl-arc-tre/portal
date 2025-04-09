@@ -7,24 +7,29 @@ servers:
   - url: /api/v0
 
 paths:
-  /hello:
+  /me:
     get:
-      description: Demo endpoint
+      description: Me endpoint
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HelloResponse"
+                $ref: "#/components/schemas/MeResponse"
         default:
           description: Unexpected error
 
 components:
   schemas:
-    HelloResponse:
+    MeResponse:
       type: object
       required:
-        - message
+        - username
+        - roles
       properties:
-        message:
+        username:
           type: string
+        roles:
+          type: array
+          items:
+            type: string

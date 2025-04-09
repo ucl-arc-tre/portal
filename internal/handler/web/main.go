@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
 type Handler struct{}
@@ -16,8 +17,15 @@ func New() *Handler {
 	return &Handler{}
 }
 
-func (h *Handler) GetHello(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, openapi.HelloResponse{
-		Message: string(middleware.GetUser(ctx).Username),
+func (h *Handler) GetMe(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	roles, err := rbac.GetRoles(user)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	ctx.JSON(http.StatusOK, openapi.MeResponse{
+		Username: string(user.Username),
+		Roles:    roles,
 	})
 }

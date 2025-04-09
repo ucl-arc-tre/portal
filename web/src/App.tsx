@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getHello } from "./openapi";
+import { getMe } from "./openapi";
 
 function App() {
   const [helloMessage, setHelloMessage] = useState<string>("");
   const [isAuthed, setIsAuthed] = useState<boolean>(false);
 
   useEffect(() => {
-    getHello()
+    getMe()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
-          setHelloMessage(res.data.message);
+          setHelloMessage(
+            `Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`,
+          );
           setIsAuthed(true);
         } else {
           console.log("error:", res.error);

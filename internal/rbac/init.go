@@ -15,7 +15,7 @@ func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewCasbinEnforcer()
 	_ = must(enforcer.AddPolicy(string(Admin), "*", "*"))
-	_ = must(enforcer.AddPolicy(string(Base), "/hello", "read"))
+	_ = must(enforcer.AddPolicy(string(Base), "/me", "read"))
 	for _, user := range persistedAdminUsers() {
 		_ = must(AddRole(user, Admin))
 	}
