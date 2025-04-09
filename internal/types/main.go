@@ -12,7 +12,7 @@ type Model struct {
 	CreatedAt time.Time
 }
 
-type ModelAutitable struct {
+type ModelAuditable struct {
 	Model
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
