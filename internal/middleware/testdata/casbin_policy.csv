@@ -1,0 +1,2 @@
+p, alice, /alice-read, read
+p, bob, /bob-write, write

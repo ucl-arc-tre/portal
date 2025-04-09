@@ -3,6 +3,11 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
+)
+
+const (
+	BaseURL = "/api/v0"
 )
 
 func ServerAddress() string {
@@ -19,6 +24,11 @@ func IsTesting() bool {
 
 func DBDataSourceName() string {
 	return env("DATABASE_DSN")
+}
+
+func AdminUsernames() []string {
+	adminUsernames := os.Getenv("ADMIN_USERNAMES")
+	return strings.Split(adminUsernames, ",")
 }
 
 func env(key string) string {

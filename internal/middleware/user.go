@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	userContextKey    = "user"
 	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
 
@@ -15,10 +16,10 @@ func SetUser(ctx *gin.Context) {
 	if username == "" {
 		panic("username header unset")
 	}
-	ctx.Set("user", types.User{Username: username})
+	ctx.Set(userContextKey, types.User{Username: username})
 }
 
 // Get the user from the gin context
 func GetUser(ctx *gin.Context) types.User {
-	return ctx.MustGet("user").(types.User)
+	return ctx.MustGet(userContextKey).(types.User)
 }
