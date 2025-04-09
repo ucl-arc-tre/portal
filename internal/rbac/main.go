@@ -7,10 +7,12 @@ import (
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
-	adminRoleName = "admin"
+	Admin = RoleName("admin") // Global admin on everything
+	Base  = RoleName("base")  // Most restricted role possible
 )
 
 var enforcer *casbin.Enforcer
@@ -27,6 +29,16 @@ func NewCasbinEnforcer() *casbin.Enforcer {
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 	return enforcer
+}
+
+// Add a role for a user
+func AddRole(user types.User, role RoleName) (bool, error) {
+	return enforcer.AddRoleForUser(user.ID.String(), string(role))
+}
+
+// Get all roles of a user
+func GetRoles(user types.User) ([]string, error) {
+	return enforcer.GetRolesForUser(user.ID.String())
 }
 
 func must[T any](value T, err error) T {

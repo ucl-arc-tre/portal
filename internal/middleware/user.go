@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -17,6 +19,11 @@ const (
 	userContextKey    = "user"
 	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
+
+// Get the user from the gin context
+func GetUser(ctx *gin.Context) types.User {
+	return ctx.MustGet(userContextKey).(types.User)
+}
 
 type UserSetter struct {
 	db    *gorm.DB
@@ -31,7 +38,6 @@ func NewSetUser() gin.HandlerFunc {
 	return setter.setUser
 }
 
-// Set the user for a request
 func (u *UserSetter) setUser(ctx *gin.Context) {
 	username := types.Username(ctx.GetHeader(usernameHeaderKey))
 	if username == "" {
@@ -39,10 +45,9 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	}
 	user, existsInCache := u.cache.Get(username)
 	if !existsInCache {
-		result := u.db.Where("username = ?", username).FirstOrInit(&user)
-		log.Debug().Any("result", result).Msg("todo - rm")
-		if result.Error != nil {
-			log.Err(result.Error).Msg("Failed to set user")
+		user, err := u.getOrCreateUserFromDB(username)
+		if err != nil {
+			log.Err(err).Msg("Failed to get user")
 			ctx.AbortWithStatus(http.StatusInternalServerError)
 			return
 		} else {
@@ -52,7 +57,23 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	ctx.Set(userContextKey, user)
 }
 
-// Get the user from the gin context
-func GetUser(ctx *gin.Context) types.User {
-	return ctx.MustGet(userContextKey).(types.User)
+func (u *UserSetter) getOrCreateUserFromDB(username types.Username) (types.User, error) {
+	user := types.User{}
+	result := u.db.Where("username = ?", username).
+		Attrs(types.User{
+			Username: username,
+			Model:    types.Model{CreatedAt: time.Now()},
+		}).
+		FirstOrCreate(&user)
+	if result.Error != nil {
+		return user, result.Error
+	}
+	userWasCreated := result.RowsAffected > 0
+	if userWasCreated {
+		_, err := rbac.AddRole(user, rbac.Base)
+		if err != nil {
+			return user, fmt.Errorf("failed assign user base role: %v", err)
+		}
+	}
+	return user, nil
 }

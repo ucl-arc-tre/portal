@@ -23,7 +23,7 @@ func NewAuthz() gin.HandlerFunc {
 
 func (a *Authorizer) eval(ctx *gin.Context) {
 	if isAuthorized, err := a.isAuthorized(ctx); err != nil {
-		log.Err(err).Msg("Failed to check authz")
+		log.Err(err).Msg("Failed to check authorization")
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 	} else if !isAuthorized {
 		ctx.AbortWithStatus(http.StatusForbidden)
@@ -37,8 +37,8 @@ func (a *Authorizer) isAuthorized(ctx *gin.Context) (bool, error) {
 	if ctx.Request.Method == "GET" || ctx.Request.Method == "HEAD" {
 		method = "read"
 	}
-	// roles, _ := a.enforcer.GetRolesForUser(userId)
-	// slog.Debug().Any("roles", roles).Any("resource", resource).Any("userId", userId).Any("method", method).Msg("authz")
+	//roles, _ := a.enforcer.GetRolesForUser(userId)
+	//log.Debug().Any("roles", roles).Any("resource", resource).Any("userId", userId).Any("method", method).Msg("authz")
 	return a.enforcer.Enforce(userId, resource, method)
 }
 
