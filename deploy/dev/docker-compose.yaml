@@ -8,7 +8,7 @@ services:
       DEBUG: true
       PORT: "8080"
       IS_DEV_DEPLOY: true
-      ADMIN_USERNAMES: "cceatyo-test@arctretest.onmicrosoft.com" # todo
+      ADMIN_USERNAMES: "cceatyo-test@arctretest.onmicrosoft.com,ccaeaho@ucl.ac.uk,cceajeh@ucl.ac.uk"
       DATABASE_DSN: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
     volumes:
       - type: bind
