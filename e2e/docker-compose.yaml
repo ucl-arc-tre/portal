@@ -42,9 +42,7 @@ services:
       POSTGRES_DB: dev
 
   cypress:
-    build:
-      context: ..
-      dockerfile: Dockerfile.cypress
+    image: cypress/included:14.3.0
     depends_on:
       - nginx
     working_dir: /web
