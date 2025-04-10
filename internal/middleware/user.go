@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	userCacheTTL      = 1 * time.Minute
+	userCacheTTL      = 1 * time.Hour
 	userContextKey    = "user"
 	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
