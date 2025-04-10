@@ -51,4 +51,4 @@ services:
     environment:
       - CYPRESS_baseUrl=http://nginx:80
       - CYPRESS_VIDEO=false
-    command: ["npx", "cypress", "run", "--config-file", "cypress.config.ts"]
+    command: ["npx", "cypress", "run", "--config-file", "cypress.config.js"]
