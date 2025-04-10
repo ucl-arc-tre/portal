@@ -40,3 +40,15 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres # pragma: allowlist secret
       POSTGRES_DB: dev
+
+  cypress:
+    image: cypress/included:13.5.0 # or latest known-good version
+    depends_on:
+      - nginx
+    working_dir: /web
+    volumes:
+      - ../web:/web
+    environment:
+      - CYPRESS_baseUrl=http://nginx:80
+      - CYPRESS_VIDEO=false
+    command: ["npx", "cypress", "run", "--config-file", "cypress.config.cjs"]

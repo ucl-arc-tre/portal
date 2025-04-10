@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi"
+    "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
+    "cypress:open": "CYPRESS_baseUrl=http://localhost:5173 cypress open",
+    "cypress:headless": "CYPRESS_baseUrl=http://localhost:5173 cypress run --headless --browser chrome"
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.10.0",
@@ -21,6 +23,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.8.0",
+    "cypress": "^14.3.0",
     "eslint": "^9.24.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
