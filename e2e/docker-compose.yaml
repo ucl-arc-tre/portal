@@ -42,7 +42,7 @@ services:
       POSTGRES_DB: dev
 
   cypress:
-    image: cypress/included:13.5.0 # or latest known-good version
+    image: cypress/included:13.5.0
     depends_on:
       - nginx
     working_dir: /web
