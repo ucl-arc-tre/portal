@@ -17,7 +17,7 @@ type Authorizer struct {
 
 // New authorization middleware. Assumes user has been set
 func NewAuthz() gin.HandlerFunc {
-	authorizer := &Authorizer{rbac.NewCasbinEnforcer()}
+	authorizer := &Authorizer{rbac.NewEnforcer()}
 	return authorizer.eval
 }
 
@@ -33,9 +33,9 @@ func (a *Authorizer) eval(ctx *gin.Context) {
 func (a *Authorizer) isAuthorized(ctx *gin.Context) (bool, error) {
 	userId := GetUser(ctx).ID.String()
 	resource := trimBaseURL(ctx.Request.URL.Path)
-	method := "write"
+	method := rbac.WriteAction
 	if ctx.Request.Method == "GET" || ctx.Request.Method == "HEAD" {
-		method = "read"
+		method = rbac.ReadAction
 	}
 	//roles, _ := a.enforcer.GetRolesForUser(userId)
 	//log.Debug().Any("roles", roles).Any("resource", resource).Any("userId", userId).Any("method", method).Msg("authz")

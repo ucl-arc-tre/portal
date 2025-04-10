@@ -4,7 +4,7 @@ import { getMe } from "./openapi";
 
 function App() {
   const [helloMessage, setHelloMessage] = useState<string>("");
-  const [isAuthed, setIsAuthed] = useState<boolean>(false);
+  const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     getMe()
@@ -15,7 +15,7 @@ function App() {
           );
           setIsAuthed(true);
         } else {
-          console.log("error:", res.error);
+          setIsAuthed(false);
         }
       })
       .catch((err) => {
@@ -26,7 +26,7 @@ function App() {
   return (
     <>
       <h1>ARC portal</h1>
-      {!isAuthed && (
+      {isAuthed === false && (
         <div>
           <button>
             <a href="/oauth2/start">Login</a>
@@ -34,9 +34,11 @@ function App() {
         </div>
       )}
       <div className="card">
-        <p>
-          GET /hello → <strong>{helloMessage}</strong>
-        </p>
+        {isAuthed === true && (
+          <p>
+            GET /hello → <strong>{helloMessage}</strong>
+          </p>
+        )}
       </div>
     </>
   );

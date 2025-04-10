@@ -45,7 +45,7 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	}
 	user, existsInCache := u.cache.Get(username)
 	if !existsInCache {
-		user, err := u.getOrCreateUserFromDB(username)
+		user, err := u.persistedUser(username)
 		if err != nil {
 			log.Err(err).Msg("Failed to get user")
 			ctx.AbortWithStatus(http.StatusInternalServerError)
@@ -57,7 +57,9 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	ctx.Set(userContextKey, user)
 }
 
-func (u *UserSetter) getOrCreateUserFromDB(username types.Username) (types.User, error) {
+// Get a user that's persisted in the database by their username. If
+// they do not exist then they will be created with the base role
+func (u *UserSetter) persistedUser(username types.Username) (types.User, error) {
 	user := types.User{}
 	result := u.db.Where("username = ?", username).
 		Attrs(types.User{

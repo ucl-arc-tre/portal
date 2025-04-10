@@ -21,7 +21,8 @@ func (h *Handler) GetMe(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
-		ctx.AbortWithStatus(http.StatusInternalServerError)
+		log.Err(err).Any("username", user.Username).Msg("Failed to get roles for user")
+		ctx.Status(http.StatusInternalServerError)
 		return
 	}
 	ctx.JSON(http.StatusOK, openapi.MeResponse{

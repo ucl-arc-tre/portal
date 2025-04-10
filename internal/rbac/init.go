@@ -10,12 +10,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// Initalise the RBAC enforcer
+// Initalise the RBAC with roles and users
 func Init() {
 	log.Info().Msg("Seeding roles and admin users")
-	enforcer := NewCasbinEnforcer()
+	enforcer := NewEnforcer()
 	_ = must(enforcer.AddPolicy(string(Admin), "*", "*"))
-	_ = must(enforcer.AddPolicy(string(Base), "/me", "read"))
+	_ = must(enforcer.AddPolicy(string(Base), "/me", ReadAction))
 	for _, user := range persistedAdminUsers() {
 		_ = must(AddRole(user, Admin))
 	}

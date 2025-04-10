@@ -14,7 +14,7 @@ import (
 
 var (
 	aliceID = uuid.MustParse("3c641bce-93e7-4824-b103-49cec25e53ff")
-	bobId   = uuid.MustParse("17dfc23a-51f6-49cc-b429-6a6a3f9ccf8e")
+	bobID   = uuid.MustParse("17dfc23a-51f6-49cc-b429-6a6a3f9ccf8e")
 )
 
 func newTestCasbinEnforcer() *casbin.Enforcer {
@@ -42,7 +42,7 @@ func TestAuthzAllowedRead(t *testing.T) {
 func TestAuthzAllowedWrite(t *testing.T) {
 	path := "/api/v0/bob-write"
 	for _, method := range []string{"PUT", "POST", "DELETE"} {
-		ctx := newEvaluatedCtxWithUsernameMethodPath(bobId, method, path)
+		ctx := newEvaluatedCtxWithUsernameMethodPath(bobID, method, path)
 		assert.Equal(t, 200, ctx.Writer.Status())
 	}
 }
@@ -59,8 +59,12 @@ func TestAuthzDisallowedWrite(t *testing.T) {
 func TestAuthzDisallowedRead(t *testing.T) {
 	path := "/api/v0/alice-read"
 	for _, method := range []string{"GET", "HEAD"} {
-		ctx := newEvaluatedCtxWithUsernameMethodPath(bobId, method, path)
+		ctx := newEvaluatedCtxWithUsernameMethodPath(bobID, method, path)
 		assert.Equal(t, 403, ctx.Writer.Status())
 		assert.True(t, ctx.IsAborted())
 	}
+}
+
+func TestTrimBaseURL(t *testing.T) {
+	assert.Equal(t, "/test", trimBaseURL("/api/v0/test"))
 }

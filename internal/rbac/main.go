@@ -11,14 +11,16 @@ import (
 )
 
 const (
-	Admin = RoleName("admin") // Global admin on everything
-	Base  = RoleName("base")  // Most restricted role possible
+	Admin       = RoleName("admin") // Global admin on everything
+	Base        = RoleName("base")  // Most restricted role possible
+	ReadAction  = "read"
+	WriteAction = "write"
 )
 
 var enforcer *casbin.Enforcer
 
-// Get a casbin policy enforcer. Singleton
-func NewCasbinEnforcer() *casbin.Enforcer {
+// Get a casbin policy enforcer. Singleton is initalised if not already
+func NewEnforcer() *casbin.Enforcer {
 	if enforcer != nil {
 		return enforcer
 	}
