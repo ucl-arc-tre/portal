@@ -10,9 +10,7 @@ function App() {
     getMe()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
-          setHelloMessage(
-            `Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`,
-          );
+          setHelloMessage(`Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`);
           setIsAuthed(true);
         } else {
           setIsAuthed(false);
