@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import { getHello } from './openapi';
+import { useEffect, useState } from "react";
+import "./App.css";
+import { getHello } from "./openapi";
 
 function App() {
-  const [helloMessage, setHelloMessage] = useState<string>('');
+  const [helloMessage, setHelloMessage] = useState<string>("");
   const [isAuthed, setIsAuthed] = useState<boolean>(false);
 
   useEffect(() => {
@@ -13,7 +13,7 @@ function App() {
           setHelloMessage(res.data.message);
           setIsAuthed(true);
         } else {
-          console.log('error:', res.error);
+          console.log("error:", res.error);
         }
       })
       .catch((err) => {
