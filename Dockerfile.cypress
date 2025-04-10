@@ -3,14 +3,11 @@ FROM cypress/included:14.3.0
 # Set working directory
 WORKDIR /web
 
-# Copy only package files first to leverage caching
-COPY web/package.json web/package-lock.json ./
+# Copy everything at once (including cypress.config.mjs and source files)
+COPY web .
 
 # Install deps
 RUN npm ci
 
-# Now copy rest of the code
-COPY web .
-
 # Default command
-CMD ["npx", "cypress", "run", "--config-file", "cypress.config.js"]
+CMD ["npx", "cypress", "run", "--config-file", "cypress.config.mjs"]
