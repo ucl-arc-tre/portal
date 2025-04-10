@@ -17,7 +17,7 @@ func New() *Handler {
 	return &Handler{}
 }
 
-func (h *Handler) GetMe(ctx *gin.Context) {
+func (h *Handler) GetProfile(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
@@ -25,7 +25,7 @@ func (h *Handler) GetMe(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.MeResponse{
+	ctx.JSON(http.StatusOK, openapi.ProfileResponse{
 		Username: string(user.Username),
 		Roles:    roles,
 	})

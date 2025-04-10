@@ -7,21 +7,21 @@ servers:
   - url: /api/v0
 
 paths:
-  /me:
+  /profile:
     get:
-      description: Me endpoint
+      description: Users profile
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MeResponse"
+                $ref: "#/components/schemas/ProfileResponse"
         default:
           description: Unexpected error
 
 components:
   schemas:
-    MeResponse:
+    ProfileResponse:
       type: object
       required:
         - username

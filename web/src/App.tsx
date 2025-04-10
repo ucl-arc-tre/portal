@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getMe } from "./openapi";
+import { getProfile } from "./openapi";
 
 function App() {
   const [helloMessage, setHelloMessage] = useState<string>("");
   const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    getMe()
+    getProfile()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
           setHelloMessage(`Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`);
