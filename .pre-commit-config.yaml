@@ -49,3 +49,10 @@ repos:
         entry: make web-lint
         pass_filenames: false
         always_run: true
+
+      - id: web-format
+        name: web-format
+        language: system
+        entry: make web-format
+        pass_filenames: false
+        always_run: true
