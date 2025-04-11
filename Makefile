@@ -28,8 +28,17 @@ test:  ## Run all tests
 test-unit:  ## Run unit tests
 	go test ./...
 
-test-e2e:  ## Run end-to-end tests
-	cd e2e && docker compose build && docker compose run test && docker compose down --remove-orphans
+# Run Cypress locally against dockerised dev server
+# make sure the dockerised dev server is running first with `make dev`
+test-e2e-dev:
+	cd web && CYPRESS_baseUrl=http://localhost:8000 npx cypress run --headless --browser chrome
+
+## Run cypress against the release build
+test-e2e-release:
+	cd e2e && \
+	docker compose -p "ucl-arc-tre-e2e" build && \
+	docker compose -p "ucl-arc-tre-e2e" run --rm cypress && \
+	docker compose -p "ucl-arc-tre-e2e" down --remove-orphans
 
 web-lint: ## Lint frontend web things
 	cd web && npm run lint
