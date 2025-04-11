@@ -84,7 +84,3 @@ During CI the tests will run against both Electron (a lightweight version of Chr
 ## Using test fixtures and intercepts
 
 You can test edge cases by adding custom fixture data along with api intercepts. This will allow the tests to run even in the absence of the backend api.
-
-## Accessibility testing
-
-Accessibility testing can be incorporated into cypress
