@@ -69,6 +69,8 @@ The e2e tests are also configured to run during CI via a GitHub action workflow.
 
 The CI tests are run against the full release version of the dockerised setup to test against the production version of the application.
 
+Failing tests during CI will produce downloadable screenshots to make debugging test failures easier.
+
 ## Testing against multiple browsers
 
 The local tests will run against Chrome by default. You can select a different browser in the Cypress GUI, or simply pass an argument in headless mode:
