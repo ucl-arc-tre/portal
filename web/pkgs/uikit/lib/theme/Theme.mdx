@@ -1,0 +1,25 @@
+import { Meta, Title, Subtitle, Source } from '@storybook/addon-docs/blocks';
+import theme from './defaultTheme';
+
+{ console.log('theme:', theme) }
+
+<Meta title="theme/Theme" />
+<Title>Theme explorer</Title>
+<Subtitle>All design tokens currently available in the theme</Subtitle>
+
+This theme explorer lists all the named properties of the theme object, found in the <a href="https://github.com/ucl-isd/uikit-react/blob/main/lib/theme/defaultTheme.ts" target="_blank">`defaultTheme.ts` file</a> .
+
+The theme object is a collection of <a href="https://atlassian.design/tokens/design-tokens/" target="_blank">design tokens</a> that are used to style the UIKit-React components.
+
+The theme object is also logged to the console when this page is loaded. 
+
+{
+  Object.entries(theme).map(([key, value]) => {
+  return (
+    <div key={key}>
+      <h2><code>{key}</code></h2>
+      <Source language="json" code={JSON.stringify(value, null, 2)} />
+    </div>
+  );
+})
+}

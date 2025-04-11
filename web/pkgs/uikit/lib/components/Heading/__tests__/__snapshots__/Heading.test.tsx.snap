@@ -1,0 +1,37 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Heading > snapshot: custom test id 1`] = `
+<h1
+  class="ucl-heading css-1bjykaw"
+  data-testid="custom-test-id"
+>
+  This is a test
+</h1>
+`;
+
+exports[`Heading > snapshot: level 1`] = `
+<h1
+  class="ucl-heading css-1bjykaw"
+  data-testid="ucl-heading"
+>
+  Level 1
+</h1>
+`;
+
+exports[`Heading > snapshot: minimal props 1`] = `
+<h1
+  class="ucl-heading css-1bjykaw"
+  data-testid="ucl-heading"
+>
+  This is a test
+</h1>
+`;
+
+exports[`Heading > snapshot: no margins 1`] = `
+<h1
+  class="ucl-heading css-x9klp3"
+  data-testid="ucl-heading"
+>
+  No margins
+</h1>
+`;

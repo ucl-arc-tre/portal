@@ -1,0 +1,73 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SpinnerSvg > Snapshot: custom className 1`] = `
+<svg
+  class="ucl-uikit-spinner css-1dy6s6p"
+  data-testid="ucl-uikit-spinner"
+  height="24"
+  viewBox="0 0 50 50"
+  width="24"
+>
+  <g
+    class="css-1tl81jg"
+  >
+    <circle
+      class="css-lyzf49"
+      cx="25"
+      cy="25"
+      fill="none"
+      r="20"
+      stroke="currentColor"
+      stroke-width="8"
+    />
+  </g>
+</svg>
+`;
+
+exports[`SpinnerSvg > snapshot: custom size 1`] = `
+<svg
+  class="ucl-uikit-spinner"
+  data-testid="ucl-uikit-spinner"
+  height="32"
+  viewBox="0 0 50 50"
+  width="32"
+>
+  <g
+    class="css-1tl81jg"
+  >
+    <circle
+      class="css-lyzf49"
+      cx="25"
+      cy="25"
+      fill="none"
+      r="20"
+      stroke="currentColor"
+      stroke-width="8"
+    />
+  </g>
+</svg>
+`;
+
+exports[`SpinnerSvg > snapshot: default props 1`] = `
+<svg
+  class="ucl-uikit-spinner"
+  data-testid="ucl-uikit-spinner"
+  height="24"
+  viewBox="0 0 50 50"
+  width="24"
+>
+  <g
+    class="css-1tl81jg"
+  >
+    <circle
+      class="css-lyzf49"
+      cx="25"
+      cy="25"
+      fill="none"
+      r="20"
+      stroke="currentColor"
+      stroke-width="8"
+    />
+  </g>
+</svg>
+`;

@@ -1,0 +1,679 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Datepicker > Snapshot: date provided 1`] = `
+<div
+  class="css-1q58hts"
+  data-testid="ucl-datepicker"
+  tabindex="0"
+>
+  <div
+    aria-label="Date input"
+    class="css-1jl4u9h"
+    data-testid="ucl-datepicker-date-field"
+    role="group"
+  >
+    <div>
+      <input
+        aria-label="Date"
+        class="css-1gbj3xb"
+        data-testid="ucl-datepicker-input"
+        inputmode="numeric"
+        placeholder="DD/MM/YYYY"
+        type="text"
+        value="04/02/2025"
+      />
+    </div>
+    <svg
+      class="ucl-icon css-148hpxb"
+      data-testid="ucl-datepicker-calendar-icon"
+      fill="none"
+      height="24"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        height="18"
+        rx="2"
+        ry="2"
+        width="18"
+        x="3"
+        y="4"
+      />
+      <line
+        x1="16"
+        x2="16"
+        y1="2"
+        y2="6"
+      />
+      <line
+        x1="8"
+        x2="8"
+        y1="2"
+        y2="6"
+      />
+      <line
+        x1="3"
+        x2="21"
+        y1="10"
+        y2="10"
+      />
+    </svg>
+  </div>
+</div>
+`;
+
+exports[`Datepicker > Snapshot: no date provided 1`] = `
+<div
+  class="css-1q58hts"
+  data-testid="ucl-datepicker"
+  tabindex="0"
+>
+  <div
+    aria-label="Date input"
+    class="css-1jl4u9h"
+    data-testid="ucl-datepicker-date-field"
+    role="group"
+  >
+    <div>
+      <input
+        aria-label="Date"
+        class="css-1gbj3xb"
+        data-testid="ucl-datepicker-input"
+        inputmode="numeric"
+        placeholder="DD/MM/YYYY"
+        type="text"
+        value=""
+      />
+    </div>
+    <svg
+      class="ucl-icon css-148hpxb"
+      data-testid="ucl-datepicker-calendar-icon"
+      fill="none"
+      height="24"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        height="18"
+        rx="2"
+        ry="2"
+        width="18"
+        x="3"
+        y="4"
+      />
+      <line
+        x1="16"
+        x2="16"
+        y1="2"
+        y2="6"
+      />
+      <line
+        x1="8"
+        x2="8"
+        y1="2"
+        y2="6"
+      />
+      <line
+        x1="3"
+        x2="21"
+        y1="10"
+        y2="10"
+      />
+    </svg>
+  </div>
+</div>
+`;
+
+exports[`Datepicker > Snapshot: with :focus & date provided 1`] = `
+<div
+  class="css-1q58hts"
+  data-testid="abc"
+  tabindex="0"
+>
+  <div
+    aria-label="Date input"
+    class="css-1jl4u9h"
+    data-testid="abc-date-field"
+    role="group"
+  >
+    <div>
+      <input
+        aria-label="Date"
+        class="css-1gbj3xb"
+        data-testid="abc-input"
+        inputmode="numeric"
+        placeholder="DD/MM/YYYY"
+        type="text"
+        value="04/02/2025"
+      />
+    </div>
+    <svg
+      class="ucl-icon css-148hpxb"
+      data-testid="abc-calendar-icon"
+      fill="none"
+      height="24"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        height="18"
+        rx="2"
+        ry="2"
+        width="18"
+        x="3"
+        y="4"
+      />
+      <line
+        x1="16"
+        x2="16"
+        y1="2"
+        y2="6"
+      />
+      <line
+        x1="8"
+        x2="8"
+        y1="2"
+        y2="6"
+      />
+      <line
+        x1="3"
+        x2="21"
+        y1="10"
+        y2="10"
+      />
+    </svg>
+  </div>
+  <div
+    class="css-1adqrcf"
+    data-testid="abc-calendar-menu"
+  >
+    <div
+      class="css-ae7n9c"
+    >
+      <svg
+        class="ucl-icon css-stisf5"
+        data-testid="ucl-icon"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <polyline
+          points="15 18 9 12 15 6"
+        />
+      </svg>
+      <span
+        class="css-m9j3hv"
+      >
+        <span>
+          February
+        </span>
+        <span>
+          2025
+        </span>
+      </span>
+      <svg
+        class="ucl-icon css-stisf5"
+        data-testid="ucl-icon"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <polyline
+          points="9 18 15 12 9 6"
+        />
+      </svg>
+    </div>
+    <div
+      class="css-10gjhii"
+    >
+      <div
+        class="css-76sg87"
+      >
+        M
+      </div>
+      <div
+        class="css-76sg87"
+      >
+        T
+      </div>
+      <div
+        class="css-76sg87"
+      >
+        W
+      </div>
+      <div
+        class="css-76sg87"
+      >
+        T
+      </div>
+      <div
+        class="css-76sg87"
+      >
+        F
+      </div>
+      <div
+        class="css-ie1qp6"
+      >
+        S
+      </div>
+      <div
+        class="css-ie1qp6"
+      >
+        S
+      </div>
+      <div
+        aria-label="Select Mon Jan 27 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          27
+        </div>
+      </div>
+      <div
+        aria-label="Select Tue Jan 28 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          28
+        </div>
+      </div>
+      <div
+        aria-label="Select Wed Jan 29 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          29
+        </div>
+      </div>
+      <div
+        aria-label="Select Thu Jan 30 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          30
+        </div>
+      </div>
+      <div
+        aria-label="Select Fri Jan 31 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          31
+        </div>
+      </div>
+      <div
+        aria-label="Select Sat Feb 01 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          1
+        </div>
+      </div>
+      <div
+        aria-label="Select Sun Feb 02 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          2
+        </div>
+      </div>
+      <div
+        aria-label="Select Mon Feb 03 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          3
+        </div>
+      </div>
+      <div
+        aria-label="Select Tue Feb 04 2025"
+        class="css-1rr2g7p"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          4
+        </div>
+      </div>
+      <div
+        aria-label="Select Wed Feb 05 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          5
+        </div>
+      </div>
+      <div
+        aria-label="Select Thu Feb 06 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          6
+        </div>
+      </div>
+      <div
+        aria-label="Select Fri Feb 07 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          7
+        </div>
+      </div>
+      <div
+        aria-label="Select Sat Feb 08 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          8
+        </div>
+      </div>
+      <div
+        aria-label="Select Sun Feb 09 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          9
+        </div>
+      </div>
+      <div
+        aria-label="Select Mon Feb 10 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          10
+        </div>
+      </div>
+      <div
+        aria-label="Select Tue Feb 11 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          11
+        </div>
+      </div>
+      <div
+        aria-label="Select Wed Feb 12 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          12
+        </div>
+      </div>
+      <div
+        aria-label="Select Thu Feb 13 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          13
+        </div>
+      </div>
+      <div
+        aria-label="Select Fri Feb 14 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          14
+        </div>
+      </div>
+      <div
+        aria-label="Select Sat Feb 15 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          15
+        </div>
+      </div>
+      <div
+        aria-label="Select Sun Feb 16 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          16
+        </div>
+      </div>
+      <div
+        aria-label="Select Mon Feb 17 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          17
+        </div>
+      </div>
+      <div
+        aria-label="Select Tue Feb 18 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          18
+        </div>
+      </div>
+      <div
+        aria-label="Select Wed Feb 19 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          19
+        </div>
+      </div>
+      <div
+        aria-label="Select Thu Feb 20 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          20
+        </div>
+      </div>
+      <div
+        aria-label="Select Fri Feb 21 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          21
+        </div>
+      </div>
+      <div
+        aria-label="Select Sat Feb 22 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          22
+        </div>
+      </div>
+      <div
+        aria-label="Select Sun Feb 23 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          23
+        </div>
+      </div>
+      <div
+        aria-label="Select Mon Feb 24 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          24
+        </div>
+      </div>
+      <div
+        aria-label="Select Tue Feb 25 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          25
+        </div>
+      </div>
+      <div
+        aria-label="Select Wed Feb 26 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          26
+        </div>
+      </div>
+      <div
+        aria-label="Select Thu Feb 27 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          27
+        </div>
+      </div>
+      <div
+        aria-label="Select Fri Feb 28 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-1n0xgdm"
+        >
+          28
+        </div>
+      </div>
+      <div
+        aria-label="Select Sat Mar 01 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          1
+        </div>
+      </div>
+      <div
+        aria-label="Select Sun Mar 02 2025"
+        class="css-1pbj7ec"
+        role="button"
+      >
+        <div
+          class="css-6lpfgq"
+        >
+          2
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -28,6 +28,7 @@
     "prettier": "^3.5.3",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.24.1",
+    "uikit":"file:pkgs/uikit",
     "vite": "^6.2.0"
   }
 }

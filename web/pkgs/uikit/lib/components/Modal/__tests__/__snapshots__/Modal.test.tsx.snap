@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Modal > snapshot: default 1`] = `
+<div
+  aria-hidden="true"
+  aria-label="Backdrop overlay, click to close modal"
+  class="ucl-blanket css-gsa5om"
+  data-testid="ucl-blanket"
+>
+  <div
+    class="ucl-modal css-n1zjuh"
+  >
+    <div
+      aira-modal="true"
+      class="css-fjo1in"
+      data-testid="ucl-modal"
+      role="dialog"
+    />
+  </div>
+</div>
+`;

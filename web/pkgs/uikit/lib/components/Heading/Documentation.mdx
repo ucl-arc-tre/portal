@@ -1,0 +1,84 @@
+import * as HeadingStories from './Heading.stories';
+import { Meta, Title, Subtitle, Canvas, Controls, Source, ArgTypes } from '@storybook/blocks';
+
+export const usage = {
+  default: `<Heading>Default Heading</Heading>`,
+  level1: `<Heading level={1}>Level 1 Heading</Heading>`,
+  level2: `<Heading level={2}>Level 2 Heading</Heading>`,
+  level3: `<Heading level={3}>Level 3 Heading</Heading>`,
+  level4: `<Heading level={4}>Level 4 Heading</Heading>`,
+  withMargins: `<Heading margins={true} >Heading with margins</Heading>`,
+  noMargins: `<Heading margins={false} >Heading with no margins</Heading>`
+};
+
+<Meta of={HeadingStories} />
+<Title />
+<Subtitle>A semantic heading element with UCL branded styling</Subtitle>
+
+The `<Heading>` component wraps <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements" target="_blank">native heading HTML elements</a>: `<h1>`, `<h2>`, `<h3>`, `<h4>`. 
+
+Headings add semantic structure to a web page, supporting machine comprehension and accessibility. They also provide visual hierarchy, helping users to understand the relative importance of different sections of content. The styling for the `<Heading>` component is based on the UCL Design System typographic guidelines. 
+
+Design specification available in Figma: <a href="https://www.figma.com/design/8Sm5PxWOWJYpYXAzhRzUzt/UCL-Design-System-UI-Kit?node-id=5862-4293&t=m0ZdPzYILv5R4XBj-4" target="_blank">UCL Design System UI Kit | Typography (Headings)</a>
+
+Styling for this element includes responsive font sizing. See the Design specification (above) for more details. 
+
+(`<h5>` and `<h6>` are not supported, but you shouldn't need a hierarchy this deep in practice.)  
+
+***Note:*** Developers should use `<Heading>` instead of `<h1>`, `<h2>`, etc, to ensure consistent styling and accessibility. 
+
+<Canvas source={{
+  code: usage.default
+}}/>
+
+<Controls />
+
+## Usage 
+
+All screens in UCL Experience apps should have a sensible semantic hierarchy. This includes ensuring there is only one level 1 `<Heading>` (equivalent to `<h1>`) per screen. Do not simply use the heading level that looks best or has the font size you want. Do not 'miss out' levels in the hierarchy: for example, an `<h2>` ought not to be followed by an `<h4>`.
+
+<Source code={usage.default} />
+
+### Props 
+
+- `level`: A **number** from 1 to 4, corresponding to the level of the HTML heading element to be rendered. Default is 1, if otherwise unspecified. 
+- `margins`: A **boolean** value. If `false`, the heading will have no margins. Default is `true`.
+- `testid`: A **string** value. If provided, the heading element will have a `data-testid` attribute with this value. The <a href="https://www.educative.io/answers/what-is-the-data-testid-attribute-in-testing" target="_blank">`data-testid` attribute</a> is used for identifying this element for testing. If unspecified, `ucl-heading` is used. 
+
+Pass the text you want in the heading as children: `<Heading>My heading text</Heading>`.
+
+Multiple HTML elements as well as plain text is supported -- for example, `<em>Italic text</em>`
+
+Custom CSS styling can be added as with all UIKit-React components by passing an optional `className` prop to the component. 
+
+<ArgTypes />
+
+# Variants 
+
+<Canvas of={HeadingStories.Level1} sourceState='shown' source={{
+  code: usage.level1
+}}/>
+
+<Canvas of={HeadingStories.Level2} sourceState='shown' source={{
+  code: usage.level2
+}}/>
+
+<Canvas of={HeadingStories.Level3} sourceState='shown' source={{
+  code: usage.level3
+}}/>
+
+<Canvas of={HeadingStories.Level4} sourceState='shown' source={{
+  code: usage.level4
+}}/>
+
+Red lines are added to the examples below to show the margins of the heading element. 
+
+Note that `margins={true}` in the below example merely specifies explicitly the default behaviour.
+
+<Canvas of={HeadingStories.Margins} sourceState='shown' source={{
+  code: usage.withMargins
+}}/>
+
+<Canvas of={HeadingStories.NoMargins} sourceState='shown' source={{
+  code: usage.noMargins
+}}/>

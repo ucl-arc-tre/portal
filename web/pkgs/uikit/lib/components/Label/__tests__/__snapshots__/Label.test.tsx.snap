@@ -1,0 +1,55 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Label > snapshot: Only required prop (text) 1`] = `
+<label
+  class="ucl-label css-1o3k4rf"
+  data-testid="ucl-label"
+>
+  Name
+</label>
+`;
+
+exports[`Label > snapshot: className prop 1`] = `
+<label
+  class="ucl-label test-class-name css-1o3k4rf"
+  data-testid="ucl-label"
+>
+  Name
+</label>
+`;
+
+exports[`Label > snapshot: testId prop 1`] = `
+<label
+  class="ucl-label css-1o3k4rf"
+  data-testid="test123"
+>
+  Name
+</label>
+`;
+
+exports[`Label > snapshot: type prop with value of bold 1`] = `
+<label
+  class="ucl-label css-11zm6ks"
+  data-testid="ucl-label"
+>
+  Name
+</label>
+`;
+
+exports[`Label > snapshot: type prop with value of small 1`] = `
+<label
+  class="ucl-label css-ur8600"
+  data-testid="ucl-label"
+>
+  Name
+</label>
+`;
+
+exports[`Label > snapshot: type prop with value of standard 1`] = `
+<label
+  class="ucl-label css-1o3k4rf"
+  data-testid="ucl-label"
+>
+  Name
+</label>
+`;

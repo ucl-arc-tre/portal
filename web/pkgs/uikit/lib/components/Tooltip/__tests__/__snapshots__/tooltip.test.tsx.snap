@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Tooltip > snapshot: no props 1`] = `
+<span
+  class="ucl-tooltip css-1fvbd1s"
+  data-testid="ucl-tooltip"
+>
+  test
+</span>
+`;
+
+exports[`Tooltip > snapshot: testId prop 1`] = `
+<span
+  class="ucl-tooltip css-1fvbd1s"
+  data-testid="test123"
+>
+   Info Tooltip 
+</span>
+`;

@@ -1,0 +1,93 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import Accordion from './Accordion';
+import { ThemeContextProvider } from '../../theme/useTheme';
+
+const meta: Meta<typeof Accordion> = {
+  title: 'Components/Accordion',
+  component: Accordion,
+  decorators: [
+    (Story: React.FC) => (
+      <ThemeContextProvider>
+        <Story />
+      </ThemeContextProvider>
+    ),
+  ],
+};
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    isOpen: false,
+    disabled: false,
+    size: 'medium',
+  },
+  render: (args) => (
+    <Accordion {...args}>
+      <Accordion.Heading>Heading</Accordion.Heading>
+      <Accordion.Panel>Panel Content</Accordion.Panel>
+    </Accordion>
+  ),
+};
+
+export const OpenByDefault: Story = {
+  args: {
+    isOpen: true,
+    disabled: false,
+    size: 'medium',
+  },
+  render: (args) => (
+    <Accordion {...args}>
+      <Accordion.Heading>Heading</Accordion.Heading>
+      <Accordion.Panel>Panel Content</Accordion.Panel>
+    </Accordion>
+  ),
+};
+
+export const Disabled: Story = {
+  args: {
+    isOpen: false,
+    disabled: true,
+    size: 'medium',
+  },
+  render: (args) => (
+    <Accordion {...args}>
+      <Accordion.Heading>Heading</Accordion.Heading>
+      <Accordion.Panel>Panel Content</Accordion.Panel>
+    </Accordion>
+  ),
+};
+
+export const SmallSize: Story = {
+  args: {
+    isOpen: false,
+    disabled: false,
+    size: 'small',
+  },
+  render: (args) => (
+    <Accordion {...args}>
+      <Accordion.Heading>Heading</Accordion.Heading>
+      <Accordion.Panel>Panel Content</Accordion.Panel>
+    </Accordion>
+  ),
+};
+
+export const CustomHeadingElement: Story = {
+  args: {
+    isOpen: false,
+    disabled: false,
+    size: 'medium',
+  },
+  render: (args) => (
+    <Accordion {...args}>
+      <Accordion.Heading as='h2'>
+        Custom Heading as H2
+      </Accordion.Heading>
+      <Accordion.Panel>
+        <p>This is the content of the accordion.</p>
+      </Accordion.Panel>
+    </Accordion>
+  ),
+};

@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Layout > Snapshot: no children 1`] = `
+<div
+  class="css-3reham"
+  data-testid="ucl-uikit-layout"
+/>
+`;
+
+exports[`Layout > Snapshot: with children 1`] = `
+<div
+  class="css-3reham"
+  data-testid="ucl-uikit-layout"
+>
+  <div>
+    Child 1
+  </div>
+  <div>
+    Child 2
+  </div>
+  <div>
+    Child 3
+  </div>
+</div>
+`;

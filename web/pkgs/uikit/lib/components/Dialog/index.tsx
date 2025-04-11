@@ -1,0 +1,10 @@
+export { default as BaseDialog } from '../Dialog/BaseDialog';
+export type { BaseDialogProps } from '../Dialog/BaseDialog';
+export { default } from './Dialog';
+export type { DialogProps } from './Dialog';
+export { default as DialogHeader } from './DialogHeader';
+export type { DialogHeaderProps } from './DialogHeader';
+export { default as DialogFooter } from './DialogFooter';
+export type { DialogFooterProps } from './DialogFooter';
+export { default as DialogBody } from './DialogBody';
+export type { DialogBodyProps } from './DialogBody';

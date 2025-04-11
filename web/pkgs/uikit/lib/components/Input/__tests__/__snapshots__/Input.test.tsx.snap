@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Input > snapshot: no props 1`] = `
+<input
+  class="ucl-input css-1rto5eb"
+  data-testid="ucl-input"
+/>
+`;
+
+exports[`Input > snapshot: placeholder prop 1`] = `
+<input
+  class="ucl-input css-1rto5eb"
+  data-testid="ucl-input"
+  placeholder="Type your value..."
+/>
+`;
+
+exports[`Input > snapshot: testId prop 1`] = `
+<input
+  class="ucl-input css-1rto5eb"
+  data-testid="test123"
+/>
+`;
+
+exports[`Input > snapshot: value prop 1`] = `
+<input
+  class="ucl-input css-1rto5eb"
+  data-testid="ucl-input"
+  value="abc"
+/>
+`;

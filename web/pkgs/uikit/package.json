@@ -1,0 +1,100 @@
+{
+  "name": "@dev-and-test/uikit-react",
+  "private": false,
+  "license": "UNLICENSED",
+  "version": "0.9.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/lib/index.d.ts",
+  "files": [
+    "dist",
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://uclisd.jfrog.io/artifactory/api/npm/isd-npm-local/"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev_expose": "vite --host",
+    "build": "tsc --p ./tsconfig-build.json && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "pre-commit": "lint-staged",
+    "format": "prettier \"./**/*.{ts,tsx}\" --write --config ./prettierrc",
+    "format:preview": "prettier \"./**/*.{ts,tsx}\" --config ./prettierrc",
+    "typecheck": "tsc --noemit",
+    "test": "vitest",
+    "test:nowatch": "vitest run",
+    "coverage": "vitest run --coverage",
+    "report": "vite ./coverage",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build",
+    "prepare": "husky",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "predeploy": "npm run build-storybook",
+    "deploy": "gh-pages -d storybook-static"
+  },
+  "lint-staged": {
+    "./**/*.{ts,tsx}": [
+      "prettier --write --config ./prettierrc"
+    ]
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^4.7.0",
+    "@emotion/css": "^11.13.5",
+    "@floating-ui/react-dom": "^2.1.2",
+    "wouter": "^3.6.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^3.2.5",
+    "@eslint/compat": "^1.2.7",
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.22.0",
+    "@storybook/addon-essentials": "^8.6.4",
+    "@storybook/addon-interactions": "^8.6.4",
+    "@storybook/addon-links": "^8.6.4",
+    "@storybook/addon-onboarding": "^8.6.4",
+    "@storybook/blocks": "^8.6.4",
+    "@storybook/react": "^8.6.4",
+    "@storybook/react-vite": "^8.6.4",
+    "@storybook/test": "^8.6.4",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "@vitejs/plugin-basic-ssl": "^2.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "3.0.9",
+    "eslint": "^9.22.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-ft-flow": "^3.0.11",
+    "eslint-plugin-jest": "^28.11.0",
+    "eslint-plugin-no-for-of-loops": "^1.0.1",
+    "eslint-plugin-no-function-declare-after-return": "^1.1.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "jsdom": "^26.0.0",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "storybook": "^8.6.4",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1",
+    "vite": "^6.2.1",
+    "vite-plugin-dts": "^4.5.3",
+    "vitest": "^3.0.8"
+  }
+}
