@@ -25,7 +25,7 @@ This project uses a [common Go project layout](https://github.com/golang-standar
 ├── deploy/               # Docker-related config
 │   └── dev/              # Docker Compose and nginx config for dev
 ├── e2e/                  # Cypress E2E test setup and Compose config
-├── Dockerfile            # Multi-stage Dockerfile for dev/release builds
+├── Dockerfile            # Multi-stage Dockerfile that handles both dev and release builds
 ├── Makefile              # Dev and CI command shortcuts
 ```
 
