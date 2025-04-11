@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run e2e tests
-        run: make test-e2e
+        run: make test-e2e-release
         working-directory: ${{ github.workspace }}
 
       - name: Upload Cypress screenshots (on failure)
