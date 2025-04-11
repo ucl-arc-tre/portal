@@ -2,6 +2,7 @@ services:
   web-api:
     build:
       context: ../..
+      dockerfile: Dockerfile.dev
       target: web-api-dev
     restart: always
     environment:
@@ -27,6 +28,7 @@ services:
   web-frontend:
     build:
       context: ../..
+      dockerfile: Dockerfile.dev
       target: web-frontend-dev
     restart: on-failure
     volumes:
