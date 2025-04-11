@@ -7,16 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HelloResponse defines model for HelloResponse.
-type HelloResponse struct {
-	Message string `json:"message"`
+// ProfileResponse defines model for ProfileResponse.
+type ProfileResponse struct {
+	Roles    []string `json:"roles"`
+	Username string   `json:"username"`
 }
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /hello)
-	GetHello(c *gin.Context)
+	// (GET /profile)
+	GetProfile(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -28,8 +29,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetHello operation middleware
-func (siw *ServerInterfaceWrapper) GetHello(c *gin.Context) {
+// GetProfile operation middleware
+func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -38,7 +39,7 @@ func (siw *ServerInterfaceWrapper) GetHello(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetHello(c)
+	siw.Handler.GetProfile(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -68,5 +69,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/hello", wrapper.GetHello)
+	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 }

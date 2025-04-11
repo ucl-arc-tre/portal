@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -35,4 +36,8 @@ func NewDB() *gorm.DB {
 
 func initDB(db *gorm.DB) {
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+	err := db.AutoMigrate(&types.User{})
+	if err != nil {
+		panic(err)
+	}
 }

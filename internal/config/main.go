@@ -3,6 +3,13 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
+
+	"github.com/ucl-arc-tre/portal/internal/types"
+)
+
+const (
+	BaseURL = "/api/v0"
 )
 
 func ServerAddress() string {
@@ -19,6 +26,14 @@ func IsTesting() bool {
 
 func DBDataSourceName() string {
 	return env("DATABASE_DSN")
+}
+
+func AdminUsernames() []types.Username {
+	usernames := []types.Username{}
+	for username := range strings.SplitSeq(os.Getenv("ADMIN_USERNAMES"), ",") {
+		usernames = append(usernames, types.Username(username))
+	}
+	return usernames
 }
 
 func env(key string) string {
