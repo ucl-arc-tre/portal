@@ -41,6 +41,8 @@ This will check if any updates are avilable for packages defined in `package.jso
 
 # Running e2e tests
 
+This project uses the [Cypress](https://www.cypress.io/) testing framework for running e2e tests. [Accessibility testing](https://docs.cypress.io/app/guides/accessibility-testing) is incorporated into Cypress with the [cypress-axe extension](https://www.npmjs.com/package/cypress-axe).
+
 ## Running tests locally
 
 To run the full e2e testing suite simply run the following command from the `/web` directory:
@@ -80,3 +82,7 @@ During CI the tests will run against both Electron (a lightweight version of Chr
 ## Using test fixtures and intercepts
 
 You can test edge cases by adding custom fixture data along with api intercepts. This will allow the tests to run even in the absence of the backend api.
+
+## Accessibility testing
+
+Accessibility testing can be incorporated into cypress
