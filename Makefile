@@ -29,7 +29,7 @@ test-unit:  ## Run unit tests
 	go test ./...
 
 # Run Cypress locally against dockerised dev server
-# make sure the dev server is running first with `make dev`
+# make sure the dockerised dev server is running first with `make dev`
 test-e2e-dev:
 	cd web && CYPRESS_baseUrl=http://localhost:8000 npx cypress run --headless --browser chrome
 

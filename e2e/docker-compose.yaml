@@ -44,4 +44,9 @@ services:
     environment:
       - CYPRESS_baseUrl=http://nginx:80
       - CYPRESS_VIDEO=false
-    command: ["npx", "cypress", "run", "--config-file", "cypress.config.ts"]
+    entrypoint: /bin/sh
+    command: >
+      -c "
+      npx cypress run --config-file cypress.config.ts --browser electron &&
+      npx cypress run --config-file cypress.config.ts --browser firefox
+      "
