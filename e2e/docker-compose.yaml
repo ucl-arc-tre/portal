@@ -1,11 +1,4 @@
 services:
-  test:
-    # This is just a stub - cypress intended
-    image: curlimages/curl:8.12.1
-    command: ["curl", "--fail", "--connect-timeout", "10", "http://nginx/"]
-    depends_on:
-      - nginx
-
   web-api:
     build:
       context: ..

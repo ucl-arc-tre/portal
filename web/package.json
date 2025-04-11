@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
-    "cypress:open": "CYPRESS_baseUrl=http://localhost:5173 cypress open",
-    "cypress:headless": "CYPRESS_baseUrl=http://localhost:5173 cypress run --headless --browser chrome"
+    "cypress:open": "cypress open",
+    "cypress:headless": "cypress run --headless --browser chrome"
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.10.0",
