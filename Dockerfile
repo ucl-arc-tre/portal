@@ -1,5 +1,3 @@
-# This Dockerfile is used to build a multi-stage Docker image for the release version of the Go web API and React frontend.
-
 FROM golang:1.24.2-alpine AS builder
 
 RUN adduser --uid 1000 --disabled-password user && \
@@ -16,7 +14,28 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
   CGO_ENABLED=0 go build -v -o web-api cmd/web-api/main.go && \
   CGO_ENABLED=0 go build -v -o web-frontend cmd/web-frontend/main.go
 
-# Frontend builder (Vite)
+# -------------------------------------------
+# Whole repo should be mounted in under /repo
+FROM golang:1.24.2-alpine AS web-api-dev
+
+RUN go install github.com/air-verse/air@latest
+
+WORKDIR /repo
+ENV GIN_MODE="debug"
+CMD ["air", "--build.cmd", "go build -o bin/web-api cmd/web-api/main.go", "--build.bin", "./bin/web-api", "--build.exclude_dir", "web,bin,deploy,tmp"]
+
+# -------------------------------------------
+# Whole repo should be mounted in under /repo
+FROM node:22-alpine3.20 AS web-frontend-dev
+
+WORKDIR /repo/web
+COPY web/package.json .
+
+RUN npm install
+
+CMD [ "npm", "run", "dev", "--", "--host", "0.0.0.0" ]
+
+# -------------------------------------------
 FROM node:22-alpine3.20 AS web-frontend-builder
 
 WORKDIR /app
@@ -26,7 +45,7 @@ RUN --mount=type=cache,target=/app/node_modules/.vite \
   npm install vite@6.2.5 && \
   npm run build
 
-# Release image for API
+# --------------------------------------------------------
 FROM scratch AS web-api-release
 
 COPY --from=builder /etc/passwd /etc/passwd
@@ -38,7 +57,7 @@ ENV PORT=8080
 ENV GIN_MODE=release
 ENTRYPOINT ["./web-api"]
 
-# Release image for frontend
+# --------------------------------------------------------
 FROM scratch AS web-frontend-release
 
 COPY --from=builder /etc/passwd /etc/passwd
