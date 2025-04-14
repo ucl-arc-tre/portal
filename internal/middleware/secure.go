@@ -21,7 +21,7 @@ func NewSecure() gin.HandlerFunc {
 		FrameDeny:             true,
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      true,
-		ContentSecurityPolicy: "default-src 'none'",
+		ContentSecurityPolicy: "default-src 'self'",
 		IENoOpen:              true,
 		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 	})

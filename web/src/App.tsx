@@ -23,21 +23,24 @@ function App() {
 
   return (
     <>
-      <h1>ARC portal</h1>
-      {isAuthed === false && (
-        <div>
-          <button>
-            <a href="/oauth2/start">Login</a>
-          </button>
-        </div>
-      )}
-      <div className="card">
-        {isAuthed === true && (
-          <p>
-            GET /hello → <strong>{helloMessage}</strong>
-          </p>
+      <h1 id="portal-title">ARC portal</h1>
+
+      <main aria-label="ARC portal main content">
+        {isAuthed === false && (
+          <div>
+            <a href="/oauth2/start" className="button">
+              Login
+            </a>
+          </div>
         )}
-      </div>
+        <div className="card">
+          {isAuthed === true && (
+            <p>
+              GET /hello → <strong>{helloMessage}</strong>
+            </p>
+          )}
+        </div>
+      </main>
     </>
   );
 }
