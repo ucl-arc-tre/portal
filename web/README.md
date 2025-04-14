@@ -34,31 +34,41 @@ This project uses the [Cypress](https://www.cypress.io/) testing framework for r
 
 ## Running tests locally
 
-To run the full e2e testing suite simply run the following command from the `/web` directory:
+Tests can be run against both the dockerised local dev environment as well as the full dockerised release production build.
+
+Failing tests will produce downloadable screenshots saved in `/web/cypress/screenshots` to make debugging test failures easier. Make sure not to commit this folder to git.
+
+### Testing the dev build
+
+The easiest way to run the full e2e testing suite is with the following command from the project root directory:
+
+```
+`make test-e2e-dev`
+```
+
+This will run all frontend tests in headless mode against the dockerised dev server running on `localhost:8000`.
+
+If you want to run the tests with the cypress UI while the dev server is running, you can run:
 
 ```shell script
 npm run cypress:open
 ```
 
-This will open a virtual browser to run end-to-end tests using [Cypress](https://www.cypress.io/).
+### Testing the release production build
 
-To run the tests in headless mode (e.g. during CI) you can run:
+Run the following command from the project root directory:
 
-```shell script
-npm run cypress:headless
+```
+make test-e2e-release
 ```
 
-This will run all frontend tests sequentially within the terminal without spinning up an active browser.
-
-Alternatively, you can run `make test-e2e-dev` from the project root directory as a shortcut to running the above.
+These tests simulate the full production build of the application.
 
 ## Running tests in CI
 
 The e2e tests are also configured to run during CI via a GitHub action workflow.
 
 The CI tests are run against the full release version of the dockerised setup to test against the production version of the application.
-
-Failing tests during CI will produce downloadable screenshots to make debugging test failures easier.
 
 ## Testing against multiple browsers
 
