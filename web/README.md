@@ -26,17 +26,6 @@ This will install all of the project dependencies that are specified in `web/pac
 
 Dependabot has been enabled on the project repo to provide monthly package update alerts. Make sure to test these locally first before merging them in.
 
-If needed, you can also update the version numbers of individual packages manually in the `package.json` file. Running `npm install` again will install the specified dependencies.
-
-To automatically check for package updates you can run:
-
-```javascript
-// add a -u flag at the end of the command to automatically update everything in package.json
-npx npm-check-updates
-```
-
-This will check if any updates are avilable for packages defined in `package.json`. Once your `package.json` has the latest version numbers, just run `npm install` to install them.
-
 ---
 
 # Running e2e tests
