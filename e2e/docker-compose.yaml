@@ -43,7 +43,6 @@ services:
       - ../web:/web
     environment:
       - CYPRESS_baseUrl=http://nginx:80
-      - CYPRESS_VIDEO=false
     entrypoint: /bin/sh
     command: >
       -c "
