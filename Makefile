@@ -1,5 +1,7 @@
 .PHONY: *
 DEV_PROJECT_NAME := "ucl-arc-tre-portal-dev"
+E2E_PROJECT_NAME := "ucl-arc-tre-e2e"
+
 
 help: ## Show this help
 	@echo
@@ -38,9 +40,9 @@ test-e2e-dev:
 ## Run cypress against the release build
 test-e2e-release:
 	cd e2e && \
-	docker compose -p "ucl-arc-tre-e2e" build && \
-	docker compose -p "ucl-arc-tre-e2e" run --rm cypress && \
-	docker compose -p "ucl-arc-tre-e2e" down --remove-orphans
+	docker compose -p $(E2E_PROJECT_NAME) build && \
+	docker compose -p $(E2E_PROJECT_NAME) run --rm cypress && \
+	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans
 
 web-lint: ## Lint frontend web things
 	cd web && npm run lint
