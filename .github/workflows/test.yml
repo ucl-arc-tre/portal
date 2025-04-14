@@ -34,10 +34,3 @@ jobs:
       - name: Run e2e tests
         run: make test-e2e-release
         working-directory: ${{ github.workspace }}
-
-      - name: Upload Cypress screenshots (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots
-          path: web/cypress/screenshots/
