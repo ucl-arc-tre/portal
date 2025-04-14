@@ -1,11 +1,4 @@
 services:
-  test:
-    # This is just a stub - cypress intended
-    image: curlimages/curl:8.12.1
-    command: ["curl", "--fail", "--connect-timeout", "10", "http://nginx/"]
-    depends_on:
-      - nginx
-
   web-api:
     build:
       context: ..
@@ -40,3 +33,20 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres # pragma: allowlist secret
       POSTGRES_DB: dev
+
+  cypress:
+    image: cypress/included:14.3.0
+    depends_on:
+      - nginx
+    working_dir: /web
+    volumes:
+      - ../web:/web
+    environment:
+      - CYPRESS_baseUrl=http://nginx:80
+    entrypoint: /bin/sh
+    command: >
+      -c "
+      npm ci &&
+      npx cypress run --config-file cypress.config.ts --browser electron &&
+      npx cypress run --config-file cypress.config.ts --browser firefox
+      "
