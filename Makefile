@@ -29,8 +29,10 @@ test-unit:  ## Run unit tests
 	go test ./...
 
 # Run Cypress locally against dockerised dev server
-# make sure the dockerised dev server is running first with `make dev`
 test-e2e-dev:
+	if ! docker compose -p $(DEV_PROJECT_NAME) ps --services --filter "status=running" | grep nginx; then \
+		echo "dev environment not running"; exit 1; \
+	fi
 	cd web && CYPRESS_baseUrl=http://localhost:8000 npx cypress run --headless --browser chrome
 
 ## Run cypress against the release build
