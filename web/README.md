@@ -8,7 +8,7 @@ Development files are located in '/src' with all components routed into App.ts.
 
 # Requirements
 
-Make sure you have read through the `README.md` file at the PROJECT_ROOT directory. This will give you more background on the application architecture.
+Make sure you have read through the root [`README.md`](../README.md) file. This will give you more background on the application architecture.
 
 ## Nodejs and npm
 
