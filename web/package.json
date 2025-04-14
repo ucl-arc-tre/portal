@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "pkgs/uikit"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,7 +16,8 @@
   "dependencies": {
     "@hey-api/client-fetch": "^0.10.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
@@ -28,7 +32,7 @@
     "prettier": "^3.5.3",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.24.1",
-    "uikit":"file:pkgs/uikit",
+    "uikit": "file:pkgs/uikit",
     "vite": "^6.2.0"
   }
 }
