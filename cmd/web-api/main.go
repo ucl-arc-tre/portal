@@ -8,11 +8,13 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/router"
+	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 )
 
 func main() {
 	graceful.InitDB()
 	rbac.Init()
+	agreements.Init()
 	router := router.New()
 	router.Use(middleware.NewSetUser(), middleware.NewAuthz())
 	openapi.RegisterHandlersWithOptions(router, handler.New(), openapi.GinServerOptions{

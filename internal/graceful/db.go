@@ -18,9 +18,11 @@ const (
 func InitDB() {
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
-	err := db.AutoMigrate(&types.User{})
-	if err != nil {
-		panic(err)
+	types := []any{&types.User{}, &types.Agreement{}}
+	for _, t := range types {
+		if err := db.AutoMigrate(t); err != nil {
+			panic(err)
+		}
 	}
 }
 
