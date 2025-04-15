@@ -19,6 +19,9 @@ dev-up: ## Docker compose up on the dev environment
 dev-destroy: ## Destroy the dev environment
 	cd deploy/dev &&  docker compose -p $(DEV_PROJECT_NAME) down
 
+dev-psql: ## Get an interactive psql shell in dev
+	docker exec -it ucl-arc-tre-portal-dev-postgres-1 psql --dbname=dev --user=postgres
+
 codegen:  ## Run the code generation
 	oapi-codegen -package openapi -generate "gin,types" api.web.yaml > "internal/openapi/web/main.gen.go"
 	cd web && npm run openapi-ts
