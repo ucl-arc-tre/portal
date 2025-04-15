@@ -1,17 +1,17 @@
-import { JSX, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import { getHello } from "./openapi";
 import { useLocation } from "react-router-dom";
-import { routes } from "./globals.js";
+import { routes } from "./globals";
 import Login from "./pages/Login";
+import { getProfile } from "./openapi";
 
 function App() {
   const location = useLocation();
   const previousPath = useRef(location.pathname);
 
   const [helloMessage, setHelloMessage] = useState<string>("");
-  const [isAuthed, setIsAuthed] = useState<boolean>(false);
+  const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     if (location.pathname !== previousPath.current) {
@@ -19,13 +19,13 @@ function App() {
       console.log("current path:", location.pathname);
     }
 
-    getHello()
+    getProfile()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
-          setHelloMessage(res.data.message);
+          setHelloMessage(`Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`);
           setIsAuthed(true);
         } else {
-          console.log("error:", res.error);
+          setIsAuthed(false);
         }
       })
       .catch((err) => {

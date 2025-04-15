@@ -12,8 +12,8 @@ import (
 func New() *gin.Engine {
 	log.Info().Msg("Creating router")
 	router := gin.Default()
-	router.Use(middleware.NewSecure())
 	router.Group("/ping").GET("", ping)
+	router.Use(middleware.NewSecure())
 	return router
 }
 
