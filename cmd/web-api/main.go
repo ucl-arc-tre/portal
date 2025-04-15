@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	graceful.InitDB()
 	rbac.Init()
 	router := router.New()
 	router.Use(middleware.NewSetUser(), middleware.NewAuthz())
