@@ -36,7 +36,7 @@ function App() {
         <div className="card">
           {isAuthed === true && (
             <p>
-              GET /hello → <strong>{helloMessage}</strong>
+              GET /profile → <strong>{helloMessage}</strong>
             </p>
           )}
         </div>

@@ -15,7 +15,7 @@ func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewEnforcer()
 	_ = must(enforcer.AddPolicy(string(Admin), "*", "*"))
-	_ = must(enforcer.AddPolicy(string(Base), "/me", ReadAction))
+	_ = must(enforcer.AddPolicy(string(Base), "/profile", string(ReadAction)))
 	for _, user := range persistedAdminUsers() {
 		_ = must(AddRole(user, Admin))
 	}
