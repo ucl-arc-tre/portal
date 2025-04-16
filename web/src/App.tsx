@@ -35,18 +35,24 @@ function App() {
 
   return (
     <>
-      <Routes>
-        {routes.map((route, index) => (
-          <Route key={index} path={route.path} element={route.element} ref={route.nodeRef} />
-        ))}
-      </Routes>
       <h1>Welcome to the ARC Services Portal</h1>
-      {!isAuthed && <Login />}
-      <div className="card">
-        <p>
-          GET /hello → <strong>{helloMessage}</strong>
-        </p>
-      </div>
+      {isAuthed === false && <Login />}
+
+      {isAuthed === true && (
+        <>
+          <Routes>
+            {routes.map((route, index) => (
+              <Route key={index} path={route.path} element={route.element} />
+            ))}
+          </Routes>
+
+          <div className="card">
+            <p>
+              GET /profile → <strong>{helloMessage}</strong>
+            </p>
+          </div>
+        </>
+      )}
     </>
   );
 }

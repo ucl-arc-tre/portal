@@ -6,7 +6,8 @@ export default function Home() {
       <button>projects</button>
       <button>studies</button>
       <button>assets</button>
-      {/* <Button>Projects</Button>
+      {/* TODO: UIKIT
+      <Button>Projects</Button>
       <Button>Studies</Button>
       <Button>Assets</Button> */}
     </div>

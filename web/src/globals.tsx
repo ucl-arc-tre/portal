@@ -1,4 +1,3 @@
-import { createRef, RefObject } from "react";
 import { Home, Login } from "./pages";
 
 type Route = {
