@@ -20,7 +20,6 @@ function App() {
       console.log("current path:", location.pathname);
     }
 
-
     getProfile()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
@@ -57,7 +56,6 @@ function App() {
           </>
         )}
       </main>
-
     </>
   );
 }
