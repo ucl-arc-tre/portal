@@ -4,7 +4,7 @@ export default function Login() {
   return (
     <div>
       {/* TODO: UIKIT */}
-      <button size="large">
+      <button>
         <a href="/oauth2/start">Login with UCL SSO</a>
       </button>
     </div>
