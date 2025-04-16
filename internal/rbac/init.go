@@ -3,6 +3,7 @@ package rbac
 import (
 	"time"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -14,8 +15,26 @@ import (
 func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewEnforcer()
-	_ = must(enforcer.AddPolicy(string(Admin), "*", "*"))
-	_ = must(enforcer.AddPolicy(string(Base), "/profile", string(ReadAction)))
+	addBasePolicies(enforcer)
+	addPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
+	addAdminUserRoleBindings()
+}
+
+func addBasePolicies(enforcer *casbin.Enforcer) {
+	policies := []Policy{
+		{RoleName: Base, Resource: "/profile", Action: ReadAction},
+		{RoleName: Base, Resource: "/agreements/approved-researcher", Action: ReadAction},
+	}
+	for _, policy := range policies {
+		addPolicy(enforcer, policy)
+	}
+}
+
+func addPolicy(enforcer *casbin.Enforcer, policy Policy) {
+	_ = must(enforcer.AddPolicy(string(policy.RoleName), policy.Resource, string(policy.Action)))
+}
+
+func addAdminUserRoleBindings() {
 	for _, user := range persistedAdminUsers() {
 		_ = must(AddRole(user, Admin))
 	}
