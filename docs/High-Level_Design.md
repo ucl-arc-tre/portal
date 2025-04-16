@@ -17,7 +17,7 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 
 ![High-level view](./media/architecture.png)
 
-The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will be use the pathfinder project for ARC's metadata store based on 
+The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will be use the pathfinder project for ARC's metadata store based on
 [this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
 Some processes such as incident and service request will be managed through "MyServices" (Xurrent) as per the pattern detailed [here in option 2](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md).
 
@@ -46,7 +46,7 @@ TBC
 
 ### Integrity
 
-See above principle on quality data. 
+See above principle on quality data.
 
 ## Definition of the MVP
 
@@ -99,16 +99,14 @@ An **Asset** belongs strictly to one **Study**. If the Study transfers an Asset 
 The **Project** entity type is expected to be subtyped for specific Environments, including with additional User roles (beyond the default `itAdmin`). E.g.
   - The ARC TRE Project subtype specifies desktop users, ingressers, etc.
   - The DSH Project subtype is called a "Share"
-  - The Condenser Project subject is called a "Tenancy" 
+  - The Condenser Project subject is called a "Tenancy"
 
 See also [Metadata Store conceptual model](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md#7-entity-relationship-er-logical-models)
 
-## Application, database and integration design 
+## Application, database and integration design
 
 The portal and database will use the Experience Layers [here](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md#4-experience-layers).
 
 The portal will align to [this design](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md#62-option-2---portal-only-workflows-recommended-option) option to support researchers acknowledging that service request will still be submitted and managed in MyServices.
 
 The overall design will be based on [The UCL Experience Framework](https://liveuclac.sharepoint.com/sites/it-architecture/SitePages/EF-architecture-patterns.aspx) (Pattern 4).
-
-
