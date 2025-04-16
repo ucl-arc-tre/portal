@@ -53,8 +53,55 @@ See above principle on quality data.
 
 
 ## Conceptual data model
+This model represents an overview of the current understanding of the target main entities referenced in the project stories, with minimal detail. It improves in some respects from the model in the [as-is Portal](#as-is-portals).
 
-TBC - Initial model [here](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md#7-entity-relationship-er-logical-models)
+```mermaid
+erDiagram
+User
+Study {
+    URL dpoRegistration
+    URL ethics
+    URL[] grantAwards
+}
+Study |o--|| User : "has owner"
+Study |o--|{ User : "has admins"
+Asset {
+    enum requiredTier
+}
+Study ||--o{ Asset : "IG for"
+Asset }o--|| Asset : parent
+Contract {
+    URL *contract
+    boolean hasExternalUsers
+}
+Asset }o--o{ Contract : "used under"
+Project |o--|| User : "has IT admin"
+Study ||--o{ Project : "IG boundary for"
+Project }o--o{ Asset : uses
+Environment {
+    URL *location
+    enum tier
+    User owner
+}
+Environment ||--|{ Project : contains
+```
+Notes on syntax:
+- [Crow's foot notation](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model#Crow's_foot_notation)
+- Some attributes use URLs to refer to entities in other systems. The local entity may express some inherited data about the referenced entity which is useful for local business rules, e.g. whether a Contract allows external users.
+
+### Study
+A **Study** is an abstract Information Governance boundary which is interpreted according to context. It may closely correspond to a real-world research study, a whole lab, or a research project or programme.
+
+### Asset
+An **Asset** belongs strictly to one **Study**. If the Study transfers an Asset to another Study, a new Asset is created. This should reference the original Asset through the `parent` relationship, so that provenance can be established. This relationship can carry additional information such as what derivation was used, e.g. anonymisation.
+
+### Project
+The **Project** entity type is expected to be subtyped for specific Environments, including with additional User roles (beyond the default `itAdmin`). E.g.
+  - The ARC TRE Project subtype specifies desktop users, ingressers, etc.
+  - The DSH Project subtype is called a "Share"
+  - The Condenser Project subject is called a "Tenancy" 
+
+See also [Metadata Store conceptual model](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md#7-entity-relationship-er-logical-models)
 
 ## Application, database and integration design 
 
