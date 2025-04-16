@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getHello } from "./openapi";
+import { getProfile } from "./openapi";
 
 function App() {
   const [helloMessage, setHelloMessage] = useState<string>("");
-  const [isAuthed, setIsAuthed] = useState<boolean>(false);
+  const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    getHello()
+    getProfile()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
-          setHelloMessage(res.data.message);
+          setHelloMessage(`Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`);
           setIsAuthed(true);
         } else {
-          console.log("error:", res.error);
+          setIsAuthed(false);
         }
       })
       .catch((err) => {
@@ -26,7 +26,7 @@ function App() {
       <h1 id="portal-title">ARC portal</h1>
 
       <main aria-label="ARC portal main content">
-        {!isAuthed && (
+        {isAuthed === false && (
           <div>
             <a href="/oauth2/start" className="button">
               Login
@@ -34,9 +34,11 @@ function App() {
           </div>
         )}
         <div className="card">
-          <p>
-            GET /hello → <strong>{helloMessage}</strong>
-          </p>
+          {isAuthed === true && (
+            <p>
+              GET /profile → <strong>{helloMessage}</strong>
+            </p>
+          )}
         </div>
       </main>
     </>
