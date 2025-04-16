@@ -1,12 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
+import { useLocation } from "react-router-dom";
+import { routes } from "./globals";
+import Login from "./pages/Login";
+
 import { getProfile } from "./openapi";
 
 function App() {
+  const location = useLocation();
+  const previousPath = useRef(location.pathname);
+
   const [helloMessage, setHelloMessage] = useState<string>("");
   const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
+    if (location.pathname !== previousPath.current) {
+      // todo: do something with this
+      console.log("current path:", location.pathname);
+    }
+
     getProfile()
       .then((res) => {
         if (res.response.status == 200 && res.data) {
@@ -23,23 +36,26 @@ function App() {
 
   return (
     <>
-      <h1 id="portal-title">ARC portal</h1>
-
+      <h1 id="portal-title">Welcome to the ARC Services Portal</h1>
       <main aria-label="ARC portal main content">
-        {isAuthed === false && (
-          <div>
-            <a href="/oauth2/start" className="button">
-              Login
-            </a>
-          </div>
+        {isAuthed === false && <Login />}
+
+        {isAuthed === true && (
+          <>
+            <Routes>
+              {routes.map((route, index) => (
+                <Route key={index} path={route.path} element={route.element} />
+              ))}
+            </Routes>
+
+            {/* TODO: get rid of this at some point - replace with some sort of notif on login */}
+            <div className="card">
+              <p>
+                GET /profile → <strong>{helloMessage}</strong>
+              </p>
+            </div>
+          </>
         )}
-        <div className="card">
-          {isAuthed === true && (
-            <p>
-              GET /profile → <strong>{helloMessage}</strong>
-            </p>
-          )}
-        </div>
       </main>
     </>
   );

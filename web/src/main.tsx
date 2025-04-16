@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import { client } from "./openapi/client.gen.ts";
+import { BrowserRouter } from "react-router-dom";
 
 client.setConfig({
   baseUrl: "/api/v0",
@@ -10,6 +11,8 @@ client.setConfig({
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>
 );

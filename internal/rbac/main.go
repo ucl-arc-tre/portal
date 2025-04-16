@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	Admin       = RoleName("admin") // Global admin on everything
-	Base        = RoleName("base")  // Most restricted role possible
+	Admin = RoleName("admin") // Global admin on everything
+	Base  = RoleName("base")  // Most restricted role possible
+
 	ReadAction  = Action("read")
 	WriteAction = Action("write")
 )

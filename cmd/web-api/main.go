@@ -13,6 +13,7 @@ import (
 
 func main() {
 	graceful.InitDB()
+
 	rbac.Init()
 	agreements.Init()
 	router := router.New()
