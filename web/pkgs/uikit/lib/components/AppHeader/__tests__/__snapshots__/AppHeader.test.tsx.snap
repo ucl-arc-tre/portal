@@ -1,8 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`AppHeader > snapshot: no props 1`] = `
-<div
-  class="ucl-timetable-app-header css-14i4gnx"
-  data-testid="ucl-timetable-app-header"
-/>
-`;
