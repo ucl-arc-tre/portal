@@ -48,6 +48,7 @@ function App() {
               ))}
             </Routes>
 
+            {/* TODO: get rid of this at some point - replace with some sort of notif on login */}
             <div className="card">
               <p>
                 GET /profile → <strong>{helloMessage}</strong>
