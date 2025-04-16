@@ -4,6 +4,7 @@ import "./App.css";
 import { useLocation } from "react-router-dom";
 import { routes } from "./globals";
 import Login from "./pages/Login";
+
 import { getProfile } from "./openapi";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       // todo: do something with this
       console.log("current path:", location.pathname);
     }
+
 
     getProfile()
       .then((res) => {
@@ -35,24 +37,27 @@ function App() {
 
   return (
     <>
-      <h1>Welcome to the ARC Services Portal</h1>
-      {isAuthed === false && <Login />}
+      <h1 id="portal-title">Welcome to the ARC Services Portal</h1>
+      <main aria-label="ARC portal main content">
+        {isAuthed === false && <Login />}
 
-      {isAuthed === true && (
-        <>
-          <Routes>
-            {routes.map((route, index) => (
-              <Route key={index} path={route.path} element={route.element} />
-            ))}
-          </Routes>
+        {isAuthed === true && (
+          <>
+            <Routes>
+              {routes.map((route, index) => (
+                <Route key={index} path={route.path} element={route.element} />
+              ))}
+            </Routes>
 
-          <div className="card">
-            <p>
-              GET /profile → <strong>{helloMessage}</strong>
-            </p>
-          </div>
-        </>
-      )}
+            <div className="card">
+              <p>
+                GET /profile → <strong>{helloMessage}</strong>
+              </p>
+            </div>
+          </>
+        )}
+      </main>
+
     </>
   );
 }

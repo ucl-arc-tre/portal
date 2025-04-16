@@ -39,7 +39,8 @@ func (a *Authorizer) isAuthorized(ctx *gin.Context) (bool, error) {
 	}
 	//roles, _ := a.enforcer.GetRolesForUser(userId)
 	//log.Debug().Any("roles", roles).Any("resource", resource).Any("userId", userId).Any("method", method).Msg("authz")
-	return a.enforcer.Enforce(userId, resource, method)
+
+	return a.enforcer.Enforce(userId, resource, string(method))
 }
 
 func trimBaseURL(url string) string {

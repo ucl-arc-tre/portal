@@ -13,8 +13,9 @@ import (
 const (
 	Admin       = RoleName("admin") // Global admin on everything
 	Base        = RoleName("base")  // Most restricted role possible
-	ReadAction  = "read"
-	WriteAction = "write"
+
+	ReadAction  = Action("read")
+	WriteAction = Action("write")
 )
 
 var enforcer *casbin.Enforcer
