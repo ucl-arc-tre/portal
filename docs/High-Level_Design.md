@@ -20,7 +20,7 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 </p>
 
 
-The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will be use the pathfinder project for ARC's metadata store based on
+The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will use the pathfinder project for ARC's metadata store based on
 [this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
 Some processes such as incident and service request will be managed through "MyServices" (Xurrent) as per the pattern detailed [here in option 2](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md).
 
@@ -78,13 +78,11 @@ Contract {
     boolean hasExternalUsers
 }
 Asset }o--o{ Contract : "used under"
-Project |o--|| User : "has IT admin"
 Study ||--o{ Project : "IG boundary for"
 Project }o--o{ Asset : uses
 Environment {
     URL *location
     enum tier
-    User owner
 }
 Environment ||--|{ Project : contains
 ```
@@ -99,7 +97,7 @@ A **Study** is an abstract Information Governance boundary which is interpreted 
 An **Asset** belongs strictly to one **Study**. If the Study transfers an Asset to another Study, a new Asset is created. This should reference the original Asset through the `parent` relationship, so that provenance can be established. This relationship can carry additional information such as what derivation was used, e.g. anonymisation.
 
 ### Project
-The **Project** entity type is expected to be subtyped for specific Environments, including with additional User roles (beyond the default `itAdmin`). E.g.
+The **Project** entity type is expected to be subtyped for specific Environments, including with User roles. E.g.
   - The ARC TRE Project subtype specifies desktop users, ingressers, etc.
   - The DSH Project subtype is called a "Share"
   - The Condenser Project subject is called a "Tenancy"
