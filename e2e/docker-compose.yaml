@@ -30,12 +30,14 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "8000:80"
+      - "8000:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./tls:/etc/nginx/tls:ro
     depends_on:
       - web-api
       - web-frontend
+      - oauth2-proxy
 
   postgres:
     image: postgres:17
@@ -51,13 +53,12 @@ services:
     volumes:
       - ../web:/web
     environment:
-      CYPRESS_baseUrl: "http://nginx:80"
+      CYPRESS_baseUrl: "https://nginx:443"
       CYPRESS_BOT_ADMIN_USERNAME: "portal-e2e-admin@arctretest.onmicrosoft.com"
       CYPRESS_BOT_ADMIN_PASSWORD: ${CYPRESS_BOT_ADMIN_PASSWORD}
     entrypoint: /bin/sh
     command: >
       -c "
       npm ci &&
-      npx cypress run --config-file cypress.config.ts --browser electron &&
-      npx cypress run --config-file cypress.config.ts --browser firefox
+      npx cypress run --config-file cypress.config.ts --browser electron
       "

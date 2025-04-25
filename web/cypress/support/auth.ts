@@ -1,6 +1,6 @@
 export function login(username: string, password: string): void {
   cy.wrap(username).should("exist");
-  cy.wrap(password).should("exist");
+  cy.wrap(password && true).should("be.true"); // mask value
 
   cy.visit("/");
   cy.contains("Login").should("be.visible");

@@ -9,5 +9,6 @@ module.exports = defineConfig({
     screenshotOnRunFailure: true,
     experimentalStudio: true,
     experimentalModifyObstructiveThirdPartyCode: true,
+    chromeWebSecurity: false,
   },
 });
