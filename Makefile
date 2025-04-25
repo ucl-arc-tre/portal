@@ -1,6 +1,14 @@
+SHELL := /bin/bash
 .PHONY: *
 DEV_PROJECT_NAME := "ucl-arc-tre-portal-dev"
 E2E_PROJECT_NAME := "ucl-arc-tre-e2e"
+
+
+define assert_file_exists
+	if [ ! -f $(1) ]; then \
+		echo -e "\033[0;31mERROR\033[0m: $(1) did not exist" && exit 1; \
+	fi
+endef
 
 
 help: ## Show this help
@@ -11,6 +19,7 @@ help: ## Show this help
 	@echo
 
 dev: codegen  ## Create dev environment
+	$(call assert_file_exists, deploy/dev/oauth2-proxy.cfg)
 	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) up --build
 
 dev-up: ## Docker compose up on the dev environment
@@ -33,22 +42,25 @@ test:  ## Run all tests
 test-unit:  ## Run unit tests
 	go test ./...
 
-# Run Cypress locally against dockerised dev server
-test-e2e-dev:
+test-e2e-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev server
 	if ! docker compose -p $(DEV_PROJECT_NAME) ps --services --filter "status=running" | grep nginx; then \
 		echo "dev environment not running"; exit 1; \
 	fi
 	cd web && CYPRESS_baseUrl=http://localhost:8000 npx cypress run --headless --browser chrome
 
-## Run cypress against the release build
-test-e2e-release:
+test-e2e-release: e2e-dependencies ## Run cypress against the release build
 	cd e2e && \
 	docker compose -p $(E2E_PROJECT_NAME) build && \
 	docker compose -p $(E2E_PROJECT_NAME) run --rm cypress && \
 	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans
+
+e2e-dependencies:
+	$(call assert_file_exists, e2e/oauth2-proxy.cfg)
 
 web-lint: ## Lint frontend web things
 	cd web && npm run lint
 
 web-format:
 	cd web && npx prettier --write .
+
+.SILENT: e2e-dependencies

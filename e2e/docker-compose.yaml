@@ -6,9 +6,18 @@ services:
     environment:
       PORT: "8080"
       IS_TESTING: true
+      ADMIN_USERNAMES: "portal-e2e-admin@arctretest.onmicrosoft.com"
       DATABASE_DSN: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
     depends_on:
       - postgres
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.2
+    command: --config /oauth2-proxy.cfg
+    volumes:
+      - "./oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
+    depends_on:
+      - web-api
 
   web-frontend:
     build:
@@ -42,7 +51,9 @@ services:
     volumes:
       - ../web:/web
     environment:
-      - CYPRESS_baseUrl=http://nginx:80
+      CYPRESS_baseUrl: "http://nginx:80"
+      CYPRESS_BOT_ADMIN_USERNAME: "portal-e2e-admin@arctretest.onmicrosoft.com"
+      CYPRESS_BOT_ADMIN_PASSWORD: ${CYPRESS_BOT_ADMIN_PASSWORD}
     entrypoint: /bin/sh
     command: >
       -c "

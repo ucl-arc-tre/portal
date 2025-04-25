@@ -28,7 +28,7 @@ function App() {
       <main aria-label="ARC portal main content">
         {isAuthed === false && (
           <div>
-            <a href="/oauth2/start" className="button">
+            <a id="login" href="/oauth2/start" className="button">
               Login
             </a>
           </div>

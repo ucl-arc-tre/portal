@@ -22,7 +22,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
-
+    environment: e2e
     needs: [unit]
 
     permissions:
@@ -31,6 +31,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create oauth2-proxy config
+        run: |
+          cat <<EOF > e2e/oauth2-proxy.cfg
+          cookie_secret="${{ secrets.OAUTH2PROXY_COOKIE_SECRET }}"
+          client_id = "${{ secrets.OAUTH2PROXY_CLIENT_ID }}"
+          oidc_issuer_url = "https://login.microsoftonline.com/${{ secrets.OAUTH2PROXY_TENANT_ID }}/v2.0"
+          client_secret = "${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}"
+
+          redirect_url = "http://localhost:8000/oauth2/callback"
+          http_address="0.0.0.0:8080"
+          email_domains=["*"]
+          cookie_secure="false"
+          session_cookie_minimal="true"
+          upstreams="http://web-api:8080/"
+          api_routes="/api"
+
+          pass_user_headers = true
+
+          provider = "oidc"
+          skip_provider_button = true
+          prefer_email_to_user = false
+          EOF
+
       - name: Run e2e tests
+        env:
+          CYPRESS_BOT_ADMIN_PASSWORD: ${{ secrets.CYPRESS_BOT_ADMIN_PASSWORD }}
         run: make test-e2e-release
-        working-directory: ${{ github.workspace }}
