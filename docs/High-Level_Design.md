@@ -15,7 +15,10 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 
 ## To-be Portal
 
-![High-level view](./media/architecture.png)
+<p align="center">
+  <img src="./media/architecture.png" alt="architecture" width="650">
+</p>
+
 
 The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will be use the pathfinder project for ARC's metadata store based on
 [this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
