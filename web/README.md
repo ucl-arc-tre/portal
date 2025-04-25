@@ -12,7 +12,9 @@ Make sure you have read through the root [`README.md`](../README.md) file. This 
 
 ## Nodejs and npm
 
-You need to have [Node.js](https://nodejs.org/en/download/) installed on your local development machine. Nodejs comes bundled with npm which is used for managing the libraries that are used for the frontend. Node version `>=20` should work with this project.
+You need to have [Node.js](https://nodejs.org/en/download/) installed on your local development machine. Nodejs comes bundled with npm which is used for managing the libraries that are used for the frontend.
+
+This project uses the the latest `Active` version of Node, as recommended by the [Node release schedule](https://nodejs.org/en/about/previous-releases). So make sure you are using this version of Node on your system for this project. We recommend using [NVM](https://github.com/nvm-sh/nvm) to manage local Node versions.
 
 To install all the necessary frontend packages and libraries, run the following from the react project directory: `/web`.
 

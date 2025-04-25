@@ -7,6 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Agreement defines model for Agreement.
+type Agreement struct {
+	// Id UUID of the agreement
+	Id   string `json:"id"`
+	Text string `json:"text"`
+}
+
 // ProfileResponse defines model for ProfileResponse.
 type ProfileResponse struct {
 	Roles    []string `json:"roles"`
@@ -15,6 +22,9 @@ type ProfileResponse struct {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (GET /agreements/approved-researcher)
+	GetAgreementsApprovedResearcher(c *gin.Context)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -28,6 +38,19 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// GetAgreementsApprovedResearcher operation middleware
+func (siw *ServerInterfaceWrapper) GetAgreementsApprovedResearcher(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAgreementsApprovedResearcher(c)
+}
 
 // GetProfile operation middleware
 func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
@@ -69,5 +92,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 }

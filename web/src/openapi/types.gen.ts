@@ -5,6 +5,14 @@ export type ProfileResponse = {
     roles: Array<string>;
 };
 
+export type Agreement = {
+    /**
+     * UUID of the agreement
+     */
+    id: string;
+    text: string;
+};
+
 export type GetProfileData = {
     body?: never;
     path?: never;
@@ -24,6 +32,26 @@ export type GetProfileResponses = {
 };
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+
+export type GetAgreementsApprovedResearcherData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/agreements/approved-researcher';
+};
+
+export type GetAgreementsApprovedResearcherErrors = {
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetAgreementsApprovedResearcherResponses = {
+    200: Agreement;
+};
+
+export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});
