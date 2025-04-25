@@ -2,6 +2,8 @@
 name: Test
 on:
   pull_request:
+    paths-ignore:
+      - "docs/**"
 
 jobs:
   unit:
@@ -39,7 +41,7 @@ jobs:
           oidc_issuer_url = "https://login.microsoftonline.com/${{ secrets.OAUTH2PROXY_TENANT_ID }}/v2.0"
           client_secret = "${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}"
 
-          redirect_url = "http://localhost:8000/oauth2/callback"
+          redirect_url = "https://nginx:443/oauth2/callback"
           http_address="0.0.0.0:8080"
           email_domains=["*"]
           cookie_secure="false"
