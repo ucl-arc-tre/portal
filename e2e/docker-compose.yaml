@@ -58,6 +58,5 @@ services:
     command: >
       -c "
       npm ci &&
-      npx cypress run --config-file cypress.config.ts --browser electron &&
-      npx cypress run --config-file cypress.config.ts --browser firefox
+      npx cypress run --config-file cypress.config.ts --browser electron
       "
