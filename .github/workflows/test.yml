@@ -56,7 +56,14 @@ jobs:
           prefer_email_to_user = false
           EOF
 
+      - name: Create cypress env
+        run: |
+          cat <<EOF > web/cypress.env.json
+          {
+            "botAdminUsername": "portal-e2e-admin@arctretest.onmicrosoft.com",
+            "botAdminPassword": "${{ secrets.CYPRESS_BOT_ADMIN_PASSWORD }}"
+          }
+          EOF
+
       - name: Run e2e tests
-        env:
-          CYPRESS_BOT_ADMIN_PASSWORD: ${{ secrets.CYPRESS_BOT_ADMIN_PASSWORD }}
         run: make test-e2e-release

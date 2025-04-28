@@ -2,8 +2,8 @@
 
 import { login } from "./auth";
 
-const botAdminUsername = Cypress.env("BOT_ADMIN_USERNAME") as string;
-const botAdminPassword = Cypress.env("BOT_ADMIN_PASSWORD") as string;
+const botAdminUsername = Cypress.env("botAdminUsername") as string;
+const botAdminPassword = Cypress.env("botAdminPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

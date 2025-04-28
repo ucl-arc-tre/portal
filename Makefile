@@ -56,6 +56,7 @@ test-e2e-release: e2e-dependencies ## Run cypress against the release build
 
 e2e-dependencies:
 	$(call assert_file_exists, e2e/oauth2-proxy.cfg)
+	$(call assert_file_exists, web/cypress.env.json)
 	cd e2e/tls && \
 	if [ ! -f nginx.key ]; then echo "creating tls certificates for nginx" && openssl req -x509 -nodes -days 365 -subj "/C=GB" -newkey rsa:2048 -keyout ./nginx.key -out ./nginx.crt; fi
 

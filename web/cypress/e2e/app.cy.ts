@@ -11,6 +11,6 @@ describe("ARC Portal UI authenticated", () => {
   it("can be logged into as an admin", () => {
     cy.loginAsAdmin();
     cy.visit("/");
-    cy.contains("Login").should("not.exist");
+    cy.contains("GET /profile").should("exist");
   });
 });
