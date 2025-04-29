@@ -40,12 +40,16 @@ Tests can be run against both the dockerised local dev environment as well as th
 
 Failing tests will produce downloadable screenshots saved in `/web/cypress/screenshots` to make debugging test failures easier. Make sure not to commit this folder to git.
 
-### Testing the dev build
+### End-to-end (e2e) tests
+
+Authenticated end-to-end tests require EntraID usernames and passwords to be set in a `cypress.env.json` file. Create it based on [cypress.sample.env.json](./cypress.sample.env.json).
+
+### e2e testing the dev build
 
 The easiest way to run the full e2e testing suite is with the following command from the project root directory:
 
 ```
-`make test-e2e-dev`
+make test-e2e-dev
 ```
 
 This will run all frontend tests in headless mode against the dockerised dev server running on `localhost:8000`.
@@ -56,7 +60,7 @@ If you want to run the tests with the cypress UI while the dev server is running
 npm run cypress:open
 ```
 
-### Testing the release production build
+### e2e testing the release production build
 
 Run the following command from the project root directory:
 

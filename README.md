@@ -15,7 +15,7 @@ services.
 make dev
 ```
 
-then go to http://localhost:8000. To destroy it run `make dev-destroy`.
+then go to http://localhost:8000. To destroy it run `make dev-destroy`. To see other commands run `make help`.
 
 ## 🏗️ Development
 
