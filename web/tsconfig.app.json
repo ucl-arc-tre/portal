@@ -21,7 +21,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* React Router v7 */
+    "rootDirs": [".", "./.react-router/types"],
+    "verbatimModuleSyntax": true
   },
-  "include": ["src", "**/*.ts"]
+  "include": ["src", "**/*.ts", ".react-router/types/**/*"]
 }

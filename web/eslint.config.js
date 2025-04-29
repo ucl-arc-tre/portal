@@ -33,5 +33,14 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
     },
+  },
+  {
+    files: ["react-router.config.ts", "./src/routes.ts", ".react-router/**/*"],
+    rules: {
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+    },
   }
 );

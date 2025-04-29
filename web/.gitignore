@@ -26,3 +26,6 @@ dist-ssr
 # cypress e2e testing
 cypress/videos
 cypress/screenshots
+
+# react router
+.react-router/

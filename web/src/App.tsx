@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import { useLocation } from "react-router-dom";
-import { routes } from "./globals";
+import { useLocation } from "react-router";
 import Login from "./pages/Login";
 
 import { getProfile } from "./openapi";
@@ -42,12 +40,6 @@ function App() {
 
         {isAuthed === true && (
           <>
-            <Routes>
-              {routes.map((route, index) => (
-                <Route key={index} path={route.path} element={route.element} />
-              ))}
-            </Routes>
-
             {/* TODO: get rid of this at some point - replace with some sort of notif on login */}
             <div className="card">
               <p>

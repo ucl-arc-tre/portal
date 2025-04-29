@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "react-router dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -14,14 +14,17 @@
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.10.0",
+    "@react-router/node": "^7.5.3",
+    "isbot": "^5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
-    "react-router-dom": "^7.5.0"
+    "react-router-dom": "^7.5.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
     "@hey-api/openapi-ts": "^0.66.3",
+    "@react-router/dev": "^7.5.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.8.0",
