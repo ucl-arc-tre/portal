@@ -13,6 +13,7 @@ import (
 
 func main() {
 	router := router.New()
+	router.LoadHTMLGlob("./*.html")
 	router.Static("/assets", "./assets")
 	router.Static("/_next", "./_next")
 	router.StaticFile("favicon.ico", "./favicon.ico")
@@ -37,7 +38,6 @@ func serveSingleHTML(router *gin.Engine, filename string) {
 	if filename != "index.html" {
 		path = strings.TrimSuffix(filename, ".html")
 	}
-	router.LoadHTMLFiles(filename)
 	router.GET(path, func(c *gin.Context) {
 		c.HTML(http.StatusOK, filename, nil)
 	})

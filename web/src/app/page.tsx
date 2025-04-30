@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getProfile } from "../openapi";
+import { getProfile } from "@/openapi";
 import styles from "./page.module.css";
 import Link from "next/link";
 

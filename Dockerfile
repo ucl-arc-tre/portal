@@ -29,8 +29,7 @@ CMD ["air", "--build.cmd", "go build -o bin/web-api cmd/web-api/main.go", "--bui
 FROM node:22-alpine3.20 AS web-frontend-dev
 
 WORKDIR /repo/web
-COPY web/package.json .
-COPY web/package-lock.json .
+COPY web/package.json web/package-lock.json ./
 
 RUN npm ci
 CMD ["npm", "run", "dev", "--", "--port", "3000", "--hostname", "0.0.0.0"]
@@ -41,7 +40,8 @@ FROM node:22-alpine3.20 AS web-frontend-builder
 WORKDIR /app
 COPY web/src src
 COPY web/public public
-COPY web/package-lock.json web/package.json web/next.config.ts web/tsconfig.json ./
+COPY web/package-lock.json web/package.json \
+  web/next.config.ts web/tsconfig.json ./
 
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
