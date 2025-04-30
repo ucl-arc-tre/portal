@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { getProfile } from "../openapi";
 import styles from "./page.module.css";
+import Link from "next/link";
 
 export default function Home() {
   const [helloMessage, setHelloMessage] = useState<string>("");
@@ -29,9 +30,9 @@ export default function Home() {
       <main aria-label="ARC portal main content">
         {isAuthed === false && (
           <div>
-            <button>
-              <a href="/oauth2/start">Login with UCL SSO</a>
-            </button>
+            <Link href="/oauth2/start">
+              <button className="btn--login">Login with UCL SSO</button>
+            </Link>
           </div>
         )}
 
@@ -42,6 +43,9 @@ export default function Home() {
               <p>
                 GET /profile → <strong>{helloMessage}</strong>
               </p>
+              <Link href="/dashboard">
+                <button>Go to Dashboard</button>
+              </Link>
             </div>
           </>
         )}
