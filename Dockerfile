@@ -32,8 +32,7 @@ WORKDIR /repo/web
 COPY web/package.json .
 
 RUN npm install
-
-CMD [ "npm", "run", "dev", "--", "--port", "0.0.0.0" ]
+CMD ["npm", "run", "dev", "--", "--port", "3000", "--hostname", "0.0.0.0"]
 
 # -------------------------------------------
 FROM node:22-alpine3.20 AS web-frontend-builder

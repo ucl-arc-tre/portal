@@ -12,6 +12,7 @@
     "cypress:headless": "cypress run --headless --browser chrome"
   },
   "dependencies": {
+    "@hey-api/client-fetch": "^0.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "next": "15.3.1"
