@@ -1,6 +1,6 @@
 {
-  "name": "test-next-app",
-  "version": "0.1.0",
+  "name": "ucl-arc-tre-portal",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
