@@ -30,8 +30,9 @@ FROM node:22-alpine3.20 AS web-frontend-dev
 
 WORKDIR /repo/web
 COPY web/package.json .
+COPY web/package-lock.json .
 
-RUN npm install
+RUN npm ci
 CMD ["npm", "run", "dev", "--", "--port", "3000", "--hostname", "0.0.0.0"]
 
 # -------------------------------------------
@@ -41,7 +42,7 @@ WORKDIR /app
 COPY web .
 
 RUN --mount=type=cache,target=/app/node_modules/.next \
-  npm install && \
+  npm ci && \
   npm run build
 
 # --------------------------------------------------------
