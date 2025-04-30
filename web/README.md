@@ -1,91 +1,36 @@
-# ARC TRE portal frontent
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-This React + Typescript project was set up using [Vite](https://vitejs.dev/guide/why.html).
+## Getting Started
 
-Development files are located in '/src' with all components routed into App.ts.
+First, run the development server:
 
----
-
-# Requirements
-
-Make sure you have read through the root [`README.md`](../README.md) file. This will give you more background on the application architecture.
-
-## Nodejs and npm
-
-You need to have [Node.js](https://nodejs.org/en/download/) installed on your local development machine. Nodejs comes bundled with npm which is used for managing the libraries that are used for the frontend.
-
-This project uses the the latest `Active` version of Node, as recommended by the [Node release schedule](https://nodejs.org/en/about/previous-releases). So make sure you are using this version of Node on your system for this project. We recommend using [NVM](https://github.com/nvm-sh/nvm) to manage local Node versions.
-
-To install all the necessary frontend packages and libraries, run the following from the react project directory: `/web`.
-
-```shell script
-npm install
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-This will install all of the project dependencies that are specified in `web/package.json`.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Updating packages
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-Dependabot has been enabled on the project repo to provide monthly package update alerts. Make sure to test these locally first before merging them in.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
----
+## Learn More
 
-# Running e2e tests
+To learn more about Next.js, take a look at the following resources:
 
-This project uses the [Cypress](https://www.cypress.io/) testing framework for running e2e tests. [Accessibility testing](https://docs.cypress.io/app/guides/accessibility-testing) is incorporated into Cypress with the [cypress-axe extension](https://www.npmjs.com/package/cypress-axe).
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Running tests locally
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Tests can be run against both the dockerised local dev environment as well as the full dockerised release production build.
+## Deploy on Vercel
 
-Failing tests will produce downloadable screenshots saved in `/web/cypress/screenshots` to make debugging test failures easier. Make sure not to commit this folder to git.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### End-to-end (e2e) tests
-
-Authenticated end-to-end tests require EntraID usernames and passwords to be set in a `cypress.env.json` file. Create it based on [cypress.sample.env.json](./cypress.sample.env.json).
-
-### e2e testing the dev build
-
-The easiest way to run the full e2e testing suite is with the following command from the project root directory:
-
-```
-make test-e2e-dev
-```
-
-This will run all frontend tests in headless mode against the dockerised dev server running on `localhost:8000`.
-
-If you want to run the tests with the cypress UI while the dev server is running, you can run:
-
-```shell script
-npm run cypress:open
-```
-
-### e2e testing the release production build
-
-Run the following command from the project root directory:
-
-```
-make test-e2e-release
-```
-
-These tests simulate the full production build of the application.
-
-## Running tests in CI
-
-The e2e tests are also configured to run during CI via a GitHub action workflow.
-
-The CI tests are run against the full release version of the dockerised setup to test against the production version of the application.
-
-## Testing against multiple browsers
-
-The local tests will run against Chrome by default. You can select a different browser in the Cypress GUI, or simply pass an argument in headless mode:
-
-```
-npx cypress run --headless --browser firefox
-```
-
-During CI the tests will run against both Electron (a lightweight version of Chrome) and Firefox.
-
-## Using test fixtures and intercepts
-
-You can test edge cases by adding custom fixture data along with api intercepts. This will allow the tests to run even in the absence of the backend api.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

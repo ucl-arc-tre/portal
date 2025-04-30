@@ -33,7 +33,7 @@ COPY web/package.json .
 
 RUN npm install
 
-CMD [ "npm", "run", "dev", "--", "--host", "0.0.0.0" ]
+CMD [ "npm", "run", "dev", "--", "--port", "0.0.0.0" ]
 
 # -------------------------------------------
 FROM node:22-alpine3.20 AS web-frontend-builder
@@ -41,8 +41,8 @@ FROM node:22-alpine3.20 AS web-frontend-builder
 WORKDIR /app
 COPY web .
 
-RUN --mount=type=cache,target=/app/node_modules/.vite \
-  npm install vite@6.2.5 && \
+RUN --mount=type=cache,target=/app/node_modules/.next \
+  npm install && \
   npm run build
 
 # --------------------------------------------------------
