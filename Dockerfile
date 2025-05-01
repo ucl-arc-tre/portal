@@ -1,3 +1,4 @@
+# ------------- DEV SECTION ----------------
 FROM golang:1.24.2-alpine AS builder
 
 RUN adduser --uid 1000 --disabled-password user && \
@@ -34,14 +35,14 @@ COPY web/package.json web/package-lock.json ./
 RUN npm ci
 CMD ["npm", "run", "dev", "--", "--port", "3000", "--hostname", "0.0.0.0"]
 
-# -------------------------------------------
+# -------------- RELEASE SECTION ------------------
 FROM node:22-alpine3.20 AS web-frontend-builder
 
 WORKDIR /app
 COPY web/src src
 COPY web/public public
 COPY web/package-lock.json web/package.json \
-  web/next.config.ts web/tsconfig.json ./
+  web/next.config.mjs web/tsconfig.json ./
 
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
