@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "lint:cypress": "eslint --config .eslintrc.cypress.mjs cypress/",
+    "lint:cypress": "eslint --config cypress/eslint.config.mjs cypress/",
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome"
