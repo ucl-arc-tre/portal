@@ -32,12 +32,14 @@ export default function Home() {
   });
   return (
     <div className={styles.page}>
-      <h1 id="portal-title">Welcome to the ARC Services Portal</h1>
+      <h1 id="title--portal">Welcome to the ARC Services Portal</h1>
       <main aria-label="ARC portal main content">
         {isAuthed === false && (
           <div>
             <Link href="/oauth2/start">
-              <button className="btn--login">Login with UCL SSO</button>
+              <button className="btn--login" id="login">
+                Login with UCL SSO
+              </button>
             </Link>
           </div>
         )}
@@ -46,7 +48,7 @@ export default function Home() {
           <>
             {/* TODO: get rid of this at some point - replace with some sort of notif on login */}
             <div className="card">
-              <p>
+              <p id="confirmation--login">
                 GET /profile → <strong>{helloMessage}</strong>
               </p>
               <div>
