@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --turbo",
+    "build": "next build --turbo",
     "start": "next start",
     "lint": "next lint",
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
