@@ -49,9 +49,11 @@ export default function Home() {
               <p>
                 GET /profile → <strong>{helloMessage}</strong>
               </p>
-              <Link href="/dashboard">
-                <button>Go to Dashboard</button>
-              </Link>
+              <div>
+                <Link href="/dashboard">
+                  <button>Go to Dashboard</button>
+                </Link>
+              </div>
             </div>
           </>
         )}
