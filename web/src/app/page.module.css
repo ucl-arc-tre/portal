@@ -56,7 +56,6 @@
   font-weight: 600;
 }
 
-
 a.primary {
   background: var(--foreground);
   color: var(--background);
@@ -119,7 +118,6 @@ a.secondary {
   .ctas {
     flex-direction: column;
   }
-
 
   a.secondary {
     min-width: auto;

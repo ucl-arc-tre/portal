@@ -2,9 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-import { getProfile } from "../openapi";
+import { getProfile } from "@/openapi";
 import styles from "./page.module.css";
 import Link from "next/link";
+
+import { client } from "@/openapi/client.gen";
+
+client.setConfig({
+  baseUrl: "/api/v0",
+});
 
 export default function Home() {
   const [helloMessage, setHelloMessage] = useState<string>("");
