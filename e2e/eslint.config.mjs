@@ -20,7 +20,7 @@ const patchedConfig = fixupConfigRules([
 const config = [
 	...patchedConfig,
 	...ts.configs.recommended,
-	{ ignores: [".next/*", "dist/*"] },
+	{ ignores: [".next/*", "out/*"] },
 ];
 
 export default config;
