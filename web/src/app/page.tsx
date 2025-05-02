@@ -36,11 +36,9 @@ export default function Home() {
       <main aria-label="ARC portal main content">
         {isAuthed === false && (
           <div>
-            <Link href="/oauth2/start">
-              <button className="btn--login" id="login">
-                Login with UCL SSO
-              </button>
-            </Link>
+            <button className="btn--login" id="login">
+              <a href="/oauth2/start">Login with UCL SSO</a>
+            </button>
           </div>
         )}
 
