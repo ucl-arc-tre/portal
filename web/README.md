@@ -2,7 +2,7 @@
 
 This React + Typescript project was set up using [NextJS](https://nextjs.org).
 
-Development files are located in '/src' with all components routed into App.ts.
+Development files are located in '/src' with all components routed into the app folder, following conventions of [app routing](https://nextjs.org/docs/14/app/building-your-application/routing)
 
 ---
 
@@ -91,3 +91,7 @@ During CI the tests will run against both Electron (a lightweight version of Chr
 ## Using test fixtures and intercepts
 
 You can test edge cases by adding custom fixture data along with api intercepts. This will allow the tests to run even in the absence of the backend api.
+
+## ESLint
+
+There are several eslint.config.mjs files in this repo with the move to flat configuration removing the `overrides` functionality. You can find the various configs in e2e/, web/ and web/cypress/
