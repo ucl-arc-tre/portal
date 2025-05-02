@@ -42,7 +42,7 @@ WORKDIR /app
 COPY web/src src
 COPY web/public public
 COPY web/package-lock.json web/package.json \
-  web/next.config.mjs web/tsconfig.json ./
+  web/next.config.mjs web/tsconfig.json web/eslint.config.mjs ./
 
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
