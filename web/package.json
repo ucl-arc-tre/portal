@@ -4,11 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
-    "lint:all": "npm run lint && npm run lint:cypress",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "lint:cypress": "eslint --config cypress/eslint.config.mjs cypress/",
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome"
@@ -20,8 +18,6 @@
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.2.8",
-    "@eslint/eslintrc": "^3",
     "@hey-api/openapi-ts": "^0.66.3",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -30,11 +26,7 @@
     "cypress-axe": "^1.6.0",
     "eslint": "^9.25.1",
     "eslint-config-next": "15.3.1",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
-    "eslint-plugin-react-refresh": "^0.4.20",
     "prettier": "^3.5.3",
-    "typescript": "^5",
-    "typescript-eslint": "^8.31.1"
+    "typescript": "^5"
   }
 }

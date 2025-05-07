@@ -1,24 +1,19 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
-import { fixupConfigRules } from "@eslint/compat";
-import ts from "typescript-eslint";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
+
 const compat = new FlatCompat({
   baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
 });
 
-const patchedConfig = fixupConfigRules([...compat.extends("next/core-web-vitals")]);
-
-const config = [
-  ...patchedConfig,
-  ...ts.configs.recommended,
-  { ignores: [".next/*", "dist/*", "cypress/*", "cypress.config.ts"] },
+const eslintConfig = [
+  {
+    ignores: ["out/**", "node_modules/**", ".next/**", "dist/**", "cypress/**", "cypress.config.ts"],
+  },
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 
-export default config;
+export default eslintConfig;
