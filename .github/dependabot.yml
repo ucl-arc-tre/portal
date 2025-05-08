@@ -22,3 +22,6 @@ updates:
       dependencies:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "next"
+        versions: ["^15"]
