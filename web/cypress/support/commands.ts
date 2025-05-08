@@ -42,7 +42,7 @@ Cypress.Commands.add("waitForApi", (retries: number = 5, delay: number = 2000) =
       .request({
         method: "GET",
         url: "/api/v0/profile",
-        failOnStatusCode: false, // we wan't to allow 401's as we only care that the api is up
+        failOnStatusCode: false, // we want to allow 401's as we only care that the api is up
       })
       .then((res) => {
         if ([502, 503, 504].includes(res.status)) {
