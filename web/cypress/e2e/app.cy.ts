@@ -1,3 +1,8 @@
+beforeEach(() => {
+  cy.clearCookies();
+  cy.clearLocalStorage();
+});
+
 describe("ARC Portal UI unauthenticated", () => {
   it("shows the ARC portal phrase on the homepage", () => {
     cy.visit("/");
@@ -8,10 +13,14 @@ describe("ARC Portal UI unauthenticated", () => {
 });
 
 describe("ARC Portal UI authenticated", () => {
+  beforeEach(() => {
+    cy.waitForApi();
+  });
+
   it("can be logged into as an admin", () => {
     cy.loginAsAdmin();
     cy.visit("/");
-    cy.get("#confirmation--login").should("exist");
+    cy.contains("Loading...").should("not.exist");
     cy.contains("GET /profile").should("exist");
   });
 });

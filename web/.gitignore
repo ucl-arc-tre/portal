@@ -1,6 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# Node & Dependencies
 /node_modules
 /.pnp
 .pnp.*
@@ -10,62 +8,48 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# Build Output
 /.next/
 /out/
-
-# production
 /build
+/dist
+/dist-ssr
 
-# misc
-.DS_Store
-*.pem
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
+# Environment
 .env*
+.env.local
+.env.*.local
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Cypress and testing
+cypress/videos
+cypress/screenshots
+cypress/downloads
+cypress.env.json
+/coverage
 
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+*debug.log*
+*error.log*
 
-node_modules
-dist
-dist-ssr
+# System / Misc
+.DS_Store
+*.pem
 *.local
+*.tsbuildinfo
+next-env.d.ts
+.eslintcache
 
-# Editor directories and files
+# Editor Configs
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# cypress e2e testing
-cypress/videos
-cypress/screenshots
-cypress.env.json
+.vercel

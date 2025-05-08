@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import { getProfile } from "@/openapi";
 import styles from "./page.module.css";
 import Link from "next/link";
 
+import { getProfile } from "@/openapi";
 import { client } from "@/openapi/client.gen";
 
 client.setConfig({
@@ -17,48 +17,51 @@ export default function Home() {
   const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    getProfile()
-      .then((res) => {
-        if (res.response.status == 200 && res.data) {
-          setHelloMessage(`Username: ${res.data.username}. Roles: ${res.data.roles.join(",")}`);
+    const fetchProfile = async () => {
+      try {
+        const response = await getProfile();
+
+        if (response.response.status === 200 && response.data) {
+          const { username, roles } = response.data;
+          setHelloMessage(`Username: ${username}. Roles: ${roles.join(", ")}`);
           setIsAuthed(true);
         } else {
           setIsAuthed(false);
         }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        setIsAuthed(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <div className={styles.page}>
       <h1 id="title--portal">Welcome to the ARC Services Portal</h1>
-      <main aria-label="ARC portal main content">
-        {isAuthed === false && (
-          <div>
-            <a href="/oauth2/start" className="btn--login" id="login" role="button">
-              {" "}
-              Login with UCL SSO
-            </a>
-          </div>
-        )}
 
-        {isAuthed === true && (
-          <>
-            {/* TODO: get rid of this at some point - replace with some sort of notif on login */}
-            <div className="card">
-              <p id="confirmation--login">
-                GET /profile → <strong>{helloMessage}</strong>
-              </p>
-              <div>
-                <Link href="/dashboard">
-                  <button>Go to Dashboard</button>
-                </Link>
-              </div>
-            </div>
-          </>
-        )}
-      </main>
+      {isAuthed === undefined && <p>Loading...</p>}
+
+      {isAuthed === false && (
+        <a href="/oauth2/start" className="btn--login" id="login" role="button">
+          Login with UCL SSO
+        </a>
+      )}
+
+      {isAuthed === true && (
+        <>
+          <div className="card">
+            <p id="confirmation--login">
+              GET /profile → <strong>{helloMessage}</strong>
+            </p>
+
+            <Link href="/dashboard">
+              <button>Go to Dashboard</button>
+            </Link>
+          </div>
+        </>
+      )}
     </div>
   );
 }
