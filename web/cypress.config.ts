@@ -9,6 +9,6 @@ module.exports = defineConfig({
     screenshotOnRunFailure: true,
     experimentalStudio: true,
     experimentalModifyObstructiveThirdPartyCode: true,
-    chromeWebSecurity: false,
+    chromeWebSecurity: false, // Necessary for cross-origin logins like AAD
   },
 });

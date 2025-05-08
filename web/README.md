@@ -16,8 +16,6 @@ You need to have [Node.js](https://nodejs.org/en/download/) installed on your lo
 
 This project uses the the latest `Active` version of Node, as recommended by the [Node release schedule](https://nodejs.org/en/about/previous-releases). So make sure you are using this version of Node on your system for this project. We recommend using [NVM](https://github.com/nvm-sh/nvm) to manage local Node versions.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
 To install all the necessary frontend packages and libraries, run the following from the react project directory: `/web`.
 
 ```shell script
@@ -91,7 +89,3 @@ During CI the tests will run against both Electron (a lightweight version of Chr
 ## Using test fixtures and intercepts
 
 You can test edge cases by adding custom fixture data along with api intercepts. This will allow the tests to run even in the absence of the backend api.
-
-## ESLint
-
-There are several eslint.config.mjs files in this repo with the move to flat configuration removing the `overrides` functionality. You can find the various configs in e2e/, web/ and web/cypress/
