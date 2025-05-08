@@ -1,3 +1,4 @@
+# ------------- DEV SECTION ----------------
 FROM golang:1.24.2-alpine AS builder
 
 RUN adduser --uid 1000 --disabled-password user && \
@@ -29,20 +30,22 @@ CMD ["air", "--build.cmd", "go build -o bin/web-api cmd/web-api/main.go", "--bui
 FROM node:22-alpine3.20 AS web-frontend-dev
 
 WORKDIR /repo/web
-COPY web/package.json .
+COPY web/package.json web/package-lock.json web/eslint.config.mjs ./
 
-RUN npm install
+RUN npm ci
+CMD ["npm", "run", "dev", "--", "--port", "3000", "--hostname", "0.0.0.0"]
 
-CMD [ "npm", "run", "dev", "--", "--host", "0.0.0.0" ]
-
-# -------------------------------------------
+# -------------- RELEASE SECTION ------------------
 FROM node:22-alpine3.20 AS web-frontend-builder
 
 WORKDIR /app
-COPY web .
+COPY web/src src
+COPY web/public public
+COPY web/package-lock.json web/package.json \
+  web/next.config.mjs web/tsconfig.json ./
 
-RUN --mount=type=cache,target=/app/node_modules/.vite \
-  npm install vite@6.2.5 && \
+RUN --mount=type=cache,target=/app/node_modules \
+  npm ci && \
   npm run build
 
 # --------------------------------------------------------
@@ -62,7 +65,7 @@ FROM scratch AS web-frontend-release
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder --chmod=777 /app/web-frontend web-frontend
-COPY --from=web-frontend-builder /app/dist .
+COPY --from=web-frontend-builder /app/out .
 
 USER user
 ENV PORT=8080

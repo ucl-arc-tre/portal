@@ -60,7 +60,7 @@ e2e-dependencies:
 	cd e2e/tls && \
 	if [ ! -f nginx.key ]; then echo "creating tls certificates for nginx" && openssl req -x509 -nodes -days 365 -subj "/C=GB" -newkey rsa:2048 -keyout ./nginx.key -out ./nginx.crt; fi
 
-web-lint: ## Lint frontend web things
+web-lint:
 	cd web && npm run lint
 
 web-format:

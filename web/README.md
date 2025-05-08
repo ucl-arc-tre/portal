@@ -1,8 +1,8 @@
 # ARC TRE portal frontent
 
-This React + Typescript project was set up using [Vite](https://vitejs.dev/guide/why.html).
+This React + Typescript project was set up using [NextJS](https://nextjs.org).
 
-Development files are located in '/src' with all components routed into App.ts.
+Development files are located in '/src' with all components routed into the app folder, following conventions of [app routing](https://nextjs.org/docs/14/app/building-your-application/routing)
 
 ---
 
