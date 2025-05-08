@@ -13,12 +13,10 @@ describe("ARC Portal UI unauthenticated", () => {
 });
 
 describe("ARC Portal UI authenticated", () => {
-  beforeEach(() => {
-    cy.waitForApi();
-  });
-
   it("can be logged into as an admin", () => {
     cy.loginAsAdmin();
+    cy.waitForApi(); // poll until the backend API is healthy
+
     cy.visit("/");
     cy.contains("Loading...").should("not.exist");
     cy.contains("GET /profile").should("exist");

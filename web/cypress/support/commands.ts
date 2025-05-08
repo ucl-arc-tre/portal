@@ -30,9 +30,13 @@ declare global {
   }
 }
 
-Cypress.Commands.add("waitForApi", (retries: number = 5, delay: number = 1000) => {
+Cypress.Commands.add("waitForApi", (retries: number = 5, delay: number = 2000) => {
   const tryRequest = (attemptsLeft: number): Cypress.Chainable<any> => {
-    if (attemptsLeft === 0) throw new Error("API not available after multiple attempts");
+    if (attemptsLeft === 0) {
+      throw new Error(
+        "API not available after multiple attempts. Your API Docker container may not be ready yet. Try again in 30 seconds"
+      );
+    }
 
     return cy
       .request({
