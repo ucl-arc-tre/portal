@@ -25,3 +25,5 @@ updates:
     ignore:
       - dependency-name: "next"
         versions: ["^15"]
+      - dependency-name: "next"
+        versions: ["^19"]
