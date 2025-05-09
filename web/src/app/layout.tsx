@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import "./ui/buttons.css";
 
 export const metadata: Metadata = {
-  title: "test title",
-  description: "test description",
+  title: "UCL ARC | portal",
+  description: "Portal for UCL ARC services",
 };
 
 export default function RootLayout({

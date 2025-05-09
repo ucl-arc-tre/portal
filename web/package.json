@@ -1,5 +1,5 @@
 {
-  "name": "my-app-15",
+  "name": "ucl-arc-tre-portal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,17 +13,17 @@
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.10.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "next": "15.3.2"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.66.3",
+    "@hey-api/openapi-ts": "^0.67.3",
     "typescript": "^5",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cypress": "^14.3.0",
+    "cypress": "^14.3.3",
     "cypress-axe": "^1.6.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
