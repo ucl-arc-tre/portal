@@ -39,10 +39,9 @@ CMD ["npm", "run", "dev", "--", "--port", "3000", "--hostname", "0.0.0.0"]
 FROM node:22-alpine3.20 AS web-frontend-builder
 
 WORKDIR /app
-COPY web/src src
-COPY web/public public
-COPY web/package-lock.json web/package.json \
-  web/next.config.mjs web/tsconfig.json ./
+
+# Copy the rest of the frontend app
+COPY web/ ./
 
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
