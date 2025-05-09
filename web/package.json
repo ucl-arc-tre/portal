@@ -1,32 +1,33 @@
 {
-  "name": "ucl-arc-tre-portal",
-  "version": "0.0.0",
+  "name": "my-app-15",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "next lint",
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome"
   },
   "dependencies": {
     "@hey-api/client-fetch": "^0.10.0",
-    "next": "^14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "15.3.2"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.66.3",
+    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cypress": "^14.3.0",
     "cypress-axe": "^1.6.0",
-    "eslint": "^9.25.1",
-    "eslint-config-next": "15.3.1",
-    "prettier": "^3.5.3",
-    "typescript": "^5"
+    "eslint": "^9",
+    "eslint-config-next": "15.3.2",
+    "@eslint/eslintrc": "^3",
+    "prettier": "^3.5.3"
   }
 }
