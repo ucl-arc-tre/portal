@@ -40,8 +40,10 @@ FROM node:22-alpine3.20 AS web-frontend-builder
 
 WORKDIR /app
 
-# Copy the rest of the frontend app
-COPY web/ ./
+COPY web/src src
+COPY web/public public
+COPY web/package-lock.json web/package.json \
+  web/next.config.ts web/tsconfig.json ./
 
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
