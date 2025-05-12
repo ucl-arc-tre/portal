@@ -18,7 +18,6 @@ func main() {
 	router.StaticFile("/favicon.ico", "./favicon.ico")
 	router.StaticFile("/index.txt", "./index.txt")
 
-	// mount every *.html file in "." as its own route
 	registerHTMLRoutes(router)
 
 	// serve fallback 404 page
@@ -30,6 +29,7 @@ func main() {
 	graceful.Serve(router.Handler())
 }
 
+// mount every *.html file as its own route
 func registerHTMLRoutes(router *gin.Engine) {
 	items, err := os.ReadDir(".")
 
