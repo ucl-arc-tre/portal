@@ -1,0 +1,31 @@
+.sidebar {
+  width: 220px;
+  background-color: #0b0b0b;
+  padding: 1rem;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-list li {
+  margin: 0.5rem 0;
+}
+
+.nav-list a {
+  text-decoration: none;
+  color: #efefef;
+}
+
+.nav-list a:hover {
+  text-decoration: underline;
+}

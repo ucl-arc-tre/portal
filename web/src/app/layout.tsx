@@ -1,22 +1,22 @@
-import type { Metadata } from "next";
-
 import "./globals.css";
-import "./ui/buttons.css";
+import "./layout.css";
 
-export const metadata: Metadata = {
+import Nav from "@/components/nav/Nav";
+import type { ReactNode } from "react";
+
+export const metadata = {
   title: "UCL ARC | portal",
   description: "Portal for UCL ARC services",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <main className="main-content">{children}</main>
+        <div className="layout">
+          <Nav />
+          <main className="main-content">{children}</main>
+        </div>
       </body>
     </html>
   );

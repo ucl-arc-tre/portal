@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import styles from "./page.module.css";
+import "./page.css";
 import Link from "next/link";
 
 import { getProfile } from "@/openapi";
@@ -38,7 +38,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={styles.page}>
+    <div className="page">
       <h1 id="title--portal">Welcome to the ARC Services Portal</h1>
 
       {isAuthed === undefined && <p>Loading...</p>}
