@@ -5,11 +5,6 @@ import { useEffect, useState } from "react";
 import "./page.css";
 
 import { getProfile } from "@/openapi";
-import { client } from "@/openapi/client.gen";
-
-client.setConfig({
-  baseUrl: "/api/v0",
-});
 
 export default function Home() {
   const [helloMessage, setHelloMessage] = useState<string>("");

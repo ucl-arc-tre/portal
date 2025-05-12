@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getProfile, ProfileResponse } from "@/openapi";
-import { client } from "@/openapi/client.gen";
 import Link from "next/link";
 
-import "./profile.css";
+import { getProfile, ProfileResponse } from "@/openapi";
 
-client.setConfig({
-  baseUrl: "/api/v0",
-});
+import "./profile.css";
 
 export default function ProfilePage() {
   const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);

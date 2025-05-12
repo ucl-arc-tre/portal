@@ -1,8 +1,7 @@
 .sidebar {
   width: 220px;
-  background-color: #0b0b0b;
+  background-color: var(--background);
   padding: 1rem;
-  border-right: 1px solid #ddd;
 }
 
 .sidebar-title {
@@ -23,7 +22,7 @@
 
 .nav-list a {
   text-decoration: none;
-  color: #efefef;
+  color: var(--foreground);
 }
 
 .nav-list a:hover {
