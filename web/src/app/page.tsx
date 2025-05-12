@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import "./page.css";
-import Link from "next/link";
 
 import { getProfile } from "@/openapi";
 import { client } from "@/openapi/client.gen";
@@ -55,10 +54,8 @@ export default function Home() {
             <p id="confirmation--login">
               GET /profile → <strong>{helloMessage}</strong>
             </p>
-
-            <Link href="/dashboard">
-              <button>Go to Dashboard</button>
-            </Link>
+            <div>Your tasks:</div>
+            <div>List of user tasks here (e.g. approved researcher process)</div>
           </div>
         </>
       )}
