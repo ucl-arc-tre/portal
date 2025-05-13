@@ -2,13 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { getProfile } from "@/openapi";
-import { client } from "@/openapi/client.gen";
 
 import ApprovedResearcherForm from "./components/ApprovedResearcherForm";
-
-client.setConfig({
-  baseUrl: "/api/v0",
-});
 
 export default function ProfilePage() {
   const [isAuthed, setIsAuthed] = useState<boolean | undefined>(undefined);
