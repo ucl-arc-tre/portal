@@ -10,3 +10,14 @@ describe("Accessibility - ARC Portal Homepage", () => {
     });
   });
 });
+
+describe("Accessibility - ARC Portal Profile page", () => {
+  it("should have no critical or serious accessibility violations on initial load", () => {
+    cy.visit("/profile");
+
+    cy.injectAxe();
+    cy.checkA11y(undefined, {
+      includedImpacts: ["critical", "serious"],
+    });
+  });
+});
