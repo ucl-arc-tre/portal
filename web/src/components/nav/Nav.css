@@ -1,0 +1,30 @@
+.sidebar {
+  width: 220px;
+  background-color: var(--background);
+  padding: 1rem;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-list li {
+  margin: 0.5rem 0;
+}
+
+.nav-list a {
+  text-decoration: none;
+  color: var(--foreground);
+}
+
+.nav-list a:hover {
+  text-decoration: underline;
+}

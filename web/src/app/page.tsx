@@ -2,15 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import styles from "./page.module.css";
-import Link from "next/link";
+import "./page.css";
 
 import { getProfile } from "@/openapi";
-import { client } from "@/openapi/client.gen";
-
-client.setConfig({
-  baseUrl: "/api/v0",
-});
 
 export default function Home() {
   const [helloMessage, setHelloMessage] = useState<string>("");
@@ -38,7 +32,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={styles.page}>
+    <div className="page">
       <h1 id="title--portal">Welcome to the ARC Services Portal</h1>
 
       {isAuthed === undefined && <p>Loading...</p>}
@@ -55,10 +49,8 @@ export default function Home() {
             <p id="confirmation--login">
               GET /profile → <strong>{helloMessage}</strong>
             </p>
-
-            <Link href="/dashboard">
-              <button>Go to Dashboard</button>
-            </Link>
+            <div>Your tasks:</div>
+            <div>List of user tasks here (e.g. approved researcher process)</div>
           </div>
         </>
       )}
