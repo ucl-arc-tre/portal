@@ -8,7 +8,7 @@ export default function Nav() {
 
   return (
     <aside className="sidebar">
-      <h2 className="sidebar-title">UCL ARC TRE</h2>
+      <h2 className="sidebar-title">UCL ARC Portal</h2>
 
       <nav>
         <ul className="nav-list">

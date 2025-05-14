@@ -10,7 +10,6 @@ export default function ApprovedResearcherForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", agreed);
     setSubmitted(true);
   };
 
@@ -36,7 +35,7 @@ export default function ApprovedResearcherForm() {
       )}
       {submitted && (
         <div className="submitted-box">
-          <p>Form submitted! Here`&apos;`s the data:</p>
+          <p>Form submitted! Data:</p>
 
           <pre>{JSON.stringify(agreed, null, 2)}</pre>
         </div>
