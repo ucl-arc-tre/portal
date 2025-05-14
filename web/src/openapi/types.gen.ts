@@ -60,13 +60,17 @@ export type GetAgreementsApprovedResearcherErrors = {
      */
     406: unknown;
     /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
      * Unexpected error
      */
     default: unknown;
 };
 
 export type GetAgreementsApprovedResearcherResponses = {
-    204: Agreement;
+    200: Agreement;
 };
 
 export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];

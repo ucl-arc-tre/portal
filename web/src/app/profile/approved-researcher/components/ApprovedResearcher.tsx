@@ -34,7 +34,7 @@ export default function ApprovedResearcher() {
   return (
     agreement && (
       <>
-        <AgreementText text={agreement?.text} />
+        <AgreementText text={agreement.text} />
         <ApprovedResearcherForm agreementId={agreement.id} />
       </>
     )

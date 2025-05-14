@@ -31,13 +31,15 @@ paths:
     get:
       description: Get the latest approved researcher agreement
       responses:
-        "204":
+        "200":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Agreement"
         "406":
           description: Not acceptable
+        "500":
+          description: Internal server error
         default:
           description: Unexpected error
 
