@@ -12,8 +12,8 @@ export default function ApprovedResearcher() {
 
   return (
     <>
-      <ApprovedResearcherForm />
       <AgreementText />
+      <ApprovedResearcherForm />
     </>
   );
 }

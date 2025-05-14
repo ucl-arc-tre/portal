@@ -13,6 +13,7 @@ export default function AgreementText() {
         const res = await getAgreementsApprovedResearcher();
 
         if (res.response.status === 200 && res.data) {
+          console.log(res.data.text);
           setAgreementText(res.data.text);
         }
       } catch (err) {
