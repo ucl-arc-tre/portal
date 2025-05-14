@@ -12,7 +12,7 @@ export default function LoginFallback({
       <h1>{title}</h1>
       <p>{message}</p>
 
-      <a href={`/oauth2/start?`} className="login-link" role="button">
+      <a href={`/oauth2/start?`} className="login-link" role="button" id="login">
         Login with UCL SSO
       </a>
     </>
