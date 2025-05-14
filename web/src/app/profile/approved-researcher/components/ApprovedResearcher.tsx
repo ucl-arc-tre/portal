@@ -6,7 +6,9 @@ import ApprovedResearcherForm from "./ApprovedResearcherForm";
 import AgreementText from "./AgreementText";
 
 export default function ApprovedResearcher() {
-  const { isAuthed } = useAuth();
+  const { loading, isAuthed } = useAuth();
+
+  if (loading) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
