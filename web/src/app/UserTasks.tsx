@@ -3,13 +3,11 @@
 import { useAuth } from "./hooks/useAuth";
 
 export default function UserTasks() {
-  const { loading, isAuthed, userData } = useAuth();
-
-  if (loading) return <p>Loading…</p>;
+  const { isAuthed, userData } = useAuth();
 
   if (!isAuthed) {
     return (
-      <a href={`/oauth2/start?rd=${encodeURIComponent(window.location.pathname)}`} className="btn--login" id="login">
+      <a href={`/oauth2/start`} className="btn--login" id="login">
         Login with UCL SSO
       </a>
     );

@@ -5,9 +5,7 @@ import ApprovedResearcherForm from "./ApprovedResearcherForm";
 import AgreementText from "./AgreementText";
 
 export default function ApprovedResearcher() {
-  const { loading, isAuthed } = useAuth();
-
-  if (loading) return <p>Loading…</p>;
+  const { isAuthed } = useAuth();
 
   if (!isAuthed) {
     return (

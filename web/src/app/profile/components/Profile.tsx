@@ -4,15 +4,13 @@ import Link from "next/link";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function Profile() {
-  const { loading, isAuthed, userData } = useAuth();
-
-  if (loading) return <p>Loading…</p>;
+  const { isAuthed, userData } = useAuth();
 
   if (!isAuthed) {
     return (
       <>
         <p>You must be logged in to view this page</p>
-        <a href={`/oauth2/start?rd=${encodeURIComponent(window.location.pathname)}`} className="btn--login">
+        <a href={`/oauth2/start`} className="btn--login">
           Login with UCL SSO
         </a>
       </>
