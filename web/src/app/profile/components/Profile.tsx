@@ -2,20 +2,12 @@
 
 import Link from "next/link";
 import { useAuth } from "../../hooks/useAuth";
+import LoginFallback from "@/components/ui/LoginFallback";
 
 export default function Profile() {
   const { isAuthed, userData } = useAuth();
 
-  if (!isAuthed) {
-    return (
-      <>
-        <p>You must be logged in to view this page</p>
-        <a href={`/oauth2/start`} className="btn--login">
-          Login with UCL SSO
-        </a>
-      </>
-    );
-  }
+  if (!isAuthed) return <LoginFallback />;
 
   return (
     <>

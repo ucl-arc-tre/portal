@@ -1,17 +1,12 @@
 "use client";
 
 import { useAuth } from "./hooks/useAuth";
+import LoginFallback from "@/components/ui/LoginFallback";
 
 export default function UserTasks() {
   const { isAuthed, userData } = useAuth();
 
-  if (!isAuthed) {
-    return (
-      <a href={`/oauth2/start`} className="btn--login" id="login">
-        Login with UCL SSO
-      </a>
-    );
-  }
+  if (!isAuthed) return <LoginFallback />;
 
   return (
     <div className="card">
