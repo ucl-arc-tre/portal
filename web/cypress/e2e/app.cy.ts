@@ -19,6 +19,6 @@ describe("ARC Portal UI authenticated", () => {
 
     cy.visit("/");
     cy.contains("Loading...").should("not.exist");
-    cy.contains("GET /profile").should("exist");
+    cy.contains("List of user tasks here").should("exist");
   });
 });

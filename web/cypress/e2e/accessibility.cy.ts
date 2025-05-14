@@ -1,12 +1,18 @@
 import "cypress-axe";
 
-describe("Accessibility - ARC Portal Homepage", () => {
-  it("should have no critical or serious accessibility violations on initial load", () => {
-    cy.visit("/");
+const pages = [
+  { name: "Homepage", path: "/" },
+  { name: "Profile page", path: "/profile" },
+];
 
-    cy.injectAxe();
-    cy.checkA11y(undefined, {
-      includedImpacts: ["critical", "serious"],
+describe("Accessibility - ARC Portal", () => {
+  pages.forEach(({ name, path }) => {
+    it(`should have no critical or serious accessibility violations on ${name}`, () => {
+      cy.visit(path);
+      cy.injectAxe();
+      cy.checkA11y(undefined, {
+        includedImpacts: ["critical", "serious"],
+      });
     });
   });
 });
