@@ -14,11 +14,20 @@ type Agreement struct {
 	Text string `json:"text"`
 }
 
+// AgreementConformation defines model for AgreementConformation.
+type AgreementConformation struct {
+	// AgreementId UUID of the agreement that has been agreed to
+	AgreementId string `json:"agreement_id"`
+}
+
 // ProfileResponse defines model for ProfileResponse.
 type ProfileResponse struct {
 	Roles    []string `json:"roles"`
 	Username string   `json:"username"`
 }
+
+// PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
+type PostProfileAgreementsJSONRequestBody = AgreementConformation
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -28,6 +37,9 @@ type ServerInterface interface {
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
+
+	// (POST /profile/agreements)
+	PostProfileAgreements(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -65,6 +77,19 @@ func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
 	siw.Handler.GetProfile(c)
 }
 
+// PostProfileAgreements operation middleware
+func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProfileAgreements(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -94,4 +119,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
+	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 }

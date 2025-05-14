@@ -13,6 +13,13 @@ export type Agreement = {
     text: string;
 };
 
+export type AgreementConformation = {
+    /**
+     * UUID of the agreement that has been agreed to
+     */
+    agreement_id: string;
+};
+
 export type GetProfileData = {
     body?: never;
     path?: never;
@@ -33,6 +40,13 @@ export type GetProfileResponses = {
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
 
+export type PostProfileAgreementsData = {
+    body: AgreementConformation;
+    path?: never;
+    query?: never;
+    url: '/profile/agreements';
+};
+
 export type GetAgreementsApprovedResearcherData = {
     body?: never;
     path?: never;
@@ -42,13 +56,17 @@ export type GetAgreementsApprovedResearcherData = {
 
 export type GetAgreementsApprovedResearcherErrors = {
     /**
+     * Not acceptable
+     */
+    406: unknown;
+    /**
      * Unexpected error
      */
     default: unknown;
 };
 
 export type GetAgreementsApprovedResearcherResponses = {
-    200: Agreement;
+    204: Agreement;
 };
 
 export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];

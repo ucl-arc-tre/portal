@@ -16,9 +16,13 @@ const (
 
 // Initalise the database with the required types
 func InitDB() {
+	types := []any{
+		&types.User{},
+		&types.Agreement{},
+		&types.UserAgreementConformation{},
+	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
-	types := []any{&types.User{}, &types.Agreement{}}
 	for _, t := range types {
 		if err := db.AutoMigrate(t); err != nil {
 			panic(err)
