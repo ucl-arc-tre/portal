@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 
-import "./ApprovedResearcherForm.css";
+import "./AgreementForm.css";
 import { postProfileAgreements } from "@/openapi";
 
-export default function ApprovedResearcherForm({ agreementId }: { agreementId: string }) {
+export default function ApprovedResearcherForm({
+  agreementId,
+  setAgreementConfirmed,
+}: {
+  agreementId: string;
+  setAgreementConfirmed: CallableFunction;
+}) {
   const [submitted, setSubmitted] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
@@ -14,6 +20,7 @@ export default function ApprovedResearcherForm({ agreementId }: { agreementId: s
     try {
       postProfileAgreements({ body: { agreement_id: agreementId } });
       setSubmitted(true);
+      setAgreementConfirmed(true);
     } catch (err) {
       console.error("Agreement post error:", err);
     }

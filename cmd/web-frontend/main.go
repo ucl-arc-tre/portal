@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -16,9 +17,8 @@ func main() {
 
 	router.Static("/_next", "./_next")
 	router.StaticFile("/favicon.ico", "./favicon.ico")
-	router.StaticFile("/index.txt", "./index.txt")
 
-	registerHTMLRoutes(router)
+	registerHTMLRoutes(router, ".")
 
 	// serve fallback 404 page
 	router.NoRoute(func(c *gin.Context) {
@@ -30,27 +30,33 @@ func main() {
 }
 
 // mount every *.html file as its own route
-func registerHTMLRoutes(router *gin.Engine) {
-	items, err := os.ReadDir(".")
+func registerHTMLRoutes(router *gin.Engine, dir string) {
+	items, err := os.ReadDir(dir)
 
 	if err != nil {
 		panic(fmt.Sprintf("failed to read dir [%v]", err))
 	}
 
 	for _, item := range items {
-		if item.IsDir() || !strings.HasSuffix(item.Name(), ".html") {
+		if item.IsDir() {
+			registerHTMLRoutes(router, filepath.Join(dir, item.Name()))
+			continue
+		}
+		if !strings.HasSuffix(item.Name(), ".html") || item.Name() == "404.html" {
 			continue
 		}
 
-		file := item.Name() // e.g. "about.html"
-		route := "/" + strings.TrimSuffix(file, ".html")
-		if file == "index.html" {
+		filePath := filepath.Join(dir, item.Name()) // e.g. "./about.html"
+		route := "/" + strings.TrimSuffix(filePath, ".html")
+		if filePath == "index.html" {
 			route = "/"
 		}
 
-		filePath := "./" + file
 		router.GET(route, func(c *gin.Context) {
 			c.File(filePath)
 		})
+
+		txtFilePath := strings.ReplaceAll(filePath, ".html", ".txt")
+		router.StaticFile("/"+txtFilePath, txtFilePath)
 	}
 }

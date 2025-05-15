@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
-	BaseURL = "/api/v0"
+	BaseURL    = "/api/v0"
+	TimeFormat = time.RFC3339
 )
 
 func ServerAddress() string {

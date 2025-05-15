@@ -19,6 +19,18 @@ paths:
         default:
           description: Unexpected error
   /profile/agreements:
+    get:
+      description: Get all the agreements a user has agreed to
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileAgreements"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
     post:
       requestBody:
         required: true
@@ -57,6 +69,7 @@ components:
           type: array
           items:
             type: string
+
     Agreement:
       type: object
       required:
@@ -68,6 +81,7 @@ components:
           description: UUID of the agreement
         text:
           type: string
+
     AgreementConfirmation:
       type: object
       required:
@@ -76,3 +90,26 @@ components:
         agreement_id:
           type: string
           description: UUID of the agreement that has been agreed to
+
+    ConfirmedAgreement:
+      type: object
+      required:
+        - confirmed_at
+        - agreement_type
+      properties:
+        confirmed_at:
+          type: string
+          description: Time in RFC3339 format at which the agreement was confirmed
+        agreement_type:
+          type: string
+          description: Type of agreement that was confirmed
+
+    ProfileAgreements:
+      type: object
+      required:
+        - confirmed_agreements
+      properties:
+        confirmed_agreements:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConfirmedAgreement"

@@ -23,9 +23,7 @@ export default function Profile() {
           </p>
 
           <p>
-            <Link href="/profile/approved-researcher" className="btn--form">
-              Become an approved researcher
-            </Link>
+            <Link href="/profile/approved-researcher">Become an approved researcher</Link>
           </p>
         </>
       )}

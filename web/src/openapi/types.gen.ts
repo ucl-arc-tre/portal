@@ -20,6 +20,21 @@ export type AgreementConfirmation = {
     agreement_id: string;
 };
 
+export type ConfirmedAgreement = {
+    /**
+     * Time in RFC3339 format at which the agreement was confirmed
+     */
+    confirmed_at: string;
+    /**
+     * Type of agreement that was confirmed
+     */
+    agreement_type: string;
+};
+
+export type ProfileAgreements = {
+    confirmed_agreements: Array<ConfirmedAgreement>;
+};
+
 export type GetProfileData = {
     body?: never;
     path?: never;
@@ -39,6 +54,30 @@ export type GetProfileResponses = {
 };
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+
+export type GetProfileAgreementsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/profile/agreements';
+};
+
+export type GetProfileAgreementsErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProfileAgreementsResponses = {
+    200: ProfileAgreements;
+};
+
+export type GetProfileAgreementsResponse = GetProfileAgreementsResponses[keyof GetProfileAgreementsResponses];
 
 export type PostProfileAgreementsData = {
     body: AgreementConfirmation;
