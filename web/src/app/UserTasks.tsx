@@ -4,7 +4,9 @@ import { useAuth } from "./hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 
 export default function UserTasks() {
-  const { isAuthed, userData } = useAuth();
+  const { loading, isAuthed, userData } = useAuth();
+
+  if (loading) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
