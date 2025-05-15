@@ -1,7 +1,8 @@
 "use client";
 
+import "./AgreementText.css";
+import Markdown from "react-markdown";
 import { useEffect, useState } from "react";
-
 import { getAgreementsApprovedResearcher } from "@/openapi";
 
 export default function AgreementText() {
@@ -23,5 +24,9 @@ export default function AgreementText() {
     fetchAgreement();
   }, []);
 
-  return <p>{agreementText}</p>;
+  return (
+    <section className="section">
+      <Markdown>{agreementText}</Markdown>
+    </section>
+  );
 }

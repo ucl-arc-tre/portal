@@ -1,0 +1,19 @@
+.section {
+  padding-top: 1rem;
+
+  p {
+    padding-top: 0.7rem;
+  }
+
+  li {
+    padding-top: 0.2rem;
+  }
+
+  a {
+    color: #6900ff;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
