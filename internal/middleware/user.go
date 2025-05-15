@@ -43,17 +43,17 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	if username == "" {
 		panic("username header unset")
 	}
-	user, existsInCache := u.cache.Get(username)
-	if !existsInCache {
-		user, err := u.persistedUser(username)
-		if err != nil {
-			log.Err(err).Msg("Failed to get user")
-			ctx.AbortWithStatus(http.StatusInternalServerError)
-			return
-		} else {
-			_ = u.cache.Add(username, user)
-		}
+	if user, existsInCache := u.cache.Get(username); existsInCache {
+		ctx.Set(userContextKey, user)
+		return
 	}
+	user, err := u.persistedUser(username)
+	if err != nil {
+		log.Err(err).Msg("Failed to get user")
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	_ = u.cache.Add(username, user)
 	ctx.Set(userContextKey, user)
 }
 
