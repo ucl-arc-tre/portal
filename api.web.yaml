@@ -25,7 +25,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AgreementConformation"
+              $ref: "#/components/schemas/AgreementConfirmation"
 
   /agreements/approved-researcher:
     get:
@@ -68,7 +68,7 @@ components:
           description: UUID of the agreement
         text:
           type: string
-    AgreementConformation:
+    AgreementConfirmation:
       type: object
       required:
         - agreement_id

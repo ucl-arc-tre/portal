@@ -18,7 +18,7 @@ func New() *Service {
 }
 
 func (s *Service) ConfirmAgreement(user types.User, agreementId uuid.UUID) error {
-	conformation := types.UserAgreementConformation{
+	conformation := types.UserAgreementConfirmation{
 		UserID:      user.ID,
 		AgreementID: agreementId,
 	}

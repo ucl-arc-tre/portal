@@ -13,7 +13,7 @@ export type Agreement = {
     text: string;
 };
 
-export type AgreementConformation = {
+export type AgreementConfirmation = {
     /**
      * UUID of the agreement that has been agreed to
      */
@@ -41,7 +41,7 @@ export type GetProfileResponses = {
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
 
 export type PostProfileAgreementsData = {
-    body: AgreementConformation;
+    body: AgreementConfirmation;
     path?: never;
     query?: never;
     url: '/profile/agreements';

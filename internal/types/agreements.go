@@ -10,7 +10,7 @@ type Agreement struct {
 	Text string `gorm:"unique"`
 }
 
-type UserAgreementConformation struct {
+type UserAgreementConfirmation struct {
 	Model
 	User        User
 	UserID      uuid.UUID

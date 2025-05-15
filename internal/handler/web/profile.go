@@ -27,7 +27,7 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 
 func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	conformation := openapi.AgreementConformation{}
+	conformation := openapi.AgreementConfirmation{}
 	if err := ctx.ShouldBindJSON(&conformation); err != nil {
 		log.Err(err).Msg("Invalid JSON object")
 		ctx.Status(http.StatusNotAcceptable)

@@ -19,7 +19,7 @@ func InitDB() {
 	types := []any{
 		&types.User{},
 		&types.Agreement{},
-		&types.UserAgreementConformation{},
+		&types.UserAgreementConfirmation{},
 	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)

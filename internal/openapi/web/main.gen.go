@@ -14,8 +14,8 @@ type Agreement struct {
 	Text string `json:"text"`
 }
 
-// AgreementConformation defines model for AgreementConformation.
-type AgreementConformation struct {
+// AgreementConfirmation defines model for AgreementConfirmation.
+type AgreementConfirmation struct {
 	// AgreementId UUID of the agreement that has been agreed to
 	AgreementId string `json:"agreement_id"`
 }
@@ -27,7 +27,7 @@ type ProfileResponse struct {
 }
 
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
-type PostProfileAgreementsJSONRequestBody = AgreementConformation
+type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {

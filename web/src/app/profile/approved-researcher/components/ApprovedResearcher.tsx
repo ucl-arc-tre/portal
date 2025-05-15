@@ -8,7 +8,7 @@ import { Agreement, getAgreementsApprovedResearcher } from "@/openapi";
 import { useEffect, useState } from "react";
 
 export default function ApprovedResearcher() {
-  const { isAuthed } = useAuth();
+  const { loading, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
 
   useEffect(() => {
@@ -28,6 +28,8 @@ export default function ApprovedResearcher() {
       fetchAgreement();
     }
   }, [isAuthed]);
+
+  if (loading) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
