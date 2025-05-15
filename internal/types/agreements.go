@@ -12,6 +12,8 @@ type Agreement struct {
 
 type UserAgreementConformation struct {
 	Model
+	User        User
 	UserID      uuid.UUID
+	Agreement   Agreement
 	AgreementID uuid.UUID
 }

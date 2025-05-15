@@ -31,7 +31,7 @@ export default function ApprovedResearcherForm({ agreementId }: { agreementId: s
               setAgreed(!agreed);
             }}
             checked={agreed}
-            className="input-field"
+            className="input-checkbox"
             required
           />
           <button type="submit" className="submit-button">
