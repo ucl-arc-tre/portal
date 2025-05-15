@@ -18,12 +18,12 @@ func New() *Service {
 }
 
 func (s *Service) ConfirmAgreement(user types.User, agreementId uuid.UUID) error {
-	conformation := types.UserAgreementConfirmation{
+	confirmation := types.UserAgreementConfirmation{
 		UserID:      user.ID,
 		AgreementID: agreementId,
 	}
-	result := s.db.Where(&conformation).Assign(types.Agreement{
+	result := s.db.Where(&confirmation).Assign(types.Agreement{
 		Model: types.Model{CreatedAt: time.Now()},
-	}).FirstOrCreate(&conformation)
+	}).FirstOrCreate(&confirmation)
 	return result.Error
 }

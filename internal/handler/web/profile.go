@@ -27,13 +27,13 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 
 func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	conformation := openapi.AgreementConfirmation{}
-	if err := ctx.ShouldBindJSON(&conformation); err != nil {
+	confirmation := openapi.AgreementConfirmation{}
+	if err := ctx.ShouldBindJSON(&confirmation); err != nil {
 		log.Err(err).Msg("Invalid JSON object")
 		ctx.Status(http.StatusNotAcceptable)
 		return
 	}
-	agreementId, err := uuid.Parse(conformation.AgreementId)
+	agreementId, err := uuid.Parse(confirmation.AgreementId)
 	if err != nil {
 		log.Err(err).Msg("Invalid agreemenet ID")
 		ctx.Status(http.StatusNotAcceptable)
