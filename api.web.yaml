@@ -18,6 +18,15 @@ paths:
                 $ref: "#/components/schemas/ProfileResponse"
         default:
           description: Unexpected error
+  /profile/agreements:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgreementConfirmation"
+
   /agreements/approved-researcher:
     get:
       description: Get the latest approved researcher agreement
@@ -27,6 +36,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Agreement"
+        "406":
+          description: Not acceptable
+        "500":
+          description: Internal server error
         default:
           description: Unexpected error
 
@@ -55,3 +68,11 @@ components:
           description: UUID of the agreement
         text:
           type: string
+    AgreementConfirmation:
+      type: object
+      required:
+        - agreement_id
+      properties:
+        agreement_id:
+          type: string
+          description: UUID of the agreement that has been agreed to

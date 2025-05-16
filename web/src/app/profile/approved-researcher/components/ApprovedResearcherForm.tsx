@@ -3,14 +3,20 @@
 import { useState } from "react";
 
 import "./ApprovedResearcherForm.css";
+import { postProfileAgreements } from "@/openapi";
 
-export default function ApprovedResearcherForm() {
+export default function ApprovedResearcherForm({ agreementId }: { agreementId: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    try {
+      postProfileAgreements({ body: { agreement_id: agreementId } });
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Agreement post error:", err);
+    }
   };
 
   return (
@@ -25,7 +31,7 @@ export default function ApprovedResearcherForm() {
               setAgreed(!agreed);
             }}
             checked={agreed}
-            className="input-field"
+            className="input-checkbox"
             required
           />
           <button type="submit" className="submit-button">
@@ -35,9 +41,7 @@ export default function ApprovedResearcherForm() {
       )}
       {submitted && (
         <div className="submitted-box">
-          <p>Form submitted! Data:</p>
-
-          <pre>{JSON.stringify(agreed, null, 2)}</pre>
+          <p>Agreement confirmed</p>
         </div>
       )}
     </div>
