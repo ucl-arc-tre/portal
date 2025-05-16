@@ -1,4 +1,5 @@
 import Profile from "./components/Profile";
+import "./profile.css";
 
 export const metadata = {
   title: "User Profile | ARC Services Portal",
@@ -7,7 +8,7 @@ export const metadata = {
 
 export default function ProfilePage() {
   return (
-    <div>
+    <div className="page page--profile">
       <h1>Profile</h1>
       <p>This is your profile. More profile features coming soon.</p>
 

@@ -10,6 +10,6 @@
     padding: 0.5rem;
     margin: 1rem 1rem;
     border-radius: 6px;
-    background-color: #165823;
+    background-color: var(--cta-green);
   }
 }
