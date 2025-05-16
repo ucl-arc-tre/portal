@@ -30,7 +30,6 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
     <div className="form form__wrapper">
       {!submitted && (
         <form onSubmit={handleSubmit}>
-          I agree
           <input
             type="checkbox"
             name="agreed"
@@ -39,7 +38,8 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             }}
             checked={agreed}
             required
-          />
+          />{" "}
+          I agree
           <button type="submit" className="btn button--submit">
             Submit
           </button>

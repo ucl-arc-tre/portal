@@ -4,7 +4,7 @@
   padding: 1rem;
 }
 
-.checkbox--agree {
+input[name="agreed"][type="checkbox"] {
   margin: 0.5rem;
 }
 
@@ -12,7 +12,6 @@
   width: 100%;
   padding: 0.5rem;
   margin-top: 1rem;
-  background-color: var(--cta-green);
   color: white;
   border: none;
   border-radius: 4px;
