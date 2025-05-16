@@ -11,7 +11,7 @@ export default function UserTasks() {
   if (!isAuthed) return <LoginFallback />;
 
   return (
-    <div className="card">
+    <div className="card card--user-tasks">
       <p>
         Username&nbsp;{userData!.username}. Roles:&nbsp;
         {userData!.roles.join(", ")}

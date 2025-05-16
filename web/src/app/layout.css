@@ -8,3 +8,7 @@ main.content {
   flex: 1;
   padding: 2rem;
 }
+
+.page {
+  height: 100svh;
+}
