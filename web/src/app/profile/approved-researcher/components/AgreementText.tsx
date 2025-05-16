@@ -9,7 +9,7 @@ type AgreementTextProps = {
 
 export default function AgreementText(props: AgreementTextProps) {
   return (
-    <section className="section" id="approved-researcher-agreement-text">
+    <section className="section section--approved-researcher-agreement">
       <Markdown>{props.text}</Markdown>
     </section>
   );
