@@ -3,10 +3,14 @@
 import "./AgreementText.css";
 import Markdown from "react-markdown";
 
-export default function AgreementText({ text }: { text: string }) {
+type AgreementTextProps = {
+  agreementText: string;
+};
+
+export default function AgreementText(props: AgreementTextProps) {
   return (
     <section className="section">
-      <Markdown>{text}</Markdown>
+      <Markdown>{props.agreementText}</Markdown>
     </section>
   );
 }
