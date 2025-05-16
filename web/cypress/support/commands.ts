@@ -71,6 +71,6 @@ Cypress.Commands.add("loginAsAdmin", () => {
     log.snapshot("after");
     log.end();
 
-    cy.waitForApi(); // Wait for the API to be available
+    cy.waitForApi(); // poll until the backend API is available
   });
 });
