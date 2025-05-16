@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function ProfilePage() {
   return (
-    <div className="profile-page">
+    <div>
       <h1>Profile</h1>
       <p>This is your profile. More profile features coming soon.</p>
 

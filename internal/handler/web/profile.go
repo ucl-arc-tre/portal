@@ -46,3 +46,16 @@ func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	agreements, err := h.profile.ConfirmedAgreements(user)
+	if err != nil {
+		log.Err(err).Msg("Failed to get agreements")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+	ctx.JSON(http.StatusOK, openapi.ProfileAgreements{
+		ConfirmedAgreements: agreements,
+	})
+}

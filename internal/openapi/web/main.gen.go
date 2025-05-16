@@ -20,6 +20,20 @@ type AgreementConfirmation struct {
 	AgreementId string `json:"agreement_id"`
 }
 
+// ConfirmedAgreement defines model for ConfirmedAgreement.
+type ConfirmedAgreement struct {
+	// AgreementType Type of agreement that was confirmed
+	AgreementType string `json:"agreement_type"`
+
+	// ConfirmedAt Time in RFC3339 format at which the agreement was confirmed
+	ConfirmedAt string `json:"confirmed_at"`
+}
+
+// ProfileAgreements defines model for ProfileAgreements.
+type ProfileAgreements struct {
+	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
+}
+
 // ProfileResponse defines model for ProfileResponse.
 type ProfileResponse struct {
 	Roles    []string `json:"roles"`
@@ -37,6 +51,9 @@ type ServerInterface interface {
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
+
+	// (GET /profile/agreements)
+	GetProfileAgreements(c *gin.Context)
 
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
@@ -75,6 +92,19 @@ func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
 	}
 
 	siw.Handler.GetProfile(c)
+}
+
+// GetProfileAgreements operation middleware
+func (siw *ServerInterfaceWrapper) GetProfileAgreements(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProfileAgreements(c)
 }
 
 // PostProfileAgreements operation middleware
@@ -119,5 +149,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
+	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 }

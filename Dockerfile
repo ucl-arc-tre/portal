@@ -65,10 +65,11 @@ ENTRYPOINT ["./web-api"]
 FROM scratch AS web-frontend-release
 
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder --chmod=777 /app/web-frontend web-frontend
-COPY --from=web-frontend-builder /app/out .
+COPY --from=builder --chmod=777 /app/web-frontend /web-frontend
+COPY --from=web-frontend-builder /app/out /out
 
 USER user
 ENV PORT=8080
 ENV GIN_MODE=release
-ENTRYPOINT ["./web-frontend"]
+WORKDIR /out
+ENTRYPOINT ["/web-frontend"]
