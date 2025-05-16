@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function ApprovedResearcherPage() {
   return (
-    <div className="profile-page">
+    <div>
       <h1>Become an Approved Researcher</h1>
       <p>To gain access to advanced services, please complete the following steps.</p>
 

@@ -5,13 +5,13 @@ import { useState } from "react";
 import "./AgreementForm.css";
 import { postProfileAgreements } from "@/openapi";
 
-export default function ApprovedResearcherForm({
-  agreementId,
-  setAgreementConfirmed,
-}: {
+type ApprovedResearcherFormProps = {
   agreementId: string;
   setAgreementConfirmed: CallableFunction;
-}) {
+};
+
+export default function ApprovedResearcherForm(props: ApprovedResearcherFormProps) {
+  const { agreementId, setAgreementConfirmed } = props;
   const [submitted, setSubmitted] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
@@ -45,11 +45,6 @@ export default function ApprovedResearcherForm({
             Submit
           </button>
         </form>
-      )}
-      {submitted && (
-        <div className="submitted-box">
-          <p>Agreement confirmed</p>
-        </div>
       )}
     </div>
   );

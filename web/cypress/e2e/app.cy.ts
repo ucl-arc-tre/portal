@@ -1,6 +1,7 @@
 beforeEach(() => {
   cy.clearCookies();
   cy.clearLocalStorage();
+  cy.waitForApi(); // poll until the backend API is healthy
 });
 
 describe("ARC Portal UI unauthenticated", () => {
@@ -15,7 +16,6 @@ describe("ARC Portal UI unauthenticated", () => {
 describe("ARC Portal UI authenticated", () => {
   it("can be logged into as an admin", () => {
     cy.loginAsAdmin();
-    cy.waitForApi(); // poll until the backend API is healthy
 
     cy.visit("/");
     cy.contains("Loading...").should("not.exist");
@@ -24,7 +24,6 @@ describe("ARC Portal UI authenticated", () => {
 
   it("admin user can agree to approved researcher agreement", () => {
     cy.loginAsAdmin();
-    cy.waitForApi(); // poll until the backend API is healthy
     cy.visit("/profile/approved-researcher");
 
     cy.get("#approved-researcher-agreement");

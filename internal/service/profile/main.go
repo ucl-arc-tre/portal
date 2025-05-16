@@ -35,7 +35,7 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 		Type      string
 		CreatedAt time.Time
 	}{}
-	result := s.db.Select("type", "user_agreement_confirmations.created_at").
+	result := s.db.Select("agreements.type", "user_agreement_confirmations.created_at").
 		Table("user_agreement_confirmations").
 		Joins("left join agreements on agreements.id = user_agreement_confirmations.agreement_id").
 		Where(types.UserAgreementConfirmation{UserID: user.ID}).
