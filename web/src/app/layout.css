@@ -11,4 +11,5 @@ main.content {
 
 .page {
   height: 100svh;
+  justify-items: center;
 }
