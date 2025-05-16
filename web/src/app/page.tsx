@@ -1,4 +1,5 @@
 import UserTasks from "./UserTasks";
+import "./home.css";
 
 export const metadata = {
   title: "ARC Services Portal | UCL",
@@ -7,10 +8,11 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <div className="page">
-      <h1 id="title--portal">Welcome to the ARC Services Portal</h1>
-      <p>This portal allows UCL researchers to manage ARC services and tasks.</p>
-
+    <div className="page page--home">
+      <div className="title__wrapper">
+        <h1 className="title--portal">Welcome to the ARC Services Portal</h1>
+        <p>This portal allows UCL researchers to manage ARC services and tasks.</p>
+      </div>
       <UserTasks />
     </div>
   );
