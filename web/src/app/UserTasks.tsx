@@ -11,12 +11,12 @@ export default function UserTasks() {
   if (!isAuthed) return <LoginFallback />;
 
   return (
-    <div className="card card--user-tasks">
+    <div>
       <p>
         Username&nbsp;{userData!.username}. Roles:&nbsp;
         {userData!.roles.join(", ")}
       </p>
-      <div className="tasks__wrapper">
+      <div>
         <h3>Your tasks:</h3>
         <div>List of user tasks here (e.g. approved researcher process)</div>
       </div>
