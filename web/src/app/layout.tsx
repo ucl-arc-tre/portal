@@ -14,9 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <AuthProvider>
-          <div className="layout">
+          <div className="page">
             <Nav />
-            <main className="layout__content">{children}</main>
+            <main className="page__content">{children}</main>
           </div>
         </AuthProvider>
       </body>

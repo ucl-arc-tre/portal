@@ -1,10 +1,10 @@
-.layout {
+.page {
   display: flex;
   min-height: 100vh;
   font-family: sans-serif;
 }
 
-main.layout__content {
+main.page__content {
   flex: 1;
   padding: 2rem;
 }
