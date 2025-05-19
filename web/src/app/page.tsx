@@ -8,12 +8,12 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <div className="page__content__inner--centered">
+    <>
       <div className="title">
         <h1>Welcome to the ARC Services Portal</h1>
         <p>This portal allows UCL researchers to manage ARC services and tasks.</p>
       </div>
       <UserTasks />
-    </div>
+    </>
   );
 }
