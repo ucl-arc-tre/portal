@@ -22,7 +22,7 @@ export default function Profile() {
             approved researcher process.
           </p>
 
-          <Link href="/profile/approved-researcher" className="btn" role="button">
+          <Link href="/profile/approved-researcher" className="button" role="button">
             Become an approved researcher
           </Link>
         </>

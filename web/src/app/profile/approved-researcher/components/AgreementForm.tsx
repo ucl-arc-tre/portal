@@ -40,7 +40,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             required
           />
           I agree
-          <button type="submit" className="btn button--submit">
+          <button type="submit" className="button button--submit">
             Submit
           </button>
         </form>
