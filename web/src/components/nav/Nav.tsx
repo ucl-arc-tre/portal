@@ -8,12 +8,12 @@ export default function Nav() {
 
   return (
     <aside className="sidebar">
-      <h2 className="sidebar-title">
+      <h2 className="sidebar__title">
         <Link href="/">UCL ARC Portal</Link>
       </h2>
 
       <nav>
-        <ul className="nav-list">
+        <ul className="nav__list">
           <li className={pathname === "/" ? "active" : ""}>
             <Link href="/">Home</Link>
           </li>

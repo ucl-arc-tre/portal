@@ -4,27 +4,29 @@
   padding: 1rem;
 }
 
-.sidebar-title {
+.sidebar__title {
   font-size: 1.25rem;
   font-weight: bold;
   margin-bottom: 1rem;
 }
 
-.nav-list {
+.nav__list {
   list-style: none;
   padding: 0;
   margin: 0;
-}
 
-.nav-list li {
-  margin: 0.5rem 0;
-}
+  li {
+    margin: 0.5rem 0;
+  }
 
-.nav-list a {
-  text-decoration: none;
-  color: var(--foreground);
-}
+  a {
+    text-decoration: none;
+    color: var(--foreground);
 
-.nav-list a:hover {
-  text-decoration: underline;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+
 }
