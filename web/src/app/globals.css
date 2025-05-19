@@ -43,11 +43,6 @@ a {
   }
 }
 
-.page__content__inner--centered {
-  height: 100svh;
-  justify-items: center;
-}
-
 .button,
 [role="button"] {
   display: block;

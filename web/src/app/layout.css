@@ -7,4 +7,6 @@
 main.page__content {
   flex: 1;
   padding: 2rem;
+  height: 100svh;
+  justify-items: center;
 }

@@ -3,6 +3,7 @@ import "./layout.css";
 
 import { AuthProvider } from "../app/hooks/useAuth";
 import Nav from "@/components/nav/Nav";
+import Page from "@/components/ui/Page";
 
 export const metadata = {
   title: "UCL ARC | portal",
@@ -16,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <div className="page">
             <Nav />
-            <main className="page__content">{children}</main>
+            <Page>{children}</Page>
           </div>
         </AuthProvider>
       </body>
