@@ -8,7 +8,7 @@ describe("ARC Portal UI unauthenticated", () => {
   it("shows the ARC portal phrase on the homepage", () => {
     cy.visit("/");
 
-    cy.get(".title--portal").should("be.visible");
+    cy.get(".title").should("be.visible");
     cy.contains("fibble").should("not.exist");
   });
 });
