@@ -9,6 +9,6 @@
     padding: 0.5rem;
     margin: 1rem 1rem;
     border-radius: 6px;
-    background-color: var(--cta-green);
+    background-color: var(--cta--green-bg);
   }
 }
