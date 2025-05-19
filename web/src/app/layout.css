@@ -1,24 +1,10 @@
-.content__wrapper {
+.layout {
   display: flex;
   min-height: 100vh;
   font-family: sans-serif;
 }
 
-main.content {
+main.layout__content {
   flex: 1;
   padding: 2rem;
-}
-
-.page {
-  height: 100svh;
-  justify-items: center;
-}
-
-.button,
-[role="button"] {
-  display: block;
-  font-size: 1.2rem;
-  padding: 0.5rem;
-  border-radius: 6px;
-  background-color: var(--cta--green-bg);
 }
