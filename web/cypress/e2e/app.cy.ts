@@ -1,7 +1,6 @@
 beforeEach(() => {
   cy.clearCookies();
   cy.clearLocalStorage();
-  cy.waitForApi(); // poll until the backend API is healthy
 });
 
 describe("ARC Portal UI unauthenticated", () => {
