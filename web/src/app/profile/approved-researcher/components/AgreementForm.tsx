@@ -38,7 +38,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             }}
             checked={agreed}
             required
-          />{" "}
+          />
           I agree
           <button type="submit" className="btn button--submit">
             Submit
