@@ -70,5 +70,7 @@ Cypress.Commands.add("loginAsAdmin", () => {
 
     log.snapshot("after");
     log.end();
+
+    cy.waitForApi(); // poll until the backend API is available
   });
 });
