@@ -7,7 +7,7 @@ describe("ARC Portal UI unauthenticated", () => {
   it("shows the ARC portal phrase on the homepage", () => {
     cy.visit("/");
 
-    cy.get("#title--portal").should("be.visible");
+    cy.get("h1").should("be.visible");
     cy.contains("fibble").should("not.exist");
   });
 });
@@ -26,13 +26,15 @@ describe("ARC Portal UI authenticated", () => {
     cy.visit("/profile/approved-researcher");
 
     cy.get("#approved-researcher-agreement");
+
     cy.get("body").then((body) => {
-      if (body.find("#approved-researcher-agreement-text").length > 0) {
-        cy.get("#approved-researcher-agreement-text").should("be.visible");
-        cy.get(".input-checkbox").check();
-        cy.get(".submit-button").click();
+      if (body.find(".approved-researcher-agreement__text").length > 0) {
+        cy.get(".approved-researcher-agreement__text").should("be.visible");
+        cy.get("input[name='agreed'][type='checkbox']").check();
+        cy.get(".button--submit").click();
       }
     });
+
     cy.contains("Agreement confirmed").should("be.visible");
   });
 });

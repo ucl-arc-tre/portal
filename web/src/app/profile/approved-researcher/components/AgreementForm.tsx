@@ -27,10 +27,9 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
   };
 
   return (
-    <div className="form-container">
+    <div className="form form__wrapper">
       {!submitted && (
         <form onSubmit={handleSubmit}>
-          I agree
           <input
             type="checkbox"
             name="agreed"
@@ -38,10 +37,10 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
               setAgreed(!agreed);
             }}
             checked={agreed}
-            className="input-checkbox"
             required
           />
-          <button type="submit" className="submit-button">
+          I agree
+          <button type="submit" className="button button--submit">
             Submit
           </button>
         </form>

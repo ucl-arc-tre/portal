@@ -1,10 +1,11 @@
 import Link from "next/link";
+import "./not-found.css";
 
 export default function NotFound() {
   return (
-    <div>
+    <div className="page__content__inner">
       <p>Sorry, the requested page does not exist.</p>
-      <Link href="/">Back to Home</Link>
+      <Link href="/">&larr; Back to Home</Link>
     </div>
   );
 }

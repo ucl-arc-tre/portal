@@ -1,6 +1,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --cta--green-bg: #165823;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,4 +41,13 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+.button,
+[role="button"] {
+  display: block;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: var(--cta--green-bg);
 }
