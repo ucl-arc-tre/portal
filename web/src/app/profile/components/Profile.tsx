@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useAuth } from "../../hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
+import Button from "@/components/ui/Button";
 
 export default function Profile() {
   const { loading, isAuthed, userData } = useAuth();
@@ -22,9 +22,9 @@ export default function Profile() {
             approved researcher process.
           </p>
 
-          <Link href="/profile/approved-researcher" className="button" role="button">
+          <Button size="large" link="/profile/approved-researcher">
             Become an approved researcher
-          </Link>
+          </Button>
         </>
       )}
     </>

@@ -1,4 +1,45 @@
 .button {
-  font-size: 1.6rem;
-  padding: 0.4rem;
+  display: block;
+  border-radius: 6px;
+  text-decoration: none;
+  border-color: var(--green-200);
+}
+
+.button--small {
+  font-size: 1rem;
+  padding: 0.3rem;
+}
+
+.button--medium {
+  font-size: 1.2rem;
+  padding: 0.5rem;
+}
+
+.button--large {
+  font-size: 1.4rem;
+  padding: 0.7rem;
+}
+
+
+.button--nav {
+  background-color: var(--green-100);
+}
+
+.button--submit {
+  width: 100%;
+  margin-top: 1rem;
+  color: var(--foreground);
+  cursor: pointer;
+  background-color: var(--green-200);
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--green-100) 60%, white 40%);
+  }
+}
+
+button:disabled {
+  opacity: 0.8;
+  background-color: grey;
+  border: none;
+  cursor: not-allowed;
 }

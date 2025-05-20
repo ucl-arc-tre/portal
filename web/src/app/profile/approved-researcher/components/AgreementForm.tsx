@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import "./AgreementForm.css";
 import { postProfileAgreements } from "@/openapi";
+import Button from "@/components/ui/Button";
 
 type ApprovedResearcherFormProps = {
   agreementId: string;
@@ -40,9 +41,9 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             required
           />
           I agree
-          <button type="submit" className="button button--submit">
+          <Button size="large" type="submit" disabled={!agreed}>
             Submit
-          </button>
+          </Button>
         </form>
       )}
     </div>

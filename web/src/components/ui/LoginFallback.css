@@ -2,13 +2,4 @@
   margin-top: 2rem;
   justify-items: center;
   gap: 0.8rem;
-
-  .login__button {
-    display: block;
-    font-size: 1.6rem;
-    padding: 0.5rem;
-    margin: 1rem 1rem;
-    border-radius: 6px;
-    background-color: var(--cta--green-bg);
-  }
 }

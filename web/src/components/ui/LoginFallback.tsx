@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "./Button";
 import "./LoginFallback.css";
 
 export default function LoginFallback({
@@ -14,9 +15,11 @@ export default function LoginFallback({
       <h1>{title}</h1>
       <p>{message}</p>
 
-      <a href={`/oauth2/start?`} className="button--sso-login" role="button" id="login">
-        Login with UCL SSO
-      </a>
+      <Button size="large">
+        <a href={`/oauth2/start?`} id="login">
+          Login with UCL SSO
+        </a>
+      </Button>
     </div>
   );
 }
