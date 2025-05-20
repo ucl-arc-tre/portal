@@ -1,12 +1,10 @@
-.page {
-  display: flex;
-  min-height: 100vh;
+.layout {
+  display: grid;
+  height: 100svh;
   font-family: sans-serif;
 }
 
-main.page__content {
-  flex: 1;
+main.content {
   padding: 2rem;
-  height: 100svh;
   justify-items: center;
 }
