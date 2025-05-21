@@ -1,6 +1,4 @@
-"use client";
-
-import "./AgreementText.css";
+import "./AgreementText.module.css";
 import Markdown from "react-markdown";
 
 type AgreementTextProps = {

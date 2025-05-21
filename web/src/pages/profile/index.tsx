@@ -1,5 +1,4 @@
 import Profile from "./components/Profile";
-import "./profile.css";
 
 export const metadata = {
   title: "User Profile | ARC Services Portal",

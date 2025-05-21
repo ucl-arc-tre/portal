@@ -1,5 +1,3 @@
-"use client";
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { getProfile } from "@/openapi";
 import { ProfileResponse } from "@/openapi";

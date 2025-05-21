@@ -1,5 +1,5 @@
 import Link from "next/link";
-import "./Button.css";
+import "./Button.module.css";
 
 type Props = React.ComponentProps<"button"> & {
   inverse?: boolean;

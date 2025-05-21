@@ -4,6 +4,6 @@
   padding: 1rem;
 }
 
-input[name="agreed"][type="checkbox"] {
+.input--checkbox {
   margin: 0.5rem;
 }

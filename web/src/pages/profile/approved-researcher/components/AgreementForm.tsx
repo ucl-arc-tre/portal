@@ -1,8 +1,6 @@
-"use client";
-
 import { useState } from "react";
 
-import "./AgreementForm.css";
+import "./AgreementForm.module.css";
 import { postProfileAgreements } from "@/openapi";
 import Button from "@/components/ui/Button";
 
@@ -32,6 +30,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
       {!submitted && (
         <form onSubmit={handleSubmit}>
           <input
+            className="input--checkbox"
             type="checkbox"
             name="agreed"
             onChange={() => {

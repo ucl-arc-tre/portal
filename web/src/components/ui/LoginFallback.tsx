@@ -1,7 +1,5 @@
-"use client";
-
 import Button from "./Button";
-import "./LoginFallback.css";
+import "./LoginFallback.module.css";
 
 export default function LoginFallback({
   title = "Access Restricted",
