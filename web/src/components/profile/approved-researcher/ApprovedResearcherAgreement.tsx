@@ -1,6 +1,4 @@
-"use client";
-
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "./AgreementForm";
 import AgreementText from "./AgreementText";

@@ -55,8 +55,5 @@ func registerHTMLRoutes(router *gin.Engine, dir string) {
 		router.GET(route, func(c *gin.Context) {
 			c.File(filePath)
 		})
-
-		txtFilePath := strings.ReplaceAll(filePath, ".html", ".txt")
-		router.StaticFile("/"+txtFilePath, txtFilePath)
 	}
 }

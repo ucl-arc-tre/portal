@@ -3,7 +3,7 @@
 This project is a full-stack web application built with:
 
 - **Go** for backend services
-- **React (Vite)** for the frontend
+- **React (NextJS)** for the frontend
 - **Docker** for containerized development and deployment
 - **Nginx** as a reverse proxy
 - **PostgreSQL** as the database
@@ -21,7 +21,7 @@ This project uses a [common Go project layout](https://github.com/golang-standar
 │   ├── web-api/          # Main Go backend API server
 │   └── web-frontend/     # Go server to serve compiled frontend in release
 ├── internal/             # Shared application logic (router, middleware, etc.)
-├── web/                  # React frontend using Vite
+├── web/                  # React frontend
 ├── deploy/               # Docker-related config
 │   └── dev/              # Docker Compose and nginx config for dev
 ├── e2e/                  # Cypress E2E test setup and Compose config
@@ -37,8 +37,8 @@ All environments are dockerised for a self-contained service that builds all ver
 
 ### 🧑‍💻 Local Development (`make dev`)
 
-- Runs containers using `docker-compose` from `deploy/dev/`
-- React frontend is served by **Vite dev server** with live reloading (port 5173)
+- Runs containers using `docker-compose` from [`deploy/dev/`](../deploy/dev/)
+- React frontend is served by **NextJS dev server** with live reloading
 - Go backend uses **Air** for live reloads
 - Nginx acts as a reverse proxy:
   - `/` → React dev server
@@ -48,13 +48,13 @@ All environments are dockerised for a self-contained service that builds all ver
 ### 🔐 Release
 
 - This environment is used for the production release
-- React frontend is built into static files (see `Dockerfile` in the `web-frontend-builder` section)
+- React frontend is built into static files (see [`Dockerfile`](../Dockerfile) in the `web-frontend-builder` section)
 - Go backend and frontend servers are compiled into standalone binaries
 - Static frontend is served by the `web-frontend` Go binary (see `cmd/web-frontend`)
 
 ### 🧪 E2E Testing (`make test-e2e-release`)
 
-- Uses Docker Compose from `e2e/`
+- Uses Docker Compose from [`e2e/`](../e2e/)
 - Spins up release versions of frontend, backend, database, and nginx (see Release section above for details)
 - Cypress runs tests against the full stack via nginx at `http://localhost:8000`
 

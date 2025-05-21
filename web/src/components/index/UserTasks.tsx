@@ -1,6 +1,4 @@
-"use client";
-
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 
 export default function UserTasks() {

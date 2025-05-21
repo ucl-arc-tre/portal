@@ -5,26 +5,26 @@
   border-color: var(--green-200);
 }
 
-.button--small {
+.small {
   font-size: 1rem;
   padding: 0.3rem;
 }
 
-.button--medium {
+.medium {
   font-size: 1.2rem;
   padding: 0.5rem;
 }
 
-.button--large {
+.large {
   font-size: 1.4rem;
   padding: 0.7rem;
 }
 
-.button--nav {
+.nav {
   background-color: var(--green-100);
 }
 
-.button--submit {
+.submit {
   width: 100%;
   margin-top: 1rem;
   color: var(--foreground);
@@ -36,7 +36,7 @@
   }
 }
 
-button:disabled {
+.button:disabled {
   opacity: 0.8;
   background-color: grey;
   border: none;

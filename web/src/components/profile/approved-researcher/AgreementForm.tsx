@@ -1,8 +1,6 @@
-"use client";
-
 import { useState } from "react";
 
-import "./AgreementForm.css";
+import styles from "./AgreementForm.module.css";
 import { postProfileAgreements } from "@/openapi";
 import Button from "@/components/ui/Button";
 
@@ -28,10 +26,11 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
   };
 
   return (
-    <div className="form form__wrapper">
+    <div className={styles.wrapper}>
       {!submitted && (
         <form onSubmit={handleSubmit}>
           <input
+            className={styles.checkbox}
             type="checkbox"
             name="agreed"
             onChange={() => {
@@ -41,7 +40,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             required
           />
           I agree
-          <Button size="large" type="submit" disabled={!agreed}>
+          <Button size="large" type="submit" disabled={!agreed} id="approved-researcher-agreement-agree">
             Submit
           </Button>
         </form>
