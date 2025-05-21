@@ -1,8 +1,7 @@
 import Link from "next/link";
-import "./Button.module.css";
+import styles from "./Button.module.css";
 
 type Props = React.ComponentProps<"button"> & {
-  inverse?: boolean;
   danger?: boolean;
   size?: string;
   type?: string;
@@ -10,12 +9,28 @@ type Props = React.ComponentProps<"button"> & {
   value?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  id?: string;
 };
 
 export default function Button(props: Props) {
+  let sizeStyle = styles.medium;
+  switch (props.size) {
+    case "large": {
+      sizeStyle = styles.large;
+      break;
+    }
+    case "small": {
+      sizeStyle = styles.small;
+      break;
+    }
+    default: {
+      sizeStyle = styles.medium;
+    }
+  }
   return (
     <button
-      className={`button ${`button--${props.size || "medium"}`} ${props.inverse ? "button--inverse" : ""} ${props.href ? "button--nav" : ""} ${props.danger ? "button--danger" : ""} ${props.type === "submit" && "button--submit"}`}
+      id={props.id}
+      className={`${styles.button} ${sizeStyle} ${props.href ? styles.nav : ""} ${props.danger ? styles.danger : ""} ${props.type === "submit" && styles.submit}`}
       type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}

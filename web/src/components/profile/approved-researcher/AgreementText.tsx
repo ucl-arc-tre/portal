@@ -1,4 +1,4 @@
-import "./AgreementText.module.css";
+import styles from "./AgreementText.module.css";
 import Markdown from "react-markdown";
 
 type AgreementTextProps = {
@@ -7,7 +7,7 @@ type AgreementTextProps = {
 
 export default function AgreementText(props: AgreementTextProps) {
   return (
-    <section className="approved-researcher-agreement__text">
+    <section className={styles.text} id="approved-researcher-agreement-text">
       <Markdown>{props.text}</Markdown>
     </section>
   );

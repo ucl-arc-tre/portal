@@ -1,18 +1,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import "./Nav.module.css";
+import styles from "./Nav.module.css";
 
 export default function Nav() {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar">
-      <h2 className="sidebar__title">
+    <aside className={styles.sidebar}>
+      <h2 className={styles.sidebar__title}>
         <Link href="/">UCL ARC Portal</Link>
       </h2>
 
       <nav>
-        <ul className="nav__list">
+        <ul className={styles.nav__list}>
           <li className={pathname === "/" ? "active" : ""}>
             <Link href="/">Home</Link>
           </li>

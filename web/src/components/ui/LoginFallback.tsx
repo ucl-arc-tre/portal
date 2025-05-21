@@ -1,5 +1,5 @@
 import Button from "./Button";
-import "./LoginFallback.module.css";
+import styles from "./LoginFallback.module.css";
 
 export default function LoginFallback({
   title = "Access Restricted",
@@ -9,7 +9,7 @@ export default function LoginFallback({
   message?: string;
 }) {
   return (
-    <div className="login__wrapper">
+    <div className={styles.wrapper}>
       <h1>{title}</h1>
       <p>{message}</p>
 

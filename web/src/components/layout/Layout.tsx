@@ -1,12 +1,12 @@
-import "./Layout.module.css";
+import styles from "./Layout.module.css";
 import Nav from "@/components/nav/Nav";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <div className="layout">
+      <div className={styles.layout}>
         <Nav />
-        <main className="content">{children}</main>
+        <main className={styles.main}>{children}</main>
       </div>
     </>
   );

@@ -25,13 +25,14 @@ describe("ARC Portal UI authenticated", () => {
     cy.loginAsAdmin();
     cy.visit("/profile/approved-researcher");
 
-    cy.get("#approved-researcher-agreement");
+    cy.get("#approved-researcher-agreement"); // wait for load
 
     cy.get("body").then((body) => {
-      if (body.find(".approved-researcher-agreement__text").length > 0) {
-        cy.get(".approved-researcher-agreement__text").should("be.visible");
+      console.log(body.find("#approved-researcher-agreement-text"));
+      if (body.find("#approved-researcher-agreement-text").length > 0) {
+        cy.get("#approved-researcher-agreement-text").should("be.visible");
         cy.get("input[name='agreed'][type='checkbox']").check();
-        cy.get(".button--submit").click();
+        cy.get("#approved-researcher-agreement-agree").click();
       }
     });
 
