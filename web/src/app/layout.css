@@ -1,12 +1,11 @@
-.page {
-  display: flex;
-  min-height: 100vh;
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 7fr;
+  height: 100svh;
   font-family: sans-serif;
 }
 
-main.page__content {
-  flex: 1;
+main.content {
   padding: 2rem;
-  height: 100svh;
   justify-items: center;
 }
