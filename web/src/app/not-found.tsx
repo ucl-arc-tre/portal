@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <div className="not-found">
       <p>Sorry, the requested page does not exist.</p>
-      <Button size="small" link="/">
+      <Button size="small" href="/">
         &larr; Back to Home
       </Button>
     </div>
