@@ -1,12 +1,12 @@
-import Head from "next/head";
+import MetaHead from "@/components/meta/Head";
 
 export default function StudiesPage() {
   return (
     <>
-      <Head>
-        <title>Studies | ARC Services Portal</title>
-        <meta property="description" content="View and modify studies in the ARC Services Portal" key="description" />
-      </Head>
+      <MetaHead
+        title="Studies | ARC Services Portal"
+        description="View and modify studies in the ARC Services Portal"
+      />
       <div>Studies page</div>
     </>
   );
