@@ -3,6 +3,7 @@
 export type ProfileResponse = {
     username: string;
     roles: Array<string>;
+    chosen_name: string;
 };
 
 export type Agreement = {
@@ -54,6 +55,13 @@ export type GetProfileResponses = {
 };
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+
+export type PostProfileData = {
+    body: ProfileResponse;
+    path?: never;
+    query?: never;
+    url: '/profile';
+};
 
 export type GetProfileAgreementsData = {
     body?: never;
