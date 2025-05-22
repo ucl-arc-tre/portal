@@ -38,3 +38,12 @@ describe("ARC Portal UI authenticated", () => {
     cy.contains("Agreement confirmed").should("be.visible");
   });
 });
+
+describe("Setting chosen name for user", () => {
+  it("prompts user to set chosen name", () => {
+    cy.loginAsAdmin();
+    cy.visit("/");
+
+    cy.get("dialog[data-id='chosenName']").should("be.visible");
+  });
+});

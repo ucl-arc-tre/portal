@@ -20,7 +20,6 @@ export default function UserTasks() {
       const response = await postProfile({
         body: { chosen_name: chosenName },
       });
-
       if (!response.response.ok) {
         throw new Error(`HTTP error! status: ${response.response.status}`);
       } else {
@@ -37,7 +36,7 @@ export default function UserTasks() {
   return (
     <div>
       {!userData!.chosen_name && (
-        <dialog open ref={dialogRef} id={styles.chosenName}>
+        <dialog open ref={dialogRef} id={styles.chosenName} data-id="chosenName">
           <form onSubmit={handleSubmit}>
             Please enter your name as you would choose to have it appear on forms related to our services.
             <input type="text" name="chosenName"></input>
