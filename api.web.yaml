@@ -95,11 +95,8 @@ components:
     ProfileUpdate:
       type: object
       required:
-        - username
         - chosen_name
       properties:
-        username:
-          type: string
         chosen_name:
           type: string
 

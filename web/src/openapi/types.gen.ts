@@ -7,7 +7,6 @@ export type ProfileResponse = {
 };
 
 export type ProfileUpdate = {
-    username: string;
     chosen_name: string;
 };
 
