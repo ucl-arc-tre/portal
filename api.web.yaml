@@ -24,7 +24,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProfileResponse"
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: "Successfully updated profile"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /profile/agreements:
     get:
       description: Get all the agreements a user has agreed to
@@ -77,6 +89,17 @@ components:
           type: array
           items:
             type: string
+        chosen_name:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      required:
+        - username
+        - chosen_name
+      properties:
+        username:
+          type: string
         chosen_name:
           type: string
 

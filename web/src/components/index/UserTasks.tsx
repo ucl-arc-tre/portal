@@ -3,6 +3,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "../ui/Button";
 import { FormEvent, useRef } from "react";
 import styles from "./UserTasks.module.css";
+import { postProfile } from "@/openapi";
 
 export default function UserTasks() {
   const { loading, isAuthed, userData } = useAuth();
@@ -16,16 +17,12 @@ export default function UserTasks() {
     const dialogElement = dialogRef.current;
 
     try {
-      const response = await fetch("/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ chosen_name: chosenName }),
+      const response = await postProfile({
+        body: { username: userData!.username, chosen_name: chosenName },
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.response.ok) {
+        throw new Error(`HTTP error! status: ${response.response.status}`);
       } else {
         dialogElement!.close();
       }
