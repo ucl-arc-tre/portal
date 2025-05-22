@@ -5,6 +5,6 @@ type ChosenName string
 
 type User struct {
 	Model
-	Username Username `gorm:"uniqueIndex"`
+	Username   Username `gorm:"uniqueIndex"`
 	ChosenName ChosenName
 }

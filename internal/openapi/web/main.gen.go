@@ -41,8 +41,14 @@ type ProfileResponse struct {
 	Username   string   `json:"username"`
 }
 
+// ProfileUpdate defines model for ProfileUpdate.
+type ProfileUpdate struct {
+	ChosenName string `json:"chosen_name"`
+	Username   string `json:"username"`
+}
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
-type PostProfileJSONRequestBody = ProfileResponse
+type PostProfileJSONRequestBody = ProfileUpdate
 
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation

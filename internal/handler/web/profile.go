@@ -20,8 +20,8 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, openapi.ProfileResponse{
-		Username: string(user.Username),
-		Roles:    roles,
+		Username:   string(user.Username),
+		Roles:      roles,
 		ChosenName: string(user.ChosenName),
 	})
 }
