@@ -49,3 +49,10 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 	}
 	return agreements, result.Error
 }
+
+func (s *Service) SetUserChosenName(user *types.User) error {
+
+	result := s.db.Model(&types.User{}).Where("username = ?", user.Username).Update("chosen_name", user.ChosenName)
+
+	return result.Error
+}
