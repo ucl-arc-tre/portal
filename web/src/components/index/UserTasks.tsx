@@ -18,7 +18,7 @@ export default function UserTasks() {
 
     try {
       const response = await postProfile({
-        body: { username: userData!.username, chosen_name: chosenName },
+        body: { chosen_name: chosenName },
       });
 
       if (!response.response.ok) {
