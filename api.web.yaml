@@ -18,6 +18,13 @@ paths:
                 $ref: "#/components/schemas/ProfileResponse"
         default:
           description: Unexpected error
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileResponse"
   /profile/agreements:
     get:
       description: Get all the agreements a user has agreed to
@@ -62,6 +69,7 @@ components:
       required:
         - username
         - roles
+        - chosen_name
       properties:
         username:
           type: string
@@ -69,6 +77,8 @@ components:
           type: array
           items:
             type: string
+        chosen_name:
+          type: string
 
     Agreement:
       type: object
