@@ -35,8 +35,7 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 		ctx.Status(http.StatusNotAcceptable)
 		return
 	}
-	 user.ChosenName = types.ChosenName(update.ChosenName)
-
+	user.ChosenName = types.ChosenName(update.ChosenName)
 
 	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
 		ChosenName: string(user.ChosenName),
