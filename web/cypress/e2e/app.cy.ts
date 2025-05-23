@@ -25,13 +25,13 @@ describe("ARC Portal UI authenticated", () => {
     cy.loginAsAdmin();
     cy.visit("/profile/approved-researcher");
 
-    cy.get("#approved-researcher-agreement"); // wait for load
+    cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
 
     cy.get("body").then((body) => {
-      if (body.find("#approved-researcher-agreement-text").length > 0) {
-        cy.get("#approved-researcher-agreement-text").should("be.visible");
+      if (body.find("[data-cy='approved-researcher-agreement-text'").length > 0) {
+        cy.get("[data-cy='approved-researcher-agreement-text']").should("be.visible");
         cy.get("input[name='agreed'][type='checkbox']").check();
-        cy.get("#approved-researcher-agreement-agree").click();
+        cy.get("[data-cy='approved-researcher-agreement-agree']").click();
       }
     });
 
@@ -47,7 +47,7 @@ describe("Setting chosen name for user", () => {
     cy.clearChosenName();
     cy.visit("/");
 
-    cy.get("dialog.dialog").should("be.visible");
+    cy.get("dialog[data-cy='chosenName']").should("be.visible");
   });
 
   it("can set chosen name", () => {
@@ -55,8 +55,8 @@ describe("Setting chosen name for user", () => {
     cy.clearChosenName();
     cy.visit("/");
 
-    cy.get("dialog.dialog").find("input").type(chosenName);
-    cy.get("dialog.dialog").find("button").click();
+    cy.get("dialog[data-cy='chosenName']").find("input").type(chosenName);
+    cy.get("dialog[data-cy='chosenName']").find("button").click();
     cy.reload();
     cy.contains(chosenName).should("be.visible");
     cy.clearChosenName();

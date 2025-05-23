@@ -40,7 +40,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             required
           />
           I agree
-          <Button size="large" type="submit" disabled={!agreed} id="approved-researcher-agreement-agree">
+          <Button size="large" type="submit" disabled={!agreed} data-cy="approved-researcher-agreement-agree">
             Submit
           </Button>
         </form>
