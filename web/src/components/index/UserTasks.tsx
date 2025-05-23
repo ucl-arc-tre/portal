@@ -36,7 +36,7 @@ export default function UserTasks() {
   return (
     <div>
       {!userData!.chosen_name && (
-        <dialog open ref={dialogRef} id={styles.chosenName} data-cy="chosenName">
+        <dialog open ref={dialogRef} id={styles.dialog} data-cy="chosenName">
           <form onSubmit={handleSubmit}>
             Please enter your name as you would choose to have it appear on forms related to our services.
             <input type="text" name="chosenName"></input>
