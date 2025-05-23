@@ -46,4 +46,14 @@ describe("Setting chosen name for user", () => {
 
     cy.get("dialog[data-id='chosenName']").should("be.visible");
   });
+
+  it("can set chosen name", () => {
+    cy.loginAsAdmin();
+    cy.visit("/");
+
+    cy.get("dialog[data-id='chosenName']").find("input").type("Test Chosen Name");
+    cy.get("dialog[data-id='chosenName']").find("button").click();
+
+    cy.contains("Test Chosen Name").should("be.visible");
+  });
 });
