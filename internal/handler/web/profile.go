@@ -37,6 +37,12 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 	}
 	user.ChosenName = types.ChosenName(update.ChosenName)
 
+	if err := h.profile.SetUserChosenName(&user); err != nil {
+		log.Err(err).Msg("Failed to update chosen name")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+
 	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
 		ChosenName: string(user.ChosenName),
 	})
