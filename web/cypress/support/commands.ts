@@ -4,7 +4,6 @@ import { login } from "./auth";
 
 const botAdminUsername = Cypress.env("botAdminUsername") as string;
 const botAdminPassword = Cypress.env("botAdminPassword") as string;
-
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -26,6 +25,12 @@ declare global {
        * @example cy.waitForApi(10, 500)       // custom settings
        */
       waitForApi(retries?: number, delay?: number): Chainable<Cypress.Response<any>>;
+
+      /**
+       * Clears the chosen name
+       * @example cy.clearChosenName()
+       */
+      clearChosenName(chosenName?: string): Chainable<any>;
     }
   }
 }
@@ -72,5 +77,15 @@ Cypress.Commands.add("loginAsAdmin", () => {
     log.end();
 
     cy.waitForApi(); // poll until the backend API is available
+  });
+});
+
+Cypress.Commands.add("clearChosenName", () => {
+  cy.request({
+    method: "POST",
+    url: "/api/v0/profile",
+    body: {
+      chosen_name: "",
+    },
   });
 });

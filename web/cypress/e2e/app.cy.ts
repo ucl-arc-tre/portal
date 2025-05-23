@@ -40,8 +40,11 @@ describe("ARC Portal UI authenticated", () => {
 });
 
 describe("Setting chosen name for user", () => {
+  const chosenName = (Cypress.env("chosenName") as string) || "Test Chosen Name";
+
   it("prompts user to set chosen name", () => {
     cy.loginAsAdmin();
+    cy.clearChosenName();
     cy.visit("/");
 
     cy.get("dialog[data-id='chosenName']").should("be.visible");
@@ -49,11 +52,13 @@ describe("Setting chosen name for user", () => {
 
   it("can set chosen name", () => {
     cy.loginAsAdmin();
+    cy.clearChosenName();
     cy.visit("/");
 
-    cy.get("dialog[data-id='chosenName']").find("input").type("Test Chosen Name");
+    cy.get("dialog[data-id='chosenName']").find("input").type(chosenName);
     cy.get("dialog[data-id='chosenName']").find("button").click();
-
-    cy.contains("Test Chosen Name").should("be.visible");
+    cy.reload();
+    cy.contains(chosenName).should("be.visible");
+    cy.clearChosenName();
   });
 });
