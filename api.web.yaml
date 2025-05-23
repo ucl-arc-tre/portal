@@ -32,12 +32,42 @@ paths:
         default:
           description: Unexpected error
     post:
+      description: Update the agreements for a user
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/AgreementConfirmation"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileAgreements"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /profile/training/nhsd:
+    post:
+      description: Update the NHS digital training record for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileTrainingUpdate"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileTrainingResponse"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /agreements/approved-researcher:
     get:
@@ -113,3 +143,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConfirmedAgreement"
+
+    ProfileTrainingUpdate:
+      type: object
+      required:
+        - certficate_content_pdf_base64
+        - kind
+      properties:
+        certficate_content_pdf_base64:
+          type: string
+          description: Base64 encoded PDF file data of the certificate
+        kind:
+          type: string
+          enum: [nhsd]
+
+    ProfileTrainingResponse:
+      type: object
+      required:
+        - certificate_is_valid
+        - certificate_message
+      properties:
+        certificate_is_valid:
+          type: boolean
+          description: Is the certificate valid
+        certificate_message:
+          type: string
+          description: Reason why the training certificate is valid/invalid

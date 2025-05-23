@@ -35,6 +35,25 @@ export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
+export type ProfileTrainingUpdate = {
+    /**
+     * Base64 encoded PDF file data of the certificate
+     */
+    certficate_content_pdf_base64: string;
+    kind: 'nhsd';
+};
+
+export type ProfileTrainingResponse = {
+    /**
+     * Is the certificate valid
+     */
+    certificate_is_valid: boolean;
+    /**
+     * Reason why the training certificate is valid/invalid
+     */
+    certificate_message: string;
+};
+
 export type GetProfileData = {
     body?: never;
     path?: never;
@@ -85,6 +104,47 @@ export type PostProfileAgreementsData = {
     query?: never;
     url: '/profile/agreements';
 };
+
+export type PostProfileAgreementsErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProfileAgreementsResponses = {
+    200: ProfileAgreements;
+};
+
+export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
+
+export type PostProfileTrainingNhsdData = {
+    body: ProfileTrainingUpdate;
+    path?: never;
+    query?: never;
+    url: '/profile/training/nhsd';
+};
+
+export type PostProfileTrainingNhsdErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProfileTrainingNhsdResponses = {
+    200: ProfileTrainingResponse;
+};
+
+export type PostProfileTrainingNhsdResponse = PostProfileTrainingNhsdResponses[keyof PostProfileTrainingNhsdResponses];
 
 export type GetAgreementsApprovedResearcherData = {
     body?: never;

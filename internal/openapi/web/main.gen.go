@@ -7,6 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Defines values for ProfileTrainingUpdateKind.
+const (
+	Nhsd ProfileTrainingUpdateKind = "nhsd"
+)
+
 // Agreement defines model for Agreement.
 type Agreement struct {
 	// Id UUID of the agreement
@@ -40,8 +45,30 @@ type ProfileResponse struct {
 	Username string   `json:"username"`
 }
 
+// ProfileTrainingResponse defines model for ProfileTrainingResponse.
+type ProfileTrainingResponse struct {
+	// CertificateIsValid Is the certificate valid
+	CertificateIsValid bool `json:"certificate_is_valid"`
+
+	// CertificateMessage Reason why the training certificate is valid/invalid
+	CertificateMessage string `json:"certificate_message"`
+}
+
+// ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
+type ProfileTrainingUpdate struct {
+	// CertficateContentPdfBase64 Base64 encoded PDF file data of the certificate
+	CertficateContentPdfBase64 string                    `json:"certficate_content_pdf_base64"`
+	Kind                       ProfileTrainingUpdateKind `json:"kind"`
+}
+
+// ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.
+type ProfileTrainingUpdateKind string
+
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
+
+// PostProfileTrainingNhsdJSONRequestBody defines body for PostProfileTrainingNhsd for application/json ContentType.
+type PostProfileTrainingNhsdJSONRequestBody = ProfileTrainingUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -57,6 +84,9 @@ type ServerInterface interface {
 
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
+
+	// (POST /profile/training/nhsd)
+	PostProfileTrainingNhsd(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -120,6 +150,19 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	siw.Handler.PostProfileAgreements(c)
 }
 
+// PostProfileTrainingNhsd operation middleware
+func (siw *ServerInterfaceWrapper) PostProfileTrainingNhsd(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProfileTrainingNhsd(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -151,4 +194,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.POST(options.BaseURL+"/profile/training/nhsd", wrapper.PostProfileTrainingNhsd)
 }

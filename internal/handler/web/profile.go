@@ -59,3 +59,7 @@ func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
 		ConfirmedAgreements: agreements,
 	})
 }
+
+func (h *Handler) PostProfileTrainingNhsd(ctx *gin.Context) {
+
+}
