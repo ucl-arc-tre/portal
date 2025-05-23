@@ -1,0 +1,81 @@
+import Button from "@/components/ui/Button";
+import LoginFallback from "@/components/ui/LoginFallback";
+import { useAuth } from "@/hooks/useAuth";
+import { postProfileTraining } from "@/openapi";
+import { useState } from "react";
+import styles from "./TrainingCertificateForm.module.css";
+
+export default function TrainingCertificateForm() {
+  const { loading, isAuthed } = useAuth();
+  const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { certificate } = e.target;
+    const files: FileList = certificate.files;
+    if (files.length != 1) {
+      setErrorMessage(`Must have only 1 file`);
+      return;
+    }
+    const file = files[0];
+    if (file.size > 1e7) {
+      setErrorMessage(`File must be < 10MB in size`);
+      return;
+    }
+    base64Encode(file).then((content) => {
+      try {
+        postProfileTraining({
+          body: {
+            kind: "training_kind_nhsd",
+            certficate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
+          },
+        }).then((res) => {
+          setIsValid(res.data?.certificate_is_valid);
+          if (res.error) {
+            setErrorMessage(`Failed to validate: ${res.error}`);
+          } else {
+            setErrorMessage("");
+          }
+        });
+      } catch (err) {
+        setErrorMessage(`Certificate training POST error: ${err}`);
+      }
+    });
+  };
+
+  if (loading) return null;
+
+  if (!isAuthed) return <LoginFallback />;
+
+  if (isValid) return <p>Valid training ✔</p>;
+
+  return (
+    <div id="training-certificate">
+      <h2 className="subtitle">Training Certificate</h2>
+
+      <form className={styles.wrapper} onSubmit={handleSubmit}>
+        <input type="file" name="certificate" accept="pdf" required />
+        <Button size="large" type="submit" id="training-certificate-sumbit">
+          Submit
+        </Button>
+      </form>
+      {errorMessage && <p>Failed {errorMessage}</p>}
+    </div>
+  );
+}
+
+function base64Encode(file: File) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+
+    fileReader.onload = () => {
+      resolve(fileReader.result);
+    };
+
+    fileReader.onerror = (error) => {
+      reject(error);
+    };
+  });
+}

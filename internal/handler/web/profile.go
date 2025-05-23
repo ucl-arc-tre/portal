@@ -29,8 +29,7 @@ func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	confirmation := openapi.AgreementConfirmation{}
 	if err := ctx.ShouldBindJSON(&confirmation); err != nil {
-		log.Err(err).Msg("Invalid JSON object")
-		ctx.Status(http.StatusNotAcceptable)
+		setInvalidResponse(ctx, err, "Invalid JSON object")
 		return
 	}
 	agreementId, err := uuid.Parse(confirmation.AgreementId)
@@ -60,6 +59,25 @@ func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) PostProfileTrainingNhsd(ctx *gin.Context) {
+func (h *Handler) PostProfileTraining(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	data := openapi.ProfileTrainingUpdate{}
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		setInvalidResponse(ctx, err, "Invalid JSON object")
+		return
+	}
+	result, err := h.training.Update(user, data)
+	if err != nil {
+		log.Err(err).Any("username", user.Username).Msg("Failed to update users training")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
+}
 
+func setInvalidResponse(ctx *gin.Context, err error, message string) {
+	if err != nil {
+		log.Err(err).Msg(message)
+		ctx.Status(http.StatusNotAcceptable)
+	}
 }

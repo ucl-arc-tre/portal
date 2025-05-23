@@ -9,7 +9,7 @@ import (
 
 // Defines values for ProfileTrainingUpdateKind.
 const (
-	Nhsd ProfileTrainingUpdateKind = "nhsd"
+	TrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
 )
 
 // Agreement defines model for Agreement.
@@ -48,16 +48,16 @@ type ProfileResponse struct {
 // ProfileTrainingResponse defines model for ProfileTrainingResponse.
 type ProfileTrainingResponse struct {
 	// CertificateIsValid Is the certificate valid
-	CertificateIsValid bool `json:"certificate_is_valid"`
+	CertificateIsValid *bool `json:"certificate_is_valid,omitempty"`
 
 	// CertificateMessage Reason why the training certificate is valid/invalid
-	CertificateMessage string `json:"certificate_message"`
+	CertificateMessage *string `json:"certificate_message,omitempty"`
 }
 
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
 	// CertficateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertficateContentPdfBase64 string                    `json:"certficate_content_pdf_base64"`
+	CertficateContentPdfBase64 *string                   `json:"certficate_content_pdf_base64,omitempty"`
 	Kind                       ProfileTrainingUpdateKind `json:"kind"`
 }
 
@@ -67,8 +67,8 @@ type ProfileTrainingUpdateKind string
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 
-// PostProfileTrainingNhsdJSONRequestBody defines body for PostProfileTrainingNhsd for application/json ContentType.
-type PostProfileTrainingNhsdJSONRequestBody = ProfileTrainingUpdate
+// PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
+type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -85,8 +85,8 @@ type ServerInterface interface {
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
 
-	// (POST /profile/training/nhsd)
-	PostProfileTrainingNhsd(c *gin.Context)
+	// (POST /profile/training)
+	PostProfileTraining(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -150,8 +150,8 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	siw.Handler.PostProfileAgreements(c)
 }
 
-// PostProfileTrainingNhsd operation middleware
-func (siw *ServerInterfaceWrapper) PostProfileTrainingNhsd(c *gin.Context) {
+// PostProfileTraining operation middleware
+func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -160,7 +160,7 @@ func (siw *ServerInterfaceWrapper) PostProfileTrainingNhsd(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostProfileTrainingNhsd(c)
+	siw.Handler.PostProfileTraining(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -194,5 +194,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
-	router.POST(options.BaseURL+"/profile/training/nhsd", wrapper.PostProfileTrainingNhsd)
+	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 }

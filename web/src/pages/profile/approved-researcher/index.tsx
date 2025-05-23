@@ -1,5 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import ApprovedResearcherAgreement from "@/components/profile/approved-researcher/ApprovedResearcherAgreement";
+import TrainingCertificateForm from "@/components/profile/approved-researcher/TrainingCertificateForm";
 
 export default function ApprovedResearcherPage() {
   return (
@@ -13,6 +14,7 @@ export default function ApprovedResearcherPage() {
         <p>To gain access to advanced services, please complete the following steps.</p>
 
         <ApprovedResearcherAgreement />
+        <TrainingCertificateForm />
       </div>
     </>
   );

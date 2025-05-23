@@ -1,4 +1,4 @@
-package training
+package pdf
 
 import (
 	"strings"

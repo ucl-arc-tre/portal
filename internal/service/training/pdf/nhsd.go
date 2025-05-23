@@ -1,15 +1,17 @@
-package training
+package pdf
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"regexp"
 	"time"
 
-	pdf "github.com/klippa-app/go-pdfium"
+	"github.com/klippa-app/go-pdfium"
 	pdfref "github.com/klippa-app/go-pdfium/references"
 	pdfreq "github.com/klippa-app/go-pdfium/requests"
 	pdfwasm "github.com/klippa-app/go-pdfium/webassembly"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -35,12 +37,19 @@ var pdfWasmPool = must(pdfwasm.Init(pdfwasm.Config{
 	MaxTotal: 1,
 }))
 
-func ParseNHSDCertificate(content []byte) (*TrainingCertificate, error) {
+func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
+	content, err := base64.StdEncoding.DecodeString(contentBase64)
+	if err != nil {
+		return nil, err
+	}
 	text, err := getFirstPageText(content)
 	if err != nil {
 		return nil, err
 	}
+
 	text = newLinesRegex.ReplaceAllString(text, " ")
+	log.Debug().Str("text", text).Msg("---")
+
 	if isValid := isValidRegex.MatchString(text); !isValid {
 		return &TrainingCertificate{IsValid: false}, nil
 	}
@@ -115,7 +124,7 @@ func getFirstPageText(content []byte) (string, error) {
 	return firstPageTextFromDoc(instance, doc.Document)
 }
 
-func firstPageTextFromDoc(instance pdf.Pdfium, doc pdfref.FPDF_DOCUMENT) (string, error) {
+func firstPageTextFromDoc(instance pdfium.Pdfium, doc pdfref.FPDF_DOCUMENT) (string, error) {
 	pageTextResult, err := instance.GetPageText(&pdfreq.GetPageText{
 		Page: pdfreq.Page{
 			ByIndex: &pdfreq.PageByIndex{

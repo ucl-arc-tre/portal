@@ -49,9 +49,9 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-  /profile/training/nhsd:
+  /profile/training:
     post:
-      description: Update the NHS digital training record for a user
+      description: Update the training record for a user
       requestBody:
         required: true
         content:
@@ -147,21 +147,17 @@ components:
     ProfileTrainingUpdate:
       type: object
       required:
-        - certficate_content_pdf_base64
         - kind
       properties:
+        kind:
+          type: string
+          enum: [training_kind_nhsd]
         certficate_content_pdf_base64:
           type: string
           description: Base64 encoded PDF file data of the certificate
-        kind:
-          type: string
-          enum: [nhsd]
 
     ProfileTrainingResponse:
       type: object
-      required:
-        - certificate_is_valid
-        - certificate_message
       properties:
         certificate_is_valid:
           type: boolean

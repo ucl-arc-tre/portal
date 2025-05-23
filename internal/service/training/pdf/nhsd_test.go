@@ -1,6 +1,7 @@
-package training
+package pdf
 
 import (
+	"encoding/base64"
 	"os"
 	"testing"
 	"time"
@@ -9,9 +10,8 @@ import (
 )
 
 func TestValidNHSDCertificateParse(t *testing.T) {
-	content, err := os.ReadFile("testdata/valid.pdf")
-	assert.NoError(t, err)
-	certificate, err := ParseNHSDCertificate(content)
+	contentBase64 := mustBase64Encode(t, "testdata/valid.pdf")
+	certificate, err := ParseNHSDCertificate(contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.True(t, certificate.IsValid)
@@ -23,10 +23,15 @@ func TestValidNHSDCertificateParse(t *testing.T) {
 }
 
 func TestInvalidNHSDCertificateParse(t *testing.T) {
-	content, err := os.ReadFile("testdata/invalid.pdf")
-	assert.NoError(t, err)
-	certificate, err := ParseNHSDCertificate(content)
+	contentBase64 := mustBase64Encode(t, "testdata/invalid.pdf")
+	certificate, err := ParseNHSDCertificate(contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.False(t, certificate.IsValid)
+}
+
+func mustBase64Encode(t *testing.T, filepath string) string {
+	content, err := os.ReadFile(filepath)
+	assert.NoError(t, err)
+	return base64.StdEncoding.EncodeToString(content)
 }

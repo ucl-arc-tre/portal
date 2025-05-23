@@ -36,22 +36,22 @@ export type ProfileAgreements = {
 };
 
 export type ProfileTrainingUpdate = {
+    kind: 'training_kind_nhsd';
     /**
      * Base64 encoded PDF file data of the certificate
      */
-    certficate_content_pdf_base64: string;
-    kind: 'nhsd';
+    certficate_content_pdf_base64?: string;
 };
 
 export type ProfileTrainingResponse = {
     /**
      * Is the certificate valid
      */
-    certificate_is_valid: boolean;
+    certificate_is_valid?: boolean;
     /**
      * Reason why the training certificate is valid/invalid
      */
-    certificate_message: string;
+    certificate_message?: string;
 };
 
 export type GetProfileData = {
@@ -122,14 +122,14 @@ export type PostProfileAgreementsResponses = {
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
 
-export type PostProfileTrainingNhsdData = {
+export type PostProfileTrainingData = {
     body: ProfileTrainingUpdate;
     path?: never;
     query?: never;
-    url: '/profile/training/nhsd';
+    url: '/profile/training';
 };
 
-export type PostProfileTrainingNhsdErrors = {
+export type PostProfileTrainingErrors = {
     /**
      * Internal server error
      */
@@ -140,11 +140,11 @@ export type PostProfileTrainingNhsdErrors = {
     default: unknown;
 };
 
-export type PostProfileTrainingNhsdResponses = {
+export type PostProfileTrainingResponses = {
     200: ProfileTrainingResponse;
 };
 
-export type PostProfileTrainingNhsdResponse = PostProfileTrainingNhsdResponses[keyof PostProfileTrainingNhsdResponses];
+export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
 
 export type GetAgreementsApprovedResearcherData = {
     body?: never;
