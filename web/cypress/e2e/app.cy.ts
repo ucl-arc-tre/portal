@@ -47,7 +47,7 @@ describe("Setting chosen name for user", () => {
     cy.clearChosenName();
     cy.visit("/");
 
-    cy.get("dialog[data-id='chosenName']").should("be.visible");
+    cy.get("dialog[data-cy='chosenName']").should("be.visible");
   });
 
   it("can set chosen name", () => {
@@ -55,8 +55,8 @@ describe("Setting chosen name for user", () => {
     cy.clearChosenName();
     cy.visit("/");
 
-    cy.get("dialog[data-id='chosenName']").find("input").type(chosenName);
-    cy.get("dialog[data-id='chosenName']").find("button").click();
+    cy.get("dialog[data-cy='chosenName']").find("input").type(chosenName);
+    cy.get("dialog[data-cy='chosenName']").find("button").click();
     cy.reload();
     cy.contains(chosenName).should("be.visible");
     cy.clearChosenName();
