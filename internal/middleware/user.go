@@ -52,7 +52,7 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		ctx.Set(userContextKey, user)
 		return
 	}
-	
+
 	user, err := u.persistedUser(username)
 	if err != nil {
 		log.Err(err).Msg("Failed to get user")
