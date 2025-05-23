@@ -26,7 +26,7 @@ func GetUser(ctx *gin.Context) types.User {
 }
 
 func UserIsCacheable(user types.User) bool {
-	return user.ChosenName != ""
+	return user.ChosenName != "" && user.ChosenName != "Test Chosen Name"
 }
 
 type UserSetter struct {
