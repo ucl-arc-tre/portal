@@ -28,7 +28,7 @@ describe("ARC Portal UI authenticated", () => {
     cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
 
     cy.get("body").then((body) => {
-      if (body.find("[data-cy='approved-researcher-agreement-text'").length > 0) {
+      if (body.find("[data-cy='approved-researcher-agreement-text']").length > 0) {
         cy.get("[data-cy='approved-researcher-agreement-text']").should("be.visible");
         cy.get("input[name='agreed'][type='checkbox']").check();
         cy.get("[data-cy='approved-researcher-agreement-agree']").click();
