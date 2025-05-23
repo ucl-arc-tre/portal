@@ -1,12 +1,13 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "../ui/Button";
-import { FormEvent, useRef } from "react";
+import { FormEvent, useRef, useState } from "react";
 import styles from "./UserTasks.module.css";
 import { postProfile } from "@/openapi";
 
 export default function UserTasks() {
   const { loading, isAuthed, userData } = useAuth();
+  const [chosenName, setChosenName] = useState<string>("");
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -23,6 +24,8 @@ export default function UserTasks() {
       if (!response.response.ok) {
         throw new Error(`HTTP error! status: ${response.response.status}`);
       } else {
+        console.log(response.response);
+        setChosenName(chosenName);
         dialogElement!.close();
       }
     } catch (error) {
@@ -36,7 +39,7 @@ export default function UserTasks() {
   return (
     <div>
       {!userData!.chosen_name && (
-        <dialog open ref={dialogRef} id={styles.dialog} data-cy="chosenName">
+        <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
           <form onSubmit={handleSubmit}>
             Please enter your name as you would choose to have it appear on forms related to our services.
             <input type="text" name="chosenName"></input>
@@ -45,7 +48,7 @@ export default function UserTasks() {
         </dialog>
       )}
       <p>
-        Name: {userData!.chosen_name}. Username&nbsp;{userData!.username}. Roles:&nbsp;
+        Name: {userData!.chosen_name || chosenName}. Username&nbsp;{userData!.username}. Roles:&nbsp;
         {userData!.roles.join(", ")}
       </p>
       <div>
