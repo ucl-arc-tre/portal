@@ -1,0 +1,22 @@
+.dialog {
+  /* CSS modules doesn't like the word "name" */
+  max-width: 28rem;
+  padding: 1rem;
+  border-radius: 8px;
+
+  form {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.2rem;
+    gap: 0.5rem;
+    margin-inline: 4%;
+
+    input {
+      font-size: 1.4rem;
+      padding: 0.2rem;
+      margin-inline: 4%;
+      margin-top: 0.4rem;
+    }
+  }
+}

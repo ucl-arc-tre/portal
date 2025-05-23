@@ -43,3 +43,8 @@ a {
     color-scheme: dark;
   }
 }
+
+dialog {
+  justify-items: center;
+  justify-self: center;
+}

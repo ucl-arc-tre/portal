@@ -9,7 +9,7 @@ type Props = React.ComponentProps<"button"> & {
   value?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  id?: string;
+  cy?: string;
 };
 
 export default function Button(props: Props) {
@@ -29,7 +29,7 @@ export default function Button(props: Props) {
   }
   return (
     <button
-      id={props.id}
+      data-cy={props.cy}
       className={`${styles.button} ${sizeStyle} ${props.href ? styles.nav : ""} ${props.danger ? styles.danger : ""} ${props.type === "submit" && styles.submit}`}
       type={props.type}
       onClick={props.onClick}
