@@ -48,6 +48,11 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		panic("username header unset")
 	}
 
+	if user, existsInCache := u.cache.Get(username); existsInCache {
+		ctx.Set(userContextKey, user)
+		return
+	}
+	
 	user, err := u.persistedUser(username)
 	if err != nil {
 		log.Err(err).Msg("Failed to get user")
@@ -56,11 +61,6 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	}
 
 	if UserIsCacheable(user) {
-		if user, existsInCache := u.cache.Get(username); existsInCache {
-			ctx.Set(userContextKey, user)
-			return
-		}
-
 		_ = u.cache.Add(username, user)
 	}
 
