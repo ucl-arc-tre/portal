@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"errors"
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
@@ -48,4 +50,16 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 		})
 	}
 	return agreements, result.Error
+}
+
+func (s *Service) SetUserChosenName(user types.User) error {
+	const isValidPattern = `^[A-Za-z\s\-\p{L}\p{M}]*$`
+	var isValidRegex = regexp.MustCompile(isValidPattern)
+
+	if isValid := isValidRegex.MatchString(string(user.ChosenName)) || user.ChosenName == ""; !isValid {
+		return errors.New("invalid chosen name")
+	}
+	result := s.db.Model(&types.User{}).Where("id = ?", user.ID).Update("chosen_name", user.ChosenName)
+
+	return result.Error
 }

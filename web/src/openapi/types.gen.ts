@@ -3,6 +3,11 @@
 export type ProfileResponse = {
     username: string;
     roles: Array<string>;
+    chosen_name: string;
+};
+
+export type ProfileUpdate = {
+    chosen_name: string;
 };
 
 export type Agreement = {
@@ -54,6 +59,33 @@ export type GetProfileResponses = {
 };
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+
+export type PostProfileData = {
+    body: ProfileUpdate;
+    path?: never;
+    query?: never;
+    url: '/profile';
+};
+
+export type PostProfileErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProfileResponses = {
+    /**
+     * Successfully updated profile
+     */
+    200: ProfileResponse;
+};
+
+export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
 
 export type GetProfileAgreementsData = {
     body?: never;
