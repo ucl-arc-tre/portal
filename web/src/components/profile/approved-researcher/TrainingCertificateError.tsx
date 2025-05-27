@@ -2,8 +2,8 @@ type TrainingCertificateErrorProps = {
   text: string;
 };
 
+const manualApprovalEmailAddress = "ig-training@ucl.ac.uk";
 const manualApprovalEmailBody = encodeURI("Dear UCL Information Governance,\n\n ...");
-
 const manualApprovalEmailSubject = "Training certificate";
 
 export default function TrainingCertificateError(props: TrainingCertificateErrorProps) {
@@ -11,8 +11,10 @@ export default function TrainingCertificateError(props: TrainingCertificateError
     <p>
       {props.text}
       {" If required, please email your certificate to "}
-      <a href={`mailto:ig-training@ucl.ac.uk?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}>
-        ig-training@ucl.ac.uk
+      <a
+        href={`mailto:${manualApprovalEmailAddress}?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
+      >
+        {manualApprovalEmailAddress}
       </a>
       {" for manual approval."}
     </p>
