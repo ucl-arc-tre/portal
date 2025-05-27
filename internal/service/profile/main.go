@@ -53,7 +53,7 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 }
 
 func (s *Service) SetUserChosenName(user types.User) error {
-	const isValidPattern = `^[A-Za-z\s-]*(?:\p{L}\p{M}*)*$`
+	const isValidPattern = `^[A-Za-z\s\-\p{L}\p{M}]*$`
 	var isValidRegex = regexp.MustCompile(isValidPattern)
 
 	if isValid := isValidRegex.MatchString(string(user.ChosenName)) || user.ChosenName == ""; !isValid {
