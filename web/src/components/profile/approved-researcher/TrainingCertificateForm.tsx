@@ -5,12 +5,16 @@ import { postProfileTraining } from "@/openapi";
 import { useState } from "react";
 import styles from "./TrainingCertificateForm.module.css";
 
+interface FormEvent extends React.FormEvent<HTMLFormElement> {
+  target: HTMLFormElement;
+}
+
 export default function TrainingCertificateForm() {
   const { loading, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const { certificate } = e.target;
     const files: FileList = certificate.files;
@@ -24,6 +28,10 @@ export default function TrainingCertificateForm() {
       return;
     }
     base64Encode(file).then((content) => {
+      if (content === null) {
+        setErrorMessage("Failed to base64 encode PDF.");
+        return;
+      }
       try {
         postProfileTraining({
           body: {
@@ -75,13 +83,13 @@ export default function TrainingCertificateForm() {
   );
 }
 
-function base64Encode(file: File) {
+function base64Encode(file: File): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.readAsDataURL(file);
 
     fileReader.onload = () => {
-      resolve(fileReader.result);
+      resolve(fileReader.result as string | null);
     };
 
     fileReader.onerror = (error) => {
