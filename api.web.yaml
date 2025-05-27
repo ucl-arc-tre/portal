@@ -7,6 +7,22 @@ servers:
   - url: /api/v0
 
 paths:
+  /auth:
+    get:
+      description: Authentication and authorization status of the user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Auth"
+        "401":
+          description: Unauthenticated
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /profile:
     get:
       description: Users profile
@@ -57,6 +73,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/AgreementConfirmation"
+      responses:
+        "200":
+          description: Accepted
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /agreements/approved-researcher:
     get:
@@ -76,12 +99,11 @@ paths:
 
 components:
   schemas:
-    ProfileResponse:
+    Auth:
       type: object
       required:
         - username
         - roles
-        - chosen_name
       properties:
         username:
           type: string
@@ -89,6 +111,15 @@ components:
           type: array
           items:
             type: string
+
+    ProfileResponse:
+      type: object
+      required:
+        - username
+        - chosen_name
+      properties:
+        username:
+          type: string
         chosen_name:
           type: string
 

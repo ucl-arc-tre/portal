@@ -25,10 +25,6 @@ func GetUser(ctx *gin.Context) types.User {
 	return ctx.MustGet(userContextKey).(types.User)
 }
 
-func UserIsCacheable(user types.User) bool {
-	return user.ChosenName != "" && user.ChosenName != "Test Chosen Name"
-}
-
 type UserSetter struct {
 	db    *gorm.DB
 	cache *expirable.LRU[types.Username, types.User]
@@ -47,23 +43,16 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	if username == "" {
 		panic("username header unset")
 	}
-
 	if user, existsInCache := u.cache.Get(username); existsInCache {
 		ctx.Set(userContextKey, user)
 		return
 	}
-
 	user, err := u.persistedUser(username)
 	if err != nil {
 		log.Err(err).Msg("Failed to get user")
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-
-	if UserIsCacheable(user) {
-		_ = u.cache.Add(username, user)
-	}
-
 	ctx.Set(userContextKey, user)
 }
 

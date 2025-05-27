@@ -52,14 +52,24 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 	return agreements, result.Error
 }
 
-func (s *Service) SetUserChosenName(user types.User) error {
-	const isValidPattern = `^[A-Za-z\s\-\p{L}\p{M}]*$`
-	var isValidRegex = regexp.MustCompile(isValidPattern)
+func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
+	attrs := types.UserAttributes{}
+	result := s.db.Take(&attrs).Where("user_id = ?", user.ID)
+	return attrs, result.Error
+}
 
-	if isValid := isValidRegex.MatchString(string(user.ChosenName)) || user.ChosenName == ""; !isValid {
+func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
+	const isValidPattern = `^[A-Za-z\s\-\p{L}\p{M}]*$`
+	isValidRegex := regexp.MustCompile(isValidPattern)
+
+	if isValid := isValidRegex.MatchString(string(chosenName)); !isValid {
 		return errors.New("invalid chosen name")
 	}
-	result := s.db.Model(&types.User{}).Where("id = ?", user.ID).Update("chosen_name", user.ChosenName)
+	attrs := types.UserAttributes{UserID: user.ID}
+	result := s.db.Where(&attrs).Assign(types.UserAttributes{
+		Model:      types.Model{CreatedAt: time.Now()},
+		ChosenName: chosenName,
+	}).FirstOrCreate(&attrs)
 
 	return result.Error
 }
