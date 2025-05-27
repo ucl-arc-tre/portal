@@ -16,20 +16,27 @@ export default function UserTasks() {
     const inputElement = event.currentTarget.elements.namedItem("chosenName") as HTMLInputElement;
     const chosenName = inputElement.value;
     const dialogElement = dialogRef.current;
+    const regex = /^[A-Za-z-]*$/; // allow letters and hyphens
 
-    try {
-      const response = await postProfile({
-        body: { chosen_name: chosenName },
-      });
-      if (!response.response.ok) {
-        throw new Error(`HTTP error! status: ${response.response.status}`);
-      } else {
-        console.log(response.response);
-        setChosenName(chosenName);
-        dialogElement!.close();
+    if (!chosenName || chosenName.trim() === "") {
+      alert("Please enter a name");
+    } else if (!regex.test(chosenName)) {
+      alert("Please enter a valid name; only letters and hyphens are allowed");
+    } else {
+      try {
+        const response = await postProfile({
+          body: { chosen_name: chosenName },
+        });
+        if (!response.response.ok) {
+          throw new Error(`HTTP error! status: ${response.response.status}`);
+        } else {
+          console.log(response.response);
+          setChosenName(chosenName);
+          dialogElement!.close();
+        }
+      } catch (error) {
+        console.error("There was a problem submitting your request:", error);
       }
-    } catch (error) {
-      console.error("There was a problem submitting your request:", error);
     }
   };
   if (loading) return null;
