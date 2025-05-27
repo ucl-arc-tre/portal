@@ -8,22 +8,20 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (h *Handler) GetProfile(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	roles, err := rbac.GetRoles(user)
+	attributes, err := h.profile.Attributes(user)
 	if err != nil {
-		log.Err(err).Any("username", user.Username).Msg("Failed to get roles for user")
+		log.Err(err).Msg("Failed to get user attributes")
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
 	ctx.JSON(http.StatusOK, openapi.ProfileResponse{
 		Username:   string(user.Username),
-		Roles:      roles,
-		ChosenName: string(user.ChosenName),
+		ChosenName: string(attributes.ChosenName),
 	})
 }
 
@@ -35,16 +33,13 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 		ctx.Status(http.StatusNotAcceptable)
 		return
 	}
-	user.ChosenName = types.ChosenName(update.ChosenName)
-
-	if err := h.profile.SetUserChosenName(user); err != nil {
+	if err := h.profile.SetUserChosenName(user, types.ChosenName(update.ChosenName)); err != nil {
 		log.Err(err).Msg("Failed to update chosen name")
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-
 	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
-		ChosenName: string(user.ChosenName),
+		ChosenName: update.ChosenName,
 	})
 }
 

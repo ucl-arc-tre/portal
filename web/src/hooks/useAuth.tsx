@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getProfile } from "@/openapi";
-import { ProfileResponse } from "@/openapi";
+import { getAuth } from "@/openapi";
+import { Auth } from "@/openapi";
 
 type AuthCtxValue = {
   loading: boolean;
   isAuthed: boolean;
-  userData: ProfileResponse | null;
+  userData: Auth | null;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
@@ -19,14 +19,14 @@ export const useAuth = () => useContext(AuthCtx);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAuthed, setIsAuthed] = useState(false);
-  const [userData, setUserData] = useState<ProfileResponse | null>(null);
+  const [userData, setUserData] = useState<Auth | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     const checkAuth = async () => {
       try {
-        const response = await getProfile();
+        const response = await getAuth();
 
         if (!cancelled && response.response.status === 200 && response.data) {
           setIsAuthed(true);

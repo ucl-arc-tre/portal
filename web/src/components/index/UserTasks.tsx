@@ -1,14 +1,28 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "../ui/Button";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./UserTasks.module.css";
-import { postProfile } from "@/openapi";
+import { postProfile, getProfile } from "@/openapi";
 
 export default function UserTasks() {
   const { loading, isAuthed, userData } = useAuth();
-  const [chosenName, setChosenName] = useState<string>("");
+  const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    try {
+      getProfile().then((response) => {
+        if (response.response.ok && response.data?.chosen_name) {
+          setChosenName(response.data?.chosen_name);
+        } else {
+          setChosenName("");
+        }
+      });
+    } catch (error) {
+      console.error("Failed to get profile:", error);
+    }
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,7 +44,6 @@ export default function UserTasks() {
         if (!response.response.ok) {
           throw new Error(`HTTP error! status: ${response.response.status}`);
         } else {
-          console.log(response.response);
           setChosenName(chosenName);
           dialogElement!.close();
         }
@@ -39,13 +52,14 @@ export default function UserTasks() {
       }
     }
   };
-  if (loading) return null;
+
+  if (loading || chosenName === undefined) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
   return (
     <div>
-      {!userData!.chosen_name && (
+      {!chosenName && (
         <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
           <form onSubmit={handleSubmit}>
             Please enter your name as you would choose to have it appear on forms related to our services.
@@ -55,7 +69,7 @@ export default function UserTasks() {
         </dialog>
       )}
       <p>
-        Name: {userData!.chosen_name || chosenName}. Username&nbsp;{userData!.username}. Roles:&nbsp;
+        Name: {chosenName}. Username&nbsp;{userData!.username}. Roles:&nbsp;
         {userData!.roles.join(", ")}
       </p>
       <div>
