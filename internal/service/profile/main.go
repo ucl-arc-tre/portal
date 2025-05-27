@@ -74,7 +74,7 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	}).FirstOrCreate(&attrs)
 
 	if chosenName == "" { // assign does not clear the value
-		log.Debug().Any("user", user.Username).Msg("Clearing the name")
+		log.Debug().Any("user", user.Username).Msg("Clearing the chosen name user attribute")
 		result := s.db.Model(&attrs).Where(&attrs).Update("chosen_name", "")
 		return result.Error
 	}

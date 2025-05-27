@@ -13,7 +13,7 @@ import (
 
 func (h *Handler) GetProfile(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	attrs, err := h.profile.Attributes(user)
+	attributes, err := h.profile.Attributes(user)
 	if err != nil {
 		log.Err(err).Msg("Failed to get user attributes")
 		ctx.Status(http.StatusInternalServerError)
@@ -21,7 +21,7 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, openapi.ProfileResponse{
 		Username:   string(user.Username),
-		ChosenName: string(attrs.ChosenName),
+		ChosenName: string(attributes.ChosenName),
 	})
 }
 
@@ -38,7 +38,6 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	log.Debug().Any("ChosenName", update.ChosenName).Msg("updated")
 	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
 		ChosenName: update.ChosenName,
 	})

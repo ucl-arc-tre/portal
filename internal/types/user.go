@@ -13,6 +13,7 @@ type User struct {
 
 type UserAttributes struct {
 	Model
+	User       User
 	UserID     uuid.UUID
 	ChosenName ChosenName
 }
