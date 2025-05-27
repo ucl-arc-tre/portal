@@ -44,22 +44,26 @@ func (s *Service) updateNHSD(
 		response.CertificateMessage = ptr("Failed to parse certificate")
 		return response, err
 	}
+	if !certificate.HasIssuedAt() {
+		return response, fmt.Errorf("certificate must have an issused at time to be saved")
+	}
 	response.CertificateIsValid = &certificate.IsValid
 	if certificate.IsValid { // todo: check name matches
-		if err := s.createTrainingRecord(user, types.TrainingKindNHSD); err != nil {
+		if err := s.createNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
 			return response, err
 		}
 	}
 	return response, nil
 }
 
-func (s *Service) createTrainingRecord(user types.User, kind types.TrainingKind) error {
+func (s *Service) createNHSDTrainingRecord(user types.User, completedAt time.Time) error {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
-		Kind:   kind,
+		Kind:   types.TrainingKindNHSD,
 	}
 	result := s.db.Where(&record).Assign(types.UserTrainingRecord{
-		Model: types.Model{CreatedAt: time.Now()},
+		Model:       types.Model{CreatedAt: time.Now()},
+		CompletedAt: completedAt,
 	}).FirstOrCreate(&record)
 	return result.Error
 }

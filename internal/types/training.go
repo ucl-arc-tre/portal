@@ -1,6 +1,10 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 const (
 	TrainingKindNHSD = TrainingKind("nhsd")
@@ -10,6 +14,7 @@ type TrainingKind string
 
 type UserTrainingRecord struct {
 	Model
-	UserID uuid.UUID
-	Kind   TrainingKind `gorm:"index"`
+	UserID      uuid.UUID
+	Kind        TrainingKind `gorm:"index"`
+	CompletedAt time.Time
 }

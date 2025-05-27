@@ -19,3 +19,8 @@ func (t *TrainingCertificate) FirstNameMatches(value string) bool {
 func (t *TrainingCertificate) LastNameMatches(value string) bool {
 	return t != nil && strings.EqualFold(t.LastName, value) // case insensitive match
 }
+
+func (t *TrainingCertificate) HasIssuedAt() bool {
+	defaultTime := time.Time{}
+	return t.IssuedAt != defaultTime
+}

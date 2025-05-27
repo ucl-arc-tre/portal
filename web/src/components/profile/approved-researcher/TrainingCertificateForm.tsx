@@ -15,12 +15,12 @@ export default function TrainingCertificateForm() {
     const { certificate } = e.target;
     const files: FileList = certificate.files;
     if (files.length != 1) {
-      setErrorMessage(`Must have only 1 file`);
+      setErrorMessage("Must have only 1 file.");
       return;
     }
     const file = files[0];
     if (file.size > 1e7) {
-      setErrorMessage(`File must be < 10MB in size`);
+      setErrorMessage("File must be < 10MB in size.");
       return;
     }
     base64Encode(file).then((content) => {
@@ -31,11 +31,10 @@ export default function TrainingCertificateForm() {
             certficate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
           },
         }).then((res) => {
+          setErrorMessage("");
           setIsValid(res.data?.certificate_is_valid);
           if (res.error) {
-            setErrorMessage(`Failed to validate: ${res.error}`);
-          } else {
-            setErrorMessage("");
+            setErrorMessage(`Failed to validate certificate.`);
           }
         });
       } catch (err) {
@@ -60,7 +59,18 @@ export default function TrainingCertificateForm() {
           Submit
         </Button>
       </form>
-      {errorMessage && <p>Failed {errorMessage}</p>}
+      {errorMessage && (
+        <p>
+          {errorMessage}
+          {"Please email "}
+          <a
+            href={`mailto:ig-training@ucl.ac.uk?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
+          >
+            ig-training@ucl.ac.uk
+          </a>
+          {" for manual approval."}
+        </p>
+      )}
     </div>
   );
 }
@@ -79,3 +89,7 @@ function base64Encode(file: File) {
     };
   });
 }
+
+const manualApprovalEmailBody = encodeURI("Dear UCL Information Governance,\n\n ...");
+
+const manualApprovalEmailSubject = "Training certificate";
