@@ -53,7 +53,6 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	_ = u.cache.Add(username, user)
 	ctx.Set(userContextKey, user)
 }
 

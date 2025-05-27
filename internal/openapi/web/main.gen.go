@@ -25,6 +25,12 @@ type AgreementConfirmation struct {
 	AgreementId string `json:"agreement_id"`
 }
 
+// Auth defines model for Auth.
+type Auth struct {
+	Roles    []string `json:"roles"`
+	Username string   `json:"username"`
+}
+
 // ConfirmedAgreement defines model for ConfirmedAgreement.
 type ConfirmedAgreement struct {
 	// AgreementType Type of agreement that was confirmed
@@ -41,8 +47,8 @@ type ProfileAgreements struct {
 
 // ProfileResponse defines model for ProfileResponse.
 type ProfileResponse struct {
-	Roles    []string `json:"roles"`
-	Username string   `json:"username"`
+	ChosenName string `json:"chosen_name"`
+	Username   string `json:"username"`
 }
 
 // ProfileTrainingResponse defines model for ProfileTrainingResponse.
@@ -64,6 +70,14 @@ type ProfileTrainingUpdate struct {
 // ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.
 type ProfileTrainingUpdateKind string
 
+// ProfileUpdate defines model for ProfileUpdate.
+type ProfileUpdate struct {
+	ChosenName string `json:"chosen_name"`
+}
+
+// PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
+type PostProfileJSONRequestBody = ProfileUpdate
+
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 
@@ -76,8 +90,14 @@ type ServerInterface interface {
 	// (GET /agreements/approved-researcher)
 	GetAgreementsApprovedResearcher(c *gin.Context)
 
+	// (GET /auth)
+	GetAuth(c *gin.Context)
+
 	// (GET /profile)
 	GetProfile(c *gin.Context)
+
+	// (POST /profile)
+	PostProfile(c *gin.Context)
 
 	// (GET /profile/agreements)
 	GetProfileAgreements(c *gin.Context)
@@ -111,6 +131,19 @@ func (siw *ServerInterfaceWrapper) GetAgreementsApprovedResearcher(c *gin.Contex
 	siw.Handler.GetAgreementsApprovedResearcher(c)
 }
 
+// GetAuth operation middleware
+func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAuth(c)
+}
+
 // GetProfile operation middleware
 func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
 
@@ -122,6 +155,19 @@ func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
 	}
 
 	siw.Handler.GetProfile(c)
+}
+
+// PostProfile operation middleware
+func (siw *ServerInterfaceWrapper) PostProfile(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProfile(c)
 }
 
 // GetProfileAgreements operation middleware
@@ -191,7 +237,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
+	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
+	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)

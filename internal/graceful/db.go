@@ -21,6 +21,7 @@ func InitDB() {
 		&types.Agreement{},
 		&types.UserAgreementConfirmation{},
 		&types.UserTrainingRecord{},
+		&types.UserAttributes{},
 	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)

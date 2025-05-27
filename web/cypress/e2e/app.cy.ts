@@ -25,16 +25,56 @@ describe("ARC Portal UI authenticated", () => {
     cy.loginAsAdmin();
     cy.visit("/profile/approved-researcher");
 
-    cy.get("#approved-researcher-agreement"); // wait for load
+    cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
 
     cy.get("body").then((body) => {
-      if (body.find("#approved-researcher-agreement-text").length > 0) {
-        cy.get("#approved-researcher-agreement-text").should("be.visible");
+      if (body.find("[data-cy='approved-researcher-agreement-text']").length > 0) {
+        cy.get("[data-cy='approved-researcher-agreement-text']").should("be.visible");
         cy.get("input[name='agreed'][type='checkbox']").check();
-        cy.get("#approved-researcher-agreement-agree").click();
+        cy.get("[data-cy='approved-researcher-agreement-agree']").click();
       }
     });
 
     cy.contains("Agreement confirmed").should("be.visible");
   });
 });
+
+describe("Setting chosen name for user", () => {
+  const chosenName = (Cypress.env("chosenName") as string) || "Test Chosen Name";
+
+  it("prompts user to set chosen name", () => {
+    clearChosenNameAndVistHomepage();
+    cy.get("dialog[data-cy='chosenName']").should("be.visible");
+  });
+
+  it("can set chosen name", () => {
+    clearChosenNameAndVistHomepage();
+    cy.get("dialog[data-cy='chosenName']").find("input").type(chosenName);
+    cy.get("dialog[data-cy='chosenName']").find("button").click();
+    cy.reload();
+    cy.contains(chosenName).should("be.visible");
+    cy.clearChosenName();
+  });
+
+  it("can't set invalid name", () => {
+    clearChosenNameAndVistHomepage();
+    const alertSpy = cy.spy();
+    cy.on("window:alert", alertSpy);
+
+    cy.get("dialog[data-cy='chosenName']").find("input").type("123533");
+    cy.get("dialog[data-cy='chosenName']")
+      .find("button")
+      .click()
+      .then(() => {
+        expect(alertSpy).to.be.calledOnce;
+        expect(alertSpy).to.be.calledWith("Please enter a valid name; only letters and hyphens are allowed");
+      });
+    cy.get("dialog[data-cy='chosenName']").should("be.visible");
+  });
+});
+
+function clearChosenNameAndVistHomepage(): void {
+  cy.loginAsAdmin();
+  cy.clearChosenName();
+  cy.visit("/");
+}
