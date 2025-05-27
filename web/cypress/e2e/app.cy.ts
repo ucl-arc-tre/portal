@@ -61,4 +61,22 @@ describe("Setting chosen name for user", () => {
     cy.contains(chosenName).should("be.visible");
     cy.clearChosenName();
   });
+
+  it("can't set invalid name", () => {
+    cy.loginAsAdmin();
+    cy.clearChosenName();
+    cy.visit("/");
+    const alertSpy = cy.spy();
+    cy.on("window:alert", alertSpy);
+
+    cy.get("dialog[data-cy='chosenName']").find("input").type("123533");
+    cy.get("dialog[data-cy='chosenName']")
+      .find("button")
+      .click()
+      .then(() => {
+        expect(alertSpy).to.be.calledOnce;
+        expect(alertSpy).to.be.calledWith("Please enter a valid name; only letters and hyphens are allowed");
+      });
+    cy.get("dialog[data-cy='chosenName']").should("be.visible");
+  });
 });
