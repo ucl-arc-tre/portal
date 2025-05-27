@@ -1,26 +1,16 @@
-package training
+package profile
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/service/training/pdf"
+	"github.com/ucl-arc-tre/portal/internal/service/profile/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
-	"gorm.io/gorm"
 )
 
-type Service struct {
-	db *gorm.DB
-}
-
-func New() *Service {
-	return &Service{db: graceful.NewDB()}
-}
-
-func (s *Service) Update(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
+func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
 	if data.CertficateContentPdfBase64 == nil {
 		log.Debug().Any("username", user.Username).Msg("Empty certificate content")
 		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
@@ -36,7 +26,7 @@ func (s *Service) updateNHSD(
 	user types.User,
 	data openapi.ProfileTrainingUpdate,
 ) (openapi.ProfileTrainingResponse, error) {
-	certificate, err := pdf.ParseNHSDCertificate(*data.CertficateContentPdfBase64)
+	certificate, err := certificate.ParseNHSDCertificate(*data.CertficateContentPdfBase64)
 	response := openapi.ProfileTrainingResponse{
 		CertificateIsValid: ptr(false),
 	}

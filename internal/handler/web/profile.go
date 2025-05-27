@@ -84,7 +84,7 @@ func (h *Handler) PostProfileTraining(ctx *gin.Context) {
 		setInvalidResponse(ctx, err, "Invalid JSON object")
 		return
 	}
-	result, err := h.training.Update(user, data)
+	result, err := h.profile.UpdateTraining(user, data)
 	if err != nil {
 		log.Err(err).Any("username", user.Username).Msg("Failed to update users training")
 		ctx.Status(http.StatusInternalServerError)

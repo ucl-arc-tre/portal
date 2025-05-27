@@ -1,4 +1,4 @@
-package pdf
+package certificate
 
 import (
 	"encoding/base64"

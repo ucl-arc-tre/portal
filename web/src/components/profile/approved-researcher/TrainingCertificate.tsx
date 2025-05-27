@@ -3,13 +3,13 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import { useAuth } from "@/hooks/useAuth";
 import { postProfileTraining } from "@/openapi";
 import { useState } from "react";
-import styles from "./TrainingCertificateForm.module.css";
+import styles from "./TrainingCertificate.module.css";
 
 interface FormEvent extends React.FormEvent<HTMLFormElement> {
   target: HTMLFormElement;
 }
 
-export default function TrainingCertificateForm() {
+export default function TrainingCertificate() {
   const { loading, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
@@ -60,6 +60,16 @@ export default function TrainingCertificateForm() {
   return (
     <div id="training-certificate">
       <h2 className="subtitle">Training Certificate</h2>
+      <p className={styles.text}>
+        All members of UCL who manage highly confidential research information, must undertake annual training on
+        handling sentitive information. Anyone with an {"'.ac.uk'"} or NHS email address can self-register for{" "}
+        <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
+          NHS Digital Data Security Awareness Level 1 course
+        </a>{" "}
+        provided by e-Learning for Health. When asked, you can register your role as a “Further Education and Higher
+        Education Researcher (Education)” which should provide you access to the course.{" "}
+        <strong>Please complete the course and upload the certificate below</strong>
+      </p>
 
       <form className={styles.wrapper} onSubmit={handleSubmit}>
         <input type="file" name="certificate" accept="pdf" required />
