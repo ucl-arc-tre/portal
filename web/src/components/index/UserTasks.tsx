@@ -16,7 +16,7 @@ export default function UserTasks() {
     const inputElement = event.currentTarget.elements.namedItem("chosenName") as HTMLInputElement;
     const chosenName = inputElement.value;
     const dialogElement = dialogRef.current;
-    const regex = /^[A-Za-z\s-\u2014]*$/; // allow letters and hyphens
+    const regex = /^[A-Za-z\s-]+(\p{M}\p{L}*)*$/u; // allow letters including diacritics and hyphens
 
     if (!chosenName || chosenName.trim() === "") {
       alert("Please enter a name");
