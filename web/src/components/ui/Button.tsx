@@ -1,6 +1,10 @@
 import Link from "next/link";
 import styles from "./Button.module.css";
-import { Button as UCLBtn } from "uikit-react-public";
+import dynamic from "next/dynamic";
+
+const UCLBtn = dynamic(() => import("uikit-react-public").then((mod) => mod.Button), {
+  ssr: false,
+});
 
 type Props = React.ComponentProps<"button"> & {
   danger?: boolean;
