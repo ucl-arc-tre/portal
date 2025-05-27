@@ -43,18 +43,12 @@ describe("Setting chosen name for user", () => {
   const chosenName = (Cypress.env("chosenName") as string) || "Test Chosen Name";
 
   it("prompts user to set chosen name", () => {
-    cy.loginAsAdmin();
-    cy.clearChosenName();
-    cy.visit("/");
-
+    clearChosenNameAndVistHomepage();
     cy.get("dialog[data-cy='chosenName']").should("be.visible");
   });
 
   it("can set chosen name", () => {
-    cy.loginAsAdmin();
-    cy.clearChosenName();
-    cy.visit("/");
-
+    clearChosenNameAndVistHomepage();
     cy.get("dialog[data-cy='chosenName']").find("input").type(chosenName);
     cy.get("dialog[data-cy='chosenName']").find("button").click();
     cy.reload();
@@ -63,9 +57,7 @@ describe("Setting chosen name for user", () => {
   });
 
   it("can't set invalid name", () => {
-    cy.loginAsAdmin();
-    cy.clearChosenName();
-    cy.visit("/");
+    clearChosenNameAndVistHomepage();
     const alertSpy = cy.spy();
     cy.on("window:alert", alertSpy);
 
@@ -80,3 +72,9 @@ describe("Setting chosen name for user", () => {
     cy.get("dialog[data-cy='chosenName']").should("be.visible");
   });
 });
+
+function clearChosenNameAndVistHomepage(): void {
+  cy.loginAsAdmin();
+  cy.clearChosenName();
+  cy.visit("/");
+}

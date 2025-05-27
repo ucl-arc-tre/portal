@@ -38,6 +38,7 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
+	log.Debug().Any("ChosenName", update.ChosenName).Msg("updated")
 	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
 		ChosenName: update.ChosenName,
 	})
