@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./Button.module.css";
+import { Button as UCLBtn } from "uikit-react-public";
 
 type Props = React.ComponentProps<"button"> & {
   danger?: boolean;
@@ -28,7 +29,7 @@ export default function Button(props: Props) {
     }
   }
   return (
-    <button
+    <UCLBtn
       data-cy={props.cy}
       className={`${styles.button} ${sizeStyle} ${props.href ? styles.nav : ""} ${props.danger ? styles.danger : ""} ${props.type === "submit" && styles.submit}`}
       type={props.type}
@@ -38,6 +39,6 @@ export default function Button(props: Props) {
       value={props.value}
     >
       {props.href ? <Link href={props.href!}>{props.children}</Link> : props.children}
-    </button>
+    </UCLBtn>
   );
 }
