@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { postProfileTraining } from "@/openapi";
 import { useState } from "react";
 import styles from "./TrainingCertificate.module.css";
+import TrainingCertificateError from "./TrainingCertificateError";
 
 interface FormEvent extends React.FormEvent<HTMLFormElement> {
   target: HTMLFormElement;
@@ -43,6 +44,8 @@ export default function TrainingCertificate() {
           setIsValid(res.data?.certificate_is_valid);
           if (res.error) {
             setErrorMessage(`Failed to validate certificate.`);
+          } else if (!isValid) {
+            setErrorMessage("Certificate was not valid. " + res.data?.certificate_message);
           }
         });
       } catch (err) {
@@ -58,9 +61,9 @@ export default function TrainingCertificate() {
   if (isValid) return <p>Valid training ✔</p>;
 
   return (
-    <div id="training-certificate">
+    <div id="training-certificate" className={styles.wrapper}>
       <h2 className="subtitle">Training Certificate</h2>
-      <p className={styles.text}>
+      <p>
         All members of UCL who manage highly confidential research information, must undertake annual training on
         handling sentitive information. Anyone with an {"'.ac.uk'"} or NHS email address can self-register for{" "}
         <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
@@ -71,24 +74,13 @@ export default function TrainingCertificate() {
         <strong>Please complete the course and upload the certificate below</strong>
       </p>
 
-      <form className={styles.wrapper} onSubmit={handleSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <input type="file" name="certificate" accept="pdf" required />
         <Button size="large" type="submit" id="training-certificate-sumbit">
           Submit
         </Button>
       </form>
-      {errorMessage && (
-        <p>
-          {errorMessage}
-          {"Please email "}
-          <a
-            href={`mailto:ig-training@ucl.ac.uk?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
-          >
-            ig-training@ucl.ac.uk
-          </a>
-          {" for manual approval."}
-        </p>
-      )}
+      {errorMessage && <TrainingCertificateError text={errorMessage} />}
     </div>
   );
 }
@@ -107,7 +99,3 @@ function base64Encode(file: File): Promise<string | null> {
     };
   });
 }
-
-const manualApprovalEmailBody = encodeURI("Dear UCL Information Governance,\n\n ...");
-
-const manualApprovalEmailSubject = "Training certificate";

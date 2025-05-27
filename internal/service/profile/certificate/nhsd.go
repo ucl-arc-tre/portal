@@ -11,7 +11,6 @@ import (
 	pdfref "github.com/klippa-app/go-pdfium/references"
 	pdfreq "github.com/klippa-app/go-pdfium/requests"
 	pdfwasm "github.com/klippa-app/go-pdfium/webassembly"
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -46,10 +45,7 @@ func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	text = newLinesRegex.ReplaceAllString(text, " ")
-	log.Debug().Str("text", text).Msg("---")
-
 	if isValid := isValidRegex.MatchString(text); !isValid {
 		return &TrainingCertificate{IsValid: false}, nil
 	}

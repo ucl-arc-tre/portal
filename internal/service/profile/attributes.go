@@ -36,3 +36,9 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	}
 	return result.Error
 }
+
+func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {
+	attrs := types.UserAttributes{}
+	result := s.db.Select("chosen_name").Limit(1).Where("user_id = ?", user.ID).Find(&attrs)
+	return attrs.ChosenName, result.Error
+}

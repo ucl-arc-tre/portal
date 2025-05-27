@@ -37,6 +37,15 @@ func (s *Service) updateNHSD(
 	if !certificate.HasIssuedAt() {
 		return response, fmt.Errorf("certificate must have an issused at time to be saved")
 	}
+	chosenName, err := s.userChosenName(user)
+	if err != nil || chosenName == "" {
+		response.CertificateMessage = ptr("Failed to get users chosen name, or it was unset.")
+		return response, err
+	}
+	if !certificate.NameMatches(chosenName) {
+		response.CertificateMessage = ptr(fmt.Sprintf("Name '%v' does not match '%v'.", certificate.Name(), chosenName))
+		return response, err
+	}
 	response.CertificateIsValid = &certificate.IsValid
 	if certificate.IsValid { // todo: check name matches
 		if err := s.createNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {

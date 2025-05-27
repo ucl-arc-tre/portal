@@ -1,10 +1,12 @@
-.wrapper {
+.form {
   max-width: 400px;
   margin: 2rem auto;
   padding: 1rem;
 }
 
-.text {
+.wrapper {
+  padding-bottom: 1rem;
+
   p {
     padding-top: 0.7rem;
   }

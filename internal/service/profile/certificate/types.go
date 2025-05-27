@@ -1,8 +1,11 @@
 package certificate
 
 import (
+	"fmt"
 	"strings"
 	"time"
+
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 type TrainingCertificate struct {
@@ -12,12 +15,16 @@ type TrainingCertificate struct {
 	IssuedAt  time.Time
 }
 
-func (t *TrainingCertificate) FirstNameMatches(value string) bool {
-	return t != nil && strings.EqualFold(t.FirstName, value) // case insensitive match
+func (t *TrainingCertificate) Name() string {
+	if t == nil {
+		return ""
+	} else {
+		return fmt.Sprintf("%s %s", t.FirstName, t.LastName)
+	}
 }
 
-func (t *TrainingCertificate) LastNameMatches(value string) bool {
-	return t != nil && strings.EqualFold(t.LastName, value) // case insensitive match
+func (t *TrainingCertificate) NameMatches(value types.ChosenName) bool {
+	return t != nil && strings.EqualFold(t.Name(), string(value)) // case insensitive match
 }
 
 func (t *TrainingCertificate) HasIssuedAt() bool {
