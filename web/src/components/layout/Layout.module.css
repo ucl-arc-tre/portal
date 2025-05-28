@@ -7,4 +7,5 @@
 main.content {
   padding: 2rem;
   justify-items: center;
+  margin-inline: 15vw;
 }

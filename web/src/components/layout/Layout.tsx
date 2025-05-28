@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header title="UCL ARC Services Portal" />
       <Nav />
       <div className={styles.layout}>
-        <main className={styles.main}>{children}</main>
+        <main className={styles.content}>{children}</main>
       </div>
       <Footer />
     </>
