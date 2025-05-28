@@ -7,6 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Defines values for ProfileTrainingUpdateKind.
+const (
+	TrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
+)
+
 // Agreement defines model for Agreement.
 type Agreement struct {
 	// Id UUID of the agreement
@@ -46,6 +51,28 @@ type ProfileResponse struct {
 	Username   string `json:"username"`
 }
 
+// ProfileTrainingResponse defines model for ProfileTrainingResponse.
+type ProfileTrainingResponse struct {
+	// CertificateIsValid Is the certificate valid
+	CertificateIsValid *bool `json:"certificate_is_valid,omitempty"`
+
+	// CertificateIssuedAt Time in RFC3339 format at which the the certificate was issued
+	CertificateIssuedAt *string `json:"certificate_issued_at,omitempty"`
+
+	// CertificateMessage Reason why the training certificate is valid/invalid
+	CertificateMessage *string `json:"certificate_message,omitempty"`
+}
+
+// ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
+type ProfileTrainingUpdate struct {
+	// CertficateContentPdfBase64 Base64 encoded PDF file data of the certificate
+	CertficateContentPdfBase64 *string                   `json:"certficate_content_pdf_base64,omitempty"`
+	Kind                       ProfileTrainingUpdateKind `json:"kind"`
+}
+
+// ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.
+type ProfileTrainingUpdateKind string
+
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
@@ -56,6 +83,9 @@ type PostProfileJSONRequestBody = ProfileUpdate
 
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
+
+// PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
+type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -77,6 +107,9 @@ type ServerInterface interface {
 
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
+
+	// (POST /profile/training)
+	PostProfileTraining(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -166,6 +199,19 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	siw.Handler.PostProfileAgreements(c)
 }
 
+// PostProfileTraining operation middleware
+func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProfileTraining(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -199,4 +245,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 }

@@ -13,10 +13,8 @@ export default function LoginFallback({
       <h1>{title}</h1>
       <p>{message}</p>
 
-      <Button size="large">
-        <a href={`/oauth2/start?`} id="login">
-          Login with UCL SSO
-        </a>
+      <Button size="large" href={`/oauth2/start?`} cy="login">
+        Login with UCL SSO
       </Button>
     </div>
   );

@@ -44,6 +44,29 @@ export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
+export type ProfileTrainingUpdate = {
+    kind: 'training_kind_nhsd';
+    /**
+     * Base64 encoded PDF file data of the certificate
+     */
+    certficate_content_pdf_base64?: string;
+};
+
+export type ProfileTrainingResponse = {
+    /**
+     * Is the certificate valid
+     */
+    certificate_is_valid?: boolean;
+    /**
+     * Reason why the training certificate is valid/invalid
+     */
+    certificate_message?: string;
+    /**
+     * Time in RFC3339 format at which the the certificate was issued
+     */
+    certificate_issued_at?: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -162,11 +185,37 @@ export type PostProfileAgreementsErrors = {
 };
 
 export type PostProfileAgreementsResponses = {
+    200: ProfileAgreements;
+};
+
+export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
+
+export type PostProfileTrainingData = {
+    body: ProfileTrainingUpdate;
+    path?: never;
+    query?: never;
+    url: '/profile/training';
+};
+
+export type PostProfileTrainingErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProfileTrainingResponses = {
     /**
      * Accepted
      */
-    200: unknown;
+    200: ProfileTrainingResponse;
 };
+
+export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
 
 export type GetAgreementsApprovedResearcherData = {
     body?: never;

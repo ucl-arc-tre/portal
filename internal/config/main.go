@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	BaseURL    = "/api/v0"
-	TimeFormat = time.RFC3339
+	BaseURL        = "/api/v0"
+	TimeFormat     = time.RFC3339
+	MaxUploadBytes = 1e7 // 10 MB
 )
 
 func ServerAddress() string {
