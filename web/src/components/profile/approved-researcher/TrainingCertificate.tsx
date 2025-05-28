@@ -64,13 +64,16 @@ export default function TrainingCertificate() {
     <div id="training-certificate" className={styles.wrapper}>
       <h2 className="subtitle">Training Certificate</h2>
       <p>
-        All members of UCL who manage highly confidential research information, must undertake annual training on
-        handling sentitive information. Anyone with an {"'.ac.uk'"} or NHS email address can self-register for{" "}
+        {
+          "All members of UCL who manage highly confidential research information, must undertake annual training on handling sentitive information. Anyone with an '.ac.uk' or NHS email address can self-register for "
+        }
         <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
           NHS Digital Data Security Awareness Level 1 course
-        </a>{" "}
-        provided by e-Learning for Health. When asked, you can register your role as a “Further Education and Higher
-        Education Researcher (Education)” which should provide you access to the course.{" "}
+        </a>
+        {
+          " provided by e-Learning for Health. When asked, you can register your role as a “Further Education and Higher Education Researcher (Education)” which should provide you access to the course. "
+        }
+        <br></br>
         <strong>Please complete the course and upload the certificate below</strong>
       </p>
 

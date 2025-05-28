@@ -10,7 +10,7 @@ export default function TrainingCertificateError(props: TrainingCertificateError
   return (
     <p>
       {props.text}
-      {" If required, please email your certificate to "}
+      {" If you believe your certificate is valid please email it to "}
       <a
         href={`mailto:${manualApprovalEmailAddress}?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
       >

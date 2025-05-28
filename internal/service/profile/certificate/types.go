@@ -2,10 +2,7 @@ package certificate
 
 import (
 	"fmt"
-	"strings"
 	"time"
-
-	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 type TrainingCertificate struct {
@@ -23,8 +20,11 @@ func (t *TrainingCertificate) Name() string {
 	}
 }
 
-func (t *TrainingCertificate) NameMatches(value types.ChosenName) bool {
-	return t != nil && strings.EqualFold(t.Name(), string(value)) // case insensitive match
+func (t *TrainingCertificate) NameMatches(value string) bool {
+	if t == nil {
+		return false
+	}
+	return caseInsensitiveMatch(stripHyphens(t.Name()), stripHyphens(value))
 }
 
 func (t *TrainingCertificate) HasIssuedAt() bool {

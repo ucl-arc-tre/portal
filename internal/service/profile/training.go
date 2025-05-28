@@ -31,23 +31,24 @@ func (s *Service) updateNHSD(
 		CertificateIsValid: ptr(false),
 	}
 	if err != nil {
-		response.CertificateMessage = ptr("Failed to parse certificate")
+		response.CertificateMessage = ptr("Failed to parse certificate.")
 		return response, err
 	}
 	if !certificate.HasIssuedAt() {
-		return response, fmt.Errorf("certificate must have an issused at time to be saved")
+		response.CertificateMessage = ptr("Certificate was missing an issued at date.")
+		return response, nil
 	}
 	chosenName, err := s.userChosenName(user)
 	if err != nil || chosenName == "" {
 		response.CertificateMessage = ptr("Failed to get users chosen name, or it was unset.")
 		return response, err
 	}
-	if !certificate.NameMatches(chosenName) {
+	if !certificate.NameMatches(string(chosenName)) {
 		response.CertificateMessage = ptr(fmt.Sprintf("Name '%v' does not match '%v'.", certificate.Name(), chosenName))
 		return response, err
 	}
 	response.CertificateIsValid = &certificate.IsValid
-	if certificate.IsValid { // todo: check name matches
+	if certificate.IsValid {
 		if err := s.createNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
 			return response, err
 		}
