@@ -1,8 +1,6 @@
 .button {
   display: block;
   border-radius: 6px;
-  text-decoration: none;
-  border-color: var(--green-200);
 }
 
 .small {

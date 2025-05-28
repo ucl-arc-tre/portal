@@ -1,46 +1,36 @@
 import Link from "next/link";
 import styles from "./Button.module.css";
 import dynamic from "next/dynamic";
+import { useTheme } from "uikit-react-public";
 
 const UCLBtn = dynamic(() => import("uikit-react-public").then((mod) => mod.Button), {
   ssr: false,
 });
 
-type Props = React.ComponentProps<"button"> & {
-  danger?: boolean;
-  size?: string;
+type Props = React.ComponentProps<typeof UCLBtn> & {
   type?: string;
   name?: string;
   value?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   cy?: string;
+  as?: string;
 };
 
 export default function Button(props: Props) {
-  let sizeStyle = styles.medium;
-  switch (props.size) {
-    case "large": {
-      sizeStyle = styles.large;
-      break;
-    }
-    case "small": {
-      sizeStyle = styles.small;
-      break;
-    }
-    default: {
-      sizeStyle = styles.medium;
-    }
-  }
+  const theme = useTheme();
+  console.log(theme[0].color.system.green100);
+
   return (
     <UCLBtn
       data-cy={props.cy}
-      className={`${styles.button} ${sizeStyle} ${props.href ? styles.nav : ""} ${props.danger ? styles.danger : ""} ${props.type === "submit" && styles.submit}`}
+      className={`${styles.button} ${props.href ? styles.nav : ""} ${props.type === "submit" && styles.submit}`}
       type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}
       name={props.name}
       value={props.value}
+      as={props.as || "button"}
     >
       {props.href ? <Link href={props.href!}>{props.children}</Link> : props.children}
     </UCLBtn>
