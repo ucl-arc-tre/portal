@@ -49,6 +49,7 @@ export default function ApprovedResearcherAgreement() {
     !agreementConfirmed &&
     agreement && (
       <div data-cy="approved-researcher-agreement">
+        <h2 className="subtitle">Approved Researcher Agreement</h2>
         <AgreementText text={agreement.text} />
         <AgreementForm agreementId={agreement.id} setAgreementConfirmed={setAgreementConfirmed} />
       </div>

@@ -20,6 +20,7 @@ func InitDB() {
 		&types.User{},
 		&types.Agreement{},
 		&types.UserAgreementConfirmation{},
+		&types.UserTrainingRecord{},
 		&types.UserAttributes{},
 	}
 	db := NewDB()

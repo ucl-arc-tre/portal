@@ -4,7 +4,7 @@ export function login(username: string, password: string): void {
 
   cy.visit("/");
   cy.contains("Login").should("be.visible");
-  cy.get("#login").click();
+  cy.get("[data-cy='login']").click();
 
   cy.origin(
     "login.microsoftonline.com",

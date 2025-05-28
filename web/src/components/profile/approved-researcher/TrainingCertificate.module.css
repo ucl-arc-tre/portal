@@ -1,10 +1,14 @@
-.text {
+.form {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.wrapper {
+  padding-bottom: 1rem;
+
   p {
     padding-top: 0.7rem;
-  }
-
-  li {
-    padding-top: 0.2rem;
   }
 
   a {

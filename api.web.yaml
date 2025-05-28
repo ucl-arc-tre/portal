@@ -67,6 +67,7 @@ paths:
         default:
           description: Unexpected error
     post:
+      description: Update the agreements for a user
       requestBody:
         required: true
         content:
@@ -75,6 +76,30 @@ paths:
               $ref: "#/components/schemas/AgreementConfirmation"
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileAgreements"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /profile/training:
+    post:
+      description: Update the training record for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileTrainingUpdate"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileTrainingResponse"
           description: Accepted
         "500":
           description: Internal server error
@@ -174,3 +199,28 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConfirmedAgreement"
+
+    ProfileTrainingUpdate:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+          enum: [training_kind_nhsd]
+        certficate_content_pdf_base64:
+          type: string
+          description: Base64 encoded PDF file data of the certificate
+
+    ProfileTrainingResponse:
+      type: object
+      properties:
+        certificate_is_valid:
+          type: boolean
+          description: Is the certificate valid
+        certificate_message:
+          type: string
+          description: Reason why the training certificate is valid/invalid
+        certificate_issued_at:
+          type: string
+          description: Time in RFC3339 format at which the the certificate was issued
