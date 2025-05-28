@@ -40,19 +40,19 @@ export default function ApprovedResearcherAgreement() {
 
   if (agreementConfirmed)
     return (
-      <div data-cy="approved-researcher-agreement">
+      <section data-cy="approved-researcher-agreement">
         <p>Agreement confirmed ✔</p>
-      </div>
+      </section>
     );
 
   return (
     !agreementConfirmed &&
     agreement && (
-      <div data-cy="approved-researcher-agreement">
+      <section data-cy="approved-researcher-agreement">
         <h2 className="subtitle">Approved Researcher Agreement</h2>
         <AgreementText text={agreement.text} />
         <AgreementForm agreementId={agreement.id} setAgreementConfirmed={setAgreementConfirmed} />
-      </div>
+      </section>
     )
   );
 }

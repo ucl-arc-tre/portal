@@ -61,7 +61,7 @@ export default function TrainingCertificate() {
   if (isValid) return <p>Valid training ✔</p>;
 
   return (
-    <div id="training-certificate" className={styles.wrapper}>
+    <section data-cy="training-certificate" className={styles.wrapper}>
       <h2 className="subtitle">Training Certificate</h2>
       <p>
         {
@@ -79,12 +79,12 @@ export default function TrainingCertificate() {
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <input type="file" name="certificate" accept="pdf" required />
-        <Button size="large" type="submit" id="training-certificate-sumbit">
+        <Button size="large" type="submit" cy="training-certificate-sumbit">
           Submit
         </Button>
       </form>
       {errorMessage && <TrainingCertificateError text={errorMessage} />}
-    </div>
+    </section>
   );
 }
 
