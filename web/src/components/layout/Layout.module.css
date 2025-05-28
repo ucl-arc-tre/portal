@@ -1,6 +1,6 @@
 .layout {
   display: grid;
-  height: 100svh;
+  height: fit-content;
   font-family: sans-serif;
 }
 
@@ -8,4 +8,5 @@ main.content {
   padding: 2rem;
   justify-items: center;
   margin-inline: 15vw;
+  min-height: 100svh;
 }
