@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Button from "../ui/Button";
+import Button from "@/components/ui/Button";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./UserTasks.module.css";
 import { postProfile, getProfile } from "@/openapi";

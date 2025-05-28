@@ -1,7 +1,6 @@
 import Link from "next/link";
 import styles from "./Button.module.css";
 import dynamic from "next/dynamic";
-import { useTheme } from "uikit-react-public";
 
 const UCLBtn = dynamic(() => import("uikit-react-public").then((mod) => mod.Button), {
   ssr: false,
@@ -18,9 +17,6 @@ type Props = React.ComponentProps<typeof UCLBtn> & {
 };
 
 export default function Button(props: Props) {
-  const theme = useTheme();
-  console.log(theme[0].color.system.green100);
-
   return (
     <UCLBtn
       data-cy={props.cy}
