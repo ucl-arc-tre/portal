@@ -56,6 +56,9 @@ type ProfileTrainingResponse struct {
 	// CertificateIsValid Is the certificate valid
 	CertificateIsValid *bool `json:"certificate_is_valid,omitempty"`
 
+	// CertificateIssuedAt Time in RFC3339 format at which the the certificate was issued
+	CertificateIssuedAt *string `json:"certificate_issued_at,omitempty"`
+
 	// CertificateMessage Reason why the training certificate is valid/invalid
 	CertificateMessage *string `json:"certificate_message,omitempty"`
 }

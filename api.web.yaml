@@ -221,3 +221,6 @@ components:
         certificate_message:
           type: string
           description: Reason why the training certificate is valid/invalid
+        certificate_issued_at:
+          type: string
+          description: Time in RFC3339 format at which the the certificate was issued

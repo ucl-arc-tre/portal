@@ -61,6 +61,10 @@ export type ProfileTrainingResponse = {
      * Reason why the training certificate is valid/invalid
      */
     certificate_message?: string;
+    /**
+     * Time in RFC3339 format at which the the certificate was issued
+     */
+    certificate_issued_at?: string;
 };
 
 export type GetAuthData = {

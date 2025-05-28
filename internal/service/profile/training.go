@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/profile/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -49,6 +50,7 @@ func (s *Service) updateNHSD(
 	}
 	response.CertificateIsValid = &certificate.IsValid
 	if certificate.IsValid {
+		response.CertificateIssuedAt = ptr(certificate.IssuedAt.Format(config.TimeFormat))
 		if err := s.createNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
 			return response, err
 		}
