@@ -1,13 +1,9 @@
 .sidebar {
-  width: 220px;
+  width: 150px;
   background-color: var(--background);
   padding: 1rem;
-}
-
-.sidebar__title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  position: absolute;
+  border-right: 1px solid var(--green-200);
 }
 
 .nav__list {

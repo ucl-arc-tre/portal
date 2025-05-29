@@ -1,8 +1,8 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import { useEffect, useState } from "react";
-import { getProfile } from "@/openapi";
 import ChosenNameForm from "./ChosenNameForm";
+import { getProfile } from "@/openapi";
 
 export default function UserTasks() {
   const { loading, isAuthed, userData } = useAuth();

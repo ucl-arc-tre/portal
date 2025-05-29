@@ -1,5 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import Profile from "@/components/profile/Profile";
+import styles from "./ProfilePage.module.css";
 
 export default function ProfilePage() {
   return (
@@ -8,10 +9,8 @@ export default function ProfilePage() {
         title="User Profile | ARC Services Portal"
         description="View and manage your ARC profile and researcher status"
       />
-      <div>
-        <h1>Profile</h1>
-        <p>This is your profile. More profile features coming soon.</p>
-
+      <div className={styles.page}>
+        <h1 className={styles.title}>Profile</h1>
         <Profile />
       </div>
     </>

@@ -64,7 +64,7 @@ describe("Setting chosen name for user", () => {
     cy.get("dialog[data-cy='chosenName']").within(() => {
       cy.get("input").type("123533");
       cy.get("button").click();
-      cy.get("#chosenNameError").should("be.visible").and("contain", "Please enter a valid name");
+      cy.get("[data-testid='ucl-uikit-alert']").should("be.visible").and("contain", "Please enter a valid name");
     });
 
     // Make sure the dialog is still open
