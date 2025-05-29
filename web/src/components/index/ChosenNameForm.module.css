@@ -18,5 +18,10 @@
       margin-inline: 4%;
       margin-top: 0.4rem;
     }
+
+    .error {
+      color: red;
+      margin-top: 0.5rem;
+    }
   }
 }
