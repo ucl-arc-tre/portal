@@ -4,6 +4,7 @@
 
   --green-100: #165823;
   --green-200: #237b35;
+  --green-300: #359749;
 }
 
 @media (prefers-color-scheme: dark) {

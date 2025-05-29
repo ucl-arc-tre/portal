@@ -10,3 +10,17 @@ main.content {
   margin-inline: 15vw;
   min-height: 100svh;
 }
+
+.ucl_header {
+  margin-bottom: 1rem;
+
+  svg {
+    fill: var(--green-300);
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    border-bottom: 20px solid var(--green-300);
+  }
+}
