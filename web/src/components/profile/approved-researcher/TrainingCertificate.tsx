@@ -70,12 +70,13 @@ export default function TrainingCertificate() {
   };
 
   const checkIsPDF = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log("checking is pdf");
     const file = event.target.files![0];
 
     const type = file!.type;
-    setIsPDF(type === "application/pdf");
-    setErrorMessage("Please select a valid PDF file to upload.");
+    const typeIsPDF = type === "application/pdf";
+    setIsPDF(typeIsPDF);
+    if (!typeIsPDF) setErrorMessage("Please select a valid PDF file to upload.");
+    else setErrorMessage("");
     return;
   };
 

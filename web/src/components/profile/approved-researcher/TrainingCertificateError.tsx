@@ -18,12 +18,12 @@ export default function TrainingCertificateError(props: TrainingCertificateError
       {props.text}
       {props.showExtra && (
         <span>
-          If you believe your certificate is valid please email it to
+          If you believe your certificate is valid please email it to{" "}
           <a
             href={`mailto:${manualApprovalEmailAddress}?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
           >
             {manualApprovalEmailAddress}
-          </a>
+          </a>{" "}
           for manual approval.
         </span>
       )}
