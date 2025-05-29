@@ -14,6 +14,9 @@ const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert
 const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
   ssr: false,
 });
+const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
+  ssr: false,
+});
 
 interface FormEvent extends React.FormEvent<HTMLFormElement> {
   target: HTMLFormElement;
@@ -74,6 +77,7 @@ export default function TrainingCertificate() {
 
     const type = file!.type;
     const typeIsPDF = type === "application/pdf";
+
     setIsPDF(typeIsPDF);
     if (!typeIsPDF) setErrorMessage("Please select a valid PDF file to upload.");
     else setErrorMessage("");
@@ -109,7 +113,7 @@ export default function TrainingCertificate() {
       </p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <input type="file" name="certificate" accept="pdf" required onChange={checkIsPDF} />
+        <Input type="file" name="certificate" accept="pdf" required onChange={checkIsPDF} />
         <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF}>
           Submit
         </Button>

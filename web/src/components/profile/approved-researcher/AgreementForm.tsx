@@ -3,7 +3,11 @@ import { useState } from "react";
 import styles from "./AgreementForm.module.css";
 import { postProfileAgreements } from "@/openapi";
 import Button from "@/components/ui/Button";
+import dynamic from "next/dynamic";
 
+const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
+  ssr: false,
+});
 type ApprovedResearcherFormProps = {
   agreementId: string;
   setAgreementConfirmed: CallableFunction;
@@ -29,7 +33,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
     <div className={styles.wrapper}>
       {!submitted && (
         <form onSubmit={handleSubmit}>
-          <input
+          <Input
             className={styles.checkbox}
             type="checkbox"
             name="agreed"

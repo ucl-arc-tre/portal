@@ -14,6 +14,9 @@ const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert
 const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
   ssr: false,
 });
+const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
+  ssr: false,
+});
 
 type ChosenNameFormProps = {
   setChosenName: (name: string) => void;
@@ -54,7 +57,7 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
         <form onSubmit={handleSubmit} noValidate>
           <p>Please enter your name as you would choose to have it appear on forms related to our services.</p>
 
-          <input
+          <Input
             type="text"
             name="chosenName"
             value={inputNameValue}
