@@ -11,7 +11,8 @@ export default function Profile() {
 
   return (
     <>
-      <h1>Welcome, {userData?.username}!</h1>
+      <h2>Welcome, {userData?.username}!</h2>
+      <p>This is your profile. More profile features coming soon.</p>
 
       {!userData?.roles?.includes("approved-researcher") && (
         <>
