@@ -1,9 +1,9 @@
 .dialog {
-  /* CSS modules doesn't like the word "name" */
   max-width: 28rem;
   padding: 1rem;
   border-radius: 8px;
-  backdrop-filter: blur(10px);
+
+  z-index: 1000;
 
   form {
     text-align: center;
@@ -18,11 +18,15 @@
       padding: 0.2rem;
       margin-inline: 4%;
       margin-top: 0.4rem;
-    }
 
-    .error {
-      color: red;
-      margin-top: 0.5rem;
+      &:focus {
+        outline-color: var(--green-200);
+      }
     }
   }
+}
+
+.blanket {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
 }

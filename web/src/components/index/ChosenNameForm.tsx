@@ -2,10 +2,16 @@ import { FormEvent, useRef, useState } from "react";
 import styles from "./ChosenNameForm.module.css";
 import Button from "../ui/Button";
 import { postProfile } from "@/openapi";
-
 import dynamic from "next/dynamic";
+import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 
 const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
+  ssr: false,
+});
+const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
+  ssr: false,
+});
+const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
   ssr: false,
 });
 
@@ -18,6 +24,7 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
 
   const [inputNameValue, setInputNameValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<AlertType>("warning");
   const dialogRef = useRef<HTMLDialogElement>(null);
   const regex = /^[A-Za-z\s-]+(\p{M}\p{L}*)*$/u;
 
@@ -37,6 +44,7 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit name. Please try again.");
+      setErrorType("error");
     }
   };
 
@@ -59,15 +67,15 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
           />
 
           {errorMessage && (
-            <p id="chosenNameError" role="alert" className={styles.error}>
-              {errorMessage}
-            </p>
+            <Alert type={errorType}>
+              <AlertMessage>{errorMessage}</AlertMessage>
+            </Alert>
           )}
 
           <Button type="submit">Submit</Button>
         </form>
       </dialog>
-      <Blanket />
+      <Blanket className={styles.blanket} />
     </>
   );
 }
