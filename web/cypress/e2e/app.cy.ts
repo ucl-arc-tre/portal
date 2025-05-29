@@ -41,7 +41,7 @@ describe("ARC Portal UI authenticated", () => {
 
 describe("Setting chosen name for user", () => {
   beforeEach(() => {
-    cy.loginAsAdmin();
+    cy.loginAsBase();
     cy.clearChosenName();
     cy.visit("/");
   });
