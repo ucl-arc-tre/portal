@@ -39,6 +39,11 @@ func (s *Service) updateNHSD(
 		response.CertificateMessage = ptr("Certificate was missing an issued at date.")
 		return response, nil
 	}
+	if time.Since(certificate.IssuedAt) > config.TrainingValidity {
+		message := fmt.Sprintf("Certificate was issued more than %v years in the past.", config.TrainingValidityYears)
+		response.CertificateMessage = ptr(message)
+		return response, nil
+	}
 	chosenName, err := s.userChosenName(user)
 	if err != nil || chosenName == "" {
 		response.CertificateMessage = ptr("Failed to get users chosen name, or it was unset.")
