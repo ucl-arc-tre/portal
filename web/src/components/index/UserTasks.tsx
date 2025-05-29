@@ -4,6 +4,11 @@ import Button from "@/components/ui/Button";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./UserTasks.module.css";
 import { postProfile, getProfile } from "@/openapi";
+import dynamic from "next/dynamic";
+
+const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
+  ssr: false,
+});
 
 export default function UserTasks() {
   const { loading, isAuthed, userData } = useAuth();
@@ -60,13 +65,16 @@ export default function UserTasks() {
   return (
     <div>
       {!chosenName && (
-        <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
-          <form onSubmit={handleSubmit}>
-            Please enter your name as you would choose to have it appear on forms related to our services.
-            <input type="text" name="chosenName"></input>
-            <Button type="submit">Submit</Button>
-          </form>
-        </dialog>
+        <>
+          <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
+            <form onSubmit={handleSubmit}>
+              Please enter your name as you would choose to have it appear on forms related to our services.
+              <input type="text" name="chosenName"></input>
+              <Button type="submit">Submit</Button>
+            </form>
+          </dialog>
+          <Blanket />
+        </>
       )}
       <p>
         Name: {chosenName}. Username&nbsp;{userData!.username}. Roles:&nbsp;

@@ -3,6 +3,7 @@
   max-width: 28rem;
   padding: 1rem;
   border-radius: 8px;
+  backdrop-filter: blur(10px);
 
   form {
     text-align: center;
