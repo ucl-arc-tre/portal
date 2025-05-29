@@ -20,7 +20,7 @@ export default function Button(props: Props) {
   return (
     <UCLBtn
       data-cy={props.cy}
-      className={`${styles.button} ${props.href ? styles.nav : ""} ${props.type === "submit" && styles.submit}`}
+      className={`${styles.button} ${props.type === "submit" && styles.submit}`}
       type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}
