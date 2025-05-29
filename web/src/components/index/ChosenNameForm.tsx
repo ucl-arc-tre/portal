@@ -70,7 +70,7 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
           />
 
           {errorMessage && (
-            <Alert type={errorType}>
+            <Alert type={errorType} className={styles.alert}>
               <AlertMessage>{errorMessage}</AlertMessage>
             </Alert>
           )}
