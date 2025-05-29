@@ -5,6 +5,14 @@ import AgreementText from "./AgreementText";
 import { Agreement, getAgreementsApprovedResearcher, getProfileAgreements } from "@/openapi";
 import { useEffect, useState } from "react";
 
+import dynamic from "next/dynamic";
+const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
+  ssr: false,
+});
+const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
+  ssr: false,
+});
+
 export default function ApprovedResearcherAgreement() {
   const { loading, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
@@ -41,7 +49,9 @@ export default function ApprovedResearcherAgreement() {
   if (agreementConfirmed)
     return (
       <section data-cy="approved-researcher-agreement">
-        <p>Agreement confirmed ✔</p>
+        <Alert type="success">
+          <AlertMessage>Agreement confirmed ✔</AlertMessage>
+        </Alert>
       </section>
     );
 

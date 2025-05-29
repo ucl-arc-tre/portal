@@ -2,9 +2,18 @@ import Button from "@/components/ui/Button";
 import LoginFallback from "@/components/ui/LoginFallback";
 import { useAuth } from "@/hooks/useAuth";
 import { postProfileTraining } from "@/openapi";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
+import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
+
+import dynamic from "next/dynamic";
+const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
+  ssr: false,
+});
+const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
+  ssr: false,
+});
 
 interface FormEvent extends React.FormEvent<HTMLFormElement> {
   target: HTMLFormElement;
@@ -14,6 +23,8 @@ export default function TrainingCertificate() {
   const { loading, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [errorType, setErrorType] = useState<AlertType>("warning");
+  const [isPDF, setIsPDF] = useState<boolean>(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -31,6 +42,7 @@ export default function TrainingCertificate() {
     base64Encode(file).then((content) => {
       if (content === null) {
         setErrorMessage("Failed to base64 encode PDF.");
+        setErrorType("error");
         return;
       }
       try {
@@ -44,21 +56,39 @@ export default function TrainingCertificate() {
           setIsValid(res.data?.certificate_is_valid);
           if (res.error) {
             setErrorMessage(`Failed to validate certificate.`);
+            setErrorType("error");
           } else if (!isValid) {
             setErrorMessage("Certificate was not valid. " + res.data?.certificate_message);
+            setErrorType("error");
           }
         });
       } catch (err) {
         setErrorMessage(`Certificate training POST error: ${err}`);
+        setErrorType("error");
       }
     });
+  };
+
+  const checkIsPDF = (event: ChangeEvent<HTMLInputElement>) => {
+    console.log("checking is pdf");
+    const file = event.target.files![0];
+
+    const type = file!.type;
+    setIsPDF(type === "application/pdf");
+    setErrorMessage("Please select a valid PDF file to upload.");
+    return;
   };
 
   if (loading) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
-  if (isValid) return <p>Valid training ✔</p>;
+  if (isValid)
+    return (
+      <Alert type="success">
+        <AlertMessage>Valid training ✔</AlertMessage>
+      </Alert>
+    );
 
   return (
     <section data-cy="training-certificate" className={styles.wrapper}>
@@ -74,16 +104,20 @@ export default function TrainingCertificate() {
           " provided by e-Learning for Health. When asked, you can register your role as a “Further Education and Higher Education Researcher (Education)” which should provide you access to the course. "
         }
         <br></br>
-        <strong>Please complete the course and upload the certificate below</strong>
+        <strong>Please complete the course and upload the PDF certificate below</strong>
       </p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <input type="file" name="certificate" accept="pdf" required />
-        <Button size="large" type="submit" cy="training-certificate-sumbit">
+        <input type="file" name="certificate" accept="pdf" required onChange={checkIsPDF} />
+        <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF}>
           Submit
         </Button>
       </form>
-      {errorMessage && <TrainingCertificateError text={errorMessage} />}
+      {errorMessage && (
+        <Alert type={errorType}>
+          <TrainingCertificateError text={errorMessage} showExtra={errorType === "error"} />
+        </Alert>
+      )}
     </section>
   );
 }
