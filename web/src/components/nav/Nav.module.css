@@ -1,9 +1,9 @@
 .sidebar {
-  width: 200px;
+  width: 150px;
   background-color: var(--background);
   padding: 1rem;
   position: absolute;
-  border: 1px solid var(--green-200);
+  border-right: 1px solid var(--green-200);
 }
 
 .nav__list {
