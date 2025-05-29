@@ -2,11 +2,11 @@ import Link from "next/link";
 import styles from "./Button.module.css";
 import dynamic from "next/dynamic";
 
-const UCLBtn = dynamic(() => import("uikit-react-public").then((mod) => mod.Button), {
+const UCLButton = dynamic(() => import("uikit-react-public").then((mod) => mod.Button), {
   ssr: false,
 });
 
-type Props = React.ComponentProps<typeof UCLBtn> & {
+type Props = React.ComponentProps<typeof UCLButton> & {
   type?: string;
   name?: string;
   value?: string;
@@ -18,7 +18,7 @@ type Props = React.ComponentProps<typeof UCLBtn> & {
 
 export default function Button(props: Props) {
   return (
-    <UCLBtn
+    <UCLButton
       data-cy={props.cy}
       className={`${styles.button} ${props.type === "submit" && styles.submit}`}
       type={props.type}
@@ -29,6 +29,6 @@ export default function Button(props: Props) {
       as={props.as || "button"}
     >
       {props.href ? <Link href={props.href!}>{props.children}</Link> : props.children}
-    </UCLBtn>
+    </UCLButton>
   );
 }
