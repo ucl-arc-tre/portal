@@ -18,7 +18,7 @@ describe("ARC Portal UI authenticated", () => {
 
     cy.visit("/");
     cy.contains("Loading...").should("not.exist");
-    cy.contains("List of user tasks here").should("exist");
+    cy.contains("Username").should("exist");
   });
 
   it("admin user can agree to approved researcher agreement", () => {
@@ -58,17 +58,14 @@ describe("Setting chosen name for user", () => {
 
   it("can't set invalid name", () => {
     clearChosenNameAndVistHomepage();
-    const alertSpy = cy.spy();
-    cy.on("window:alert", alertSpy);
 
-    cy.get("dialog[data-cy='chosenName']").find("input").type("123533");
-    cy.get("dialog[data-cy='chosenName']")
-      .find("button")
-      .click()
-      .then(() => {
-        expect(alertSpy).to.be.calledOnce;
-        expect(alertSpy).to.be.calledWith("Please enter a valid name; only letters and hyphens are allowed");
-      });
+    cy.get("dialog[data-cy='chosenName']").within(() => {
+      cy.get("input").type("123533");
+      cy.get("button").click();
+      cy.get("#chosenNameError").should("be.visible").and("contain", "Please enter a valid name");
+    });
+
+    // Make sure the dialog is still open
     cy.get("dialog[data-cy='chosenName']").should("be.visible");
   });
 });
