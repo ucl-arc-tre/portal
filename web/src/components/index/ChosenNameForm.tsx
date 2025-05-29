@@ -3,6 +3,12 @@ import styles from "./ChosenNameForm.module.css";
 import Button from "../ui/Button";
 import { postProfile } from "@/openapi";
 
+import dynamic from "next/dynamic";
+
+const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
+  ssr: false,
+});
+
 type ChosenNameFormProps = {
   setChosenName: (name: string) => void;
 };
@@ -35,30 +41,33 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
   };
 
   return (
-    <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
-      <form onSubmit={handleSubmit} noValidate>
-        <p>Please enter your name as you would choose to have it appear on forms related to our services.</p>
+    <>
+      <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
+        <form onSubmit={handleSubmit} noValidate>
+          <p>Please enter your name as you would choose to have it appear on forms related to our services.</p>
 
-        <input
-          type="text"
-          name="chosenName"
-          value={inputNameValue}
-          onChange={(e) => {
-            setInputNameValue(e.target.value);
-            if (errorMessage) setErrorMessage(null); // Clear error as user types
-          }}
-          aria-invalid={!!errorMessage}
-          aria-describedby="chosenNameError"
-        />
+          <input
+            type="text"
+            name="chosenName"
+            value={inputNameValue}
+            onChange={(e) => {
+              setInputNameValue(e.target.value);
+              if (errorMessage) setErrorMessage(null); // Clear error as user types
+            }}
+            aria-invalid={!!errorMessage}
+            aria-describedby="chosenNameError"
+          />
 
-        {errorMessage && (
-          <p id="chosenNameError" role="alert" className={styles.error}>
-            {errorMessage}
-          </p>
-        )}
+          {errorMessage && (
+            <p id="chosenNameError" role="alert" className={styles.error}>
+              {errorMessage}
+            </p>
+          )}
 
-        <Button type="submit">Submit</Button>
-      </form>
-    </dialog>
+          <Button type="submit">Submit</Button>
+        </form>
+      </dialog>
+      <Blanket />
+    </>
   );
 }
