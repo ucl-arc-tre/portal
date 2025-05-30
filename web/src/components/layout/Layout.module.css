@@ -7,7 +7,7 @@
 main.content {
   padding: 2rem;
   justify-items: center;
-  margin-inline: 15vw;
+  margin-inline: 16vw;
   min-height: 100svh;
 }
 
@@ -15,12 +15,12 @@ main.content {
   margin-bottom: 1rem;
 
   svg {
-    fill: var(--green-300);
+    fill: var(--green-100);
   }
 
   &::after {
     content: "";
     display: block;
-    border-bottom: 20px solid var(--green-300);
+    border-bottom: 20px solid var(--green-100);
   }
 }
