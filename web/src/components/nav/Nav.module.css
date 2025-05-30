@@ -37,19 +37,16 @@
     }
   }
 
-  button {
+  a {
     /* displaying as flex to allow for gap because when navigating the spacing changes fsr */
     display: flex;
     gap: 0.5rem;
+    text-decoration: none;
+    color: var(--foreground);
+    transition: all 0.3s ease;
 
     svg {
       stroke: var(--green);
-      transition: all 0.3s ease;
-    }
-
-    a {
-      text-decoration: none;
-      color: var(--foreground);
       transition: all 0.3s ease;
     }
 
