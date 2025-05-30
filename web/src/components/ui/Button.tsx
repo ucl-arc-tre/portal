@@ -27,6 +27,7 @@ export default function Button(props: Props) {
       name={props.name}
       value={props.value}
       as={props.as || "button"}
+      {...props}
     >
       {props.href ? <Link href={props.href!}>{props.children}</Link> : props.children}
     </UCLButton>
