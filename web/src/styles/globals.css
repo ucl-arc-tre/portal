@@ -2,9 +2,12 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  --green-100: #165823;
+  --grey: color-mix(in srgb, var(--background) 80%, var(--foreground) 20%);
+
+  --green-300: #165823;
   --green-200: #237b35;
-  --green-300: #359749;
+  --green-100: #359749;
+  --green-50: #64bb75;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,7 +26,11 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -1,3 +1,4 @@
+"use client";
 import styles from "./Layout.module.css";
 import Nav from "@/components/nav/Nav";
 import dynamic from "next/dynamic";
