@@ -6,11 +6,9 @@
   --green--background: color-mix(in srgb, var(--nav-base) 90%, var(--green) 10%);
 
   width: 180px;
+  height: 100%;
   padding: 1rem;
   position: absolute;
-  border: 1px solid var(--green-300);
-  border-radius: 3px;
-  border-left: none;
   background-color: var(--nav-base);
 
   hr {
@@ -52,7 +50,7 @@
     }
 
     &:hover {
-      color: var(--green--hover);
+      color: var(--foreground);
     }
 
     &:where([href="/profile"]) {

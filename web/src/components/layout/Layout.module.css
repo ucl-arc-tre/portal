@@ -13,8 +13,6 @@ main.content {
 }
 
 .ucl_header {
-  margin-bottom: 1rem;
-
   svg {
     fill: var(--green-100);
   }
