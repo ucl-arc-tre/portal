@@ -8,7 +8,7 @@
   width: 180px;
   padding: 1rem;
   position: absolute;
-  border: 2px solid var(--green-300);
+  border: 1px solid var(--green-300);
   border-radius: 3px;
   border-left: none;
   background-color: var(--nav-base);
@@ -44,6 +44,7 @@
     text-decoration: none;
     color: var(--foreground);
     transition: all 0.3s ease;
+    text-align: left;
 
     svg {
       stroke: var(--green);
@@ -51,22 +52,13 @@
     }
 
     &:hover {
-      svg {
-        stroke: var(--green--hover);
-      }
+      color: var(--green--hover);
     }
 
     &:where([href="/profile"]) {
       svg {
         fill: var(--green);
         stroke: none;
-      }
-
-      &:hover {
-        svg {
-          fill: var(--green--hover);
-          stroke: none;
-        }
       }
     }
   }
