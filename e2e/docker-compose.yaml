@@ -49,9 +49,9 @@ services:
     image: cypress/included:14.3.0
     depends_on:
       - nginx
-    working_dir: /web
+    working_dir: /repo/web
     volumes:
-      - ../web:/web
+      - ../:/repo
     environment:
       CYPRESS_baseUrl: "https://nginx:443"
     entrypoint: /bin/sh
