@@ -13,6 +13,9 @@ const (
 	BaseURL        = "/api/v0"
 	TimeFormat     = time.RFC3339
 	MaxUploadBytes = 1e7 // 10 MB
+
+	TrainingValidityYears = 1
+	TrainingValidity      = TrainingValidityYears * 365 * 24 * time.Hour
 )
 
 func ServerAddress() string {

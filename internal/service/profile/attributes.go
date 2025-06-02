@@ -11,7 +11,7 @@ import (
 
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 	attrs := types.UserAttributes{}
-	result := s.db.Find(&attrs).Limit(1).Where("user_id = ?", user.ID)
+	result := s.db.Find(&attrs, "user_id = ?", user.ID)
 	return attrs, result.Error
 }
 
