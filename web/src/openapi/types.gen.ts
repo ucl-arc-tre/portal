@@ -2,7 +2,7 @@
 
 export type Auth = {
     username: string;
-    roles: Array<string>;
+    roles: Array<'admin' | 'base' | 'approved-researcher'>;
 };
 
 export type ProfileResponse = {
@@ -34,11 +34,10 @@ export type ConfirmedAgreement = {
      * Time in RFC3339 format at which the agreement was confirmed
      */
     confirmed_at: string;
-    /**
-     * Type of agreement that was confirmed
-     */
-    agreement_type: string;
+    agreement_type: AgreementType;
 };
+
+export type AgreementType = 'approved-researcher';
 
 export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;

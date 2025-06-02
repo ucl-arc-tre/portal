@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
 
 const (
-	ApprovedResearcherType = types.AgreementType("approved-researcher")
+	ApprovedResearcherType = types.AgreementType(openapi.AgreementTypeApprovedResearcher)
 )
 
 type Service struct {
