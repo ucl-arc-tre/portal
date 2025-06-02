@@ -12,8 +12,8 @@
     "cypress:headless": "cypress run --headless --browser chrome"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.10.0",
-    "next": "15.3.2",
+    "@hey-api/client-fetch": "^0.11.0",
+    "next": "15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
@@ -21,14 +21,14 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@hey-api/openapi-ts": "^0.67.3",
+    "@hey-api/openapi-ts": "^0.69.1",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cypress": "^14.3.3",
+    "cypress": "^14.4.0",
     "cypress-axe": "^1.6.0",
     "eslint": "^9",
-    "eslint-config-next": "15.3.2",
+    "eslint-config-next": "15.3.3",
     "prettier": "^3.5.3",
     "typescript": "^5"
   }

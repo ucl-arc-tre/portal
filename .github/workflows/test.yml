@@ -61,7 +61,9 @@ jobs:
           cat <<EOF > web/cypress.env.json
           {
             "botAdminUsername": "portal-e2e-admin@arctretest.onmicrosoft.com",
-            "botAdminPassword": "${{ secrets.CYPRESS_BOT_ADMIN_PASSWORD }}"
+            "botAdminPassword": "${{ secrets.CYPRESS_BOT_ADMIN_PASSWORD }}",
+            "botBaseUsername": "portal-e2e-base@arctretest.onmicrosoft.com",
+            "botBasePassword": "${{ secrets.CYPRESS_BOT_BASE_PASSWORD }}"
           }
           EOF
 

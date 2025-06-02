@@ -4,6 +4,9 @@ import { login } from "./auth";
 
 const botAdminUsername = Cypress.env("botAdminUsername") as string;
 const botAdminPassword = Cypress.env("botAdminPassword") as string;
+const botBaseUsername = Cypress.env("botBaseUsername") as string;
+const botBasePassword = Cypress.env("botBasePassword") as string;
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -13,6 +16,12 @@ declare global {
        * @example cy.loginAsAdmin()
        */
       loginAsAdmin(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as as as base user
+       * @example cy.loginAsBase()
+       */
+      loginAsBase(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Repeatedly polls the given endpoint until it answers with a status
@@ -65,7 +74,7 @@ Cypress.Commands.add("loginAsAdmin", () => {
   // See: https://docs.cypress.io/app/guides/authentication-testing/azure-active-directory-authentication
   cy.session(`login-admin`, () => {
     const log = Cypress.log({
-      displayName: "Entra ID Login",
+      displayName: "Entra ID Admin Login",
       message: [`🔐 Authenticating admin`],
       autoEnd: false,
     });
@@ -73,6 +82,23 @@ Cypress.Commands.add("loginAsAdmin", () => {
     log.snapshot("before");
     login(botAdminUsername, botAdminPassword);
 
+    log.snapshot("after");
+    log.end();
+
+    cy.waitForApi(); // poll until the backend API is available
+  });
+});
+
+Cypress.Commands.add("loginAsBase", () => {
+  cy.session(`login-base`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID Base user Login",
+      message: [`🔐 Authenticating base user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botBaseUsername, botBasePassword);
     log.snapshot("after");
     log.end();
 
