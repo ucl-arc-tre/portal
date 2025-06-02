@@ -71,3 +71,40 @@ describe("Setting chosen name for user", () => {
     cy.get("dialog[data-cy='chosenName']").should("be.visible");
   });
 });
+
+describe("Uploading a NHSD training certificate", () => {
+  beforeEach(() => {
+    cy.loginAsBase();
+    cy.clearChosenName();
+  });
+
+  const submitFile = function (filePath: string) {
+    cy.visit("/profile/approved-researcher");
+    cy.get("input[type=file]").selectFile(filePath);
+    cy.get("[data-cy='training-certificate-sumbit']").click();
+  };
+
+  const setChosenName = function (name: string) {
+    cy.visit("/");
+    cy.get("dialog[data-cy='chosenName']").find("input").type(name);
+    cy.get("dialog[data-cy='chosenName']").find("button").click();
+  };
+
+  it("invalid certificate is not valid", function () {
+    setChosenName("Tom Young");
+    submitFile("cypress/e2e/testdata/invalid_nhsd_certificate.pdf");
+    cy.contains("Certificate was not valid").should("be.visible");
+  });
+
+  it("valid certificate for wrong user is invalid", function () {
+    setChosenName("Bob smith");
+    submitFile("cypress/e2e/testdata/valid_nhsd_certificate.pdf");
+    cy.contains("Certificate was not valid").should("be.visible");
+  });
+
+  it("valid certificate for correct user is valid", function () {
+    setChosenName("Tom Young");
+    submitFile("cypress/e2e/testdata/valid_nhsd_certificate.pdf");
+    cy.contains("Valid training").should("be.visible");
+  });
+});
