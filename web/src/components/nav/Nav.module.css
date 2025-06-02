@@ -1,9 +1,19 @@
 .sidebar {
-  width: 150px;
-  background-color: var(--background);
+  --nav-base: color-mix(in srgb, var(--background) 90%, var(--green-100) 10%);
+
+  --green: var(--green-100);
+  --green--hover: var(--green-50);
+  --green--background: color-mix(in srgb, var(--nav-base) 90%, var(--green) 10%);
+
+  width: 180px;
+  height: 100%;
   padding: 1rem;
   position: absolute;
-  border-right: 1px solid var(--green-200);
+  background-color: var(--nav-base);
+
+  hr {
+    border-color: var(--green--hover);
+  }
 }
 
 .nav__list {
@@ -13,14 +23,41 @@
 
   li {
     margin: 0.5rem 0;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: var(--green--background);
+    }
+
+    &.active {
+      background-color: var(--green--background);
+      border: 2px solid var(--green-300);
+    }
   }
 
   a {
+    /* displaying as flex to allow for gap because when navigating the spacing changes fsr */
+    display: flex;
+    gap: 0.5rem;
     text-decoration: none;
     color: var(--foreground);
+    transition: all 0.3s ease;
+    text-align: left;
+
+    svg {
+      stroke: var(--green);
+      transition: all 0.3s ease;
+    }
 
     &:hover {
-      text-decoration: underline;
+      color: var(--foreground);
+    }
+
+    &:where([href="/profile"]) {
+      svg {
+        fill: var(--green);
+        stroke: none;
+      }
     }
   }
 }

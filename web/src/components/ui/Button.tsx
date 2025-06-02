@@ -1,4 +1,3 @@
-import Link from "next/link";
 import styles from "./Button.module.css";
 import dynamic from "next/dynamic";
 
@@ -26,9 +25,10 @@ export default function Button(props: Props) {
       disabled={props.disabled}
       name={props.name}
       value={props.value}
-      as={props.as || "button"}
+      as={props.href ? "a" : props.as || "button"}
+      {...props}
     >
-      {props.href ? <Link href={props.href!}>{props.children}</Link> : props.children}
+      {props.children}
     </UCLButton>
   );
 }
