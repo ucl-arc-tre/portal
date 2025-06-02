@@ -37,7 +37,9 @@ func DBDataSourceName() string {
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
 	for username := range strings.SplitSeq(os.Getenv("ADMIN_USERNAMES"), ",") {
-		usernames = append(usernames, types.Username(username))
+		if username != "" {
+			usernames = append(usernames, types.Username(username))
+		}
 	}
 	return usernames
 }
