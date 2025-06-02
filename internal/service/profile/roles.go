@@ -19,7 +19,7 @@ func (s *Service) updateApprovedResearcherStatus(user types.User) error {
 		log.Debug().Any("username", user.Username).Msg("Not yet agreed to approved resarcher agreement")
 		return nil
 	}
-	if hasTraining, err := s.HasNHSDTrainingRecord(user); err != nil {
+	if hasTraining, err := s.hasValidNHSDTrainingRecord(user); err != nil {
 		return err
 	} else if !hasTraining {
 		log.Debug().Any("username", user.Username).Msg("Not yet completed NHSD training")

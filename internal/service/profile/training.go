@@ -69,18 +69,18 @@ func (s *Service) updateNHSD(
 	return response, nil
 }
 
-func (s *Service) HasNHSDTrainingRecord(user types.User) (bool, error) {
+func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
 	}
-	result := s.db.First(&record)
+	result := s.db.Order("completed_at desc").Find(&record).Limit(1)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return false, nil
 	} else if result.Error != nil {
 		return false, result.Error
 	}
-	return true, nil
+	return time.Since(record.CompletedAt) < config.TrainingValidity, nil
 }
 
 func (s *Service) createNHSDTrainingRecord(user types.User, completedAt time.Time) error {

@@ -37,7 +37,7 @@ export type ConfirmedAgreement = {
     agreement_type: AgreementType;
 };
 
-export type AgreementType = 'approved-researcher';
+export type AgreementType = 'approved-researcher' | 'study-owner';
 
 export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;

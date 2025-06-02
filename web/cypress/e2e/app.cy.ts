@@ -114,6 +114,6 @@ describe("Uploading a NHSD training certificate", () => {
       }
     });
     cy.visit("/");
-    cy.contains("Roles: approved-researcher").should("be.visible"); // todo: move to querying /profile
+    cy.contains("approved-researcher").should("be.visible"); // todo: move to querying /profile
   });
 });

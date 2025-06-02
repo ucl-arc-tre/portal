@@ -10,6 +10,7 @@ import (
 // Defines values for AgreementType.
 const (
 	AgreementTypeApprovedResearcher AgreementType = "approved-researcher"
+	AgreementTypeStudyOwner         AgreementType = "study-owner"
 )
 
 // Defines values for AuthRoles.

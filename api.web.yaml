@@ -198,6 +198,7 @@ components:
       type: string
       enum:
         - approved-researcher
+        - study-owner
 
     ProfileAgreements:
       type: object
