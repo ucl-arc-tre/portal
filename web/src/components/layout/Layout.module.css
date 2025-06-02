@@ -7,20 +7,19 @@
 main.content {
   padding: 2rem;
   justify-items: center;
-  margin-inline: 15vw;
+  margin-inline-end: 8vw;
+  margin-inline-start: 20vw;
   min-height: 100svh;
 }
 
 .ucl_header {
-  margin-bottom: 1rem;
-
   svg {
-    fill: var(--green-300);
+    fill: var(--green-100);
   }
 
   &::after {
     content: "";
     display: block;
-    border-bottom: 20px solid var(--green-300);
+    border-bottom: 20px solid var(--green-100);
   }
 }
