@@ -4,7 +4,11 @@
 package openapi
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // Defines values for AgreementType.
@@ -58,6 +62,22 @@ type ConfirmedAgreement struct {
 	ConfirmedAt string `json:"confirmed_at"`
 }
 
+// PeopleAdminResponse defines model for People_AdminResponse.
+type PeopleAdminResponse struct {
+	People []PersonAdminView `json:"people"`
+}
+
+// PeopleApprovedResearcherResponse defines model for People_ApprovedResearcherResponse.
+type PeopleApprovedResearcherResponse struct {
+	People []string `json:"people"`
+}
+
+// PersonAdminView defines model for Person_AdminView.
+type PersonAdminView struct {
+	Agreements ProfileAgreements `json:"agreements"`
+	Auth       Auth              `json:"auth"`
+}
+
 // ProfileAgreements defines model for ProfileAgreements.
 type ProfileAgreements struct {
 	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
@@ -96,6 +116,15 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// GetPeopleParams defines parameters for GetPeople.
+type GetPeopleParams struct {
+	// Role Determine shcema response with role query
+	Role string `form:"role" json:"role"`
+}
+
+// PostPeopleUpdateJSONRequestBody defines body for PostPeopleUpdate for application/json ContentType.
+type PostPeopleUpdateJSONRequestBody = AgreementConfirmation
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -113,6 +142,12 @@ type ServerInterface interface {
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
+
+	// (GET /people)
+	GetPeople(c *gin.Context, params GetPeopleParams)
+
+	// (POST /people/update)
+	PostPeopleUpdate(c *gin.Context)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -163,6 +198,52 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	}
 
 	siw.Handler.GetAuth(c)
+}
+
+// GetPeople operation middleware
+func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetPeopleParams
+
+	// ------------- Required query parameter "role" -------------
+
+	if paramValue := c.Query("role"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument role is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "role", c.Request.URL.Query(), &params.Role)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter role: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetPeople(c, params)
+}
+
+// PostPeopleUpdate operation middleware
+func (siw *ServerInterfaceWrapper) PostPeopleUpdate(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostPeopleUpdate(c)
 }
 
 // GetProfile operation middleware
@@ -259,6 +340,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
+	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
+	router.POST(options.BaseURL+"/people/update", wrapper.PostPeopleUpdate)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
