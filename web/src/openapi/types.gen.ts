@@ -67,6 +67,19 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
+export type PersonAdminView = {
+    auth: Auth;
+    agreements: ProfileAgreements;
+};
+
+export type PeopleAdminResponse = {
+    people: Array<PersonAdminView>;
+};
+
+export type PeopleApprovedResearcherResponse = {
+    people: Array<string>;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -244,6 +257,59 @@ export type GetAgreementsApprovedResearcherResponses = {
 };
 
 export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];
+
+export type GetPeopleData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Determine shcema response with role query
+         */
+        role: string;
+    };
+    url: '/people';
+};
+
+export type GetPeopleErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetPeopleResponses = {
+    200: PeopleAdminResponse | PeopleApprovedResearcherResponse;
+};
+
+export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+
+export type PostPeopleUpdateData = {
+    body: AgreementConfirmation;
+    path?: never;
+    query?: never;
+    url: '/people/update';
+};
+
+export type PostPeopleUpdateErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostPeopleUpdateResponses = {
+    200: ProfileAgreements;
+};
+
+export type PostPeopleUpdateResponse = PostPeopleUpdateResponses[keyof PostPeopleUpdateResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});
