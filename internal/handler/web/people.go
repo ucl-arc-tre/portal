@@ -13,7 +13,7 @@ func (h *Handler) GetPeople(ctx *gin.Context, params openapi.GetPeopleParams) {
 
 	case "admin":
 		// retrieve auth + agreements info
-		users, err := h.people.GetAllPeople() // Make sure GetAllPeople returns ([]User, error)
+		users, err := h.people.GetAllPeople()
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

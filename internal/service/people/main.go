@@ -25,7 +25,6 @@ type UserWithAgreements struct {
 }
 
 func (s *Service) GetAllPeople() ([]UserWithAgreements, error) {
-
 	var usersWithAgreements []UserWithAgreements
 
 	// get all users from db
