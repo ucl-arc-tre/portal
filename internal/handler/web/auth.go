@@ -11,13 +11,14 @@ import (
 
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
+	auth := openapi.Auth{Username: string(user.Username)}
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
 		setServerError(ctx, err, "Failed to get roles for user")
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.Auth{
-		Username: string(user.Username),
-		Roles:    roles,
-	})
+	for _, role := range roles {
+		auth.Roles = append(auth.Roles, openapi.AuthRoles(role))
+	}
+	ctx.JSON(http.StatusOK, auth)
 }

@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/profile/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"gorm.io/gorm"
 )
 
 func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
@@ -19,8 +21,9 @@ func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUp
 	switch data.Kind {
 	case openapi.TrainingKindNhsd:
 		return s.updateNHSD(user, data)
+	default:
+		return openapi.ProfileTrainingResponse{}, fmt.Errorf("unsupported training kind")
 	}
-	return openapi.ProfileTrainingResponse{}, fmt.Errorf("unsupported training kind")
 }
 
 func (s *Service) updateNHSD(
@@ -59,8 +62,25 @@ func (s *Service) updateNHSD(
 		if err := s.createNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
 			return response, err
 		}
+		if err := s.updateApprovedResearcherStatus(user); err != nil {
+			return response, err
+		}
 	}
 	return response, nil
+}
+
+func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
+	record := types.UserTrainingRecord{
+		UserID: user.ID,
+		Kind:   types.TrainingKindNHSD,
+	}
+	result := s.db.Order("completed_at desc").Find(&record).Limit(1)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return false, nil
+	} else if result.Error != nil {
+		return false, result.Error
+	}
+	return time.Since(record.CompletedAt) < config.TrainingValidity, nil
 }
 
 func (s *Service) createNHSDTrainingRecord(user types.User, completedAt time.Time) error {

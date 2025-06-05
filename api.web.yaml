@@ -136,6 +136,10 @@ components:
           type: array
           items:
             type: string
+            enum:
+              - admin
+              - base
+              - approved-researcher
 
     ProfileResponse:
       type: object
@@ -187,8 +191,14 @@ components:
           type: string
           description: Time in RFC3339 format at which the agreement was confirmed
         agreement_type:
-          type: string
+          $ref: "#/components/schemas/AgreementType"
           description: Type of agreement that was confirmed
+
+    AgreementType:
+      type: string
+      enum:
+        - approved-researcher
+        - study-owner
 
     ProfileAgreements:
       type: object

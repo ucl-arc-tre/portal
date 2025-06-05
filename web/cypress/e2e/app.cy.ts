@@ -106,5 +106,14 @@ describe("Uploading a NHSD training certificate", () => {
     setChosenName("Tom Young");
     submitFile("cypress/e2e/testdata/valid_nhsd_certificate.pdf");
     cy.contains("Valid training").should("be.visible");
+    // If needed agree to the approved resarcher agreement
+    cy.get("body").then((body) => {
+      if (body.find("[data-cy='approved-researcher-agreement-text']").length > 0) {
+        cy.get("input[name='agreed'][type='checkbox']").check();
+        cy.get("[data-cy='approved-researcher-agreement-agree']").click();
+      }
+    });
+    cy.visit("/");
+    cy.contains("approved-researcher").should("be.visible"); // todo: move to querying /profile
   });
 });
