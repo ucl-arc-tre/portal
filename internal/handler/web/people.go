@@ -2,34 +2,33 @@ package handler
 
 import (
 	"net/http"
+	"slices"
 
 	"github.com/gin-gonic/gin"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/middleware"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-func (h *Handler) GetPeople(ctx *gin.Context, params openapi.GetPeopleParams) {
-	role := params.Role
-	switch role {
+func (h *Handler) GetPeople(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	roles, err := rbac.GetRoles(user)
+	if err != nil {
+		setServerError(ctx, err, "Failed to get roles for user")
+		return
+	}
 
-	case "admin":
+	if slices.Contains(roles, "admin") {
 		// retrieve auth + agreements info
 		users, err := h.people.GetAllPeople()
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
 		ctx.JSON(http.StatusOK, users)
-		return
-	case "approvedResearcher":
-		// todo: retrieve study/project info
-	default:
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role specified"})
 
-		return
-
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No valid roles found"})
 	}
-}
 
-func (h *Handler) PostPeopleUpdate(ctx *gin.Context) {
-	// todo
 }

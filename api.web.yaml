@@ -125,14 +125,6 @@ paths:
   /people:
     get:
       description: Get all the people a user has access to
-      parameters:
-        - in: query
-          name: role
-          required: true
-          schema:
-            type: string
-          description: Determine shcema response with role query
-
       responses:
         "200":
           content:
@@ -141,26 +133,6 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/People_AdminResponse"
                   - $ref: "#/components/schemas/People_ApprovedResearcherResponse"
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
-  /people/update:
-    post:
-      description: Update the agreements for a user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AgreementConfirmation"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProfileAgreements"
         "500":
           description: Internal server error
         default:

@@ -261,12 +261,7 @@ export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResea
 export type GetPeopleData = {
     body?: never;
     path?: never;
-    query: {
-        /**
-         * Determine shcema response with role query
-         */
-        role: string;
-    };
+    query?: never;
     url: '/people';
 };
 
@@ -286,30 +281,6 @@ export type GetPeopleResponses = {
 };
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
-
-export type PostPeopleUpdateData = {
-    body: AgreementConfirmation;
-    path?: never;
-    query?: never;
-    url: '/people/update';
-};
-
-export type PostPeopleUpdateErrors = {
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PostPeopleUpdateResponses = {
-    200: ProfileAgreements;
-};
-
-export type PostPeopleUpdateResponse = PostPeopleUpdateResponses[keyof PostPeopleUpdateResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});

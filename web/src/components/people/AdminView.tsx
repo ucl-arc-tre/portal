@@ -4,14 +4,9 @@ import { useEffect, useState } from "react";
 export default function AdminView() {
   const [people, setPeople] = useState([]);
   useEffect(() => {
-    const options = {
-      query: {
-        role: "admin",
-      },
-    };
     const fetchPeople = async () => {
       try {
-        const response = await getPeople(options);
+        const response = await getPeople();
 
         console.log(response);
         // if (response.response.ok && response.data?) {
