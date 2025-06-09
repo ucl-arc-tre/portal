@@ -3,3 +3,7 @@
   justify-items: center;
   gap: 0.8rem;
 }
+
+.button {
+  margin: 1rem;
+}

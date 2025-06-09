@@ -10,7 +10,6 @@ export default function ProfilePage() {
         description="View and manage your ARC profile and researcher status"
       />
       <div className={styles.page}>
-        <h1 className={styles.title}>Profile</h1>
         <Profile />
       </div>
     </>
