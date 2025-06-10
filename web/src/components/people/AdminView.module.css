@@ -1,0 +1,26 @@
+.table {
+  width: 100%;
+  margin-block: 1rem;
+  font-size: 110%;
+
+  tbody {
+    border-top: 1px solid var(--foreground);
+  }
+
+  td {
+    padding: 0.5rem;
+  }
+
+  .user {
+    display: flex;
+    flex-direction: column;
+
+    small {
+      color: var(--grey);
+    }
+  }
+
+  .roles {
+    text-align: center;
+  }
+}
