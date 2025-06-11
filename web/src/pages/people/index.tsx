@@ -22,7 +22,7 @@ export default function PeoplePage() {
       {userData?.roles.includes("admin") ? (
         <AdminView />
       ) : (
-        userData?.roles.includes("approved_researcher") && <p>Approved Researcher</p>
+        userData?.roles.includes("approved-researcher") && <p>Approved Researcher</p>
       )}
     </>
   );
