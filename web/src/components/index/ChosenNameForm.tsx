@@ -61,6 +61,7 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
             type="text"
             name="chosenName"
             value={inputNameValue}
+            placeholder="e.g. Alice Smith"
             onChange={(e) => {
               setInputNameValue(e.target.value);
               if (errorMessage) setErrorMessage(null); // Clear error as user types
