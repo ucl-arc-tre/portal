@@ -26,7 +26,6 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 			return
 		}
 
-		// ctx.JSON(http.StatusOK, users)
 		ctx.JSON(http.StatusOK, openapi.PeopleAdminResponse{
 			People: users,
 		})

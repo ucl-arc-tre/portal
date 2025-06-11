@@ -9,11 +9,7 @@ export default function PeoplePage() {
 
   if (!isAuthed) return <LoginFallback />;
 
-  console.log(userData);
-
   const cannotView = !userData?.roles.includes("admin") && !userData?.roles.includes("approved_researcher");
-
-  console.log(cannotView);
 
   return (
     <>

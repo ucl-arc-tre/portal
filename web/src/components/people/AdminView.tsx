@@ -1,27 +1,7 @@
-import {
-  ConfirmedAgreement,
-  getPeople,
-  PeopleAdminResponse,
-  PeopleApprovedResearcherResponse,
-  PersonAdminView,
-} from "@/openapi";
+import { ConfirmedAgreement, getPeople, PeopleAdminResponse, PersonAdminView } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
-
-// type Agreement = {
-//   agreement_type: string;
-//   confirmed_at: string;
-// };
-// type PersonAdminView = {
-//   User: {
-//     ID: string;
-//     CreatedAt: string;
-//     Username: string;
-//   };
-//   Agreements: Agreement[];
-//   Roles: string[];
-// };
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -30,9 +10,6 @@ const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.
   ssr: false,
 });
 
-function isAdminResponse(data: PeopleAdminResponse | PeopleApprovedResearcherResponse): data is PeopleAdminResponse {
-  return Array.isArray(data) && data.every((item) => "User" in item && "Agreements" in item);
-}
 export default function AdminView() {
   const [people, setPeople] = useState<PeopleAdminResponse | null>(null);
 
@@ -41,9 +18,8 @@ export default function AdminView() {
       try {
         const response = await getPeople();
 
-        console.log(response);
-        if (response.response.ok && response.data && isAdminResponse(response.data)) {
-          setPeople(response.data);
+        if (response.response.ok && response.data?.people) {
+          setPeople(response.data as PeopleAdminResponse);
         } else {
         }
       } catch (error) {
