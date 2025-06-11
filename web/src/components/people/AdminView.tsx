@@ -1,21 +1,27 @@
-import { getPeople, PeopleAdminResponse, PeopleApprovedResearcherResponse } from "@/openapi";
+import {
+  ConfirmedAgreement,
+  getPeople,
+  PeopleAdminResponse,
+  PeopleApprovedResearcherResponse,
+  PersonAdminView,
+} from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
 
-type Agreement = {
-  agreement_type: string;
-  confirmed_at: string;
-};
-type PersonAdminView = {
-  User: {
-    ID: string;
-    CreatedAt: string;
-    Username: string;
-  };
-  Agreements: Agreement[];
-  Roles: string[];
-};
+// type Agreement = {
+//   agreement_type: string;
+//   confirmed_at: string;
+// };
+// type PersonAdminView = {
+//   User: {
+//     ID: string;
+//     CreatedAt: string;
+//     Username: string;
+//   };
+//   Agreements: Agreement[];
+//   Roles: string[];
+// };
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -60,17 +66,17 @@ export default function AdminView() {
         </tr>
       </thead>
       <tbody>
-        {people!.map((person: PersonAdminView) => (
-          <tr key={person.User.ID}>
+        {people!.people.map((person: PersonAdminView) => (
+          <tr key={person.user.id}>
             <td className={styles.user}>
-              {person.User.Username} <small>{person.User.ID}</small>
+              {person.user.username} <small>{person.user.id}</small>
             </td>
-            <td className={styles.roles}>{person.Roles}</td>
+            <td className={styles.roles}>{person.roles}</td>
             <td className={styles.agreements}>
-              {Object.entries(person.Agreements).map(([key, agreement]) => (
-                <div key={key}>
-                  {agreement!.agreement_type}
-                  {agreement!.confirmed_at! ? <CheckIcon /> : <XIcon />}
+              {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
+                <div key={agreement.agreement_type}>
+                  {agreement.agreement_type}
+                  {agreement.confirmed_at ? <CheckIcon /> : <XIcon />}
                 </div>
               ))}
             </td>

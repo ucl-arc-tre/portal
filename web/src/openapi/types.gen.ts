@@ -68,7 +68,11 @@ export type ProfileTrainingResponse = {
 };
 
 export type PersonAdminView = {
-    auth: Auth;
+    user: {
+        username?: string;
+        id?: string;
+    };
+    roles: Array<string>;
     agreements: ProfileAgreements;
 };
 

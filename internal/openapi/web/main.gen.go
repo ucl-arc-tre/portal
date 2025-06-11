@@ -53,7 +53,11 @@ type PeopleApprovedResearcherResponse struct {
 // PersonAdminView defines model for Person_AdminView.
 type PersonAdminView struct {
 	Agreements ProfileAgreements `json:"agreements"`
-	Auth       Auth              `json:"auth"`
+	Roles      []string          `json:"roles"`
+	User       struct {
+		Id       *string `json:"id,omitempty"`
+		Username *string `json:"username,omitempty"`
+	} `json:"user"`
 }
 
 // ProfileAgreements defines model for ProfileAgreements.

@@ -20,14 +20,8 @@ func New() *Service {
 	return &Service{db: graceful.NewDB(), profile: profile.New()}
 }
 
-type UserWithAgreements struct {
-	User       types.User
-	Agreements []openapi.ConfirmedAgreement
-	Roles      []string
-}
-
-func (s *Service) GetAllPeople() ([]UserWithAgreements, error) {
-	var usersWithAgreements []UserWithAgreements
+func (s *Service) GetAllPeople() ([]openapi.PersonAdminView, error) {
+	var usersWithAgreements []openapi.PersonAdminView
 
 	// get all users from db
 	var users []types.User
@@ -47,10 +41,21 @@ func (s *Service) GetAllPeople() ([]UserWithAgreements, error) {
 			return nil, errors.New("failed to get roles for user")
 		}
 
-		usersWithAgreements = append(usersWithAgreements, UserWithAgreements{
-			User:       user,
-			Agreements: agreements,
-			Roles:      roles,
+		userId := user.ID.String()
+		userName := string(user.Username)
+
+		usersWithAgreements = append(usersWithAgreements, openapi.PersonAdminView{
+			User: struct {
+				Id       *string `json:"id,omitempty"`
+				Username *string `json:"username,omitempty"`
+			}{
+				Id:       &userId,
+				Username: &userName,
+			},
+			Agreements: openapi.ProfileAgreements{
+				ConfirmedAgreements: agreements,
+			},
+			Roles: roles,
 		})
 	}
 	return usersWithAgreements, nil

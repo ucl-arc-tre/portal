@@ -244,11 +244,21 @@ components:
     Person_AdminView:
       type: object
       required:
-        - auth
+        - user
+        - roles
         - agreements
       properties:
-        auth:
-          $ref: "#/components/schemas/Auth"
+        user:
+          type: object
+          properties:
+            username:
+              type: string
+            id:
+              type: string
+        roles:
+          type: array
+          items:
+            type: string
         agreements:
           $ref: "#/components/schemas/ProfileAgreements"
 

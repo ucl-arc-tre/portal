@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
@@ -25,7 +26,10 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, users)
+		// ctx.JSON(http.StatusOK, users)
+		ctx.JSON(http.StatusOK, openapi.PeopleAdminResponse{
+			People: users,
+		})
 
 	} else {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No valid roles found"})
