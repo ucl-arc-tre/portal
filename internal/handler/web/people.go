@@ -20,18 +20,18 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 
 	if slices.Contains(roles, "admin") {
 		// retrieve auth + agreements info
-		users, err := h.people.GetAllPeople()
+		people, err := h.people.GetAllPeople()
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			setServerError(ctx, err, "Failed to get people")
 			return
 		}
 
 		ctx.JSON(http.StatusOK, openapi.PeopleAdminResponse{
-			People: users,
+			People: people,
 		})
 
 	} else {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No valid roles found"})
+		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
 	}
 
 }

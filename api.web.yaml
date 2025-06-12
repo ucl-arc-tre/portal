@@ -241,6 +241,15 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        id:
+          type: string
+          format: uuid
+
     Person:
       type: object
       required:
@@ -249,12 +258,7 @@ components:
         - agreements
       properties:
         user:
-          type: object
-          properties:
-            username:
-              type: string
-            id:
-              type: string
+          $ref: "#/components/schemas/User"
         roles:
           type: array
           items:

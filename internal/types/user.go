@@ -9,11 +9,11 @@ type ChosenName string
 type User struct {
 	Model
 	Username Username `gorm:"uniqueIndex"`
+	UserID   uuid.UUID
 }
 
 type UserAttributes struct {
 	Model
 	User       User
-	UserID     uuid.UUID
 	ChosenName ChosenName
 }

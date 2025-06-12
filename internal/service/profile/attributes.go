@@ -22,7 +22,7 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	if isValid := isValidRegex.MatchString(string(chosenName)); !isValid {
 		return errors.New("invalid chosen name")
 	}
-	attrs := types.UserAttributes{UserID: user.ID}
+	attrs := types.UserAttributes{User: user}
 
 	result := s.db.Where(&attrs).Assign(types.UserAttributes{
 		Model:      types.Model{CreatedAt: time.Now()},

@@ -67,11 +67,13 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
+export type User = {
+    username?: string;
+    id?: string;
+};
+
 export type Person = {
-    user: {
-        username?: string;
-        id?: string;
-    };
+    user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
 };
