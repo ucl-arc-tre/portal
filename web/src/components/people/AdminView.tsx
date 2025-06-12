@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getPeople, PeopleAdminResponse, PersonAdminView } from "@/openapi";
+import { ConfirmedAgreement, getPeople, PeopleAdminResponse, Person } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -20,7 +20,6 @@ export default function AdminView() {
 
         if (response.response.ok && response.data?.people) {
           setPeople(response.data as PeopleAdminResponse);
-        } else {
         }
       } catch (error) {
         console.error("Failed to get people:", error);
@@ -42,7 +41,7 @@ export default function AdminView() {
         </tr>
       </thead>
       <tbody>
-        {people!.people.map((person: PersonAdminView) => (
+        {people!.people.map((person: Person) => (
           <tr key={person.user.id}>
             <td className={styles.user}>
               {person.user.username} <small>{person.user.id}</small>

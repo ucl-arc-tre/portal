@@ -9,7 +9,10 @@ export default function PeoplePage() {
 
   if (!isAuthed) return <LoginFallback />;
 
-  const cannotView = !userData?.roles.includes("admin") && !userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+
+  const cannotView = !isAdmin && !isApprovedResearcher;
 
   return (
     <>
@@ -19,11 +22,7 @@ export default function PeoplePage() {
       />
       <h1>People</h1>
       {cannotView && <h4>You do not have permission to view this page</h4>}
-      {userData?.roles.includes("admin") ? (
-        <AdminView />
-      ) : (
-        userData?.roles.includes("approved-researcher") && <p>Approved Researcher</p>
-      )}
+      {isAdmin ? <AdminView /> : isApprovedResearcher && <p>Approved Researcher</p>}
     </>
   );
 }
