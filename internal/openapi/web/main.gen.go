@@ -42,16 +42,11 @@ type ConfirmedAgreement struct {
 
 // PeopleAdminResponse defines model for People_AdminResponse.
 type PeopleAdminResponse struct {
-	People []PersonAdminView `json:"people"`
+	People []Person `json:"people"`
 }
 
-// PeopleApprovedResearcherResponse defines model for People_ApprovedResearcherResponse.
-type PeopleApprovedResearcherResponse struct {
-	People []string `json:"people"`
-}
-
-// PersonAdminView defines model for Person_AdminView.
-type PersonAdminView struct {
+// Person defines model for Person.
+type Person struct {
 	Agreements ProfileAgreements `json:"agreements"`
 	Roles      []string          `json:"roles"`
 	User       struct {

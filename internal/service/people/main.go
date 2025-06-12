@@ -20,8 +20,8 @@ func New() *Service {
 	return &Service{db: graceful.NewDB(), profile: profile.New()}
 }
 
-func (s *Service) GetAllPeople() ([]openapi.PersonAdminView, error) {
-	var usersWithAgreements []openapi.PersonAdminView
+func (s *Service) GetAllPeople() ([]openapi.Person, error) {
+	var usersWithAgreements []openapi.Person
 
 	// get all users from db
 	var users []types.User
@@ -44,7 +44,7 @@ func (s *Service) GetAllPeople() ([]openapi.PersonAdminView, error) {
 		userId := user.ID.String()
 		userName := string(user.Username)
 
-		usersWithAgreements = append(usersWithAgreements, openapi.PersonAdminView{
+		usersWithAgreements = append(usersWithAgreements, openapi.Person{
 			User: struct {
 				Id       *string `json:"id,omitempty"`
 				Username *string `json:"username,omitempty"`

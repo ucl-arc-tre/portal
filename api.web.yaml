@@ -130,9 +130,9 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/People_AdminResponse"
-                  - $ref: "#/components/schemas/People_ApprovedResearcherResponse"
+                $ref: "#/components/schemas/People_AdminResponse"
+        "403":
+          description: Forbidden
         "500":
           description: Internal server error
         default:
@@ -241,7 +241,7 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
-    Person_AdminView:
+    Person:
       type: object
       required:
         - user
@@ -270,15 +270,4 @@ components:
         people:
           type: array
           items:
-            $ref: "#/components/schemas/Person_AdminView"
-
-    People_ApprovedResearcherResponse:
-      type: object
-      required:
-        - people
-      properties:
-        people:
-          type: array
-          items:
-            type: string
-            description: Placeholder response until projects are implemented
+            $ref: "#/components/schemas/Person"

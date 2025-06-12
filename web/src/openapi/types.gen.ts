@@ -67,7 +67,7 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
-export type PersonAdminView = {
+export type Person = {
     user: {
         username?: string;
         id?: string;
@@ -77,11 +77,7 @@ export type PersonAdminView = {
 };
 
 export type PeopleAdminResponse = {
-    people: Array<PersonAdminView>;
-};
-
-export type PeopleApprovedResearcherResponse = {
-    people: Array<string>;
+    people: Array<Person>;
 };
 
 export type GetAuthData = {
@@ -271,6 +267,10 @@ export type GetPeopleData = {
 
 export type GetPeopleErrors = {
     /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
      * Internal server error
      */
     500: unknown;
@@ -281,7 +281,7 @@ export type GetPeopleErrors = {
 };
 
 export type GetPeopleResponses = {
-    200: PeopleAdminResponse | PeopleApprovedResearcherResponse;
+    200: PeopleAdminResponse;
 };
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
