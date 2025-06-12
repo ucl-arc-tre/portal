@@ -41,7 +41,7 @@ func (s *Service) GetAllPeople() ([]openapi.Person, error) {
 			return nil, errors.New("failed to get roles for user")
 		}
 
-		userID := user.UserID.String()
+		userID := user.ID.String()
 		userName := string(user.Username)
 
 		usersWithAgreements = append(usersWithAgreements, openapi.Person{
