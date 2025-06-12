@@ -113,13 +113,13 @@ describe("People page content", () => {
   it("should show nothing to base role", () => {
     cy.loginAsBase();
     cy.visit("/people");
-    cy.contains("you do not have permission").should("be.visible");
+    cy.contains(/you do not have permission/i).should("be.visible");
   });
 
   it("should show content for admin", () => {
     cy.loginAsAdmin();
     cy.visit("/people");
-    cy.contains("you do not have permission").should("not.be.visible");
+    cy.contains(/you do not have permission/i).should("not.be.visible");
     cy.get("table").contains("User").should("be.visible");
     cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
   });
