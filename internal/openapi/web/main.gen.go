@@ -5,7 +5,6 @@ package openapi
 
 import (
 	"github.com/gin-gonic/gin"
-	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for ProfileTrainingUpdateKind.
@@ -93,8 +92,8 @@ type ProfileUpdate struct {
 
 // User defines model for User.
 type User struct {
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-	Username *string             `json:"username,omitempty"`
+	Id       *string `json:"id,omitempty"`
+	Username *string `json:"username,omitempty"`
 }
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.

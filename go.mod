@@ -10,7 +10,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/klippa-app/go-pdfium v1.14.1
-	github.com/oapi-codegen/runtime v1.1.1
 	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.10.0
 	gorm.io/driver/postgres v1.6.0

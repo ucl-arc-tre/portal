@@ -3,8 +3,6 @@ package people
 import (
 	"errors"
 
-	oapiTypes "github.com/oapi-codegen/runtime/types"
-
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -43,7 +41,7 @@ func (s *Service) GetAllPeople() ([]openapi.Person, error) {
 			return nil, errors.New("failed to get roles for user")
 		}
 
-		userID := oapiTypes.UUID(user.UserID)
+		userID := user.UserID.String()
 		userName := string(user.Username)
 
 		usersWithAgreements = append(usersWithAgreements, openapi.Person{

@@ -14,6 +14,6 @@ type User struct {
 
 type UserAttributes struct {
 	Model
-	User       User
+	User       User `gorm:"foreignKey:UserID"`
 	ChosenName ChosenName
 }
