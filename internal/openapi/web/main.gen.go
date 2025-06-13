@@ -58,6 +58,18 @@ type ConfirmedAgreement struct {
 	ConfirmedAt string `json:"confirmed_at"`
 }
 
+// PeopleAdminResponse defines model for People_AdminResponse.
+type PeopleAdminResponse struct {
+	People []Person `json:"people"`
+}
+
+// Person defines model for Person.
+type Person struct {
+	Agreements ProfileAgreements `json:"agreements"`
+	Roles      []string          `json:"roles"`
+	User       User              `json:"user"`
+}
+
 // ProfileAgreements defines model for ProfileAgreements.
 type ProfileAgreements struct {
 	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
@@ -96,6 +108,12 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// User defines model for User.
+type User struct {
+	Id       *string `json:"id,omitempty"`
+	Username *string `json:"username,omitempty"`
+}
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -113,6 +131,9 @@ type ServerInterface interface {
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
+
+	// (GET /people)
+	GetPeople(c *gin.Context)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -163,6 +184,19 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	}
 
 	siw.Handler.GetAuth(c)
+}
+
+// GetPeople operation middleware
+func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetPeople(c)
 }
 
 // GetProfile operation middleware
@@ -259,6 +293,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
+	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

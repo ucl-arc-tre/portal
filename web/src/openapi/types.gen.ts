@@ -66,6 +66,21 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
+export type User = {
+    username?: string;
+    id?: string;
+};
+
+export type Person = {
+    user: User;
+    roles: Array<string>;
+    agreements: ProfileAgreements;
+};
+
+export type PeopleAdminResponse = {
+    people: Array<Person>;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -243,6 +258,34 @@ export type GetAgreementsApprovedResearcherResponses = {
 };
 
 export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];
+
+export type GetPeopleData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/people';
+};
+
+export type GetPeopleErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetPeopleResponses = {
+    200: PeopleAdminResponse;
+};
+
+export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});

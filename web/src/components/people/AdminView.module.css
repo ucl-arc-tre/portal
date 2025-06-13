@@ -1,0 +1,51 @@
+.table {
+  width: 100%;
+  margin-block: 1rem;
+  font-size: 110%;
+
+  tbody {
+    border-top: 1px solid var(--foreground);
+  }
+
+  td {
+    padding: 0.5rem;
+  }
+
+  .user {
+    display: flex;
+    flex-direction: column;
+
+    small {
+      color: var(--grey);
+    }
+  }
+
+  .roles {
+    text-align: center;
+  }
+
+  .agreements {
+    text-align: right;
+    grid-template-columns: repeat(1fr);
+  }
+
+  .agreement {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 3fr 0.2fr;
+
+    .confirmed svg {
+      grid-row: 1;
+      stroke: var(--green-100);
+    }
+
+    .unconfirmed svg {
+      grid-row: 1;
+      stroke: red;
+    }
+
+    /* small {
+            grid-row: 2;
+        } */
+  }
+}

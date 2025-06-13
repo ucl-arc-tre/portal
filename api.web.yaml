@@ -122,6 +122,22 @@ paths:
         default:
           description: Unexpected error
 
+  /people:
+    get:
+      description: Get all the people a user has access to
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/People_AdminResponse"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   schemas:
     Auth:
@@ -234,3 +250,37 @@ components:
         certificate_issued_at:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
+
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        id:
+          type: string
+
+    Person:
+      type: object
+      required:
+        - user
+        - roles
+        - agreements
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        roles:
+          type: array
+          items:
+            type: string
+        agreements:
+          $ref: "#/components/schemas/ProfileAgreements"
+
+    People_AdminResponse:
+      type: object
+      required:
+        - people
+      properties:
+        people:
+          type: array
+          items:
+            $ref: "#/components/schemas/Person"

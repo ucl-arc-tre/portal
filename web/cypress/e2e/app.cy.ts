@@ -3,6 +3,24 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
+describe("People page content", () => {
+  it("should show nothing to base role", () => {
+    cy.loginAsBase();
+    cy.visit("/people");
+
+    cy.contains("You do not have permission to view this page").should("be.visible");
+  });
+
+  it("should show content for admin", () => {
+    cy.loginAsAdmin();
+    cy.visit("/people");
+
+    cy.contains("You do not have permission to view this page").should("not.exist");
+    cy.get("table").contains("User").should("be.visible");
+    cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
+  });
+});
+
 describe("ARC Portal UI unauthenticated", () => {
   it("shows the ARC portal phrase on the homepage", () => {
     cy.visit("/");
@@ -14,7 +32,7 @@ describe("ARC Portal UI unauthenticated", () => {
 
 describe("ARC Portal UI authenticated", () => {
   it("can be logged into as an admin", () => {
-    cy.loginAsAdmin();
+    cy.loginAsBase();
 
     cy.visit("/");
     cy.contains("Loading...").should("not.exist");
@@ -23,6 +41,23 @@ describe("ARC Portal UI authenticated", () => {
 
   it("admin user can agree to approved researcher agreement", () => {
     cy.loginAsAdmin();
+    cy.visit("/profile/approved-researcher");
+
+    cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
+
+    cy.get("body").then((body) => {
+      if (body.find("[data-cy='approved-researcher-agreement-text']").length > 0) {
+        cy.get("[data-cy='approved-researcher-agreement-text']").should("be.visible");
+        cy.get("input[name='agreed'][type='checkbox']").check();
+        cy.get("[data-cy='approved-researcher-agreement-agree']").click();
+      }
+    });
+
+    cy.contains("Agreement confirmed").should("be.visible");
+  });
+
+  it("base user can agree to approved researcher agreement", () => {
+    cy.loginAsBase();
     cy.visit("/profile/approved-researcher");
 
     cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
