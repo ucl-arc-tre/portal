@@ -3,6 +3,24 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
+describe("People page content", () => {
+  it("should show nothing to base role", () => {
+    cy.loginAsBase();
+    cy.visit("/people");
+
+    cy.contains("You do not have permission to view this page").should("be.visible");
+  });
+
+  it("should show content for admin", () => {
+    cy.loginAsAdmin();
+    cy.visit("/people");
+
+    cy.contains("You do not have permission to view this page").should("not.exist");
+    cy.get("table").contains("User").should("be.visible");
+    cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
+  });
+});
+
 describe("ARC Portal UI unauthenticated", () => {
   it("shows the ARC portal phrase on the homepage", () => {
     cy.visit("/");
@@ -123,21 +141,5 @@ describe("Uploading a NHSD training certificate", () => {
     setChosenName("Tom Young");
     submitFile("cypress/e2e/testdata/valid_nhsd_certificate.pdf");
     cy.contains("Valid training").should("be.visible");
-  });
-});
-
-describe("People page content", () => {
-  it("should show nothing to base role", () => {
-    cy.loginAsBase();
-    cy.visit("/people");
-    cy.get("h4").contains("You do not have permission to view this page").should("be.visible");
-  });
-
-  it("should show content for admin", () => {
-    cy.loginAsAdmin();
-    cy.visit("/people");
-    cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.get("table").contains("User").should("be.visible");
-    cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
   });
 });
