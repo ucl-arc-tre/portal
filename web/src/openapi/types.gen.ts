@@ -67,8 +67,8 @@ export type ProfileTrainingResponse = {
 };
 
 export type User = {
-    username?: string;
-    id?: string;
+    username: string;
+    id: string;
 };
 
 export type Person = {
@@ -77,9 +77,7 @@ export type Person = {
     agreements: ProfileAgreements;
 };
 
-export type PeopleAdminResponse = {
-    people: Array<Person>;
-};
+export type People = Array<Person>;
 
 export type GetAuthData = {
     body?: never;
@@ -282,7 +280,7 @@ export type GetPeopleErrors = {
 };
 
 export type GetPeopleResponses = {
-    200: PeopleAdminResponse;
+    200: People;
 };
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];

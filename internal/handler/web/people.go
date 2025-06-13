@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
@@ -20,15 +19,12 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 
 	if slices.Contains(roles, "admin") {
 		// retrieve auth + agreements info
-		people, err := h.people.GetAllPeople()
+		people, err := h.users.GetAllPeople()
 		if err != nil {
 			setServerError(ctx, err, "Failed to get people")
 			return
 		}
-
-		ctx.JSON(http.StatusOK, openapi.PeopleAdminResponse{
-			People: people,
-		})
+		ctx.JSON(http.StatusOK, people)
 
 	} else {
 		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})

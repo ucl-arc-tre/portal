@@ -13,7 +13,7 @@ import (
 
 func (h *Handler) GetProfile(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	attributes, err := h.profile.Attributes(user)
+	attributes, err := h.users.Attributes(user)
 	if err != nil {
 		log.Err(err).Msg("Failed to get user attributes")
 		ctx.Status(http.StatusInternalServerError)
@@ -32,7 +32,7 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return
 	}
-	if err := h.profile.SetUserChosenName(user, types.ChosenName(update.ChosenName)); err != nil {
+	if err := h.users.SetUserChosenName(user, types.ChosenName(update.ChosenName)); err != nil {
 		setServerError(ctx, err, "Failed to update chosen name")
 		return
 	}
@@ -53,7 +53,7 @@ func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 		setInvalid(ctx, err, "Invalid agreemenet ID")
 		return
 	}
-	if err := h.profile.ConfirmAgreement(user, agreementId); err != nil {
+	if err := h.users.ConfirmAgreement(user, agreementId); err != nil {
 		ctx.Status(http.StatusInternalServerError)
 		setServerError(ctx, err, "Failed to confirm agreement")
 		return
@@ -63,7 +63,7 @@ func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 
 func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	agreements, err := h.profile.ConfirmedAgreements(user)
+	agreements, err := h.users.ConfirmedAgreements(user)
 	if err != nil {
 		setServerError(ctx, err, "Failed to get agreements")
 		return
@@ -80,7 +80,7 @@ func (h *Handler) PostProfileTraining(ctx *gin.Context) {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return
 	}
-	result, err := h.profile.UpdateTraining(user, data)
+	result, err := h.users.UpdateTraining(user, data)
 	if err != nil {
 		setServerError(ctx, err, "Failed to update users training")
 		return

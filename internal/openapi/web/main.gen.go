@@ -58,10 +58,8 @@ type ConfirmedAgreement struct {
 	ConfirmedAt string `json:"confirmed_at"`
 }
 
-// PeopleAdminResponse defines model for People_AdminResponse.
-type PeopleAdminResponse struct {
-	People []Person `json:"people"`
-}
+// People defines model for People.
+type People = []Person
 
 // Person defines model for Person.
 type Person struct {
@@ -110,8 +108,8 @@ type ProfileUpdate struct {
 
 // User defines model for User.
 type User struct {
-	Id       *string `json:"id,omitempty"`
-	Username *string `json:"username,omitempty"`
+	Id       string `json:"id"`
+	Username string `json:"username"`
 }
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.

@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getPeople, PeopleAdminResponse, Person } from "@/openapi";
+import { ConfirmedAgreement, getPeople, People, Person } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -20,15 +20,15 @@ function convertRFC3339ToDDMMYYYY(dateString: string) {
 }
 
 export default function AdminView() {
-  const [people, setPeople] = useState<PeopleAdminResponse | null>(null);
+  const [people, setPeople] = useState<People | null>(null);
 
   useEffect(() => {
     const fetchPeople = async () => {
       try {
         const response = await getPeople();
 
-        if (response.response.ok && response.data?.people) {
-          setPeople(response.data as PeopleAdminResponse);
+        if (response.response.ok && response.data) {
+          setPeople(response.data as People);
         }
       } catch (error) {
         console.error("Failed to get people:", error);
@@ -50,7 +50,7 @@ export default function AdminView() {
         </tr>
       </thead>
       <tbody>
-        {people!.people.map((person: Person) => (
+        {people.map((person: Person) => (
           <tr key={person.user.id}>
             <td className={styles.user}>
               {person.user.username} <small>{person.user.id}</small>
