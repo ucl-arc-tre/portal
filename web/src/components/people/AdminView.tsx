@@ -51,7 +51,13 @@ export default function AdminView() {
               {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                 <div key={agreement.agreement_type}>
                   {agreement.agreement_type}
-                  {agreement.confirmed_at ? <CheckIcon /> : <XIcon />}
+                  {agreement.confirmed_at ? (
+                    <span>
+                      <CheckIcon /> {agreement.confirmed_at}
+                    </span>
+                  ) : (
+                    <XIcon />
+                  )}
                 </div>
               ))}
             </td>
