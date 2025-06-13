@@ -7,14 +7,16 @@ import (
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
-	Admin       = RoleName("admin") // Global admin on everything
-	Base        = RoleName("base")  // Most restricted role possible
-	ReadAction  = Action("read")
-	WriteAction = Action("write")
+	Admin              = RoleName(openapi.AuthRolesAdmin)              // Global admin on everything
+	Base               = RoleName(openapi.AuthRolesBase)               // Most restricted role possible
+	ApprovedResearcher = RoleName(openapi.AuthRolesApprovedResearcher) // Trained and attested user
+	ReadAction         = Action("read")
+	WriteAction        = Action("write")
 )
 
 var enforcer *casbin.Enforcer
@@ -41,6 +43,10 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 // Get all roles of a user
 func GetRoles(user types.User) ([]string, error) {
 	return enforcer.GetRolesForUser(user.ID.String())
+}
+
+func HasRole(user types.User, role RoleName) (bool, error) {
+	return enforcer.HasRoleForUser(user.ID.String(), string(role))
 }
 
 func must[T any](value T, err error) T {

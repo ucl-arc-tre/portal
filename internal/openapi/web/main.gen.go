@@ -7,6 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Defines values for AgreementType.
+const (
+	AgreementTypeApprovedResearcher AgreementType = "approved-researcher"
+	AgreementTypeStudyOwner         AgreementType = "study-owner"
+)
+
+// Defines values for AuthRoles.
+const (
+	AuthRolesAdmin              AuthRoles = "admin"
+	AuthRolesApprovedResearcher AuthRoles = "approved-researcher"
+	AuthRolesBase               AuthRoles = "base"
+)
+
 // Defines values for ProfileTrainingUpdateKind.
 const (
 	TrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
@@ -25,16 +38,21 @@ type AgreementConfirmation struct {
 	AgreementId string `json:"agreement_id"`
 }
 
+// AgreementType defines model for AgreementType.
+type AgreementType string
+
 // Auth defines model for Auth.
 type Auth struct {
-	Roles    []string `json:"roles"`
-	Username string   `json:"username"`
+	Roles    []AuthRoles `json:"roles"`
+	Username string      `json:"username"`
 }
+
+// AuthRoles defines model for Auth.Roles.
+type AuthRoles string
 
 // ConfirmedAgreement defines model for ConfirmedAgreement.
 type ConfirmedAgreement struct {
-	// AgreementType Type of agreement that was confirmed
-	AgreementType string `json:"agreement_type"`
+	AgreementType AgreementType `json:"agreement_type"`
 
 	// ConfirmedAt Time in RFC3339 format at which the agreement was confirmed
 	ConfirmedAt string `json:"confirmed_at"`

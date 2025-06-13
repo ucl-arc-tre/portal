@@ -17,7 +17,10 @@ func (s *Service) ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 	result := s.db.Where(&confirmation).Assign(types.Agreement{
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&confirmation)
-	return result.Error
+	if result.Error != nil {
+		return result.Error
+	}
+	return s.updateApprovedResearcherStatus(user)
 }
 
 func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgreement, error) {
@@ -33,9 +36,22 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 	agreements := []openapi.ConfirmedAgreement{}
 	for _, item := range data {
 		agreements = append(agreements, openapi.ConfirmedAgreement{
-			AgreementType: item.Type,
+			AgreementType: openapi.AgreementType(item.Type),
 			ConfirmedAt:   item.CreatedAt.Format(config.TimeFormat),
 		})
 	}
 	return agreements, result.Error
+}
+
+func (s *Service) hasAgreedToApprovedResarcherAgreement(user types.User) (bool, error) {
+	agreements, err := s.ConfirmedAgreements(user)
+	if err != nil {
+		return false, err
+	}
+	for _, agreement := range agreements {
+		if agreement.AgreementType == openapi.AgreementTypeApprovedResearcher {
+			return true, nil
+		}
+	}
+	return false, nil
 }

@@ -36,10 +36,7 @@ export default function UserTasks() {
 
       <p>Name: {chosenName}</p>
 
-      <p>
-        Username&nbsp;{userData.username}. Roles:&nbsp;
-        {userData.roles.join(", ")}
-      </p>
+      <p>Username&nbsp;{userData.username}</p>
 
       <p>
         Roles:&nbsp;
