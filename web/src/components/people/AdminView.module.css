@@ -26,5 +26,26 @@
 
   .agreements {
     text-align: right;
+    grid-template-columns: repeat(1fr);
+  }
+
+  .agreement {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 3fr 0.2fr;
+
+    .confirmed svg {
+      grid-row: 1;
+      stroke: var(--green-100);
+    }
+
+    .unconfirmed svg {
+      grid-row: 1;
+      stroke: red;
+    }
+
+    /* small {
+            grid-row: 2;
+        } */
   }
 }

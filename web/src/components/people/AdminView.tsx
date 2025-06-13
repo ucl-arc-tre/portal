@@ -10,6 +10,15 @@ const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.
   ssr: false,
 });
 
+function convertRFC3339ToDDMMYYYY(dateString: string) {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // January is 0!
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
 export default function AdminView() {
   const [people, setPeople] = useState<PeopleAdminResponse | null>(null);
 
@@ -49,15 +58,18 @@ export default function AdminView() {
             <td className={styles.roles}>{person.roles}</td>
             <td className={styles.agreements}>
               {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
-                <div key={agreement.agreement_type}>
+                <div key={agreement.agreement_type} className={styles.agreement}>
                   {agreement.agreement_type}
                   {agreement.confirmed_at ? (
-                    <span>
-                      <CheckIcon /> {agreement.confirmed_at}
+                    <span className={styles.confirmed}>
+                      <CheckIcon />
                     </span>
                   ) : (
-                    <XIcon />
+                    <span className={styles.unconfirmed}>
+                      <XIcon />
+                    </span>
                   )}
+                  {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
                 </div>
               ))}
             </td>
