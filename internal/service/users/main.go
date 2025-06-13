@@ -1,4 +1,4 @@
-package profile
+package users
 
 import (
 	"github.com/ucl-arc-tre/portal/internal/graceful"
