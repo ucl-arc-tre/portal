@@ -42,3 +42,16 @@ func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {
 	result := s.db.Select("chosen_name").Limit(1).Where("user_id = ?", user.ID).Find(&attrs)
 	return attrs.ChosenName, result.Error
 }
+
+func (s *Service) SetUserUsername(user types.User, username types.Username) error {
+	const isValidPattern = `^[A-Za-z0-9@\-.]*$`
+	isValidRegex := regexp.MustCompile(isValidPattern)
+
+	if isValid := isValidRegex.MatchString(string(username)); !isValid {
+		return errors.New("invalid username")
+	}
+
+	result := s.db.Model(&types.User{}).Where("id = ?", user.ID).Update("username", username)
+
+	return result.Error
+}

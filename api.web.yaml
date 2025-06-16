@@ -310,7 +310,7 @@ components:
     PersonUpdate:
       type: object
       properties:
-        chosen_name:
+        username:
           type: string
         training_kind:
           $ref: "#/components/schemas/TrainingKind"
