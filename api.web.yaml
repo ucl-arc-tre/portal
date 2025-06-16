@@ -130,7 +130,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/People_AdminResponse"
+                $ref: "#/components/schemas/People"
         "403":
           description: Forbidden
         "500":
@@ -282,6 +282,9 @@ components:
 
     User:
       type: object
+      required:
+        - username
+        - id
       properties:
         username:
           type: string
@@ -315,12 +318,7 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
-    People_AdminResponse:
-      type: object
-      required:
-        - people
-      properties:
-        people:
-          type: array
-          items:
-            $ref: "#/components/schemas/Person"
+    People:
+      type: array
+      items:
+        $ref: "#/components/schemas/Person"
