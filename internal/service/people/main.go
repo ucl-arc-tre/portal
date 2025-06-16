@@ -57,3 +57,19 @@ func (s *Service) GetAllPeople() ([]openapi.Person, error) {
 	}
 	return usersWithAgreements, nil
 }
+
+func (s *Service) GetPerson(username types.Username) (types.User, error) {
+	person := types.User{}
+	result := s.db.Where("username = ?", username).
+		First(&person)
+	if result.Error != nil {
+		return person, result.Error
+	}
+	return person, nil
+}
+
+func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind) error {
+	// todo
+	// get the name of the training and then set the date
+	return nil
+}

@@ -138,6 +138,32 @@ paths:
         default:
           description: Unexpected error
 
+  /people/update:
+    post:
+      parameters:
+        - in: query
+          name: username
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonUpdate"
+      responses:
+        "200":
+          description: "Successfully updated person"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   schemas:
     Auth:
@@ -226,14 +252,17 @@ components:
           items:
             $ref: "#/components/schemas/ConfirmedAgreement"
 
+    TrainingKind:
+      type: string
+      enum: [training_kind_nhsd]
+
     ProfileTrainingUpdate:
       type: object
       required:
         - kind
       properties:
         kind:
-          type: string
-          enum: [training_kind_nhsd]
+          $ref: "#/components/schemas/TrainingKind"
         certficate_content_pdf_base64:
           type: string
           description: Base64 encoded PDF file data of the certificate
@@ -274,6 +303,17 @@ components:
             type: string
         agreements:
           $ref: "#/components/schemas/ProfileAgreements"
+
+    PersonUpdate:
+      type: object
+      properties:
+        chosen_name:
+          type: string
+        training_kind:
+          $ref: "#/components/schemas/TrainingKind"
+        training_date:
+          type: string
+          description: Time in RFC3339 format at which the the certificate was issued
 
     People_AdminResponse:
       type: object

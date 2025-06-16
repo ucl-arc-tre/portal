@@ -43,8 +43,10 @@ export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
+export type TrainingKind = 'training_kind_nhsd';
+
 export type ProfileTrainingUpdate = {
-    kind: 'training_kind_nhsd';
+    kind: TrainingKind;
     /**
      * Base64 encoded PDF file data of the certificate
      */
@@ -75,6 +77,15 @@ export type Person = {
     user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
+};
+
+export type PersonUpdate = {
+    chosen_name?: string;
+    training_kind?: TrainingKind;
+    /**
+     * Time in RFC3339 format at which the the certificate was issued
+     */
+    training_date?: string;
 };
 
 export type PeopleAdminResponse = {
@@ -286,6 +297,41 @@ export type GetPeopleResponses = {
 };
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+
+export type PostPeopleUpdateData = {
+    body: PersonUpdate;
+    path?: never;
+    query: {
+        username: string;
+    };
+    url: '/people/update';
+};
+
+export type PostPeopleUpdateErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostPeopleUpdateResponses = {
+    /**
+     * Successfully updated person
+     */
+    200: unknown;
+};
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});
