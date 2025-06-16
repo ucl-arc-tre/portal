@@ -1,4 +1,4 @@
-package profile
+package users
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/service/profile/certificate"
+	"github.com/ucl-arc-tre/portal/internal/service/users/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
