@@ -126,7 +126,7 @@ type User struct {
 
 // PostPeopleUpdateParams defines parameters for PostPeopleUpdate.
 type PostPeopleUpdateParams struct {
-	Username string `form:"username" json:"username"`
+	Id string `form:"id" json:"id"`
 }
 
 // PostPeopleUpdateJSONRequestBody defines body for PostPeopleUpdate for application/json ContentType.
@@ -228,18 +228,18 @@ func (siw *ServerInterfaceWrapper) PostPeopleUpdate(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PostPeopleUpdateParams
 
-	// ------------- Required query parameter "username" -------------
+	// ------------- Required query parameter "id" -------------
 
-	if paramValue := c.Query("username"); paramValue != "" {
+	if paramValue := c.Query("id"); paramValue != "" {
 
 	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument username is required, but not found"), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Query argument id is required, but not found"), http.StatusBadRequest)
 		return
 	}
 
-	err = runtime.BindQueryParameter("form", true, true, "username", c.Request.URL.Query(), &params.Username)
+	err = runtime.BindQueryParameter("form", true, true, "id", c.Request.URL.Query(), &params.Id)
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter username: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
 	}
 

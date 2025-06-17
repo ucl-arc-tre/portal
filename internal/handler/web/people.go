@@ -51,8 +51,8 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 		}
 
 		// take the username from the query and get the person
-		username := params.Username
-		person, err := h.users.GetPerson(types.Username(username))
+		id := params.Id
+		person, err := h.users.GetPerson(id)
 		if err != nil {
 			setServerError(ctx, err, "Failed to get person")
 			return

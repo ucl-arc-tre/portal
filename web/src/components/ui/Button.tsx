@@ -6,7 +6,7 @@ const UCLButton = dynamic(() => import("uikit-react-public").then((mod) => mod.B
 });
 
 type Props = React.ComponentProps<typeof UCLButton> & {
-  type?: string;
+  type?: string; // button | submit
   name?: string;
   value?: string;
   href?: string;

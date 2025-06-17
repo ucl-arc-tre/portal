@@ -43,9 +43,9 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 	return people, nil
 }
 
-func (s *Service) GetPerson(username types.Username) (types.User, error) {
+func (s *Service) GetPerson(id string) (types.User, error) {
 	person := types.User{}
-	result := s.db.Where("username = ?", username).
+	result := s.db.Where("id = ?", id).
 		First(&person)
 	if result.Error != nil {
 		return person, result.Error

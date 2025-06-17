@@ -300,7 +300,7 @@ export type PostPeopleUpdateData = {
     body: PersonUpdate;
     path?: never;
     query: {
-        username: string;
+        id: string;
     };
     url: '/people/update';
 };

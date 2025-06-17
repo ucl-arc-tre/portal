@@ -142,7 +142,7 @@ paths:
     post:
       parameters:
         - in: query
-          name: username
+          name: id
           schema:
             type: string
           required: true
