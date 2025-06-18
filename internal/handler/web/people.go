@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"slices"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
@@ -61,17 +62,24 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 		if update.Username != nil {
 			username := *update.Username
 			if err := h.users.SetUserUsername(person, types.Username(username)); err != nil {
-				setServerError(ctx, err, "Failed to update chosen name")
-				return // will this stop the rest of the code from running?
+				setServerError(ctx, err, "Failed to update username")
 			}
 		}
 
-		// if update.TrainingKind != nil {
-		// if there's a date, set the date to that, otherwise use today, now?
+		if update.TrainingKind != nil {
+			// if there's a date, set the date to that, otherwise use today, now?
+			var date string
+			if update.TrainingDate != nil {
+				date = *update.TrainingDate
+			} else {
+				date = time.Now().Format(time.RFC3339)
+			}
 
-		// h.people.SetTrainingValidity(person, types.TrainingKind(*update.TrainingKind))
+			if err := h.users.SetTrainingValidity(person, types.TrainingKind(*update.TrainingKind), (date)); err != nil {
+				setServerError(ctx, err, "Failed to update agreement validity")
+			}
 
-		// }
+		}
 
 	} else {
 		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})

@@ -4,6 +4,7 @@ import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import UsernameForm from "./UsernameForm";
+import AgreementsForm from "./AgreementsForm";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -24,6 +25,8 @@ function convertRFC3339ToDDMMYYYY(dateString: string) {
 export default function AdminView() {
   const [people, setPeople] = useState<People | null>(null);
   const [userNameDialogOpen, setUsernameDialogOpen] = useState(false);
+  const [agreementsDialogOpen, setAgreementsDialogOpen] = useState(false);
+
   const [id, setId] = useState("");
   useEffect(() => {
     const fetchPeople = async () => {
@@ -47,10 +50,16 @@ export default function AdminView() {
     setId(id);
     setUsernameDialogOpen(true);
   };
+  const handleEditAgreementsClick = (id: string) => {
+    setId(id);
+    setAgreementsDialogOpen(true);
+  };
 
   return (
     <>
       {userNameDialogOpen && <UsernameForm id={id} setUsernameDialogOpen={setUsernameDialogOpen} />}
+      {agreementsDialogOpen && <AgreementsForm id={id} setAgreementsDialogOpen={setAgreementsDialogOpen} />}
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -76,7 +85,7 @@ export default function AdminView() {
                 </span>
                 <small>{person.user.id}</small>
               </td>
-              <td className={styles.roles}>{person.roles}</td>
+              <td className={styles.roles}>{person.roles.join(", ")}</td>
               <td className={styles.agreements}>
                 {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                   <div key={agreement.agreement_type} className={styles.agreement}>
@@ -92,7 +101,15 @@ export default function AdminView() {
                     )}
                     {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
                   </div>
-                ))}
+                ))}{" "}
+                <Button
+                  variant="tertiary"
+                  size="small"
+                  onClick={() => handleEditAgreementsClick(person.user.id)}
+                  className={styles.edit}
+                >
+                  Edit
+                </Button>
               </td>
             </tr>
           ))}
