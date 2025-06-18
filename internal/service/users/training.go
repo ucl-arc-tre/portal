@@ -49,7 +49,7 @@ func (s *Service) updateNHSD(
 	}
 	chosenName, err := s.userChosenName(user)
 	if err != nil || chosenName == "" {
-		response.CertificateMessage = ptr("Failed to get users chosen name, or it was unset.")
+		response.CertificateMessage = ptr("Failed to get user's chosen name, or it was unset.")
 		return response, err
 	}
 	if !certificate.NameMatches(string(chosenName)) {
