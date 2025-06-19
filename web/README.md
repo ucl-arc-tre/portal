@@ -44,6 +44,8 @@ Failing tests will produce downloadable screenshots saved in `/web/cypress/scree
 
 Authenticated end-to-end tests require EntraID usernames and passwords to be set in a `cypress.env.json` file. Create it based on [cypress.sample.env.json](./cypress.sample.env.json).
 
+Two sets of credentials will be needed to simulate both an admin user and a user with a base role during tests. To generate these credentials, speak to a senior team member.
+
 ### e2e testing the dev build
 
 The easiest way to run the full e2e testing suite is with the following command from the project root directory:
