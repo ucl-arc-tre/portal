@@ -6,9 +6,21 @@ beforeEach(() => {
 describe("People page content", () => {
   it("should show nothing to base role", () => {
     cy.loginAsBase();
+    cy.mockAuthAsBaseUser();
     cy.visit("/people");
+    cy.waitForMockedAuth();
 
     cy.contains("You do not have permission to view this page").should("be.visible");
+  });
+
+  it("should show content for base approved researcher", () => {
+    cy.loginAsBase();
+    cy.mockAuthAsBaseApprovedResearcher();
+    cy.visit("/people");
+    cy.waitForMockedAuth();
+
+    cy.contains("You do not have permission to view this page").should("not.exist");
+    cy.contains("Approved Researcher").should("be.visible");
   });
 
   it("should show content for admin", () => {
@@ -43,6 +55,7 @@ describe("ARC Portal UI authenticated", () => {
     cy.loginAsAdmin();
     cy.visit("/profile/approved-researcher");
 
+    cy.contains("Loading...").should("not.exist");
     cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
 
     cy.get("body").then((body) => {
@@ -60,6 +73,7 @@ describe("ARC Portal UI authenticated", () => {
     cy.loginAsBase();
     cy.visit("/profile/approved-researcher");
 
+    cy.contains("Loading...").should("not.exist");
     cy.get("[data-cy='approved-researcher-agreement']"); // wait for load
 
     cy.get("body").then((body) => {
@@ -115,6 +129,7 @@ describe("Uploading a NHSD training certificate", () => {
 
   const submitFile = function (filePath: string) {
     cy.visit("/profile/approved-researcher");
+    cy.contains("Loading...").should("not.exist");
     cy.get("input[type=file]").selectFile(filePath);
     cy.get("[data-cy='training-certificate-sumbit']").click();
   };

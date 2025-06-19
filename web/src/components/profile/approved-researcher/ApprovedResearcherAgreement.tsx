@@ -17,9 +17,11 @@ export default function ApprovedResearcherAgreement() {
   const { loading, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
   const [agreementConfirmed, setAgreementConfirmed] = useState(false);
+  const [isLoadingAgreement, setIsLoadingAgreement] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoadingAgreement(true);
       try {
         const agreementResult = await getAgreementsApprovedResearcher();
         const profileAgreementsResult = await getProfileAgreements();
@@ -34,6 +36,8 @@ export default function ApprovedResearcherAgreement() {
         }
       } catch (err) {
         console.error("Fetch error:", err);
+      } finally {
+        setIsLoadingAgreement(false);
       }
     };
 
@@ -42,7 +46,9 @@ export default function ApprovedResearcherAgreement() {
     }
   }, [isAuthed]);
 
-  if (loading) return null;
+  if (loading || isLoadingAgreement) return <div>Loading...</div>;
+
+  if (!agreement) return <div>No agreements could be found.</div>;
 
   if (!isAuthed) return <LoginFallback />;
 
