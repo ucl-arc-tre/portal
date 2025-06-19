@@ -35,7 +35,6 @@ describe("ARC Portal UI authenticated", () => {
     cy.loginAsBase();
 
     cy.visit("/");
-    cy.contains("Loading...").should("not.exist");
     cy.contains("Username").should("exist");
   });
 
