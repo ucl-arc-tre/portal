@@ -5,9 +5,9 @@ import Title from "@/components/ui/Title";
 import styles from "./Profile.module.css";
 
 export default function Profile() {
-  const { loading, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData } = useAuth();
 
-  if (loading) return null;
+  if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 

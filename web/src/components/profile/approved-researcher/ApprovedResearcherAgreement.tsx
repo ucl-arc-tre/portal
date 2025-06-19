@@ -14,7 +14,7 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 });
 
 export default function ApprovedResearcherAgreement() {
-  const { loading, isAuthed } = useAuth();
+  const { authInProgress, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
   const [agreementConfirmed, setAgreementConfirmed] = useState(false);
 
@@ -42,7 +42,7 @@ export default function ApprovedResearcherAgreement() {
     }
   }, [isAuthed]);
 
-  if (loading) return null;
+  if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 

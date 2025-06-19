@@ -3,9 +3,9 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 
 export default function Projects() {
-  const { loading, isAuthed } = useAuth();
+  const { authInProgress, isAuthed } = useAuth();
 
-  if (loading) return null;
+  if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 

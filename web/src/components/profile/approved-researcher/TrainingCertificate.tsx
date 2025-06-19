@@ -23,7 +23,7 @@ interface FormEvent extends React.FormEvent<HTMLFormElement> {
 }
 
 export default function TrainingCertificate() {
-  const { loading, isAuthed } = useAuth();
+  const { authInProgress, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [errorType, setErrorType] = useState<AlertType>("warning");
@@ -84,7 +84,7 @@ export default function TrainingCertificate() {
     return;
   };
 
-  if (loading) return null;
+  if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
