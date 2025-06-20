@@ -4,7 +4,11 @@
 package openapi
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // Defines values for AgreementType.
@@ -20,9 +24,9 @@ const (
 	AuthRolesBase               AuthRoles = "base"
 )
 
-// Defines values for ProfileTrainingUpdateKind.
+// Defines values for TrainingKind.
 const (
-	TrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
+	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
 )
 
 // Agreement defines model for Agreement.
@@ -68,6 +72,14 @@ type Person struct {
 	User       User              `json:"user"`
 }
 
+// PersonUpdate defines model for PersonUpdate.
+type PersonUpdate struct {
+	// TrainingDate Time in RFC3339 format at which the the certificate was issued
+	TrainingDate *string       `json:"training_date,omitempty"`
+	TrainingKind *TrainingKind `json:"training_kind,omitempty"`
+	Username     *string       `json:"username,omitempty"`
+}
+
 // ProfileAgreements defines model for ProfileAgreements.
 type ProfileAgreements struct {
 	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
@@ -94,23 +106,31 @@ type ProfileTrainingResponse struct {
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
 	// CertficateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertficateContentPdfBase64 *string                   `json:"certficate_content_pdf_base64,omitempty"`
-	Kind                       ProfileTrainingUpdateKind `json:"kind"`
+	CertficateContentPdfBase64 *string      `json:"certficate_content_pdf_base64,omitempty"`
+	Kind                       TrainingKind `json:"kind"`
 }
-
-// ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.
-type ProfileTrainingUpdateKind string
 
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// TrainingKind defines model for TrainingKind.
+type TrainingKind string
+
 // User defines model for User.
 type User struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 }
+
+// PostPeopleUpdateParams defines parameters for PostPeopleUpdate.
+type PostPeopleUpdateParams struct {
+	Id string `form:"id" json:"id"`
+}
+
+// PostPeopleUpdateJSONRequestBody defines body for PostPeopleUpdate for application/json ContentType.
+type PostPeopleUpdateJSONRequestBody = PersonUpdate
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
@@ -132,6 +152,9 @@ type ServerInterface interface {
 
 	// (GET /people)
 	GetPeople(c *gin.Context)
+
+	// (POST /people/update)
+	PostPeopleUpdate(c *gin.Context, params PostPeopleUpdateParams)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -195,6 +218,39 @@ func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
 	}
 
 	siw.Handler.GetPeople(c)
+}
+
+// PostPeopleUpdate operation middleware
+func (siw *ServerInterfaceWrapper) PostPeopleUpdate(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostPeopleUpdateParams
+
+	// ------------- Required query parameter "id" -------------
+
+	if paramValue := c.Query("id"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "id", c.Request.URL.Query(), &params.Id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostPeopleUpdate(c, params)
 }
 
 // GetProfile operation middleware
@@ -292,6 +348,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
+	router.POST(options.BaseURL+"/people/update", wrapper.PostPeopleUpdate)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

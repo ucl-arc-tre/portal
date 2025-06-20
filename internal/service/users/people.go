@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"time"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -41,4 +42,31 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 		people = append(people, person)
 	}
 	return people, nil
+}
+
+func (s *Service) GetPerson(id string) (types.User, error) {
+	person := types.User{}
+	result := s.db.Where("id = ?", id).
+		First(&person)
+	if result.Error != nil {
+		return person, result.Error
+	}
+	return person, nil
+}
+
+func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
+
+	confirmation_time, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		return err
+	}
+
+	switch trainingkind {
+	case types.TrainingKind(openapi.TrainingKindNhsd):
+
+		response := s.createNHSDTrainingRecord(user, confirmation_time)
+		return response
+	}
+
+	return err
 }

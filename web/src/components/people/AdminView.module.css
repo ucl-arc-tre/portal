@@ -20,13 +20,25 @@
     }
   }
 
+  .edit {
+    font-weight: 400;
+    font-size: 0.8rem;
+    padding-inline-start: 0.4rem;
+    color: var(--green-300);
+
+    &:hover {
+      color: var(--green-100);
+    }
+  }
+
   .roles {
     text-align: center;
   }
 
   .agreements {
     text-align: right;
-    grid-template-columns: repeat(1fr);
+    display: grid;
+    grid-template-columns: 4fr 0.5fr;
   }
 
   .agreement {

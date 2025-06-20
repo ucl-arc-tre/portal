@@ -1,9 +1,14 @@
 .dialog {
   max-width: 28rem;
   padding: 1rem;
+  padding-top: 0.5rem;
   border-radius: 8px;
 
   z-index: 1000;
+
+  .closeButton {
+    top: 0;
+  }
 
   form {
     text-align: center;
