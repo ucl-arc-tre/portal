@@ -16,7 +16,7 @@
     flex-direction: column;
 
     small {
-      color: var(--grey);
+      color: rgb(172, 172, 172);
     }
   }
 
