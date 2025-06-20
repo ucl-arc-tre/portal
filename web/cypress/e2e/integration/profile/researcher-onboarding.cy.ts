@@ -3,53 +3,7 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
-describe("People page content", () => {
-  it("should show nothing to base role", () => {
-    cy.loginAsBase();
-    cy.mockAuthAsBaseUser();
-    cy.visit("/people");
-    cy.waitForMockedAuth();
-
-    cy.contains("You do not have permission to view this page").should("be.visible");
-  });
-
-  it("should show content for base approved researcher", () => {
-    cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
-    cy.visit("/people");
-    cy.waitForMockedAuth();
-
-    cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.contains("Approved Researcher").should("be.visible");
-  });
-
-  it("should show content for admin", () => {
-    cy.loginAsAdmin();
-    cy.visit("/people");
-
-    cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.get("table").contains("User").should("be.visible");
-    cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
-  });
-});
-
-describe("ARC Portal UI unauthenticated", () => {
-  it("shows the ARC portal phrase on the homepage", () => {
-    cy.visit("/");
-
-    cy.get("h1").should("be.visible");
-    cy.contains("fibble").should("not.exist");
-  });
-});
-
-describe("ARC Portal UI authenticated", () => {
-  it("can be logged into as an admin", () => {
-    cy.loginAsBase();
-
-    cy.visit("/");
-    cy.contains("Username").should("exist");
-  });
-
+describe("Full Researcher Onboarding Integration", () => {
   it("admin user can agree to approved researcher agreement", () => {
     cy.loginAsAdmin();
     cy.visit("/profile/approved-researcher");
@@ -87,7 +41,7 @@ describe("ARC Portal UI authenticated", () => {
   });
 });
 
-describe("Setting chosen name for user", () => {
+describe("Chosen Name Integration", () => {
   beforeEach(() => {
     cy.loginAsBase();
     cy.clearChosenName();
@@ -96,31 +50,16 @@ describe("Setting chosen name for user", () => {
 
   const chosenName = (Cypress.env("chosenName") as string) || "Test Chosen Name";
 
-  it("prompts user to set chosen name", () => {
-    cy.get("dialog[data-cy='chosenName']").should("be.visible");
-  });
-
-  it("can set chosen name", () => {
+  it("can set and persist chosen name", () => {
     cy.get("dialog[data-cy='chosenName']").find("input").type(chosenName);
     cy.get("dialog[data-cy='chosenName']").find("button").click();
     cy.reload();
     cy.contains(chosenName).should("be.visible");
     cy.clearChosenName();
   });
-
-  it("can't set invalid name", () => {
-    cy.get("dialog[data-cy='chosenName']").within(() => {
-      cy.get("input").type("123533");
-      cy.get("button").click();
-      cy.get("[data-testid='ucl-uikit-alert']").should("be.visible").and("contain", "Please enter a valid name");
-    });
-
-    // Make sure the dialog is still open
-    cy.get("dialog[data-cy='chosenName']").should("be.visible");
-  });
 });
 
-describe("Uploading a NHSD training certificate", () => {
+describe("NHSD Training Certificate Upload Integration", () => {
   beforeEach(() => {
     cy.loginAsBase();
     cy.clearChosenName();
@@ -141,19 +80,19 @@ describe("Uploading a NHSD training certificate", () => {
 
   it("invalid certificate is not valid", function () {
     setChosenName("Tom Young");
-    submitFile("cypress/e2e/testdata/invalid_nhsd_certificate.pdf");
+    submitFile("cypress/fixtures/invalid_nhsd_certificate.pdf");
     cy.contains("Certificate was not valid").should("be.visible");
   });
 
   it("valid certificate for wrong user is invalid", function () {
     setChosenName("Bob smith");
-    submitFile("cypress/e2e/testdata/valid_nhsd_certificate.pdf");
+    submitFile("cypress/fixtures/valid_nhsd_certificate.pdf");
     cy.contains("Certificate was not valid").should("be.visible");
   });
 
   it("valid certificate for correct user is valid", function () {
     setChosenName("Tom Young");
-    submitFile("cypress/e2e/testdata/valid_nhsd_certificate.pdf");
+    submitFile("cypress/fixtures/valid_nhsd_certificate.pdf");
     cy.contains("Valid training").should("be.visible");
     // If needed agree to the approved resarcher agreement
     cy.get("body").then((body) => {

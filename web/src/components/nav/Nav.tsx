@@ -37,8 +37,8 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 export default function Nav() {
   return (
     <aside className={styles.sidebar}>
-      <nav>
-        <h4>Menu</h4>
+      <nav aria-label="Main navigation">
+        <h2>Menu</h2>
         <hr />
         <ul className={styles.nav__list}>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
