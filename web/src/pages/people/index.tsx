@@ -4,8 +4,8 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function PeoplePage() {
-  const { loading, isAuthed, userData } = useAuth();
-  if (loading) return null;
+  const { authInProgress, isAuthed, userData } = useAuth();
+  if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
