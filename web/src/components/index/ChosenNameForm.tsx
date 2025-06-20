@@ -57,7 +57,9 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
         <form onSubmit={handleSubmit} noValidate>
           <p>Please enter your name as you would choose to have it appear on forms related to our services.</p>
 
+          <label htmlFor="chosenNameInput">Chosen Name</label>
           <Input
+            id="chosenNameInput"
             type="text"
             name="chosenName"
             value={inputNameValue}
