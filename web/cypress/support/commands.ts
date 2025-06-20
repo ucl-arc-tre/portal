@@ -40,6 +40,24 @@ declare global {
        * @example cy.clearChosenName()
        */
       clearChosenName(chosenName?: string): Chainable<any>;
+
+      /**
+       * Mock auth response to return base user role only
+       * @example cy.mockAuthAsBaseUser()
+       */
+      mockAuthAsBaseUser(): Chainable<any>;
+
+      /**
+       * Mock auth response to return base and approved researcher roles
+       * @example cy.mockAuthAsBaseApprovedResearcher()
+       */
+      mockAuthAsBaseApprovedResearcher(): Chainable<any>;
+
+      /**
+       * Wait for the mocked auth request to complete
+       * @example cy.waitForMockedAuth()
+       */
+      waitForMockedAuth(): Chainable<any>;
     }
   }
 }
@@ -114,4 +132,20 @@ Cypress.Commands.add("clearChosenName", () => {
       chosen_name: "",
     },
   });
+});
+
+Cypress.Commands.add("mockAuthAsBaseUser", () => {
+  cy.intercept("GET", "/api/v0/auth", {
+    fixture: "auth-base-user.json",
+  }).as("authRequest");
+});
+
+Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
+  cy.intercept("GET", "/api/v0/auth", {
+    fixture: "auth-base-approved-researcher.json",
+  }).as("authRequest");
+});
+
+Cypress.Commands.add("waitForMockedAuth", () => {
+  cy.wait("@authRequest");
 });
