@@ -21,7 +21,7 @@ export default function PeoplePage() {
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
       <h1>People</h1>
-      {cannotView && <div>You do not have permission to view this page</div>}
+      {cannotView && <h4>You do not have permission to view this page</h4>}
       {isAdmin ? <AdminView /> : isApprovedResearcher && <p>Approved Researcher</p>}
     </>
   );
