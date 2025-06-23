@@ -10,5 +10,6 @@ module.exports = defineConfig({
     experimentalStudio: true,
     experimentalModifyObstructiveThirdPartyCode: true,
     chromeWebSecurity: false, // Necessary for cross-origin logins like AAD
+    defaultCommandTimeout: 10000,
   },
 });
