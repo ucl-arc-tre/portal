@@ -51,7 +51,6 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         body: { training_kind: trainingKind, training_date: trainingDate },
       });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
-      console.log(response);
 
       closeDialog();
     } catch (error) {

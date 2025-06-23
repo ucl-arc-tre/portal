@@ -32,7 +32,6 @@ export default function AdminView() {
     const fetchPeople = async () => {
       try {
         const response = await getPeople();
-        console.log(response);
 
         if (response.response.ok && response.data) {
           setPeople(response.data as People);
