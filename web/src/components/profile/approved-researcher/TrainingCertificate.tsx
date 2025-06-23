@@ -47,7 +47,7 @@ export default function TrainingCertificate() {
 
     const file = files[0];
 
-    // Note: Client-side validation can be bypassed - we server should also validate this on the server
+    // Note: Client-side validation can be bypassed - we should also validate this on the server
     if (file.size > 1e7) {
       setErrorMessage("File must be < 10MB in size.");
       setErrorType("warning");
