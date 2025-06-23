@@ -30,7 +30,7 @@ describe("Setting chosen name for user", () => {
       expect(interception.request.body).to.have.property("chosen_name", chosenName);
     });
 
-    // Verify dialog closes (UI behavior)
+    // Verify dialog closes
     cy.get("dialog[data-cy='chosenName']").should("not.exist");
   });
 
