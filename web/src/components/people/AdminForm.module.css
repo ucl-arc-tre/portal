@@ -10,6 +10,10 @@
     top: 0;
   }
 
+  p {
+    margin-bottom: 0.5rem;
+  }
+
   form {
     text-align: center;
     display: flex;
@@ -26,6 +30,10 @@
       &:focus {
         outline-color: var(--green-200);
       }
+    }
+
+    select {
+      font-size: 1.4rem;
     }
 
     .alert {

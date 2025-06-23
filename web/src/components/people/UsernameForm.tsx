@@ -1,5 +1,5 @@
 import { FormEvent, useRef, useState } from "react";
-import styles from "./UsernameForm.module.css";
+import styles from "./AdminForm.module.css";
 import Button from "../ui/Button";
 import { postPeopleUpdate } from "@/openapi";
 import dynamic from "next/dynamic";

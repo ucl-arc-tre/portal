@@ -1,5 +1,5 @@
 import { FormEvent, useRef, useState } from "react";
-import styles from "./UsernameForm.module.css";
+import styles from "./AdminForm.module.css";
 import Button from "../ui/Button";
 import { postPeopleUpdate, TrainingKind } from "@/openapi";
 import dynamic from "next/dynamic";
@@ -63,7 +63,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
   return (
     <>
-      <dialog open ref={dialogRef} className={styles.dialog} data-cy="username">
+      <dialog open ref={dialogRef} className={styles.dialog} data-cy="training">
         <Button
           type="button"
           variant="tertiary"
@@ -84,7 +84,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
               if (errorMessage) setErrorMessage(null);
             }}
             aria-invalid={!!errorMessage}
-            aria-describedby="usernameError"
+            aria-describedby="trainingError"
           >
             <option value="">Select Training Kind</option>
             {Object.entries(Trainingkind).map((training) => (
@@ -103,7 +103,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
               if (errorMessage) setErrorMessage(null); // Clear error as user types
             }}
             aria-invalid={!!errorMessage}
-            aria-describedby="usernameError"
+            aria-describedby="trainingError"
           />
 
           {errorMessage && (
