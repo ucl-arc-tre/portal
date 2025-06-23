@@ -30,10 +30,10 @@
     font-weight: 400;
     font-size: 0.8rem;
     padding-inline-start: 0.4rem;
-    color: var(--green-300);
+    color: var(--green-100);
 
     &:hover {
-      color: var(--green-100);
+      color: var(--green-50);
     }
   }
 
