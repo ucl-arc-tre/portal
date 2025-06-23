@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -34,7 +33,6 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 
 		training, err := s.GetPersonTrainingRecords(user)
 		if err != nil {
-			fmt.Println("err", err)
 			return people, errors.New("failed to get training for user")
 		}
 
@@ -103,12 +101,10 @@ func (s *Service) SetTrainingValidity(user types.User, trainingkind types.Traini
 	if err != nil {
 		return err
 	}
-	fmt.Println("setting training validity", confirmation_time, trainingkind, types.TrainingKind(openapi.TrainingKindNhsd))
 	switch trainingkind {
 	case types.TrainingKind(openapi.TrainingKindNhsd):
 
 		response := s.createNHSDTrainingRecord(user, confirmation_time)
-		fmt.Println("response", response)
 
 		return response
 	}

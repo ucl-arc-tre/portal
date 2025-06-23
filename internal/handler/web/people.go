@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"slices"
 	"time"
@@ -68,7 +67,7 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 		}
 
 		if update.TrainingKind != nil {
-			// if there's a date, set the date to that, otherwise use today, now?
+			// if there's a date, set the date to that, otherwise use today, now
 			var date string
 			if update.TrainingDate != nil {
 				date = *update.TrainingDate
@@ -77,16 +76,12 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 			}
 
 			if err := h.users.SetTrainingValidity(person, types.TrainingKind(*update.TrainingKind), (date)); err != nil {
-				setServerError(ctx, err, "Failed to update agreement validity")
+				setServerError(ctx, err, "Failed to update training validity")
 			}
-
-			agreements, err := h.users.ConfirmedAgreements(user)
-			if err != nil {
-				setServerError(ctx, err, "Failed to get agreements")
-				return
-			}
-			fmt.Println("agreements", agreements)
-
+			ctx.JSON(http.StatusOK, openapi.TrainingRecord{
+				TrainingKind: update.TrainingKind,
+				CompletedAt:  &date,
+			})
 		}
 
 	} else {
