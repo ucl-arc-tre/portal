@@ -8,12 +8,21 @@
     border-top: 2px solid var(--foreground);
   }
 
+  .row {
+    border-bottom: 1px solid var(--text--secondary);
+    margin-bottom: 0.8rem;
+
+    td {
+      padding-block: 0.6rem;
+    }
+  }
+
   .user {
     display: flex;
     flex-direction: column;
 
     small {
-      color: rgb(172, 172, 172);
+      color: var(--text--secondary);
     }
   }
 
@@ -36,9 +45,10 @@
     text-align: right;
   }
 
-  .agreement {
+  .agreement,
+  .training {
     display: grid;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 0.5fr;
     grid-template-columns: 3fr 0.2fr;
 
     .confirmed svg {
@@ -56,7 +66,7 @@
     }
   }
 
-  .training {
+  .trainingRecord {
     text-align: right;
     display: grid;
     grid-template-columns: 4fr 0.5fr;

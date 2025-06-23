@@ -72,7 +72,7 @@ export default function AdminView() {
         </thead>
         <tbody className={styles.tbody}>
           {people.map((person: Person) => (
-            <tr key={person.user.id}>
+            <tr key={person.user.id} className={styles.row}>
               <td className={styles.user}>
                 <span>
                   {person.user.username}{" "}
@@ -105,30 +105,32 @@ export default function AdminView() {
                   </div>
                 ))}
               </td>
-              <td className={styles.training}>
-                {person.training_record?.map((training: TrainingRecord) => (
-                  <div key={training.training_kind} className={styles.agreement}>
-                    {training.training_kind}
-                    {training.completed_at ? (
-                      <span className={styles.confirmed}>
-                        <CheckIcon />
-                      </span>
-                    ) : (
-                      <span className={styles.unconfirmed}>
-                        <XIcon />
-                      </span>
-                    )}
-                    {training.completed_at && <small>{convertRFC3339ToDDMMYYYY(training.completed_at)}</small>}
-                  </div>
-                ))}{" "}
-                <Button
-                  variant="tertiary"
-                  size="small"
-                  onClick={() => handleEditTrainingClick(person.user.id)}
-                  className={styles.edit}
-                >
-                  Edit
-                </Button>
+              <td>
+                <div className={styles.trainingRecord}>
+                  {person.training_record?.map((training: TrainingRecord) => (
+                    <div key={training.training_kind} className={styles.training}>
+                      {training.training_kind}
+                      {training.completed_at ? (
+                        <span className={styles.confirmed}>
+                          <CheckIcon />
+                        </span>
+                      ) : (
+                        <span className={styles.unconfirmed}>
+                          <XIcon />
+                        </span>
+                      )}
+                      {training.completed_at && <small>{convertRFC3339ToDDMMYYYY(training.completed_at)}</small>}
+                    </div>
+                  ))}{" "}
+                  <Button
+                    variant="tertiary"
+                    size="small"
+                    onClick={() => handleEditTrainingClick(person.user.id)}
+                    className={styles.edit}
+                  >
+                    Edit
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}
