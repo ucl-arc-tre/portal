@@ -1,4 +1,5 @@
 import MetaHead from "@/components/meta/Head";
+import AdminView from "@/components/people/AdminView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -21,6 +22,7 @@ export default function PeoplePage() {
       />
       <h1>People</h1>
       {cannotView && <h4>You do not have permission to view this page</h4>}
+      {isAdmin ? <AdminView /> : isApprovedResearcher && <p>Approved Researcher</p>}
     </>
   );
 }
