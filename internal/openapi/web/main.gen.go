@@ -93,9 +93,9 @@ type ProfileTrainingResponse struct {
 
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
-	// CertficateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertficateContentPdfBase64 *string                   `json:"certficate_content_pdf_base64,omitempty"`
-	Kind                       ProfileTrainingUpdateKind `json:"kind"`
+	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
+	CertificateContentPdfBase64 *string                   `json:"certificate_content_pdf_base64,omitempty"`
+	Kind                        ProfileTrainingUpdateKind `json:"kind"`
 }
 
 // ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.

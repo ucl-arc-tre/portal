@@ -6,8 +6,8 @@ import { ChangeEvent, useState } from "react";
 import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
-
 import dynamic from "next/dynamic";
+
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -47,7 +47,7 @@ export default function TrainingCertificate() {
 
     const file = files[0];
 
-    // Note: Client-side validation - server should also validate
+    // Note: Client-side validation can be bypassed - we server should also validate this on the server
     if (file.size > 1e7) {
       setErrorMessage("File must be < 10MB in size.");
       setErrorType("warning");
@@ -67,7 +67,7 @@ export default function TrainingCertificate() {
       const res = await postProfileTraining({
         body: {
           kind: "training_kind_nhsd",
-          certficate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
+          certificate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
         },
       });
 
