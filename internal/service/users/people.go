@@ -37,7 +37,6 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 			fmt.Println("err", err)
 			return people, errors.New("failed to get training for user")
 		}
-		fmt.Println("training", training)
 
 		person := openapi.Person{
 			User: openapi.User{
@@ -66,7 +65,7 @@ func (s *Service) GetPerson(id string) (types.User, error) {
 }
 
 func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrainingRecords, error) {
-	// get the user training records, extract the relevant data and put it in a TrainingRecord format (only date and kind) and put it in a PersonTrainingRecords slice
+	// get the user training records, extract the relevant data and put it in a TrainingRecord format (only date and kind)
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
 	}
@@ -95,11 +94,7 @@ func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrain
 		training_records = append(training_records, apiTrainingRecord)
 	}
 
-	training := openapi.PersonTrainingRecords{
-		Training: &training_records,
-	}
-
-	return training, nil
+	return training_records, nil
 }
 
 func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {

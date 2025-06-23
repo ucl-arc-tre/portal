@@ -300,12 +300,9 @@ components:
           $ref: "#/components/schemas/TrainingKind"
 
     PersonTrainingRecords:
-      type: object
-      properties:
-        training:
-          type: array
-          items:
-            $ref: "#/components/schemas/TrainingRecord"
+      type: array
+      items:
+        $ref: "#/components/schemas/TrainingRecord"
 
     Person:
       type: object

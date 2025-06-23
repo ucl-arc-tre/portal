@@ -74,9 +74,7 @@ type Person struct {
 }
 
 // PersonTrainingRecords defines model for PersonTrainingRecords.
-type PersonTrainingRecords struct {
-	Training *[]TrainingRecord `json:"training,omitempty"`
-}
+type PersonTrainingRecords = []TrainingRecord
 
 // PersonUpdate defines model for PersonUpdate.
 type PersonUpdate struct {

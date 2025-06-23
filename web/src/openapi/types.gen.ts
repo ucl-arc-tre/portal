@@ -78,9 +78,7 @@ export type TrainingRecord = {
     training_kind?: TrainingKind;
 };
 
-export type PersonTrainingRecords = {
-    training?: Array<TrainingRecord>;
-};
+export type PersonTrainingRecords = Array<TrainingRecord>;
 
 export type Person = {
     user: User;
