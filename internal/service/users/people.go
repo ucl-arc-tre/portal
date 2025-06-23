@@ -47,8 +47,8 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 			Agreements: openapi.ProfileAgreements{
 				ConfirmedAgreements: agreements,
 			},
-			// TrainingRecord: training,
-			Roles: roles,
+			TrainingRecord: training,
+			Roles:          roles,
 		}
 		people = append(people, person)
 	}
@@ -65,7 +65,7 @@ func (s *Service) GetPerson(id string) (types.User, error) {
 	return person, nil
 }
 
-func (s *Service) GetPersonTrainingRecords(user types.User) ([]openapi.PersonTrainingRecords, error) {
+func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrainingRecords, error) {
 	// get the user training records, extract the relevant data and put it in a TrainingRecord format (only date and kind) and put it in a PersonTrainingRecords slice
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
@@ -73,10 +73,10 @@ func (s *Service) GetPersonTrainingRecords(user types.User) ([]openapi.PersonTra
 	var fetchedTrainingRecords []types.UserTrainingRecord
 	result := s.db.Where(&record).Find(&fetchedTrainingRecords)
 	if result.Error != nil {
-		return nil, result.Error
+		return openapi.PersonTrainingRecords{}, result.Error
 	}
 
-	training_records := []openapi.PersonTrainingRecords{}
+	var training_records []openapi.TrainingRecord
 
 	for _, tr := range fetchedTrainingRecords {
 		trainingKind := openapi.TrainingKind(tr.Kind)
@@ -87,15 +87,19 @@ func (s *Service) GetPersonTrainingRecords(user types.User) ([]openapi.PersonTra
 			formattedTime = &formatted
 		}
 
-		apiTrainingRecord := &openapi.PersonTrainingRecords{
-			Training: &[]openapi.TrainingRecord{
-				{TrainingKind: &trainingKind,
-					CompletedAt: formattedTime},
-			},
+		apiTrainingRecord := openapi.TrainingRecord{
+			TrainingKind: &trainingKind,
+			CompletedAt:  formattedTime,
 		}
-		training_records = append(training_records, *apiTrainingRecord)
+
+		training_records = append(training_records, apiTrainingRecord)
 	}
-	return training_records, nil
+
+	training := openapi.PersonTrainingRecords{
+		Training: &training_records,
+	}
+
+	return training, nil
 }
 
 func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
