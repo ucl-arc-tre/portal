@@ -5,7 +5,7 @@ import ChosenNameForm from "./ChosenNameForm";
 import { getProfile } from "@/openapi";
 
 export default function UserTasks() {
-  const { loading, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function UserTasks() {
     fetchProfile();
   }, []);
 
-  if (loading || chosenName === undefined) return null;
+  if (authInProgress || chosenName === undefined) return null;
 
   if (!isAuthed || !userData) return <LoginFallback />;
 

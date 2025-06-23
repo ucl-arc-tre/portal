@@ -3,13 +3,13 @@ import { getAuth } from "@/openapi";
 import { Auth } from "@/openapi";
 
 type AuthCtxValue = {
-  loading: boolean;
+  authInProgress: boolean;
   isAuthed: boolean;
   userData: Auth | null;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
-  loading: true,
+  authInProgress: true,
   isAuthed: false,
   userData: null,
 });
@@ -17,7 +17,7 @@ const AuthCtx = createContext<AuthCtxValue>({
 export const useAuth = () => useContext(AuthCtx);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(true);
+  const [authInProgress, setAuthInProgress] = useState(true);
   const [isAuthed, setIsAuthed] = useState(false);
   const [userData, setUserData] = useState<Auth | null>(null);
 
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsAuthed(false);
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setAuthInProgress(false);
       }
     };
 
@@ -51,5 +51,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return <AuthCtx.Provider value={{ loading, isAuthed, userData }}>{children}</AuthCtx.Provider>;
+  return <AuthCtx.Provider value={{ authInProgress, isAuthed, userData }}>{children}</AuthCtx.Provider>;
 }
