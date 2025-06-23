@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getPeople, People, Person } from "@/openapi";
+import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -32,7 +32,6 @@ export default function AdminView() {
     const fetchPeople = async () => {
       try {
         const response = await getPeople();
-
         console.log(response);
 
         if (response.response.ok && response.data) {
@@ -71,7 +70,7 @@ export default function AdminView() {
             <th>Training</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className={styles.tbody}>
           {people.map((person: Person) => (
             <tr key={person.user.id}>
               <td className={styles.user}>
@@ -107,7 +106,7 @@ export default function AdminView() {
                 ))}
               </td>
               <td className={styles.training}>
-                {/* {person.training_record.map((training: PersonTrainingRecord) => (
+                {person.training_record?.map((training: TrainingRecord) => (
                   <div key={training.training_kind} className={styles.agreement}>
                     {training.training_kind}
                     {training.completed_at ? (
@@ -121,7 +120,7 @@ export default function AdminView() {
                     )}
                     {training.completed_at && <small>{convertRFC3339ToDDMMYYYY(training.completed_at)}</small>}
                   </div>
-                ))}{" "} */}
+                ))}{" "}
                 <Button
                   variant="tertiary"
                   size="small"
