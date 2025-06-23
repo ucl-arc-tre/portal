@@ -30,21 +30,6 @@ func (s *Service) updateNHSD(
 	user types.User,
 	data openapi.ProfileTrainingUpdate,
 ) (openapi.ProfileTrainingResponse, error) {
-
-	if len(*data.CertificateContentPdfBase64) > 10*1024*1024 {
-		return openapi.ProfileTrainingResponse{
-			CertificateIsValid: ptr(false),
-			CertificateMessage: ptr("Certificate content is too large. File must be less than 10 MB's"),
-		}, nil
-	}
-
-	if len(*data.CertificateContentPdfBase64) == 0 {
-		return openapi.ProfileTrainingResponse{
-			CertificateIsValid: ptr(false),
-			CertificateMessage: ptr("Certificate content is empty."),
-		}, nil
-	}
-
 	certificate, err := certificate.ParseNHSDCertificate(*data.CertificateContentPdfBase64)
 	response := openapi.ProfileTrainingResponse{
 		CertificateIsValid: ptr(false),
