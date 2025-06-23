@@ -67,9 +67,15 @@ type People = []Person
 
 // Person defines model for Person.
 type Person struct {
-	Agreements ProfileAgreements `json:"agreements"`
-	Roles      []string          `json:"roles"`
-	User       User              `json:"user"`
+	Agreements     ProfileAgreements     `json:"agreements"`
+	Roles          []string              `json:"roles"`
+	TrainingRecord PersonTrainingRecords `json:"training_record"`
+	User           User                  `json:"user"`
+}
+
+// PersonTrainingRecords defines model for PersonTrainingRecords.
+type PersonTrainingRecords struct {
+	Training *[]TrainingRecord `json:"training,omitempty"`
 }
 
 // PersonUpdate defines model for PersonUpdate.
@@ -117,6 +123,12 @@ type ProfileUpdate struct {
 
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
+
+// TrainingRecord defines model for TrainingRecord.
+type TrainingRecord struct {
+	CompletedAt  *string       `json:"completed_at,omitempty"`
+	TrainingKind *TrainingKind `json:"training_kind,omitempty"`
+}
 
 // User defines model for User.
 type User struct {

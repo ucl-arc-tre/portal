@@ -73,10 +73,20 @@ export type User = {
     id: string;
 };
 
+export type TrainingRecord = {
+    completed_at?: string;
+    training_kind?: TrainingKind;
+};
+
+export type PersonTrainingRecords = {
+    training?: Array<TrainingRecord>;
+};
+
 export type Person = {
     user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
+    training_record: PersonTrainingRecords;
 };
 
 export type PersonUpdate = {

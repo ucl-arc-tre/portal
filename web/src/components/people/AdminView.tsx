@@ -4,7 +4,7 @@ import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import UsernameForm from "./UsernameForm";
-import AgreementsForm from "./AgreementsForm";
+import TrainingForm from "./TrainingForm";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -25,13 +25,15 @@ function convertRFC3339ToDDMMYYYY(dateString: string) {
 export default function AdminView() {
   const [people, setPeople] = useState<People | null>(null);
   const [userNameDialogOpen, setUsernameDialogOpen] = useState(false);
-  const [agreementsDialogOpen, setAgreementsDialogOpen] = useState(false);
+  const [agreementsDialogOpen, setTrainingDialogOpen] = useState(false);
 
   const [id, setId] = useState("");
   useEffect(() => {
     const fetchPeople = async () => {
       try {
         const response = await getPeople();
+
+        console.log(response);
 
         if (response.response.ok && response.data) {
           setPeople(response.data as People);
@@ -50,15 +52,15 @@ export default function AdminView() {
     setId(id);
     setUsernameDialogOpen(true);
   };
-  const handleEditAgreementsClick = (id: string) => {
+  const handleEditTrainingClick = (id: string) => {
     setId(id);
-    setAgreementsDialogOpen(true);
+    setTrainingDialogOpen(true);
   };
 
   return (
     <>
       {userNameDialogOpen && <UsernameForm id={id} setUsernameDialogOpen={setUsernameDialogOpen} />}
-      {agreementsDialogOpen && <AgreementsForm id={id} setAgreementsDialogOpen={setAgreementsDialogOpen} />}
+      {agreementsDialogOpen && <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} />}
 
       <table className={styles.table}>
         <thead>
@@ -66,6 +68,7 @@ export default function AdminView() {
             <th>User</th>
             <th>Roles</th>
             <th>Agreements</th>
+            <th>Training</th>
           </tr>
         </thead>
         <tbody>
@@ -101,11 +104,28 @@ export default function AdminView() {
                     )}
                     {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
                   </div>
-                ))}{" "}
+                ))}
+              </td>
+              <td className={styles.training}>
+                {/* {person.training_record.map((training: PersonTrainingRecord) => (
+                  <div key={training.training_kind} className={styles.agreement}>
+                    {training.training_kind}
+                    {training.completed_at ? (
+                      <span className={styles.confirmed}>
+                        <CheckIcon />
+                      </span>
+                    ) : (
+                      <span className={styles.unconfirmed}>
+                        <XIcon />
+                      </span>
+                    )}
+                    {training.completed_at && <small>{convertRFC3339ToDDMMYYYY(training.completed_at)}</small>}
+                  </div>
+                ))}{" "} */}
                 <Button
                   variant="tertiary"
                   size="small"
-                  onClick={() => handleEditAgreementsClick(person.user.id)}
+                  onClick={() => handleEditTrainingClick(person.user.id)}
                   className={styles.edit}
                 >
                   Edit

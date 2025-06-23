@@ -21,13 +21,13 @@ const Trainingkind = {
   NHSD: "training_kind_nhsd",
 };
 
-type AgreementsFormProps = {
+type TrainingFormProps = {
   id: string;
-  setAgreementsDialogOpen: (name: boolean) => void;
+  setTrainingDialogOpen: (name: boolean) => void;
 };
 
-export default function AgreementsForm(AgreementsFormProps: AgreementsFormProps) {
-  const { id, setAgreementsDialogOpen } = AgreementsFormProps;
+export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
+  const { id, setTrainingDialogOpen } = TrainingFormProps;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -37,7 +37,7 @@ export default function AgreementsForm(AgreementsFormProps: AgreementsFormProps)
 
   const closeDialog = () => {
     dialogRef.current?.close();
-    setAgreementsDialogOpen(false);
+    setTrainingDialogOpen(false);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -73,7 +73,7 @@ export default function AgreementsForm(AgreementsFormProps: AgreementsFormProps)
           className={styles.closeButton}
         ></Button>
         <form onSubmit={handleSubmit} noValidate>
-          <p>Use this form to set an agreement as valid. If the date is left empty it will be set to today</p>
+          <p>Use this form to validate a training certificate. If the date is left empty it will be set to today</p>
 
           <select
             id="training_kind"

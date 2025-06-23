@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"slices"
 	"time"
@@ -78,6 +79,13 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 			if err := h.users.SetTrainingValidity(person, types.TrainingKind(*update.TrainingKind), (date)); err != nil {
 				setServerError(ctx, err, "Failed to update agreement validity")
 			}
+
+			agreements, err := h.users.ConfirmedAgreements(user)
+			if err != nil {
+				setServerError(ctx, err, "Failed to get agreements")
+				return
+			}
+			fmt.Println("agreements", agreements)
 
 		}
 
