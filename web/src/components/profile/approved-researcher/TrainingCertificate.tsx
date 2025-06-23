@@ -67,7 +67,7 @@ export default function TrainingCertificate() {
       const res = await postProfileTraining({
         body: {
           kind: "training_kind_nhsd",
-          certificate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
+          certficate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
         },
       });
 

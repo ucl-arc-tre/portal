@@ -130,7 +130,7 @@ describe("Uploading a NHSD training certificate", () => {
     cy.visit("/profile/approved-researcher");
     cy.contains("Loading...").should("not.exist");
     cy.get("input[type=file]").selectFile(filePath);
-    cy.get("[data-cy='training-certificate-sumbit']").click();
+    cy.get("[data-cy='training-certificate-submit']").click();
   };
 
   const setChosenName = function (name: string) {
