@@ -1,14 +1,11 @@
 import { FormEvent, useRef, useState } from "react";
-import styles from "./AdminForm.module.css";
+import styles from "./Form.module.css";
 import Button from "../ui/Button";
 import { postPeopleUpdate, TrainingKind } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
-import { XIcon } from "./AdminView";
+import AdminDialog from "./AdminDialog";
 
-const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
-  ssr: false,
-});
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -61,60 +58,49 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   };
 
   return (
-    <>
-      <dialog open ref={dialogRef} className={styles.dialog} data-cy="training">
-        <Button
-          type="button"
-          variant="tertiary"
-          size="small"
-          icon={<XIcon />}
-          onClick={closeDialog}
-          className={styles.closeButton}
-        ></Button>
-        <form onSubmit={handleSubmit} noValidate>
-          <p>Use this form to validate a training certificate. If the date is left empty it will be set to today</p>
+    <AdminDialog setDialogOpen={setTrainingDialogOpen} data-cy="training">
+      <form onSubmit={handleSubmit} noValidate className={styles.form}>
+        <p>Use this form to validate a training certificate. If the date is left empty it will be set to today</p>
 
-          <select
-            id="training_kind"
-            name="training_kind"
-            value={trainingKind || ""}
-            onChange={(e) => {
-              setTrainingKind(e.target.value as TrainingKind);
-              if (errorMessage) setErrorMessage(null);
-            }}
-            aria-invalid={!!errorMessage}
-            aria-describedby="trainingError"
-          >
-            <option value="">Select Training Kind</option>
-            {Object.entries(Trainingkind).map((training) => (
-              <option key={training[1]} value={training[1]}>
-                {training[0]}
-              </option>
-            ))}
-          </select>
+        <select
+          id="training_kind"
+          name="training_kind"
+          value={trainingKind || ""}
+          onChange={(e) => {
+            setTrainingKind(e.target.value as TrainingKind);
+            if (errorMessage) setErrorMessage(null);
+          }}
+          aria-invalid={!!errorMessage}
+          aria-describedby="trainingError"
+        >
+          <option value="">Select Training Kind</option>
+          {Object.entries(Trainingkind).map((training) => (
+            <option key={training[1]} value={training[1]}>
+              {training[0]}
+            </option>
+          ))}
+        </select>
 
-          <input
-            type="date"
-            name="training_date"
-            value={trainingDate}
-            onChange={(e) => {
-              setTrainingDate(e.target.value);
-              if (errorMessage) setErrorMessage(null); // Clear error as user types
-            }}
-            aria-invalid={!!errorMessage}
-            aria-describedby="trainingError"
-          />
+        <input
+          type="date"
+          name="training_date"
+          value={trainingDate}
+          onChange={(e) => {
+            setTrainingDate(e.target.value);
+            if (errorMessage) setErrorMessage(null); // Clear error as user types
+          }}
+          aria-invalid={!!errorMessage}
+          aria-describedby="trainingError"
+        />
 
-          {errorMessage && (
-            <Alert type={errorType} className={styles.alert}>
-              <AlertMessage>{errorMessage}</AlertMessage>
-            </Alert>
-          )}
+        {errorMessage && (
+          <Alert type={errorType} className={styles.alert}>
+            <AlertMessage>{errorMessage}</AlertMessage>
+          </Alert>
+        )}
 
-          <Button type="submit">Submit</Button>
-        </form>
-      </dialog>
-      <Blanket className={styles.blanket} />
-    </>
+        <Button type="submit">Submit</Button>
+      </form>
+    </AdminDialog>
   );
 }

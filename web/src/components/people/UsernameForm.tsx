@@ -1,14 +1,10 @@
 import { FormEvent, useRef, useState } from "react";
-import styles from "./AdminForm.module.css";
+import styles from "./Form.module.css";
 import Button from "../ui/Button";
 import { postPeopleUpdate } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
-import { XIcon } from "./AdminView";
-
-const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
-  ssr: false,
-});
+import AdminDialog from "./AdminDialog";
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -58,16 +54,8 @@ export default function UsernameForm(UserameFormProps: UserameFormProps) {
 
   return (
     <>
-      <dialog open ref={dialogRef} className={styles.dialog} data-cy="username">
-        <Button
-          type="button"
-          variant="tertiary"
-          size="small"
-          icon={<XIcon />}
-          onClick={closeDialog}
-          className={styles.closeButton}
-        ></Button>
-        <form onSubmit={handleSubmit} noValidate>
+      <AdminDialog setDialogOpen={setUsernameDialogOpen} data-cy="username">
+        <form onSubmit={handleSubmit} noValidate className={styles.form}>
           <p>Please enter an email address. This will be your username</p>
 
           <Input
@@ -91,8 +79,7 @@ export default function UsernameForm(UserameFormProps: UserameFormProps) {
 
           <Button type="submit">Submit</Button>
         </form>
-      </dialog>
-      <Blanket className={styles.blanket} />
+      </AdminDialog>
     </>
   );
 }
