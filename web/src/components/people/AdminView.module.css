@@ -58,7 +58,7 @@
 
     .unconfirmed svg {
       grid-row: 1;
-      stroke: red;
+      stroke: #ff6161;
     }
 
     small {
