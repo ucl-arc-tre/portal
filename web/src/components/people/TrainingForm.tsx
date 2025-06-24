@@ -1,7 +1,7 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import styles from "./Form.module.css";
 import Button from "../ui/Button";
-import { postPeopleUpdate, TrainingKind } from "@/openapi";
+import { postPeopleUpdate, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import AdminDialog from "./AdminDialog";
@@ -21,19 +21,18 @@ const Trainingkind = {
 type TrainingFormProps = {
   id: string;
   setTrainingDialogOpen: (name: boolean) => void;
+  updatePersonUI: (id: string, training?: TrainingRecord) => void;
 };
 
 export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
-  const { id, setTrainingDialogOpen } = TrainingFormProps;
+  const { id, setTrainingDialogOpen, updatePersonUI } = TrainingFormProps;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
-  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const [trainingKind, setTrainingKind] = useState<TrainingKind | null>(null);
   const [trainingDate, setTrainingDate] = useState<string | undefined>(undefined);
 
   const closeDialog = () => {
-    dialogRef.current?.close();
     setTrainingDialogOpen(false);
   };
 
@@ -49,7 +48,16 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
       });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
+      if (!trainingDate) {
+        setTrainingDate(new Date().toISOString().split("T")[0]);
+      }
+
       closeDialog();
+
+      updatePersonUI(id, {
+        training_kind: trainingKind,
+        completed_at: trainingDate,
+      });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit agreement update. Please try again.");

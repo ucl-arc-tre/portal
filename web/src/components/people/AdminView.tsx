@@ -16,7 +16,7 @@ export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mo
 function convertRFC3339ToDDMMYYYY(dateString: string) {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // January is 0!
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
@@ -44,6 +44,24 @@ export default function AdminView() {
     fetchPeople();
   }, []);
 
+  const updatePersonUI = (id: string, training?: TrainingRecord, username?: string) => {
+    // get people object and find the person with the right id
+    const personToUpdate = people!.find((person) => person.user.id === id);
+
+    if (personToUpdate) {
+      console.log(personToUpdate, training, username);
+      if (training) {
+        if (!personToUpdate.training_record) {
+          personToUpdate.training_record = [];
+        }
+        personToUpdate.training_record.push(training);
+      }
+      if (username) {
+        personToUpdate.user.username = username;
+      }
+    }
+  };
+
   if (!people) return null;
 
   const handleEditUsernameClick = (id: string) => {
@@ -57,8 +75,12 @@ export default function AdminView() {
 
   return (
     <>
-      {userNameDialogOpen && <UsernameForm id={id} setUsernameDialogOpen={setUsernameDialogOpen} />}
-      {agreementsDialogOpen && <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} />}
+      {userNameDialogOpen && (
+        <UsernameForm id={id} setUsernameDialogOpen={setUsernameDialogOpen} updatePersonUI={updatePersonUI} />
+      )}
+      {agreementsDialogOpen && (
+        <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
+      )}
 
       <table className={styles.table}>
         <thead>

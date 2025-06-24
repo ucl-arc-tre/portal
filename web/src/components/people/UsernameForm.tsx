@@ -1,7 +1,7 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import styles from "./Form.module.css";
 import Button from "../ui/Button";
-import { postPeopleUpdate } from "@/openapi";
+import { postPeopleUpdate, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import AdminDialog from "./AdminDialog";
@@ -18,18 +18,17 @@ const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input
 type UserameFormProps = {
   id: string;
   setUsernameDialogOpen: (name: boolean) => void;
+  updatePersonUI: (id: string, training?: TrainingRecord, username?: string) => void;
 };
 
 export default function UsernameForm(UserameFormProps: UserameFormProps) {
-  const { id, setUsernameDialogOpen } = UserameFormProps;
+  const { id, setUsernameDialogOpen, updatePersonUI } = UserameFormProps;
   const [inputNameValue, setInputNameValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const regex = /^[A-Za-z0-9@\-.]*$/u;
 
   const closeDialog = () => {
-    dialogRef.current?.close();
     setUsernameDialogOpen(false);
   };
 
@@ -45,6 +44,8 @@ export default function UsernameForm(UserameFormProps: UserameFormProps) {
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
       closeDialog();
+
+      updatePersonUI(id, undefined, username);
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit username. Please try again.");
