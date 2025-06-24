@@ -48,15 +48,16 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
       });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
-      if (!trainingDate) {
-        setTrainingDate(new Date().toISOString().split("T")[0]);
+      let rfc3339Date = trainingDate;
+      if (!trainingDate || trainingDate === undefined) {
+        rfc3339Date = new Date().toISOString();
       }
 
       closeDialog();
 
       updatePersonUI(id, {
         training_kind: trainingKind,
-        completed_at: trainingDate,
+        completed_at: rfc3339Date,
       });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
