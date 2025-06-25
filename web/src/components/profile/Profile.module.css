@@ -65,4 +65,8 @@
   .completed-message p {
     color: #9ca3af;
   }
+
+  .completed-message h2 {
+    color: #1ebc58;
+  }
 }
