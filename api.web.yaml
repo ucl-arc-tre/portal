@@ -234,7 +234,7 @@ components:
         kind:
           type: string
           enum: [training_kind_nhsd]
-        certficate_content_pdf_base64:
+        certificate_content_pdf_base64:
           type: string
           description: Base64 encoded PDF file data of the certificate
 
