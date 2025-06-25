@@ -56,11 +56,12 @@ export default function TrainingCertificate() {
           },
         }).then((res) => {
           setErrorMessage("");
-          setIsValid(res.data?.certificate_is_valid);
+          const isValidCert = res.data?.certificate_is_valid;
+          setIsValid(isValidCert);
           if (res.error) {
             setErrorMessage(`Failed to validate certificate.`);
             setErrorType("error");
-          } else if (!isValid) {
+          } else if (!isValidCert) {
             setErrorMessage("Certificate was not valid. " + res.data?.certificate_message);
             setErrorType("error");
           }
