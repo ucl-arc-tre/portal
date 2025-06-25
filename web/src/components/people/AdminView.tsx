@@ -95,7 +95,7 @@ export default function AdminView() {
           {people.map((person: Person) => (
             <tr key={person.user.id} className={styles.row}>
               <td className={styles.user}>
-                <span>
+                <span data-cy="username">
                   {person.user.username}{" "}
                   <Button
                     variant="tertiary"
@@ -127,7 +127,7 @@ export default function AdminView() {
                 ))}
               </td>
               <td>
-                <div className={styles.trainingRecord}>
+                <div className={styles.trainingRecord} data-cy="training">
                   {person.training_record?.map((training: TrainingRecord) => (
                     <div key={training.training_kind} className={styles.training}>
                       {training.training_kind}

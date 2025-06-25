@@ -154,7 +154,7 @@ paths:
               $ref: "#/components/schemas/PersonUpdate"
       responses:
         "200":
-          description: "Successfully updated person"
+          description: Successfully updated person
         "403":
           description: Forbidden
         "404":
