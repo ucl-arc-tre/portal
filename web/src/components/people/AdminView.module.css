@@ -16,7 +16,7 @@
     flex-direction: column;
 
     small {
-      color: rgb(172, 172, 172);
+      color: rgb(70, 70, 70);
     }
   }
 
@@ -47,5 +47,24 @@
     /* small {
             grid-row: 2;
         } */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .table {
+    color: var(--foreground);
+    background-color: var(--background);
+
+    tbody {
+      border-top: 1px solid var(--foreground);
+    }
+
+    td {
+      color: var(--foreground);
+    }
+
+    .user small {
+      color: rgb(150, 150, 150);
+    }
   }
 }

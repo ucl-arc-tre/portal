@@ -94,7 +94,7 @@
 }
 
 .step-title-completed {
-  color: #1ebc58;
+  color: #218646;
 }
 
 .step-description {
@@ -112,7 +112,7 @@
 }
 
 .step-description-completed {
-  color: #93a6c2;
+  color: #19191a;
 }
 
 .step-connector {
@@ -145,5 +145,13 @@
 
   .step-connector-pending {
     background-color: #c01515;
+  }
+
+  .step-description-completed {
+    color: #93a6c2;
+  }
+
+  .step-title-completed {
+    color: #1ebc58;
   }
 }
