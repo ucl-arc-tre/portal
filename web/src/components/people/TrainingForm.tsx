@@ -13,9 +13,9 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
-const Trainingkind = {
-  // todo: is there a better way of doing this?
-  NHSD: "training_kind_nhsd",
+const TrainingKindOptions = {
+  //  is there a better way of doing this? Won't let me use type as a value
+  nhsd: "training_kind_nhsd",
 };
 
 type TrainingFormProps = {
@@ -55,8 +55,11 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
       closeDialog();
 
+      // matching with db value
+      const trainingKindKey = Object.entries(TrainingKindOptions).find(([, value]) => value === trainingKind)?.[0];
+
       updatePersonUI(id, {
-        training_kind: trainingKind,
+        training_kind: trainingKindKey as TrainingKind,
         completed_at: rfc3339Date,
       });
     } catch (error) {
@@ -83,9 +86,9 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
           aria-describedby="trainingError"
         >
           <option value="">Select Training Kind</option>
-          {Object.entries(Trainingkind).map((training) => (
-            <option key={training[1]} value={training[1]}>
-              {training[0]}
+          {Object.entries(TrainingKindOptions).map((tk) => (
+            <option key={tk[1]} value={tk[1]}>
+              {tk[0]}
             </option>
           ))}
         </select>
