@@ -57,13 +57,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   if (!isAuthed) return <LoginFallback />;
 
   // allow the user to show/hide the agreement if they want to see it again?
-  if (agreementCompleted) {
-    return (
-      <section data-cy="approved-researcher-agreement">
-        <div>Agreement confirmed ✔</div>
-      </section>
-    );
-  }
+  if (agreementCompleted) return null;
 
   return (
     agreement && (

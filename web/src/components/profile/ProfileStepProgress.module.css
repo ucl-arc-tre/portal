@@ -43,7 +43,7 @@
 
 .step-icon-pending {
   background-color: #fef2f2;
-  color: #c42626;
+  color: #b91c1c;
   border: 2px solid #fecaca;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .step-title-pending {
-  color: #cd0a0a;
+  color: #e83333;
   font-weight: 600;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .step-title-completed {
-  color: var(--green-300);
+  color: #1ebc58;
 }
 
 .step-description {
@@ -104,7 +104,7 @@
 }
 
 .step-description-pending {
-  color: #9ca3af;
+  color: #a2afca;
 }
 
 .step-description-current {
@@ -112,7 +112,7 @@
 }
 
 .step-description-completed {
-  color: #6b7280;
+  color: #93a6c2;
 }
 
 .step-connector {

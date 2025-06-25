@@ -35,9 +35,23 @@ export default function UserTasks() {
 
   return (
     <div className={styles.container}>
+      <div className={styles["user-info"]}>
+        <p>
+          <strong>Chosen name:</strong> {chosenName}
+        </p>
+        <p>
+          <strong>Username:</strong> {userData.username}
+        </p>
+        <p>
+          <strong>Roles:</strong> {userData.roles.join(", ")}
+        </p>
+      </div>
+
+      <br />
+
       {!chosenName ? (
         <div className={styles["setup-prompt"]}>
-          <h3>Complete Your Profile Setup</h3>
+          <h2>Complete Your Profile Setup</h2>
           <p>
             To get started with ARC services, please complete your profile setup including setting your chosen name.
           </p>
@@ -47,16 +61,6 @@ export default function UserTasks() {
         </div>
       ) : (
         <div className={styles["user-info"]}>
-          <p>
-            <strong>Name:</strong> {chosenName}
-          </p>
-          <p>
-            <strong>Username:</strong> {userData.username}
-          </p>
-          <p>
-            <strong>Roles:</strong> {userData.roles.join(", ")}
-          </p>
-
           {!userData.roles.includes("approved-researcher") && (
             <div className={styles["researcher-prompt"]}>
               <p>Complete your profile setup to become an approved researcher.</p>
