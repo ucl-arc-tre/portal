@@ -58,6 +58,18 @@ declare global {
        * @example cy.waitForMockedAuth()
        */
       waitForMockedAuth(): Chainable<any>;
+
+      /**
+       * Force light mode for testing
+       * @example cy.forceLightMode()
+       */
+      forceLightMode(): Chainable<any>;
+
+      /**
+       * Force dark mode for testing
+       * @example cy.forceDarkMode()
+       */
+      forceDarkMode(): Chainable<any>;
     }
   }
 }
@@ -148,4 +160,38 @@ Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
 
 Cypress.Commands.add("waitForMockedAuth", () => {
   cy.wait("@authRequest");
+});
+
+Cypress.Commands.add("forceLightMode", () => {
+  cy.wrap(
+    Cypress.automation("remote:debugger:protocol", {
+      command: "Emulation.setEmulatedMedia",
+      params: {
+        media: "screen",
+        features: [
+          {
+            name: "prefers-color-scheme",
+            value: "light",
+          },
+        ],
+      },
+    })
+  );
+});
+
+Cypress.Commands.add("forceDarkMode", () => {
+  cy.wrap(
+    Cypress.automation("remote:debugger:protocol", {
+      command: "Emulation.setEmulatedMedia",
+      params: {
+        media: "screen",
+        features: [
+          {
+            name: "prefers-color-scheme",
+            value: "dark",
+          },
+        ],
+      },
+    })
+  );
 });

@@ -3,54 +3,66 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
-describe("ARC Portal UI unauthenticated", () => {
-  it("shows the ARC portal phrase on the homepage", () => {
-    cy.visit("/");
-    cy.get("h1").should("be.visible");
-  });
-});
+["light", "dark"].forEach((mode) => {
+  describe(`Homepage Tests (${mode} mode)`, () => {
+    beforeEach(() => {
+      if (mode === "light") {
+        cy.forceLightMode();
+      } else {
+        cy.forceDarkMode();
+      }
+    });
 
-describe("ARC Portal UI authenticated", () => {
-  it("can be logged into as an admin", () => {
-    cy.loginAsAdmin();
+    describe("Unauthenticated content", () => {
+      it("shows the ARC portal phrase on the homepage", () => {
+        cy.visit("/");
+        cy.get("h1").should("be.visible");
+      });
+    });
 
-    cy.visit("/");
-    cy.contains("Username").should("exist");
-  });
-});
+    describe("Authenticated content", () => {
+      it("can be logged into as an admin", () => {
+        cy.loginAsAdmin();
 
-describe("Homepage user experience", () => {
-  beforeEach(() => {
-    cy.loginAsBase();
-    cy.clearChosenName();
-    cy.visit("/");
-  });
+        cy.visit("/");
+        cy.contains("Username").should("exist");
+      });
+    });
 
-  it("shows profile setup prompt when no chosen name", () => {
-    cy.contains("Complete Your Profile Setup").should("be.visible");
-    cy.contains("Complete Profile Setup").should("be.visible");
-  });
+    describe("User experience", () => {
+      beforeEach(() => {
+        cy.loginAsBase();
+        cy.clearChosenName();
+        cy.visit("/");
+      });
 
-  it("shows user info when profile is complete", () => {
-    // Mock profile with chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {
-        chosen_name: "Test User",
-      },
-    }).as("getProfile");
+      it("shows profile setup prompt when no chosen name", () => {
+        cy.contains("Complete Your Profile Setup").should("be.visible");
+        cy.contains("Complete Profile Setup").should("be.visible");
+      });
 
-    // Mock auth as approved researcher (complete profile)
-    cy.mockAuthAsBaseApprovedResearcher();
+      it("shows user info when profile is complete", () => {
+        // Mock profile with chosen name
+        cy.intercept("GET", "/api/v0/profile", {
+          statusCode: 200,
+          body: {
+            chosen_name: "Test User",
+          },
+        }).as("getProfile");
 
-    cy.visit("/");
-    cy.waitForMockedAuth();
-    cy.wait("@getProfile");
+        // Mock auth as approved researcher (complete profile)
+        cy.mockAuthAsBaseApprovedResearcher();
 
-    // Should now show user information instead of setup prompt
-    cy.contains("Chosen name:").should("be.visible");
-    cy.contains("Test User").should("be.visible");
-    cy.contains("Username").should("be.visible");
-    cy.contains("Roles:").should("be.visible");
+        cy.visit("/");
+        cy.waitForMockedAuth();
+        cy.wait("@getProfile");
+
+        // Should now show user information instead of setup prompt
+        cy.contains("Chosen name:").should("be.visible");
+        cy.contains("Test User").should("be.visible");
+        cy.contains("Username").should("be.visible");
+        cy.contains("Roles:").should("be.visible");
+      });
+    });
   });
 });
