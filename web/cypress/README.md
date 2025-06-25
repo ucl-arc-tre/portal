@@ -105,6 +105,7 @@ The CI tests are run against the full release version of the dockerised setup to
 
 - **State pollution**: This can happen when integration tests modify the database. To avoid this, make sure to use proper cleanup in `beforeEach` hooks.
 - **Timing issues**: Use `cy.wait()` for API calls, `cy.contains()` for text verification
+- **Light/Dark mode differences**: Tests may pass locally but fail in CI due to color scheme differences. GitHub Actions runs tests in light mode by default, while local tests may use your system's preferred color scheme. If you encounter accessibility or visual test failures that work locally, check if your system is using dark mode. The application uses CSS `@media (prefers-color-scheme: dark)` queries for theming, which can affect color contrast calculations in accessibility tests.
 
 ### Debug Tools
 
