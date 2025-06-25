@@ -83,7 +83,7 @@
 }
 
 .step-title-pending {
-  color: #e83333;
+  color: #b80f0f;
   font-weight: 600;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .step-description-pending {
-  color: #a2afca;
+  color: #363738;
 }
 
 .step-description-current {
@@ -151,7 +151,16 @@
     color: #93a6c2;
   }
 
+  .step-description-pending {
+    color: #a2afca;
+  }
+
   .step-title-completed {
     color: #1ebc58;
+  }
+
+  .step-title-pending {
+    color: #e83333;
+    font-weight: 600;
   }
 }
