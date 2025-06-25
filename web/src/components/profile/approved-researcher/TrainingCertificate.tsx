@@ -32,15 +32,30 @@ export default function TrainingCertificate() {
   const [isPDF, setIsPDF] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  function base64Encode(file: File): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result as string | null);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage(undefined);
 
     const { certificate } = e.target;
-    const files: FileList = certificate.files;
+    const files: FileList | null = certificate.files;
 
-    if (files.length !== 1) {
+    if (!files || files.length !== 1) {
       setErrorMessage("Must have only 1 file.");
       setErrorType("warning");
       setIsSubmitting(false);
@@ -164,19 +179,4 @@ export default function TrainingCertificate() {
       )}
     </section>
   );
-}
-
-function base64Encode(file: File): Promise<string | null> {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-
-    fileReader.onload = () => {
-      resolve(fileReader.result as string | null);
-    };
-
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
-  });
 }

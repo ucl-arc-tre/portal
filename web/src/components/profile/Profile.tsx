@@ -43,7 +43,7 @@ export default function Profile() {
     }
   }, [isAuthed]);
 
-  if (authInProgress || chosenName === undefined) return null;
+  if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
