@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -16,18 +15,10 @@ import (
 )
 
 const (
+	userCacheTTL      = 1 * time.Hour
 	userContextKey    = "user"
 	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
-
-func getUserCacheTTL() time.Duration {
-	isDevelopment := config.IsDevDeploy() || config.IsTesting()
-	if isDevelopment {
-		return 0 // No cache in development
-	}
-
-	return 1 * time.Hour // 1 hour cache in production
-}
 
 // Get the user from the gin context
 func GetUser(ctx *gin.Context) types.User {
@@ -42,7 +33,7 @@ type UserSetter struct {
 func NewSetUser() gin.HandlerFunc {
 	setter := &UserSetter{
 		db:    graceful.NewDB(),
-		cache: expirable.NewLRU[types.Username, types.User](1000, nil, getUserCacheTTL()),
+		cache: expirable.NewLRU[types.Username, types.User](1000, nil, userCacheTTL),
 	}
 	return setter.setUser
 }
