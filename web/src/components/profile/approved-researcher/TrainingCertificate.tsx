@@ -114,7 +114,14 @@ export default function TrainingCertificate() {
       </p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <Input type="file" name="certificate" accept="pdf" required onChange={checkIsPDF} />
+        <Input
+          type="file"
+          name="certificate"
+          aria-label="certificate-upload"
+          accept="pdf"
+          required
+          onChange={checkIsPDF}
+        />
         <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF}>
           Submit
         </Button>

@@ -16,11 +16,8 @@
     padding-top: 0.7rem;
   }
 
-  a {
-    color: #9f84f2;
-  }
-
   a:hover {
     text-decoration: underline;
+    color: #4023a7;
   }
 }
