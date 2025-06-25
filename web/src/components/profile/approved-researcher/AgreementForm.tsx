@@ -44,6 +44,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
             }}
             checked={agreed}
             required
+            aria-label="I agree to the approved researcher agreement"
           />
           I agree
           <Button size="large" type="submit" disabled={!agreed} cy="approved-researcher-agreement-agree">
