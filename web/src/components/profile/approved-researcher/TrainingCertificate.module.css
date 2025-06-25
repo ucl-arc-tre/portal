@@ -16,8 +16,20 @@
     padding-top: 0.7rem;
   }
 
-  a:hover {
+  a {
     text-decoration: underline;
     color: #4023a7;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .wrapper {
+    p {
+      color: #c9ced8;
+    }
+
+    a {
+      color: #c3b0d7;
+    }
   }
 }

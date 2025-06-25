@@ -61,6 +61,7 @@ describe("Accessibility - Profile Page", () => {
 
       cy.get("main").should("be.visible");
       cy.contains("Approved Researcher Agreement").should("be.visible");
+      cy.contains("You are reminded that").should("be.visible");
 
       cy.injectAxe();
       cy.checkA11y(undefined, {
