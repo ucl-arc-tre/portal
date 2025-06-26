@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord } from "@/openapi";
+import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord, User } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -28,6 +28,7 @@ export default function AdminView() {
   const [agreementsDialogOpen, setTrainingDialogOpen] = useState(false);
 
   const [id, setId] = useState("");
+  const [username, setUsername] = useState("");
   useEffect(() => {
     const fetchPeople = async () => {
       try {
@@ -58,14 +59,16 @@ export default function AdminView() {
       }
       if (username) {
         personToUpdate.user.username = username;
+        setUsername("");
       }
     }
   };
 
   if (!people) return null;
 
-  const handleEditUsernameClick = (id: string) => {
-    setId(id);
+  const handleEditUsernameClick = (user: User) => {
+    setId(user.id);
+    setUsername(user.username);
     setUsernameDialogOpen(true);
   };
   const handleEditTrainingClick = (id: string) => {
@@ -76,7 +79,12 @@ export default function AdminView() {
   return (
     <>
       {userNameDialogOpen && (
-        <UsernameForm id={id} setUsernameDialogOpen={setUsernameDialogOpen} updatePersonUI={updatePersonUI} />
+        <UsernameForm
+          id={id}
+          username={username}
+          setUsernameDialogOpen={setUsernameDialogOpen}
+          updatePersonUI={updatePersonUI}
+        />
       )}
       {agreementsDialogOpen && (
         <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
@@ -100,7 +108,7 @@ export default function AdminView() {
                   <Button
                     variant="tertiary"
                     size="small"
-                    onClick={() => handleEditUsernameClick(person.user.id)}
+                    onClick={() => handleEditUsernameClick(person.user)}
                     className={styles.edit}
                   >
                     Edit

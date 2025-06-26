@@ -17,12 +17,13 @@ const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input
 
 type UserameFormProps = {
   id: string;
+  username: string;
   setUsernameDialogOpen: (name: boolean) => void;
   updatePersonUI: (id: string, training?: TrainingRecord, username?: string) => void;
 };
 
 export default function UsernameForm(UserameFormProps: UserameFormProps) {
-  const { id, setUsernameDialogOpen, updatePersonUI } = UserameFormProps;
+  const { id, username, setUsernameDialogOpen, updatePersonUI } = UserameFormProps;
   const [inputNameValue, setInputNameValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
@@ -57,7 +58,7 @@ export default function UsernameForm(UserameFormProps: UserameFormProps) {
     <>
       <AdminDialog setDialogOpen={setUsernameDialogOpen} data-cy="username">
         <form onSubmit={handleSubmit} noValidate className={styles.form}>
-          <p>Please enter an email address. This will be your username</p>
+          <p>Editing username: {username}</p>
 
           <Input
             type="email"
