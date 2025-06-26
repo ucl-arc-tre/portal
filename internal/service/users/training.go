@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
-	if data.CertficateContentPdfBase64 == nil {
+	if data.CertificateContentPdfBase64 == nil {
 		log.Debug().Any("username", user.Username).Msg("Empty certificate content")
 		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
 	}
@@ -30,7 +30,7 @@ func (s *Service) updateNHSD(
 	user types.User,
 	data openapi.ProfileTrainingUpdate,
 ) (openapi.ProfileTrainingResponse, error) {
-	certificate, err := certificate.ParseNHSDCertificate(*data.CertficateContentPdfBase64)
+	certificate, err := certificate.ParseNHSDCertificate(*data.CertificateContentPdfBase64)
 	response := openapi.ProfileTrainingResponse{
 		CertificateIsValid: ptr(false),
 	}

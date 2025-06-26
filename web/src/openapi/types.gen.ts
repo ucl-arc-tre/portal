@@ -50,7 +50,7 @@ export type ProfileTrainingUpdate = {
     /**
      * Base64 encoded PDF file data of the certificate
      */
-    certficate_content_pdf_base64?: string;
+    certificate_content_pdf_base64?: string;
 };
 
 export type ProfileTrainingResponse = {

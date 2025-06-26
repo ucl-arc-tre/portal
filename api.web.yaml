@@ -262,8 +262,9 @@ components:
         - kind
       properties:
         kind:
-          $ref: "#/components/schemas/TrainingKind"
-        certficate_content_pdf_base64:
+          type: string
+          enum: [training_kind_nhsd]
+        certificate_content_pdf_base64:
           type: string
           description: Base64 encoded PDF file data of the certificate
 
