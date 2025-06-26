@@ -5,6 +5,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import Loading from "@/components/ui/Loading";
 import ProfileStepProgress from "./ProfileStepProgress";
+import ProfileSummaryCard from "./ProfileSummaryCard";
 import ProfileChosenName from "./ProfileChosenName";
 import ApprovedResearcherAgreement from "./approved-researcher/ApprovedResearcherAgreement";
 import TrainingCertificate from "./approved-researcher/TrainingCertificate";
@@ -106,24 +107,16 @@ export default function Profile() {
       );
     }
 
-    return (
-      <div className={styles["completed-message"]}>
-        <h2>Profile Complete!</h2>
-        <p>You have successfully completed all profile setup steps and are now an approved researcher.</p>
-      </div>
-    );
+    return null;
   };
 
   return (
     <>
       <Title text={"Profile Setup"} />
 
-      <div className={styles["welcome-section"]}>
-        <h2>Welcome, {userData?.username}!</h2>
-        <p>Complete the following steps to set up your profile and become an approved researcher.</p>
-      </div>
+      <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
 
-      <ProfileStepProgress steps={steps} />
+      <ProfileStepProgress steps={steps} profileIsComplete={isApprovedResearcher} />
 
       <div className={styles["current-step"]}>{getCurrentStepComponent()}</div>
     </>

@@ -16,14 +16,13 @@ describe(`Homepage Tests`, () => {
       cy.loginAsAdmin();
 
       cy.visit("/");
-      cy.contains("Username").should("exist");
+      cy.contains("Your Tasks").should("exist");
     });
   });
 
   describe("User experience", () => {
     beforeEach(() => {
       cy.loginAsBase();
-      cy.clearChosenName();
       cy.visit("/");
     });
 
@@ -32,7 +31,7 @@ describe(`Homepage Tests`, () => {
       cy.contains("Complete Profile Setup").should("be.visible");
     });
 
-    it("shows user info when profile is complete", () => {
+    it("shows tasks complete when profile is complete", () => {
       // Mock profile with chosen name
       cy.intercept("GET", "/api/v0/profile", {
         statusCode: 200,
@@ -48,11 +47,7 @@ describe(`Homepage Tests`, () => {
       cy.waitForMockedAuth();
       cy.wait("@getProfile");
 
-      // Should now show user information instead of setup prompt
-      cy.contains("Chosen name:").should("be.visible");
-      cy.contains("Test User").should("be.visible");
-      cy.contains("Username").should("be.visible");
-      cy.contains("Roles:").should("be.visible");
+      cy.contains("You have completed all your tasks").should("be.visible");
     });
   });
 });

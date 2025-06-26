@@ -6,6 +6,13 @@
   margin: 2rem 0;
 }
 
+.container h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
 .setup-prompt {
   text-align: center;
 }
@@ -22,22 +29,6 @@
   line-height: 1.5;
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.user-info p {
-  margin: 0;
-  color: var(--foreground);
-  line-height: 1.5;
-}
-
-.user-info strong {
-  font-weight: 600;
-}
-
 .researcher-prompt {
   margin-top: 1.5rem;
   padding: 1.5rem;
@@ -50,6 +41,20 @@
   margin: 0 0 1rem 0;
   color: #475569;
   font-size: 0.875rem;
+}
+
+.completed-tasks {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+}
+
+.completed-tasks p {
+  margin: 0;
+  color: #166534;
+  font-weight: 500;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -68,5 +73,14 @@
 
   .researcher-prompt p {
     color: #d1d5db;
+  }
+
+  .completed-tasks {
+    background: #064e3b;
+    border-color: #065f46;
+  }
+
+  .completed-tasks p {
+    color: #6ee7b7;
   }
 }

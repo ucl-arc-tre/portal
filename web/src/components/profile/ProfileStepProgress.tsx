@@ -7,13 +7,29 @@ const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.I
 
 type ProfileStepProgressProps = {
   steps: ProfileStep[];
+  profileIsComplete?: boolean;
 };
 
 export default function ProfileStepProgress(props: ProfileStepProgressProps) {
-  const { steps } = props;
+  const { steps, profileIsComplete } = props;
 
   return (
     <div className={styles.container}>
+      <div className={styles["completion-header"]}>
+        {profileIsComplete ? (
+          <>
+            <h3 className={styles["completion-title"]}>Profile Complete!</h3>
+            <p className={styles["completion-subtitle"]}>
+              You have successfully completed all profile setup steps and are now an approved researcher.
+            </p>
+          </>
+        ) : (
+          <p className={styles["intro-text"]}>
+            Complete the following steps to set up your profile and become an approved researcher.
+          </p>
+        )}
+      </div>
+
       <div aria-label="Profile setup progress">
         <ol className={styles["step-list"]}>
           {steps.map((step, stepIndex) => (
@@ -61,6 +77,7 @@ export default function ProfileStepProgress(props: ProfileStepProgressProps) {
                   </p>
                 </div>
               </div>
+
               {stepIndex < steps.length - 1 && (
                 <div
                   className={`${styles["step-connector"]} ${
