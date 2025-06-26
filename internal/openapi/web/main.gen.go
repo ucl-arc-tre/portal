@@ -91,6 +91,15 @@ type ProfileTrainingResponse struct {
 	CertificateMessage *string `json:"certificate_message,omitempty"`
 }
 
+// ProfileTrainingStatus defines model for ProfileTrainingStatus.
+type ProfileTrainingStatus struct {
+	// CompletedAt Time in RFC3339 format when the training was completed
+	CompletedAt *string `json:"completed_at,omitempty"`
+
+	// HasValidTraining Whether the user has valid training certification
+	HasValidTraining bool `json:"has_valid_training"`
+}
+
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
 	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
@@ -144,6 +153,9 @@ type ServerInterface interface {
 
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
+
+	// (GET /profile/training)
+	GetProfileTraining(c *gin.Context)
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
@@ -249,6 +261,19 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	siw.Handler.PostProfileAgreements(c)
 }
 
+// GetProfileTraining operation middleware
+func (siw *ServerInterfaceWrapper) GetProfileTraining(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProfileTraining(c)
+}
+
 // PostProfileTraining operation middleware
 func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 
@@ -296,5 +321,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 }

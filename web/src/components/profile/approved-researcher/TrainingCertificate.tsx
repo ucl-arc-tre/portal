@@ -24,7 +24,11 @@ interface FormEvent extends React.FormEvent<HTMLFormElement> {
   };
 }
 
-export default function TrainingCertificate() {
+type TrainingCertificateProps = {
+  setTrainingCertificateCompleted: (completed: boolean) => void;
+};
+
+export default function TrainingCertificate({ setTrainingCertificateCompleted }: TrainingCertificateProps) {
   const { authInProgress, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
@@ -98,6 +102,7 @@ export default function TrainingCertificate() {
         setErrorType("error");
       } else {
         setErrorMessage("");
+        setTrainingCertificateCompleted(true);
       }
     } catch (err) {
       setErrorMessage(`Certificate upload failed: ${err instanceof Error ? err.message : "Unknown error"}`);

@@ -66,6 +66,17 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
+export type ProfileTrainingStatus = {
+    /**
+     * Whether the user has valid training certification
+     */
+    has_valid_training: boolean;
+    /**
+     * Time in RFC3339 format when the training was completed
+     */
+    completed_at?: string;
+};
+
 export type User = {
     username: string;
     id: string;
@@ -201,6 +212,30 @@ export type PostProfileAgreementsResponses = {
 };
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
+
+export type GetProfileTrainingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/profile/training';
+};
+
+export type GetProfileTrainingErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProfileTrainingResponses = {
+    200: ProfileTrainingStatus;
+};
+
+export type GetProfileTrainingResponse = GetProfileTrainingResponses[keyof GetProfileTrainingResponses];
 
 export type PostProfileTrainingData = {
     body: ProfileTrainingUpdate;

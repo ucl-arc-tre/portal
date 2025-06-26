@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getProfileAgreements } from "@/openapi";
+import { getProfile, getProfileAgreements, getProfileTraining } from "@/openapi";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import Loading from "@/components/ui/Loading";
@@ -16,13 +16,18 @@ export default function Profile() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [agreementCompleted, setAgreementCompleted] = useState(false);
+  const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
       setIsLoading(true);
       try {
-        const [profileResponse, agreementsResponse] = await Promise.all([getProfile(), getProfileAgreements()]);
+        const [profileResponse, agreementsResponse, trainingResponse] = await Promise.all([
+          getProfile(),
+          getProfileAgreements(),
+          getProfileTraining(),
+        ]);
 
         if (profileResponse.response.ok && profileResponse.data?.chosen_name) {
           setChosenName(profileResponse.data.chosen_name);
@@ -35,6 +40,10 @@ export default function Profile() {
           setAgreementCompleted(
             confirmedAgreements.some((agreement) => agreement.agreement_type === "approved-researcher")
           );
+        }
+
+        if (trainingResponse.response.ok && trainingResponse.data) {
+          setTrainingCertificateCompleted(trainingResponse.data.has_valid_training);
         }
       } catch (error) {
         console.error("Failed to get profile data:", error);
@@ -62,7 +71,6 @@ export default function Profile() {
     );
   }
 
-  const isApprovedResearcher = userData?.roles?.includes("approved-researcher");
   const hasChosenName = !!chosenName;
 
   const steps: ProfileStep[] = [
@@ -84,8 +92,8 @@ export default function Profile() {
       id: "certificate",
       title: "Training Certificate",
       description: "Upload your NHS Digital Data Security Awareness certificate",
-      completed: isApprovedResearcher || false,
-      current: hasChosenName && agreementCompleted && !isApprovedResearcher,
+      completed: trainingCertificateCompleted,
+      current: hasChosenName && agreementCompleted && !trainingCertificateCompleted,
     },
   ];
 
@@ -94,7 +102,7 @@ export default function Profile() {
       return <ProfileChosenName currentName={chosenName} setChosenName={setChosenName} />;
     }
 
-    if (hasChosenName && !isApprovedResearcher) {
+    if (hasChosenName && !(agreementCompleted && trainingCertificateCompleted)) {
       return (
         <div className={styles["approved-researcher-steps"]}>
           <ApprovedResearcherAgreement
@@ -102,7 +110,7 @@ export default function Profile() {
             agreementCompleted={agreementCompleted}
           />
           <hr className={styles.divider} />
-          <TrainingCertificate />
+          <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
         </div>
       );
     }
@@ -116,7 +124,10 @@ export default function Profile() {
 
       <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
 
-      <ProfileStepProgress steps={steps} profileIsComplete={isApprovedResearcher} />
+      <ProfileStepProgress
+        steps={steps}
+        profileIsComplete={hasChosenName && agreementCompleted && trainingCertificateCompleted}
+      />
 
       <div className={styles["current-step"]}>{getCurrentStepComponent()}</div>
     </>
