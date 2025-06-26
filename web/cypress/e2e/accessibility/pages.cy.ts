@@ -25,10 +25,7 @@ const pages = [
           cy.visit(path);
           cy.get("header").should("be.visible"); // wait for page layout to load
           cy.get("main").should("be.visible");
-          cy.injectAxe();
-          cy.checkA11y(undefined, {
-            includedImpacts: ["critical", "serious"],
-          });
+          cy.checkAccessibility();
         });
       });
     });
@@ -43,10 +40,7 @@ const pages = [
           cy.visit(path);
           cy.get("header").should("be.visible"); // wait for page layout to load
           cy.get("main").should("be.visible");
-          cy.injectAxe();
-          cy.checkA11y(undefined, {
-            includedImpacts: ["critical", "serious"],
-          });
+          cy.checkAccessibility();
         });
       });
     });
@@ -61,10 +55,7 @@ const pages = [
           cy.visit(path);
           cy.get("header").should("be.visible"); // wait for page layout to load
           cy.get("main").should("be.visible");
-          cy.injectAxe();
-          cy.checkA11y(undefined, {
-            includedImpacts: ["critical", "serious"],
-          });
+          cy.checkAccessibility();
         });
       });
     });

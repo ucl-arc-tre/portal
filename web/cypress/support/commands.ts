@@ -70,6 +70,14 @@ declare global {
        * @example cy.forceDarkMode()
        */
       forceDarkMode(): Chainable<any>;
+
+      /**
+       * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
+       * @param selector - Optional selector to check specific element (defaults to entire page)
+       * @example cy.checkAccessibility()
+       * @example cy.checkAccessibility('[data-cy="profile-form"]')
+       */
+      checkAccessibility(selector?: string): Chainable<any>;
     }
   }
 }
@@ -194,4 +202,11 @@ Cypress.Commands.add("forceDarkMode", () => {
       },
     })
   );
+});
+
+Cypress.Commands.add("checkAccessibility", (selector?: string) => {
+  cy.injectAxe();
+  cy.checkA11y(selector, {
+    includedImpacts: ["critical", "serious"],
+  });
 });

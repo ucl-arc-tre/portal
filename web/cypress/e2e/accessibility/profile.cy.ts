@@ -39,10 +39,7 @@ import "cypress-axe";
 
         cy.contains("Set Your Chosen Name").should("be.visible");
 
-        cy.injectAxe();
-        cy.checkA11y(undefined, {
-          includedImpacts: ["critical", "serious"],
-        });
+        cy.checkAccessibility();
       });
 
       it("should have no accessibility violations on step 2 (chosen name set, no agreement)", () => {
@@ -70,10 +67,7 @@ import "cypress-axe";
         cy.contains("Approved Researcher Agreement").should("be.visible");
         cy.contains("You are reminded that").should("be.visible");
 
-        cy.injectAxe();
-        cy.checkA11y(undefined, {
-          includedImpacts: ["critical", "serious"],
-        });
+        cy.checkAccessibility();
       });
 
       it("should have no accessibility violations on step 3 (chosen name and agreement completed)", () => {
@@ -105,10 +99,7 @@ import "cypress-axe";
         cy.get("main").should("be.visible");
         cy.contains("Training Certificate").should("be.visible");
 
-        cy.injectAxe();
-        cy.checkA11y(undefined, {
-          includedImpacts: ["critical", "serious"],
-        });
+        cy.checkAccessibility();
       });
     });
 
@@ -148,10 +139,7 @@ import "cypress-axe";
         cy.get("main").should("be.visible");
         cy.contains("Profile Complete!").should("be.visible");
 
-        cy.injectAxe();
-        cy.checkA11y(undefined, {
-          includedImpacts: ["critical", "serious"],
-        });
+        cy.checkAccessibility();
       });
     });
   });

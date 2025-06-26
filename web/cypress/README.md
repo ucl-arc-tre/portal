@@ -108,7 +108,7 @@ The CI tests are run against the full release version of the dockerised setup to
 
 ## Light/Dark Mode Testing
 
-All tests automatically run in both light and dark color schemes to ensure comprehensive coverage of the application's theming system. Each test suite uses the `cy.forceLightMode()` and `cy.forceDarkMode()` commands to emulate different color preferences.
+Accessibility tests automatically run in both light and dark color schemes to ensure comprehensive coverage of color contrast compliance. These tests use the `cy.forceLightMode()` and `cy.forceDarkMode()` commands to emulate different color preferences.
 
 **Test Structure:**
 
