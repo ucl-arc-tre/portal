@@ -160,7 +160,11 @@ export default function TrainingCertificate({ setTrainingCertificateCompleted }:
         Higher Education Researcher (Education)&quot; which should provide you access to the course.
         <br />
         <br />
-        <strong>Please complete the course and upload the PDF certificate below</strong>
+        <strong>Please complete the course and upload the PDF certificate below.</strong>
+      </p>
+      <p>
+        Note that the name on your certificate must match the chosen name you entered in step 1 for validation to
+        succeed.
       </p>
 
       <form className={styles.form} onSubmit={handleSubmit}>

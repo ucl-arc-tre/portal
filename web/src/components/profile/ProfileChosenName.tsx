@@ -57,6 +57,8 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
       <h3 className={styles.title}>Set Your Chosen Name</h3>
       <p className={styles.description}>
         Please enter your name as you would choose to have it appear on forms related to our services.
+        <strong> This name must match the name on your training certificate</strong> that you will upload in the next
+        step.
       </p>
 
       <form onSubmit={handleSubmit} noValidate className={styles.form}>

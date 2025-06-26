@@ -77,7 +77,7 @@ export default function Profile() {
     {
       id: "chosen-name",
       title: "Set Your Chosen Name",
-      description: "Enter your preferred name for forms and documents",
+      description: "Enter your preferred name - this must match the name on your training certificate",
       completed: hasChosenName,
       current: !hasChosenName,
     },
