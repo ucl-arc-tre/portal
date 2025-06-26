@@ -28,3 +28,19 @@
     margin-inline: 4%;
   }
 }
+
+/* training only - put in new file? */
+.date {
+  display: flex;
+  flex-direction: column;
+}
+
+.todayButton {
+  color: #6b9fff !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+
+  &:hover {
+    color: var(--foreground) !important;
+  }
+}

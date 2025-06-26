@@ -39,7 +39,8 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!trainingKind) return setErrorMessage("Please enter a name.");
+    if (!trainingKind) return setErrorMessage("Please provide a training kind.");
+    if (!trainingDate) return setErrorMessage("Please enter the date the training was completed.");
 
     try {
       const response = await postPeopleUpdate({
@@ -48,11 +49,6 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
       });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
-      let rfc3339Date = trainingDate;
-      if (!trainingDate || trainingDate === undefined) {
-        rfc3339Date = new Date().toISOString();
-      }
-
       closeDialog();
 
       // matching with db value
@@ -60,7 +56,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
       updatePersonUI(id, {
         training_kind: trainingKindKey as TrainingKind,
-        completed_at: rfc3339Date,
+        completed_at: trainingDate,
       });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
@@ -69,10 +65,15 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
     }
   };
 
+  const setDateToToday = () => {
+    const today = new Date().toISOString().split("T")[0];
+    setTrainingDate(today);
+  };
+
   return (
     <AdminDialog setDialogOpen={setTrainingDialogOpen} data-cy="training">
       <form onSubmit={handleSubmit} noValidate className={styles.form}>
-        <p>Use this form to validate a training certificate. If the date is left empty it will be set to today</p>
+        <p>Use this form to validate a training certificate. Make sure you check the date on the certificate.</p>
 
         <select
           id="training_kind"
@@ -92,18 +93,30 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
             </option>
           ))}
         </select>
-
-        <input
-          type="date"
-          name="training_date"
-          value={trainingDate}
-          onChange={(e) => {
-            setTrainingDate(e.target.value);
-            if (errorMessage) setErrorMessage(null); // Clear error as user types
-          }}
-          aria-invalid={!!errorMessage}
-          aria-describedby="trainingError"
-        />
+        <div className={styles.date}>
+          <input
+            type="date"
+            name="training_date"
+            value={trainingDate}
+            onChange={(e) => {
+              setTrainingDate(e.target.value);
+              if (errorMessage) setErrorMessage(null); // Clear error as user types
+            }}
+            aria-invalid={!!errorMessage}
+            aria-describedby="trainingError"
+          />
+          <small>
+            <Button
+              type="button"
+              onClick={setDateToToday}
+              size="small"
+              variant="tertiary"
+              className={styles.todayButton}
+            >
+              Set to Today
+            </Button>
+          </small>
+        </div>
 
         {errorMessage && (
           <Alert type={errorType} className={styles.alert}>
