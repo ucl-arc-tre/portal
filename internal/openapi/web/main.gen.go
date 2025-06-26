@@ -4,7 +4,11 @@
 package openapi
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // Defines values for AgreementType.
@@ -22,7 +26,12 @@ const (
 
 // Defines values for ProfileTrainingUpdateKind.
 const (
-	TrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
+	ProfileTrainingUpdateKindTrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
+)
+
+// Defines values for TrainingKind.
+const (
+	TrainingKindTrainingKindNhsd TrainingKind = "training_kind_nhsd"
 )
 
 // Agreement defines model for Agreement.
@@ -63,9 +72,20 @@ type People = []Person
 
 // Person defines model for Person.
 type Person struct {
-	Agreements ProfileAgreements `json:"agreements"`
-	Roles      []string          `json:"roles"`
-	User       User              `json:"user"`
+	Agreements     ProfileAgreements     `json:"agreements"`
+	Roles          []string              `json:"roles"`
+	TrainingRecord PersonTrainingRecords `json:"training_record"`
+	User           User                  `json:"user"`
+}
+
+// PersonTrainingRecords defines model for PersonTrainingRecords.
+type PersonTrainingRecords = []TrainingRecord
+
+// PersonUpdate defines model for PersonUpdate.
+type PersonUpdate struct {
+	// TrainingDate Time in RFC3339 format at which the the certificate was issued
+	TrainingDate *string       `json:"training_date,omitempty"`
+	TrainingKind *TrainingKind `json:"training_kind,omitempty"`
 }
 
 // ProfileAgreements defines model for ProfileAgreements.
@@ -106,11 +126,28 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// TrainingKind defines model for TrainingKind.
+type TrainingKind string
+
+// TrainingRecord defines model for TrainingRecord.
+type TrainingRecord struct {
+	CompletedAt  *string       `json:"completed_at,omitempty"`
+	TrainingKind *TrainingKind `json:"training_kind,omitempty"`
+}
+
 // User defines model for User.
 type User struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 }
+
+// PostPeopleUpdateParams defines parameters for PostPeopleUpdate.
+type PostPeopleUpdateParams struct {
+	Id string `form:"id" json:"id"`
+}
+
+// PostPeopleUpdateJSONRequestBody defines body for PostPeopleUpdate for application/json ContentType.
+type PostPeopleUpdateJSONRequestBody = PersonUpdate
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
@@ -132,6 +169,9 @@ type ServerInterface interface {
 
 	// (GET /people)
 	GetPeople(c *gin.Context)
+
+	// (POST /people/update)
+	PostPeopleUpdate(c *gin.Context, params PostPeopleUpdateParams)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -195,6 +235,39 @@ func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
 	}
 
 	siw.Handler.GetPeople(c)
+}
+
+// PostPeopleUpdate operation middleware
+func (siw *ServerInterfaceWrapper) PostPeopleUpdate(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PostPeopleUpdateParams
+
+	// ------------- Required query parameter "id" -------------
+
+	if paramValue := c.Query("id"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument id is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "id", c.Request.URL.Query(), &params.Id)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostPeopleUpdate(c, params)
 }
 
 // GetProfile operation middleware
@@ -292,6 +365,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
+	router.POST(options.BaseURL+"/people/update", wrapper.PostPeopleUpdate)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

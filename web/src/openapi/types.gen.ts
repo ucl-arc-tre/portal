@@ -43,6 +43,8 @@ export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
+export type TrainingKind = 'training_kind_nhsd';
+
 export type ProfileTrainingUpdate = {
     kind: 'training_kind_nhsd';
     /**
@@ -71,10 +73,26 @@ export type User = {
     id: string;
 };
 
+export type TrainingRecord = {
+    completed_at?: string;
+    training_kind?: TrainingKind;
+};
+
+export type PersonTrainingRecords = Array<TrainingRecord>;
+
 export type Person = {
     user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
+    training_record: PersonTrainingRecords;
+};
+
+export type PersonUpdate = {
+    training_kind?: TrainingKind;
+    /**
+     * Time in RFC3339 format at which the the certificate was issued
+     */
+    training_date?: string;
 };
 
 export type People = Array<Person>;
@@ -284,6 +302,41 @@ export type GetPeopleResponses = {
 };
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+
+export type PostPeopleUpdateData = {
+    body: PersonUpdate;
+    path?: never;
+    query: {
+        id: string;
+    };
+    url: '/people/update';
+};
+
+export type PostPeopleUpdateErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostPeopleUpdateResponses = {
+    /**
+     * Successfully updated person
+     */
+    200: unknown;
+};
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});

@@ -16,7 +16,6 @@
     input {
       font-size: 1.4rem;
       padding: 0.2rem;
-      margin-inline: 4%;
       margin-top: 0.4rem;
 
       &:focus {

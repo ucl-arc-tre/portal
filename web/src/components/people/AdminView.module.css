@@ -2,21 +2,40 @@
   width: 100%;
   margin-block: 1rem;
   font-size: 110%;
+  border-collapse: collapse;
 
-  tbody {
-    border-top: 1px solid var(--foreground);
+  .tbody {
+    border-top: 2px solid var(--foreground);
   }
 
-  td {
-    padding: 0.5rem;
+  .row {
+    border-bottom: 1px solid var(--text--secondary);
+    margin-bottom: 0.8rem;
+
+    td {
+      padding-block: 0.6rem;
+    }
   }
 
   .user {
     display: flex;
     flex-direction: column;
+    gap: 0.3rem;
 
     small {
-      color: rgb(172, 172, 172);
+      color: var(--text--secondary);
+      font-size: 0.8rem;
+    }
+  }
+
+  .edit {
+    font-weight: 400;
+    font-size: 0.8rem;
+    padding-inline-start: 0.4rem;
+    color: var(--green-100);
+
+    &:hover {
+      color: var(--green-50);
     }
   }
 
@@ -26,12 +45,12 @@
 
   .agreements {
     text-align: right;
-    grid-template-columns: repeat(1fr);
   }
 
-  .agreement {
+  .agreement,
+  .training {
     display: grid;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 0.5fr;
     grid-template-columns: 3fr 0.2fr;
 
     .confirmed svg {
@@ -41,11 +60,17 @@
 
     .unconfirmed svg {
       grid-row: 1;
-      stroke: red;
+      stroke: #ff6161;
     }
 
-    /* small {
-            grid-row: 2;
-        } */
+    small {
+      grid-row: 2;
+    }
+  }
+
+  .trainingRecord {
+    text-align: right;
+    display: grid;
+    grid-template-columns: 4fr 0.5fr;
   }
 }
