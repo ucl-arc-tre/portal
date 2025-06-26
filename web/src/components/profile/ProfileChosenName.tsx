@@ -55,11 +55,13 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
   return (
     <section className={styles.section} data-cy="chosen-name-form">
       <h3 className={styles.title}>Set Your Chosen Name</h3>
-      <p className={styles.description}>
+      <div className={styles.description}>
         Please enter your name as you would choose to have it appear on forms related to our services.
-        <strong> This name must match the name on your training certificate</strong> that you will upload in the next
-        step.
-      </p>
+        <div>
+          <strong> This name must match the name on your training certificate</strong> that you will upload in the next
+          step.
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} noValidate className={styles.form}>
         <div className={styles["input-group"]}>
