@@ -24,9 +24,14 @@ const (
 	AuthRolesBase               AuthRoles = "base"
 )
 
+// Defines values for ProfileTrainingUpdateKind.
+const (
+	ProfileTrainingUpdateKindTrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
+)
+
 // Defines values for TrainingKind.
 const (
-	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
+	TrainingKindTrainingKindNhsd TrainingKind = "training_kind_nhsd"
 )
 
 // Agreement defines model for Agreement.
@@ -112,6 +117,9 @@ type ProfileTrainingUpdate struct {
 	CertificateContentPdfBase64 *string                   `json:"certificate_content_pdf_base64,omitempty"`
 	Kind                        ProfileTrainingUpdateKind `json:"kind"`
 }
+
+// ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.
+type ProfileTrainingUpdateKind string
 
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {

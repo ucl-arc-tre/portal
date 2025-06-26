@@ -102,7 +102,7 @@ func (s *Service) SetTrainingValidity(user types.User, trainingkind types.Traini
 		return err
 	}
 	switch trainingkind {
-	case types.TrainingKind(openapi.TrainingKindNhsd):
+	case types.TrainingKind(types.TrainingKindNHSD):
 
 		response := s.createNHSDTrainingRecord(user, confirmation_time)
 

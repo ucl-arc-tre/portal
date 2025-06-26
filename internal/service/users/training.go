@@ -19,7 +19,7 @@ func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUp
 		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
 	}
 	switch data.Kind {
-	case openapi.TrainingKindNhsd:
+	case openapi.ProfileTrainingUpdateKind("training_kind_nhsd"):
 		return s.updateNHSD(user, data)
 	default:
 		return openapi.ProfileTrainingResponse{}, fmt.Errorf("unsupported training kind")

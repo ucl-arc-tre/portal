@@ -46,7 +46,7 @@ export type ProfileAgreements = {
 export type TrainingKind = 'training_kind_nhsd';
 
 export type ProfileTrainingUpdate = {
-    kind: TrainingKind;
+    kind: 'training_kind_nhsd';
     /**
      * Base64 encoded PDF file data of the certificate
      */
