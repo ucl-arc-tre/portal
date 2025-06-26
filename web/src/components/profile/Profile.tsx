@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getProfile, getProfileAgreements } from "@/openapi";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
+import Loading from "@/components/ui/Loading";
 import ProfileStepProgress from "./ProfileStepProgress";
 import ProfileChosenName from "./ProfileChosenName";
 import ApprovedResearcherAgreement from "./approved-researcher/ApprovedResearcherAgreement";
@@ -14,9 +15,11 @@ export default function Profile() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [agreementCompleted, setAgreementCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
+      setIsLoading(true);
       try {
         const [profileResponse, agreementsResponse] = await Promise.all([getProfile(), getProfileAgreements()]);
 
@@ -35,6 +38,8 @@ export default function Profile() {
       } catch (error) {
         console.error("Failed to get profile data:", error);
         setChosenName("");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -45,7 +50,16 @@ export default function Profile() {
 
   if (authInProgress) return null;
 
-  if (!isAuthed) return <LoginFallback />;
+  if (!isAuthed && !authInProgress) return <LoginFallback />;
+
+  if (isLoading) {
+    return (
+      <>
+        <Title text={"Profile Setup"} />
+        <Loading message="Loading your profile..." />
+      </>
+    );
+  }
 
   const isApprovedResearcher = userData?.roles?.includes("approved-researcher");
   const hasChosenName = !!chosenName;
