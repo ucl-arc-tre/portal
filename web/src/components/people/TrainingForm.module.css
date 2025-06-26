@@ -36,11 +36,14 @@
 }
 
 .todayButton {
-  color: #6b9fff !important;
-  font-weight: 300 !important;
+  font-weight: 400 !important;
   font-size: 0.8rem !important;
 
-  &:hover {
-    color: var(--foreground) !important;
+  @media (prefers-color-scheme: dark) {
+    color: #6b9fff !important;
+
+    &:hover {
+      color: var(--foreground) !important;
+    }
   }
 }

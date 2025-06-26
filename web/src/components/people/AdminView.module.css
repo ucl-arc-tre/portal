@@ -20,9 +20,11 @@
   .user {
     display: flex;
     flex-direction: column;
+    gap: 0.3rem;
 
     small {
       color: var(--text--secondary);
+      font-size: 0.8rem;
     }
   }
 
