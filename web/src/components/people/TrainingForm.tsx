@@ -30,6 +30,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   const [errorType, setErrorType] = useState<AlertType>("warning");
 
   const [trainingKind, setTrainingKind] = useState<TrainingKind | null>(null);
+  const [trainingDisplayDate, setTrainingDisplayDate] = useState<string | undefined>(undefined);
   const [trainingDate, setTrainingDate] = useState<string | undefined>(undefined);
 
   const closeDialog = () => {
@@ -40,7 +41,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
     event.preventDefault();
 
     if (!trainingKind) return setErrorMessage("Please provide a training kind.");
-    if (!trainingDate) return setErrorMessage("Please enter the date the training was completed.");
+    if (!trainingDisplayDate) return setErrorMessage("Please enter the date the training was completed.");
 
     try {
       const response = await postPeopleUpdate({
@@ -51,12 +52,12 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
       closeDialog();
 
-      // matching with db value
+      // matching with db value so training_kind_nhsd shows as nhsd
       const trainingKindKey = Object.entries(TrainingKindOptions).find(([, value]) => value === trainingKind)?.[0];
 
       updatePersonUI(id, {
         training_kind: trainingKindKey as TrainingKind,
-        completed_at: trainingDate,
+        completed_at: trainingDisplayDate,
       });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
@@ -66,7 +67,8 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   };
 
   const setDateToToday = () => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString();
+    setTrainingDisplayDate(today.split("T")[0]);
     setTrainingDate(today);
   };
 
@@ -96,10 +98,10 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         <div className={styles.date}>
           <input
             type="date"
-            name="training_date"
-            value={trainingDate}
+            name="display_date"
+            value={trainingDisplayDate}
             onChange={(e) => {
-              setTrainingDate(e.target.value);
+              setTrainingDisplayDate(e.target.value);
               if (errorMessage) setErrorMessage(null); // Clear error as user types
             }}
             aria-invalid={!!errorMessage}
@@ -116,6 +118,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
               Set to Today
             </Button>
           </small>
+          <input type="hidden" name="training_date" value={trainingDate} />
         </div>
 
         {errorMessage && (
