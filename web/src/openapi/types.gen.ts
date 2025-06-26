@@ -88,7 +88,6 @@ export type Person = {
 };
 
 export type PersonUpdate = {
-    username?: string;
     training_kind?: TrainingKind;
     /**
      * Time in RFC3339 format at which the the certificate was issued

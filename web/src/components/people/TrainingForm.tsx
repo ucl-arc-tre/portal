@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import styles from "./Form.module.css";
+import styles from "./TrainingForm.module.css";
 import Button from "../ui/Button";
 import { postPeopleUpdate, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
@@ -114,6 +114,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
               size="small"
               variant="tertiary"
               className={styles.todayButton}
+              data-cy="set-to-today"
             >
               Set to Today
             </Button>

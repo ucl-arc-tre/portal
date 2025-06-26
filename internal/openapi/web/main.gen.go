@@ -81,7 +81,6 @@ type PersonUpdate struct {
 	// TrainingDate Time in RFC3339 format at which the the certificate was issued
 	TrainingDate *string       `json:"training_date,omitempty"`
 	TrainingKind *TrainingKind `json:"training_kind,omitempty"`
-	Username     *string       `json:"username,omitempty"`
 }
 
 // ProfileAgreements defines model for ProfileAgreements.

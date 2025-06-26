@@ -58,13 +58,6 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 			return
 		}
 
-		if update.Username != nil {
-			username := *update.Username
-			if err := h.users.SetUserUsername(person, types.Username(username)); err != nil {
-				setServerError(ctx, err, "Failed to update username")
-			}
-		}
-
 		if update.TrainingKind != nil {
 			date := *update.TrainingDate
 

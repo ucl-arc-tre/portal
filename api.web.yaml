@@ -326,8 +326,6 @@ components:
     PersonUpdate:
       type: object
       properties:
-        username:
-          type: string
         training_kind:
           $ref: "#/components/schemas/TrainingKind"
         training_date:

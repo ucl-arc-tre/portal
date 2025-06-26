@@ -1,9 +1,8 @@
-import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord, User } from "@/openapi";
+import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
 import Button from "../ui/Button";
-import UsernameForm from "./UsernameForm";
 import TrainingForm from "./TrainingForm";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
@@ -24,11 +23,10 @@ function convertRFC3339ToDDMMYYYY(dateString: string) {
 
 export default function AdminView() {
   const [people, setPeople] = useState<People | null>(null);
-  const [userNameDialogOpen, setUsernameDialogOpen] = useState(false);
-  const [agreementsDialogOpen, setTrainingDialogOpen] = useState(false);
+  const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
 
   const [id, setId] = useState("");
-  const [username, setUsername] = useState("");
+
   useEffect(() => {
     const fetchPeople = async () => {
       try {
@@ -45,32 +43,22 @@ export default function AdminView() {
     fetchPeople();
   }, []);
 
-  const updatePersonUI = (id: string, training?: TrainingRecord, username?: string) => {
+  const updatePersonUI = (id: string, training?: TrainingRecord) => {
     // get people object and find the person with the right id
     const personToUpdate = people!.find((person) => person.user.id === id);
 
     if (personToUpdate) {
-      console.log(personToUpdate, training, username);
       if (training) {
         if (!personToUpdate.training_record) {
           personToUpdate.training_record = [];
         }
         personToUpdate.training_record.push(training);
       }
-      if (username) {
-        personToUpdate.user.username = username;
-        setUsername("");
-      }
     }
   };
 
   if (!people) return null;
 
-  const handleEditUsernameClick = (user: User) => {
-    setId(user.id);
-    setUsername(user.username);
-    setUsernameDialogOpen(true);
-  };
   const handleEditTrainingClick = (id: string) => {
     setId(id);
     setTrainingDialogOpen(true);
@@ -78,15 +66,7 @@ export default function AdminView() {
 
   return (
     <>
-      {userNameDialogOpen && (
-        <UsernameForm
-          id={id}
-          username={username}
-          setUsernameDialogOpen={setUsernameDialogOpen}
-          updatePersonUI={updatePersonUI}
-        />
-      )}
-      {agreementsDialogOpen && (
+      {trainingDialogOpen && (
         <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
       )}
 
@@ -103,18 +83,7 @@ export default function AdminView() {
           {people.map((person: Person) => (
             <tr key={person.user.id} className={styles.row}>
               <td className={styles.user}>
-                <span data-cy="username">
-                  {person.user.username}{" "}
-                  <Button
-                    variant="tertiary"
-                    size="small"
-                    onClick={() => handleEditUsernameClick(person.user)}
-                    className={styles.edit}
-                  >
-                    Edit
-                  </Button>
-                </span>
-                <small>{person.user.id}</small>
+                {person.user.username} <small>{person.user.id}</small>
               </td>
               <td className={styles.roles}>{person.roles.join(", ")}</td>
               <td className={styles.agreements}>
