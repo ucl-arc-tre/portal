@@ -4,11 +4,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
 const (
-	TrainingKindNHSD = TrainingKind(openapi.Nhsd)
+	TrainingKindNHSD = TrainingKind("nhsd") // FIXED
 )
 
 type TrainingKind string
