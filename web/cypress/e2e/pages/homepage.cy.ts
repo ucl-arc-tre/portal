@@ -20,15 +20,14 @@ describe(`Homepage Tests`, () => {
     });
   });
 
-  describe("User experience", () => {
+  describe("User tasks", () => {
     beforeEach(() => {
       cy.loginAsBase();
       cy.visit("/");
     });
 
     it("shows profile setup prompt when no chosen name", () => {
-      cy.contains("Complete Your Profile Setup").should("be.visible");
-      cy.contains("Complete Profile Setup").should("be.visible");
+      cy.contains("Continue Profile Setup").should("be.visible");
     });
 
     it("shows tasks complete when profile is complete", () => {
