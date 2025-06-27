@@ -27,17 +27,13 @@ describe(`Homepage Tests`, () => {
     });
 
     it("shows profile setup prompt when no chosen name", () => {
+      cy.mockProfileChosenName(""); // No chosen name
       cy.contains("Complete Profile Setup").should("be.visible");
     });
 
     it("shows tasks complete when profile is complete", () => {
       // Mock profile with chosen name
-      cy.intercept("GET", "/api/v0/profile", {
-        statusCode: 200,
-        body: {
-          chosen_name: "Test User",
-        },
-      }).as("getProfile");
+      cy.mockProfileChosenName("Tom Young"); // No chosen name
 
       // Mock auth as approved researcher (complete profile)
       cy.mockAuthAsBaseApprovedResearcher();
