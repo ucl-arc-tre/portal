@@ -66,15 +66,26 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
-export type ProfileTrainingStatus = {
+export type TrainingRecord = {
     /**
-     * Whether the user has valid training certification
+     * The type of training (e.g., "nhsd")
      */
-    has_valid_training: boolean;
+    kind: string;
+    /**
+     * Whether this training certification is currently valid
+     */
+    is_valid: boolean;
     /**
      * Time in RFC3339 format when the training was completed
      */
     completed_at?: string;
+};
+
+export type ProfileTrainingStatus = {
+    /**
+     * List of all training records for the user
+     */
+    training_records: Array<TrainingRecord>;
 };
 
 export type User = {

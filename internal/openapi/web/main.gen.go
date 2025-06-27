@@ -93,11 +93,8 @@ type ProfileTrainingResponse struct {
 
 // ProfileTrainingStatus defines model for ProfileTrainingStatus.
 type ProfileTrainingStatus struct {
-	// CompletedAt Time in RFC3339 format when the training was completed
-	CompletedAt *string `json:"completed_at,omitempty"`
-
-	// HasValidTraining Whether the user has valid training certification
-	HasValidTraining bool `json:"has_valid_training"`
+	// TrainingRecords List of all training records for the user
+	TrainingRecords []TrainingRecord `json:"training_records"`
 }
 
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
@@ -113,6 +110,18 @@ type ProfileTrainingUpdateKind string
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
+}
+
+// TrainingRecord defines model for TrainingRecord.
+type TrainingRecord struct {
+	// CompletedAt Time in RFC3339 format when the training was completed
+	CompletedAt *string `json:"completed_at,omitempty"`
+
+	// IsValid Whether this training certification is currently valid
+	IsValid bool `json:"is_valid"`
+
+	// Kind The type of training (e.g., "nhsd")
+	Kind string `json:"kind"`
 }
 
 // User defines model for User.

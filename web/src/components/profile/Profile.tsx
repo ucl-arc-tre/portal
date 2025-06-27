@@ -43,7 +43,8 @@ export default function Profile() {
         }
 
         if (trainingResponse.response.ok && trainingResponse.data) {
-          setTrainingCertificateCompleted(trainingResponse.data.has_valid_training);
+          const nhsdTraining = trainingResponse.data.training_records.find((record) => record.kind === "nhsd");
+          setTrainingCertificateCompleted(nhsdTraining?.is_valid || false);
         }
       } catch (error) {
         console.error("Failed to get profile data:", error);

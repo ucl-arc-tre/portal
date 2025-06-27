@@ -263,17 +263,32 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
-    ProfileTrainingStatus:
+    TrainingRecord:
       type: object
       required:
-        - has_valid_training
+        - kind
+        - is_valid
       properties:
-        has_valid_training:
+        kind:
+          type: string
+          description: The type of training (e.g., "nhsd")
+        is_valid:
           type: boolean
-          description: Whether the user has valid training certification
+          description: Whether this training certification is currently valid
         completed_at:
           type: string
           description: Time in RFC3339 format when the training was completed
+
+    ProfileTrainingStatus:
+      type: object
+      required:
+        - training_records
+      properties:
+        training_records:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrainingRecord"
+          description: List of all training records for the user
 
     User:
       type: object

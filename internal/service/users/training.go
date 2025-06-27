@@ -95,31 +95,45 @@ func (s *Service) createNHSDTrainingRecord(user types.User, completedAt time.Tim
 	return result.Error
 }
 
-// GetTrainingStatus returns the training status for a user
+// returns all training records for a user
 func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingStatus, error) {
-	hasValid, err := s.hasValidNHSDTrainingRecord(user)
-	if err != nil {
-		return openapi.ProfileTrainingStatus{}, err
-	}
+	var trainingRecords []openapi.TrainingRecord
 
-	response := openapi.ProfileTrainingStatus{
-		HasValidTraining: hasValid,
+	// Get NHSD training record with single DB query
+	record := types.UserTrainingRecord{
+		UserID: user.ID,
+		Kind:   types.TrainingKindNHSD,
 	}
+	result := s.db.Order("completed_at desc").First(&record)
 
-	// If they have valid training, get the completion date
-	if hasValid {
-		record := types.UserTrainingRecord{
-			UserID: user.ID,
-			Kind:   types.TrainingKindNHSD,
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		// No NHSD training record found
+		nhsdRecord := openapi.TrainingRecord{
+			Kind:    string(types.TrainingKindNHSD),
+			IsValid: false,
 		}
-		result := s.db.Order("completed_at desc").First(&record)
-		if result.Error == nil {
-			completedAt := record.CompletedAt.Format(config.TimeFormat)
-			response.CompletedAt = &completedAt
+		trainingRecords = append(trainingRecords, nhsdRecord)
+	} else if result.Error != nil {
+		// Database error
+		return openapi.ProfileTrainingStatus{}, result.Error
+	} else {
+		// Record found - check if it's still valid
+		isValid := time.Since(record.CompletedAt) < config.TrainingValidity
+		completedAt := record.CompletedAt.Format(config.TimeFormat)
+
+		nhsdRecord := openapi.TrainingRecord{
+			Kind:        string(types.TrainingKindNHSD),
+			IsValid:     isValid,
+			CompletedAt: &completedAt,
 		}
+		trainingRecords = append(trainingRecords, nhsdRecord)
 	}
 
-	return response, nil
+	// TODO: Add other training types here in the future
+
+	return openapi.ProfileTrainingStatus{
+		TrainingRecords: trainingRecords,
+	}, nil
 }
 
 func ptr[T any](value T) *T {
