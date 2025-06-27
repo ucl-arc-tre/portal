@@ -27,7 +27,7 @@ describe(`Homepage Tests`, () => {
     });
 
     it("shows profile setup prompt when no chosen name", () => {
-      cy.contains("Continue Profile Setup").should("be.visible");
+      cy.contains("Complete Profile Setup").should("be.visible");
     });
 
     it("shows tasks complete when profile is complete", () => {
