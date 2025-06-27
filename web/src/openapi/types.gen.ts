@@ -44,7 +44,7 @@ export type ProfileAgreements = {
 };
 
 export type ProfileTrainingUpdate = {
-    kind: 'training_kind_nhsd';
+    kind: TrainingRecordKind;
     /**
      * Base64 encoded PDF file data of the certificate
      */
@@ -67,10 +67,7 @@ export type ProfileTrainingResponse = {
 };
 
 export type TrainingRecord = {
-    /**
-     * The type of training (e.g., "nhsd")
-     */
-    kind: string;
+    kind: TrainingRecordKind;
     /**
      * Whether this training certification is currently valid
      */
@@ -100,6 +97,8 @@ export type Person = {
 };
 
 export type People = Array<Person>;
+
+export type TrainingRecordKind = 'nhsd';
 
 export type GetAuthData = {
     body?: never;
