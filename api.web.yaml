@@ -244,7 +244,7 @@ components:
         - kind
       properties:
         kind:
-          $ref: "#/components/schemas/TrainingRecordKind"
+          $ref: "#/components/schemas/TrainingKind"
         certificate_content_pdf_base64:
           type: string
           description: Base64 encoded PDF file data of the certificate
@@ -269,7 +269,7 @@ components:
         - is_valid
       properties:
         kind:
-          $ref: "#/components/schemas/TrainingRecordKind"
+          $ref: "#/components/schemas/TrainingKind"
           description: The type of training
         is_valid:
           type: boolean
@@ -321,7 +321,7 @@ components:
       items:
         $ref: "#/components/schemas/Person"
 
-    TrainingRecordKind:
+    TrainingKind:
       type: string
       enum:
-        - "nhsd"
+        - "training_kind_nhsd"

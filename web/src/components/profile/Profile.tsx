@@ -43,7 +43,9 @@ export default function Profile() {
         }
 
         if (trainingResponse.response.ok && trainingResponse.data) {
-          const nhsdTraining = trainingResponse.data.training_records.find((record) => record.kind === "nhsd");
+          const nhsdTraining = trainingResponse.data.training_records.find(
+            (record) => record.kind === "training_kind_nhsd"
+          );
           setTrainingCertificateCompleted(nhsdTraining?.is_valid || false);
         }
       } catch (error) {

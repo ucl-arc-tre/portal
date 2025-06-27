@@ -19,7 +19,7 @@ func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUp
 		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
 	}
 	switch data.Kind {
-	case openapi.Nhsd:
+	case openapi.TrainingKindNhsd:
 		return s.updateNHSD(user, data)
 	default:
 		return openapi.ProfileTrainingResponse{}, fmt.Errorf("unsupported training kind [%v]", data.Kind)
@@ -109,7 +109,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		// No NHSD training record found
 		nhsdRecord := openapi.TrainingRecord{
-			Kind:    openapi.Nhsd,
+			Kind:    openapi.TrainingKindNhsd,
 			IsValid: false,
 		}
 		trainingRecords = append(trainingRecords, nhsdRecord)
@@ -122,7 +122,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 		completedAt := record.CompletedAt.Format(config.TimeFormat)
 
 		nhsdRecord := openapi.TrainingRecord{
-			Kind:        openapi.Nhsd,
+			Kind:        openapi.TrainingKindNhsd,
 			IsValid:     isValid,
 			CompletedAt: &completedAt,
 		}

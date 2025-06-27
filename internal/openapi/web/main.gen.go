@@ -20,9 +20,9 @@ const (
 	AuthRolesBase               AuthRoles = "base"
 )
 
-// Defines values for TrainingRecordKind.
+// Defines values for TrainingKind.
 const (
-	Nhsd TrainingRecordKind = "nhsd"
+	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
 )
 
 // Agreement defines model for Agreement.
@@ -100,8 +100,8 @@ type ProfileTrainingStatus struct {
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
 	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertificateContentPdfBase64 *string            `json:"certificate_content_pdf_base64,omitempty"`
-	Kind                        TrainingRecordKind `json:"kind"`
+	CertificateContentPdfBase64 *string      `json:"certificate_content_pdf_base64,omitempty"`
+	Kind                        TrainingKind `json:"kind"`
 }
 
 // ProfileUpdate defines model for ProfileUpdate.
@@ -109,18 +109,18 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// TrainingKind defines model for TrainingKind.
+type TrainingKind string
+
 // TrainingRecord defines model for TrainingRecord.
 type TrainingRecord struct {
 	// CompletedAt Time in RFC3339 format when the training was completed
 	CompletedAt *string `json:"completed_at,omitempty"`
 
 	// IsValid Whether this training certification is currently valid
-	IsValid bool               `json:"is_valid"`
-	Kind    TrainingRecordKind `json:"kind"`
+	IsValid bool         `json:"is_valid"`
+	Kind    TrainingKind `json:"kind"`
 }
-
-// TrainingRecordKind defines model for TrainingRecordKind.
-type TrainingRecordKind string
 
 // User defines model for User.
 type User struct {
