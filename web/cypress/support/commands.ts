@@ -264,7 +264,7 @@ Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) =
 
 Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: string) => {
   const trainingRecord: any = {
-    kind: "nhsd",
+    kind: "training_kind_nhsd",
     is_valid: isValid,
   };
 

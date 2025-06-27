@@ -155,7 +155,7 @@ describe(`Profile Page Step Workflow UI`, () => {
       body: {
         training_records: [
           {
-            kind: "nhsd",
+            kind: "training_kind_nhsd",
             is_valid: false,
           },
         ],
@@ -209,7 +209,7 @@ describe(`Profile Page Step Workflow UI`, () => {
       body: {
         training_records: [
           {
-            kind: "nhsd",
+            kind: "training_kind_nhsd",
             is_valid: false,
           },
         ],
@@ -269,7 +269,7 @@ describe(`Profile Page Step Workflow UI`, () => {
       body: {
         training_records: [
           {
-            kind: "nhsd",
+            kind: "training_kind_nhsd",
             is_valid: false,
           },
         ],
