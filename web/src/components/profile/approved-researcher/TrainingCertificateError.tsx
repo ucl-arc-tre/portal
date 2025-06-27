@@ -1,3 +1,5 @@
+import styles from "./TrainingCertificateError.module.css";
+
 import dynamic from "next/dynamic";
 const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
   ssr: false,
@@ -15,18 +17,20 @@ const manualApprovalEmailSubject = "Training certificate";
 export default function TrainingCertificateError(props: TrainingCertificateErrorProps) {
   return (
     <AlertMessage>
-      {props.text}
-      {props.showExtra && (
-        <span>
-          If you believe your certificate is valid please email it to{" "}
-          <a
-            href={`mailto:${manualApprovalEmailAddress}?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
-          >
-            {manualApprovalEmailAddress}
-          </a>{" "}
-          for manual approval.
-        </span>
-      )}
+      <div className={styles["error-wrapper"]}>
+        {props.text}
+        {props.showExtra && (
+          <span>
+            If you believe your certificate is valid please email it to{" "}
+            <a
+              href={`mailto:${manualApprovalEmailAddress}?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
+            >
+              {manualApprovalEmailAddress}
+            </a>{" "}
+            for manual approval.
+          </span>
+        )}
+      </div>
     </AlertMessage>
   );
 }

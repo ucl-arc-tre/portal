@@ -1,13 +1,10 @@
-import { FormEvent, useRef, useState } from "react";
-import styles from "./ChosenNameForm.module.css";
+import { FormEvent, useState } from "react";
+import styles from "./ProfileChosenName.module.css";
 import Button from "../ui/Button";
 import { postProfile } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 
-const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
-  ssr: false,
-});
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -18,17 +15,18 @@ const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input
   ssr: false,
 });
 
-type ChosenNameFormProps = {
+type ProfileChosenNameProps = {
+  currentName?: string;
   setChosenName: (name: string) => void;
 };
 
-export default function ChosenNameForm(props: ChosenNameFormProps) {
-  const { setChosenName } = props;
+export default function ProfileChosenName(props: ProfileChosenNameProps) {
+  const { currentName, setChosenName } = props;
 
-  const [inputNameValue, setInputNameValue] = useState("");
+  const [inputNameValue, setInputNameValue] = useState(currentName || "");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const regex = /^[A-Za-z\s-]+(\p{M}\p{L}*)*$/u;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -38,26 +36,38 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
     if (!name) return setErrorMessage("Please enter a name.");
     if (!regex.test(name)) return setErrorMessage("Please enter a valid name. Only letters and hyphens are allowed.");
 
+    setIsSubmitting(true);
     try {
       const response = await postProfile({ body: { chosen_name: name } });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
       setChosenName(name);
-      dialogRef.current?.close();
+      setErrorMessage(null);
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit name. Please try again.");
       setErrorType("error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <>
-      <dialog open ref={dialogRef} className={styles.dialog} data-cy="chosenName">
-        <form onSubmit={handleSubmit} noValidate>
-          <p>Please enter your name as you would choose to have it appear on forms related to our services.</p>
+    <section className={styles.section} data-cy="chosen-name-form">
+      <h3 className={styles.title}>Set Your Chosen Name</h3>
+      <div className={styles.description}>
+        Please enter your name as you would choose to have it appear on forms related to our services.
+        <div>
+          <strong> This name must match the name on your training certificate</strong> that you will upload in the next
+          step.
+        </div>
+      </div>
 
-          <label htmlFor="chosenNameInput">Chosen Name</label>
+      <form onSubmit={handleSubmit} noValidate className={styles.form}>
+        <div className={styles["input-group"]}>
+          <label htmlFor="chosenNameInput" className={styles.label}>
+            Chosen Name
+          </label>
           <Input
             id="chosenNameInput"
             type="text"
@@ -66,22 +76,24 @@ export default function ChosenNameForm(props: ChosenNameFormProps) {
             placeholder="e.g. Alice Smith"
             onChange={(e) => {
               setInputNameValue(e.target.value);
-              if (errorMessage) setErrorMessage(null); // Clear error as user types
+              if (errorMessage) setErrorMessage(null);
             }}
             aria-invalid={!!errorMessage}
             aria-describedby="chosenNameError"
+            className={styles.input}
           />
+        </div>
 
-          {errorMessage && (
-            <Alert type={errorType} className={styles.alert}>
-              <AlertMessage>{errorMessage}</AlertMessage>
-            </Alert>
-          )}
+        {errorMessage && (
+          <Alert type={errorType} className={styles.alert}>
+            <AlertMessage>{errorMessage}</AlertMessage>
+          </Alert>
+        )}
 
-          <Button type="submit">Submit</Button>
-        </form>
-      </dialog>
-      <Blanket className={styles.blanket} />
-    </>
+        <Button type="submit" size="large" disabled={isSubmitting} className={styles["submit-button"]}>
+          {isSubmitting ? "Saving..." : "Save Name"}
+        </Button>
+      </form>
+    </section>
   );
 }

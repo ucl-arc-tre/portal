@@ -17,10 +17,19 @@
   }
 
   a {
-    color: #9f84f2;
-  }
-
-  a:hover {
     text-decoration: underline;
+    color: #4023a7;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .wrapper {
+    p {
+      color: #c9ced8;
+    }
+
+    a {
+      color: #c3b0d7;
+    }
   }
 }

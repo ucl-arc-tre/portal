@@ -1,0 +1,86 @@
+.container {
+  background: var(--background);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.container h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.setup-prompt {
+  text-align: center;
+}
+
+.setup-prompt h3 {
+  margin: 0 0 1rem 0;
+  color: var(--foreground);
+  font-size: 1.25rem;
+}
+
+.setup-prompt p {
+  margin: 0 0 1.5rem 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.researcher-prompt {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.researcher-prompt p {
+  margin: 0 0 1rem 0;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.completed-tasks {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+}
+
+.completed-tasks p {
+  margin: 0;
+  color: #166534;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    border-color: #374151;
+  }
+
+  .setup-prompt p {
+    color: #9ca3af;
+  }
+
+  .researcher-prompt {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .researcher-prompt p {
+    color: #d1d5db;
+  }
+
+  .completed-tasks {
+    background: #064e3b;
+    border-color: #065f46;
+  }
+
+  .completed-tasks p {
+    color: #6ee7b7;
+  }
+}

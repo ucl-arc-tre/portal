@@ -66,6 +66,28 @@ export type ProfileTrainingResponse = {
     certificate_issued_at?: string;
 };
 
+export type TrainingRecord = {
+    /**
+     * The type of training (e.g., "nhsd")
+     */
+    kind: string;
+    /**
+     * Whether this training certification is currently valid
+     */
+    is_valid: boolean;
+    /**
+     * Time in RFC3339 format when the training was completed
+     */
+    completed_at?: string;
+};
+
+export type ProfileTrainingStatus = {
+    /**
+     * List of all training records for the user
+     */
+    training_records: Array<TrainingRecord>;
+};
+
 export type User = {
     username: string;
     id: string;
@@ -201,6 +223,30 @@ export type PostProfileAgreementsResponses = {
 };
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
+
+export type GetProfileTrainingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/profile/training';
+};
+
+export type GetProfileTrainingErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProfileTrainingResponses = {
+    200: ProfileTrainingStatus;
+};
+
+export type GetProfileTrainingResponse = GetProfileTrainingResponses[keyof GetProfileTrainingResponses];
 
 export type PostProfileTrainingData = {
     body: ProfileTrainingUpdate;

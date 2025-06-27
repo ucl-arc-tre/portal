@@ -1,7 +1,53 @@
-.p {
-  padding: 1rem;
+.current-step {
+  margin: 2rem 0;
 }
 
-.button {
-  margin: 1rem;
+.approved-researcher-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 1rem 0;
+}
+
+.completed-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--background);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.completed-message h2 {
+  margin: 0 0 1rem 0;
+  color: var(--green-200);
+}
+
+.completed-message p {
+  margin: 0;
+  color: #37393d;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .divider {
+    background-color: #374151;
+  }
+
+  .completed-message {
+    border-color: #374151;
+  }
+
+  .completed-message p {
+    color: #9ca3af;
+  }
+
+  .completed-message h2 {
+    color: #1ebc58;
+  }
 }

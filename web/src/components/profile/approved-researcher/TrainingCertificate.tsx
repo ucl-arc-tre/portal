@@ -19,10 +19,16 @@ const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input
 });
 
 interface FormEvent extends React.FormEvent<HTMLFormElement> {
-  target: HTMLFormElement;
+  target: HTMLFormElement & {
+    certificate: HTMLInputElement;
+  };
 }
 
-export default function TrainingCertificate() {
+type TrainingCertificateProps = {
+  setTrainingCertificateCompleted: (completed: boolean) => void;
+};
+
+export default function TrainingCertificate({ setTrainingCertificateCompleted }: TrainingCertificateProps) {
   const { authInProgress, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
@@ -30,15 +36,30 @@ export default function TrainingCertificate() {
   const [isPDF, setIsPDF] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  function base64Encode(file: File): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result as string | null);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage(undefined);
 
     const { certificate } = e.target;
-    const files: FileList = certificate.files;
+    const files: FileList | null = certificate.files;
 
-    if (files.length !== 1) {
+    if (!files || files.length !== 1) {
       setErrorMessage("Must have only 1 file.");
       setErrorType("warning");
       setIsSubmitting(false);
@@ -70,17 +91,18 @@ export default function TrainingCertificate() {
         },
       });
 
+      const isValidCert = res.data?.certificate_is_valid;
+      setIsValid(isValidCert);
+
       if (res.error) {
         setErrorMessage("Failed to validate certificate.");
         setErrorType("error");
+      } else if (!isValidCert) {
+        setErrorMessage(`Certificate was not valid. ${res.data?.certificate_message || ""}`);
+        setErrorType("error");
       } else {
-        const isValidCert = res.data?.certificate_is_valid;
-        setIsValid(isValidCert);
-
-        if (!isValidCert) {
-          setErrorMessage(`Certificate was not valid. ${res.data?.certificate_message || ""}`);
-          setErrorType("error");
-        }
+        setErrorMessage("");
+        setTrainingCertificateCompleted(true);
       }
     } catch (err) {
       setErrorMessage(`Certificate upload failed: ${err instanceof Error ? err.message : "Unknown error"}`);
@@ -104,7 +126,6 @@ export default function TrainingCertificate() {
 
     setIsPDF(typeIsPDF);
 
-    // Clear any previous errors when selecting a new file
     if (typeIsPDF) {
       setErrorMessage("");
       setErrorType("warning");
@@ -130,7 +151,7 @@ export default function TrainingCertificate() {
     <section data-cy="training-certificate" className={styles.wrapper}>
       <h2 className="subtitle">Training Certificate</h2>
       <p>
-        All members of UCL who manage highly confidential research information, must undertake annual training on
+        All members of UCL who manage highly confidential research information must undertake annual training on
         handling sensitive information. Anyone with an &apos;.ac.uk&apos; or NHS email address can self-register for{" "}
         <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
           NHS Digital Data Security Awareness Level 1 course
@@ -139,20 +160,24 @@ export default function TrainingCertificate() {
         Higher Education Researcher (Education)&quot; which should provide you access to the course.
         <br />
         <br />
-        <strong>Please complete the course and upload the PDF certificate below</strong>
+        <strong>Please complete the course and upload the PDF certificate below.</strong>
+      </p>
+      <p>
+        Note that the name on your certificate must match the chosen name you entered in step 1 for validation to
+        succeed.
       </p>
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <Input
           type="file"
           name="certificate"
-          accept=".pdf,application/pdf"
+          aria-label="certificate-upload"
+          accept="application/pdf"
           required
           onChange={checkIsPDF}
-          disabled={isSubmitting}
         />
-        <Button size="large" type="submit" cy="training-certificate-submit" disabled={!isPDF || isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit"}
+        <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF || isSubmitting}>
+          Submit
         </Button>
       </form>
 
@@ -163,19 +188,4 @@ export default function TrainingCertificate() {
       )}
     </section>
   );
-}
-
-function base64Encode(file: File): Promise<string | null> {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-
-    fileReader.onload = () => {
-      resolve(fileReader.result as string | null);
-    };
-
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
-  });
 }
