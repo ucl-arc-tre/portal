@@ -109,7 +109,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		// No NHSD training record found
 		nhsdRecord := openapi.TrainingRecord{
-			Kind:    openapi.TrainingRecordKind(types.TrainingKindNHSD),
+			Kind:    openapi.Nhsd,
 			IsValid: false,
 		}
 		trainingRecords = append(trainingRecords, nhsdRecord)
@@ -122,7 +122,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 		completedAt := record.CompletedAt.Format(config.TimeFormat)
 
 		nhsdRecord := openapi.TrainingRecord{
-			Kind:        openapi.TrainingRecordKind(types.TrainingKindNHSD),
+			Kind:        openapi.Nhsd,
 			IsValid:     isValid,
 			CompletedAt: &completedAt,
 		}
