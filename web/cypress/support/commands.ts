@@ -78,6 +78,31 @@ declare global {
        * @example cy.checkAccessibility('[data-cy="profile-form"]')
        */
       checkAccessibility(selector?: string): Chainable<any>;
+
+      /**
+       * Mock profile chosen name endpoint
+       * @param chosenName - The chosen name to return, empty string for no name, undefined for empty response
+       * @example cy.mockProfileChosenName("Test User")
+       * @example cy.mockProfileChosenName("") // no chosen name set
+       */
+      mockProfileChosenName(chosenName?: string): Chainable<any>;
+
+      /**
+       * Mock profile agreements endpoint
+       * @param hasApprovedResearcher - Whether user has confirmed approved researcher agreement
+       * @example cy.mockProfileAgreements(true)
+       * @example cy.mockProfileAgreements(false)
+       */
+      mockProfileAgreements(hasApprovedResearcher: boolean): Chainable<any>;
+
+      /**
+       * Mock profile training endpoint
+       * @param isValid - Whether the NHSD training is valid
+       * @param completedAt - Optional completion date (only used if isValid is true)
+       * @example cy.mockProfileTraining(false)
+       * @example cy.mockProfileTraining(true, "2024-01-01T00:00:00Z")
+       */
+      mockProfileTraining(isValid: boolean, completedAt?: string): Chainable<any>;
     }
   }
 }
@@ -209,4 +234,48 @@ Cypress.Commands.add("checkAccessibility", (selector?: string) => {
   cy.checkA11y(selector, {
     includedImpacts: ["critical", "serious"],
   });
+});
+
+Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
+  const body = chosenName === undefined ? {} : { chosen_name: chosenName };
+  cy.intercept("GET", "/api/v0/profile", {
+    statusCode: 200,
+    body,
+  }).as("getProfile");
+});
+
+Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
+  const confirmedAgreements = hasApprovedResearcher
+    ? [
+        {
+          agreement_type: "approved-researcher",
+          confirmed_at: "2024-01-01T00:00:00Z",
+        },
+      ]
+    : [];
+
+  cy.intercept("GET", "/api/v0/profile/agreements", {
+    statusCode: 200,
+    body: {
+      confirmed_agreements: confirmedAgreements,
+    },
+  }).as("getAgreements");
+});
+
+Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: string) => {
+  const trainingRecord: any = {
+    kind: "nhsd",
+    is_valid: isValid,
+  };
+
+  if (isValid && completedAt) {
+    trainingRecord.completed_at = completedAt;
+  }
+
+  cy.intercept("GET", "/api/v0/profile/training", {
+    statusCode: 200,
+    body: {
+      training_records: [trainingRecord],
+    },
+  }).as("getTraining");
 });

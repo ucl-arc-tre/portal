@@ -9,23 +9,14 @@ describe(`Profile Page Step Workflow UI`, () => {
   });
 
   it("displays step progress indicator with step 1 current", () => {
-    // Mock profile with no chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {},
-    }).as("getProfile");
-
-    // Mock agreements with no confirmed agreements
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [],
-      },
-    }).as("getAgreements");
+    cy.mockProfileChosenName(); // No chosen name
+    cy.mockProfileAgreements(false); // No agreements
+    cy.mockProfileTraining(false); // No training
 
     cy.visit("/profile");
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     cy.get("[aria-label='Profile setup progress']").should("be.visible");
 
@@ -39,23 +30,14 @@ describe(`Profile Page Step Workflow UI`, () => {
   });
 
   it("only shows current step content", () => {
-    // Mock profile with no chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {},
-    }).as("getProfile");
-
-    // Mock agreements with no confirmed agreements
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [],
-      },
-    }).as("getAgreements");
+    cy.mockProfileChosenName(); // No chosen name
+    cy.mockProfileAgreements(false); // No agreements
+    cy.mockProfileTraining(false); // No training
 
     cy.visit("/profile");
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     // Should only show chosen name form initially
     cy.get("[data-cy='chosen-name-form']").should("be.visible");
@@ -64,23 +46,14 @@ describe(`Profile Page Step Workflow UI`, () => {
   });
 
   it("validates chosen name input", () => {
-    // Mock profile with no chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {},
-    }).as("getProfile");
-
-    // Mock agreements with no confirmed agreements
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [],
-      },
-    }).as("getAgreements");
+    cy.mockProfileChosenName(); // No chosen name
+    cy.mockProfileAgreements(false); // No agreements
+    cy.mockProfileTraining(false); // No training
 
     cy.visit("/profile");
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     cy.get("[data-cy='chosen-name-form'] input").type("123");
     cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
@@ -102,26 +75,15 @@ describe(`Profile Page Step Workflow UI`, () => {
       },
     }).as("getAuth");
 
-    // Mock profile with chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {
-        chosen_name: "Test User",
-      },
-    }).as("getProfile");
-
-    // Mock agreements with no confirmed agreements
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [],
-      },
-    }).as("getAgreements");
+    cy.mockProfileChosenName("Test User"); // Has chosen name
+    cy.mockProfileAgreements(false); // No agreements yet
+    cy.mockProfileTraining(false); // No training yet
 
     cy.visit("/profile");
     cy.wait("@getAuth");
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     // Should show step 2 content
     cy.get("[data-cy='approved-researcher-agreement']").should("be.visible");
@@ -139,31 +101,15 @@ describe(`Profile Page Step Workflow UI`, () => {
       },
     }).as("getAuth");
 
-    // Mock profile with chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {
-        chosen_name: "Test User",
-      },
-    }).as("getProfile");
-
-    // Mock agreements with approved-researcher agreement confirmed
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [
-          {
-            agreement_type: "approved-researcher",
-            confirmed_at: "2024-01-01T00:00:00Z",
-          },
-        ],
-      },
-    }).as("getAgreements");
+    cy.mockProfileChosenName("Test User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(false); // Training not complete (this is why we should see step 3)
 
     cy.visit("/profile");
     cy.wait("@getAuth");
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     // Should show step 3 content
     cy.get("[data-cy='training-certificate']").should("be.visible");
@@ -203,10 +149,24 @@ describe(`Profile Page Step Workflow UI`, () => {
       },
     }).as("getAgreements");
 
+    // Mock training as not complete initially
+    cy.intercept("GET", "/api/v0/profile/training", {
+      statusCode: 200,
+      body: {
+        training_records: [
+          {
+            kind: "nhsd",
+            is_valid: false,
+          },
+        ],
+      },
+    }).as("getTraining");
+
     cy.visit("/profile");
     cy.wait("@getAuth");
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     // Should be on step 3
     cy.get("[data-cy='training-certificate']").should("be.visible");
@@ -243,9 +203,23 @@ describe(`Profile Page Step Workflow UI`, () => {
       },
     }).as("getAgreements");
 
+    // Mock training as not complete initially
+    cy.intercept("GET", "/api/v0/profile/training", {
+      statusCode: 200,
+      body: {
+        training_records: [
+          {
+            kind: "nhsd",
+            is_valid: false,
+          },
+        ],
+      },
+    }).as("getTraining");
+
     cy.visit("/profile");
     cy.wait("@getAuth");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     cy.clearChosenName();
     cy.visit("/profile");
@@ -289,9 +263,23 @@ describe(`Profile Page Step Workflow UI`, () => {
       },
     }).as("getAgreements");
 
+    // Mock training as not complete initially
+    cy.intercept("GET", "/api/v0/profile/training", {
+      statusCode: 200,
+      body: {
+        training_records: [
+          {
+            kind: "nhsd",
+            is_valid: false,
+          },
+        ],
+      },
+    }).as("getTraining");
+
     cy.visit("/profile");
     cy.wait("@getAuth");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     cy.clearChosenName();
     cy.visit("/profile");
@@ -307,39 +295,22 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
     cy.get("[data-cy='training-certificate-sumbit']").click();
 
-    // Should show success message
-    cy.contains("Valid training").should("be.visible");
+    cy.contains("Profile Complete").should("be.visible");
   });
 
   it("shows completion state when all steps done", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseApprovedResearcher();
 
-    // Mock profile with chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {
-        chosen_name: "Complete User",
-      },
-    }).as("getProfile");
-
-    // Mock agreements with approved-researcher agreement confirmed
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [
-          {
-            agreement_type: "approved-researcher",
-            confirmed_at: "2024-01-01T00:00:00Z",
-          },
-        ],
-      },
-    }).as("getAgreements");
+    cy.mockProfileChosenName("Complete User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(true, "2024-01-01T00:00:00Z"); // Training completed
 
     cy.visit("/profile");
     cy.waitForMockedAuth();
     cy.wait("@getProfile");
     cy.wait("@getAgreements");
+    cy.wait("@getTraining");
 
     // Should show completion message instead of steps
     cy.contains("Profile Complete").should("be.visible");
