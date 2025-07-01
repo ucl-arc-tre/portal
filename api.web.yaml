@@ -152,7 +152,11 @@ paths:
 
   /people/approved-researchers/import/csv:
     post:
-      description: Upload a CSV file containing <username>,<agreed to agreement>,<NHSD training completed at>
+      description: |
+        Upload a CSV file with fields
+        <username: string, e.g. "bob@example.com">,
+        <agreed to agreement: bool, e.g. true>,
+        <NHSD training completed at date: string, e.g. 2021-03-11>
       requestBody:
         required: true
         content:

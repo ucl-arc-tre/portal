@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"slices"
@@ -40,5 +39,9 @@ func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
 		setServerError(ctx, err, "Failed to read body")
 		return
 	}
-	fmt.Println(string(content))
+	if err := h.users.ImportApprovedResearchersCSV(content); err != nil {
+		setServerError(ctx, err, "Failed to import")
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }

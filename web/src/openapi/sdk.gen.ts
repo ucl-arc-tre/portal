@@ -118,7 +118,11 @@ export const getPeople = <ThrowOnError extends boolean = false>(options?: Option
 };
 
 /**
- * Upload a CSV file containing <username>,<agreed to agreement>,<NHSD training completed at>
+ * Upload a CSV file with fields
+ * <username: string, e.g. "bob@example.com">,
+ * <agreed to agreement: bool, e.g. true>,
+ * <NHSD training completed at date: string, e.g. 2021-03-11>
+ *
  */
 export const postPeopleApprovedResearchersImportCsv = <ThrowOnError extends boolean = false>(options: Options<PostPeopleApprovedResearchersImportCsvData, ThrowOnError>) => {
     return (options.client ?? _heyApiClient).post<PostPeopleApprovedResearchersImportCsvResponses, PostPeopleApprovedResearchersImportCsvErrors, ThrowOnError>({
