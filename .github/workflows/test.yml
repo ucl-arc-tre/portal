@@ -52,6 +52,7 @@ jobs:
 
       - name: tmp
         run: |
+          cd e2e/tls && if [ ! -f nginx.key ]; then echo "creating tls certificates for nginx" && openssl req -x509 -nodes -days 365 -subj "/C=GB" -newkey rsa:2048 -keyout ./nginx.key -out ./nginx.crt; fi
           cd e2e && \
           docker compose -p ucl-arc-tre-e2e build && \
           docker compose -p ucl-arc-tre-e2e up nginx -d && \
