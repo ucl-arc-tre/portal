@@ -59,7 +59,7 @@ jobs:
           cd e2e && \
           docker compose -p ucl-arc-tre-e2e build && \
           docker compose -p ucl-arc-tre-e2e up nginx -d && \
-          docker compose -p ucl-arc-tre-e2e --rm cypress
+          docker compose -p ucl-arc-tre-e2e cypress
 
       - name: Run e2e tests
         run: make test-e2e-release
