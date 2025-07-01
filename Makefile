@@ -51,6 +51,7 @@ test-e2e-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev se
 test-e2e-release: e2e-dependencies ## Run cypress against the release build
 	cd e2e && \
 	docker compose -p $(E2E_PROJECT_NAME) build && \
+	docker compose -p $(E2E_PROJECT_NAME) up nginx -d && \
 	docker compose -p $(E2E_PROJECT_NAME) run --rm cypress && \
 	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans
 
