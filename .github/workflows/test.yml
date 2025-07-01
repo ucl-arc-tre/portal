@@ -67,5 +67,10 @@ jobs:
           }
           EOF
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - name: Run e2e tests
         run: make test-e2e-release
