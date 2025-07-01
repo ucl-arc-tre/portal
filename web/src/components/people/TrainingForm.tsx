@@ -56,8 +56,9 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
       const trainingKindKey = Object.entries(TrainingKindOptions).find(([, value]) => value === trainingKind)?.[0];
 
       updatePersonUI(id, {
-        training_kind: trainingKindKey as TrainingKind,
+        kind: trainingKindKey as TrainingKind,
         completed_at: trainingDisplayDate,
+        is_valid: true,
       });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);

@@ -53,12 +53,12 @@
     grid-template-rows: 1fr 0.5fr;
     grid-template-columns: 3fr 0.2fr;
 
-    .confirmed svg {
+    .valid svg {
       grid-row: 1;
       stroke: var(--green-100);
     }
 
-    .unconfirmed svg {
+    .invalid svg {
       grid-row: 1;
       stroke: #ff6161;
     }

@@ -91,11 +91,11 @@ export default function AdminView() {
                   <div key={agreement.agreement_type} className={styles.agreement}>
                     {agreement.agreement_type}
                     {agreement.confirmed_at ? (
-                      <span className={styles.confirmed}>
+                      <span className={styles.valid}>
                         <CheckIcon />
                       </span>
                     ) : (
-                      <span className={styles.unconfirmed}>
+                      <span className={styles.invalid}>
                         <XIcon />
                       </span>
                     )}
@@ -106,14 +106,14 @@ export default function AdminView() {
               <td>
                 <div className={styles.trainingRecord} data-cy="training">
                   {person.training_record?.map((training: TrainingRecord) => (
-                    <div key={training.training_kind} className={styles.training}>
-                      {training.training_kind}
-                      {training.completed_at ? (
-                        <span className={styles.confirmed}>
+                    <div key={training.kind} className={styles.training}>
+                      {training.kind}
+                      {training.is_valid ? (
+                        <span className={styles.valid}>
                           <CheckIcon />
                         </span>
                       ) : (
-                        <span className={styles.unconfirmed}>
+                        <span className={styles.invalid}>
                           <XIcon />
                         </span>
                       )}
