@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 	"slices"
 
@@ -30,4 +32,13 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
 	}
 
+}
+
+func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
+	content, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		setServerError(ctx, err, "Failed to read body")
+		return
+	}
+	fmt.Println(string(content))
 }

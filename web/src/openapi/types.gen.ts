@@ -330,6 +330,37 @@ export type GetPeopleResponses = {
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
 
+export type PostPeopleApprovedResearchersImportCsvData = {
+    body: Blob | File;
+    path?: never;
+    query?: never;
+    url: '/people/approved-researchers/import/csv';
+};
+
+export type PostPeopleApprovedResearchersImportCsvErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostPeopleApprovedResearchersImportCsvResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostPeopleApprovedResearchersImportCsvResponse = PostPeopleApprovedResearchersImportCsvResponses[keyof PostPeopleApprovedResearchersImportCsvResponses];
+
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});
 };
