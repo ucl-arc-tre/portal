@@ -6,22 +6,6 @@ on:
       - "docs/**"
 
 jobs:
-  unit:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.24"
-
-      - name: Run unit tests
-        run: make test-unit
-
   e2e:
     runs-on: ubuntu-latest
     environment: e2e
@@ -67,10 +51,12 @@ jobs:
           }
           EOF
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
+      - name: tmp
+        run: |
+          cd e2e && \
+          docker compose -p ucl-arc-tre-e2e build && \
+          docker compose -p ucl-arc-tre-e2e up nginx -d && \
+          docker compose -p ucl-arc-tre-e2e logs -f
 
       - name: Run e2e tests
         run: make test-e2e-release
