@@ -12,22 +12,37 @@ import (
 )
 
 // Import a CSV file containing usernames,agreement conformation,nhsd training completed at dates
-func (s *Service) ImportApprovedResearchersCSV(csvContent []byte) error {
+func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement types.Agreement) error {
 	records, err := approvedResearcherImportRecordsFromCSV(csvContent)
 	if err != nil {
 		return err
 	}
 	for _, record := range records {
-		if err := s.insertApprovedResearcher(record); err != nil {
+		user, err := s.persistedUser(record.Username)
+		if err != nil {
 			return err
 		}
-		log.Debug().Any("username", record.Username).Msg("Inserted approved researcher")
+		if err := s.ConfirmAgreement(user, agreement.ID); err != nil {
+			return err
+		}
+		if err := s.createNHSDTrainingRecord(user, record.NHSDTrainingCompletedAt); err != nil {
+			return err
+		}
+		log.Debug().Any("user", user).Msg("Inserted approved researcher")
 	}
 	return nil
 }
 
-func (s *Service) insertApprovedResearcher(record ApprovedResearcherImportRecord) error {
-	return nil
+// Get or create a user for a unique username
+func (s *Service) persistedUser(username types.Username) (types.User, error) {
+	user := types.User{}
+	result := s.db.Where("username = ?", username).
+		Attrs(types.User{
+			Username: username,
+			Model:    types.Model{CreatedAt: time.Now()},
+		}).
+		FirstOrCreate(&user)
+	return user, result.Error
 }
 
 func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResearcherImportRecord, error) {

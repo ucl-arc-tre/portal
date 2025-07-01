@@ -39,7 +39,12 @@ func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
 		setServerError(ctx, err, "Failed to read body")
 		return
 	}
-	if err := h.users.ImportApprovedResearchersCSV(content); err != nil {
+	agreement, err := h.agreements.LatestApprovedResearcher()
+	if err != nil {
+		setServerError(ctx, err, "Failed to get approved researcher agreement")
+		return
+	}
+	if err := h.users.ImportApprovedResearchersCSV(content, *agreement); err != nil {
 		setServerError(ctx, err, "Failed to import")
 		return
 	}
