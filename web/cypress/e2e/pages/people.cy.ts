@@ -3,7 +3,7 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
-describe("People page content", () => {
+describe(`People page content`, () => {
   it("should show nothing to base role", () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseUser();

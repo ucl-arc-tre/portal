@@ -86,6 +86,18 @@ paths:
           description: Unexpected error
 
   /profile/training:
+    get:
+      description: Get the training record status for a user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileTrainingStatus"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
     post:
       description: Update the training record for a user
       requestBody:
@@ -262,8 +274,7 @@ components:
         - kind
       properties:
         kind:
-          type: string
-          enum: [training_kind_nhsd]
+          $ref: "#/components/schemas/TrainingKind"
         certificate_content_pdf_base64:
           type: string
           description: Base64 encoded PDF file data of the certificate
@@ -281,6 +292,33 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
+    TrainingRecord:
+      type: object
+      required:
+        - kind
+        - is_valid
+      properties:
+        kind:
+          $ref: "#/components/schemas/TrainingKind"
+          description: The type of training
+        is_valid:
+          type: boolean
+          description: Whether this training certification is currently valid
+        completed_at:
+          type: string
+          description: Time in RFC3339 format when the training was completed
+
+    ProfileTrainingStatus:
+      type: object
+      required:
+        - training_records
+      properties:
+        training_records:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrainingRecord"
+          description: List of all training records for the user
+
     User:
       type: object
       required:
@@ -291,14 +329,6 @@ components:
           type: string
         id:
           type: string
-
-    TrainingRecord:
-      type: object
-      properties:
-        completed_at:
-          type: string
-        training_kind:
-          $ref: "#/components/schemas/TrainingKind"
 
     PersonTrainingRecords:
       type: array

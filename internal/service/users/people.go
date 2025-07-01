@@ -85,8 +85,8 @@ func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrain
 		}
 
 		apiTrainingRecord := openapi.TrainingRecord{
-			TrainingKind: &trainingKind,
-			CompletedAt:  formattedTime,
+			Kind:        trainingKind,
+			CompletedAt: formattedTime,
 		}
 
 		training_records = append(training_records, apiTrainingRecord)

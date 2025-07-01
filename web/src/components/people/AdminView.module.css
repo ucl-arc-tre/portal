@@ -74,3 +74,22 @@
     grid-template-columns: 4fr 0.5fr;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .table {
+    color: var(--foreground);
+    background-color: var(--background);
+
+    tbody {
+      border-top: 1px solid var(--foreground);
+    }
+
+    td {
+      color: var(--foreground);
+    }
+
+    .user small {
+      color: rgb(150, 150, 150);
+    }
+  }
+}

@@ -24,14 +24,9 @@ const (
 	AuthRolesBase               AuthRoles = "base"
 )
 
-// Defines values for ProfileTrainingUpdateKind.
-const (
-	ProfileTrainingUpdateKindTrainingKindNhsd ProfileTrainingUpdateKind = "training_kind_nhsd"
-)
-
 // Defines values for TrainingKind.
 const (
-	TrainingKindTrainingKindNhsd TrainingKind = "training_kind_nhsd"
+	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
 )
 
 // Agreement defines model for Agreement.
@@ -111,15 +106,18 @@ type ProfileTrainingResponse struct {
 	CertificateMessage *string `json:"certificate_message,omitempty"`
 }
 
+// ProfileTrainingStatus defines model for ProfileTrainingStatus.
+type ProfileTrainingStatus struct {
+	// TrainingRecords List of all training records for the user
+	TrainingRecords []TrainingRecord `json:"training_records"`
+}
+
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
 	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertificateContentPdfBase64 *string                   `json:"certificate_content_pdf_base64,omitempty"`
-	Kind                        ProfileTrainingUpdateKind `json:"kind"`
+	CertificateContentPdfBase64 *string      `json:"certificate_content_pdf_base64,omitempty"`
+	Kind                        TrainingKind `json:"kind"`
 }
-
-// ProfileTrainingUpdateKind defines model for ProfileTrainingUpdate.Kind.
-type ProfileTrainingUpdateKind string
 
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {
@@ -131,8 +129,12 @@ type TrainingKind string
 
 // TrainingRecord defines model for TrainingRecord.
 type TrainingRecord struct {
-	CompletedAt  *string       `json:"completed_at,omitempty"`
-	TrainingKind *TrainingKind `json:"training_kind,omitempty"`
+	// CompletedAt Time in RFC3339 format when the training was completed
+	CompletedAt *string `json:"completed_at,omitempty"`
+
+	// IsValid Whether this training certification is currently valid
+	IsValid bool         `json:"is_valid"`
+	Kind    TrainingKind `json:"kind"`
 }
 
 // User defines model for User.
@@ -184,6 +186,9 @@ type ServerInterface interface {
 
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
+
+	// (GET /profile/training)
+	GetProfileTraining(c *gin.Context)
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
@@ -322,6 +327,19 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	siw.Handler.PostProfileAgreements(c)
 }
 
+// GetProfileTraining operation middleware
+func (siw *ServerInterfaceWrapper) GetProfileTraining(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProfileTraining(c)
+}
+
 // PostProfileTraining operation middleware
 func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 
@@ -370,5 +388,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 }

@@ -65,8 +65,9 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 				setServerError(ctx, err, "Failed to update training validity")
 			}
 			ctx.JSON(http.StatusOK, openapi.TrainingRecord{
-				TrainingKind: update.TrainingKind,
-				CompletedAt:  &date,
+				Kind:        *update.TrainingKind,
+				CompletedAt: &date,
+				IsValid:     true,
 			})
 		}
 

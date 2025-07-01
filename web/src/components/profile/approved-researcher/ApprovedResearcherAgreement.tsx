@@ -1,22 +1,20 @@
+import { useEffect, useState } from "react";
+import { Agreement, getAgreementsApprovedResearcher, getProfileAgreements } from "@/openapi";
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "./AgreementForm";
 import AgreementText from "./AgreementText";
-import { Agreement, getAgreementsApprovedResearcher, getProfileAgreements } from "@/openapi";
-import { useEffect, useState } from "react";
 
-import dynamic from "next/dynamic";
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
+type ApprovedResearcherAgreementProps = {
+  setAgreementCompleted: (completed: boolean) => void;
+  agreementCompleted: boolean;
+};
 
-export default function ApprovedResearcherAgreement() {
+export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgreementProps) {
+  const { setAgreementCompleted, agreementCompleted } = props;
+
   const { authInProgress, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
-  const [agreementConfirmed, setAgreementConfirmed] = useState(false);
   const [isLoadingAgreement, setIsLoadingAgreement] = useState(false);
 
   useEffect(() => {
@@ -25,14 +23,20 @@ export default function ApprovedResearcherAgreement() {
       try {
         const agreementResult = await getAgreementsApprovedResearcher();
         const profileAgreementsResult = await getProfileAgreements();
+
         if (agreementResult.response.status === 200 && agreementResult.data) {
           setAgreement(agreementResult.data);
         }
+
         if (profileAgreementsResult.response.status == 200 && profileAgreementsResult.data) {
           const confirmedAgreements = profileAgreementsResult.data.confirmed_agreements;
-          setAgreementConfirmed(
-            confirmedAgreements.some((agreement) => agreement.agreement_type == "approved-researcher")
+          const isConfirmed = confirmedAgreements.some(
+            (agreement) => agreement.agreement_type == "approved-researcher"
           );
+
+          if (isConfirmed) {
+            setAgreementCompleted(true);
+          }
         }
       } catch (err) {
         console.error("Fetch error:", err);
@@ -52,22 +56,16 @@ export default function ApprovedResearcherAgreement() {
 
   if (!isAuthed) return <LoginFallback />;
 
-  if (agreementConfirmed)
-    return (
-      <section data-cy="approved-researcher-agreement">
-        <Alert type="success">
-          <AlertMessage>Agreement confirmed ✔</AlertMessage>
-        </Alert>
-      </section>
-    );
+  // allow the user to show/hide the agreement if they want to see it again?
+  if (agreementCompleted) return null;
 
   return (
-    !agreementConfirmed &&
     agreement && (
       <section data-cy="approved-researcher-agreement">
         <h2 className="subtitle">Approved Researcher Agreement</h2>
         <AgreementText text={agreement.text} />
-        <AgreementForm agreementId={agreement.id} setAgreementConfirmed={setAgreementConfirmed} />
+
+        <AgreementForm agreementId={agreement.id} setAgreementCompleted={setAgreementCompleted} />
       </section>
     )
   );

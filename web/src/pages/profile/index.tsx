@@ -9,6 +9,7 @@ export default function ProfilePage() {
         title="User Profile | ARC Services Portal"
         description="View and manage your ARC profile and researcher status"
       />
+
       <div className={styles.page}>
         <Profile />
       </div>
