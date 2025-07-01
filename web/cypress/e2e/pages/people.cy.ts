@@ -53,7 +53,6 @@ describe("Import approved researchers", () => {
     const filename = "tmp_approved_researchers.csv";
     cy.writeFile(filename, `${username},true,2025-07-01`);
     cy.get("input[type=file]").selectFile(filename, { force: true });
-    cy.get("[data-cy='approved-researcher-import']").click();
     cy.visit("/people");
     cy.get("table").contains(username).should("be.visible");
   });
