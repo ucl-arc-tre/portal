@@ -2,6 +2,7 @@ import { ConfirmedAgreement, getPeople, People, Person } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
+import ApprovedResearcherImport from "./ApprovedResearcherImport";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -41,41 +42,44 @@ export default function AdminView() {
   if (!people) return null;
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Roles</th>
-          <th>Agreements</th>
-        </tr>
-      </thead>
-      <tbody>
-        {people.map((person: Person) => (
-          <tr key={person.user.id}>
-            <td className={styles.user}>
-              {person.user.username} <small>{person.user.id}</small>
-            </td>
-            <td className={styles.roles}>{person.roles}</td>
-            <td className={styles.agreements}>
-              {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
-                <div key={agreement.agreement_type} className={styles.agreement}>
-                  {agreement.agreement_type}
-                  {agreement.confirmed_at ? (
-                    <span className={styles.confirmed}>
-                      <CheckIcon />
-                    </span>
-                  ) : (
-                    <span className={styles.unconfirmed}>
-                      <XIcon />
-                    </span>
-                  )}
-                  {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
-                </div>
-              ))}
-            </td>
+    <>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Roles</th>
+            <th>Agreements</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {people.map((person: Person) => (
+            <tr key={person.user.id}>
+              <td className={styles.user}>
+                {person.user.username} <small>{person.user.id}</small>
+              </td>
+              <td className={styles.roles}>{person.roles}</td>
+              <td className={styles.agreements}>
+                {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
+                  <div key={agreement.agreement_type} className={styles.agreement}>
+                    {agreement.agreement_type}
+                    {agreement.confirmed_at ? (
+                      <span className={styles.confirmed}>
+                        <CheckIcon />
+                      </span>
+                    ) : (
+                      <span className={styles.unconfirmed}>
+                        <XIcon />
+                      </span>
+                    )}
+                    {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
+                  </div>
+                ))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <ApprovedResearcherImport />
+    </>
   );
 }
