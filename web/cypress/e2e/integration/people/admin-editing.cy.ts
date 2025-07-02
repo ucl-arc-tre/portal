@@ -18,3 +18,16 @@ describe("Admin can edit people", () => {
     cy.contains("tr", botBaseUsername).find("[data-cy='training']").contains("nhsd").should("be.visible");
   });
 });
+
+describe("Base cannot edit people", () => {
+  beforeEach(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    cy.loginAsBase();
+    cy.visit("/people");
+  });
+
+  it("cannot access an edit button", () => {
+    cy.contains("Edit").should("not.exist");
+  });
+});
