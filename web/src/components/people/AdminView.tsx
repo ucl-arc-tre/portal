@@ -5,11 +5,9 @@ import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
+import { XIcon } from "../assets/exports";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
-  ssr: false,
-});
-export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.X), {
   ssr: false,
 });
 
@@ -78,7 +76,7 @@ export default function AdminView() {
         </thead>
         <tbody className={styles.tbody}>
           {people.map((person: Person) => (
-            <tr key={person.user.id}>
+            <tr key={person.user.id} className={styles.row}>
               <td className={styles.user}>
                 {person.user.username} <small>{person.user.id}</small>
               </td>
