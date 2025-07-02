@@ -1,6 +1,7 @@
 import Button from "@/components/ui/Button";
 import { postPeopleApprovedResearchersImportCsv } from "@/openapi";
 import { useRef, useState } from "react";
+import styles from "./ApprovedResearcherImport.module.css";
 
 export default function ApprovedResearcherImport() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -11,16 +12,22 @@ export default function ApprovedResearcherImport() {
     const files = e.target.files;
     if (!files) return;
 
-    const response = await postPeopleApprovedResearchersImportCsv({
-      body: files[0],
-    });
-    if (response.error) {
-      console.log(response.error);
-      setButtonText("Failed");
-    } else {
-      setButtonText("Imported ✔");
-    }
     setButtonDisabled(true);
+
+    try {
+      const response = await postPeopleApprovedResearchersImportCsv({
+        body: files[0],
+      });
+      if (response.error) {
+        console.error(response.error);
+        setButtonText("Failed");
+      } else {
+        setButtonText("Imported ✔");
+      }
+    } catch (error) {
+      console.error(error);
+      setButtonText("Failed");
+    }
   }
 
   function handleSumbit(e: React.MouseEvent<HTMLButtonElement>) {
@@ -34,10 +41,22 @@ export default function ApprovedResearcherImport() {
     <div>
       <form>
         <input ref={inputRef} type="file" hidden onChange={handleFileUpload} />
-        <Button onClick={handleSumbit} disabled={buttonDisabled} cy="approved-researcher-import">
+        <Button
+          className={styles.button}
+          onClick={handleSumbit}
+          disabled={buttonDisabled}
+          cy="approved-researcher-import"
+        >
           {buttonText}
         </Button>
       </form>
+      <span className={styles.helptext}>
+        Upload a .csv file (
+        <a href="https://github.com/ucl-arc-tre/portal/blob/cb4aaae44f270a943332b204adeafd73c23399a0/api.web.yaml#L156-L159">
+          format
+        </a>
+        ) containing approved researchers.
+      </span>
     </div>
   );
 }

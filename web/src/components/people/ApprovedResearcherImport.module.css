@@ -1,0 +1,12 @@
+.helptext {
+  font-size: 0.65rem;
+  margin-bottom: 0.5rem;
+
+  :link {
+    color: #0000ee;
+  }
+}
+
+.button {
+  min-width: 17rem;
+}
