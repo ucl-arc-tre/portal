@@ -21,7 +21,7 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 	}
 
 	if slices.Contains(roles, "admin") {
-		// retrieve auth + agreements info
+		// retrieve auth + agreements + training info
 		people, err := h.users.GetAllPeople()
 		if err != nil {
 			setServerError(ctx, err, "Failed to get people")
@@ -50,7 +50,7 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 			return
 		}
 
-		// take the id from the query and get the person
+		// take the id from the url and get the person
 		id := ctx.Params.ByName("id")
 		person, err := h.users.GetPerson(id)
 		if err != nil {
