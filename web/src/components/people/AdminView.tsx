@@ -44,14 +44,14 @@ export default function AdminView() {
     fetchPeople();
   }, []);
 
-  const updatePersonUI = (id: string, training?: TrainingRecord) => {
+  const updatePersonUI = (id: string, training: TrainingRecord) => {
     // get people object and find the person with the right id
     const personToUpdate = people!.find((person) => person.user.id === id);
 
-  if (personToUpdate && training) {
-  personToUpdate.training_record ??= [];
-  personToUpdate.training_record.push(training);
-}
+    if (personToUpdate && training) {
+      personToUpdate.training_record ??= [];
+      personToUpdate.training_record.push(training);
+    }
   };
 
   if (!people) return null;

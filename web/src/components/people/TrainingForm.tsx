@@ -21,7 +21,7 @@ const TrainingKindOptions = {
 type TrainingFormProps = {
   id: string;
   setTrainingDialogOpen: (name: boolean) => void;
-  updatePersonUI: (id: string, training?: TrainingRecord) => void;
+  updatePersonUI: (id: string, training: TrainingRecord) => void;
 };
 
 export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
