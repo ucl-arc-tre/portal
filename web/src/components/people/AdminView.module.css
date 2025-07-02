@@ -4,6 +4,10 @@
   font-size: 110%;
   border-collapse: collapse;
 
+  th {
+    padding-inline: 0.5rem;
+  }
+
   .tbody {
     border-top: 2px solid var(--foreground);
   }
@@ -14,6 +18,7 @@
 
     td {
       padding-block: 0.6rem;
+      padding-inline: 0.5rem;
     }
   }
 

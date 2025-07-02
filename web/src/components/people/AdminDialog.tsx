@@ -2,7 +2,7 @@ import { useRef } from "react";
 import styles from "./AdminDialog.module.css";
 import Button from "../ui/Button";
 import dynamic from "next/dynamic";
-import { XIcon } from "./AdminView";
+import { XIcon } from "../assets/exports";
 
 const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Blanket), {
   ssr: false,
