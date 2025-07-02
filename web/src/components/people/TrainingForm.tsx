@@ -90,9 +90,9 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
           aria-describedby="trainingError"
         >
           <option value="">Select Training Kind</option>
-          {Object.entries(TrainingKindOptions).map((tk) => (
-            <option key={tk[1]} value={tk[1]}>
-              {tk[0]}
+          {Object.entries(TrainingKindOptions).map((trainingkind) => (
+            <option key={trainingkind[1]} value={trainingkind[1]}>
+              {trainingkind[0]}
             </option>
           ))}
         </select>
