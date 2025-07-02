@@ -1,0 +1,22 @@
+.helptext {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+
+  :link {
+    color: blue;
+    text-decoration: underline;
+  }
+}
+
+.button {
+  min-width: 23rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .helptext {
+    :link {
+      color: lightblue;
+    }
+  }
+}

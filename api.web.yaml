@@ -176,6 +176,30 @@ paths:
         default:
           description: Unexpected error
 
+  /people/approved-researchers/import/csv:
+    post:
+      description: |
+        Upload a CSV file with fields
+        <username: string, e.g. "bob@example.com">,
+        <agreed to agreement: bool, e.g. true>,
+        <NHSD training completed at date: string, e.g. 2021-03-11>
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: OK
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   schemas:
     Auth:

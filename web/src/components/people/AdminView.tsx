@@ -4,6 +4,7 @@ import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import TrainingForm from "./TrainingForm";
+import ApprovedResearcherImport from "./ApprovedResearcherImport";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -81,7 +82,7 @@ export default function AdminView() {
         </thead>
         <tbody className={styles.tbody}>
           {people.map((person: Person) => (
-            <tr key={person.user.id} className={styles.row}>
+            <tr key={person.user.id}>
               <td className={styles.user}>
                 {person.user.username} <small>{person.user.id}</small>
               </td>
@@ -134,6 +135,7 @@ export default function AdminView() {
           ))}
         </tbody>
       </table>
+      <ApprovedResearcherImport />
     </>
   );
 }
