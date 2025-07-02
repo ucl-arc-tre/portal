@@ -1,6 +1,7 @@
 .helptext {
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 
   :link {
     color: blue;
@@ -8,7 +9,7 @@
 }
 
 .button {
-  min-width: 17rem;
+  min-width: 23rem;
 }
 
 @media (prefers-color-scheme: dark) {

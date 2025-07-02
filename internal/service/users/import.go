@@ -11,7 +11,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-// Import a CSV file containing usernames,agreement conformation,nhsd training completed at dates
+// Import a CSV file containing usernames, agreement confirmation, nhsd training completed at dates
 func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement types.Agreement) error {
 	records, err := approvedResearcherImportRecordsFromCSV(csvContent)
 	if err != nil {

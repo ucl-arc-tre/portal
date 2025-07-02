@@ -50,13 +50,13 @@ export default function ApprovedResearcherImport() {
           {buttonText}
         </Button>
       </form>
-      <span className={styles.helptext}>
+      <p className={styles.helptext}>
         Upload a .csv file (
         <a href="https://github.com/ucl-arc-tre/portal/blob/cb4aaae44f270a943332b204adeafd73c23399a0/api.web.yaml#L156-L159">
           format
         </a>
         ) containing approved researchers.
-      </span>
+      </p>
     </div>
   );
 }
