@@ -149,6 +149,9 @@ type ServerInterface interface {
 	// (GET /people)
 	GetPeople(c *gin.Context)
 
+	// (POST /people/approved-researchers/import/csv)
+	PostPeopleApprovedResearchersImportCsv(c *gin.Context)
+
 	// (GET /profile)
 	GetProfile(c *gin.Context)
 
@@ -214,6 +217,19 @@ func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
 	}
 
 	siw.Handler.GetPeople(c)
+}
+
+// PostPeopleApprovedResearchersImportCsv operation middleware
+func (siw *ServerInterfaceWrapper) PostPeopleApprovedResearchersImportCsv(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostPeopleApprovedResearchersImportCsv(c)
 }
 
 // GetProfile operation middleware
@@ -324,6 +340,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
+	router.POST(options.BaseURL+"/people/approved-researchers/import/csv", wrapper.PostPeopleApprovedResearchersImportCsv)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

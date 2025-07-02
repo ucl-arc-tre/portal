@@ -32,3 +32,28 @@ describe(`People page content`, () => {
     cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
   });
 });
+
+describe("Import approved researchers", () => {
+  it("should not be uploadable by a base user", () => {
+    cy.loginAsBase();
+    cy.request({
+      method: "POST",
+      url: "/api/v0/people/approved-researchers/import/csv",
+      body: "some-bytes",
+      failOnStatusCode: false,
+    })
+      .its("status")
+      .should("equal", 403);
+  });
+
+  it("should be uploadable by a admin user", () => {
+    cy.loginAsAdmin();
+    cy.visit("/people");
+    const username = "laura@example.com";
+    const filename = "tmp_approved_researchers.csv";
+    cy.writeFile(filename, `${username},true,2025-07-01`);
+    cy.get("input[type=file]").selectFile(filename, { force: true });
+    cy.visit("/people");
+    cy.get("table").contains(username).should("be.visible");
+  });
+});
