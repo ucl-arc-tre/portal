@@ -73,7 +73,7 @@ func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrain
 		return openapi.PersonTrainingRecords{}, result.Error
 	}
 
-	var training_records []openapi.TrainingRecord
+	var trainingRecords []openapi.TrainingRecord
 
 	for _, tr := range fetchedTrainingRecords {
 		trainingKind := openapi.TrainingKind(tr.Kind)
@@ -89,10 +89,10 @@ func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrain
 			CompletedAt: formattedTime,
 		}
 
-		training_records = append(training_records, apiTrainingRecord)
+		trainingRecords = append(trainingRecords, apiTrainingRecord)
 	}
 
-	return training_records, nil
+	return trainingRecords, nil
 }
 
 func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
