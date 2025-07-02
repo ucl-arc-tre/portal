@@ -3,10 +3,18 @@
   margin-bottom: 0.5rem;
 
   :link {
-    color: #0000ee;
+    color: blue;
   }
 }
 
 .button {
   min-width: 17rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .helptext {
+    :link {
+      color: lightblue;
+    }
+  }
 }
