@@ -97,14 +97,14 @@ func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrain
 
 func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
 
-	confirmation_time, err := time.Parse(time.RFC3339, date)
+	confirmationTime, err := time.Parse(time.RFC3339, date)
 	if err != nil {
 		return err
 	}
 	switch trainingkind {
 	case types.TrainingKind(types.TrainingKindNHSD):
 
-		response := s.createNHSDTrainingRecord(user, confirmation_time)
+		response := s.createNHSDTrainingRecord(user, confirmationTime)
 
 		return response
 	}
