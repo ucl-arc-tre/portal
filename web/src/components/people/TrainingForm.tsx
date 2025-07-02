@@ -31,7 +31,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
   const [trainingKind, setTrainingKind] = useState<TrainingKind | null>(null);
   const [trainingDisplayDate, setTrainingDisplayDate] = useState<string | undefined>(undefined);
-  const [trainingDate, setTrainingDate] = useState<string | undefined>(undefined);
+  const [trainingDate, setTrainingDate] = useState<string>("");
 
   const closeDialog = () => {
     setTrainingDialogOpen(false);
