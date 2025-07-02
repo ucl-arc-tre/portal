@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import styles from "./TrainingForm.module.css";
 import Button from "../ui/Button";
-import { postPeopleUpdate, TrainingKind, TrainingRecord } from "@/openapi";
+import { postPeopleById, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import AdminDialog from "./AdminDialog";
@@ -44,8 +44,8 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
     if (!trainingDisplayDate) return setErrorMessage("Please enter the date the training was completed.");
 
     try {
-      const response = await postPeopleUpdate({
-        query: { id: id },
+      const response = await postPeopleById({
+        path: { id: id },
         body: { training_kind: trainingKind, training_date: trainingDate },
       });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);

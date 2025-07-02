@@ -341,16 +341,16 @@ export type GetPeopleResponses = {
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
 
-export type PostPeopleUpdateData = {
+export type PostPeopleByIdData = {
     body: PersonUpdate;
-    path?: never;
-    query: {
+    path: {
         id: string;
     };
-    url: '/people/update';
+    query?: never;
+    url: '/people/{id}';
 };
 
-export type PostPeopleUpdateErrors = {
+export type PostPeopleByIdErrors = {
     /**
      * Forbidden
      */
@@ -369,7 +369,7 @@ export type PostPeopleUpdateErrors = {
     default: unknown;
 };
 
-export type PostPeopleUpdateResponses = {
+export type PostPeopleByIdResponses = {
     /**
      * Successfully updated person
      */

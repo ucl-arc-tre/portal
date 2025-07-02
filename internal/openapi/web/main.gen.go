@@ -143,13 +143,8 @@ type User struct {
 	Username string `json:"username"`
 }
 
-// PostPeopleUpdateParams defines parameters for PostPeopleUpdate.
-type PostPeopleUpdateParams struct {
-	Id string `form:"id" json:"id"`
-}
-
-// PostPeopleUpdateJSONRequestBody defines body for PostPeopleUpdate for application/json ContentType.
-type PostPeopleUpdateJSONRequestBody = PersonUpdate
+// PostPeopleIdJSONRequestBody defines body for PostPeopleId for application/json ContentType.
+type PostPeopleIdJSONRequestBody = PersonUpdate
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
@@ -172,8 +167,8 @@ type ServerInterface interface {
 	// (GET /people)
 	GetPeople(c *gin.Context)
 
-	// (POST /people/update)
-	PostPeopleUpdate(c *gin.Context, params PostPeopleUpdateParams)
+	// (POST /people/{id})
+	PostPeopleId(c *gin.Context, id string)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -242,24 +237,15 @@ func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
 	siw.Handler.GetPeople(c)
 }
 
-// PostPeopleUpdate operation middleware
-func (siw *ServerInterfaceWrapper) PostPeopleUpdate(c *gin.Context) {
+// PostPeopleId operation middleware
+func (siw *ServerInterfaceWrapper) PostPeopleId(c *gin.Context) {
 
 	var err error
 
-	// Parameter object where we will unmarshal all parameters from the context
-	var params PostPeopleUpdateParams
+	// ------------- Path parameter "id" -------------
+	var id string
 
-	// ------------- Required query parameter "id" -------------
-
-	if paramValue := c.Query("id"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument id is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	err = runtime.BindQueryParameter("form", true, true, "id", c.Request.URL.Query(), &params.Id)
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
 		return
@@ -272,7 +258,7 @@ func (siw *ServerInterfaceWrapper) PostPeopleUpdate(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostPeopleUpdate(c, params)
+	siw.Handler.PostPeopleId(c, id)
 }
 
 // GetProfile operation middleware
@@ -383,7 +369,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
-	router.POST(options.BaseURL+"/people/update", wrapper.PostPeopleUpdate)
+	router.POST(options.BaseURL+"/people/:id", wrapper.PostPeopleId)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

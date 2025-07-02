@@ -35,7 +35,7 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 
 }
 
-func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUpdateParams) {
+func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 	user := middleware.GetUser(ctx)
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
@@ -44,14 +44,14 @@ func (h *Handler) PostPeopleUpdate(ctx *gin.Context, params openapi.PostPeopleUp
 	}
 
 	if slices.Contains(roles, "admin") {
-		update := openapi.PersonUpdate{}
+		var update openapi.PersonUpdate
 		if err := ctx.ShouldBindJSON(&update); err != nil {
 			setInvalid(ctx, err, "Invalid JSON object")
 			return
 		}
 
-		// take the username from the query and get the person
-		id := params.Id
+		// take the id from the query and get the person
+		id := ctx.Params.ByName("id")
 		person, err := h.users.GetPerson(id)
 		if err != nil {
 			setServerError(ctx, err, "Failed to get person")
