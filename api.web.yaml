@@ -380,6 +380,9 @@ components:
 
     PersonUpdate:
       type: object
+      required:
+        - training_kind
+        - training_date
       properties:
         training_kind:
           $ref: "#/components/schemas/TrainingKind"

@@ -102,11 +102,11 @@ export type Person = {
 };
 
 export type PersonUpdate = {
-    training_kind?: TrainingKind;
+    training_kind: TrainingKind;
     /**
      * Time in RFC3339 format at which the the certificate was issued
      */
-    training_date?: string;
+    training_date: string;
 };
 
 export type People = Array<Person>;

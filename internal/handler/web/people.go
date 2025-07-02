@@ -50,18 +50,14 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 		return
 	}
 
-	if update.TrainingKind != nil {
-		date := *update.TrainingDate
-
-		if err := h.users.SetTrainingValidity(person, types.TrainingKind(*update.TrainingKind), (date)); err != nil {
-			setServerError(ctx, err, "Failed to update training validity")
-		}
-		ctx.JSON(http.StatusOK, openapi.TrainingRecord{
-			Kind:        *update.TrainingKind,
-			CompletedAt: &date,
-			IsValid:     true,
-		})
+	if err := h.users.SetTrainingValidity(person, types.TrainingKind(update.TrainingKind), (update.TrainingDate)); err != nil {
+		setServerError(ctx, err, "Failed to update training validity")
 	}
+	ctx.JSON(http.StatusOK, openapi.TrainingRecord{
+		Kind:        update.TrainingKind,
+		CompletedAt: &update.TrainingDate,
+		IsValid:     true,
+	})
 }
 
 func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
