@@ -48,7 +48,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
     if (isAuthed) {
       fetchData();
     }
-  }, [isAuthed]);
+  }, [isAuthed, setAgreementCompleted]);
 
   if (authInProgress || isLoadingAgreement) return null;
 
