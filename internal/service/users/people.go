@@ -47,6 +47,11 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 			TrainingRecord: training,
 			Roles:          roles,
 		}
+
+		if err := s.updateApprovedResearcherStatus(user); err != nil {
+			return people, err
+		}
+
 		people = append(people, person)
 	}
 	return people, nil
