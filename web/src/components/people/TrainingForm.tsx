@@ -26,7 +26,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   const [errorType, setErrorType] = useState<AlertType>("warning");
 
   const [trainingKind, setTrainingKind] = useState<TrainingKind | null>(null);
-  const [trainingDisplayDate, setTrainingDisplayDate] = useState<string | undefined>(undefined);
+  const [trainingDisplayDate, setTrainingDisplayDate] = useState<string>("");
   const [trainingDate, setTrainingDate] = useState<string>("");
 
   const closeDialog = () => {
@@ -37,8 +37,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
     event.preventDefault();
 
     if (!trainingKind) return setErrorMessage("Please provide a training kind.");
-    if (!trainingDisplayDate) return setErrorMessage("Please enter the date the training was completed.");
-
+    if (!trainingDate) return setErrorMessage("Please enter the date the training was completed.");
     try {
       const response = await postPeopleById({
         path: { id: id },
@@ -64,6 +63,11 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
     const today = new Date().toISOString();
     setTrainingDisplayDate(today.split("T")[0]);
     setTrainingDate(today);
+  };
+
+  const updateTrainingDate = (date: string) => {
+    const rfc3339Date = date + "T00:00:00Z";
+    setTrainingDate(rfc3339Date);
   };
 
   return (
@@ -102,6 +106,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
             name="display_date"
             value={trainingDisplayDate}
             onChange={(e) => {
+              updateTrainingDate(e.target.value);
               setTrainingDisplayDate(e.target.value);
               if (errorMessage) setErrorMessage(null); // Clear error as user types
             }}
