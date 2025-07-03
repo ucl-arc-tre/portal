@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"time"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -24,10 +25,17 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 		if err != nil {
 			return people, errors.New("failed to get agreements for user")
 		}
+
 		roles, err := rbac.GetRoles(user)
 		if err != nil {
 			return people, errors.New("failed to get roles for user")
 		}
+
+		training, err := s.GetTrainingStatus(user)
+		if err != nil {
+			return people, errors.New("failed to get training for user")
+		}
+
 		person := openapi.Person{
 			User: openapi.User{
 				Id:       user.ID.String(),
@@ -36,9 +44,33 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 			Agreements: openapi.ProfileAgreements{
 				ConfirmedAgreements: agreements,
 			},
-			Roles: roles,
+			TrainingRecord: training,
+			Roles:          roles,
 		}
 		people = append(people, person)
 	}
 	return people, nil
+}
+
+func (s *Service) GetPerson(id string) (types.User, error) {
+	person := types.User{}
+	result := s.db.Where("id = ?", id).
+		First(&person)
+	if result.Error != nil {
+		return person, result.Error
+	}
+	return person, nil
+}
+
+func (s *Service) SetNhsdTrainingValidity(user types.User, date string) error {
+
+	confirmationTime, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		return err
+	}
+
+	response := s.createNHSDTrainingRecord(user, confirmationTime)
+
+	return response
+
 }

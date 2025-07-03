@@ -4,7 +4,11 @@
 package openapi
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/oapi-codegen/runtime"
 )
 
 // Defines values for AgreementType.
@@ -63,9 +67,17 @@ type People = []Person
 
 // Person defines model for Person.
 type Person struct {
-	Agreements ProfileAgreements `json:"agreements"`
-	Roles      []string          `json:"roles"`
-	User       User              `json:"user"`
+	Agreements     ProfileAgreements     `json:"agreements"`
+	Roles          []string              `json:"roles"`
+	TrainingRecord ProfileTrainingStatus `json:"training_record"`
+	User           User                  `json:"user"`
+}
+
+// PersonUpdate defines model for PersonUpdate.
+type PersonUpdate struct {
+	// TrainingDate Time in RFC3339 format at which the the certificate was issued
+	TrainingDate string       `json:"training_date"`
+	TrainingKind TrainingKind `json:"training_kind"`
 }
 
 // ProfileAgreements defines model for ProfileAgreements.
@@ -128,6 +140,9 @@ type User struct {
 	Username string `json:"username"`
 }
 
+// PostPeopleIdJSONRequestBody defines body for PostPeopleId for application/json ContentType.
+type PostPeopleIdJSONRequestBody = PersonUpdate
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -151,6 +166,9 @@ type ServerInterface interface {
 
 	// (POST /people/approved-researchers/import/csv)
 	PostPeopleApprovedResearchersImportCsv(c *gin.Context)
+
+	// (POST /people/{id})
+	PostPeopleId(c *gin.Context, id string)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -230,6 +248,30 @@ func (siw *ServerInterfaceWrapper) PostPeopleApprovedResearchersImportCsv(c *gin
 	}
 
 	siw.Handler.PostPeopleApprovedResearchersImportCsv(c)
+}
+
+// PostPeopleId operation middleware
+func (siw *ServerInterfaceWrapper) PostPeopleId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostPeopleId(c, id)
 }
 
 // GetProfile operation middleware
@@ -341,6 +383,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
 	router.POST(options.BaseURL+"/people/approved-researchers/import/csv", wrapper.PostPeopleApprovedResearchersImportCsv)
+	router.POST(options.BaseURL+"/people/:id", wrapper.PostPeopleId)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

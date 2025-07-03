@@ -43,6 +43,8 @@ export type ProfileAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
+export type TrainingKind = 'training_kind_nhsd';
+
 export type ProfileTrainingUpdate = {
     kind: TrainingKind;
     /**
@@ -94,11 +96,18 @@ export type Person = {
     user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
+    training_record: ProfileTrainingStatus;
+};
+
+export type PersonUpdate = {
+    training_kind: TrainingKind;
+    /**
+     * Time in RFC3339 format at which the the certificate was issued
+     */
+    training_date: string;
 };
 
 export type People = Array<Person>;
-
-export type TrainingKind = 'training_kind_nhsd';
 
 export type GetAuthData = {
     body?: never;
@@ -329,6 +338,44 @@ export type GetPeopleResponses = {
 };
 
 export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+
+export type PostPeopleByIdData = {
+    body: PersonUpdate;
+    path: {
+        /**
+         * ID of the person to be updated
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/people/{id}';
+};
+
+export type PostPeopleByIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostPeopleByIdResponses = {
+    /**
+     * Successfully updated person
+     */
+    200: unknown;
+};
 
 export type PostPeopleApprovedResearchersImportCsvData = {
     body: Blob | File;

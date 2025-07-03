@@ -7,6 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
@@ -19,7 +21,7 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 	}
 
 	if slices.Contains(roles, "admin") {
-		// retrieve auth + agreements info
+		// retrieve auth + agreements + training info
 		people, err := h.users.GetAllPeople()
 		if err != nil {
 			setServerError(ctx, err, "Failed to get people")
@@ -31,6 +33,38 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
 	}
 
+}
+
+func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
+	var update openapi.PersonUpdate
+	if err := ctx.ShouldBindJSON(&update); err != nil {
+		setInvalid(ctx, err, "Invalid JSON object")
+		return
+	}
+
+	// take the id from the url and get the person
+	person, err := h.users.GetPerson(id)
+	if err != nil {
+		setServerError(ctx, err, "Failed to get person")
+		return
+	}
+
+	switch update.TrainingKind {
+	case openapi.TrainingKindNhsd:
+		if err := h.users.SetNhsdTrainingValidity(person, update.TrainingDate); err != nil {
+			setServerError(ctx, err, "Failed to update training validity")
+		}
+
+	default:
+		panic("unsupported training kind")
+
+	}
+
+	ctx.JSON(http.StatusOK, openapi.TrainingRecord{
+		Kind:        update.TrainingKind,
+		CompletedAt: &update.TrainingDate,
+		IsValid:     true,
+	})
 }
 
 func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {

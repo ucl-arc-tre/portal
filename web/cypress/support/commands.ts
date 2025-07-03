@@ -4,7 +4,7 @@ import { login } from "./auth";
 
 const botAdminUsername = Cypress.env("botAdminUsername") as string;
 const botAdminPassword = Cypress.env("botAdminPassword") as string;
-const botBaseUsername = Cypress.env("botBaseUsername") as string;
+export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
 
 declare global {

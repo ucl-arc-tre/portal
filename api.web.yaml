@@ -150,6 +150,33 @@ paths:
         default:
           description: Unexpected error
 
+  /people/{id}:
+    post:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID of the person to be updated
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonUpdate"
+      responses:
+        "200":
+          description: Successfully updated person
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /people/approved-researchers/import/csv:
     post:
       description: |
@@ -262,6 +289,10 @@ components:
           items:
             $ref: "#/components/schemas/ConfirmedAgreement"
 
+    TrainingKind:
+      type: string
+      enum: [training_kind_nhsd]
+
     ProfileTrainingUpdate:
       type: object
       required:
@@ -330,6 +361,7 @@ components:
         - user
         - roles
         - agreements
+        - training_record
       properties:
         user:
           $ref: "#/components/schemas/User"
@@ -339,13 +371,22 @@ components:
             type: string
         agreements:
           $ref: "#/components/schemas/ProfileAgreements"
+        training_record:
+          $ref: "#/components/schemas/ProfileTrainingStatus"
+
+    PersonUpdate:
+      type: object
+      required:
+        - training_kind
+        - training_date
+      properties:
+        training_kind:
+          $ref: "#/components/schemas/TrainingKind"
+        training_date:
+          type: string
+          description: Time in RFC3339 format at which the the certificate was issued
 
     People:
       type: array
       items:
         $ref: "#/components/schemas/Person"
-
-    TrainingKind:
-      type: string
-      enum:
-        - "training_kind_nhsd"

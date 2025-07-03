@@ -2,9 +2,11 @@
   --background: #ffffff;
   --foreground: #171717;
 
+  --text--secondary: #595959;
+
   --green-300: #165823;
   --green-200: #237b35;
-  --green-100: #359749;
+  --green-100: #328543;
   --green-50: #64bb75;
 }
 
@@ -12,6 +14,10 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    --text--secondary: #acacac;
+
+    --green-100: #359749;
   }
 }
 
