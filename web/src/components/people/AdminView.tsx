@@ -105,11 +105,6 @@ export default function AdminView() {
                 {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                   <div key={agreement.agreement_type} className={styles.agreement}>
                     {agreement.agreement_type}
-                    {agreement.confirmed_at && (
-                      <span className={styles.valid}>
-                        <CheckIcon />
-                      </span>
-                    )}
                     {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
                   </div>
                 ))}
