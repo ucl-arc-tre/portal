@@ -73,10 +73,16 @@
     }
   }
 
-  .trainingRecord {
+  .trainingInfo {
     text-align: right;
     display: grid;
     grid-template-columns: 4fr 0.5fr;
+  }
+
+  .trainingRecord {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
   }
 }
 

@@ -33,7 +33,6 @@ export default function AdminView() {
       setIsLoading(true);
       try {
         const response = await getPeople();
-
         if (response.response.ok && response.data) {
           setPeople(response.data as People);
         }
@@ -56,8 +55,8 @@ export default function AdminView() {
 
     if (personIndex !== -1) {
       const person = updatedPeople[personIndex];
-      person.training_record ??= [];
-      person.training_record.push(training);
+      person.training_record.training_records ??= [];
+      person.training_record.training_records.push(training);
       setPeople(updatedPeople);
     }
   };
@@ -109,9 +108,9 @@ export default function AdminView() {
                   </div>
                 ))}
               </td>
-              <td>
+              <td className={styles.trainingInfo}>
                 <div className={styles.trainingRecord} data-cy="training">
-                  {person.training_record?.map((training: TrainingRecord) => (
+                  {person.training_record.training_records?.map((training: TrainingRecord) => (
                     <div key={`${training.kind}-${training.completed_at}`} className={styles.training}>
                       {training.kind}
                       {training.is_valid ? (
@@ -126,15 +125,15 @@ export default function AdminView() {
                       {training.completed_at && <small>{convertRFC3339ToDDMMYYYY(training.completed_at)}</small>}
                     </div>
                   ))}{" "}
-                  <Button
-                    variant="tertiary"
-                    size="small"
-                    onClick={() => handleEditTrainingClick(person.user.id)}
-                    className={styles.edit}
-                  >
-                    Edit
-                  </Button>
                 </div>
+                <Button
+                  variant="tertiary"
+                  size="small"
+                  onClick={() => handleEditTrainingClick(person.user.id)}
+                  className={styles.edit}
+                >
+                  Edit
+                </Button>
               </td>
             </tr>
           ))}
