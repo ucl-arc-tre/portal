@@ -42,7 +42,7 @@ func (s *Service) updateNHSD(
 		response.CertificateMessage = ptr("Certificate was missing an issued at date.")
 		return response, nil
 	}
-	if time.Since(certificate.IssuedAt) > config.TrainingValidity {
+	if !NHSDTrainingIsValid(certificate.IssuedAt) {
 		message := fmt.Sprintf("Certificate was issued more than %v years in the past.", config.TrainingValidityYears)
 		response.CertificateMessage = ptr(message)
 		return response, nil
@@ -59,7 +59,7 @@ func (s *Service) updateNHSD(
 	response.CertificateIsValid = &certificate.IsValid
 	if certificate.IsValid {
 		response.CertificateIssuedAt = ptr(certificate.IssuedAt.Format(config.TimeFormat))
-		if err := s.createNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
+		if err := s.CreateNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
 			return response, err
 		}
 		if err := s.updateApprovedResearcherStatus(user); err != nil {
@@ -80,10 +80,10 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 	} else if result.Error != nil {
 		return false, result.Error
 	}
-	return time.Since(record.CompletedAt) < config.TrainingValidity, nil
+	return NHSDTrainingIsValid(record.CompletedAt), nil
 }
 
-func (s *Service) createNHSDTrainingRecord(user types.User, completedAt time.Time) error {
+func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Time) error {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
@@ -118,12 +118,11 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 		return openapi.ProfileTrainingStatus{}, result.Error
 	} else {
 		// Record found - check if it's still valid
-		isValid := time.Since(record.CompletedAt) < config.TrainingValidity
 		completedAt := record.CompletedAt.Format(config.TimeFormat)
 
 		nhsdRecord := openapi.TrainingRecord{
 			Kind:        openapi.TrainingKindNhsd,
-			IsValid:     isValid,
+			IsValid:     NHSDTrainingIsValid(record.CompletedAt),
 			CompletedAt: &completedAt,
 		}
 		trainingRecords = append(trainingRecords, nhsdRecord)
@@ -134,6 +133,10 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 	return openapi.ProfileTrainingStatus{
 		TrainingRecords: trainingRecords,
 	}, nil
+}
+
+func NHSDTrainingIsValid(completedAt time.Time) bool {
+	return time.Since(completedAt) < config.TrainingValidity
 }
 
 func ptr[T any](value T) *T {
