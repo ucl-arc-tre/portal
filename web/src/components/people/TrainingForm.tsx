@@ -5,7 +5,8 @@ import { postPeopleById, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import AdminDialog from "./AdminDialog";
-import { InfoIcon } from "../assets/exports";
+import { InfoIcon, TrainingKindOptions } from "../assets/exports";
+import { getHumanReadableTrainingKind } from "@/utils/training";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -13,11 +14,6 @@ const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert
 const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
   ssr: false,
 });
-
-const TrainingKindOptions = {
-  //  is there a better way of doing this? Won't let me use type as a value
-  nhsd: "training_kind_nhsd",
-};
 
 type TrainingFormProps = {
   id: string;
@@ -53,11 +49,10 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
       closeDialog();
 
-      // matching with db value so training_kind_nhsd shows as nhsd
-      const trainingKindKey = Object.entries(TrainingKindOptions).find(([, value]) => value === trainingKind)?.[0];
+      const humanReadableTrainingKind = getHumanReadableTrainingKind(trainingKind);
 
       updatePersonUI(id, {
-        kind: trainingKindKey as TrainingKind,
+        kind: humanReadableTrainingKind as TrainingKind,
         completed_at: trainingDisplayDate,
         is_valid: true,
       });
@@ -92,7 +87,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         >
           <option value="">Select Training Kind</option>
           {Object.entries(TrainingKindOptions).map((trainingkind) => (
-            <option key={trainingkind[1]} value={trainingkind[0]}>
+            <option key={trainingkind[1]} value={trainingkind[1]}>
               {trainingkind[0]}
             </option>
           ))}

@@ -7,6 +7,7 @@ import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
 import { XIcon } from "../assets/exports";
 import Loading from "../ui/Loading";
+import { getHumanReadableTrainingKind } from "@/utils/training";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -112,7 +113,7 @@ export default function AdminView() {
                 <div className={styles.trainingRecord} data-cy="training">
                   {person.training_record.training_records?.map((training: TrainingRecord) => (
                     <div key={`${training.kind}-${training.completed_at}`} className={styles.training}>
-                      {training.kind}
+                      {getHumanReadableTrainingKind(training.kind)}
                       {training.is_valid ? (
                         <span className={styles.valid}>
                           <CheckIcon />
