@@ -74,7 +74,7 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
 	}
-	result := s.db.Order("completed_at desc").Find(&record).Limit(1)
+	result := s.db.Order("completed_at desc").Where(&record).First(&record)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return false, nil
 	} else if result.Error != nil {
@@ -104,7 +104,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
 	}
-	result := s.db.Order("completed_at desc").First(&record)
+	result := s.db.Order("completed_at desc").Where(&record).First(&record)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		// No NHSD training record found

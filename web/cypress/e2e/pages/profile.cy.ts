@@ -14,9 +14,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileTraining(false); // No training
 
     cy.visit("/profile");
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForProfileData();
 
     cy.get("[aria-label='Profile setup progress']").should("be.visible");
 
@@ -35,9 +33,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileTraining(false); // No training
 
     cy.visit("/profile");
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForProfileData();
 
     // Should only show chosen name form initially
     cy.get("[data-cy='chosen-name-form']").should("be.visible");
@@ -51,9 +47,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileTraining(false); // No training
 
     cy.visit("/profile");
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForProfileData();
 
     cy.get("[data-cy='chosen-name-form'] input").type("123");
     cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
@@ -66,24 +60,15 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("shows step 2 when chosen name is completed", () => {
     // Mock auth without approved-researcher role
-    cy.intercept("GET", "/api/v0/auth", {
-      statusCode: 200,
-      body: {
-        username: "testuser",
-        roles: ["base"],
-        enabled: true,
-      },
-    }).as("getAuth");
+    cy.mockAuthAsBaseUser();
 
     cy.mockProfileChosenName("Test User"); // Has chosen name
     cy.mockProfileAgreements(false); // No agreements yet
     cy.mockProfileTraining(false); // No training yet
 
     cy.visit("/profile");
-    cy.wait("@getAuth");
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForAuth();
+    cy.waitForProfileData();
 
     // Should show step 2 content
     cy.get("[data-cy='approved-researcher-agreement']").should("be.visible");
@@ -92,24 +77,15 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("shows step 3 when chosen name and agreement completed", () => {
     // Mock auth without approved-researcher role
-    cy.intercept("GET", "/api/v0/auth", {
-      statusCode: 200,
-      body: {
-        username: "testuser",
-        roles: ["base"],
-        enabled: true,
-      },
-    }).as("getAuth");
+    cy.mockAuthAsBaseUser();
 
     cy.mockProfileChosenName("Test User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(false); // Training not complete (this is why we should see step 3)
 
     cy.visit("/profile");
-    cy.wait("@getAuth");
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForAuth();
+    cy.waitForProfileData();
 
     // Should show step 3 content
     cy.get("[data-cy='training-certificate']").should("be.visible");
@@ -119,54 +95,20 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("shows error message when invalid certificate uploaded", () => {
     // Mock auth without approved-researcher role
-    cy.intercept("GET", "/api/v0/auth", {
-      statusCode: 200,
-      body: {
-        username: "testuser",
-        roles: ["base"],
-        enabled: true,
-      },
-    }).as("getAuth");
+    cy.mockAuthAsBaseUser();
 
     // Mock profile with chosen name
-    cy.intercept("GET", "/api/v0/profile", {
-      statusCode: 200,
-      body: {
-        chosen_name: "Test User",
-      },
-    }).as("getProfile");
+    cy.mockProfileChosenName("Test User");
 
     // Mock agreements with approved-researcher agreement confirmed
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [
-          {
-            agreement_type: "approved-researcher",
-            confirmed_at: "2024-01-01T00:00:00Z",
-          },
-        ],
-      },
-    }).as("getAgreements");
+    cy.mockProfileAgreements(true);
 
-    // Mock training as not complete initially
-    cy.intercept("GET", "/api/v0/profile/training", {
-      statusCode: 200,
-      body: {
-        training_records: [
-          {
-            kind: "training_kind_nhsd",
-            is_valid: false,
-          },
-        ],
-      },
-    }).as("getTraining");
+    // Mock training as not complete
+    cy.mockProfileTraining(false);
 
     cy.visit("/profile");
-    cy.wait("@getAuth");
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForAuth();
+    cy.waitForProfileData();
 
     // Should be on step 3
     cy.get("[data-cy='training-certificate']").should("be.visible");
@@ -181,45 +123,18 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("shows an error message when the wrong name is used for the certificate", () => {
     // Mock auth without approved-researcher role initially
-    cy.intercept("GET", "/api/v0/auth", {
-      statusCode: 200,
-      body: {
-        username: "testuser",
-        roles: ["base"],
-        enabled: true,
-      },
-    }).as("getAuth");
+    cy.mockAuthAsBaseUser();
 
     // Mock agreements with approved-researcher agreement confirmed
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [
-          {
-            agreement_type: "approved-researcher",
-            confirmed_at: "2024-01-01T00:00:00Z",
-          },
-        ],
-      },
-    }).as("getAgreements");
+    cy.mockProfileAgreements(true);
 
     // Mock training as not complete initially
-    cy.intercept("GET", "/api/v0/profile/training", {
-      statusCode: 200,
-      body: {
-        training_records: [
-          {
-            kind: "training_kind_nhsd",
-            is_valid: false,
-          },
-        ],
-      },
-    }).as("getTraining");
+    cy.mockProfileTraining(false);
 
     cy.visit("/profile");
-    cy.wait("@getAuth");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForAuth();
+    cy.waitForAgreements();
+    cy.waitForTraining();
 
     cy.clearChosenName();
     cy.visit("/profile");
@@ -241,45 +156,18 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("shows success message when valid certificate uploaded", () => {
     // Mock auth without approved-researcher role initially
-    cy.intercept("GET", "/api/v0/auth", {
-      statusCode: 200,
-      body: {
-        username: "testuser",
-        roles: ["base"],
-        enabled: true,
-      },
-    }).as("getAuth");
+    cy.mockAuthAsBaseUser();
 
     // Mock agreements with approved-researcher agreement confirmed
-    cy.intercept("GET", "/api/v0/profile/agreements", {
-      statusCode: 200,
-      body: {
-        confirmed_agreements: [
-          {
-            agreement_type: "approved-researcher",
-            confirmed_at: "2024-01-01T00:00:00Z",
-          },
-        ],
-      },
-    }).as("getAgreements");
+    cy.mockProfileAgreements(true);
 
     // Mock training as not complete initially
-    cy.intercept("GET", "/api/v0/profile/training", {
-      statusCode: 200,
-      body: {
-        training_records: [
-          {
-            kind: "training_kind_nhsd",
-            is_valid: false,
-          },
-        ],
-      },
-    }).as("getTraining");
+    cy.mockProfileTraining(false);
 
     cy.visit("/profile");
-    cy.wait("@getAuth");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForAuth();
+    cy.waitForAgreements();
+    cy.waitForTraining();
 
     cy.clearChosenName();
     cy.visit("/profile");
@@ -307,10 +195,8 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileTraining(true, "2024-01-01T00:00:00Z"); // Training completed
 
     cy.visit("/profile");
-    cy.waitForMockedAuth();
-    cy.wait("@getProfile");
-    cy.wait("@getAgreements");
-    cy.wait("@getTraining");
+    cy.waitForAuth();
+    cy.waitForProfileData();
 
     // Should show completion message instead of steps
     cy.contains("Profile Complete").should("be.visible");

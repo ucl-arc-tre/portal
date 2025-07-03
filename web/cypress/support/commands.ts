@@ -41,6 +41,7 @@ declare global {
        */
       clearChosenName(chosenName?: string): Chainable<any>;
 
+      // Auth fixture commands
       /**
        * Mock auth response to return base user role only
        * @example cy.mockAuthAsBaseUser()
@@ -53,32 +54,7 @@ declare global {
        */
       mockAuthAsBaseApprovedResearcher(): Chainable<any>;
 
-      /**
-       * Wait for the mocked auth request to complete
-       * @example cy.waitForMockedAuth()
-       */
-      waitForMockedAuth(): Chainable<any>;
-
-      /**
-       * Force light mode for testing
-       * @example cy.forceLightMode()
-       */
-      forceLightMode(): Chainable<any>;
-
-      /**
-       * Force dark mode for testing
-       * @example cy.forceDarkMode()
-       */
-      forceDarkMode(): Chainable<any>;
-
-      /**
-       * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
-       * @param selector - Optional selector to check specific element (defaults to entire page)
-       * @example cy.checkAccessibility()
-       * @example cy.checkAccessibility('[data-cy="profile-form"]')
-       */
-      checkAccessibility(selector?: string): Chainable<any>;
-
+      // Profile fixture commands
       /**
        * Mock profile chosen name endpoint
        * @param chosenName - The chosen name to return, empty string for no name, undefined for empty response
@@ -103,6 +79,57 @@ declare global {
        * @example cy.mockProfileTraining(true, "2024-01-01T00:00:00Z")
        */
       mockProfileTraining(isValid: boolean, completedAt?: string): Chainable<any>;
+
+      // Wait commands for fixtures
+      /**
+       * Wait for the mocked auth request to complete
+       * @example cy.waitForAuth()
+       */
+      waitForAuth(): Chainable<any>;
+
+      /**
+       * Wait for the mocked chosen name request to complete
+       * @example cy.waitForChosenName()
+       */
+      waitForChosenName(): Chainable<any>;
+
+      /**
+       * Wait for the mocked profile agreements request to complete
+       * @example cy.waitForAgreements()
+       */
+      waitForAgreements(): Chainable<any>;
+
+      /**
+       * Wait for the mocked profile training request to complete
+       * @example cy.waitForTraining()
+       */
+      waitForTraining(): Chainable<any>;
+
+      /**
+       * Wait for all profile-related requests to complete
+       * @example cy.waitForProfileData()
+       */
+      waitForProfileData(): Chainable<any>;
+
+      /**
+       * Force light mode for testing
+       * @example cy.forceLightMode()
+       */
+      forceLightMode(): Chainable<any>;
+
+      /**
+       * Force dark mode for testing
+       * @example cy.forceDarkMode()
+       */
+      forceDarkMode(): Chainable<any>;
+
+      /**
+       * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
+       * @param selector - Optional selector to check specific element (defaults to entire page)
+       * @example cy.checkAccessibility()
+       * @example cy.checkAccessibility('[data-cy="profile-form"]')
+       */
+      checkAccessibility(selector?: string): Chainable<any>;
     }
   }
 }
@@ -179,20 +206,61 @@ Cypress.Commands.add("clearChosenName", () => {
   });
 });
 
+// Auth fixture commands
 Cypress.Commands.add("mockAuthAsBaseUser", () => {
   cy.intercept("GET", "/api/v0/auth", {
     fixture: "auth-base-user.json",
-  }).as("authRequest");
+  }).as("getAuth");
 });
 
 Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
   cy.intercept("GET", "/api/v0/auth", {
     fixture: "auth-base-approved-researcher.json",
-  }).as("authRequest");
+  }).as("getAuth");
 });
 
-Cypress.Commands.add("waitForMockedAuth", () => {
-  cy.wait("@authRequest");
+Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
+  const body = chosenName === undefined ? {} : { chosen_name: chosenName };
+  cy.intercept("GET", "/api/v0/profile", {
+    statusCode: 200,
+    body,
+  }).as("getChosenName");
+});
+
+Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
+  const confirmedAgreements = hasApprovedResearcher
+    ? [
+        {
+          agreement_type: "approved-researcher",
+          confirmed_at: "2024-01-01T00:00:00Z",
+        },
+      ]
+    : [];
+
+  cy.intercept("GET", "/api/v0/profile/agreements", {
+    statusCode: 200,
+    body: {
+      confirmed_agreements: confirmedAgreements,
+    },
+  }).as("getAgreements");
+});
+
+Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: string) => {
+  const trainingRecord: any = {
+    kind: "training_kind_nhsd",
+    is_valid: isValid,
+  };
+
+  if (isValid && completedAt) {
+    trainingRecord.completed_at = completedAt;
+  }
+
+  cy.intercept("GET", "/api/v0/profile/training", {
+    statusCode: 200,
+    body: {
+      training_records: [trainingRecord],
+    },
+  }).as("getTraining");
 });
 
 Cypress.Commands.add("forceLightMode", () => {
@@ -236,46 +304,25 @@ Cypress.Commands.add("checkAccessibility", (selector?: string) => {
   });
 });
 
-Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
-  const body = chosenName === undefined ? {} : { chosen_name: chosenName };
-  cy.intercept("GET", "/api/v0/profile", {
-    statusCode: 200,
-    body,
-  }).as("getProfile");
+// Wait commands for fixtures
+Cypress.Commands.add("waitForAuth", () => {
+  cy.wait("@getAuth");
 });
 
-Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
-  const confirmedAgreements = hasApprovedResearcher
-    ? [
-        {
-          agreement_type: "approved-researcher",
-          confirmed_at: "2024-01-01T00:00:00Z",
-        },
-      ]
-    : [];
-
-  cy.intercept("GET", "/api/v0/profile/agreements", {
-    statusCode: 200,
-    body: {
-      confirmed_agreements: confirmedAgreements,
-    },
-  }).as("getAgreements");
+Cypress.Commands.add("waitForChosenName", () => {
+  cy.wait("@getChosenName");
 });
 
-Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: string) => {
-  const trainingRecord: any = {
-    kind: "training_kind_nhsd",
-    is_valid: isValid,
-  };
+Cypress.Commands.add("waitForAgreements", () => {
+  cy.wait("@getAgreements");
+});
 
-  if (isValid && completedAt) {
-    trainingRecord.completed_at = completedAt;
-  }
+Cypress.Commands.add("waitForTraining", () => {
+  cy.wait("@getTraining");
+});
 
-  cy.intercept("GET", "/api/v0/profile/training", {
-    statusCode: 200,
-    body: {
-      training_records: [trainingRecord],
-    },
-  }).as("getTraining");
+Cypress.Commands.add("waitForProfileData", () => {
+  cy.wait("@getChosenName");
+  cy.wait("@getAgreements");
+  cy.wait("@getTraining");
 });

@@ -8,7 +8,7 @@ describe(`People page content`, () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseUser();
     cy.visit("/people");
-    cy.waitForMockedAuth();
+    cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("be.visible");
   });
@@ -17,7 +17,7 @@ describe(`People page content`, () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseApprovedResearcher();
     cy.visit("/people");
-    cy.waitForMockedAuth();
+    cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("not.exist");
     cy.contains("Approved Researcher").should("be.visible");
