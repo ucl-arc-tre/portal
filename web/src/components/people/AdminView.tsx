@@ -65,6 +65,13 @@ export default function AdminView() {
     if (personIndex !== -1) {
       const person = updatedPeople[personIndex];
       person.training_record.training_records ??= [];
+      const recordIndex = person.training_record.training_records.findIndex((record) => record.kind === training.kind);
+
+      // If the training record exists, remove it
+      if (recordIndex !== -1) {
+        person.training_record.training_records.splice(recordIndex, 1);
+      }
+
       person.training_record.training_records.push(training);
       setPeople(updatedPeople);
     }
