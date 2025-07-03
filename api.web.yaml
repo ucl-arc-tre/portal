@@ -355,11 +355,6 @@ components:
         id:
           type: string
 
-    PersonTrainingRecords:
-      type: array
-      items:
-        $ref: "#/components/schemas/TrainingRecord"
-
     Person:
       type: object
       required:
@@ -377,7 +372,7 @@ components:
         agreements:
           $ref: "#/components/schemas/ProfileAgreements"
         training_record:
-          $ref: "#/components/schemas/PersonTrainingRecords"
+          $ref: "#/components/schemas/ProfileTrainingStatus"
 
     PersonUpdate:
       type: object

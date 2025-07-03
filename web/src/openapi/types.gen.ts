@@ -92,13 +92,11 @@ export type User = {
     id: string;
 };
 
-export type PersonTrainingRecords = Array<TrainingRecord>;
-
 export type Person = {
     user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
-    training_record: PersonTrainingRecords;
+    training_record: ProfileTrainingStatus;
 };
 
 export type PersonUpdate = {

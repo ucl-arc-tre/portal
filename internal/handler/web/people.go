@@ -49,7 +49,6 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 		setServerError(ctx, err, "Failed to get person")
 		return
 	}
-
 	if err := h.users.SetTrainingValidity(person, types.TrainingKind(update.TrainingKind), (update.TrainingDate)); err != nil {
 		setServerError(ctx, err, "Failed to update training validity")
 	}

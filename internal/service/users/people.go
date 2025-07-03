@@ -31,7 +31,7 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 			return people, errors.New("failed to get roles for user")
 		}
 
-		training, err := s.GetPersonTrainingRecords(user)
+		training, err := s.GetTrainingStatus(user)
 		if err != nil {
 			return people, errors.New("failed to get training for user")
 		}
@@ -62,39 +62,6 @@ func (s *Service) GetPerson(id string) (types.User, error) {
 	return person, nil
 }
 
-func (s *Service) GetPersonTrainingRecords(user types.User) (openapi.PersonTrainingRecords, error) {
-	// get the user training records, extract the relevant data and put it in a TrainingRecord format (only date and kind)
-	record := types.UserTrainingRecord{
-		UserID: user.ID,
-	}
-	var fetchedTrainingRecords []types.UserTrainingRecord
-	result := s.db.Where(&record).Find(&fetchedTrainingRecords)
-	if result.Error != nil {
-		return openapi.PersonTrainingRecords{}, result.Error
-	}
-
-	var trainingRecords []openapi.TrainingRecord
-
-	for _, tr := range fetchedTrainingRecords {
-		trainingKind := openapi.TrainingKind(tr.Kind)
-
-		var formattedTime *string
-		if !tr.CompletedAt.IsZero() {
-			formatted := tr.CompletedAt.Format(time.RFC3339)
-			formattedTime = &formatted
-		}
-
-		apiTrainingRecord := openapi.TrainingRecord{
-			Kind:        trainingKind,
-			CompletedAt: formattedTime,
-		}
-
-		trainingRecords = append(trainingRecords, apiTrainingRecord)
-	}
-
-	return trainingRecords, nil
-}
-
 func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
 
 	confirmationTime, err := time.Parse(time.RFC3339, date)
@@ -107,7 +74,10 @@ func (s *Service) SetTrainingValidity(user types.User, trainingkind types.Traini
 		response := s.createNHSDTrainingRecord(user, confirmationTime)
 
 		return response
+
+	default:
+		panic("unsupported training kind")
+
 	}
 
-	return err
 }
