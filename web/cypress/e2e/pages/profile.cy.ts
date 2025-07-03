@@ -61,13 +61,13 @@ describe(`Profile Page Step Workflow UI`, () => {
   it("shows step 2 when chosen name is completed", () => {
     // Mock auth without approved-researcher role
     cy.mockAuthAsBaseUser();
-    cy.waitForAuth();
 
     cy.mockProfileChosenName("Test User"); // Has chosen name
     cy.mockProfileAgreements(false); // No agreements yet
     cy.mockProfileTraining(false); // No training yet
 
     cy.visit("/profile");
+    cy.waitForAuth();
     cy.waitForProfileData();
 
     // Should show step 2 content
