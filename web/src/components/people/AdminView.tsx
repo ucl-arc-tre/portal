@@ -6,6 +6,7 @@ import Button from "../ui/Button";
 import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
 import { XIcon } from "../assets/exports";
+import Loading from "../ui/Loading";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -23,11 +24,13 @@ function convertRFC3339ToDDMMYYYY(dateString: string) {
 export default function AdminView() {
   const [people, setPeople] = useState<People | null>(null);
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [id, setId] = useState("");
 
   useEffect(() => {
     const fetchPeople = async () => {
+      setIsLoading(true);
       try {
         const response = await getPeople();
 
@@ -37,18 +40,25 @@ export default function AdminView() {
       } catch (error) {
         console.error("Failed to get people:", error);
         setPeople(null);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchPeople();
   }, []);
 
   const updatePersonUI = (id: string, training: TrainingRecord) => {
-    // get people object and find the person with the right id
-    const personToUpdate = people!.find((person) => person.user.id === id);
+    // get people object and find the person with the right id then update the training
+    if (!people) return;
 
-    if (personToUpdate && training) {
-      personToUpdate.training_record ??= [];
-      personToUpdate.training_record.push(training);
+    const updatedPeople = [...people];
+    const personIndex = updatedPeople.findIndex((person) => person.user.id === id);
+
+    if (personIndex !== -1) {
+      const person = updatedPeople[personIndex];
+      person.training_record ??= [];
+      person.training_record.push(training);
+      setPeople(updatedPeople);
     }
   };
 
@@ -59,6 +69,14 @@ export default function AdminView() {
     setTrainingDialogOpen(true);
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <h2>Your Tasks</h2>
+        <Loading message="Loading users..." />
+      </div>
+    );
+  }
   return (
     <>
       {trainingDialogOpen && (
@@ -103,7 +121,7 @@ export default function AdminView() {
               <td>
                 <div className={styles.trainingRecord} data-cy="training">
                   {person.training_record?.map((training: TrainingRecord) => (
-                    <div key={training.kind} className={styles.training}>
+                    <div key={`${training.kind}-${training.completed_at}`} className={styles.training}>
                       {training.kind}
                       {training.is_valid ? (
                         <span className={styles.valid}>
