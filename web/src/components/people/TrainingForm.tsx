@@ -92,7 +92,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         >
           <option value="">Select Training Kind</option>
           {Object.entries(TrainingKindOptions).map((trainingkind) => (
-            <option key={trainingkind[1]} value={trainingkind[1]}>
+            <option key={trainingkind[1]} value={trainingkind[0]}>
               {trainingkind[0]}
             </option>
           ))}
