@@ -156,6 +156,7 @@ paths:
         - in: path
           name: id
           required: true
+          description: ID of the person to be updated
           schema:
             type: string
       requestBody:

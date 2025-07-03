@@ -344,6 +344,9 @@ export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
 export type PostPeopleByIdData = {
     body: PersonUpdate;
     path: {
+        /**
+         * ID of the person to be updated
+         */
         id: string;
     };
     query?: never;
