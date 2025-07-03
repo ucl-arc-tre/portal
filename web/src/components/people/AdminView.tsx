@@ -77,12 +77,12 @@ export default function AdminView() {
     }
   };
 
-  if (!people) return null;
-
   const handleEditTrainingClick = (id: string) => {
     setId(id);
     setTrainingDialogOpen(true);
   };
+
+  if (!people) return null;
 
   if (isLoading) {
     return (
