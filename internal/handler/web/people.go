@@ -10,7 +10,6 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 
 	"github.com/ucl-arc-tre/portal/internal/rbac"
-	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (h *Handler) GetPeople(ctx *gin.Context) {
@@ -52,7 +51,7 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 
 	switch update.TrainingKind {
 	case openapi.TrainingKindNhsd:
-		if err := h.users.SetNhsdTrainingValidity(person, types.TrainingKind(update.TrainingKind), (update.TrainingDate)); err != nil {
+		if err := h.users.SetNhsdTrainingValidity(person, update.TrainingDate); err != nil {
 			setServerError(ctx, err, "Failed to update training validity")
 		}
 
