@@ -10,17 +10,6 @@
   --green-50: #64bb75;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-
-    --text--secondary: #acacac;
-
-    --green-100: #359749;
-  }
-}
-
 html,
 body {
   max-width: 100vw;
@@ -53,12 +42,6 @@ a {
 .subtitle {
   padding-top: 2rem;
   padding-bottom: 1rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
 
 dialog {

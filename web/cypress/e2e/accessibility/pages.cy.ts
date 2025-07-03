@@ -9,54 +9,44 @@ const pages = [
   { name: "People page", path: "/people" },
 ];
 
-["light", "dark"].forEach((mode) => {
-  describe(`Accessibility - ARC Portal (${mode} mode)`, () => {
+describe(`Accessibility - ARC Portal`, () => {
+  describe("Unauthenticated content", () => {
+    pages.forEach(({ name, path }) => {
+      it(`should have no critical accessibility violations on ${name} (login fallback)`, () => {
+        cy.visit(path);
+        cy.get("header").should("be.visible"); // wait for page layout to load
+        cy.get("main").should("be.visible");
+        cy.checkAccessibility();
+      });
+    });
+  });
+
+  describe("Base user content", () => {
     beforeEach(() => {
-      if (mode === "light") {
-        cy.forceLightMode();
-      } else {
-        cy.forceDarkMode();
-      }
+      cy.loginAsBase();
     });
 
-    describe("Unauthenticated content", () => {
-      pages.forEach(({ name, path }) => {
-        it(`should have no critical accessibility violations on ${name} (login fallback)`, () => {
-          cy.visit(path);
-          cy.get("header").should("be.visible"); // wait for page layout to load
-          cy.get("main").should("be.visible");
-          cy.checkAccessibility();
-        });
+    pages.forEach(({ name, path }) => {
+      it(`should have no critical accessibility violations on ${name} (base user)`, () => {
+        cy.visit(path);
+        cy.get("header").should("be.visible"); // wait for page layout to load
+        cy.get("main").should("be.visible");
+        cy.checkAccessibility();
       });
     });
+  });
 
-    describe("Base user content", () => {
-      beforeEach(() => {
-        cy.loginAsBase();
-      });
-
-      pages.forEach(({ name, path }) => {
-        it(`should have no critical accessibility violations on ${name} (base user)`, () => {
-          cy.visit(path);
-          cy.get("header").should("be.visible"); // wait for page layout to load
-          cy.get("main").should("be.visible");
-          cy.checkAccessibility();
-        });
-      });
+  describe("Admin user content", () => {
+    beforeEach(() => {
+      cy.loginAsAdmin();
     });
 
-    describe("Admin user content", () => {
-      beforeEach(() => {
-        cy.loginAsAdmin();
-      });
-
-      pages.forEach(({ name, path }) => {
-        it(`should have no critical accessibility violations on ${name} (admin user)`, () => {
-          cy.visit(path);
-          cy.get("header").should("be.visible"); // wait for page layout to load
-          cy.get("main").should("be.visible");
-          cy.checkAccessibility();
-        });
+    pages.forEach(({ name, path }) => {
+      it(`should have no critical accessibility violations on ${name} (admin user)`, () => {
+        cy.visit(path);
+        cy.get("header").should("be.visible"); // wait for page layout to load
+        cy.get("main").should("be.visible");
+        cy.checkAccessibility();
       });
     });
   });

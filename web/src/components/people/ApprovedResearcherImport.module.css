@@ -12,11 +12,3 @@
 .button {
   min-width: 23rem;
 }
-
-@media (prefers-color-scheme: dark) {
-  .helptext {
-    :link {
-      color: lightblue;
-    }
-  }
-}

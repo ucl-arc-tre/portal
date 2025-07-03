@@ -46,14 +46,3 @@
     transform: rotate(360deg);
   }
 }
-
-@media (prefers-color-scheme: dark) {
-  .loading-spinner {
-    border-color: #374151;
-    border-top-color: #1ebc58;
-  }
-
-  .loading-message {
-    color: #9ca3af;
-  }
-}
