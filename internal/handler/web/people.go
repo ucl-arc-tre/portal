@@ -49,9 +49,18 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 		setServerError(ctx, err, "Failed to get person")
 		return
 	}
-	if err := h.users.SetTrainingValidity(person, types.TrainingKind(update.TrainingKind), (update.TrainingDate)); err != nil {
-		setServerError(ctx, err, "Failed to update training validity")
+
+	switch update.TrainingKind {
+	case openapi.TrainingKindNhsd:
+		if err := h.users.SetNhsdTrainingValidity(person, types.TrainingKind(update.TrainingKind), (update.TrainingDate)); err != nil {
+			setServerError(ctx, err, "Failed to update training validity")
+		}
+
+	default:
+		panic("unsupported training kind")
+
 	}
+
 	ctx.JSON(http.StatusOK, openapi.TrainingRecord{
 		Kind:        update.TrainingKind,
 		CompletedAt: &update.TrainingDate,

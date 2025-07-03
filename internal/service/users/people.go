@@ -62,22 +62,15 @@ func (s *Service) GetPerson(id string) (types.User, error) {
 	return person, nil
 }
 
-func (s *Service) SetTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
+func (s *Service) SetNhsdTrainingValidity(user types.User, trainingkind types.TrainingKind, date string) error {
 
 	confirmationTime, err := time.Parse(time.RFC3339, date)
 	if err != nil {
 		return err
 	}
-	switch trainingkind {
-	case types.TrainingKindNHSD:
 
-		response := s.createNHSDTrainingRecord(user, confirmationTime)
+	response := s.createNHSDTrainingRecord(user, confirmationTime)
 
-		return response
-
-	default:
-		panic("unsupported training kind")
-
-	}
+	return response
 
 }
