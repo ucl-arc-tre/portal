@@ -112,18 +112,6 @@ declare global {
       waitForProfileData(): Chainable<any>;
 
       /**
-       * Force light mode for testing
-       * @example cy.forceLightMode()
-       */
-      forceLightMode(): Chainable<any>;
-
-      /**
-       * Force dark mode for testing
-       * @example cy.forceDarkMode()
-       */
-      forceDarkMode(): Chainable<any>;
-
-      /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
        * @param selector - Optional selector to check specific element (defaults to entire page)
        * @example cy.checkAccessibility()
@@ -261,40 +249,6 @@ Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: str
       training_records: [trainingRecord],
     },
   }).as("getTraining");
-});
-
-Cypress.Commands.add("forceLightMode", () => {
-  cy.wrap(
-    Cypress.automation("remote:debugger:protocol", {
-      command: "Emulation.setEmulatedMedia",
-      params: {
-        media: "screen",
-        features: [
-          {
-            name: "prefers-color-scheme",
-            value: "light",
-          },
-        ],
-      },
-    })
-  );
-});
-
-Cypress.Commands.add("forceDarkMode", () => {
-  cy.wrap(
-    Cypress.automation("remote:debugger:protocol", {
-      command: "Emulation.setEmulatedMedia",
-      params: {
-        media: "screen",
-        features: [
-          {
-            name: "prefers-color-scheme",
-            value: "dark",
-          },
-        ],
-      },
-    })
-  );
 });
 
 Cypress.Commands.add("checkAccessibility", (selector?: string) => {

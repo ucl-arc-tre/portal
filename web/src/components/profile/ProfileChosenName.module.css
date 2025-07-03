@@ -49,13 +49,3 @@
   align-self: flex-start;
   margin-top: 0.5rem;
 }
-
-@media (prefers-color-scheme: dark) {
-  .section {
-    border-color: #374151;
-  }
-
-  .description {
-    color: #9ca3af;
-  }
-}

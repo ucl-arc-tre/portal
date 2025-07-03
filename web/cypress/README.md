@@ -106,27 +106,6 @@ The CI tests are run against the full release version of the dockerised setup to
 - **State pollution**: This can happen when integration tests modify the database. To avoid this, make sure to use proper cleanup in `beforeEach` hooks.
 - **Timing issues**: Use `cy.wait()` for API calls, `cy.contains()` for text verification
 
-## Light/Dark Mode Testing
-
-Accessibility tests automatically run in both light and dark color schemes to ensure comprehensive coverage of color contrast compliance. These tests use the `cy.forceLightMode()` and `cy.forceDarkMode()` commands to emulate different color preferences.
-
-**Test Structure:**
-
-```typescript
-["light", "dark"].forEach((mode) => {
-  describe(`Test Suite Name (${mode} mode)`, () => {
-    beforeEach(() => {
-      if (mode === "light") {
-        cy.forceLightMode();
-      } else {
-        cy.forceDarkMode();
-      }
-    });
-    // tests...
-  });
-});
-```
-
 ### Debug Tools
 
 - Use `cypress:open` for interactive debugging

@@ -33,21 +33,3 @@
   color: #37393d;
   line-height: 1.5;
 }
-
-@media (prefers-color-scheme: dark) {
-  .divider {
-    background-color: #374151;
-  }
-
-  .completed-message {
-    border-color: #374151;
-  }
-
-  .completed-message p {
-    color: #9ca3af;
-  }
-
-  .completed-message h2 {
-    color: #1ebc58;
-  }
-}

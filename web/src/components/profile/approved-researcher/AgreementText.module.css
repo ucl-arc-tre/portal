@@ -12,19 +12,3 @@
     color: #4023a7;
   }
 }
-
-.text {
-  @media (prefers-color-scheme: dark) {
-    p {
-      color: #c9ced8;
-    }
-
-    li {
-      color: #c9ced8;
-    }
-
-    a {
-      color: #c3b0d7;
-    }
-  }
-}
