@@ -24,9 +24,7 @@ import "cypress-axe";
         cy.mockProfileTraining(false); // No training
 
         cy.visit("/profile");
-        cy.wait("@getProfile");
-        cy.wait("@getAgreements");
-        cy.wait("@getTraining");
+        cy.waitForProfileData();
 
         cy.contains("Set Your Chosen Name").should("be.visible");
 
@@ -39,9 +37,7 @@ import "cypress-axe";
         cy.mockProfileTraining(false); // No training yet
 
         cy.visit("/profile");
-        cy.wait("@getProfile");
-        cy.wait("@getAgreements");
-        cy.wait("@getTraining");
+        cy.waitForProfileData();
 
         cy.get("main").should("be.visible");
         cy.contains("Approved Researcher Agreement").should("be.visible");
@@ -56,9 +52,7 @@ import "cypress-axe";
         cy.mockProfileTraining(false); // Training not complete (this is why we see step 3)
 
         cy.visit("/profile");
-        cy.wait("@getProfile");
-        cy.wait("@getAgreements");
-        cy.wait("@getTraining");
+        cy.waitForProfileData();
 
         cy.get("main").should("be.visible");
         cy.contains("Training Certificate").should("be.visible");
@@ -79,10 +73,8 @@ import "cypress-axe";
         cy.mockProfileTraining(true, "2024-01-01T00:00:00Z"); // Training completed
 
         cy.visit("/profile");
-        cy.waitForMockedAuth();
-        cy.wait("@getProfile");
-        cy.wait("@getAgreements");
-        cy.wait("@getTraining");
+        cy.waitForAuth();
+        cy.waitForProfileData();
 
         cy.get("main").should("be.visible");
         cy.contains("Profile Complete!").should("be.visible");
