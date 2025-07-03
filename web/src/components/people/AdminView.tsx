@@ -5,9 +5,8 @@ import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
-import { XIcon } from "../assets/exports";
+import { TrainingKindOptions, XIcon } from "../assets/exports";
 import Loading from "../ui/Loading";
-import { getHumanReadableTrainingKind } from "@/utils/training";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -20,6 +19,15 @@ function convertRFC3339ToDDMMYYYY(dateString: string) {
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
+}
+
+function getHumanReadableTrainingKind(trainingKind: string) {
+  // getting the key from the value
+  const humanReadableTrainingKind = Object.entries(TrainingKindOptions).find(
+    ([, value]) => value === trainingKind
+  )?.[0];
+
+  return humanReadableTrainingKind;
 }
 
 export default function AdminView() {

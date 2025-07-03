@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import AdminDialog from "./AdminDialog";
 import { InfoIcon, TrainingKindOptions } from "../assets/exports";
-import { getHumanReadableTrainingKind } from "@/utils/training";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -49,10 +48,8 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
       closeDialog();
 
-      const humanReadableTrainingKind = getHumanReadableTrainingKind(trainingKind);
-
       updatePersonUI(id, {
-        kind: humanReadableTrainingKind as TrainingKind,
+        kind: trainingKind as TrainingKind,
         completed_at: trainingDisplayDate,
         is_valid: true,
       });
