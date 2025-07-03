@@ -40,7 +40,7 @@ describe(`Homepage Tests`, () => {
 
       cy.visit("/");
       cy.waitForAuth();
-      cy.wait("@getProfile");
+      cy.waitForChosenName();
 
       cy.contains("You have completed all your tasks").should("be.visible");
     });

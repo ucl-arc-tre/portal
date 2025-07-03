@@ -74,9 +74,7 @@ import "cypress-axe";
 
         cy.visit("/profile");
         cy.waitForAuth();
-        cy.wait("@getProfile");
-        cy.wait("@getAgreements");
-        cy.wait("@getTraining");
+        cy.waitForProfileData();
 
         cy.get("main").should("be.visible");
         cy.contains("Profile Complete!").should("be.visible");
