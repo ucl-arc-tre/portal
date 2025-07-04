@@ -27,7 +27,7 @@ CMD ["air", "--build.cmd", "go build -o bin/web-api cmd/web-api/main.go", "--bui
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
-FROM node:22-alpine3.20 AS web-frontend-dev
+FROM node:22-alpine3.21 AS web-frontend-dev
 
 WORKDIR /repo/web
 COPY web/package.json web/package-lock.json web/eslint.config.mjs ./
