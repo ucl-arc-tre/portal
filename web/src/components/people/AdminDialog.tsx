@@ -31,7 +31,7 @@ export default function AdminDialog(AdminDialogProps: AdminDialogProps) {
           size="small"
           icon={<XIcon />}
           onClick={closeDialog}
-          className={styles.closeButton}
+          className={styles["close-button"]}
         ></Button>
         {children}
       </dialog>

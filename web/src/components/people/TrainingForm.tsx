@@ -119,7 +119,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
               onClick={setDateToToday}
               size="small"
               variant="tertiary"
-              className={styles.todayButton}
+              className={styles["today-button"]}
               data-cy="set-to-today"
             >
               Set to Today

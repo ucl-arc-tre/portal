@@ -124,8 +124,8 @@ export default function AdminView() {
                   </div>
                 ))}
               </td>
-              <td className={styles.trainingInfo} data-cy="training">
-                <div className={styles.trainingRecord}>
+              <td className={styles["training-info"]} data-cy="training">
+                <div className={styles["training-record"]}>
                   {person.training_record.training_records?.map((training: TrainingRecord) => (
                     <div key={`${training.kind}-${training.completed_at}`} className={styles.training}>
                       {getHumanReadableTrainingKind(training.kind)}
