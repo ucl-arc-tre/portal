@@ -2,9 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"slices"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,33 +10,9 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
-
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-func (h *Handler) GetPeople(ctx *gin.Context) {
-	user := middleware.GetUser(ctx)
-	roles, err := rbac.GetRoles(user)
-	if err != nil {
-		setServerError(ctx, err, "Failed to get roles for user")
-		return
-	}
-
-	if slices.Contains(roles, "admin") {
-		// retrieve auth + agreements + training info
-		people, err := h.users.GetAllPeople()
-		if err != nil {
-			setServerError(ctx, err, "Failed to get people")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
-
-	} else {
-		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
-	}
-
-}
-
+// PostPeopleId updates a person's training record based on the provided user ID and training kind.
 func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
 	var update openapi.PersonUpdate
 	if err := ctx.ShouldBindJSON(&update); err != nil {
@@ -75,20 +49,29 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
 	})
 }
 
-func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
-	content, err := io.ReadAll(ctx.Request.Body)
+// GetProfileTraining retrieves the training status of the user.
+func (h *Handler) GetProfileTraining(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	status, err := h.users.GetTrainingStatus(user)
 	if err != nil {
-		setServerError(ctx, err, "Failed to read body")
+		setServerError(ctx, err, "Failed to get training status")
 		return
 	}
-	agreement, err := h.agreements.LatestApprovedResearcher()
+	ctx.JSON(http.StatusOK, status)
+}
+
+// PostProfileTraining updates the user's training status.
+func (h *Handler) PostProfileTraining(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	data := openapi.ProfileTrainingUpdate{}
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		setInvalid(ctx, err, "Invalid JSON object")
+		return
+	}
+	result, err := h.users.UpdateTraining(user, data)
 	if err != nil {
-		setServerError(ctx, err, "Failed to get approved researcher agreement")
+		setServerError(ctx, err, "Failed to update users training")
 		return
 	}
-	if err := h.users.ImportApprovedResearchersCSV(content, *agreement); err != nil {
-		setServerError(ctx, err, "Failed to import")
-		return
-	}
-	ctx.Status(http.StatusNoContent)
+	ctx.JSON(http.StatusOK, result)
 }
