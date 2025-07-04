@@ -1,13 +1,17 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"slices"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/service/users"
 
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
@@ -35,15 +39,20 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 
 }
 
-func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
+func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
 	var update openapi.PersonUpdate
 	if err := ctx.ShouldBindJSON(&update); err != nil {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return
 	}
 
-	// take the id from the url and get the person
-	person, err := h.users.GetPerson(id)
+	trainingDate, err := time.Parse(config.TimeFormat, update.TrainingDate)
+	if err != nil {
+		setInvalid(ctx, err, fmt.Sprintf("Failed to parse date [%v]", update.TrainingDate))
+		return
+	}
+
+	person, err := h.users.GetUser(userId)
 	if err != nil {
 		setServerError(ctx, err, "Failed to get person")
 		return
@@ -51,19 +60,18 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, id string) {
 
 	switch update.TrainingKind {
 	case openapi.TrainingKindNhsd:
-		if err := h.users.SetNhsdTrainingValidity(person, update.TrainingDate); err != nil {
+		if err := h.users.CreateNHSDTrainingRecord(person, trainingDate); err != nil {
 			setServerError(ctx, err, "Failed to update training validity")
+			return
 		}
-
 	default:
 		panic("unsupported training kind")
-
 	}
 
 	ctx.JSON(http.StatusOK, openapi.TrainingRecord{
 		Kind:        update.TrainingKind,
 		CompletedAt: &update.TrainingDate,
-		IsValid:     true,
+		IsValid:     users.NHSDTrainingIsValid(trainingDate),
 	})
 }
 

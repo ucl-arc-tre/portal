@@ -168,6 +168,10 @@ paths:
       responses:
         "200":
           description: Successfully updated person
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingRecord"
         "403":
           description: Forbidden
         "404":
