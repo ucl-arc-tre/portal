@@ -1,18 +1,21 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Title from "@/components/ui/Title";
+import ApprovedResearcherView from "./ApprovedResearcherView";
 
 export default function Studies() {
-  const { authInProgress, isAuthed } = useAuth();
-
+  const { authInProgress, isAuthed, userData } = useAuth();
   if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
+
   return (
     <>
-      <Title text={"Studies"} />
-      <p>This page is being built. Please check back soon for updates!</p>
+      {!isAdmin && !isApprovedResearcher && <p>This page is being built. Please check back soon for updates!</p>}
+
+      {isApprovedResearcher && <ApprovedResearcherView />}
     </>
   );
 }

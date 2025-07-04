@@ -1,3 +1,4 @@
+import Button from "../ui/Button";
 import styles from "./ProfileStepProgress.module.css";
 import dynamic from "next/dynamic";
 
@@ -20,8 +21,12 @@ export default function ProfileStepProgress(props: ProfileStepProgressProps) {
           <>
             <h3 className={styles["completion-title"]}>Profile Complete!</h3>
             <p className={styles["completion-subtitle"]}>
-              You have successfully completed all profile setup steps and are now an approved researcher.
+              You have successfully completed all profile setup steps and are now an approved researcher. You can now
+              create and manage studies.
             </p>
+            <Button href="/studies" size="default">
+              Go to studies
+            </Button>
           </>
         ) : (
           <p className={styles["intro-text"]}>

@@ -1,0 +1,56 @@
+.study-dialog {
+  width: 70vw;
+  overflow: scroll;
+  position: absolute;
+  top: 5vh;
+}
+
+.form {
+  width: 100%;
+  margin-block: 1.8rem;
+  padding-inline: 4%;
+
+  a {
+    color: var(--form-link);
+    text-decoration: underline;
+  }
+
+  .fieldset {
+    border: 1px solid var(--text--secondary);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-block-end: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+
+    legend {
+      color: var(--text--secondary);
+      font-size: 0.75rem;
+    }
+
+    label {
+      padding: 0.4rem;
+      font-weight: 400;
+      max-width: 100%;
+
+      input,
+      textarea {
+        accent-color: var(--green-200);
+      }
+
+      small {
+        display: block;
+      }
+    }
+  }
+
+  .button--continue {
+    float: inline-end;
+  }
+
+  .button--continue,
+  .button--back {
+    margin-inline: 0.4%;
+  }
+}
