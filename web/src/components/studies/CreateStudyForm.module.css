@@ -8,6 +8,7 @@
 .form {
   width: 100%;
   margin-block: 1.8rem;
+  padding-inline: 4%;
 
   a {
     color: var(--form-link);
@@ -20,6 +21,7 @@
     padding: 1rem;
     margin-block-end: 1.5rem;
     display: grid;
+    grid-template-columns: 1fr;
     width: 100%;
 
     legend {
@@ -29,10 +31,11 @@
 
     label {
       padding: 0.4rem;
+      font-weight: 400;
+      max-width: 100%;
 
       input,
       textarea {
-        margin-inline: 0.4rem;
         accent-color: var(--green-200);
       }
 
@@ -40,5 +43,14 @@
         display: block;
       }
     }
+  }
+
+  .button--continue {
+    float: inline-end;
+  }
+
+  .button--continue,
+  .button--back {
+    margin-inline: 0.4%;
   }
 }
