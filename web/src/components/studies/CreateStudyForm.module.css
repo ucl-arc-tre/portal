@@ -9,6 +9,11 @@
   width: 100%;
   margin-block: 1.8rem;
 
+  a {
+    color: var(--form-link);
+    text-decoration: underline;
+  }
+
   .fieldset {
     border: 1px solid var(--text--secondary);
     border-radius: 8px;
@@ -20,6 +25,20 @@
     legend {
       color: var(--text--secondary);
       font-size: 0.75rem;
+    }
+
+    label {
+      padding: 0.4rem;
+
+      input,
+      textarea {
+        margin-inline: 0.4rem;
+        accent-color: var(--green-200);
+      }
+
+      small {
+        display: block;
+      }
     }
   }
 }
