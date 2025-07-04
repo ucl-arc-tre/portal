@@ -1,0 +1,25 @@
+.study-dialog {
+  width: 70vw;
+  overflow: scroll;
+  position: absolute;
+  top: 5vh;
+}
+
+.form {
+  width: 100%;
+  margin-block: 1.8rem;
+
+  .fieldset {
+    border: 1px solid var(--text--secondary);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-block-end: 1.5rem;
+    display: grid;
+    width: 100%;
+
+    legend {
+      color: var(--text--secondary);
+      font-size: 0.75rem;
+    }
+  }
+}
