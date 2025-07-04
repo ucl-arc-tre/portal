@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import styles from "./AdminDialog.module.css";
-import Button from "../ui/Button";
+import styles from "./Dialog.module.css";
+import Button from "./Button";
 import dynamic from "next/dynamic";
 import { XIcon } from "../assets/exports";
 
@@ -8,13 +8,13 @@ const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Bla
   ssr: false,
 });
 
-type AdminDialogProps = {
+type DialogProps = {
   setDialogOpen: (name: boolean) => void;
   children: React.ReactNode;
 };
 
-export default function AdminDialog(AdminDialogProps: AdminDialogProps) {
-  const { setDialogOpen, children } = AdminDialogProps;
+export default function Dialog(DialogProps: DialogProps) {
+  const { setDialogOpen, children } = DialogProps;
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const closeDialog = () => {

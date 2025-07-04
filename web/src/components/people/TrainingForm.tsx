@@ -4,7 +4,7 @@ import Button from "../ui/Button";
 import { postPeopleById, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
-import AdminDialog from "./AdminDialog";
+import Dialog from "../ui/Dialog";
 import { InfoIcon, TrainingKindOptions } from "../assets/exports";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
@@ -71,7 +71,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   };
 
   return (
-    <AdminDialog setDialogOpen={setTrainingDialogOpen} data-cy="training">
+    <Dialog setDialogOpen={setTrainingDialogOpen} data-cy="training">
       <form onSubmit={handleSubmit} noValidate className={styles.form}>
         <p>Use this form to validate a training certificate. Make sure you check the date on the certificate.</p>
 
@@ -136,6 +136,6 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
         <Button type="submit">Submit</Button>
       </form>
-    </AdminDialog>
+    </Dialog>
   );
 }
