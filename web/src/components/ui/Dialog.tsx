@@ -11,10 +11,12 @@ const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Bla
 type DialogProps = {
   setDialogOpen: (name: boolean) => void;
   children: React.ReactNode;
+  className?: string;
+  cypressId?: string;
 };
 
 export default function Dialog(DialogProps: DialogProps) {
-  const { setDialogOpen, children } = DialogProps;
+  const { setDialogOpen, children, className, cypressId } = DialogProps;
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const closeDialog = () => {
@@ -22,9 +24,11 @@ export default function Dialog(DialogProps: DialogProps) {
     setDialogOpen(false);
   };
 
+  const combinedClassName = `${styles.dialog}${className ? ` ${className}` : ""}`;
+
   return (
     <>
-      <dialog open ref={dialogRef} className={styles.dialog} data-cy="training">
+      <dialog open ref={dialogRef} className={combinedClassName} data-cy={cypressId}>
         <Button
           type="button"
           variant="tertiary"

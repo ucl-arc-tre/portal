@@ -71,7 +71,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   };
 
   return (
-    <Dialog setDialogOpen={setTrainingDialogOpen} data-cy="training">
+    <Dialog setDialogOpen={setTrainingDialogOpen} cypressId="training" className={styles["training-dialog"]}>
       <form onSubmit={handleSubmit} noValidate className={styles.form}>
         <p>Use this form to validate a training certificate. Make sure you check the date on the certificate.</p>
 
