@@ -30,14 +30,24 @@ describe("Approved researcher can create studies", () => {
     cy.mockAuthAsBaseApprovedResearcher();
     cy.visit("/studies");
     cy.waitForAuth();
+  });
 
+  it("can bring up the form", () => {
+    cy.contains("Create Study").should("be.visible").click();
+    cy.get("[data-cy='create-study-form']").should("be.visible");
+  });
+
+  it("can't edit study owner", () => {
     cy.fixture("auth-base-approved-researcher.json").then((data) => {
       const username = data.username;
 
-      it("can bring up the form", () => {
-        cy.contains("Create Study").should("be.visible").click();
-        cy.get("input[name='owner']").should("be.readonly").should("have.value", username);
-      });
+      cy.contains("Create Study").should("be.visible").click();
+
+      cy.get("input[name='owner']").should("be.readonly").should("have.value", username);
     });
+  });
+
+  it("can't submit without filling in required fields", () => {
+    cy.contains("Create Study").should("be.visible").click();
   });
 });
