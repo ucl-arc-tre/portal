@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
-import { getProfile } from "@/openapi";
+import { getUserIdentity } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 
@@ -15,7 +15,7 @@ export default function UserTasks() {
     const fetchProfile = async () => {
       setIsLoading(true);
       try {
-        const response = await getProfile();
+        const response = await getUserIdentity();
 
         if (response.response.ok && response.data?.chosen_name) {
           setChosenName(response.data.chosen_name);

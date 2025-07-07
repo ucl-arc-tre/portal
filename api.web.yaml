@@ -23,18 +23,19 @@ paths:
         default:
           description: Unexpected error
 
-  /profile:
+  /user/identity:
     get:
-      description: Users profile
+      description: User identity information (chosen name)
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: "#/components/schemas/UserIdentityResponse"
         default:
           description: Unexpected error
     post:
+      description: Update user identity information (chosen name)
       requestBody:
         required: true
         content:
@@ -43,11 +44,11 @@ paths:
               $ref: "#/components/schemas/ProfileUpdate"
       responses:
         "200":
-          description: "Successfully updated profile"
+          description: "Successfully updated user identity"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: "#/components/schemas/UserIdentityResponse"
         "500":
           description: Internal server error
         default:
@@ -233,7 +234,7 @@ components:
               - base
               - approved-researcher
 
-    ProfileResponse:
+    UserIdentityResponse:
       type: object
       required:
         - username

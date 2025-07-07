@@ -16,14 +16,17 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
             <span className={styles.label}>Chosen name:</span>
             <span className={styles.value}>{chosenName || <span className={styles.placeholder}>Not set</span>}</span>
           </div>
+
           <div className={styles.field}>
             <span className={styles.label}>Username:</span>
             <span className={styles.value}>{username}</span>
           </div>
         </div>
+
         <div className={styles.row}>
           <div className={styles.field}>
             <span className={styles.label}>Roles:</span>
+
             <div className={styles.roles}>
               {roles && roles.length > 0 ? (
                 roles.map((role) => (

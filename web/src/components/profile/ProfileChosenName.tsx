@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import styles from "./ProfileChosenName.module.css";
 import Button from "../ui/Button";
-import { postProfile } from "@/openapi";
+import { postUserIdentity } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 
@@ -38,7 +38,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
     setIsSubmitting(true);
     try {
-      const response = await postProfile({ body: { chosen_name: name } });
+      const response = await postUserIdentity({ body: { chosen_name: name } });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
       setChosenName(name);

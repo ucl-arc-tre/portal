@@ -5,7 +5,7 @@ export type Auth = {
     roles: Array<'admin' | 'base' | 'approved-researcher'>;
 };
 
-export type ProfileResponse = {
+export type UserIdentityResponse = {
     username: string;
     chosen_name: string;
 };
@@ -136,34 +136,34 @@ export type GetAuthResponses = {
 
 export type GetAuthResponse = GetAuthResponses[keyof GetAuthResponses];
 
-export type GetProfileData = {
+export type GetUserIdentityData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/profile';
+    url: '/user/identity';
 };
 
-export type GetProfileErrors = {
+export type GetUserIdentityErrors = {
     /**
      * Unexpected error
      */
     default: unknown;
 };
 
-export type GetProfileResponses = {
-    200: ProfileResponse;
+export type GetUserIdentityResponses = {
+    200: UserIdentityResponse;
 };
 
-export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+export type GetUserIdentityResponse = GetUserIdentityResponses[keyof GetUserIdentityResponses];
 
-export type PostProfileData = {
+export type PostUserIdentityData = {
     body: ProfileUpdate;
     path?: never;
     query?: never;
-    url: '/profile';
+    url: '/user/identity';
 };
 
-export type PostProfileErrors = {
+export type PostUserIdentityErrors = {
     /**
      * Internal server error
      */
@@ -174,14 +174,14 @@ export type PostProfileErrors = {
     default: unknown;
 };
 
-export type PostProfileResponses = {
+export type PostUserIdentityResponses = {
     /**
-     * Successfully updated profile
+     * Successfully updated user identity
      */
-    200: ProfileResponse;
+    200: UserIdentityResponse;
 };
 
-export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
+export type PostUserIdentityResponse = PostUserIdentityResponses[keyof PostUserIdentityResponses];
 
 export type GetProfileAgreementsData = {
     body?: never;

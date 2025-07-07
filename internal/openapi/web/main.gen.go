@@ -78,12 +78,6 @@ type ProfileAgreements struct {
 	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
 }
 
-// ProfileResponse defines model for ProfileResponse.
-type ProfileResponse struct {
-	ChosenName string `json:"chosen_name"`
-	Username   string `json:"username"`
-}
-
 // ProfileTrainingResponse defines model for ProfileTrainingResponse.
 type ProfileTrainingResponse struct {
 	// CertificateIsValid Is the certificate valid
@@ -139,8 +133,11 @@ type User struct {
 	Username string `json:"username"`
 }
 
-// PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
-type PostProfileJSONRequestBody = ProfileUpdate
+// UserIdentityResponse defines model for UserIdentityResponse.
+type UserIdentityResponse struct {
+	ChosenName string `json:"chosen_name"`
+	Username   string `json:"username"`
+}
 
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
@@ -150,6 +147,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
 // UpdateUserTrainingDateJSONRequestBody defines body for UpdateUserTrainingDate for application/json ContentType.
 type UpdateUserTrainingDateJSONRequestBody = TrainingValidFromDate
+
+// PostUserIdentityJSONRequestBody defines body for PostUserIdentity for application/json ContentType.
+type PostUserIdentityJSONRequestBody = ProfileUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -162,12 +162,6 @@ type ServerInterface interface {
 
 	// (POST /people/approved-researchers/import/csv)
 	PostPeopleApprovedResearchersImportCsv(c *gin.Context)
-
-	// (GET /profile)
-	GetProfile(c *gin.Context)
-
-	// (POST /profile)
-	PostProfile(c *gin.Context)
 
 	// (GET /profile/agreements)
 	GetProfileAgreements(c *gin.Context)
@@ -183,6 +177,12 @@ type ServerInterface interface {
 
 	// (PUT /training/{userId}/{trainingKind})
 	UpdateUserTrainingDate(c *gin.Context, userId string, trainingKind TrainingKind)
+
+	// (GET /user/identity)
+	GetUserIdentity(c *gin.Context)
+
+	// (POST /user/identity)
+	PostUserIdentity(c *gin.Context)
 
 	// (GET /users)
 	GetAllUsers(c *gin.Context)
@@ -234,32 +234,6 @@ func (siw *ServerInterfaceWrapper) PostPeopleApprovedResearchersImportCsv(c *gin
 	}
 
 	siw.Handler.PostPeopleApprovedResearchersImportCsv(c)
-}
-
-// GetProfile operation middleware
-func (siw *ServerInterfaceWrapper) GetProfile(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetProfile(c)
-}
-
-// PostProfile operation middleware
-func (siw *ServerInterfaceWrapper) PostProfile(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostProfile(c)
 }
 
 // GetProfileAgreements operation middleware
@@ -347,6 +321,32 @@ func (siw *ServerInterfaceWrapper) UpdateUserTrainingDate(c *gin.Context) {
 	siw.Handler.UpdateUserTrainingDate(c, userId, trainingKind)
 }
 
+// GetUserIdentity operation middleware
+func (siw *ServerInterfaceWrapper) GetUserIdentity(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUserIdentity(c)
+}
+
+// PostUserIdentity operation middleware
+func (siw *ServerInterfaceWrapper) PostUserIdentity(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostUserIdentity(c)
+}
+
 // GetAllUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetAllUsers(c *gin.Context) {
 
@@ -390,12 +390,12 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.POST(options.BaseURL+"/people/approved-researchers/import/csv", wrapper.PostPeopleApprovedResearchersImportCsv)
-	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
-	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.PUT(options.BaseURL+"/training/:userId/:trainingKind", wrapper.UpdateUserTrainingDate)
+	router.GET(options.BaseURL+"/user/identity", wrapper.GetUserIdentity)
+	router.POST(options.BaseURL+"/user/identity", wrapper.PostUserIdentity)
 	router.GET(options.BaseURL+"/users", wrapper.GetAllUsers)
 }

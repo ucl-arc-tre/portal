@@ -36,7 +36,7 @@ func (h *Handler) GetAllUsers(ctx *gin.Context) {
 
 }
 
-func (h *Handler) GetProfile(ctx *gin.Context) {
+func (h *Handler) GetUserIdentity(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	attributes, err := h.users.Attributes(user)
 	if err != nil {
@@ -44,14 +44,13 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.ProfileResponse{
+	ctx.JSON(http.StatusOK, openapi.UserIdentityResponse{
 		Username:   string(user.Username),
 		ChosenName: string(attributes.ChosenName),
 	})
 }
 
-// Updates the user's chosen name.
-func (h *Handler) PostProfile(ctx *gin.Context) {
+func (h *Handler) PostUserIdentity(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	update := openapi.ProfileUpdate{}
 	if err := ctx.ShouldBindJSON(&update); err != nil {
@@ -62,7 +61,8 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 		setServerError(ctx, err, "Failed to update chosen name")
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
+	ctx.JSON(http.StatusOK, openapi.UserIdentityResponse{
+		Username:   string(user.Username),
 		ChosenName: update.ChosenName,
 	})
 }
