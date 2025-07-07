@@ -50,9 +50,9 @@ func (h *Handler) GetUserIdentity(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) PostUserIdentity(ctx *gin.Context) {
+func (h *Handler) UpdateChosenName(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	update := openapi.ProfileUpdate{}
+	update := openapi.UserIdentity{}
 	if err := ctx.ShouldBindJSON(&update); err != nil {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return

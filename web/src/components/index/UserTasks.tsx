@@ -11,6 +11,8 @@ export default function UserTasks() {
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
+  console.log(userData);
+
   useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true);

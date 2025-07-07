@@ -11,7 +11,10 @@ import (
 
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	auth := openapi.Auth{Username: string(user.Username)}
+	auth := openapi.Auth{
+		Username: string(user.Username),
+		Id:       user.ID.String(),
+	}
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
 		setServerError(ctx, err, "Failed to get roles for user")

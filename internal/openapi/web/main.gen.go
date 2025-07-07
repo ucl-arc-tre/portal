@@ -47,6 +47,7 @@ type AgreementType string
 
 // Auth defines model for Auth.
 type Auth struct {
+	Id       string      `json:"id"`
 	Roles    []AuthRoles `json:"roles"`
 	Username string      `json:"username"`
 }
@@ -67,45 +68,15 @@ type People = []Person
 
 // Person defines model for Person.
 type Person struct {
-	Agreements     ProfileAgreements     `json:"agreements"`
-	Roles          []string              `json:"roles"`
-	TrainingRecord ProfileTrainingStatus `json:"training_record"`
-	User           User                  `json:"user"`
+	Agreements     ProfileAgreements  `json:"agreements"`
+	Roles          []string           `json:"roles"`
+	TrainingRecord UserTrainingStatus `json:"training_record"`
+	User           User               `json:"user"`
 }
 
 // ProfileAgreements defines model for ProfileAgreements.
 type ProfileAgreements struct {
 	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
-}
-
-// ProfileTrainingResponse defines model for ProfileTrainingResponse.
-type ProfileTrainingResponse struct {
-	// CertificateIsValid Is the certificate valid
-	CertificateIsValid *bool `json:"certificate_is_valid,omitempty"`
-
-	// CertificateIssuedAt Time in RFC3339 format at which the the certificate was issued
-	CertificateIssuedAt *string `json:"certificate_issued_at,omitempty"`
-
-	// CertificateMessage Reason why the training certificate is valid/invalid
-	CertificateMessage *string `json:"certificate_message,omitempty"`
-}
-
-// ProfileTrainingStatus defines model for ProfileTrainingStatus.
-type ProfileTrainingStatus struct {
-	// TrainingRecords List of all training records for the user
-	TrainingRecords []TrainingRecord `json:"training_records"`
-}
-
-// ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
-type ProfileTrainingUpdate struct {
-	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertificateContentPdfBase64 *string      `json:"certificate_content_pdf_base64,omitempty"`
-	Kind                        TrainingKind `json:"kind"`
-}
-
-// ProfileUpdate defines model for ProfileUpdate.
-type ProfileUpdate struct {
-	ChosenName string `json:"chosen_name"`
 }
 
 // TrainingKind defines model for TrainingKind.
@@ -133,23 +104,53 @@ type User struct {
 	Username string `json:"username"`
 }
 
+// UserIdentity defines model for UserIdentity.
+type UserIdentity struct {
+	ChosenName string `json:"chosen_name"`
+}
+
 // UserIdentityResponse defines model for UserIdentityResponse.
 type UserIdentityResponse struct {
 	ChosenName string `json:"chosen_name"`
 	Username   string `json:"username"`
 }
 
+// UserTrainingResponse defines model for UserTrainingResponse.
+type UserTrainingResponse struct {
+	// CertificateIsValid Is the certificate valid
+	CertificateIsValid *bool `json:"certificate_is_valid,omitempty"`
+
+	// CertificateIssuedAt Time in RFC3339 format at which the the certificate was issued
+	CertificateIssuedAt *string `json:"certificate_issued_at,omitempty"`
+
+	// CertificateMessage Reason why the training certificate is valid/invalid
+	CertificateMessage *string `json:"certificate_message,omitempty"`
+}
+
+// UserTrainingStatus defines model for UserTrainingStatus.
+type UserTrainingStatus struct {
+	// TrainingRecords List of all training records for the user
+	TrainingRecords []TrainingRecord `json:"training_records"`
+}
+
+// UserTrainingUpdate defines model for UserTrainingUpdate.
+type UserTrainingUpdate struct {
+	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
+	CertificateContentPdfBase64 *string      `json:"certificate_content_pdf_base64,omitempty"`
+	Kind                        TrainingKind `json:"kind"`
+}
+
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 
-// PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
-type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
+// UpdateTrainingRecordJSONRequestBody defines body for UpdateTrainingRecord for application/json ContentType.
+type UpdateTrainingRecordJSONRequestBody = UserTrainingUpdate
 
-// UpdateUserTrainingDateJSONRequestBody defines body for UpdateUserTrainingDate for application/json ContentType.
-type UpdateUserTrainingDateJSONRequestBody = TrainingValidFromDate
+// UpdateTrainingValidityDateJSONRequestBody defines body for UpdateTrainingValidityDate for application/json ContentType.
+type UpdateTrainingValidityDateJSONRequestBody = TrainingValidFromDate
 
-// PostUserIdentityJSONRequestBody defines body for PostUserIdentity for application/json ContentType.
-type PostUserIdentityJSONRequestBody = ProfileUpdate
+// UpdateChosenNameJSONRequestBody defines body for UpdateChosenName for application/json ContentType.
+type UpdateChosenNameJSONRequestBody = UserIdentity
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -169,20 +170,20 @@ type ServerInterface interface {
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
 
-	// (GET /profile/training)
-	GetProfileTraining(c *gin.Context)
+	// (GET /training/{userId})
+	GetTrainingRecord(c *gin.Context, userId string)
 
-	// (POST /profile/training)
-	PostProfileTraining(c *gin.Context)
+	// (POST /training/{userId})
+	UpdateTrainingRecord(c *gin.Context, userId string)
 
 	// (PUT /training/{userId}/{trainingKind})
-	UpdateUserTrainingDate(c *gin.Context, userId string, trainingKind TrainingKind)
+	UpdateTrainingValidityDate(c *gin.Context, userId string, trainingKind TrainingKind)
 
 	// (GET /user/identity)
 	GetUserIdentity(c *gin.Context)
 
 	// (POST /user/identity)
-	PostUserIdentity(c *gin.Context)
+	UpdateChosenName(c *gin.Context)
 
 	// (GET /users)
 	GetAllUsers(c *gin.Context)
@@ -262,8 +263,19 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	siw.Handler.PostProfileAgreements(c)
 }
 
-// GetProfileTraining operation middleware
-func (siw *ServerInterfaceWrapper) GetProfileTraining(c *gin.Context) {
+// GetTrainingRecord operation middleware
+func (siw *ServerInterfaceWrapper) GetTrainingRecord(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -272,11 +284,22 @@ func (siw *ServerInterfaceWrapper) GetProfileTraining(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetProfileTraining(c)
+	siw.Handler.GetTrainingRecord(c, userId)
 }
 
-// PostProfileTraining operation middleware
-func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
+// UpdateTrainingRecord operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTrainingRecord(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -285,11 +308,11 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostProfileTraining(c)
+	siw.Handler.UpdateTrainingRecord(c, userId)
 }
 
-// UpdateUserTrainingDate operation middleware
-func (siw *ServerInterfaceWrapper) UpdateUserTrainingDate(c *gin.Context) {
+// UpdateTrainingValidityDate operation middleware
+func (siw *ServerInterfaceWrapper) UpdateTrainingValidityDate(c *gin.Context) {
 
 	var err error
 
@@ -318,7 +341,7 @@ func (siw *ServerInterfaceWrapper) UpdateUserTrainingDate(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UpdateUserTrainingDate(c, userId, trainingKind)
+	siw.Handler.UpdateTrainingValidityDate(c, userId, trainingKind)
 }
 
 // GetUserIdentity operation middleware
@@ -334,8 +357,8 @@ func (siw *ServerInterfaceWrapper) GetUserIdentity(c *gin.Context) {
 	siw.Handler.GetUserIdentity(c)
 }
 
-// PostUserIdentity operation middleware
-func (siw *ServerInterfaceWrapper) PostUserIdentity(c *gin.Context) {
+// UpdateChosenName operation middleware
+func (siw *ServerInterfaceWrapper) UpdateChosenName(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -344,7 +367,7 @@ func (siw *ServerInterfaceWrapper) PostUserIdentity(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostUserIdentity(c)
+	siw.Handler.UpdateChosenName(c)
 }
 
 // GetAllUsers operation middleware
@@ -392,10 +415,10 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/people/approved-researchers/import/csv", wrapper.PostPeopleApprovedResearchersImportCsv)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
-	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
-	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
-	router.PUT(options.BaseURL+"/training/:userId/:trainingKind", wrapper.UpdateUserTrainingDate)
+	router.GET(options.BaseURL+"/training/:userId", wrapper.GetTrainingRecord)
+	router.POST(options.BaseURL+"/training/:userId", wrapper.UpdateTrainingRecord)
+	router.PUT(options.BaseURL+"/training/:userId/:trainingKind", wrapper.UpdateTrainingValidityDate)
 	router.GET(options.BaseURL+"/user/identity", wrapper.GetUserIdentity)
-	router.POST(options.BaseURL+"/user/identity", wrapper.PostUserIdentity)
+	router.POST(options.BaseURL+"/user/identity", wrapper.UpdateChosenName)
 	router.GET(options.BaseURL+"/users", wrapper.GetAllUsers)
 }

@@ -97,9 +97,11 @@ export default function AdminView() {
       {trainingDialogOpen && (
         <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
       )}
+
       <p>
         Please note the dates shown are when the agreement/training is <em>valid from</em>
       </p>
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -109,6 +111,7 @@ export default function AdminView() {
             <th>Training</th>
           </tr>
         </thead>
+
         <tbody className={styles.tbody}>
           {people.map((person: Person) => (
             <tr key={person.user.id} className={styles.row}>

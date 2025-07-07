@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getUserIdentity, getProfileAgreements, getProfileTraining } from "@/openapi";
+import { getUserIdentity, getProfileAgreements, getTrainingRecord } from "@/openapi";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import Loading from "@/components/ui/Loading";
@@ -26,7 +26,7 @@ export default function Profile() {
         const [profileResponse, agreementsResponse, trainingResponse] = await Promise.all([
           getUserIdentity(),
           getProfileAgreements(),
-          getProfileTraining(),
+          getTrainingRecord({ path: { userId: userData?.id || "" } }),
         ]);
 
         if (profileResponse.response.ok && profileResponse.data?.chosen_name) {

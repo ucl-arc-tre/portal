@@ -2,6 +2,7 @@
 
 export type Auth = {
     username: string;
+    id: string;
     roles: Array<'admin' | 'base' | 'approved-researcher'>;
 };
 
@@ -10,7 +11,7 @@ export type UserIdentityResponse = {
     chosen_name: string;
 };
 
-export type ProfileUpdate = {
+export type UserIdentity = {
     chosen_name: string;
 };
 
@@ -45,7 +46,7 @@ export type ProfileAgreements = {
 
 export type TrainingKind = 'training_kind_nhsd';
 
-export type ProfileTrainingUpdate = {
+export type UserTrainingUpdate = {
     kind: TrainingKind;
     /**
      * Base64 encoded PDF file data of the certificate
@@ -53,7 +54,7 @@ export type ProfileTrainingUpdate = {
     certificate_content_pdf_base64?: string;
 };
 
-export type ProfileTrainingResponse = {
+export type UserTrainingResponse = {
     /**
      * Is the certificate valid
      */
@@ -80,7 +81,7 @@ export type TrainingRecord = {
     completed_at?: string;
 };
 
-export type ProfileTrainingStatus = {
+export type UserTrainingStatus = {
     /**
      * List of all training records for the user
      */
@@ -96,7 +97,7 @@ export type Person = {
     user: User;
     roles: Array<string>;
     agreements: ProfileAgreements;
-    training_record: ProfileTrainingStatus;
+    training_record: UserTrainingStatus;
 };
 
 export type TrainingValidFromDate = {
@@ -156,14 +157,14 @@ export type GetUserIdentityResponses = {
 
 export type GetUserIdentityResponse = GetUserIdentityResponses[keyof GetUserIdentityResponses];
 
-export type PostUserIdentityData = {
-    body: ProfileUpdate;
+export type UpdateChosenNameData = {
+    body: UserIdentity;
     path?: never;
     query?: never;
     url: '/user/identity';
 };
 
-export type PostUserIdentityErrors = {
+export type UpdateChosenNameErrors = {
     /**
      * Internal server error
      */
@@ -174,14 +175,14 @@ export type PostUserIdentityErrors = {
     default: unknown;
 };
 
-export type PostUserIdentityResponses = {
+export type UpdateChosenNameResponses = {
     /**
      * Successfully updated user identity
      */
     200: UserIdentityResponse;
 };
 
-export type PostUserIdentityResponse = PostUserIdentityResponses[keyof PostUserIdentityResponses];
+export type UpdateChosenNameResponse = UpdateChosenNameResponses[keyof UpdateChosenNameResponses];
 
 export type GetProfileAgreementsData = {
     body?: never;
@@ -231,14 +232,19 @@ export type PostProfileAgreementsResponses = {
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
 
-export type GetProfileTrainingData = {
+export type GetTrainingRecordData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * ID of the user whose training records to retrieve
+         */
+        userId: string;
+    };
     query?: never;
-    url: '/profile/training';
+    url: '/training/{userId}';
 };
 
-export type GetProfileTrainingErrors = {
+export type GetTrainingRecordErrors = {
     /**
      * Internal server error
      */
@@ -249,20 +255,25 @@ export type GetProfileTrainingErrors = {
     default: unknown;
 };
 
-export type GetProfileTrainingResponses = {
-    200: ProfileTrainingStatus;
+export type GetTrainingRecordResponses = {
+    200: UserTrainingStatus;
 };
 
-export type GetProfileTrainingResponse = GetProfileTrainingResponses[keyof GetProfileTrainingResponses];
+export type GetTrainingRecordResponse = GetTrainingRecordResponses[keyof GetTrainingRecordResponses];
 
-export type PostProfileTrainingData = {
-    body: ProfileTrainingUpdate;
-    path?: never;
+export type UpdateTrainingRecordData = {
+    body: UserTrainingUpdate;
+    path: {
+        /**
+         * ID of the user whose training record to update
+         */
+        userId: string;
+    };
     query?: never;
-    url: '/profile/training';
+    url: '/training/{userId}';
 };
 
-export type PostProfileTrainingErrors = {
+export type UpdateTrainingRecordErrors = {
     /**
      * Internal server error
      */
@@ -273,14 +284,14 @@ export type PostProfileTrainingErrors = {
     default: unknown;
 };
 
-export type PostProfileTrainingResponses = {
+export type UpdateTrainingRecordResponses = {
     /**
      * Accepted
      */
-    200: ProfileTrainingResponse;
+    200: UserTrainingResponse;
 };
 
-export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
+export type UpdateTrainingRecordResponse = UpdateTrainingRecordResponses[keyof UpdateTrainingRecordResponses];
 
 export type GetAgreementsApprovedResearcherData = {
     body?: never;
@@ -338,7 +349,7 @@ export type GetAllUsersResponses = {
 
 export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];
 
-export type UpdateUserTrainingDateData = {
+export type UpdateTrainingValidityDateData = {
     body: TrainingValidFromDate;
     path: {
         /**
@@ -354,7 +365,7 @@ export type UpdateUserTrainingDateData = {
     url: '/training/{userId}/{trainingKind}';
 };
 
-export type UpdateUserTrainingDateErrors = {
+export type UpdateTrainingValidityDateErrors = {
     /**
      * Forbidden
      */
@@ -373,14 +384,14 @@ export type UpdateUserTrainingDateErrors = {
     default: unknown;
 };
 
-export type UpdateUserTrainingDateResponses = {
+export type UpdateTrainingValidityDateResponses = {
     /**
      * Successfully updated training record
      */
     200: TrainingRecord;
 };
 
-export type UpdateUserTrainingDateResponse = UpdateUserTrainingDateResponses[keyof UpdateUserTrainingDateResponses];
+export type UpdateTrainingValidityDateResponse = UpdateTrainingValidityDateResponses[keyof UpdateTrainingValidityDateResponses];
 
 export type PostPeopleApprovedResearchersImportCsvData = {
     body: Blob | File;

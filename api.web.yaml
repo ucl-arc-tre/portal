@@ -35,13 +35,14 @@ paths:
         default:
           description: Unexpected error
     post:
+      operationId: updateChosenName
       description: Update user identity information (chosen name)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProfileUpdate"
+              $ref: "#/components/schemas/UserIdentity"
       responses:
         "200":
           description: "Successfully updated user identity"
@@ -86,33 +87,49 @@ paths:
         default:
           description: Unexpected error
 
-  /profile/training:
+  /training/{userId}:
     get:
+      operationId: getTrainingRecord
       description: Get the training record status for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user whose training records to retrieve
+          schema:
+            type: string
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileTrainingStatus"
+                $ref: "#/components/schemas/UserTrainingStatus"
         "500":
           description: Internal server error
         default:
           description: Unexpected error
     post:
+      operationId: updateTrainingRecord
       description: Update the training record for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user whose training record to update
+          schema:
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProfileTrainingUpdate"
+              $ref: "#/components/schemas/UserTrainingUpdate"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileTrainingResponse"
+                $ref: "#/components/schemas/UserTrainingResponse"
           description: Accepted
         "500":
           description: Internal server error
@@ -154,7 +171,7 @@ paths:
 
   /training/{userId}/{trainingKind}:
     put:
-      operationId: updateUserTrainingDate
+      operationId: updateTrainingValidityDate
       description: Update a user's training record for a specific training kind
       parameters:
         - in: path
@@ -221,9 +238,12 @@ components:
       type: object
       required:
         - username
+        - id
         - roles
       properties:
         username:
+          type: string
+        id:
           type: string
         roles:
           type: array
@@ -245,7 +265,7 @@ components:
         chosen_name:
           type: string
 
-    ProfileUpdate:
+    UserIdentity:
       type: object
       required:
         - chosen_name
@@ -307,7 +327,7 @@ components:
       type: string
       enum: [training_kind_nhsd]
 
-    ProfileTrainingUpdate:
+    UserTrainingUpdate:
       type: object
       required:
         - kind
@@ -318,7 +338,7 @@ components:
           type: string
           description: Base64 encoded PDF file data of the certificate
 
-    ProfileTrainingResponse:
+    UserTrainingResponse:
       type: object
       properties:
         certificate_is_valid:
@@ -347,7 +367,7 @@ components:
           type: string
           description: Time in RFC3339 format when the training was completed
 
-    ProfileTrainingStatus:
+    UserTrainingStatus:
       type: object
       required:
         - training_records
@@ -386,7 +406,7 @@ components:
         agreements:
           $ref: "#/components/schemas/ProfileAgreements"
         training_record:
-          $ref: "#/components/schemas/ProfileTrainingStatus"
+          $ref: "#/components/schemas/UserTrainingStatus"
 
     TrainingValidFromDate:
       type: object

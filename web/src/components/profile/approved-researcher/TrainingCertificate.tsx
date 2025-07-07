@@ -1,7 +1,7 @@
 import Button from "@/components/ui/Button";
 import LoginFallback from "@/components/ui/LoginFallback";
 import { useAuth } from "@/hooks/useAuth";
-import { postProfileTraining } from "@/openapi";
+import { updateTrainingRecord } from "@/openapi";
 import { ChangeEvent, useState } from "react";
 import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
@@ -29,7 +29,7 @@ type TrainingCertificateProps = {
 };
 
 export default function TrainingCertificate({ setTrainingCertificateCompleted }: TrainingCertificateProps) {
-  const { authInProgress, isAuthed } = useAuth();
+  const { authInProgress, isAuthed, userData } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [errorType, setErrorType] = useState<AlertType>("warning");
@@ -84,7 +84,8 @@ export default function TrainingCertificate({ setTrainingCertificateCompleted }:
         return;
       }
 
-      const res = await postProfileTraining({
+      const res = await updateTrainingRecord({
+        path: { userId: userData?.id || "" },
         body: {
           kind: "training_kind_nhsd",
           certificate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),

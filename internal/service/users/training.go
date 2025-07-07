@@ -13,25 +13,25 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
+func (s *Service) UpdateTraining(user types.User, data openapi.UserTrainingUpdate) (openapi.UserTrainingResponse, error) {
 	if data.CertificateContentPdfBase64 == nil {
 		log.Debug().Any("username", user.Username).Msg("Empty certificate content")
-		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
+		return openapi.UserTrainingResponse{CertificateIsValid: ptr(false)}, nil
 	}
 	switch data.Kind {
 	case openapi.TrainingKindNhsd:
 		return s.updateNHSD(user, data)
 	default:
-		return openapi.ProfileTrainingResponse{}, fmt.Errorf("unsupported training kind [%v]", data.Kind)
+		return openapi.UserTrainingResponse{}, fmt.Errorf("unsupported training kind [%v]", data.Kind)
 	}
 }
 
 func (s *Service) updateNHSD(
 	user types.User,
-	data openapi.ProfileTrainingUpdate,
-) (openapi.ProfileTrainingResponse, error) {
+	data openapi.UserTrainingUpdate,
+) (openapi.UserTrainingResponse, error) {
 	certificate, err := certificate.ParseNHSDCertificate(*data.CertificateContentPdfBase64)
-	response := openapi.ProfileTrainingResponse{
+	response := openapi.UserTrainingResponse{
 		CertificateIsValid: ptr(false),
 	}
 	if err != nil {
@@ -96,7 +96,7 @@ func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Tim
 }
 
 // returns all training records for a user
-func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingStatus, error) {
+func (s *Service) GetTrainingStatus(user types.User) (openapi.UserTrainingStatus, error) {
 	var trainingRecords []openapi.TrainingRecord
 
 	// Get NHSD training record with single DB query
@@ -115,7 +115,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 		trainingRecords = append(trainingRecords, nhsdRecord)
 	} else if result.Error != nil {
 		// Database error
-		return openapi.ProfileTrainingStatus{}, result.Error
+		return openapi.UserTrainingStatus{}, result.Error
 	} else {
 		// Record found - check if it's still valid
 		completedAt := record.CompletedAt.Format(config.TimeFormat)
@@ -130,7 +130,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 
 	// TODO: Add other training types here in the future
 
-	return openapi.ProfileTrainingStatus{
+	return openapi.UserTrainingStatus{
 		TrainingRecords: trainingRecords,
 	}, nil
 }
