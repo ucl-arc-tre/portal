@@ -1,0 +1,31 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.16 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.16">
+  <diagram name="Page-1" id="UHER08wLGpxzrWcNl8kL">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-1" value="Client Device" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="250" y="140" width="260" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-2" value="Browser" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="260" y="170" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-3" value="Application" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="270" y="200" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-4" value="AWS Cloud" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-5" value="UCL Organisation" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="90" y="450" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-6" value="TRE Account" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="480" width="270" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="AuHyLcOj6jhQLvMKE2NI-7" value="" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.s3;fillColor=#E05243;gradientColor=none;" vertex="1" parent="1">
+          <mxGeometry x="130" y="508.5" width="36.5" height="43" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

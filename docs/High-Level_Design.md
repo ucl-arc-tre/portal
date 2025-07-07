@@ -1,10 +1,19 @@
-# Portal HLD
+# ARC Services Portal HLD
+## Introduction
 
-## As-is Portal(s)
+The ARC services portal will support users creating and managing resources on ARC services such as TRE projects, RDSS shares, HPC access and Condenser namespaces. The initial use case laid out below is in support of the ARC TRE, Data Safe Haven and associated IG processes.
+
+## The IG/TRE use case
+
+In order to run the Research Data ISMS ARC needs to ensure processes such as study creation and user onboarding are managed and collect quality data. The ISMS is documented [here](https://isms.arc.ucl.ac.uk/).
+
+The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will use the pathfinder project for ARC's metadata store based on
+[this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
+Some processes such as incident and service request will be managed through "MyServices" (Xurrent) as per the pattern detailed [here in option 2](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md).
+
+##  As-is IG Portal(s)
 
 ![As-is](./media/ARC_Portals_Current.drawio.svg)
-
-
 
 Current portal is hosted in SharePoint, the data related to cases and (AKA studies and projects) researchers etc. in several SharePoint lists. Users logon to the sharepoint portal with their UCL username and password and are able to see and update their existing studies, make requests for new studies and complete other compliance processes such as user onboarding and registering data assets.
 
@@ -15,14 +24,15 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 
 ## To-be Portal
 
+The portal is comprised of a React frontend that uses a web api to interact with a backend database. Further APIs for supported platforms (initially the TRE) connect the to the data to provide or configure access to resources. The app will access UCL enterprise systems using one of the producer patterns found [here](https://liveuclac.sharepoint.com/sites/it-architecture/SitePages/integration-patterns.aspx). 
+
+### Logical View
 <p align="center">
-  <img src="./media/architecture.png" alt="architecture" width="650">
+  <img src="./media/architecture_3.drawio.svg" alt="to-be architecture" width="650">
 </p>
 
+### Physical View
 
-The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will use the pathfinder project for ARC's metadata store based on
-[this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
-Some processes such as incident and service request will be managed through "MyServices" (Xurrent) as per the pattern detailed [here in option 2](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md).
 
 ## Design Principles
 
