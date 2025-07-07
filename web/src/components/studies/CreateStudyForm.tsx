@@ -64,11 +64,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
-  const ownerValue = useWatch({
-    name: "owner",
-    control,
-  });
-  const ownerIsUser = ownerValue === username;
   const showCagRef = useWatch({
     name: "cag",
     control,
@@ -122,17 +117,22 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             <fieldset className={styles.fieldset}>
               <legend>Ownership</legend>
               <Label htmlFor="owner">
-                Study Owner (PI)*:
-                <Input type="email" id="owner" {...register("owner", { required: true })} />
-                <HelperText>
-                  <strong>Must</strong> be a full UCL staff member, not honorary or affiliated.
-                </HelperText>
+                Study Owner (PI):
+                <Input
+                  type="email"
+                  id="owner"
+                  {...register("owner", { disabled: true, value: username })}
+                  placeholder={username}
+                />
               </Label>
 
-              {/* if owner is user then allow, otherwise this should be disabled */}
               <Label htmlFor="admin">
                 Study Administrator:
-                <Input type="email" id="admin" {...register("admin")} disabled={!ownerIsUser} />
+                <Input type="email" id="admin" {...register("admin")} />
+                <HelperText>
+                  {" "}
+                  <strong>Must</strong> be a full UCL staff member, not honorary or affiliated.
+                </HelperText>
               </Label>
 
               <Label htmlFor="controller">
@@ -325,8 +325,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             </Button>
           </>
         )}
-
-        <Input type="hidden" name="username" value={username} />
       </form>
     </Dialog>
   );

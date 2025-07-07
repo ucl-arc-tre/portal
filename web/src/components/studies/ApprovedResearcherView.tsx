@@ -3,7 +3,11 @@ import Button from "../ui/Button";
 import styles from "./ApprovedResearcherView.module.css";
 import CreateStudyForm from "./CreateStudyForm";
 
-export default function ApprovedResearcherView() {
+type ApprovedResearcherViewProps = {
+  username: string;
+};
+export default function ApprovedResearcherView(props: ApprovedResearcherViewProps) {
+  const { username } = props;
   const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
   const handleCreateStudyClick = () => {
     console.log("Create study");
@@ -11,7 +15,7 @@ export default function ApprovedResearcherView() {
   };
   return (
     <>
-      {createStudyFormOpen && <CreateStudyForm username={"username"} setCreateStudyFormOpen={setCreateStudyFormOpen} />}
+      {createStudyFormOpen && <CreateStudyForm username={username} setCreateStudyFormOpen={setCreateStudyFormOpen} />}
 
       <h2 className={styles["content-heading"]}>Your Studies</h2>
       <div className={styles["content-wrapper"]}>

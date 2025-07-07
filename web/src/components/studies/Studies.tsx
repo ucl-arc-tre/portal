@@ -11,11 +11,13 @@ export default function Studies() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
 
+  const username = userData!.username;
+
   return (
     <>
       {!isAdmin && !isApprovedResearcher && <p>This page is being built. Please check back soon for updates!</p>}
 
-      {isApprovedResearcher && <ApprovedResearcherView />}
+      {isApprovedResearcher && <ApprovedResearcherView username={username} />}
     </>
   );
 }
