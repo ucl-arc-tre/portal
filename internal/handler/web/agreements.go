@@ -9,10 +9,23 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
-func (h *Handler) GetAgreementsApprovedResearcher(ctx *gin.Context) {
+// retrieves all agreements confirmed by the user.
+func (h *Handler) GetAllConfirmedAgreements(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	agreements, err := h.users.ConfirmedAgreements(user)
+	if err != nil {
+		setServerError(ctx, err, "Failed to get agreements")
+		return
+	}
+	ctx.JSON(http.StatusOK, openapi.AgreementsList{
+		ConfirmedAgreements: agreements,
+	})
+}
+
+func (h *Handler) GetAgreementsTextApprovedResearcher(ctx *gin.Context) {
 	agreement, err := h.agreements.LatestApprovedResearcher()
 	if err != nil {
-		setServerError(ctx, err, "Failed to get approved researcher agreement")
+		setServerError(ctx, err, "Failed to get approved researcher agreement text")
 		return
 	}
 	ctx.JSON(http.StatusOK, openapi.Agreement{
@@ -21,8 +34,8 @@ func (h *Handler) GetAgreementsApprovedResearcher(ctx *gin.Context) {
 	})
 }
 
-// PostProfileAgreements allows a user to confirm an agreement by its ID.
-func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
+// allows a user to confirm an agreement by its ID
+func (h *Handler) ConfirmAgreement(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	confirmation := openapi.AgreementConfirmation{}
 	if err := ctx.ShouldBindJSON(&confirmation); err != nil {
@@ -40,17 +53,4 @@ func (h *Handler) PostProfileAgreements(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusOK)
-}
-
-// GetProfileAgreements retrieves all agreements confirmed by the user.
-func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
-	user := middleware.GetUser(ctx)
-	agreements, err := h.users.ConfirmedAgreements(user)
-	if err != nil {
-		setServerError(ctx, err, "Failed to get agreements")
-		return
-	}
-	ctx.JSON(http.StatusOK, openapi.ProfileAgreements{
-		ConfirmedAgreements: agreements,
-	})
 }

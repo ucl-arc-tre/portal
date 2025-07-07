@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { postProfileAgreements } from "@/openapi";
+import { confirmAgreement } from "@/openapi";
 import Button from "@/components/ui/Button";
 import dynamic from "next/dynamic";
 
@@ -23,7 +23,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
     e.preventDefault();
 
     try {
-      postProfileAgreements({ body: { agreement_id: agreementId } });
+      confirmAgreement({ body: { agreement_id: agreementId } });
       setSubmitted(true);
       setAgreementCompleted(true);
     } catch (err) {

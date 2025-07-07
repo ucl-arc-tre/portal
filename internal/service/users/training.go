@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *Service) UpdateTraining(user types.User, data openapi.UserTrainingUpdate) (openapi.UserTrainingResponse, error) {
+func (s *Service) UpdateTraining(user types.User, data openapi.UserTrainingUpdateBody) (openapi.UserTrainingResponse, error) {
 	if data.CertificateContentPdfBase64 == nil {
 		log.Debug().Any("username", user.Username).Msg("Empty certificate content")
 		return openapi.UserTrainingResponse{CertificateIsValid: ptr(false)}, nil
@@ -28,7 +28,7 @@ func (s *Service) UpdateTraining(user types.User, data openapi.UserTrainingUpdat
 
 func (s *Service) updateNHSD(
 	user types.User,
-	data openapi.UserTrainingUpdate,
+	data openapi.UserTrainingUpdateBody,
 ) (openapi.UserTrainingResponse, error) {
 	certificate, err := certificate.ParseNHSDCertificate(*data.CertificateContentPdfBase64)
 	response := openapi.UserTrainingResponse{

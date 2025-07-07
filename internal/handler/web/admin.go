@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
+func (h *Handler) ImportApprovedResearchersCsv(ctx *gin.Context) {
 	content, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		setServerError(ctx, err, "Failed to read body")

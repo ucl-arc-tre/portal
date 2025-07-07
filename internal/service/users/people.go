@@ -40,7 +40,7 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 				Id:       user.ID.String(),
 				Username: string(user.Username),
 			},
-			Agreements: openapi.ProfileAgreements{
+			Agreements: openapi.AgreementsList{
 				ConfirmedAgreements: agreements,
 			},
 			TrainingRecord: training,

@@ -45,6 +45,11 @@ type AgreementConfirmation struct {
 // AgreementType defines model for AgreementType.
 type AgreementType string
 
+// AgreementsList defines model for AgreementsList.
+type AgreementsList struct {
+	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
+}
+
 // Auth defines model for Auth.
 type Auth struct {
 	Id       string      `json:"id"`
@@ -68,15 +73,10 @@ type People = []Person
 
 // Person defines model for Person.
 type Person struct {
-	Agreements     ProfileAgreements  `json:"agreements"`
+	Agreements     AgreementsList     `json:"agreements"`
 	Roles          []string           `json:"roles"`
 	TrainingRecord UserTrainingStatus `json:"training_record"`
 	User           User               `json:"user"`
-}
-
-// ProfileAgreements defines model for ProfileAgreements.
-type ProfileAgreements struct {
-	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
 }
 
 // TrainingKind defines model for TrainingKind.
@@ -120,7 +120,7 @@ type UserTrainingResponse struct {
 	// CertificateIsValid Is the certificate valid
 	CertificateIsValid *bool `json:"certificate_is_valid,omitempty"`
 
-	// CertificateIssuedAt Time in RFC3339 format at which the the certificate was issued
+	// CertificateIssuedAt Time in RFC3339 format at which the certificate was issued
 	CertificateIssuedAt *string `json:"certificate_issued_at,omitempty"`
 
 	// CertificateMessage Reason why the training certificate is valid/invalid
@@ -133,18 +133,18 @@ type UserTrainingStatus struct {
 	TrainingRecords []TrainingRecord `json:"training_records"`
 }
 
-// UserTrainingUpdate defines model for UserTrainingUpdate.
-type UserTrainingUpdate struct {
+// UserTrainingUpdateBody defines model for UserTrainingUpdateBody.
+type UserTrainingUpdateBody struct {
 	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
 	CertificateContentPdfBase64 *string      `json:"certificate_content_pdf_base64,omitempty"`
 	Kind                        TrainingKind `json:"kind"`
 }
 
-// PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
-type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
+// ConfirmAgreementJSONRequestBody defines body for ConfirmAgreement for application/json ContentType.
+type ConfirmAgreementJSONRequestBody = AgreementConfirmation
 
 // UpdateTrainingRecordJSONRequestBody defines body for UpdateTrainingRecord for application/json ContentType.
-type UpdateTrainingRecordJSONRequestBody = UserTrainingUpdate
+type UpdateTrainingRecordJSONRequestBody = UserTrainingUpdateBody
 
 // UpdateTrainingValidityDateJSONRequestBody defines body for UpdateTrainingValidityDate for application/json ContentType.
 type UpdateTrainingValidityDateJSONRequestBody = TrainingValidFromDate
@@ -155,20 +155,20 @@ type UpdateChosenNameJSONRequestBody = UserIdentity
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (POST /admin/approved-researchers/import/csv)
+	ImportApprovedResearchersCsv(c *gin.Context)
+
+	// (GET /agreements)
+	GetAllConfirmedAgreements(c *gin.Context)
+
+	// (POST /agreements)
+	ConfirmAgreement(c *gin.Context)
+
 	// (GET /agreements/approved-researcher)
-	GetAgreementsApprovedResearcher(c *gin.Context)
+	GetAgreementsTextApprovedResearcher(c *gin.Context)
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
-
-	// (POST /people/approved-researchers/import/csv)
-	PostPeopleApprovedResearchersImportCsv(c *gin.Context)
-
-	// (GET /profile/agreements)
-	GetProfileAgreements(c *gin.Context)
-
-	// (POST /profile/agreements)
-	PostProfileAgreements(c *gin.Context)
 
 	// (GET /training/{userId})
 	GetTrainingRecord(c *gin.Context, userId string)
@@ -198,8 +198,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetAgreementsApprovedResearcher operation middleware
-func (siw *ServerInterfaceWrapper) GetAgreementsApprovedResearcher(c *gin.Context) {
+// ImportApprovedResearchersCsv operation middleware
+func (siw *ServerInterfaceWrapper) ImportApprovedResearchersCsv(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -208,7 +208,46 @@ func (siw *ServerInterfaceWrapper) GetAgreementsApprovedResearcher(c *gin.Contex
 		}
 	}
 
-	siw.Handler.GetAgreementsApprovedResearcher(c)
+	siw.Handler.ImportApprovedResearchersCsv(c)
+}
+
+// GetAllConfirmedAgreements operation middleware
+func (siw *ServerInterfaceWrapper) GetAllConfirmedAgreements(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAllConfirmedAgreements(c)
+}
+
+// ConfirmAgreement operation middleware
+func (siw *ServerInterfaceWrapper) ConfirmAgreement(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.ConfirmAgreement(c)
+}
+
+// GetAgreementsTextApprovedResearcher operation middleware
+func (siw *ServerInterfaceWrapper) GetAgreementsTextApprovedResearcher(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAgreementsTextApprovedResearcher(c)
 }
 
 // GetAuth operation middleware
@@ -222,45 +261,6 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	}
 
 	siw.Handler.GetAuth(c)
-}
-
-// PostPeopleApprovedResearchersImportCsv operation middleware
-func (siw *ServerInterfaceWrapper) PostPeopleApprovedResearchersImportCsv(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostPeopleApprovedResearchersImportCsv(c)
-}
-
-// GetProfileAgreements operation middleware
-func (siw *ServerInterfaceWrapper) GetProfileAgreements(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetProfileAgreements(c)
-}
-
-// PostProfileAgreements operation middleware
-func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostProfileAgreements(c)
 }
 
 // GetTrainingRecord operation middleware
@@ -410,11 +410,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
+	router.POST(options.BaseURL+"/admin/approved-researchers/import/csv", wrapper.ImportApprovedResearchersCsv)
+	router.GET(options.BaseURL+"/agreements", wrapper.GetAllConfirmedAgreements)
+	router.POST(options.BaseURL+"/agreements", wrapper.ConfirmAgreement)
+	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsTextApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
-	router.POST(options.BaseURL+"/people/approved-researchers/import/csv", wrapper.PostPeopleApprovedResearchersImportCsv)
-	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
-	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/training/:userId", wrapper.GetTrainingRecord)
 	router.POST(options.BaseURL+"/training/:userId", wrapper.UpdateTrainingRecord)
 	router.PUT(options.BaseURL+"/training/:userId/:trainingKind", wrapper.UpdateTrainingValidityDate)

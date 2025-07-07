@@ -32,7 +32,7 @@ func (h *Handler) UpdateTrainingRecord(ctx *gin.Context, userId string) {
 		setServerError(ctx, err, "Failed to get user")
 		return
 	}
-	data := openapi.UserTrainingUpdate{}
+	data := openapi.UserTrainingUpdateBody{}
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return

@@ -7,6 +7,7 @@ servers:
   - url: /api/v0
 
 paths:
+  # Authentication
   /auth:
     get:
       description: Authentication and authorization status of the user
@@ -23,6 +24,25 @@ paths:
         default:
           description: Unexpected error
 
+  # User Management (Admin)
+  /users:
+    get:
+      operationId: getAllUsers
+      description: Get all the users that an admin has access to
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/People"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  # User Identity Management
   /user/identity:
     get:
       description: User identity information (chosen name)
@@ -45,7 +65,7 @@ paths:
               $ref: "#/components/schemas/UserIdentity"
       responses:
         "200":
-          description: "Successfully updated user identity"
+          description: Successfully updated user identity
           content:
             application/json:
               schema:
@@ -55,38 +75,7 @@ paths:
         default:
           description: Unexpected error
 
-  /profile/agreements:
-    get:
-      description: Get all the agreements a user has agreed to
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProfileAgreements"
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-    post:
-      description: Update the agreements for a user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AgreementConfirmation"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProfileAgreements"
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
+  # Training Management
   /training/{userId}:
     get:
       operationId: getTrainingRecord
@@ -123,7 +112,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserTrainingUpdate"
+              $ref: "#/components/schemas/UserTrainingUpdateBody"
       responses:
         "200":
           content:
@@ -131,39 +120,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserTrainingResponse"
           description: Accepted
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
-  /agreements/approved-researcher:
-    get:
-      description: Get the latest approved researcher agreement
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Agreement"
-        "406":
-          description: Not acceptable
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
-  /users:
-    get:
-      operationId: getAllUsers
-      description: Get all the people a user has access to
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/People"
-        "403":
-          description: Forbidden
         "500":
           description: Internal server error
         default:
@@ -208,8 +164,62 @@ paths:
         default:
           description: Unexpected error
 
-  /people/approved-researchers/import/csv:
+  # Agreement Management
+  /agreements:
+    get:
+      operationId: getAllConfirmedAgreements
+      description: Get all the agreements a user has agreed to
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementsList"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
     post:
+      operationId: confirmAgreement
+      description: Confirm an agreement for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgreementConfirmation"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementsList"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /agreements/approved-researcher:
+    get:
+      operationId: getAgreementsTextApprovedResearcher
+      description: Get the latest approved researcher agreement text
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agreement"
+        "406":
+          description: Not acceptable
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  # Data Import (Admin)
+  /admin/approved-researchers/import/csv:
+    post:
+      operationId: importApprovedResearchersCsv
       description: |
         Upload a CSV file with fields
         <username: string, e.g. "bob@example.com">,
@@ -237,13 +247,13 @@ components:
     Auth:
       type: object
       required:
-        - username
         - id
+        - username
         - roles
       properties:
-        username:
-          type: string
         id:
+          type: string
+        username:
           type: string
         roles:
           type: array
@@ -253,6 +263,50 @@ components:
               - admin
               - base
               - approved-researcher
+
+    User:
+      type: object
+      required:
+        - username
+        - id
+      properties:
+        username:
+          type: string
+        id:
+          type: string
+
+    Person:
+      type: object
+      required:
+        - user
+        - roles
+        - agreements
+        - training_record
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        roles:
+          type: array
+          items:
+            type: string
+        agreements:
+          $ref: "#/components/schemas/AgreementsList"
+        training_record:
+          $ref: "#/components/schemas/UserTrainingStatus"
+
+    People:
+      type: array
+      items:
+        $ref: "#/components/schemas/Person"
+
+    TrainingValidFromDate:
+      type: object
+      required:
+        - training_valid_from_date
+      properties:
+        training_valid_from_date:
+          type: string
+          description: Time in RFC3339 format representing the date from which the training is valid
 
     UserIdentityResponse:
       type: object
@@ -313,7 +367,7 @@ components:
         - approved-researcher
         - study-owner
 
-    ProfileAgreements:
+    AgreementsList:
       type: object
       required:
         - confirmed_agreements
@@ -325,9 +379,10 @@ components:
 
     TrainingKind:
       type: string
-      enum: [training_kind_nhsd]
+      enum:
+        - training_kind_nhsd
 
-    UserTrainingUpdate:
+    UserTrainingUpdateBody:
       type: object
       required:
         - kind
@@ -349,7 +404,18 @@ components:
           description: Reason why the training certificate is valid/invalid
         certificate_issued_at:
           type: string
-          description: Time in RFC3339 format at which the the certificate was issued
+          description: Time in RFC3339 format at which the certificate was issued
+
+    UserTrainingStatus:
+      type: object
+      required:
+        - training_records
+      properties:
+        training_records:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrainingRecord"
+          description: List of all training records for the user
 
     TrainingRecord:
       type: object
@@ -366,58 +432,3 @@ components:
         completed_at:
           type: string
           description: Time in RFC3339 format when the training was completed
-
-    UserTrainingStatus:
-      type: object
-      required:
-        - training_records
-      properties:
-        training_records:
-          type: array
-          items:
-            $ref: "#/components/schemas/TrainingRecord"
-          description: List of all training records for the user
-
-    User:
-      type: object
-      required:
-        - username
-        - id
-      properties:
-        username:
-          type: string
-        id:
-          type: string
-
-    Person:
-      type: object
-      required:
-        - user
-        - roles
-        - agreements
-        - training_record
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-        roles:
-          type: array
-          items:
-            type: string
-        agreements:
-          $ref: "#/components/schemas/ProfileAgreements"
-        training_record:
-          $ref: "#/components/schemas/UserTrainingStatus"
-
-    TrainingValidFromDate:
-      type: object
-      required:
-        - training_valid_from_date
-      properties:
-        training_valid_from_date:
-          type: string
-          description: Time in RFC3339 format representing the date from which the training is valid
-
-    People:
-      type: array
-      items:
-        $ref: "#/components/schemas/Person"

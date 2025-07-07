@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Agreement, getAgreementsApprovedResearcher, getProfileAgreements } from "@/openapi";
+import { Agreement, getAgreementsTextApprovedResearcher } from "@/openapi";
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "./AgreementForm";
@@ -14,29 +14,17 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   const { setAgreementCompleted, agreementCompleted } = props;
 
   const { authInProgress, isAuthed } = useAuth();
-  const [agreement, setAgreement] = useState<Agreement | null>(null);
+  const [agreementText, setAgreementText] = useState<Agreement | null>(null);
   const [isLoadingAgreement, setIsLoadingAgreement] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoadingAgreement(true);
       try {
-        const agreementResult = await getAgreementsApprovedResearcher();
-        const profileAgreementsResult = await getProfileAgreements();
+        const agreementTextResponse = await getAgreementsTextApprovedResearcher();
 
-        if (agreementResult.response.status === 200 && agreementResult.data) {
-          setAgreement(agreementResult.data);
-        }
-
-        if (profileAgreementsResult.response.status == 200 && profileAgreementsResult.data) {
-          const confirmedAgreements = profileAgreementsResult.data.confirmed_agreements;
-          const isConfirmed = confirmedAgreements.some(
-            (agreement) => agreement.agreement_type == "approved-researcher"
-          );
-
-          if (isConfirmed) {
-            setAgreementCompleted(true);
-          }
+        if (agreementTextResponse.response.status === 200 && agreementTextResponse.data) {
+          setAgreementText(agreementTextResponse.data);
         }
       } catch (err) {
         console.error("Fetch error:", err);
@@ -52,7 +40,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
 
   if (authInProgress || isLoadingAgreement) return null;
 
-  if (!agreement) return <div>No agreements could be found.</div>;
+  if (!agreementText) return <div>No agreements could be found.</div>;
 
   if (!isAuthed) return <LoginFallback />;
 
@@ -60,12 +48,12 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   if (agreementCompleted) return null;
 
   return (
-    agreement && (
+    agreementText && (
       <section data-cy="approved-researcher-agreement">
         <h2 className="subtitle">Approved Researcher Agreement</h2>
-        <AgreementText text={agreement.text} />
+        <AgreementText text={agreementText.text} />
 
-        <AgreementForm agreementId={agreement.id} setAgreementCompleted={setAgreementCompleted} />
+        <AgreementForm agreementId={agreementText.id} setAgreementCompleted={setAgreementCompleted} />
       </section>
     )
   );
