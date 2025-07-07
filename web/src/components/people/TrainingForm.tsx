@@ -71,7 +71,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   };
 
   return (
-    <Dialog setDialogOpen={setTrainingDialogOpen} cyid="training" className={styles["training-dialog"]}>
+    <Dialog setDialogOpen={setTrainingDialogOpen} cy="training" className={styles["training-dialog"]}>
       <form onSubmit={handleSubmit} noValidate className={styles.form}>
         <p>Use this form to validate a training certificate. Make sure you check the date on the certificate.</p>
 

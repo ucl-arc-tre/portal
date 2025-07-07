@@ -11,7 +11,7 @@ type Props = React.ComponentProps<typeof UCLButton> & {
   value?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  cyid?: string;
+  cy?: string;
   as?: string;
   className?: string;
 };
@@ -19,7 +19,7 @@ type Props = React.ComponentProps<typeof UCLButton> & {
 export default function Button(props: Props) {
   return (
     <UCLButton
-      data-cy={props.cyid}
+      data-cy={props.cy}
       className={`${styles.button} ${props.type === "submit" && styles.submit} ${props.className}`}
       type={props.type}
       onClick={props.onClick}

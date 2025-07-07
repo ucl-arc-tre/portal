@@ -12,11 +12,11 @@ type DialogProps = {
   setDialogOpen: (name: boolean) => void;
   children: React.ReactNode;
   className?: string;
-  cyid?: string;
+  cy?: string;
 };
 
 export default function Dialog(DialogProps: DialogProps) {
-  const { setDialogOpen, children, className, cyid } = DialogProps;
+  const { setDialogOpen, children, className, cy } = DialogProps;
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const closeDialog = () => {
@@ -28,7 +28,7 @@ export default function Dialog(DialogProps: DialogProps) {
 
   return (
     <>
-      <dialog open ref={dialogRef} className={combinedClassName} data-cy={cyid}>
+      <dialog open ref={dialogRef} className={combinedClassName} data-cy={cy}>
         <Button
           type="button"
           variant="tertiary"
