@@ -24,6 +24,15 @@
     grid-template-columns: 1fr;
     width: 100%;
 
+    &.visible {
+      display: block;
+    }
+
+    &.hidden {
+      visibility: hidden;
+      display: none;
+    }
+
     legend {
       color: var(--text--secondary);
       font-size: 0.75rem;
@@ -33,10 +42,18 @@
       padding: 0.4rem;
       font-weight: 400;
       max-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      gap: 0.4rem;
 
       input,
       textarea {
         accent-color: var(--green-200);
+      }
+
+      input[type="checkbox"] {
+        width: 1.4rem;
       }
 
       small {
