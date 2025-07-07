@@ -160,7 +160,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               {...register("owner")}
               readOnly={true}
               value={username}
-              className={styles.readOnly}
+              inputClassName={styles.readonly}
             />
             <HelperText>
               If you are not the study owner, contact the owner and ask them to fill out this form on their account.

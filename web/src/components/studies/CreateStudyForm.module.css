@@ -71,11 +71,6 @@
         width: 1.4rem;
       }
 
-      .readonly {
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
       small {
         display: block;
       }
@@ -94,6 +89,14 @@
   .form-helper--invalid {
     text-align: center;
     color: red;
+  }
+
+  .readonly {
+    cursor: not-allowed;
+
+    &:focus-visible {
+      box-shadow: none !important;
+    }
   }
 }
 
