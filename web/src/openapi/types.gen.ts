@@ -99,12 +99,11 @@ export type Person = {
     training_record: ProfileTrainingStatus;
 };
 
-export type PersonUpdate = {
-    training_kind: TrainingKind;
+export type TrainingValidFromDate = {
     /**
-     * Time in RFC3339 format at which the the certificate was issued
+     * Time in RFC3339 format representing the date from which the training is valid
      */
-    training_date: string;
+    training_valid_from_date: string;
 };
 
 export type People = Array<Person>;
@@ -311,14 +310,14 @@ export type GetAgreementsApprovedResearcherResponses = {
 
 export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];
 
-export type GetPeopleData = {
+export type GetAllUsersData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/people';
+    url: '/users';
 };
 
-export type GetPeopleErrors = {
+export type GetAllUsersErrors = {
     /**
      * Forbidden
      */
@@ -333,25 +332,29 @@ export type GetPeopleErrors = {
     default: unknown;
 };
 
-export type GetPeopleResponses = {
+export type GetAllUsersResponses = {
     200: People;
 };
 
-export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];
 
-export type PostPeopleByIdData = {
-    body: PersonUpdate;
+export type UpdateUserTrainingDateData = {
+    body: TrainingValidFromDate;
     path: {
         /**
-         * ID of the person to be updated
+         * ID of the user whose training record should be updated
          */
-        id: string;
+        userId: string;
+        /**
+         * The kind of training to update
+         */
+        trainingKind: TrainingKind;
     };
     query?: never;
-    url: '/people/{id}';
+    url: '/training/{userId}/{trainingKind}';
 };
 
-export type PostPeopleByIdErrors = {
+export type UpdateUserTrainingDateErrors = {
     /**
      * Forbidden
      */
@@ -370,14 +373,14 @@ export type PostPeopleByIdErrors = {
     default: unknown;
 };
 
-export type PostPeopleByIdResponses = {
+export type UpdateUserTrainingDateResponses = {
     /**
-     * Successfully updated person
+     * Successfully updated training record
      */
     200: TrainingRecord;
 };
 
-export type PostPeopleByIdResponse = PostPeopleByIdResponses[keyof PostPeopleByIdResponses];
+export type UpdateUserTrainingDateResponse = UpdateUserTrainingDateResponses[keyof UpdateUserTrainingDateResponses];
 
 export type PostPeopleApprovedResearchersImportCsvData = {
     body: Blob | File;

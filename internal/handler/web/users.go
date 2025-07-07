@@ -13,8 +13,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-// GetPeople retrieves all people in the system, but only if the user has admin role.
-func (h *Handler) GetPeople(ctx *gin.Context) {
+func (h *Handler) GetAllUsers(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	roles, err := rbac.GetRoles(user)
 	if err != nil {

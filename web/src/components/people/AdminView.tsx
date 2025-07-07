@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord } from "@/openapi";
+import { ConfirmedAgreement, getAllUsers, People, Person, TrainingRecord } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -41,7 +41,7 @@ export default function AdminView() {
     const fetchPeople = async () => {
       setIsLoading(true);
       try {
-        const response = await getPeople();
+        const response = await getAllUsers();
         if (response.response.ok && response.data) {
           setPeople(response.data as People);
         }

@@ -12,29 +12,28 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
 
-// PostPeopleId updates a person's training record based on the provided user ID and training kind.
-func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
-	var update openapi.PersonUpdate
-	if err := ctx.ShouldBindJSON(&update); err != nil {
+func (h *Handler) UpdateUserTrainingDate(ctx *gin.Context, userId string, trainingKind openapi.TrainingKind) {
+	var updatedDate openapi.TrainingValidFromDate
+	if err := ctx.ShouldBindJSON(&updatedDate); err != nil {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return
 	}
 
-	trainingDate, err := time.Parse(config.TimeFormat, update.TrainingDate)
+	parsedTrainingDate, err := time.Parse(config.TimeFormat, updatedDate.TrainingValidFromDate)
 	if err != nil {
-		setInvalid(ctx, err, fmt.Sprintf("Failed to parse date [%v]", update.TrainingDate))
+		setInvalid(ctx, err, fmt.Sprintf("Failed to parse date [%v]", updatedDate.TrainingValidFromDate))
 		return
 	}
 
-	person, err := h.users.GetUser(userId)
+	user, err := h.users.GetUser(userId)
 	if err != nil {
-		setServerError(ctx, err, "Failed to get person")
+		setServerError(ctx, err, "Failed to get user")
 		return
 	}
 
-	switch update.TrainingKind {
+	switch trainingKind {
 	case openapi.TrainingKindNhsd:
-		if err := h.users.CreateNHSDTrainingRecord(person, trainingDate); err != nil {
+		if err := h.users.CreateNHSDTrainingRecord(user, parsedTrainingDate); err != nil {
 			setServerError(ctx, err, "Failed to update training validity")
 			return
 		}
@@ -43,9 +42,9 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
 	}
 
 	ctx.JSON(http.StatusOK, openapi.TrainingRecord{
-		Kind:        update.TrainingKind,
-		CompletedAt: &update.TrainingDate,
-		IsValid:     users.NHSDTrainingIsValid(trainingDate),
+		Kind:        trainingKind,
+		CompletedAt: &updatedDate.TrainingValidFromDate,
+		IsValid:     users.NHSDTrainingIsValid(parsedTrainingDate),
 	})
 }
 

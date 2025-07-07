@@ -73,13 +73,6 @@ type Person struct {
 	User           User                  `json:"user"`
 }
 
-// PersonUpdate defines model for PersonUpdate.
-type PersonUpdate struct {
-	// TrainingDate Time in RFC3339 format at which the the certificate was issued
-	TrainingDate string       `json:"training_date"`
-	TrainingKind TrainingKind `json:"training_kind"`
-}
-
 // ProfileAgreements defines model for ProfileAgreements.
 type ProfileAgreements struct {
 	ConfirmedAgreements []ConfirmedAgreement `json:"confirmed_agreements"`
@@ -134,14 +127,17 @@ type TrainingRecord struct {
 	Kind    TrainingKind `json:"kind"`
 }
 
+// TrainingValidFromDate defines model for TrainingValidFromDate.
+type TrainingValidFromDate struct {
+	// TrainingValidFromDate Time in RFC3339 format representing the date from which the training is valid
+	TrainingValidFromDate string `json:"training_valid_from_date"`
+}
+
 // User defines model for User.
 type User struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 }
-
-// PostPeopleIdJSONRequestBody defines body for PostPeopleId for application/json ContentType.
-type PostPeopleIdJSONRequestBody = PersonUpdate
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
@@ -152,6 +148,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// UpdateUserTrainingDateJSONRequestBody defines body for UpdateUserTrainingDate for application/json ContentType.
+type UpdateUserTrainingDateJSONRequestBody = TrainingValidFromDate
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
@@ -161,14 +160,8 @@ type ServerInterface interface {
 	// (GET /auth)
 	GetAuth(c *gin.Context)
 
-	// (GET /people)
-	GetPeople(c *gin.Context)
-
 	// (POST /people/approved-researchers/import/csv)
 	PostPeopleApprovedResearchersImportCsv(c *gin.Context)
-
-	// (POST /people/{id})
-	PostPeopleId(c *gin.Context, id string)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -187,6 +180,12 @@ type ServerInterface interface {
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
+
+	// (PUT /training/{userId}/{trainingKind})
+	UpdateUserTrainingDate(c *gin.Context, userId string, trainingKind TrainingKind)
+
+	// (GET /users)
+	GetAllUsers(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -224,19 +223,6 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	siw.Handler.GetAuth(c)
 }
 
-// GetPeople operation middleware
-func (siw *ServerInterfaceWrapper) GetPeople(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetPeople(c)
-}
-
 // PostPeopleApprovedResearchersImportCsv operation middleware
 func (siw *ServerInterfaceWrapper) PostPeopleApprovedResearchersImportCsv(c *gin.Context) {
 
@@ -248,30 +234,6 @@ func (siw *ServerInterfaceWrapper) PostPeopleApprovedResearchersImportCsv(c *gin
 	}
 
 	siw.Handler.PostPeopleApprovedResearchersImportCsv(c)
-}
-
-// PostPeopleId operation middleware
-func (siw *ServerInterfaceWrapper) PostPeopleId(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "id" -------------
-	var id string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Param("id"), &id, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostPeopleId(c, id)
 }
 
 // GetProfile operation middleware
@@ -352,6 +314,52 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	siw.Handler.PostProfileTraining(c)
 }
 
+// UpdateUserTrainingDate operation middleware
+func (siw *ServerInterfaceWrapper) UpdateUserTrainingDate(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "trainingKind" -------------
+	var trainingKind TrainingKind
+
+	err = runtime.BindStyledParameterWithOptions("simple", "trainingKind", c.Param("trainingKind"), &trainingKind, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter trainingKind: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateUserTrainingDate(c, userId, trainingKind)
+}
+
+// GetAllUsers operation middleware
+func (siw *ServerInterfaceWrapper) GetAllUsers(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAllUsers(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -381,13 +389,13 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/approved-researcher", wrapper.GetAgreementsApprovedResearcher)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
-	router.GET(options.BaseURL+"/people", wrapper.GetPeople)
 	router.POST(options.BaseURL+"/people/approved-researchers/import/csv", wrapper.PostPeopleApprovedResearchersImportCsv)
-	router.POST(options.BaseURL+"/people/:id", wrapper.PostPeopleId)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.PUT(options.BaseURL+"/training/:userId/:trainingKind", wrapper.UpdateUserTrainingDate)
+	router.GET(options.BaseURL+"/users", wrapper.GetAllUsers)
 }

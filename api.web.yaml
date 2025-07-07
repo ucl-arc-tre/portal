@@ -134,8 +134,9 @@ paths:
         default:
           description: Unexpected error
 
-  /people:
+  /users:
     get:
+      operationId: getAllUsers
       description: Get all the people a user has access to
       responses:
         "200":
@@ -150,24 +151,32 @@ paths:
         default:
           description: Unexpected error
 
-  /people/{id}:
-    post:
+  /training/{userId}/{trainingKind}:
+    put:
+      operationId: updateUserTrainingDate
+      description: Update a user's training record for a specific training kind
       parameters:
         - in: path
-          name: id
+          name: userId
           required: true
-          description: ID of the person to be updated
+          description: ID of the user whose training record should be updated
           schema:
             type: string
+        - in: path
+          name: trainingKind
+          required: true
+          description: The kind of training to update
+          schema:
+            $ref: "#/components/schemas/TrainingKind"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PersonUpdate"
+              $ref: "#/components/schemas/TrainingValidFromDate"
       responses:
         "200":
-          description: Successfully updated person
+          description: Successfully updated training record
           content:
             application/json:
               schema:
@@ -378,17 +387,14 @@ components:
         training_record:
           $ref: "#/components/schemas/ProfileTrainingStatus"
 
-    PersonUpdate:
+    TrainingValidFromDate:
       type: object
       required:
-        - training_kind
-        - training_date
+        - training_valid_from_date
       properties:
-        training_kind:
-          $ref: "#/components/schemas/TrainingKind"
-        training_date:
+        training_valid_from_date:
           type: string
-          description: Time in RFC3339 format at which the the certificate was issued
+          description: Time in RFC3339 format representing the date from which the training is valid
 
     People:
       type: array
