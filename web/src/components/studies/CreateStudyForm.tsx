@@ -92,6 +92,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
   const onSubmit: SubmitHandler<CreateStudyValues> = (data) => {
     console.log(data);
+    //todo: do the things
   };
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
@@ -99,6 +100,12 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   return (
     <Dialog setDialogOpen={setCreateStudyFormOpen} className={styles["study-dialog"]}>
       <h2>Create Study</h2>
+      <div className={styles["step-progress"]}>
+        <div className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""}`}></div>
+        <div className={`${styles["step-dot"]} ${currentStep === 2 ? styles["active"] : ""}`}></div>
+        <div className={`${styles["step-dot"]} ${currentStep === 3 ? styles["active"] : ""}`}></div>
+      </div>
+
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>

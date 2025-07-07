@@ -56,9 +56,9 @@
 
         &:focus-visible {
           /* overriding the uikit focus */
-          -webkit-box-shadow: 0 0 1px 1.2px #31a214;
-          -moz-box-shadow: 0 0 1px 1.2px #31a214;
-          box-shadow: 0 0 1px 1.2px #31a214;
+          -webkit-box-shadow: 0 0 1px 1.2px var(--green-100);
+          -moz-box-shadow: 0 0 1px 1.2px var(--green-100);
+          box-shadow: 0 0 1px 1.2px var(--green-100);
         }
       }
 
@@ -89,5 +89,24 @@
   .form-helper--invalid {
     text-align: center;
     color: red;
+  }
+}
+
+.step-progress {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .step-dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin: 0 0.5rem;
+
+    &.active {
+      background-color: var(--green-100);
+    }
   }
 }
