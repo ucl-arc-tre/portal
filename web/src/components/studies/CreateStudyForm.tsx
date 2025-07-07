@@ -2,7 +2,7 @@ import { useState } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import styles from "./CreateStudyForm.module.css";
-import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import dynamic from "next/dynamic";
 
 const Label = dynamic(() => import("uikit-react-public").then((mod) => mod.Label), {
@@ -17,6 +17,13 @@ const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Te
 const HelperText = dynamic(() => import("uikit-react-public").then((mod) => mod.Field.HelperText), {
   ssr: false,
 });
+const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
+  ssr: false,
+});
+const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
+  ssr: false,
+});
+
 type CreateStudyProps = {
   username: string;
   setCreateStudyFormOpen: (name: boolean) => void;
@@ -83,8 +90,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     control,
   });
 
-  const noSpecialCharactersRegex = /^[a-zA-Z0-9 ]+$/;
-
   const onSubmit: SubmitHandler<CreateStudyValues> = (data) => {
     console.log(data);
   };
@@ -100,20 +105,28 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           <legend>Study Name</legend>
           <Label htmlFor="shortStudyName">
             Short Study Name*:
-            <Input
-              type="text"
-              id="shortStudyName"
-              {...register("shortStudyName", {
-                required: true,
-                maxLength: { value: 55, message: "Maximum 55 characters" },
+            <Controller
+              name="shortStudyName"
+              control={control}
+              rules={{
+                required: "This field is required",
+                maxLength: {
+                  value: 55,
+                  message: "Maximum 55 characters",
+                },
                 pattern: {
-                  value: noSpecialCharactersRegex,
+                  value: /^[a-zA-Z0-9 ]+$/,
                   message: "Do not include any special characters",
                 },
-              })}
+              }}
+              render={({ field }) => <Input {...field} type="text" id="shortStudyName" />}
             />
             <HelperText>Maximum 55 characters, do not include any special characters</HelperText>
-            {errors.shortStudyName && <span>{errors.shortStudyName.message}</span>}
+            {errors.shortStudyName && (
+              <Alert type="error">
+                <AlertMessage>{errors.shortStudyName.message}</AlertMessage>
+              </Alert>
+            )}
           </Label>
 
           <Label htmlFor="longStudyName">
@@ -132,6 +145,9 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               {...register("owner", { disabled: true, value: username })}
               placeholder={username}
             />
+            <HelperText>
+              If you are not the study owner, contact the owner and ask them to fill out this form on their account.
+            </HelperText>
           </Label>
 
           <Label htmlFor="admin">
@@ -145,14 +161,24 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           <Label htmlFor="controller">
             Data Controller (organisation)*:
-            <Input type="text" id="controller" {...register("controller", { required: true })} />
+            <Controller
+              name="controller"
+              control={control}
+              rules={{ required: "This field is required" }}
+              render={({ field }) => <Input {...field} type="text" id="controller" />}
+            />
+            {errors.controller && (
+              <Alert type="error">
+                <AlertMessage>{errors.controller.message}</AlertMessage>
+              </Alert>
+            )}
           </Label>
         </fieldset>
 
         {/* second step */}
         <fieldset className={getFieldsetClass(2)}>
           <legend>Sponsorship & Approvals</legend>
-          <Label htmlFor="uclSponsorship">
+          <Label htmlFor="uclSponsorship" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="uclSponsorship" {...register("uclSponsorship")} />{" "}
             <span>
               We will be seeking/have sought{" "}
@@ -162,7 +188,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               of this research
             </span>
           </Label>
-          <Label htmlFor="cag">
+          <Label htmlFor="cag" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="cag" {...register("cag")} />
             <span>
               {" "}
@@ -180,12 +206,12 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             </Label>
           )}
 
-          <Label htmlFor="ethics">
+          <Label htmlFor="ethics" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="ethics" {...register("ethics")} />
             We will be seeking/have sought Research Ethics Committee approval for this research
           </Label>
 
-          <Label htmlFor="hra">
+          <Label htmlFor="hra" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="hra" {...register("hra")} />{" "}
             <span>
               We will be seeking/have sought{" "}
@@ -212,14 +238,14 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <fieldset className={getFieldsetClass(2)}>
           <legend>NHS</legend>
 
-          <Label htmlFor="nhs">
+          <Label htmlFor="nhs" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="nhs" {...register("nhs")} />
             This research is associated with the NHS, uses NHS data, works with NHS sites or has use of a/some NHS
             facilities
           </Label>
           {showNhsRelated && (
             <>
-              <Label htmlFor="nhsEngland">
+              <Label htmlFor="nhsEngland" className={styles["checkbox-label"]}>
                 <Input type="checkbox" id="nhsEngland" {...register("nhsEngland")} />
                 NHS England will be involved in gatekeeping and/or providing data for this research
               </Label>
@@ -230,7 +256,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 </Label>
               )}
 
-              <Label htmlFor="mnca">
+              <Label htmlFor="mnca" className={styles["checkbox-label"]}>
                 <Input type="checkbox" id="mnca" {...register("mnca")} />{" "}
                 <span>
                   The{" "}
@@ -240,7 +266,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   will be in place across all sites when working with NHS sites
                 </span>
               </Label>
-              <Label htmlFor="dspt">
+              <Label htmlFor="dspt" className={styles["checkbox-label"]}>
                 <Input type="checkbox" id="dspt" {...register("dspt")} />
                 This research requires an NHS Data Security & Protection Toolkit registration to be in place at UCL.
                 (This might arise when approaching public bodies for NHS and social care data)
@@ -253,13 +279,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <fieldset className={getFieldsetClass(3)}>
           <legend>Data</legend>
 
-          <Label htmlFor="dbs">
+          <Label htmlFor="dbs" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="dbs" {...register("dbs")} />
             There is data related to this research only to be handled by staff who have obtained a Disclosure and
             Barring Service (DBS) check
           </Label>
 
-          <Label htmlFor="dataProtection">
+          <Label htmlFor="dataProtection" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="dataProtection" {...register("dataProtection")} />
             The research already registered with UCL Data Protection
           </Label>
@@ -269,25 +295,25 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               <Input type="number" id="dataProtectionNumber" {...register("dataProtectionNumber")} />
             </Label>
           )}
-          <Label htmlFor="thirdParty">
+          <Label htmlFor="thirdParty" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="thirdParty" {...register("thirdParty")} />
             Organisations or businesses other than UCL will be involved in creating, storing, modifying, gatekeeping or
             providing data for this research
           </Label>
-          <Label htmlFor="externalUsers">
+          <Label htmlFor="externalUsers" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="externalUsers" {...register("externalUsers")} />
             We plan to give access to someone who is not a member of UCL
           </Label>
 
-          <Label htmlFor="consent">
+          <Label htmlFor="consent" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="consent" {...register("consent")} />
             We will be seeking/have sought consent from participants to collect data about them for this research
           </Label>
-          <Label htmlFor="nonConsent">
+          <Label htmlFor="nonConsent" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="nonConsent" {...register("nonConsent")} />
             There is data to be collected indirectly for this research, e.g. by another organisation
           </Label>
-          <Label htmlFor="extEea">
+          <Label htmlFor="extEea" className={styles["checkbox-label"]}>
             <Input type="checkbox" id="extEea" {...register("extEea")} />
             There is data related to this research to be processed outside of the UK and the countries that form the
             European Economic Area (For GDPR purposes)
@@ -305,9 +331,14 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </Button>
         )}
         {currentStep === totalSteps && (
-          <Button type="submit" disabled={!isValid || isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit Request"}
-          </Button>
+          <>
+            {!isValid && (
+              <HelperText className={styles["form-helper--invalid"]}>Please fill out all required fields</HelperText>
+            )}
+            <Button type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit Request"}
+            </Button>
+          </>
         )}
       </form>
     </Dialog>
