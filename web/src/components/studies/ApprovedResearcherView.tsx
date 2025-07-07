@@ -10,7 +10,6 @@ export default function ApprovedResearcherView(props: ApprovedResearcherViewProp
   const { username } = props;
   const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
   const handleCreateStudyClick = () => {
-    console.log("Create study");
     setCreateStudyFormOpen(true);
   };
   return (

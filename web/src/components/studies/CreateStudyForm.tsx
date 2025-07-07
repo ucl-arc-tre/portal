@@ -37,9 +37,6 @@ interface CreateStudyValues {
   cag: boolean;
   ethics: boolean;
   hra: boolean;
-  secureData: boolean;
-  redcap: boolean;
-  tre: boolean;
   dbs: boolean;
   dataProtection: boolean;
   thirdParty: boolean;
