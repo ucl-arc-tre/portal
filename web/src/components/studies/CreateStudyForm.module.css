@@ -68,7 +68,7 @@
       }
 
       input[type="checkbox"] {
-        width: 1.4rem;
+        transform: scale(1.5);
       }
 
       small {

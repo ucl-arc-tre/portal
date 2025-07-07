@@ -13,7 +13,8 @@ export default function StudiesPage() {
       />
       <Title text={"Studies"} />
       <p className={styles.subtitle}>
-        Studies are a top level entity. They can contain projects and assets, for more information, look at our
+        Studies are a top level entity. They can contain projects and assets, for more detailed information and an
+        entity relationship diagram, look at our
         <Button href="/glossary#studies" variant="tertiary" size="small" className={styles["glossary-button"]}>
           Glossary
         </Button>
