@@ -251,26 +251,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             <fieldset className={styles.fieldset}>
               <legend>Data</legend>
 
-              <fieldset className={styles.fieldset}>
-                <legend>Data Security</legend>
-                <Label htmlFor="secureData">
-                  There is a current need to secure data in this research; it is being/has been collected already.
-                  <Input type="checkbox" id="secureData" {...register("secureData")} />
-                </Label>
-                <Label htmlFor="redcap">
-                  We intend to use the UCL REDCap instance which is installed in the Data Safe Haven (note this is{" "}
-                  <strong>different</strong> to the UCL REDCap used for low-risk data).
-                  <Input type="checkbox" id="redcap" {...register("redcap")} />
-                </Label>
-                <Label htmlFor="tre">
-                  We are interested in using the new UCL Advanced Research Computing Trusted Research Environment (ARC
-                  TRE) for this research. <br />
-                  We are aware that if we do <strong>not</strong> check this box and require a trusted research
-                  environment we will be directed to the UCL Data Safe Haven.
-                  <Input type="checkbox" id="tre" {...register("tre")} />
-                </Label>
-              </fieldset>
-
               <Label htmlFor="dbs">
                 There is data related to this research only to be handled by staff who have obtained a Disclosure and
                 Barring Service (DBS) check.
