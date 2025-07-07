@@ -374,8 +374,10 @@ export type PostPeopleByIdResponses = {
     /**
      * Successfully updated person
      */
-    200: unknown;
+    200: TrainingRecord;
 };
+
+export type PostPeopleByIdResponse = PostPeopleByIdResponses[keyof PostPeopleByIdResponses];
 
 export type PostPeopleApprovedResearchersImportCsvData = {
     body: Blob | File;

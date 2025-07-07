@@ -25,7 +25,7 @@ func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement type
 		if err := s.ConfirmAgreement(user, agreement.ID); err != nil {
 			return err
 		}
-		if err := s.createNHSDTrainingRecord(user, record.NHSDTrainingCompletedAt); err != nil {
+		if err := s.CreateNHSDTrainingRecord(user, record.NHSDTrainingCompletedAt); err != nil {
 			return err
 		}
 		log.Debug().Any("user", user).Msg("Inserted approved researcher")

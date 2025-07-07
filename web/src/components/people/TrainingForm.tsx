@@ -50,7 +50,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
       updatePersonUI(id, {
         kind: trainingKind as TrainingKind,
         completed_at: trainingDisplayDate,
-        is_valid: true,
+        is_valid: response.data?.is_valid || false,
       });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
