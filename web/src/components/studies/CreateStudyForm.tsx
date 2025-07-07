@@ -104,7 +104,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
 
   return (
-    <Dialog setDialogOpen={setCreateStudyFormOpen} className={styles["study-dialog"]} cypressId="create-study-dialog">
+    <Dialog setDialogOpen={setCreateStudyFormOpen} className={styles["study-dialog"]} cyid="create-study-form">
       <h2>Create Study</h2>
       <div className={styles["step-progress"]}>
         <div
@@ -338,12 +338,19 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         </fieldset>
 
         {currentStep > 1 && (
-          <Button type="button" variant="secondary" size="small" onClick={prevStep} className={styles["button--back"]}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="small"
+            onClick={prevStep}
+            className={styles["button--back"]}
+            cyid="back"
+          >
             &larr; Back
           </Button>
         )}
         {currentStep < totalSteps && (
-          <Button type="button" size="small" onClick={nextStep} className={styles["button--continue"]}>
+          <Button type="button" size="small" onClick={nextStep} className={styles["button--continue"]} cyid="next">
             Next &rarr;
           </Button>
         )}
