@@ -17,11 +17,11 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 type TrainingFormProps = {
   id: string;
   setTrainingDialogOpen: (name: boolean) => void;
-  updatePersonUI: (id: string, training: TrainingRecord) => void;
+  updateUserProfileUI: (id: string, training: TrainingRecord) => void;
 };
 
 export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
-  const { id, setTrainingDialogOpen, updatePersonUI } = TrainingFormProps;
+  const { id, setTrainingDialogOpen, updateUserProfileUI } = TrainingFormProps;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
 
@@ -47,7 +47,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
       closeDialog();
 
-      updatePersonUI(id, {
+      updateUserProfileUI(id, {
         kind: trainingKind as TrainingKind,
         completed_at: trainingDisplayDate,
         is_valid: response.data?.is_valid || false,

@@ -8,34 +8,34 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (s *Service) GetAllPeople() (openapi.People, error) {
-	people := openapi.People{}
+func (s *Service) GetAllUserProfiles() (openapi.UserProfiles, error) {
+	userProfiles := openapi.UserProfiles{}
 
 	// get all users from db
 	users := []types.User{}
 	result := s.db.Find(&users)
 	if result.Error != nil {
-		return people, result.Error
+		return userProfiles, result.Error
 	}
 
 	// then loop through each and get their agreements & roles
 	for _, user := range users {
 		agreements, err := s.ConfirmedAgreements(user)
 		if err != nil {
-			return people, errors.New("failed to get agreements for user")
+			return userProfiles, errors.New("failed to get agreements for user")
 		}
 
 		roles, err := rbac.GetRoles(user)
 		if err != nil {
-			return people, errors.New("failed to get roles for user")
+			return userProfiles, errors.New("failed to get roles for user")
 		}
 
 		training, err := s.GetTrainingStatus(user)
 		if err != nil {
-			return people, errors.New("failed to get training for user")
+			return userProfiles, errors.New("failed to get training for user")
 		}
 
-		person := openapi.Person{
+		userProfile := openapi.UserProfile{
 			User: openapi.User{
 				Id:       user.ID.String(),
 				Username: string(user.Username),
@@ -46,9 +46,9 @@ func (s *Service) GetAllPeople() (openapi.People, error) {
 			TrainingRecord: training,
 			Roles:          roles,
 		}
-		people = append(people, person)
+		userProfiles = append(userProfiles, userProfile)
 	}
-	return people, nil
+	return userProfiles, nil
 }
 
 func (s *Service) GetUser(id string) (types.User, error) {

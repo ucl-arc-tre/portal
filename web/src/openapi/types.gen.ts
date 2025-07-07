@@ -11,21 +11,20 @@ export type User = {
     id: string;
 };
 
-export type Person = {
+/**
+ * Complete profile information for a user including identity, roles, agreements, and training status
+ */
+export type UserProfile = {
     user: User;
     roles: Array<string>;
     agreements: AgreementsList;
     training_record: UserTrainingStatus;
 };
 
-export type People = Array<Person>;
-
-export type TrainingValidFromDate = {
-    /**
-     * Time in RFC3339 format representing the date from which the training is valid
-     */
-    training_valid_from_date: string;
-};
+/**
+ * List of user profiles accessible to admin users
+ */
+export type UserProfiles = Array<UserProfile>;
 
 export type UserIdentityResponse = {
     username: string;
@@ -109,6 +108,13 @@ export type TrainingRecord = {
     completed_at?: string;
 };
 
+export type TrainingValidFromDate = {
+    /**
+     * Time in RFC3339 format representing the date from which the training is valid
+     */
+    training_valid_from_date: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -160,7 +166,7 @@ export type GetAllUsersErrors = {
 };
 
 export type GetAllUsersResponses = {
-    200: People;
+    200: UserProfiles;
 };
 
 export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];

@@ -23,12 +23,12 @@ func (h *Handler) GetAllUsers(ctx *gin.Context) {
 
 	if slices.Contains(roles, "admin") {
 		// retrieve auth + agreements + training info
-		people, err := h.users.GetAllPeople()
+		userProfiles, err := h.users.GetAllUserProfiles()
 		if err != nil {
-			setServerError(ctx, err, "Failed to get people")
+			setServerError(ctx, err, "Failed to get user profiles")
 			return
 		}
-		ctx.JSON(http.StatusOK, people)
+		ctx.JSON(http.StatusOK, userProfiles)
 
 	} else {
 		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})

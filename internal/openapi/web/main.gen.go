@@ -68,17 +68,6 @@ type ConfirmedAgreement struct {
 	ConfirmedAt string `json:"confirmed_at"`
 }
 
-// People defines model for People.
-type People = []Person
-
-// Person defines model for Person.
-type Person struct {
-	Agreements     AgreementsList     `json:"agreements"`
-	Roles          []string           `json:"roles"`
-	TrainingRecord UserTrainingStatus `json:"training_record"`
-	User           User               `json:"user"`
-}
-
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -114,6 +103,17 @@ type UserIdentityResponse struct {
 	ChosenName string `json:"chosen_name"`
 	Username   string `json:"username"`
 }
+
+// UserProfile Complete profile information for a user including identity, roles, agreements, and training status
+type UserProfile struct {
+	Agreements     AgreementsList     `json:"agreements"`
+	Roles          []string           `json:"roles"`
+	TrainingRecord UserTrainingStatus `json:"training_record"`
+	User           User               `json:"user"`
+}
+
+// UserProfiles List of user profiles accessible to admin users
+type UserProfiles = []UserProfile
 
 // UserTrainingResponse defines model for UserTrainingResponse.
 type UserTrainingResponse struct {

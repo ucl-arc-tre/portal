@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getAllUsers, People, Person, TrainingRecord } from "@/openapi";
+import { ConfirmedAgreement, getAllUsers, UserProfiles, UserProfile, TrainingRecord } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -31,49 +31,51 @@ function getHumanReadableTrainingKind(trainingKind: string) {
 }
 
 export default function AdminView() {
-  const [people, setPeople] = useState<People | null>(null);
+  const [userProfiles, setUserProfiles] = useState<UserProfiles | null>(null);
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [id, setId] = useState("");
 
   useEffect(() => {
-    const fetchPeople = async () => {
+    const fetchUserProfiles = async () => {
       setIsLoading(true);
       try {
         const response = await getAllUsers();
         if (response.response.ok && response.data) {
-          setPeople(response.data as People);
+          setUserProfiles(response.data as UserProfiles);
         }
       } catch (error) {
-        console.error("Failed to get people:", error);
-        setPeople(null);
+        console.error("Failed to get user profiles:", error);
+        setUserProfiles(null);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchPeople();
+    fetchUserProfiles();
   }, []);
 
-  const updatePersonUI = (id: string, training: TrainingRecord) => {
-    // get people object and find the person with the right id then update the training
-    if (!people) return;
+  const updateUserProfileUI = (id: string, training: TrainingRecord) => {
+    // get user profiles object and find the user profile with the right id then update the training
+    if (!userProfiles) return;
 
-    const updatedPeople = [...people];
-    const personIndex = updatedPeople.findIndex((person) => person.user.id === id);
+    const updatedUserProfiles = [...userProfiles];
+    const userProfileIndex = updatedUserProfiles.findIndex((userProfile) => userProfile.user.id === id);
 
-    if (personIndex !== -1) {
-      const person = updatedPeople[personIndex];
-      person.training_record.training_records ??= [];
-      const recordIndex = person.training_record.training_records.findIndex((record) => record.kind === training.kind);
+    if (userProfileIndex !== -1) {
+      const userProfile = updatedUserProfiles[userProfileIndex];
+      userProfile.training_record.training_records ??= [];
+      const recordIndex = userProfile.training_record.training_records.findIndex(
+        (record: TrainingRecord) => record.kind === training.kind
+      );
 
       // If the training record exists, remove it
       if (recordIndex !== -1) {
-        person.training_record.training_records.splice(recordIndex, 1);
+        userProfile.training_record.training_records.splice(recordIndex, 1);
       }
 
-      person.training_record.training_records.push(training);
-      setPeople(updatedPeople);
+      userProfile.training_record.training_records.push(training);
+      setUserProfiles(updatedUserProfiles);
     }
   };
 
@@ -82,7 +84,7 @@ export default function AdminView() {
     setTrainingDialogOpen(true);
   };
 
-  if (!people) return null;
+  if (!userProfiles) return null;
 
   if (isLoading) {
     return (
@@ -95,7 +97,7 @@ export default function AdminView() {
   return (
     <>
       {trainingDialogOpen && (
-        <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
+        <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updateUserProfileUI={updateUserProfileUI} />
       )}
 
       <p>
@@ -113,25 +115,28 @@ export default function AdminView() {
         </thead>
 
         <tbody className={styles.tbody}>
-          {people.map((person: Person) => (
-            <tr key={person.user.id} className={styles.row}>
+          {userProfiles.map((userProfile: UserProfile) => (
+            <tr key={userProfile.user.id} className={styles.row}>
               <td className={styles.user}>
-                {person.user.username} <small>{person.user.id}</small>
+                {userProfile.user.username} <small>{userProfile.user.id}</small>
               </td>
-              <td className={styles.roles}>{person.roles.join(", ")}</td>
+
+              <td className={styles.roles}>{userProfile.roles.join(", ")}</td>
+
               <td className={styles.agreements}>
-                {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
+                {userProfile.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                   <div key={agreement.agreement_type} className={styles.agreement}>
                     {agreement.agreement_type}
                     {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
                   </div>
                 ))}
               </td>
+
               <td className={styles.trainingInfo} data-cy="training">
                 <div className={styles.trainingRecord}>
-                  {person.training_record.training_records?.map((training: TrainingRecord) => (
+                  {userProfile.training_record.training_records?.map((training: TrainingRecord) => (
                     <div
-                      key={`${person.user.id}-${training.kind}-${training.completed_at}`}
+                      key={`${userProfile.user.id}-${training.kind}-${training.completed_at}`}
                       className={styles.training}
                     >
                       {getHumanReadableTrainingKind(training.kind)}
@@ -148,10 +153,11 @@ export default function AdminView() {
                     </div>
                   ))}{" "}
                 </div>
+
                 <Button
                   variant="tertiary"
                   size="small"
-                  onClick={() => handleEditTrainingClick(person.user.id)}
+                  onClick={() => handleEditTrainingClick(userProfile.user.id)}
                   className={styles.edit}
                 >
                   Edit
@@ -161,6 +167,7 @@ export default function AdminView() {
           ))}
         </tbody>
       </table>
+
       <ApprovedResearcherImport />
     </>
   );

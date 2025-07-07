@@ -34,7 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/People"
+                $ref: "#/components/schemas/UserProfiles"
         "403":
           description: Forbidden
         "500":
@@ -275,8 +275,9 @@ components:
         id:
           type: string
 
-    Person:
+    UserProfile:
       type: object
+      description: Complete profile information for a user including identity, roles, agreements, and training status
       required:
         - user
         - roles
@@ -294,19 +295,11 @@ components:
         training_record:
           $ref: "#/components/schemas/UserTrainingStatus"
 
-    People:
+    UserProfiles:
       type: array
+      description: List of user profiles accessible to admin users
       items:
-        $ref: "#/components/schemas/Person"
-
-    TrainingValidFromDate:
-      type: object
-      required:
-        - training_valid_from_date
-      properties:
-        training_valid_from_date:
-          type: string
-          description: Time in RFC3339 format representing the date from which the training is valid
+        $ref: "#/components/schemas/UserProfile"
 
     UserIdentityResponse:
       type: object
@@ -432,3 +425,12 @@ components:
         completed_at:
           type: string
           description: Time in RFC3339 format when the training was completed
+
+    TrainingValidFromDate:
+      type: object
+      required:
+        - training_valid_from_date
+      properties:
+        training_valid_from_date:
+          type: string
+          description: Time in RFC3339 format representing the date from which the training is valid
