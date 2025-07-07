@@ -63,7 +63,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     handleSubmit,
     control,
     formState: { errors, isValid, isSubmitting },
-  } = useForm<CreateStudyValues>({ mode: "onChange", criteriaMode: "all" });
+  } = useForm<CreateStudyValues>({
+    mode: "onChange",
+    criteriaMode: "all",
+    defaultValues: {
+      owner: username,
+    },
+  });
   const [currentStep, setCurrentStep] = useState(1);
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
@@ -98,10 +104,12 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
 
   return (
-    <Dialog setDialogOpen={setCreateStudyFormOpen} className={styles["study-dialog"]}>
+    <Dialog setDialogOpen={setCreateStudyFormOpen} className={styles["study-dialog"]} cypressId="create-study-dialog">
       <h2>Create Study</h2>
       <div className={styles["step-progress"]}>
-        <div className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""}`}></div>
+        <div
+          className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""} ${isValid ? styles.valid : ""}`}
+        ></div>
         <div className={`${styles["step-dot"]} ${currentStep === 2 ? styles["active"] : ""}`}></div>
         <div className={`${styles["step-dot"]} ${currentStep === 3 ? styles["active"] : ""}`}></div>
       </div>
@@ -149,8 +157,10 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             <Input
               type="email"
               id="owner"
-              {...register("owner", { disabled: true, value: username })}
-              placeholder={username}
+              {...register("owner")}
+              readOnly={true}
+              value={username}
+              className={styles.readOnly}
             />
             <HelperText>
               If you are not the study owner, contact the owner and ask them to fill out this form on their account.
