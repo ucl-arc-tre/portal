@@ -1,5 +1,12 @@
 .subtitle {
   text-align: center;
+
+  .info {
+    height: 15px;
+    width: 15px;
+    color: var(--text--secondary);
+    vertical-align: top;
+  }
 }
 
 .glossary-button {
