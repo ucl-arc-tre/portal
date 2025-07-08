@@ -28,7 +28,7 @@ The portal is comprised of a React frontend that uses a web api to interact with
 
 ### Logical View
 
-![Architecture](./media/architecture_3.drawio.svg)
+![Architecture](./media/Architecture_3.drawio.svg)
 
 
 ### Physical View
