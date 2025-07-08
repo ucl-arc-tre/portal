@@ -172,7 +172,22 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           <Label htmlFor="admin">
             Study Administrator:
-            <Input type="email" id="admin" {...register("admin")} />
+            <Controller
+              name="admin"
+              control={control}
+              rules={{
+                pattern: {
+                  value: /@ucl\.ac\.uk$/,
+                  message: "Email must be a UCL email address",
+                },
+              }}
+              render={({ field }) => <Input {...field} type="email" id="admin" placeholder="ccbcabc@ucl.ac.uk" />}
+            />
+            {errors.admin && (
+              <Alert type="error">
+                <AlertMessage>{errors.admin.message}</AlertMessage>
+              </Alert>
+            )}
             <HelperText>
               {" "}
               <strong>Must</strong> be a full UCL staff member, not honorary or affiliated
