@@ -18,7 +18,7 @@ export default function Studies() {
     <>
       {!isAdmin && !isApprovedResearcher && (
         <>
-          <h3>No Studies</h3>
+          <h2>No Studies</h2>
           <p>
             You need to be an Approved Researcher to view and create Studies. Check your{" "}
             <Button size="small" href="/profile" variant="tertiary">

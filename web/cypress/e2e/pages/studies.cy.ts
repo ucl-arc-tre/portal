@@ -10,7 +10,7 @@ describe(`Studies page content`, () => {
     cy.visit("/studies");
     cy.waitForAuth();
 
-    cy.contains("This page is being built. Please check back soon for updates!").should("be.visible");
+    cy.contains("No Studies").should("be.visible");
   });
 
   it("should show content for base approved researcher", () => {
@@ -19,7 +19,7 @@ describe(`Studies page content`, () => {
     cy.visit("/studies");
     cy.waitForAuth();
 
-    cy.contains("This page is being built. Please check back soon for updates!").should("not.exist");
+    cy.contains("No Studies").should("not.exist");
     cy.contains("Your Studies").should("be.visible");
   });
 });
