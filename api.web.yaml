@@ -31,7 +31,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: "#/components/schemas/Profile"
         default:
           description: Unexpected error
     post:
@@ -47,7 +47,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: "#/components/schemas/Profile"
         "500":
           description: Internal server error
         default:
@@ -61,7 +61,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileAgreements"
+                $ref: "#/components/schemas/UserAgreements"
         "500":
           description: Internal server error
         default:
@@ -79,7 +79,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileAgreements"
+                $ref: "#/components/schemas/UserAgreements"
         "500":
           description: Internal server error
         default:
@@ -93,7 +93,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileTrainingStatus"
+                $ref: "#/components/schemas/ProfileTraining"
         "500":
           description: Internal server error
         default:
@@ -118,9 +118,16 @@ paths:
         default:
           description: Unexpected error
 
-  /agreements/approved-researcher:
+  /agreements/{agreementType}:
     get:
       description: Get the latest approved researcher agreement
+      parameters:
+        - in: path
+          name: agreementType
+          required: true
+          description: Type of agreement to get
+          schema:
+            $ref: "#/components/schemas/AgreementType"
       responses:
         "200":
           content:
@@ -134,15 +141,17 @@ paths:
         default:
           description: Unexpected error
 
-  /people:
+  /users:
     get:
-      description: Get all the people a user has access to
+      description: Get all the users a user has access to view
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/People"
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserData"
         "403":
           description: Forbidden
         "500":
@@ -150,13 +159,13 @@ paths:
         default:
           description: Unexpected error
 
-  /people/{id}:
+  /users/{userId}/training:
     post:
       parameters:
         - in: path
-          name: id
+          name: userId
           required: true
-          description: ID of the person to be updated
+          description: ID of the user to be updated
           schema:
             type: string
       requestBody:
@@ -164,10 +173,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PersonUpdate"
+              $ref: "#/components/schemas/UserTrainingUpdate"
       responses:
         "200":
-          description: Successfully updated person
+          description: Successfully updated user
           content:
             application/json:
               schema:
@@ -181,7 +190,7 @@ paths:
         default:
           description: Unexpected error
 
-  /people/approved-researchers/import/csv:
+  /users/approved-researchers/import/csv:
     post:
       description: |
         Upload a CSV file with fields
@@ -224,7 +233,7 @@ components:
               - base
               - approved-researcher
 
-    ProfileResponse:
+    Profile:
       type: object
       required:
         - username
@@ -283,7 +292,7 @@ components:
         - approved-researcher
         - study-owner
 
-    ProfileAgreements:
+    UserAgreements:
       type: object
       required:
         - confirmed_agreements
@@ -295,7 +304,8 @@ components:
 
     TrainingKind:
       type: string
-      enum: [training_kind_nhsd]
+      enum:
+        - training_kind_nhsd
 
     ProfileTrainingUpdate:
       type: object
@@ -337,7 +347,7 @@ components:
           type: string
           description: Time in RFC3339 format when the training was completed
 
-    ProfileTrainingStatus:
+    ProfileTraining:
       type: object
       required:
         - training_records
@@ -359,7 +369,7 @@ components:
         id:
           type: string
 
-    Person:
+    UserData:
       type: object
       required:
         - user
@@ -374,11 +384,11 @@ components:
           items:
             type: string
         agreements:
-          $ref: "#/components/schemas/ProfileAgreements"
+          $ref: "#/components/schemas/UserAgreements"
         training_record:
-          $ref: "#/components/schemas/ProfileTrainingStatus"
+          $ref: "#/components/schemas/ProfileTraining"
 
-    PersonUpdate:
+    UserTrainingUpdate:
       type: object
       required:
         - training_kind
@@ -389,8 +399,3 @@ components:
         training_date:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
-
-    People:
-      type: array
-      items:
-        $ref: "#/components/schemas/Person"

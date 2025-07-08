@@ -1,4 +1,4 @@
-import { ConfirmedAgreement, getPeople, People, Person, TrainingRecord } from "@/openapi";
+import { ConfirmedAgreement, getUsers, UserData, TrainingRecord } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import dynamic from "next/dynamic";
@@ -31,7 +31,7 @@ function getHumanReadableTrainingKind(trainingKind: string) {
 }
 
 export default function AdminView() {
-  const [people, setPeople] = useState<People | null>(null);
+  const [users, setUsers] = useState<Array<UserData> | null>(null);
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,13 +41,13 @@ export default function AdminView() {
     const fetchPeople = async () => {
       setIsLoading(true);
       try {
-        const response = await getPeople();
+        const response = await getUsers();
         if (response.response.ok && response.data) {
-          setPeople(response.data as People);
+          setUsers(response.data);
         }
       } catch (error) {
         console.error("Failed to get people:", error);
-        setPeople(null);
+        setUsers(null);
       } finally {
         setIsLoading(false);
       }
@@ -57,9 +57,9 @@ export default function AdminView() {
 
   const updatePersonUI = (id: string, training: TrainingRecord) => {
     // get people object and find the person with the right id then update the training
-    if (!people) return;
+    if (!users) return;
 
-    const updatedPeople = [...people];
+    const updatedPeople = [...users];
     const personIndex = updatedPeople.findIndex((person) => person.user.id === id);
 
     if (personIndex !== -1) {
@@ -73,7 +73,7 @@ export default function AdminView() {
       }
 
       person.training_record.training_records.push(training);
-      setPeople(updatedPeople);
+      setUsers(updatedPeople);
     }
   };
 
@@ -82,7 +82,7 @@ export default function AdminView() {
     setTrainingDialogOpen(true);
   };
 
-  if (!people) return null;
+  if (!users) return null;
 
   if (isLoading) {
     return (
@@ -110,14 +110,14 @@ export default function AdminView() {
           </tr>
         </thead>
         <tbody className={styles.tbody}>
-          {people.map((person: Person) => (
-            <tr key={person.user.id} className={styles.row}>
+          {users.map((userData: UserData) => (
+            <tr key={userData.user.id} className={styles.row}>
               <td className={styles.user}>
-                {person.user.username} <small>{person.user.id}</small>
+                {userData.user.username} <small>{userData.user.id}</small>
               </td>
-              <td className={styles.roles}>{person.roles.join(", ")}</td>
+              <td className={styles.roles}>{userData.roles.join(", ")}</td>
               <td className={styles.agreements}>
-                {person.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
+                {userData.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                   <div key={agreement.agreement_type} className={styles.agreement}>
                     {agreement.agreement_type}
                     {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
@@ -126,9 +126,9 @@ export default function AdminView() {
               </td>
               <td className={styles.trainingInfo} data-cy="training">
                 <div className={styles.trainingRecord}>
-                  {person.training_record.training_records?.map((training: TrainingRecord) => (
+                  {userData.training_record.training_records?.map((training: TrainingRecord) => (
                     <div
-                      key={`${person.user.id}-${training.kind}-${training.completed_at}`}
+                      key={`${userData.user.id}-${training.kind}-${training.completed_at}`}
                       className={styles.training}
                     >
                       {getHumanReadableTrainingKind(training.kind)}
@@ -148,7 +148,7 @@ export default function AdminView() {
                 <Button
                   variant="tertiary"
                   size="small"
-                  onClick={() => handleEditTrainingClick(person.user.id)}
+                  onClick={() => handleEditTrainingClick(userData.user.id)}
                   className={styles.edit}
                 >
                   Edit
