@@ -27,9 +27,9 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 The portal is comprised of a React frontend that uses a web api to interact with a backend database. Further APIs for supported platforms (initially the TRE) connect the to the data to provide or configure access to resources. The app will access UCL enterprise systems using one of the producer patterns found [here](https://liveuclac.sharepoint.com/sites/it-architecture/SitePages/integration-patterns.aspx). 
 
 ### Logical View
-<p align="center">
-  <img src="./media/architecture_3.drawio.svg" alt="to-be architecture" width="650">
-</p>
+
+![Architecture](./media/architecture_3.drawio.svg)
+
 
 ### Physical View
 
