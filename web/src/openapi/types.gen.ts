@@ -5,7 +5,7 @@ export type Auth = {
     roles: Array<'admin' | 'base' | 'approved-researcher'>;
 };
 
-export type ProfileResponse = {
+export type Profile = {
     username: string;
     chosen_name: string;
 };
@@ -39,7 +39,7 @@ export type ConfirmedAgreement = {
 
 export type AgreementType = 'approved-researcher' | 'study-owner';
 
-export type ProfileAgreements = {
+export type UserAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
@@ -80,7 +80,7 @@ export type TrainingRecord = {
     completed_at?: string;
 };
 
-export type ProfileTrainingStatus = {
+export type ProfileTraining = {
     /**
      * List of all training records for the user
      */
@@ -92,22 +92,20 @@ export type User = {
     id: string;
 };
 
-export type Person = {
+export type UserData = {
     user: User;
     roles: Array<string>;
-    agreements: ProfileAgreements;
-    training_record: ProfileTrainingStatus;
+    agreements: UserAgreements;
+    training_record: ProfileTraining;
 };
 
-export type PersonUpdate = {
+export type UserTrainingUpdate = {
     training_kind: TrainingKind;
     /**
      * Time in RFC3339 format at which the the certificate was issued
      */
     training_date: string;
 };
-
-export type People = Array<Person>;
 
 export type GetAuthData = {
     body?: never;
@@ -152,7 +150,7 @@ export type GetProfileErrors = {
 };
 
 export type GetProfileResponses = {
-    200: ProfileResponse;
+    200: Profile;
 };
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
@@ -179,7 +177,7 @@ export type PostProfileResponses = {
     /**
      * Successfully updated profile
      */
-    200: ProfileResponse;
+    200: Profile;
 };
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
@@ -203,7 +201,7 @@ export type GetProfileAgreementsErrors = {
 };
 
 export type GetProfileAgreementsResponses = {
-    200: ProfileAgreements;
+    200: UserAgreements;
 };
 
 export type GetProfileAgreementsResponse = GetProfileAgreementsResponses[keyof GetProfileAgreementsResponses];
@@ -227,7 +225,7 @@ export type PostProfileAgreementsErrors = {
 };
 
 export type PostProfileAgreementsResponses = {
-    200: ProfileAgreements;
+    200: UserAgreements;
 };
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
@@ -251,7 +249,7 @@ export type GetProfileTrainingErrors = {
 };
 
 export type GetProfileTrainingResponses = {
-    200: ProfileTrainingStatus;
+    200: ProfileTraining;
 };
 
 export type GetProfileTrainingResponse = GetProfileTrainingResponses[keyof GetProfileTrainingResponses];
@@ -283,14 +281,19 @@ export type PostProfileTrainingResponses = {
 
 export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
 
-export type GetAgreementsApprovedResearcherData = {
+export type GetAgreementsByAgreementTypeData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * Type of agreement to get
+         */
+        agreementType: AgreementType;
+    };
     query?: never;
-    url: '/agreements/approved-researcher';
+    url: '/agreements/{agreementType}';
 };
 
-export type GetAgreementsApprovedResearcherErrors = {
+export type GetAgreementsByAgreementTypeErrors = {
     /**
      * Not acceptable
      */
@@ -305,20 +308,20 @@ export type GetAgreementsApprovedResearcherErrors = {
     default: unknown;
 };
 
-export type GetAgreementsApprovedResearcherResponses = {
+export type GetAgreementsByAgreementTypeResponses = {
     200: Agreement;
 };
 
-export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];
+export type GetAgreementsByAgreementTypeResponse = GetAgreementsByAgreementTypeResponses[keyof GetAgreementsByAgreementTypeResponses];
 
-export type GetPeopleData = {
+export type GetUsersData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/people';
+    url: '/users';
 };
 
-export type GetPeopleErrors = {
+export type GetUsersErrors = {
     /**
      * Forbidden
      */
@@ -333,25 +336,25 @@ export type GetPeopleErrors = {
     default: unknown;
 };
 
-export type GetPeopleResponses = {
-    200: People;
+export type GetUsersResponses = {
+    200: Array<UserData>;
 };
 
-export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+export type GetUsersResponse = GetUsersResponses[keyof GetUsersResponses];
 
-export type PostPeopleByIdData = {
-    body: PersonUpdate;
+export type PostUsersByUserIdTrainingData = {
+    body: UserTrainingUpdate;
     path: {
         /**
-         * ID of the person to be updated
+         * ID of the user to be updated
          */
-        id: string;
+        userId: string;
     };
     query?: never;
-    url: '/people/{id}';
+    url: '/users/{userId}/training';
 };
 
-export type PostPeopleByIdErrors = {
+export type PostUsersByUserIdTrainingErrors = {
     /**
      * Forbidden
      */
@@ -370,23 +373,23 @@ export type PostPeopleByIdErrors = {
     default: unknown;
 };
 
-export type PostPeopleByIdResponses = {
+export type PostUsersByUserIdTrainingResponses = {
     /**
-     * Successfully updated person
+     * Successfully updated user
      */
     200: TrainingRecord;
 };
 
-export type PostPeopleByIdResponse = PostPeopleByIdResponses[keyof PostPeopleByIdResponses];
+export type PostUsersByUserIdTrainingResponse = PostUsersByUserIdTrainingResponses[keyof PostUsersByUserIdTrainingResponses];
 
-export type PostPeopleApprovedResearchersImportCsvData = {
+export type PostUsersApprovedResearchersImportCsvData = {
     body: Blob | File;
     path?: never;
     query?: never;
-    url: '/people/approved-researchers/import/csv';
+    url: '/users/approved-researchers/import/csv';
 };
 
-export type PostPeopleApprovedResearchersImportCsvErrors = {
+export type PostUsersApprovedResearchersImportCsvErrors = {
     /**
      * Forbidden
      */
@@ -401,14 +404,14 @@ export type PostPeopleApprovedResearchersImportCsvErrors = {
     default: unknown;
 };
 
-export type PostPeopleApprovedResearchersImportCsvResponses = {
+export type PostUsersApprovedResearchersImportCsvResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type PostPeopleApprovedResearchersImportCsvResponse = PostPeopleApprovedResearchersImportCsvResponses[keyof PostPeopleApprovedResearchersImportCsvResponses];
+export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});

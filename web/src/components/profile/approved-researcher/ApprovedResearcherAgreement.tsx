@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Agreement, getAgreementsApprovedResearcher, getProfileAgreements } from "@/openapi";
+import { Agreement, getAgreementsByAgreementType, getProfileAgreements } from "@/openapi";
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "./AgreementForm";
@@ -21,7 +21,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
     const fetchData = async () => {
       setIsLoadingAgreement(true);
       try {
-        const agreementResult = await getAgreementsApprovedResearcher();
+        const agreementResult = await getAgreementsByAgreementType({ path: { agreementType: "approved-researcher" } });
         const profileAgreementsResult = await getProfileAgreements();
 
         if (agreementResult.response.status === 200 && agreementResult.data) {

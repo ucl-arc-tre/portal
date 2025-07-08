@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"slices"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,17 +15,17 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-func (h *Handler) GetPeople(ctx *gin.Context) {
+func (h *Handler) GetUsers(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	roles, err := rbac.GetRoles(user)
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
 		setServerError(ctx, err, "Failed to get roles for user")
 		return
 	}
 
-	if slices.Contains(roles, "admin") {
+	if isAdmin {
 		// retrieve auth + agreements + training info
-		people, err := h.users.GetAllPeople()
+		people, err := h.users.AllUsers()
 		if err != nil {
 			setServerError(ctx, err, "Failed to get people")
 			return
@@ -34,13 +33,12 @@ func (h *Handler) GetPeople(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, people)
 
 	} else {
-		ctx.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+		ctx.JSON(http.StatusInternalServerError, "Not implemented")
 	}
-
 }
 
-func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
-	var update openapi.PersonUpdate
+func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
+	var update openapi.UserTrainingUpdate
 	if err := ctx.ShouldBindJSON(&update); err != nil {
 		setInvalid(ctx, err, "Invalid JSON object")
 		return
@@ -75,7 +73,7 @@ func (h *Handler) PostPeopleId(ctx *gin.Context, userId string) {
 	})
 }
 
-func (h *Handler) PostPeopleApprovedResearchersImportCsv(ctx *gin.Context) {
+func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	content, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		setServerError(ctx, err, "Failed to read body")
