@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import ApprovedResearcherView from "./ApprovedResearcherView";
+import Button from "../ui/Button";
 
 export default function Studies() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -15,7 +16,18 @@ export default function Studies() {
 
   return (
     <>
-      {!isAdmin && !isApprovedResearcher && <p>This page is being built. Please check back soon for updates!</p>}
+      {!isAdmin && !isApprovedResearcher && (
+        <>
+          <h3>No Studies</h3>
+          <p>
+            You need to be an Approved Researcher to view and create Studies. Check your{" "}
+            <Button size="small" href="/profile" variant="tertiary">
+              profile
+            </Button>{" "}
+            for steps to become an Approved Researcher
+          </p>
+        </>
+      )}
 
       {isApprovedResearcher && <ApprovedResearcherView username={username} />}
     </>

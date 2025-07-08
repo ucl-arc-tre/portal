@@ -23,7 +23,7 @@ export default function StudiesPage() {
           className={styles.info}
         />
         , for more detailed information and an entity relationship diagram, look at our
-        <Button href="/glossary#studies" variant="tertiary" size="small" className={styles["glossary-button"]}>
+        <Button href="/glossary" variant="tertiary" size="small" className={styles["glossary-button"]}>
           Glossary
         </Button>
       </p>

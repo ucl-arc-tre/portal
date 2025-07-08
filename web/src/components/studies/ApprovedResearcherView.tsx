@@ -28,9 +28,9 @@ export default function ApprovedResearcherView(props: ApprovedResearcherViewProp
           <table>
             <thead>
               <tr>
-                <th>Study Name</th>
-                <th>Study Description</th>
-                <th>Study Status</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
                 <th>View full details</th>
               </tr>
             </thead>
