@@ -111,7 +111,9 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <div
           className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""} ${isValid ? styles.valid : ""}`}
         ></div>
-        <div className={`${styles["step-dot"]} ${currentStep === 2 ? styles["active"] : ""}`}></div>
+        <div
+          className={`${styles["step-dot"]} ${currentStep === 2 ? styles["active"] : ""}${isValid ? styles.valid : ""}`}
+        ></div>
         <div className={`${styles["step-dot"]} ${currentStep === 3 ? styles["active"] : ""}`}></div>
       </div>
 
