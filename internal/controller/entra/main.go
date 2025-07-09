@@ -51,14 +51,14 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	}
 	configuration := &graphusers.UserItemRequestBuilderGetRequestConfiguration{
 		QueryParameters: &graphusers.UserItemRequestBuilderGetQueryParameters{
-			Select: []string{"mail"},
+			Select: []string{"mail", "employeeType"},
 		},
 	}
 	data, err := c.client.Users().ByUserId(string(username)).Get(ctx, configuration)
 	if err != nil {
 		return nil, err
 	}
-	userData := UserData{Email: data.GetMail()}
+	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType()}
 	_ = c.userDataCache.Add(username, userData)
 	return &userData, nil
 }
