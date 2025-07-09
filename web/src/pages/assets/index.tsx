@@ -19,10 +19,12 @@ export default function AssetsPage() {
   const [studies, setStudies] = useState<Study[]>([]);
   const [studiesLoading, setStudiesLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStudies = async () => {
-      if (!isApprovedResearcher) return;
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
+  useEffect(() => {
+    if (!isApprovedResearcher) return;
+
+    const fetchStudies = async () => {
       setStudiesLoading(true);
       try {
         // TODO: Replace with actual API call
@@ -52,12 +54,10 @@ export default function AssetsPage() {
     };
 
     fetchStudies();
-  }, []);
+  }, [isApprovedResearcher]);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
-
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   return (
     <>
