@@ -10,6 +10,7 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -28,11 +29,12 @@ var k = koanf.New(".")
 
 func Init() {
 	if err := k.Load(file.Provider(webConfigPath), yaml.Parser()); err != nil {
-		panic(fmt.Errorf("error loading config: %v", err))
+		log.Err(err).Msg("error loading config")
 	}
 	if k.Bool("debug") {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
+	log.Debug().Msg("Initalised config")
 }
 
 func ServerAddress() string {
@@ -41,11 +43,11 @@ func ServerAddress() string {
 }
 
 func IsDevDeploy() bool {
-	return k.Bool("is_dev_deploy")
+	return os.Getenv("IS_DEV_DEPLOY") == "true"
 }
 
 func IsTesting() bool {
-	return k.Bool("is_testing")
+	return os.Getenv("IS_TESTING") == "true"
 }
 
 func DBDataSourceName() string {

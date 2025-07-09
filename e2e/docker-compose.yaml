@@ -5,6 +5,7 @@ services:
       target: web-api-release
     environment:
       PORT: "8080"
+      IS_TESTING: true
     volumes:
       - ./config.web.yaml:/etc/portal/config.web.yaml:ro
     depends_on:
