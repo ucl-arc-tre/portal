@@ -40,8 +40,8 @@ export default function Assets(props: AssetsProps) {
 
   return (
     <>
-      <div className={styles.selectedStudyHeader}>
-        <div className={styles.studyBreadcrumb}>
+      <div className={styles["selected-study-header"]}>
+        <div className={styles["study-breadcrumb"]}>
           <span>
             Study: <strong>{selectedStudy?.title}</strong>
           </span>

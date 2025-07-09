@@ -64,7 +64,7 @@ export default function AssetsPage() {
 
       <Title text={"Data Assets"} />
       <h2>View and manage your data assets.</h2>
-      <div className={styles.pageDescription}>
+      <div className={styles["page-description"]}>
         <p>
           Use this page to create data assets you would like to associate with your study. Assets can be any kind of
           data entity you want to associate with your study. Assets can be things like consent forms, physical study
@@ -73,7 +73,7 @@ export default function AssetsPage() {
       </div>
 
       {!isApprovedResearcher && (
-        <>
+        <div className={styles["not-approved-section"]}>
           <h2>
             To access your assets, please first set up your profile by completing the approved researcher process.
           </h2>
@@ -81,7 +81,7 @@ export default function AssetsPage() {
           <Button href="/profile" size="large">
             Complete your profile
           </Button>
-        </>
+        </div>
       )}
 
       {isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}

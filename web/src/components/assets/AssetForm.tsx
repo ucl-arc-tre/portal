@@ -90,7 +90,7 @@ export default function AssetForm(props: AssetFormProps) {
             aria-invalid={!!errors.title}
             className={errors.title ? styles.error : ""}
           />
-          {errors.title && <span className={styles.errorText}>{errors.title.message}</span>}
+          {errors.title && <span className={styles["error-text"]}>{errors.title.message}</span>}
         </div>
 
         <div className={styles.field}>
@@ -105,7 +105,7 @@ export default function AssetForm(props: AssetFormProps) {
             aria-invalid={!!errors.description}
             className={errors.description ? styles.error : ""}
           />
-          {errors.description && <span className={styles.errorText}>{errors.description.message}</span>}
+          {errors.description && <span className={styles["error-text"]}>{errors.description.message}</span>}
         </div>
 
         <div className={styles.field}>
@@ -127,7 +127,7 @@ export default function AssetForm(props: AssetFormProps) {
             <option value={5}>5 - High</option>
           </select>
           {errors.classification_impact && (
-            <span className={styles.errorText}>{errors.classification_impact.message}</span>
+            <span className={styles["error-text"]}>{errors.classification_impact.message}</span>
           )}
         </div>
 
@@ -143,18 +143,18 @@ export default function AssetForm(props: AssetFormProps) {
             aria-invalid={!!errors.location}
             className={errors.location ? styles.error : ""}
           />
-          {errors.location && <span className={styles.errorText}>{errors.location.message}</span>}
+          {errors.location && <span className={styles["error-text"]}>{errors.location.message}</span>}
         </div>
 
         <div className={styles.field}>
-          <label className={styles.checkboxLabel}>
+          <label className={styles["checkbox-label"]}>
             <input type="checkbox" {...register("is_active")} className={styles.checkbox} />
             Active
           </label>
         </div>
 
         <div className={styles.actions}>
-          <Button type="submit" disabled={isSubmitting} className={styles.submitButton}>
+          <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
             {isSubmitting ? "Creating..." : "Create Asset"}
           </Button>
 

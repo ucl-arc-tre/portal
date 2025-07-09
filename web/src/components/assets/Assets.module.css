@@ -1,10 +1,10 @@
-.selectedStudyHeader {
+.selected-study-header {
   max-width: 800px;
   margin: 0 auto 2rem auto;
   padding: 0 2rem;
 }
 
-.studyBreadcrumb {
+.study-breadcrumb {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,23 +14,23 @@
   border-left: 4px solid #007bff;
 }
 
-.studyBreadcrumb span {
+.study-breadcrumb span {
   font-size: 0.9rem;
   color: #666;
 }
 
-.studyBreadcrumb strong {
+.study-breadcrumb strong {
   color: #333;
 }
 
 @media (max-width: 768px) {
-  .studyBreadcrumb {
+  .study-breadcrumb {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .selectedStudyHeader {
+  .selected-study-header {
     padding: 0 1rem;
   }
 }

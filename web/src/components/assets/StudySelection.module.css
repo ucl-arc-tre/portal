@@ -1,26 +1,26 @@
-.studySelection {
+.study-selection {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-.studySelection h2 {
+.study-selection h2 {
   color: #333;
   margin-bottom: 0.5rem;
 }
 
-.studySelection p {
+.study-selection p {
   color: #666;
   margin-bottom: 2rem;
 }
 
-.studiesList {
+.studies-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.studyItem {
+.study-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,33 +32,33 @@
   gap: 1rem;
 }
 
-.studyItem:hover {
+.study-item:hover {
   border-color: #007bff;
   background: #f8f9ff;
 }
 
-.studyInfo {
+.study-info {
   flex: 1;
 }
 
-.studyInfo h3 {
+.study-info h3 {
   margin: 0 0 0.5rem 0;
   color: #333;
   font-size: 1.1rem;
 }
 
-.studyInfo p {
+.study-info p {
   margin: 0;
   color: #666;
   font-size: 0.9rem;
 }
 
 @media (max-width: 768px) {
-  .studySelection {
+  .study-selection {
     padding: 1rem;
   }
 
-  .studyItem {
+  .study-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;

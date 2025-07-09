@@ -1,5 +1,5 @@
 .container {
-  max-width: 600px;
+  width: 70%;
   margin: 0 auto;
   padding: 2rem;
   border: 1px solid #e0e0e0;
@@ -52,13 +52,13 @@
   border-color: #dc3545 !important;
 }
 
-.errorText {
+.error-text {
   color: #dc3545;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
-.checkboxLabel {
+.checkbox-label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -78,7 +78,7 @@
   margin-top: 1rem;
 }
 
-.submitButton {
+.submit-button {
   min-width: 140px;
 }
 
