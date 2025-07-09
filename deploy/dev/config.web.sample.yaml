@@ -1,0 +1,8 @@
+debug: true
+port: 8080
+is_testing: false
+is_dev_deploy: false
+admin_usernames:
+  - bob@example.com
+db:
+  dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret

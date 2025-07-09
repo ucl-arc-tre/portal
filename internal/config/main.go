@@ -3,13 +3,18 @@ package config
 import (
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
+	"github.com/rs/zerolog"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
+	webConfigPath = "/etc/portal/config.web.yaml"
+
 	BaseURL        = "/api/v0"
 	TimeFormat     = time.RFC3339
 	MaxUploadBytes = 1e7 // 10 MB
@@ -18,25 +23,37 @@ const (
 	TrainingValidity      = TrainingValidityYears * 365 * 24 * time.Hour
 )
 
+var k = koanf.New(".")
+
+func Init() {
+	if err := k.Load(file.Provider(webConfigPath), yaml.Parser()); err != nil {
+		panic(fmt.Errorf("error loading config: %v", err))
+	}
+	if k.Bool("debug") {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+}
+
 func ServerAddress() string {
+	// loads from env to match with Gin
 	return fmt.Sprintf(":%s", env("PORT"))
 }
 
 func IsDevDeploy() bool {
-	return os.Getenv("IS_DEV_DEPLOY") == "true"
+	return k.Bool("is_dev_deploy")
 }
 
 func IsTesting() bool {
-	return os.Getenv("IS_TESTING") == "true"
+	return k.Bool("is_testing")
 }
 
 func DBDataSourceName() string {
-	return env("DATABASE_DSN")
+	return k.String("db.dsn")
 }
 
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
-	for username := range strings.SplitSeq(os.Getenv("ADMIN_USERNAMES"), ",") {
+	for _, username := range k.Strings("admin_usernames") {
 		if username != "" {
 			usernames = append(usernames, types.Username(username))
 		}
