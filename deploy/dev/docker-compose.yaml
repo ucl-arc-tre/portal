@@ -6,6 +6,7 @@ services:
     restart: always
     environment:
       PORT: "8080"
+      IS_DEV_DEPLOY: true
     volumes:
       - ./config.web.yaml:/etc/portal/config.web.yaml:ro
       - type: bind
