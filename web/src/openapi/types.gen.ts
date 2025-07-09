@@ -107,6 +107,70 @@ export type UserTrainingUpdate = {
     training_date: string;
 };
 
+/**
+ * A data asset representing a set of related data entities
+ */
+export type Asset = {
+    /**
+     * Unique identifier for the asset
+     */
+    id: string;
+    /**
+     * Title of the asset
+     */
+    title: string;
+    /**
+     * Description of the asset
+     */
+    description: string;
+    /**
+     * Classification impact level from 1-5
+     */
+    classification_impact: number;
+    /**
+     * Location of the asset
+     */
+    location: string;
+    /**
+     * Whether the asset is active or inactive
+     */
+    is_active: boolean;
+    /**
+     * Time in RFC3339 format when the asset was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the asset was last updated
+     */
+    updated_at: string;
+};
+
+/**
+ * Data required to create a new asset
+ */
+export type AssetCreate = {
+    /**
+     * Title of the asset
+     */
+    title: string;
+    /**
+     * Description of the asset
+     */
+    description: string;
+    /**
+     * Classification impact level from 1-5
+     */
+    classification_impact: number;
+    /**
+     * Location of the asset
+     */
+    location: string;
+    /**
+     * Whether the asset is active or inactive
+     */
+    is_active: boolean;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -412,6 +476,61 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 };
 
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
+
+export type GetAssetsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/assets';
+};
+
+export type GetAssetsErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetAssetsResponses = {
+    200: Array<Asset>;
+};
+
+export type GetAssetsResponse = GetAssetsResponses[keyof GetAssetsResponses];
+
+export type PostAssetsData = {
+    body: AssetCreate;
+    path?: never;
+    query?: never;
+    url: '/assets';
+};
+
+export type PostAssetsErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostAssetsResponses = {
+    /**
+     * Asset created successfully
+     */
+    201: Asset;
+};
+
+export type PostAssetsResponse = PostAssetsResponses[keyof PostAssetsResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});

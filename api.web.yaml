@@ -214,6 +214,44 @@ paths:
         default:
           description: Unexpected error
 
+  # Asset Management
+  /assets:
+    get:
+      description: Get all assets for the authenticated user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Asset"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a new asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetCreate"
+      responses:
+        "201":
+          description: Asset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   schemas:
     Auth:
@@ -399,3 +437,71 @@ components:
         training_date:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
+
+    Asset:
+      type: object
+      description: A data asset representing a set of related data entities
+      required:
+        - id
+        - title
+        - description
+        - classification_impact
+        - location
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the asset
+        title:
+          type: string
+          description: Title of the asset
+        description:
+          type: string
+          description: Description of the asset
+        classification_impact:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Classification impact level from 1-5
+        location:
+          type: string
+          description: Location of the asset
+        is_active:
+          type: boolean
+          description: Whether the asset is active or inactive
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the asset was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the asset was last updated
+
+    AssetCreate:
+      type: object
+      description: Data required to create a new asset
+      required:
+        - title
+        - description
+        - classification_impact
+        - location
+        - is_active
+      properties:
+        title:
+          type: string
+          description: Title of the asset
+        description:
+          type: string
+          description: Description of the asset
+        classification_impact:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Classification impact level from 1-5
+        location:
+          type: string
+          description: Location of the asset
+        is_active:
+          type: boolean
+          description: Whether the asset is active or inactive

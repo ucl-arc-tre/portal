@@ -45,6 +45,51 @@ type AgreementConfirmation struct {
 // AgreementType defines model for AgreementType.
 type AgreementType string
 
+// Asset A data asset representing a set of related data entities
+type Asset struct {
+	// ClassificationImpact Classification impact level from 1-5
+	ClassificationImpact int `json:"classification_impact"`
+
+	// CreatedAt Time in RFC3339 format when the asset was created
+	CreatedAt string `json:"created_at"`
+
+	// Description Description of the asset
+	Description string `json:"description"`
+
+	// Id Unique identifier for the asset
+	Id string `json:"id"`
+
+	// IsActive Whether the asset is active or inactive
+	IsActive bool `json:"is_active"`
+
+	// Location Location of the asset
+	Location string `json:"location"`
+
+	// Title Title of the asset
+	Title string `json:"title"`
+
+	// UpdatedAt Time in RFC3339 format when the asset was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
+// AssetCreate Data required to create a new asset
+type AssetCreate struct {
+	// ClassificationImpact Classification impact level from 1-5
+	ClassificationImpact int `json:"classification_impact"`
+
+	// Description Description of the asset
+	Description string `json:"description"`
+
+	// IsActive Whether the asset is active or inactive
+	IsActive bool `json:"is_active"`
+
+	// Location Location of the asset
+	Location string `json:"location"`
+
+	// Title Title of the asset
+	Title string `json:"title"`
+}
+
 // Auth defines model for Auth.
 type Auth struct {
 	Roles    []AuthRoles `json:"roles"`
@@ -137,6 +182,9 @@ type UserTrainingUpdate struct {
 	TrainingKind TrainingKind `json:"training_kind"`
 }
 
+// PostAssetsJSONRequestBody defines body for PostAssets for application/json ContentType.
+type PostAssetsJSONRequestBody = AssetCreate
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -154,6 +202,12 @@ type ServerInterface interface {
 
 	// (GET /agreements/{agreementType})
 	GetAgreementsAgreementType(c *gin.Context, agreementType AgreementType)
+
+	// (GET /assets)
+	GetAssets(c *gin.Context)
+
+	// (POST /assets)
+	PostAssets(c *gin.Context)
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
@@ -217,6 +271,32 @@ func (siw *ServerInterfaceWrapper) GetAgreementsAgreementType(c *gin.Context) {
 	}
 
 	siw.Handler.GetAgreementsAgreementType(c, agreementType)
+}
+
+// GetAssets operation middleware
+func (siw *ServerInterfaceWrapper) GetAssets(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAssets(c)
+}
+
+// PostAssets operation middleware
+func (siw *ServerInterfaceWrapper) PostAssets(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostAssets(c)
 }
 
 // GetAuth operation middleware
@@ -388,6 +468,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/agreements/:agreementType", wrapper.GetAgreementsAgreementType)
+	router.GET(options.BaseURL+"/assets", wrapper.GetAssets)
+	router.POST(options.BaseURL+"/assets", wrapper.PostAssets)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)

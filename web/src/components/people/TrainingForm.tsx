@@ -5,7 +5,7 @@ import { postUsersByUserIdTraining, TrainingKind, TrainingRecord } from "@/opena
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import AdminDialog from "./AdminDialog";
-import { InfoIcon, TrainingKindOptions } from "../assets/exports";
+import { InfoIcon, TrainingKindOptions } from "../shared/exports";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,

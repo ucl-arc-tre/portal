@@ -1,0 +1,20 @@
+.pageDescription {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+}
+
+.pageDescription p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .pageDescription {
+    margin: 1rem 0;
+    padding: 1rem;
+  }
+}
