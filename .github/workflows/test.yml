@@ -58,7 +58,7 @@ jobs:
 
       - name: Create config
         run: | # pragma: allowlist secret
-          cat <<EOF > deploy/dev/config.web.yaml
+          cat <<EOF > e2e/config.web.yaml
           debug: true
           is_testing: true
           is_dev_deploy: false
