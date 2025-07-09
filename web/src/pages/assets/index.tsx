@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+
 import Assets from "@/components/assets/Assets";
 import MetaHead from "@/components/meta/Head";
 import LoginFallback from "@/components/ui/LoginFallback";
-import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import Title from "@/components/ui/Title";
-import styles from "./index.module.css";
 
-type Study = {
-  id: string;
-  title: string;
-  description: string;
-};
+import styles from "./index.module.css";
 
 export default function AssetsPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -100,11 +96,7 @@ export default function AssetsPage() {
         </>
       )}
 
-      {isApprovedResearcher && !studiesLoading && studies.length > 0 && (
-        <>
-          <Assets studies={studies} />
-        </>
-      )}
+      {isApprovedResearcher && !studiesLoading && studies.length > 0 && <Assets studies={studies} />}
     </>
   );
 }
