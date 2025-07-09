@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/knadh/koanf/parsers/yaml"
@@ -54,6 +55,9 @@ func DBDataSourceName() string {
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
 	for _, username := range k.Strings("admin_usernames") {
+		usernames = append(usernames, types.Username(username))
+	}
+	for username := range strings.SplitSeq(os.Getenv("ADMIN_USERNAMES"), ",") { // tmp
 		if username != "" {
 			usernames = append(usernames, types.Username(username))
 		}

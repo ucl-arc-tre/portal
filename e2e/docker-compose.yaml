@@ -3,6 +3,8 @@ services:
     build:
       context: ..
       target: web-api-release
+    environment:
+      PORT: "8080"
     volumes:
       - ./config.web.yaml:/etc/portal/config.web.yaml:ro
     depends_on:

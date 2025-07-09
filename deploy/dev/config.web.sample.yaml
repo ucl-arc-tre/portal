@@ -1,7 +1,7 @@
 debug: true
 port: 8080
-is_testing: false
-is_dev_deploy: true
+is_testing: true
+is_dev_deploy: false
 admin_usernames:
   - bob@example.com
 db:
