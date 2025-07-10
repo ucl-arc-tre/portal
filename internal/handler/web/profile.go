@@ -19,7 +19,7 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.ProfileResponse{
+	ctx.JSON(http.StatusOK, openapi.Profile{
 		Username:   string(user.Username),
 		ChosenName: string(attributes.ChosenName),
 	})
@@ -68,14 +68,14 @@ func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
 		setServerError(ctx, err, "Failed to get agreements")
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.ProfileAgreements{
+	ctx.JSON(http.StatusOK, openapi.UserAgreements{
 		ConfirmedAgreements: agreements,
 	})
 }
 
 func (h *Handler) GetProfileTraining(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	status, err := h.users.GetTrainingStatus(user)
+	status, err := h.users.GetTrainingRecord(user)
 	if err != nil {
 		setServerError(ctx, err, "Failed to get training status")
 		return

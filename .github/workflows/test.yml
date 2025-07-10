@@ -56,6 +56,16 @@ jobs:
           prefer_email_to_user = false
           EOF
 
+      - name: Create config
+        run: | # pragma: allowlist secret
+          cat <<EOF > e2e/config.web.yaml
+          debug: true
+          admin_usernames:
+            - portal-e2e-admin@arctretest.onmicrosoft.com
+          db:
+            dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC
+          EOF
+
       - name: Create cypress env
         run: |
           cat <<EOF > web/cypress.env.json

@@ -96,7 +96,7 @@ func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Tim
 }
 
 // returns all training records for a user
-func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingStatus, error) {
+func (s *Service) GetTrainingRecord(user types.User) (openapi.ProfileTraining, error) {
 	var trainingRecords []openapi.TrainingRecord
 
 	// Get NHSD training record with single DB query
@@ -115,7 +115,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 		trainingRecords = append(trainingRecords, nhsdRecord)
 	} else if result.Error != nil {
 		// Database error
-		return openapi.ProfileTrainingStatus{}, result.Error
+		return openapi.ProfileTraining{}, result.Error
 	} else {
 		// Record found - check if it's still valid
 		completedAt := record.CompletedAt.Format(config.TimeFormat)
@@ -130,7 +130,7 @@ func (s *Service) GetTrainingStatus(user types.User) (openapi.ProfileTrainingSta
 
 	// TODO: Add other training types here in the future
 
-	return openapi.ProfileTrainingStatus{
+	return openapi.ProfileTraining{
 		TrainingRecords: trainingRecords,
 	}, nil
 }

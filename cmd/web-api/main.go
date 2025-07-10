@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	config.Init()
 	graceful.InitDB()
 	rbac.Init()
 	agreements.Init()

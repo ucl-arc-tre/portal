@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { postPeopleApprovedResearchersImportCsv } from "@/openapi";
+import { postUsersApprovedResearchersImportCsv } from "@/openapi";
 import { useRef, useState } from "react";
 import styles from "./ApprovedResearcherImport.module.css";
 
@@ -15,7 +15,7 @@ export default function ApprovedResearcherImport() {
     setButtonDisabled(true);
 
     try {
-      const response = await postPeopleApprovedResearchersImportCsv({
+      const response = await postUsersApprovedResearchersImportCsv({
         body: files[0],
       });
       if (response.error) {

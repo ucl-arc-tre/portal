@@ -5,10 +5,9 @@
   --green--hover: var(--green-50);
   --green--background: color-mix(in srgb, var(--nav-base) 90%, var(--green) 10%);
 
+  grid-area: nav;
   width: 180px;
-  height: 100%;
   padding: 1rem;
-  position: absolute;
   background-color: var(--nav-base);
 
   hr {

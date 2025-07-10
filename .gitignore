@@ -7,3 +7,5 @@ dist
 !*.sample.cfg
 *.bkp
 *.dtmp
+config.*.yaml
+!config.*.sample.yaml
