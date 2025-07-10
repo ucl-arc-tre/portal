@@ -8,3 +8,6 @@ entra:
   tenant_id: <CHANGE_ME>
   client_id: <CHANGE_ME>
   client_secret: <CHANGE_ME>
+tre:
+  users:
+    username: password # pragma: allowlist secret

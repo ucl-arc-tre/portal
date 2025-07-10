@@ -56,6 +56,11 @@ func DBDataSourceName() string {
 	return k.String("db.dsn")
 }
 
+// TREUserAccounts are the username:password pairs used to access the TRE API
+func TREUserAccounts() map[string]string {
+	return k.StringMap("tre.users")
+}
+
 func EntraCredentials() EntraCredentialBundle {
 	return EntraCredentialBundle{
 		TenantID:     k.String("entra.tenant_id"),

@@ -31,5 +31,6 @@ func addWeb(router gin.IRouter) {
 }
 
 func addTRE(router gin.IRouter) {
+	router.Use(gin.BasicAuth(config.TREUserAccounts()))
 	apitre.RegisterHandlers(router, tre.New())
 }

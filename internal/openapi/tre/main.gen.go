@@ -11,6 +11,10 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+const (
+	BasicAuthScopes = "basicAuth.Scopes"
+)
+
 // UserStatus defines model for UserStatus.
 type UserStatus struct {
 	// IsApprovedResearcher Is the user an approved researcher?
@@ -46,6 +50,8 @@ type MiddlewareFunc func(c *gin.Context)
 func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 
 	var err error
+
+	c.Set(BasicAuthScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUserStatusParams

@@ -45,3 +45,6 @@ components:
         nhsd_training_expires_at:
           type: string
           description: Instanc at which the user's training expires in RFC3339 format
+
+security:
+  - basicAuth: []
