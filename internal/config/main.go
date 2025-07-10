@@ -15,9 +15,11 @@ import (
 )
 
 const (
-	webConfigPath = "/etc/portal/config.web.yaml"
+	BaseWebURL = "/web/api/v0"
+	BaseTREURL = "/tre/api/v0"
 
-	BaseURL        = "/api/v0"
+	configPath = "/etc/portal/config.yaml"
+
 	TimeFormat     = time.RFC3339
 	MaxUploadBytes = 1e7 // 10 MB
 
@@ -28,7 +30,7 @@ const (
 var k = koanf.New(".")
 
 func Init() {
-	if err := k.Load(file.Provider(webConfigPath), yaml.Parser()); err != nil {
+	if err := k.Load(file.Provider(configPath), yaml.Parser()); err != nil {
 		log.Err(err).Msg("error loading config")
 	}
 	if k.Bool("debug") {
