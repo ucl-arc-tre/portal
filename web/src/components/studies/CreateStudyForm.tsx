@@ -17,6 +17,9 @@ const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Te
 const HelperText = dynamic(() => import("uikit-react-public").then((mod) => mod.Field.HelperText), {
   ssr: false,
 });
+// const Select = dynamic(() => import("uikit-react-public").then((mod) => mod.Select), {
+//   ssr: false,
+// });
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -30,8 +33,8 @@ type CreateStudyProps = {
 };
 
 interface CreateStudyValues {
-  shortStudyName: string;
-  longStudyName: string;
+  studyName: string;
+  studyDescription: string;
   owner: string;
   admin: string;
   controller: string;
@@ -120,11 +123,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>
-          <legend>Study Name</legend>
-          <Label htmlFor="shortStudyName">
-            Short Study Name*:
+          <legend>Study Details</legend>
+          <Label htmlFor="studyName">
+            Study Name*:
             <Controller
-              name="shortStudyName"
+              name="studyName"
               control={control}
               rules={{
                 required: "This field is required",
@@ -137,19 +140,19 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   message: "Do not include any special characters",
                 },
               }}
-              render={({ field }) => <Input {...field} type="text" id="shortStudyName" />}
+              render={({ field }) => <Input {...field} type="text" id="studyName" />}
             />
             <HelperText>Maximum 55 characters, do not include any special characters</HelperText>
-            {errors.shortStudyName && (
+            {errors.studyName && (
               <Alert type="error">
-                <AlertMessage>{errors.shortStudyName.message}</AlertMessage>
+                <AlertMessage>{errors.studyName.message}</AlertMessage>
               </Alert>
             )}
           </Label>
 
-          <Label htmlFor="longStudyName">
+          <Label htmlFor="studyDescription">
             Long Study Name:
-            <Textarea id="longStudyName" {...register("longStudyName", { maxLength: 255 })} />
+            <Textarea id="studyDescription" {...register("studyDescription", { maxLength: 255 })} />
           </Label>
         </fieldset>
 
@@ -196,12 +199,18 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           <Label htmlFor="controller">
             Data Controller (organisation)*:
-            <Controller
+            {/* <Controller
               name="controller"
               control={control}
               rules={{ required: "This field is required" }}
-              render={({ field }) => <Input {...field} type="text" id="controller" />}
-            />
+              render={({ field }) => (
+<Select {...field} id="controller" value="string" onValueChange={(e) => field.onChange(e.target.value)} options={[
+  { value: "UCL", label: "UCL" },
+  { value: "Other", label: "Other" },
+]}>
+</Select>
+              )}
+            /> */}
             {errors.controller && (
               <Alert type="error">
                 <AlertMessage>{errors.controller.message}</AlertMessage>
