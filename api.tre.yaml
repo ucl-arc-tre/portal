@@ -11,6 +11,7 @@ paths:
     parameters:
       - in: query
         name: username
+        required: true
         schema:
           type: string
         description: Username of the user to get the status of. e.g. ccxyz@ucl.ac.uk

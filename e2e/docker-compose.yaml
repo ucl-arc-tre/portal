@@ -7,7 +7,7 @@ services:
       PORT: "8080"
       IS_TESTING: true
     volumes:
-      - ./config.web.yaml:/etc/portal/config.web.yaml:ro
+      - ./config.yaml:/etc/portal/config.yaml:ro
     depends_on:
       - postgres
 

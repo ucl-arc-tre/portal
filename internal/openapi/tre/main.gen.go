@@ -23,7 +23,7 @@ type UserStatus struct {
 // GetUserStatusParams defines parameters for GetUserStatus.
 type GetUserStatusParams struct {
 	// Username Username of the user to get the status of. e.g. ccxyz@ucl.ac.uk
-	Username *string `form:"username,omitempty" json:"username,omitempty"`
+	Username string `form:"username" json:"username"`
 }
 
 // ServerInterface represents all server handlers.
@@ -50,9 +50,16 @@ func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUserStatusParams
 
-	// ------------- Optional query parameter "username" -------------
+	// ------------- Required query parameter "username" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "username", c.Request.URL.Query(), &params.Username)
+	if paramValue := c.Query("username"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument username is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "username", c.Request.URL.Query(), &params.Username)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter username: %w", err), http.StatusBadRequest)
 		return

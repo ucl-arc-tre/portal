@@ -20,8 +20,8 @@ func main() {
 	rbac.Init()
 	agreements.Init()
 	router := router.New()
-	addWeb(router.Group("/web/api/v0/"))
-	addTRE(router.Group("/tre/api/v0/"))
+	addWeb(router.Group(config.BaseWebURL))
+	addTRE(router.Group(config.BaseTREURL))
 	graceful.Serve(router.Handler())
 }
 
