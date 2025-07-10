@@ -32,7 +32,7 @@ func newEvaluatedCtxWithUsernameMethodPath(id uuid.UUID, method string, path str
 }
 
 func TestAuthzAllowedRead(t *testing.T) {
-	path := "/api/v0/alice-read"
+	path := "/web/api/v0/alice-read"
 	for _, method := range []string{"GET", "HEAD"} {
 		ctx := newEvaluatedCtxWithUsernameMethodPath(aliceID, method, path)
 		assert.Equal(t, 200, ctx.Writer.Status())
@@ -40,7 +40,7 @@ func TestAuthzAllowedRead(t *testing.T) {
 }
 
 func TestAuthzAllowedWrite(t *testing.T) {
-	path := "/api/v0/bob-write"
+	path := "/web/api/v0/bob-write"
 	for _, method := range []string{"PUT", "POST", "DELETE"} {
 		ctx := newEvaluatedCtxWithUsernameMethodPath(bobID, method, path)
 		assert.Equal(t, 200, ctx.Writer.Status())
@@ -48,7 +48,7 @@ func TestAuthzAllowedWrite(t *testing.T) {
 }
 
 func TestAuthzDisallowedWrite(t *testing.T) {
-	path := "/api/v0/bob-write"
+	path := "/web/api/v0/bob-write"
 	for _, method := range []string{"PUT", "POST", "DELETE"} {
 		ctx := newEvaluatedCtxWithUsernameMethodPath(aliceID, method, path)
 		assert.Equal(t, 403, ctx.Writer.Status())
@@ -57,7 +57,7 @@ func TestAuthzDisallowedWrite(t *testing.T) {
 }
 
 func TestAuthzDisallowedRead(t *testing.T) {
-	path := "/api/v0/alice-read"
+	path := "/web/api/v0/alice-read"
 	for _, method := range []string{"GET", "HEAD"} {
 		ctx := newEvaluatedCtxWithUsernameMethodPath(bobID, method, path)
 		assert.Equal(t, 403, ctx.Writer.Status())
@@ -66,5 +66,5 @@ func TestAuthzDisallowedRead(t *testing.T) {
 }
 
 func TestTrimBaseURL(t *testing.T) {
-	assert.Equal(t, "/test", trimBaseURL("/api/v0/test"))
+	assert.Equal(t, "/test", trimBaseWebURL("/web/api/v0/test"))
 }

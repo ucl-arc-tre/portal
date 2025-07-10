@@ -9,11 +9,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	"github.com/ucl-arc-tre/portal/internal/middleware"
 	"github.com/ucl-arc-tre/portal/internal/router"
 )
 
 func main() {
 	router := router.New()
+	router.Use(middleware.NewSecure())
 
 	router.Static("/_next", "./_next")
 	router.StaticFile("/favicon.ico", "./favicon.ico")

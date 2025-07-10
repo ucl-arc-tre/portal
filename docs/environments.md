@@ -18,7 +18,7 @@ This project uses a [common Go project layout](https://github.com/golang-standar
 ```
 .
 ├── cmd/                  # Entry points for Go binaries
-│   ├── web-api/          # Main Go backend API server
+│   ├── api/              # Main Go backend API server
 │   └── web-frontend/     # Go server to serve compiled frontend in release
 ├── internal/             # Shared application logic (router, middleware, etc.)
 ├── web/                  # React frontend

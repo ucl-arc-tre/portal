@@ -13,7 +13,7 @@ func New() *gin.Engine {
 	log.Info().Msg("Creating router")
 	router := gin.Default()
 	router.Group("/ping").GET("", ping)
-	router.Use(middleware.NewSecure(), middleware.LimitBodySize)
+	router.Use(middleware.LimitBodySize)
 	return router
 }
 

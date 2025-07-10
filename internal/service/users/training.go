@@ -135,6 +135,22 @@ func (s *Service) GetTrainingRecord(user types.User) (openapi.ProfileTraining, e
 	}, nil
 }
 
+// Get the time at which a users NHSD training expires. Optional
+func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
+	record := types.UserTrainingRecord{
+		UserID: user.ID,
+		Kind:   types.TrainingKindNHSD,
+	}
+	result := s.db.Order("completed_at desc").Where(&record).First(&record)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	} else if result.Error != nil {
+		return nil, result.Error
+	}
+	expiresAt := record.CompletedAt.Add(config.TrainingValidity)
+	return &expiresAt, nil
+}
+
 func NHSDTrainingIsValid(completedAt time.Time) bool {
 	return time.Since(completedAt) < config.TrainingValidity
 }

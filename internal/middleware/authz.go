@@ -32,7 +32,7 @@ func (a *Authorizer) eval(ctx *gin.Context) {
 
 func (a *Authorizer) isAuthorized(ctx *gin.Context) (bool, error) {
 	userId := GetUser(ctx).ID.String()
-	resource := trimBaseURL(ctx.Request.URL.Path)
+	resource := trimBaseWebURL(ctx.Request.URL.Path)
 	method := rbac.WriteAction
 	if ctx.Request.Method == "GET" || ctx.Request.Method == "HEAD" {
 		method = rbac.ReadAction
@@ -42,6 +42,6 @@ func (a *Authorizer) isAuthorized(ctx *gin.Context) (bool, error) {
 	return a.enforcer.Enforce(userId, resource, string(method))
 }
 
-func trimBaseURL(url string) string {
-	return strings.TrimPrefix(url, config.BaseURL)
+func trimBaseWebURL(url string) string {
+	return strings.TrimPrefix(url, config.BaseWebURL)
 }

@@ -12,18 +12,18 @@ COPY internal ./internal
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
   --mount=type=cache,target=/go/pkg/mod \
-  CGO_ENABLED=0 go build -v -o web-api cmd/web-api/main.go && \
+  CGO_ENABLED=0 go build -v -o api cmd/api/main.go && \
   CGO_ENABLED=0 go build -v -o web-frontend cmd/web-frontend/main.go
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
-FROM golang:1.24.4-alpine AS web-api-dev
+FROM golang:1.24.4-alpine AS api-dev
 
 RUN go install github.com/air-verse/air@latest
 
 WORKDIR /repo
 ENV GIN_MODE="debug"
-CMD ["air", "--build.cmd", "go build -o bin/web-api cmd/web-api/main.go", "--build.bin", "./bin/web-api", "--build.exclude_dir", "web,bin,deploy,tmp"]
+CMD ["air", "--build.cmd", "go build -o bin/api cmd/api/main.go", "--build.bin", "./bin/api", "--build.exclude_dir", "web,bin,deploy,tmp"]
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
@@ -50,16 +50,16 @@ RUN --mount=type=cache,target=/app/node_modules \
   npm run build
 
 # --------------------------------------------------------
-FROM scratch AS web-api-release
+FROM scratch AS api-release
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder --chmod=777 /app/web-api web-api
+COPY --from=builder --chmod=777 /app/api api
 
 USER user
 ENV PORT=8080
 ENV GIN_MODE=release
-ENTRYPOINT ["./web-api"]
+ENTRYPOINT ["./api"]
 
 # --------------------------------------------------------
 FROM scratch AS web-frontend-release

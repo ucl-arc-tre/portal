@@ -1,4 +1,4 @@
-package handler
+package web
 
 import (
 	"github.com/rs/zerolog/log"
@@ -12,7 +12,7 @@ type Handler struct {
 }
 
 func New() *Handler {
-	log.Info().Msg("Creating handler")
+	log.Info().Msg("Creating web handler")
 	return &Handler{
 		agreements: agreements.New(),
 		users:      users.New(),
