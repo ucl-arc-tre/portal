@@ -307,7 +307,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           <Label htmlFor="dataProtection" className={styles["checkbox-label"]}>
             <input type="checkbox" id="dataProtection" {...register("dataProtection")} />
-            The research already registered with UCL Data Protection
+            The research is already registered with the UCL Data Protection Office
           </Label>
           {showDataProtectionNumber && (
             <Label htmlFor="dataProtectionNumber">
