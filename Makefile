@@ -42,19 +42,20 @@ test:  ## Run all tests
 	$(MAKE) test-e2e
 
 test-unit:  ## Run unit tests
-	go test ./...
+	go test ./internal/...
 
-test-e2e-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev server
+test-e2e-cypress-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev server
 	if ! docker compose -p $(DEV_PROJECT_NAME) ps --services --filter "status=running" | grep nginx; then \
 		echo "dev environment not running"; exit 1; \
 	fi
 	cd web && CYPRESS_baseUrl=http://localhost:8000 npx cypress run --headless --browser chrome
 
-test-e2e-release: e2e-dependencies ## Run cypress against the release build
+test-e2e-release: e2e-dependencies ## Run end-to-end tests against the release build
 	cd e2e && \
 	docker compose -p $(E2E_PROJECT_NAME) build && \
 	docker compose -p $(E2E_PROJECT_NAME) up nginx -d && \
 	docker compose -p $(E2E_PROJECT_NAME) run --rm cypress && \
+	docker compose -p $(E2E_PROJECT_NAME) run --rm test-tre-api && \
 	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans
 
 e2e-dependencies:

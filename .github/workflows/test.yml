@@ -68,6 +68,9 @@ jobs:
             tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
             client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}
             client_secret: ${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}
+          tre:
+            users:
+              username: password
           EOF
 
       - name: Create cypress env

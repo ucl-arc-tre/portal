@@ -60,3 +60,17 @@ services:
       npm ci &&
       npx cypress run --config-file cypress.config.ts --browser electron
       "
+
+  tre-api-test:
+    build:
+      context: ..
+      target: builder
+    entrypoint:
+      - "go"
+      - "test"
+      - "./e2e/..."
+    working_dir: /repo
+    volumes:
+      - ./..:/repo
+    depends_on:
+      - api

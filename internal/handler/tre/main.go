@@ -17,7 +17,7 @@ type Handler struct {
 }
 
 func New() *Handler {
-	log.Info().Msg("Creating handler")
+	log.Info().Msg("Creating TRE handler")
 	return &Handler{users: users.New()}
 }
 
@@ -27,16 +27,19 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 		log.Err(err).Any("params", params).Msg("Failed to get user")
 		ctx.Status(http.StatusInternalServerError)
 		return
+	} else if user == nil {
+		ctx.Status(http.StatusNotFound)
+		return
 	}
 	userStatus := openapi.UserStatus{}
-	if isApprovedResearcher, err := rbac.HasRole(user, rbac.ApprovedResearcher); err != nil {
+	if isApprovedResearcher, err := rbac.HasRole(*user, rbac.ApprovedResearcher); err != nil {
 		log.Err(err).Any("username", user.Username).Msg("Failed to get role for user")
 		ctx.Status(http.StatusInternalServerError)
 		return
 	} else {
 		userStatus.IsApprovedResearcher = isApprovedResearcher
 	}
-	if expiresAt, err := h.users.NHSDTrainingExpiresAt(user); err != nil {
+	if expiresAt, err := h.users.NHSDTrainingExpiresAt(*user); err != nil {
 		log.Err(err).Any("username", user.Username).Msg("Failed to get training expiry for user")
 		ctx.Status(http.StatusInternalServerError)
 		return
