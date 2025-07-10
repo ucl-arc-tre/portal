@@ -414,5 +414,5 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
 
 export type ClientOptions = {
-    baseUrl: `${string}://${string}/api/v0` | (string & {});
+    baseUrl: `${string}://${string}/web/api/v0` | (string & {});
 };

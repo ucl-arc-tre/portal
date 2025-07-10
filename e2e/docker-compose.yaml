@@ -1,8 +1,8 @@
 services:
-  web-api:
+  api:
     build:
       context: ..
-      target: web-api-release
+      target: api-release
     environment:
       PORT: "8080"
       IS_TESTING: true
@@ -17,7 +17,7 @@ services:
     volumes:
       - "./oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
     depends_on:
-      - web-api
+      - api
 
   web-frontend:
     build:
@@ -35,7 +35,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./tls:/etc/nginx/tls:ro
     depends_on:
-      - web-api
+      - api
       - web-frontend
       - oauth2-proxy
 

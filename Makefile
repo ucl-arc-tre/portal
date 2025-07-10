@@ -34,6 +34,7 @@ dev-psql: ## Get an interactive psql shell in dev
 
 codegen:  ## Run the code generation
 	oapi-codegen -package openapi -generate "gin,types" api.web.yaml > "internal/openapi/web/main.gen.go"
+	oapi-codegen -package openapi -generate "gin,types" api.tre.yaml > "internal/openapi/tre/main.gen.go"
 	cd web && npm run openapi-ts
 
 test:  ## Run all tests

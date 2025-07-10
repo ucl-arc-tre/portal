@@ -4,7 +4,7 @@ info:
   title: portal-tre
   description: UCL ARC portal TRE API
 servers:
-  - url: /api/v0
+  - url: /tre/api/v0
 
 paths:
   /user-status:
@@ -14,11 +14,6 @@ paths:
         schema:
           type: string
         description: Username of the user to get the status of. e.g. ccxyz@ucl.ac.uk
-      - in: query
-        name: email_alias
-        schema:
-          type: string
-        description: Email alias of the user to get the status of. e.g. alice.smith@ucl.ac.uk
     get:
       description: Get the status of a user
       responses:

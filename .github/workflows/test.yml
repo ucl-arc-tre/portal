@@ -46,7 +46,7 @@ jobs:
           email_domains=["*"]
           cookie_secure="false"
           session_cookie_minimal="true"
-          upstreams="http://web-api:8080/"
+          upstreams="http://api:8080/"
           api_routes="/api"
 
           pass_user_headers = true

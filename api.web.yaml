@@ -4,7 +4,7 @@ info:
   title: portal
   description: UCL ARC portal web API
 servers:
-  - url: /api/v0
+  - url: /web/api/v0
 
 paths:
   /auth:
