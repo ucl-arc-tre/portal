@@ -59,7 +59,7 @@ describe("Approved researcher can create studies", () => {
     // go back to start of form and fill in the fields
     cy.get("[data-cy='back']").click();
     cy.get("[data-cy='back']").click();
-    cy.get("input[name='shortStudyName']").type("Test Study");
+    cy.get("input[name='studyNameName']").type("Test Study");
     cy.get("input[name='controller']").type("Test Controller");
 
     // go to the end and submit
