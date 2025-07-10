@@ -10,13 +10,6 @@
   .coloured {
     color: var(--green-200);
   }
-
-  .info {
-    height: 15px;
-    width: 15px;
-    color: var(--text--secondary);
-    vertical-align: top;
-  }
 }
 
 .glossary-button {

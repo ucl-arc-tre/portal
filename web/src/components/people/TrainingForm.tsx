@@ -5,7 +5,8 @@ import { postPeopleById, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Dialog from "../ui/Dialog";
-import { InfoIcon, TrainingKindOptions } from "../assets/exports";
+import { TrainingKindOptions } from "../assets/exports";
+import InfoTooltip from "../ui/InfoTooltip";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -96,10 +97,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         <div className={styles.date}>
           <label htmlFor="display_date">
             Date valid from{" "}
-            <InfoIcon
-              title="The date the training was completed, this can be found on the certificate."
-              className={styles.info}
-            />
+            <InfoTooltip text="The date the training was completed, this can be found on the certificate." />
           </label>
           <input
             type="date"

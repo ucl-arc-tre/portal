@@ -23,13 +23,6 @@
       }
     }
 
-    .info {
-      height: 15px;
-      width: 15px;
-      color: var(--text--secondary);
-      vertical-align: top;
-    }
-
     select {
       font-size: 1.4rem;
       margin-bottom: 1rem;
