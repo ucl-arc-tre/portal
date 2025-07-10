@@ -4,10 +4,12 @@
 
   --text--secondary: #595959;
 
-  --green-300: #165823;
-  --green-200: #237b35;
+  --green-300: #10431a;
+  --green-200: #1b6229;
   --green-100: #328543;
   --green-50: #64bb75;
+
+  --form-link: #4023a7;
 }
 
 html,
