@@ -12,13 +12,11 @@ const Footer = dynamic(() => import("uikit-react-public").then((mod) => mod.Foot
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <Header title="UCL ARC Services Portal" className={styles.ucl_header} />
+    <div className={styles.layout}>
+      <Header title="UCL ARC Services Portal" className={styles["ucl-header"]} />
       <Nav />
-      <div className={styles.layout}>
-        <main className={styles.content}>{children}</main>
-      </div>
-      <Footer />
-    </>
+      <main className={styles.content}>{children}</main>
+      <Footer className={styles.footer} />
+    </div>
   );
 }

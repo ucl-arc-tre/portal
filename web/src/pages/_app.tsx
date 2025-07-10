@@ -8,10 +8,12 @@ import dynamic from "next/dynamic";
 const ThemeContextProvider = dynamic(() => import("uikit-react-public").then((mod) => mod.ThemeContextProvider), {
   ssr: false,
 });
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
       <MetaHead title="ARC Services Portal | UCL" description="ARC Services Portal" />
+
       <ThemeContextProvider>
         <Layout>
           <Component {...pageProps} />
