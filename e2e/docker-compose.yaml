@@ -6,8 +6,8 @@ services:
     environment:
       PORT: "8080"
       IS_TESTING: true
-      ADMIN_USERNAMES: "portal-e2e-admin@arctretest.onmicrosoft.com,portal-ahl-admin@arctretest.onmicrosoft.com,portal-jh-admin@arctretest.onmicrosoft.com"
-      DATABASE_DSN: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
+    volumes:
+      - ./config.web.yaml:/etc/portal/config.web.yaml:ro
     depends_on:
       - postgres
 
