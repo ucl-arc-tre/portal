@@ -110,6 +110,20 @@ export default function AssetForm(props: AssetFormProps) {
 
         <div className={styles.field}>
           <label htmlFor="classification_impact">Classification Impact *</label>
+          <div className={styles["info-text"]}>
+            <p>
+              You should be aware of{" "}
+              <a
+                href="https://liveuclac.sharepoint.com/sites/ISD.InformationSecurityGroup/Team%20Documents/Policy/Information-Management-Policy_V1.2.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                UCL&apos;s policy on classifying information assets
+              </a>{" "}
+              before determining a classification.
+            </p>
+          </div>
+
           <select
             id="classification_impact"
             {...register("classification_impact", {

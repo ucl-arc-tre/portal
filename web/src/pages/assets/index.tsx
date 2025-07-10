@@ -67,8 +67,16 @@ export default function AssetsPage() {
       <div className={styles["page-description"]}>
         <p>
           Use this page to create data assets you would like to associate with your study. Assets can be any kind of
-          data entity you want to associate with your study. Assets can be things like consent forms, physical study
-          materials, or anything else associated with your study.
+          data entity you want to associate with your study (e.g. consent forms, physical study materials etc.). The
+          National Archives also have{" "}
+          <a
+            href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            a more thorough guide
+          </a>{" "}
+          on what assets are and how to use them.
         </p>
       </div>
 
