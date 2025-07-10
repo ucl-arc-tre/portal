@@ -10,13 +10,12 @@ export default function Studies() {
   if (!isAuthed) return <LoginFallback />;
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isAdmin = userData?.roles.includes("admin");
 
   const username = userData!.username;
 
   return (
     <>
-      {!isAdmin && !isApprovedResearcher && (
+      {!isApprovedResearcher && (
         <>
           <h2>No Studies</h2>
           <p>
