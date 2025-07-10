@@ -17,9 +17,6 @@ const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Te
 const HelperText = dynamic(() => import("uikit-react-public").then((mod) => mod.Field.HelperText), {
   ssr: false,
 });
-// const Select = dynamic(() => import("uikit-react-public").then((mod) => mod.Select), {
-//   ssr: false,
-// });
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -38,8 +35,12 @@ type CreateStudyValues = {
   owner: string;
   admin: string;
   controller: string;
+  controllerOther: string;
   cagRef: number;
-  dataProtectionNumber: number;
+  dataProtectionPrefix: string;
+  dataProtectionDate: Date;
+  dataProtectionId: number;
+  dataProtectionNumber: string; // prefix/date/id
   nhsEnglandRef: number;
   irasId: string; // might be number, unclear
   // checkboxes
@@ -60,6 +61,8 @@ type CreateStudyValues = {
   dspt: boolean;
 };
 
+const UclDpoId = "Z6364106";
+
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   const { username, setCreateStudyFormOpen } = CreateStudyProps;
   const {
@@ -72,6 +75,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     criteriaMode: "all",
     defaultValues: {
       owner: username,
+      dataProtectionPrefix: UclDpoId,
     },
   });
   const [currentStep, setCurrentStep] = useState(1);
@@ -99,9 +103,19 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     name: "nhsEngland",
     control,
   });
+  const controllerValue = useWatch({
+    name: "controller",
+    control,
+  });
 
   const onSubmit: SubmitHandler<CreateStudyValues> = (data) => {
     console.log(data);
+    // set the dataProtectionNumber
+    const updatedData = {
+      ...data,
+      dataProtectionNumber: `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`,
+    };
+    console.log(updatedData);
     //todo: do the things
   };
   const getFieldsetClass = (step: number) =>
@@ -151,7 +165,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </Label>
 
           <Label htmlFor="studyDescription">
-            Long Study Name:
+            Study Description:
             <Textarea id="studyDescription" {...register("studyDescription", { maxLength: 255 })} />
           </Label>
         </fieldset>
@@ -199,21 +213,27 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           <Label htmlFor="controller">
             Data Controller (organisation)*:
-            {/* <Controller
+            <Controller
               name="controller"
               control={control}
               rules={{ required: "This field is required" }}
               render={({ field }) => (
-<Select {...field} id="controller" value="string" onValueChange={(e) => field.onChange(e.target.value)} options={[
-  { value: "UCL", label: "UCL" },
-  { value: "Other", label: "Other" },
-]}>
-</Select>
+                <select {...field} id={styles.controller}>
+                  <option value="UCL">UCL</option>
+                  <option value="Other">Other</option>
+                </select>
               )}
-            /> */}
-            {errors.controller && (
+            />
+            {controllerValue === "Other" && (
+              <Input
+                type="text"
+                placeholder="Please specify"
+                {...register("controllerOther", { required: "This field is required" })}
+              />
+            )}
+            {(errors.controller || errors.controllerOther) && (
               <Alert type="error">
-                <AlertMessage>{errors.controller.message}</AlertMessage>
+                <AlertMessage>{errors.controller?.message || errors.controllerOther?.message}</AlertMessage>
               </Alert>
             )}
           </Label>
@@ -336,7 +356,38 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           {showDataProtectionNumber && (
             <Label htmlFor="dataProtectionNumber">
               Data Protection Registration Number:
-              <Input type="number" id="dataProtectionNumber" {...register("dataProtectionNumber")} />
+              <div className={styles["data-protection-wrapper"]}>
+                <Input
+                  type="text"
+                  id="dataProtectionPrefix"
+                  {...register("dataProtectionPrefix")}
+                  readOnly={true}
+                  value={UclDpoId}
+                  inputClassName={styles.readonly}
+                />
+                <Input type="date" id="dataProtectionDate" {...register("dataProtectionDate")} />
+                <Input
+                  type="number"
+                  id="dataProtectionId"
+                  {...register("dataProtectionId", {
+                    min: {
+                      value: 0,
+                      message: "Cannot be a negative number",
+                    },
+                    max: {
+                      value: 999,
+                      message: "Cannot be more than 3 digits",
+                    },
+                  })}
+                />
+              </div>
+              {(errors.dataProtectionDate || errors.dataProtectionId) && (
+                <Alert type="error">
+                  <AlertMessage>
+                    {errors.dataProtectionNumber?.message || errors.dataProtectionId?.message}
+                  </AlertMessage>
+                </Alert>
+              )}
             </Label>
           )}
           <Label htmlFor="thirdParty" className={styles["checkbox-label"]}>

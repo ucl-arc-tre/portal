@@ -51,7 +51,8 @@
       }
 
       input,
-      textarea {
+      textarea,
+      select {
         accent-color: var(--green-200);
 
         &:focus-visible {
@@ -73,6 +74,20 @@
 
       small {
         display: block;
+      }
+
+      #controller {
+        margin-inline-start: 0.3rem;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+      }
+
+      .data-protection-wrapper {
+        display: flex;
+
+        input {
+          display: inline-block;
+        }
       }
     }
   }
