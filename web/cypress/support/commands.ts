@@ -133,7 +133,7 @@ Cypress.Commands.add("waitForApi", (retries: number = 5, delay: number = 2000) =
     return cy
       .request({
         method: "GET",
-        url: "/api/v0/profile",
+        url: "/web/api/v0/profile",
         failOnStatusCode: false, // we want to allow 401's as we only care that the api is up
       })
       .then((res) => {
@@ -187,7 +187,7 @@ Cypress.Commands.add("loginAsBase", () => {
 Cypress.Commands.add("clearChosenName", () => {
   cy.request({
     method: "POST",
-    url: "/api/v0/profile",
+    url: "/web/api/v0/profile",
     body: {
       chosen_name: "",
     },
@@ -196,20 +196,20 @@ Cypress.Commands.add("clearChosenName", () => {
 
 // Auth fixture commands
 Cypress.Commands.add("mockAuthAsBaseUser", () => {
-  cy.intercept("GET", "/api/v0/auth", {
+  cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-user.json",
   }).as("getAuth");
 });
 
 Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
-  cy.intercept("GET", "/api/v0/auth", {
+  cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-approved-researcher.json",
   }).as("getAuth");
 });
 
 Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
   const body = chosenName === undefined ? {} : { chosen_name: chosenName };
-  cy.intercept("GET", "/api/v0/profile", {
+  cy.intercept("GET", "/web/api/v0/profile", {
     statusCode: 200,
     body,
   }).as("getChosenName");
@@ -225,7 +225,7 @@ Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) =
       ]
     : [];
 
-  cy.intercept("GET", "/api/v0/profile/agreements", {
+  cy.intercept("GET", "/web/api/v0/profile/agreements", {
     statusCode: 200,
     body: {
       confirmed_agreements: confirmedAgreements,
@@ -243,7 +243,7 @@ Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: str
     trainingRecord.completed_at = completedAt;
   }
 
-  cy.intercept("GET", "/api/v0/profile/training", {
+  cy.intercept("GET", "/web/api/v0/profile/training", {
     statusCode: 200,
     body: {
       training_records: [trainingRecord],

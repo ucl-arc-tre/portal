@@ -38,7 +38,7 @@ describe("Import approved researchers", () => {
     cy.loginAsBase();
     cy.request({
       method: "POST",
-      url: "/api/v0/people/approved-researchers/import/csv",
+      url: "/web/api/v0/people/approved-researchers/import/csv",
       body: "some-bytes",
       failOnStatusCode: false,
     })
