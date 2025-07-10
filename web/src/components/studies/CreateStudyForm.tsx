@@ -32,7 +32,7 @@ type CreateStudyProps = {
   setCreateStudyFormOpen: (name: boolean) => void;
 };
 
-interface CreateStudyValues {
+type CreateStudyValues = {
   studyName: string;
   studyDescription: string;
   owner: string;
@@ -58,7 +58,7 @@ interface CreateStudyValues {
   nhsEngland: boolean;
   mnca: boolean;
   dspt: boolean;
-}
+};
 
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   const { username, setCreateStudyFormOpen } = CreateStudyProps;
