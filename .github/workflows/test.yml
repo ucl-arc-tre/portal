@@ -64,6 +64,10 @@ jobs:
             - portal-e2e-admin@arctretest.onmicrosoft.com
           db:
             dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC
+          entra:
+            tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
+            client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}
+            client_secret: ${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}
           EOF
 
       - name: Create cypress env
