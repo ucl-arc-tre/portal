@@ -16,7 +16,7 @@ export default function GlossaryPage() {
       </p>
 
       <img
-        src={"/entity_relationships.png"}
+        src={"/entity_diagram.drawio.svg"}
         alt="Entity diagram demonstrating that studies are top level entities, with projects and assets as children. Projects can also contain assets"
         className={styles["entity-relationships"]}
       />
