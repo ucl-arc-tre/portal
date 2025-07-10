@@ -55,8 +55,11 @@ func (s *Service) GetUser(id string) (types.User, error) {
 	person := types.User{}
 	result := s.db.Where("id = ?", id).
 		First(&person)
-	if result.Error != nil {
-		return person, result.Error
-	}
-	return person, nil
+	return person, result.Error
+}
+
+func (s *Service) GetUserByUsername(username types.Username) (types.User, error) {
+	user := types.User{}
+	result := s.db.Where("username = ?", username).First(&user)
+	return user, result.Error
 }
