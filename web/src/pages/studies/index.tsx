@@ -15,9 +15,9 @@ export default function StudiesPage() {
       <Title text={"Studies"} />
       <p className={styles.subtitle}>
         <span className={styles.highlighted}>Studies</span> are a top level entity. They can contain{" "}
-        <strong className={styles.coloured}>projects</strong>{" "}
+        <strong className={styles.coloured}>projects</strong>
         <InfoTooltip text="Projects are owned by a study and can contain assets" />
-        and <strong className={styles.coloured}>assets</strong>{" "}
+        and <strong className={styles.coloured}>assets</strong>
         <InfoTooltip text="Assets can be owned directly by a study or by a project within a study" />, for more detailed
         information and an entity relationship diagram, look at our
         <Button href="/glossary" variant="tertiary" size="small" className={styles["glossary-button"]}>
