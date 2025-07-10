@@ -38,7 +38,7 @@ type CreateStudyValues = {
   controllerOther: string;
   cagRef: number;
   dataProtectionPrefix: string;
-  dataProtectionDate: Date;
+  dataProtectionDate: string;
   dataProtectionId: number;
   dataProtectionNumber: string; // prefix/date/id
   nhsEnglandRef: number;
@@ -365,7 +365,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   value={UclDpoId}
                   inputClassName={styles.readonly}
                 />
-                <Input type="date" id="dataProtectionDate" {...register("dataProtectionDate")} />
+                <Input type="month" id="dataProtectionDate" {...register("dataProtectionDate")} />
                 <Input
                   type="number"
                   id="dataProtectionId"
