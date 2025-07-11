@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
-import { TrainingKindOptions, XIcon } from "../assets/exports";
+import { TrainingKindOptions, XIcon } from "../shared/exports";
 import Loading from "../ui/Loading";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {

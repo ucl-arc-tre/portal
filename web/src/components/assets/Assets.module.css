@@ -1,0 +1,36 @@
+.selected-study-header {
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+  padding: 0 2rem;
+}
+
+.study-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+}
+
+.study-breadcrumb span {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.study-breadcrumb strong {
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .study-breadcrumb {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .selected-study-header {
+    padding: 0 1rem;
+  }
+}
