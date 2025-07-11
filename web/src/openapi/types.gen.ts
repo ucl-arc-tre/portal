@@ -124,17 +124,13 @@ export type Asset = {
      */
     description: string;
     /**
-     * Classification impact level from 1-5
+     * Classification level of the asset
      */
-    classification_impact: number;
+    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
     /**
-     * Location of the asset
+     * Storage locations and touchpoints for the asset
      */
-    location: string;
-    /**
-     * Whether the asset is active or inactive
-     */
-    is_active: boolean;
+    location: Array<string>;
     /**
      * Type of protection applied to the asset
      */
@@ -142,15 +138,31 @@ export type Asset = {
     /**
      * Legal basis for holding the asset
      */
-    legal_basis?: string;
+    legal_basis: string;
     /**
      * Format of the asset
      */
-    format?: string;
+    format: string;
     /**
      * Retention expiry date of the asset
      */
-    expiry?: string;
+    expiry: string;
+    /**
+     * Whether there is an up to date Data Security & Protection Toolkit in place
+     */
+    has_dspt: boolean;
+    /**
+     * Whether the asset is stored or processed outside UK and EEA
+     */
+    stored_outside_uk_eea: boolean;
+    /**
+     * Whether the asset is accessed by or governed by third parties
+     */
+    accessed_by_third_parties: boolean;
+    /**
+     * Status of the asset
+     */
+    status: 'Active' | 'Awaiting' | 'Destroyed';
     /**
      * Time in RFC3339 format when the asset was created
      */
@@ -521,14 +533,27 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
 
-export type GetAssetsData = {
+export type GetStudiesByStudyIdAssetsData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
     query?: never;
-    url: '/assets';
+    url: '/studies/{studyId}/assets';
 };
 
-export type GetAssetsErrors = {
+export type GetStudiesByStudyIdAssetsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
     /**
      * Internal server error
      */
@@ -539,25 +564,38 @@ export type GetAssetsErrors = {
     default: unknown;
 };
 
-export type GetAssetsResponses = {
+export type GetStudiesByStudyIdAssetsResponses = {
     200: Array<Asset>;
 };
 
-export type GetAssetsResponse = GetAssetsResponses[keyof GetAssetsResponses];
+export type GetStudiesByStudyIdAssetsResponse = GetStudiesByStudyIdAssetsResponses[keyof GetStudiesByStudyIdAssetsResponses];
 
-export type PostAssetsData = {
+export type PostStudiesByStudyIdAssetsData = {
     body: AssetCreate;
-    path?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
     query?: never;
-    url: '/assets';
+    url: '/studies/{studyId}/assets';
 };
 
-export type PostAssetsErrors = {
+export type PostStudiesByStudyIdAssetsErrors = {
     /**
      * Invalid request
      */
     400: unknown;
     /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
      * Internal server error
      */
     500: unknown;
@@ -567,14 +605,14 @@ export type PostAssetsErrors = {
     default: unknown;
 };
 
-export type PostAssetsResponses = {
+export type PostStudiesByStudyIdAssetsResponses = {
     /**
      * Asset created successfully
      */
     201: Asset;
 };
 
-export type PostAssetsResponse = PostAssetsResponses[keyof PostAssetsResponses];
+export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});

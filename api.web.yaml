@@ -214,10 +214,17 @@ paths:
         default:
           description: Unexpected error
 
-  # Asset Management
-  /assets:
+  # Study Asset Management
+  /studies/{studyId}/assets:
     get:
-      description: Get all assets for the authenticated user
+      description: Get all assets for a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
       responses:
         "200":
           content:
@@ -226,12 +233,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Asset"
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
         "500":
           description: Internal server error
         default:
           description: Unexpected error
     post:
-      description: Create a new asset
+      description: Create a new asset for a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -247,6 +265,10 @@ paths:
                 $ref: "#/components/schemas/Asset"
         "400":
           description: Invalid request
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
         "500":
           description: Internal server error
         default:
@@ -447,8 +469,14 @@ components:
         - description
         - classification_impact
         - location
-        - is_active
         - protection
+        - legal_basis
+        - format
+        - expiry
+        - has_dspt
+        - stored_outside_uk_eea
+        - accessed_by_third_parties
+        - status
         - created_at
         - updated_at
       properties:
@@ -462,16 +490,17 @@ components:
           type: string
           description: Description of the asset
         classification_impact:
-          type: integer
-          minimum: 1
-          maximum: 5
-          description: Classification impact level from 1-5
-        location:
           type: string
-          description: Location of the asset
-        is_active:
-          type: boolean
-          description: Whether the asset is active or inactive
+          enum:
+            - Public
+            - Confidential
+            - Highly confidential
+          description: Classification level of the asset
+        location:
+          type: array
+          items:
+            type: string
+          description: Storage locations and touchpoints for the asset
         protection:
           type: string
           enum:
@@ -487,6 +516,22 @@ components:
         expiry:
           type: string
           description: Retention expiry date of the asset
+        has_dspt:
+          type: boolean
+          description: Whether there is an up to date Data Security & Protection Toolkit in place
+        stored_outside_uk_eea:
+          type: boolean
+          description: Whether the asset is stored or processed outside UK and EEA
+        accessed_by_third_parties:
+          type: boolean
+          description: Whether the asset is accessed by or governed by third parties
+        status:
+          type: string
+          enum:
+            - Active
+            - Awaiting
+            - Destroyed
+          description: Status of the asset
         created_at:
           type: string
           description: Time in RFC3339 format when the asset was created

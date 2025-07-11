@@ -17,17 +17,31 @@ const (
 	AgreementTypeStudyOwner         AgreementType = "study-owner"
 )
 
+// Defines values for AssetClassificationImpact.
+const (
+	AssetClassificationImpactConfidential       AssetClassificationImpact = "Confidential"
+	AssetClassificationImpactHighlyConfidential AssetClassificationImpact = "Highly confidential"
+	AssetClassificationImpactPublic             AssetClassificationImpact = "Public"
+)
+
 // Defines values for AssetProtection.
 const (
 	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
 	AssetProtectionIdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
 )
 
+// Defines values for AssetStatus.
+const (
+	AssetStatusActive    AssetStatus = "Active"
+	AssetStatusAwaiting  AssetStatus = "Awaiting"
+	AssetStatusDestroyed AssetStatus = "Destroyed"
+)
+
 // Defines values for AssetCreateClassificationImpact.
 const (
-	Confidential       AssetCreateClassificationImpact = "Confidential"
-	HighlyConfidential AssetCreateClassificationImpact = "Highly confidential"
-	Public             AssetCreateClassificationImpact = "Public"
+	AssetCreateClassificationImpactConfidential       AssetCreateClassificationImpact = "Confidential"
+	AssetCreateClassificationImpactHighlyConfidential AssetCreateClassificationImpact = "Highly confidential"
+	AssetCreateClassificationImpactPublic             AssetCreateClassificationImpact = "Public"
 )
 
 // Defines values for AssetCreateProtection.
@@ -38,9 +52,9 @@ const (
 
 // Defines values for AssetCreateStatus.
 const (
-	Active    AssetCreateStatus = "Active"
-	Awaiting  AssetCreateStatus = "Awaiting"
-	Destroyed AssetCreateStatus = "Destroyed"
+	AssetCreateStatusActive    AssetCreateStatus = "Active"
+	AssetCreateStatusAwaiting  AssetCreateStatus = "Awaiting"
+	AssetCreateStatusDestroyed AssetCreateStatus = "Destroyed"
 )
 
 // Defines values for AuthRoles.
@@ -73,8 +87,11 @@ type AgreementType string
 
 // Asset A data asset representing a set of related data entities
 type Asset struct {
-	// ClassificationImpact Classification impact level from 1-5
-	ClassificationImpact int `json:"classification_impact"`
+	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
+	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
+
+	// ClassificationImpact Classification level of the asset
+	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
 
 	// CreatedAt Time in RFC3339 format when the asset was created
 	CreatedAt string `json:"created_at"`
@@ -83,25 +100,31 @@ type Asset struct {
 	Description string `json:"description"`
 
 	// Expiry Retention expiry date of the asset
-	Expiry *string `json:"expiry,omitempty"`
+	Expiry string `json:"expiry"`
 
 	// Format Format of the asset
-	Format *string `json:"format,omitempty"`
+	Format string `json:"format"`
+
+	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
+	HasDspt bool `json:"has_dspt"`
 
 	// Id Unique identifier for the asset
 	Id string `json:"id"`
 
-	// IsActive Whether the asset is active or inactive
-	IsActive bool `json:"is_active"`
-
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis *string `json:"legal_basis,omitempty"`
+	LegalBasis string `json:"legal_basis"`
 
-	// Location Location of the asset
-	Location string `json:"location"`
+	// Location Storage locations and touchpoints for the asset
+	Location []string `json:"location"`
 
 	// Protection Type of protection applied to the asset
 	Protection AssetProtection `json:"protection"`
+
+	// Status Status of the asset
+	Status AssetStatus `json:"status"`
+
+	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
+	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
 	// Title Title of the asset
 	Title string `json:"title"`
@@ -110,8 +133,14 @@ type Asset struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+// AssetClassificationImpact Classification level of the asset
+type AssetClassificationImpact string
+
 // AssetProtection Type of protection applied to the asset
 type AssetProtection string
+
+// AssetStatus Status of the asset
+type AssetStatus string
 
 // AssetCreate Data required to create a new asset
 type AssetCreate struct {
@@ -253,9 +282,6 @@ type UserTrainingUpdate struct {
 	TrainingKind TrainingKind `json:"training_kind"`
 }
 
-// PostAssetsJSONRequestBody defines body for PostAssets for application/json ContentType.
-type PostAssetsJSONRequestBody = AssetCreate
-
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -265,6 +291,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
+type PostStudiesStudyIdAssetsJSONRequestBody = AssetCreate
+
 // PostUsersUserIdTrainingJSONRequestBody defines body for PostUsersUserIdTraining for application/json ContentType.
 type PostUsersUserIdTrainingJSONRequestBody = UserTrainingUpdate
 
@@ -273,12 +302,6 @@ type ServerInterface interface {
 
 	// (GET /agreements/{agreementType})
 	GetAgreementsAgreementType(c *gin.Context, agreementType AgreementType)
-
-	// (GET /assets)
-	GetAssets(c *gin.Context)
-
-	// (POST /assets)
-	PostAssets(c *gin.Context)
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
@@ -300,6 +323,12 @@ type ServerInterface interface {
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
+
+	// (GET /studies/{studyId}/assets)
+	GetStudiesStudyIdAssets(c *gin.Context, studyId string)
+
+	// (POST /studies/{studyId}/assets)
+	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context)
@@ -342,32 +371,6 @@ func (siw *ServerInterfaceWrapper) GetAgreementsAgreementType(c *gin.Context) {
 	}
 
 	siw.Handler.GetAgreementsAgreementType(c, agreementType)
-}
-
-// GetAssets operation middleware
-func (siw *ServerInterfaceWrapper) GetAssets(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetAssets(c)
-}
-
-// PostAssets operation middleware
-func (siw *ServerInterfaceWrapper) PostAssets(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostAssets(c)
 }
 
 // GetAuth operation middleware
@@ -461,6 +464,54 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	siw.Handler.PostProfileTraining(c)
 }
 
+// GetStudiesStudyIdAssets operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssets(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAssets(c, studyId)
+}
+
+// PostStudiesStudyIdAssets operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -539,8 +590,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/agreements/:agreementType", wrapper.GetAgreementsAgreementType)
-	router.GET(options.BaseURL+"/assets", wrapper.GetAssets)
-	router.POST(options.BaseURL+"/assets", wrapper.PostAssets)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
@@ -548,6 +597,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
+	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
