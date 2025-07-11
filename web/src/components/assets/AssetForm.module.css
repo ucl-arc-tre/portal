@@ -11,6 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin-top: 1rem;
 }
 
 .field {
@@ -20,9 +21,11 @@
 }
 
 .field label {
-  font-weight: 600;
-  color: #333;
-  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 1rem;
+  display: block;
+  line-height: 1.4;
 }
 
 .field input,
@@ -61,14 +64,15 @@
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   cursor: pointer;
   font-weight: 400 !important;
+  padding: 0.5rem 0;
 }
 
 .checkbox {
   width: auto !important;
-  margin: 0 !important;
+  margin: 0 0.75rem 0 0 !important;
 }
 
 .actions {
@@ -117,7 +121,6 @@
 .checkbox-group {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
@@ -130,6 +133,43 @@
 .definitions-link:hover {
   color: #004499;
   text-decoration: none;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 500 !important;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+  min-width: 90px;
+  justify-content: center;
+}
+
+.radio-label:hover {
+  border-color: #0066cc;
+  background-color: #e8f4f8;
+}
+
+.radio-label:has(input:checked) {
+  border-color: #0066cc;
+  background-color: #0066cc;
+  color: white;
+}
+
+.radio {
+  width: auto !important;
+  margin: 0 0.5rem 0 0 !important;
 }
 
 @media (max-width: 768px) {

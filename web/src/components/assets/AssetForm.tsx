@@ -17,13 +17,16 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 type AssetFormData = {
   title: string;
   description: string;
-  classification_impact: number;
+  classification_impact: string;
   protection: string;
   legal_basis: string;
   format: string;
   expiry: string;
   location: string[];
-  is_active: boolean;
+  has_dspt: boolean;
+  stored_outside_uk_eea: boolean;
+  accessed_by_third_parties: boolean;
+  status: string;
 };
 
 type AssetFormProps = {
@@ -47,13 +50,16 @@ export default function AssetForm(props: AssetFormProps) {
     defaultValues: {
       title: "",
       description: "",
-      classification_impact: 1,
+      classification_impact: "",
       protection: "",
       legal_basis: "",
       format: "",
       expiry: "",
       location: [],
-      is_active: true,
+      has_dspt: false,
+      stored_outside_uk_eea: false,
+      accessed_by_third_parties: false,
+      status: "Active",
     },
   });
 
@@ -137,17 +143,14 @@ export default function AssetForm(props: AssetFormProps) {
             id="classification_impact"
             {...register("classification_impact", {
               required: "Classification impact is required",
-              min: { value: 1, message: "Classification impact must be between 1 and 5" },
-              max: { value: 5, message: "Classification impact must be between 1 and 5" },
             })}
             aria-invalid={!!errors.classification_impact}
             className={errors.classification_impact ? styles.error : ""}
           >
-            <option value={1}>1 - Low</option>
-            <option value={2}>2 - Medium-Low</option>
-            <option value={3}>3 - Medium</option>
-            <option value={4}>4 - Medium-High</option>
-            <option value={5}>5 - High</option>
+            <option value="">Select classification</option>
+            <option value="Public">Public</option>
+            <option value="Confidential">Confidential</option>
+            <option value="Highly confidential">Highly confidential</option>
           </select>
           {errors.classification_impact && (
             <span className={styles["error-text"]}>{errors.classification_impact.message}</span>
@@ -256,10 +259,118 @@ export default function AssetForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles["checkbox-label"]}>
-            <input type="checkbox" {...register("is_active")} className={styles.checkbox} />
-            Active
+          <label htmlFor="has_dspt">
+            Is this information provided under condition of there being an up to date Data Security & Protection Toolkit
+            in place at the organisation? *
           </label>
+          <div className={styles["radio-group"]}>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="true"
+                {...register("has_dspt", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              Yes
+            </label>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="false"
+                {...register("has_dspt", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              No
+            </label>
+          </div>
+          {errors.has_dspt && <span className={styles["error-text"]}>{errors.has_dspt.message}</span>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="stored_outside_uk_eea">
+            Is this asset stored or processed outside of the UK and the European Economic Area at all? *
+          </label>
+          <div className={styles["radio-group"]}>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="true"
+                {...register("stored_outside_uk_eea", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              Yes
+            </label>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="false"
+                {...register("stored_outside_uk_eea", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              No
+            </label>
+          </div>
+          {errors.stored_outside_uk_eea && (
+            <span className={styles["error-text"]}>{errors.stored_outside_uk_eea.message}</span>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="accessed_by_third_parties">
+            Is this asset accessed by or governed by any third parties? *
+          </label>
+          <div className={styles["radio-group"]}>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="true"
+                {...register("accessed_by_third_parties", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              Yes
+            </label>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="false"
+                {...register("accessed_by_third_parties", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              No
+            </label>
+          </div>
+          {errors.accessed_by_third_parties && (
+            <span className={styles["error-text"]}>{errors.accessed_by_third_parties.message}</span>
+          )}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="status">Status *</label>
+          <select
+            id="status"
+            {...register("status", {
+              required: "Status is required",
+            })}
+            aria-invalid={!!errors.status}
+            className={errors.status ? styles.error : ""}
+          >
+            <option value="Active">Active</option>
+            <option value="Awaiting">Awaiting</option>
+            <option value="Destroyed">Destroyed</option>
+          </select>
+          {errors.status && <span className={styles["error-text"]}>{errors.status.message}</span>}
         </div>
 
         <div className={styles.actions}>

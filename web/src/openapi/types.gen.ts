@@ -174,17 +174,13 @@ export type AssetCreate = {
      */
     description: string;
     /**
-     * Classification impact level from 1-5
+     * Classification level of the asset
      */
-    classification_impact: number;
+    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
     /**
-     * Location of the asset
+     * Storage locations and touchpoints for the asset
      */
-    location: string;
-    /**
-     * Whether the asset is active or inactive
-     */
-    is_active: boolean;
+    location: Array<string>;
     /**
      * Type of protection applied to the asset
      */
@@ -192,15 +188,31 @@ export type AssetCreate = {
     /**
      * Legal basis for holding the asset
      */
-    legal_basis?: string;
+    legal_basis: string;
     /**
      * Format of the asset
      */
-    format?: string;
+    format: string;
     /**
      * Retention expiry date of the asset
      */
-    expiry?: string;
+    expiry: string;
+    /**
+     * Whether there is an up to date Data Security & Protection Toolkit in place
+     */
+    has_dspt: boolean;
+    /**
+     * Whether the asset is stored or processed outside UK and EEA
+     */
+    stored_outside_uk_eea: boolean;
+    /**
+     * Whether the asset is accessed by or governed by third parties
+     */
+    accessed_by_third_parties: boolean;
+    /**
+     * Status of the asset
+     */
+    status: 'Active' | 'Awaiting' | 'Destroyed';
 };
 
 export type GetAuthData = {

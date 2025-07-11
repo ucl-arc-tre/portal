@@ -23,10 +23,24 @@ const (
 	AssetProtectionIdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
 )
 
+// Defines values for AssetCreateClassificationImpact.
+const (
+	Confidential       AssetCreateClassificationImpact = "Confidential"
+	HighlyConfidential AssetCreateClassificationImpact = "Highly confidential"
+	Public             AssetCreateClassificationImpact = "Public"
+)
+
 // Defines values for AssetCreateProtection.
 const (
 	AssetCreateProtectionAnonymisation                             AssetCreateProtection = "anonymisation"
 	AssetCreateProtectionIdentifiableLowConfidencePseudonymisation AssetCreateProtection = "identifiable_low_confidence_pseudonymisation"
+)
+
+// Defines values for AssetCreateStatus.
+const (
+	Active    AssetCreateStatus = "Active"
+	Awaiting  AssetCreateStatus = "Awaiting"
+	Destroyed AssetCreateStatus = "Destroyed"
 )
 
 // Defines values for AuthRoles.
@@ -101,36 +115,51 @@ type AssetProtection string
 
 // AssetCreate Data required to create a new asset
 type AssetCreate struct {
-	// ClassificationImpact Classification impact level from 1-5
-	ClassificationImpact int `json:"classification_impact"`
+	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
+	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
+
+	// ClassificationImpact Classification level of the asset
+	ClassificationImpact AssetCreateClassificationImpact `json:"classification_impact"`
 
 	// Description Description of the asset
 	Description string `json:"description"`
 
 	// Expiry Retention expiry date of the asset
-	Expiry *string `json:"expiry,omitempty"`
+	Expiry string `json:"expiry"`
 
 	// Format Format of the asset
-	Format *string `json:"format,omitempty"`
+	Format string `json:"format"`
 
-	// IsActive Whether the asset is active or inactive
-	IsActive bool `json:"is_active"`
+	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
+	HasDspt bool `json:"has_dspt"`
 
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis *string `json:"legal_basis,omitempty"`
+	LegalBasis string `json:"legal_basis"`
 
-	// Location Location of the asset
-	Location string `json:"location"`
+	// Location Storage locations and touchpoints for the asset
+	Location []string `json:"location"`
 
 	// Protection Type of protection applied to the asset
 	Protection AssetCreateProtection `json:"protection"`
+
+	// Status Status of the asset
+	Status AssetCreateStatus `json:"status"`
+
+	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
+	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
 	// Title Title of the asset
 	Title string `json:"title"`
 }
 
+// AssetCreateClassificationImpact Classification level of the asset
+type AssetCreateClassificationImpact string
+
 // AssetCreateProtection Type of protection applied to the asset
 type AssetCreateProtection string
+
+// AssetCreateStatus Status of the asset
+type AssetCreateStatus string
 
 // Auth defines model for Auth.
 type Auth struct {
