@@ -448,6 +448,7 @@ components:
         - classification_impact
         - location
         - is_active
+        - protection
         - created_at
         - updated_at
       properties:
@@ -471,6 +472,21 @@ components:
         is_active:
           type: boolean
           description: Whether the asset is active or inactive
+        protection:
+          type: string
+          enum:
+            - anonymisation
+            - identifiable_low_confidence_pseudonymisation
+          description: Type of protection applied to the asset
+        legal_basis:
+          type: string
+          description: Legal basis for holding the asset
+        format:
+          type: string
+          description: Format of the asset
+        expiry:
+          type: string
+          description: Retention expiry date of the asset
         created_at:
           type: string
           description: Time in RFC3339 format when the asset was created
@@ -487,6 +503,7 @@ components:
         - classification_impact
         - location
         - is_active
+        - protection
       properties:
         title:
           type: string
@@ -505,3 +522,18 @@ components:
         is_active:
           type: boolean
           description: Whether the asset is active or inactive
+        protection:
+          type: string
+          enum:
+            - anonymisation
+            - identifiable_low_confidence_pseudonymisation
+          description: Type of protection applied to the asset
+        legal_basis:
+          type: string
+          description: Legal basis for holding the asset
+        format:
+          type: string
+          description: Format of the asset
+        expiry:
+          type: string
+          description: Retention expiry date of the asset

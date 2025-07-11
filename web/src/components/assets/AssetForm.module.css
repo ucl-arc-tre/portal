@@ -110,6 +110,28 @@
   color: #004499;
 }
 
+.red-text {
+  color: #dc3545;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.definitions-link {
+  color: #0066cc;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.definitions-link:hover {
+  color: #004499;
+  text-decoration: none;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;

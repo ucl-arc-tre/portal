@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
+import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetForm.module.css";
 
@@ -17,7 +18,11 @@ type AssetFormData = {
   title: string;
   description: string;
   classification_impact: number;
-  location: string;
+  protection: string;
+  legal_basis: string;
+  format: string;
+  expiry: string;
+  location: string[];
   is_active: boolean;
 };
 
@@ -43,7 +48,11 @@ export default function AssetForm(props: AssetFormProps) {
       title: "",
       description: "",
       classification_impact: 1,
-      location: "",
+      protection: "",
+      legal_basis: "",
+      format: "",
+      expiry: "",
+      location: [],
       is_active: true,
     },
   });
@@ -146,17 +155,103 @@ export default function AssetForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="location">Location *</label>
-          <input
-            id="location"
-            type="text"
-            {...register("location", {
-              required: "Location is required",
-              maxLength: { value: 255, message: "Location must be less than 255 characters" },
+          <label htmlFor="protection">What protection is applied to this asset in the form described here? *</label>
+          <select
+            id="protection"
+            {...register("protection", {
+              required: "Protection type is required",
             })}
-            aria-invalid={!!errors.location}
-            className={errors.location ? styles.error : ""}
+            aria-invalid={!!errors.protection}
+            className={errors.protection ? styles.error : ""}
+          >
+            <option value="">Select protection</option>
+            <option value="anonymisation">Anonymisation</option>
+            <option value="identifiable_low_confidence_pseudonymisation">
+              Identifiable of low confidence of pseudonymisation
+            </option>
+          </select>
+          {errors.protection && <span className={styles["error-text"]}>{errors.protection.message}</span>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="legal_basis">What is the legal basis for holding this asset? *</label>
+          <input
+            id="legal_basis"
+            type="text"
+            {...register("legal_basis", {
+              required: "Legal basis is required",
+              maxLength: { value: 255, message: "This must be less than 255 characters" },
+            })}
+            aria-invalid={!!errors.legal_basis}
+            className={errors.legal_basis ? styles.error : ""}
           />
+          {errors.legal_basis && <span className={styles["error-text"]}>{errors.legal_basis.message}</span>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="format">What format is the asset in? *</label>
+          <select
+            id="format"
+            {...register("format", {
+              required: "Format is required",
+            })}
+            aria-invalid={!!errors.format}
+            className={errors.format ? styles.error : ""}
+          >
+            <option value="">Select format</option>
+            <option value="electronic">Electronic</option>
+            <option value="paper">Paper</option>
+            <option value="other">Other</option>
+          </select>
+          {errors.format && <span className={styles["error-text"]}>{errors.format.message}</span>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="expiry" className={styles["red-text"]}>
+            What is the asset&apos;s retention expiry date? *
+          </label>
+          <input
+            id="expiry"
+            type="date"
+            {...register("expiry", {
+              required: "Expiry date is required",
+            })}
+            aria-invalid={!!errors.expiry}
+            className={errors.expiry ? styles.error : ""}
+          />
+          {errors.expiry && <span className={styles["error-text"]}>{errors.expiry.message}</span>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="location">
+            Where will these files/items be saved/stored and how will they be moved? Select all of the touchpoints that
+            are relevant including backups. *{" "}
+            <a
+              href="/assets/definitions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles["definitions-link"]}
+            >
+              What do these options mean? (Must read)
+            </a>
+          </label>
+
+          <div className={styles["checkbox-group"]}>
+            {storageDefinitions.map((storage) => (
+              <label key={storage.value} className={styles["checkbox-label"]}>
+                <input
+                  type="checkbox"
+                  value={storage.value}
+                  {...register("location", {
+                    required: "At least one location must be selected",
+                  })}
+                  className={styles.checkbox}
+                />
+                {storage.name}
+              </label>
+            ))}
+          </div>
+
           {errors.location && <span className={styles["error-text"]}>{errors.location.message}</span>}
         </div>
 

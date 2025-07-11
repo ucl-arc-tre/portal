@@ -136,6 +136,22 @@ export type Asset = {
      */
     is_active: boolean;
     /**
+     * Type of protection applied to the asset
+     */
+    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    /**
+     * Legal basis for holding the asset
+     */
+    legal_basis?: string;
+    /**
+     * Format of the asset
+     */
+    format?: string;
+    /**
+     * Retention expiry date of the asset
+     */
+    expiry?: string;
+    /**
      * Time in RFC3339 format when the asset was created
      */
     created_at: string;
@@ -169,6 +185,22 @@ export type AssetCreate = {
      * Whether the asset is active or inactive
      */
     is_active: boolean;
+    /**
+     * Type of protection applied to the asset
+     */
+    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    /**
+     * Legal basis for holding the asset
+     */
+    legal_basis?: string;
+    /**
+     * Format of the asset
+     */
+    format?: string;
+    /**
+     * Retention expiry date of the asset
+     */
+    expiry?: string;
 };
 
 export type GetAuthData = {

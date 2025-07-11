@@ -17,6 +17,18 @@ const (
 	AgreementTypeStudyOwner         AgreementType = "study-owner"
 )
 
+// Defines values for AssetProtection.
+const (
+	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
+	AssetProtectionIdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
+)
+
+// Defines values for AssetCreateProtection.
+const (
+	AssetCreateProtectionAnonymisation                             AssetCreateProtection = "anonymisation"
+	AssetCreateProtectionIdentifiableLowConfidencePseudonymisation AssetCreateProtection = "identifiable_low_confidence_pseudonymisation"
+)
+
 // Defines values for AuthRoles.
 const (
 	AuthRolesAdmin              AuthRoles = "admin"
@@ -56,14 +68,26 @@ type Asset struct {
 	// Description Description of the asset
 	Description string `json:"description"`
 
+	// Expiry Retention expiry date of the asset
+	Expiry *string `json:"expiry,omitempty"`
+
+	// Format Format of the asset
+	Format *string `json:"format,omitempty"`
+
 	// Id Unique identifier for the asset
 	Id string `json:"id"`
 
 	// IsActive Whether the asset is active or inactive
 	IsActive bool `json:"is_active"`
 
+	// LegalBasis Legal basis for holding the asset
+	LegalBasis *string `json:"legal_basis,omitempty"`
+
 	// Location Location of the asset
 	Location string `json:"location"`
+
+	// Protection Type of protection applied to the asset
+	Protection AssetProtection `json:"protection"`
 
 	// Title Title of the asset
 	Title string `json:"title"`
@@ -71,6 +95,9 @@ type Asset struct {
 	// UpdatedAt Time in RFC3339 format when the asset was last updated
 	UpdatedAt string `json:"updated_at"`
 }
+
+// AssetProtection Type of protection applied to the asset
+type AssetProtection string
 
 // AssetCreate Data required to create a new asset
 type AssetCreate struct {
@@ -80,15 +107,30 @@ type AssetCreate struct {
 	// Description Description of the asset
 	Description string `json:"description"`
 
+	// Expiry Retention expiry date of the asset
+	Expiry *string `json:"expiry,omitempty"`
+
+	// Format Format of the asset
+	Format *string `json:"format,omitempty"`
+
 	// IsActive Whether the asset is active or inactive
 	IsActive bool `json:"is_active"`
+
+	// LegalBasis Legal basis for holding the asset
+	LegalBasis *string `json:"legal_basis,omitempty"`
 
 	// Location Location of the asset
 	Location string `json:"location"`
 
+	// Protection Type of protection applied to the asset
+	Protection AssetCreateProtection `json:"protection"`
+
 	// Title Title of the asset
 	Title string `json:"title"`
 }
+
+// AssetCreateProtection Type of protection applied to the asset
+type AssetCreateProtection string
 
 // Auth defines model for Auth.
 type Auth struct {
