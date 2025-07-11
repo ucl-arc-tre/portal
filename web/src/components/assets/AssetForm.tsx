@@ -59,7 +59,7 @@ export default function AssetForm(props: AssetFormProps) {
       has_dspt: false,
       stored_outside_uk_eea: false,
       accessed_by_third_parties: false,
-      status: "Active",
+      status: "",
     },
   });
 
@@ -275,6 +275,7 @@ export default function AssetForm(props: AssetFormProps) {
               />
               Yes
             </label>
+
             <label className={styles["radio-label"]}>
               <input
                 type="radio"
@@ -306,6 +307,7 @@ export default function AssetForm(props: AssetFormProps) {
               />
               Yes
             </label>
+
             <label className={styles["radio-label"]}>
               <input
                 type="radio"
@@ -339,6 +341,7 @@ export default function AssetForm(props: AssetFormProps) {
               />
               Yes
             </label>
+
             <label className={styles["radio-label"]}>
               <input
                 type="radio"
@@ -366,6 +369,7 @@ export default function AssetForm(props: AssetFormProps) {
             aria-invalid={!!errors.status}
             className={errors.status ? styles.error : ""}
           >
+            <option value="">Select status</option>
             <option value="Active">Active</option>
             <option value="Awaiting">Awaiting</option>
             <option value="Destroyed">Destroyed</option>
