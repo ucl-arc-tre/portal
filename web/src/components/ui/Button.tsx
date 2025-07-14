@@ -14,13 +14,14 @@ type Props = React.ComponentProps<typeof UCLButton> & {
   cy?: string;
   as?: string;
   className?: string;
+  inline?: boolean;
 };
 
 export default function Button(props: Props) {
   return (
     <UCLButton
       data-cy={props.cy}
-      className={`${styles.button} ${props.type === "submit" && styles.submit} ${props.className}`}
+      className={`${styles.button} ${props.type === "submit" && styles.submit} ${props.className} ${props.inline && styles.inline}`}
       type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}
