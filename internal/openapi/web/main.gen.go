@@ -19,42 +19,22 @@ const (
 
 // Defines values for AssetClassificationImpact.
 const (
-	AssetClassificationImpactConfidential       AssetClassificationImpact = "Confidential"
-	AssetClassificationImpactHighlyConfidential AssetClassificationImpact = "Highly confidential"
-	AssetClassificationImpactPublic             AssetClassificationImpact = "Public"
+	Confidential       AssetClassificationImpact = "Confidential"
+	HighlyConfidential AssetClassificationImpact = "Highly confidential"
+	Public             AssetClassificationImpact = "Public"
 )
 
 // Defines values for AssetProtection.
 const (
-	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
-	AssetProtectionIdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
+	Anonymisation                             AssetProtection = "anonymisation"
+	IdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
 )
 
 // Defines values for AssetStatus.
 const (
-	AssetStatusActive    AssetStatus = "Active"
-	AssetStatusAwaiting  AssetStatus = "Awaiting"
-	AssetStatusDestroyed AssetStatus = "Destroyed"
-)
-
-// Defines values for AssetCreateClassificationImpact.
-const (
-	AssetCreateClassificationImpactConfidential       AssetCreateClassificationImpact = "Confidential"
-	AssetCreateClassificationImpactHighlyConfidential AssetCreateClassificationImpact = "Highly confidential"
-	AssetCreateClassificationImpactPublic             AssetCreateClassificationImpact = "Public"
-)
-
-// Defines values for AssetCreateProtection.
-const (
-	AssetCreateProtectionAnonymisation                             AssetCreateProtection = "anonymisation"
-	AssetCreateProtectionIdentifiableLowConfidencePseudonymisation AssetCreateProtection = "identifiable_low_confidence_pseudonymisation"
-)
-
-// Defines values for AssetCreateStatus.
-const (
-	AssetCreateStatusActive    AssetCreateStatus = "Active"
-	AssetCreateStatusAwaiting  AssetCreateStatus = "Awaiting"
-	AssetCreateStatusDestroyed AssetCreateStatus = "Destroyed"
+	Active    AssetStatus = "Active"
+	Awaiting  AssetStatus = "Awaiting"
+	Destroyed AssetStatus = "Destroyed"
 )
 
 // Defines values for AuthRoles.
@@ -114,8 +94,8 @@ type Asset struct {
 	// LegalBasis Legal basis for holding the asset
 	LegalBasis string `json:"legal_basis"`
 
-	// Location Storage locations and touchpoints for the asset
-	Location []string `json:"location"`
+	// Locations Storage locations and touchpoints for the asset
+	Locations []string `json:"locations"`
 
 	// Protection Type of protection applied to the asset
 	Protection AssetProtection `json:"protection"`
@@ -144,57 +124,6 @@ type AssetProtection string
 
 // AssetStatus Status of the asset
 type AssetStatus string
-
-// AssetCreate Data required to create a new asset
-type AssetCreate struct {
-	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
-	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
-
-	// ClassificationImpact Classification level of the asset
-	ClassificationImpact AssetCreateClassificationImpact `json:"classification_impact"`
-
-	// Description Description of the asset
-	Description string `json:"description"`
-
-	// Expiry Retention expiry date of the asset
-	Expiry string `json:"expiry"`
-
-	// Format Format of the asset
-	Format string `json:"format"`
-
-	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
-	HasDspt bool `json:"has_dspt"`
-
-	// LegalBasis Legal basis for holding the asset
-	LegalBasis string `json:"legal_basis"`
-
-	// Location Storage locations and touchpoints for the asset
-	Location []string `json:"location"`
-
-	// Protection Type of protection applied to the asset
-	Protection AssetCreateProtection `json:"protection"`
-
-	// Status Status of the asset
-	Status AssetCreateStatus `json:"status"`
-
-	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
-	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
-
-	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
-	ThirdPartyAgreement *string `json:"third_party_agreement,omitempty"`
-
-	// Title Title of the asset
-	Title string `json:"title"`
-}
-
-// AssetCreateClassificationImpact Classification level of the asset
-type AssetCreateClassificationImpact string
-
-// AssetCreateProtection Type of protection applied to the asset
-type AssetCreateProtection string
-
-// AssetCreateStatus Status of the asset
-type AssetCreateStatus string
 
 // Auth defines model for Auth.
 type Auth struct {
@@ -298,7 +227,7 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
-type PostStudiesStudyIdAssetsJSONRequestBody = AssetCreate
+type PostStudiesStudyIdAssetsJSONRequestBody = Asset
 
 // PostUsersUserIdTrainingJSONRequestBody defines body for PostUsersUserIdTraining for application/json ContentType.
 type PostUsersUserIdTrainingJSONRequestBody = UserTrainingUpdate

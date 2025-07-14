@@ -130,7 +130,7 @@ export type Asset = {
     /**
      * Storage locations and touchpoints for the asset
      */
-    location: Array<string>;
+    locations: Array<string>;
     /**
      * Type of protection applied to the asset
      */
@@ -175,64 +175,6 @@ export type Asset = {
      * Time in RFC3339 format when the asset was last updated
      */
     updated_at: string;
-};
-
-/**
- * Data required to create a new asset
- */
-export type AssetCreate = {
-    /**
-     * Title of the asset
-     */
-    title: string;
-    /**
-     * Description of the asset
-     */
-    description: string;
-    /**
-     * Classification level of the asset
-     */
-    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
-    /**
-     * Storage locations and touchpoints for the asset
-     */
-    location: Array<string>;
-    /**
-     * Type of protection applied to the asset
-     */
-    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
-    /**
-     * Legal basis for holding the asset
-     */
-    legal_basis: string;
-    /**
-     * Format of the asset
-     */
-    format: string;
-    /**
-     * Retention expiry date of the asset
-     */
-    expiry: string;
-    /**
-     * Whether there is an up to date Data Security & Protection Toolkit in place
-     */
-    has_dspt: boolean;
-    /**
-     * Whether the asset is stored or processed outside UK and EEA
-     */
-    stored_outside_uk_eea: boolean;
-    /**
-     * Whether the asset is accessed by or governed by third parties
-     */
-    accessed_by_third_parties: boolean;
-    /**
-     * Third party agreement identifier if asset is governed by third parties
-     */
-    third_party_agreement?: string;
-    /**
-     * Status of the asset
-     */
-    status: 'Active' | 'Awaiting' | 'Destroyed';
 };
 
 export type GetAuthData = {
@@ -579,7 +521,7 @@ export type GetStudiesByStudyIdAssetsResponses = {
 export type GetStudiesByStudyIdAssetsResponse = GetStudiesByStudyIdAssetsResponses[keyof GetStudiesByStudyIdAssetsResponses];
 
 export type PostStudiesByStudyIdAssetsData = {
-    body: AssetCreate;
+    body: Asset;
     path: {
         /**
          * ID of the study

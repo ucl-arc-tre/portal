@@ -255,7 +255,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AssetCreate"
+              $ref: "#/components/schemas/Asset"
       responses:
         "201":
           description: Asset created successfully
@@ -468,7 +468,7 @@ components:
         - title
         - description
         - classification_impact
-        - location
+        - locations
         - protection
         - legal_basis
         - format
@@ -496,7 +496,7 @@ components:
             - Confidential
             - Highly confidential
           description: Classification level of the asset
-        location:
+        locations:
           type: array
           items:
             type: string
@@ -541,73 +541,3 @@ components:
         updated_at:
           type: string
           description: Time in RFC3339 format when the asset was last updated
-
-    AssetCreate:
-      type: object
-      description: Data required to create a new asset
-      required:
-        - title
-        - description
-        - classification_impact
-        - location
-        - protection
-        - legal_basis
-        - format
-        - expiry
-        - has_dspt
-        - stored_outside_uk_eea
-        - accessed_by_third_parties
-        - status
-      properties:
-        title:
-          type: string
-          description: Title of the asset
-        description:
-          type: string
-          description: Description of the asset
-        classification_impact:
-          type: string
-          enum:
-            - Public
-            - Confidential
-            - Highly confidential
-          description: Classification level of the asset
-        location:
-          type: array
-          items:
-            type: string
-          description: Storage locations and touchpoints for the asset
-        protection:
-          type: string
-          enum:
-            - anonymisation
-            - identifiable_low_confidence_pseudonymisation
-          description: Type of protection applied to the asset
-        legal_basis:
-          type: string
-          description: Legal basis for holding the asset
-        format:
-          type: string
-          description: Format of the asset
-        expiry:
-          type: string
-          description: Retention expiry date of the asset
-        has_dspt:
-          type: boolean
-          description: Whether there is an up to date Data Security & Protection Toolkit in place
-        stored_outside_uk_eea:
-          type: boolean
-          description: Whether the asset is stored or processed outside UK and EEA
-        accessed_by_third_parties:
-          type: boolean
-          description: Whether the asset is accessed by or governed by third parties
-        third_party_agreement:
-          type: string
-          description: Third party agreement identifier if asset is governed by third parties
-        status:
-          type: string
-          enum:
-            - Active
-            - Awaiting
-            - Destroyed
-          description: Status of the asset
