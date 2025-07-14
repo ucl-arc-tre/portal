@@ -172,6 +172,63 @@
   margin: 0 0.5rem 0 0 !important;
 }
 
+.ucl-guidance {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+}
+
+.ucl-guidance p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #856404;
+  line-height: 1.4;
+}
+
+.ucl-guidance a {
+  color: #856404;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.ucl-guidance a:hover {
+  color: #533f03;
+  text-decoration: none;
+}
+
+.third-party-dropdown {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #e8f4f8;
+  border-left: 4px solid #0066cc;
+  border-radius: 4px;
+}
+
+.third-party-text {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: #333;
+  line-height: 1.4;
+}
+
+.third-party-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border-color 0.2s;
+}
+
+.third-party-select:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;

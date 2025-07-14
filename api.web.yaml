@@ -525,6 +525,9 @@ components:
         accessed_by_third_parties:
           type: boolean
           description: Whether the asset is accessed by or governed by third parties
+        third_party_agreement:
+          type: string
+          description: Third party agreement identifier if asset is governed by third parties
         status:
           type: string
           enum:
@@ -598,6 +601,9 @@ components:
         accessed_by_third_parties:
           type: boolean
           description: Whether the asset is accessed by or governed by third parties
+        third_party_agreement:
+          type: string
+          description: Third party agreement identifier if asset is governed by third parties
         status:
           type: string
           enum:

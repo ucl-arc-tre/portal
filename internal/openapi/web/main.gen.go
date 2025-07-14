@@ -126,6 +126,9 @@ type Asset struct {
 	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
+	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
+	ThirdPartyAgreement *string `json:"third_party_agreement,omitempty"`
+
 	// Title Title of the asset
 	Title string `json:"title"`
 
@@ -176,6 +179,9 @@ type AssetCreate struct {
 
 	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
+
+	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
+	ThirdPartyAgreement *string `json:"third_party_agreement,omitempty"`
 
 	// Title Title of the asset
 	Title string `json:"title"`

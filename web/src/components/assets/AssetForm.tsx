@@ -26,6 +26,7 @@ type AssetFormData = {
   has_dspt: boolean;
   stored_outside_uk_eea: boolean;
   accessed_by_third_parties: boolean;
+  third_party_agreement: string;
   status: string;
 };
 
@@ -46,6 +47,7 @@ export default function AssetForm(props: AssetFormProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<AssetFormData>({
     defaultValues: {
       title: "",
@@ -59,9 +61,16 @@ export default function AssetForm(props: AssetFormProps) {
       has_dspt: false,
       stored_outside_uk_eea: false,
       accessed_by_third_parties: false,
+      third_party_agreement: "",
       status: "",
     },
   });
+
+  const protectionValue = watch("protection");
+  const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
+
+  const thirdPartyAccessed = watch("accessed_by_third_parties");
+  const showThirdPartyDropdown = String(thirdPartyAccessed) === "true";
 
   const onFormSubmit = async (data: AssetFormData) => {
     try {
@@ -169,11 +178,28 @@ export default function AssetForm(props: AssetFormProps) {
           >
             <option value="">Select protection</option>
             <option value="anonymisation">Anonymisation</option>
+            <option value="pseudonymisation">Pseudonymisation</option>
             <option value="identifiable_low_confidence_pseudonymisation">
-              Identifiable of low confidence of pseudonymisation
+              Identifiable or low confidence of pseudonymisation
             </option>
           </select>
           {errors.protection && <span className={styles["error-text"]}>{errors.protection.message}</span>}
+
+          {showUCLGuidanceText && (
+            <div className={styles["ucl-guidance"]}>
+              <p>
+                Confirm that{" "}
+                <a
+                  href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/practical-data-protection-guidance-notices/anonymisation-and"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  UCL guidance on anonymisation and pseudonymisation
+                </a>{" "}
+                has been applied.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -356,6 +382,21 @@ export default function AssetForm(props: AssetFormProps) {
           </div>
           {errors.accessed_by_third_parties && (
             <span className={styles["error-text"]}>{errors.accessed_by_third_parties.message}</span>
+          )}
+
+          {showThirdPartyDropdown && (
+            // WIP: will need to potentially fetch third party agreements from the API
+            <div className={styles["third-party-dropdown"]}>
+              <p className={styles["third-party-text"]}>
+                If this asset is governed by an agreement with a third party please link to the item from your submitted
+                third party information at Stage 2.
+              </p>
+              <select {...register("third_party_agreement")} className={styles["third-party-select"]}>
+                <option value="">Select third party agreement</option>
+                <option value="test1">Test1</option>
+                <option value="test2">Test2</option>
+              </select>
+            </div>
           )}
         </div>
 

@@ -160,6 +160,10 @@ export type Asset = {
      */
     accessed_by_third_parties: boolean;
     /**
+     * Third party agreement identifier if asset is governed by third parties
+     */
+    third_party_agreement?: string;
+    /**
      * Status of the asset
      */
     status: 'Active' | 'Awaiting' | 'Destroyed';
@@ -221,6 +225,10 @@ export type AssetCreate = {
      * Whether the asset is accessed by or governed by third parties
      */
     accessed_by_third_parties: boolean;
+    /**
+     * Third party agreement identifier if asset is governed by third parties
+     */
+    third_party_agreement?: string;
     /**
      * Status of the asset
      */
