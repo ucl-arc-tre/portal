@@ -14,9 +14,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid study ID format",
-		})
+		setInvalid(ctx, err, "Invalid study ID format")
 		return
 	}
 
@@ -24,9 +22,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": "Study not found or you don't have permission to access it",
-			})
+			setInvalid(ctx, err, "Study not found or you don't have permission to access it")
 			return
 		}
 
