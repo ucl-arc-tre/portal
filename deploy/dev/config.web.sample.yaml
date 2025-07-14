@@ -3,3 +3,8 @@ admin_usernames:
   - bob@example.com
 db:
   dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
+entra:
+  # EntraID app registration with User.Read.All application permissions
+  tenant_id: <CHANGE_ME>
+  client_id: <CHANGE_ME>
+  client_secret: <CHANGE_ME>
