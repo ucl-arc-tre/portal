@@ -54,6 +54,14 @@ func DBDataSourceName() string {
 	return k.String("db.dsn")
 }
 
+func EntraCredentials() EntraCredentialBundle {
+	return EntraCredentialBundle{
+		TenantID:     k.String("entra.tenant_id"),
+		ClientID:     k.String("entra.client_id"),
+		ClientSecret: k.String("entra.client_secret"),
+	}
+}
+
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
 	for _, username := range k.Strings("admin_usernames") {
