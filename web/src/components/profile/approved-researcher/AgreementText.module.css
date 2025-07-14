@@ -9,6 +9,6 @@
 
   a {
     text-decoration: underline;
-    color: #4023a7;
+    color: var(--form-link);
   }
 }

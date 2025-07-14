@@ -8,3 +8,9 @@
   color: var(--foreground);
   cursor: pointer;
 }
+
+.inline {
+  display: inline !important;
+  margin-inline: 0.2rem;
+  padding: 0 !important;
+}
