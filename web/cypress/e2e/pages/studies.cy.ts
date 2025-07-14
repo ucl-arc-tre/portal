@@ -100,7 +100,6 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='next']").click();
 
     cy.get("input[name='dataProtection']").check();
-
     cy.get("input[name='dataProtectionPrefix']").should("not.have.attr", "readonly").type("A12345678"); // pragma: allowlist secret
   });
 
