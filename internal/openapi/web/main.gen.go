@@ -17,6 +17,26 @@ const (
 	AgreementTypeStudyOwner         AgreementType = "study-owner"
 )
 
+// Defines values for AssetClassificationImpact.
+const (
+	Confidential       AssetClassificationImpact = "Confidential"
+	HighlyConfidential AssetClassificationImpact = "Highly confidential"
+	Public             AssetClassificationImpact = "Public"
+)
+
+// Defines values for AssetProtection.
+const (
+	Anonymisation                             AssetProtection = "anonymisation"
+	IdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
+)
+
+// Defines values for AssetStatus.
+const (
+	Active    AssetStatus = "Active"
+	Awaiting  AssetStatus = "Awaiting"
+	Destroyed AssetStatus = "Destroyed"
+)
+
 // Defines values for AuthRoles.
 const (
 	AuthRolesAdmin              AuthRoles = "admin"
@@ -44,6 +64,66 @@ type AgreementConfirmation struct {
 
 // AgreementType defines model for AgreementType.
 type AgreementType string
+
+// Asset A data asset representing a set of related data entities
+type Asset struct {
+	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
+	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
+
+	// ClassificationImpact Classification level of the asset
+	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
+
+	// CreatedAt Time in RFC3339 format when the asset was created
+	CreatedAt string `json:"created_at"`
+
+	// Description Description of the asset
+	Description string `json:"description"`
+
+	// Expiry Retention expiry date of the asset
+	Expiry string `json:"expiry"`
+
+	// Format Format of the asset
+	Format string `json:"format"`
+
+	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
+	HasDspt bool `json:"has_dspt"`
+
+	// Id Unique identifier for the asset
+	Id string `json:"id"`
+
+	// LegalBasis Legal basis for holding the asset
+	LegalBasis string `json:"legal_basis"`
+
+	// Locations Storage locations and touchpoints for the asset
+	Locations []string `json:"locations"`
+
+	// Protection Type of protection applied to the asset
+	Protection AssetProtection `json:"protection"`
+
+	// Status Status of the asset
+	Status AssetStatus `json:"status"`
+
+	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
+	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
+
+	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
+	ThirdPartyAgreement string `json:"third_party_agreement"`
+
+	// Title Title of the asset
+	Title string `json:"title"`
+
+	// UpdatedAt Time in RFC3339 format when the asset was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
+// AssetClassificationImpact Classification level of the asset
+type AssetClassificationImpact string
+
+// AssetProtection Type of protection applied to the asset
+type AssetProtection string
+
+// AssetStatus Status of the asset
+type AssetStatus string
 
 // Auth defines model for Auth.
 type Auth struct {
@@ -146,6 +226,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
+type PostStudiesStudyIdAssetsJSONRequestBody = Asset
+
 // PostUsersUserIdTrainingJSONRequestBody defines body for PostUsersUserIdTraining for application/json ContentType.
 type PostUsersUserIdTrainingJSONRequestBody = UserTrainingUpdate
 
@@ -175,6 +258,12 @@ type ServerInterface interface {
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
+
+	// (GET /studies/{studyId}/assets)
+	GetStudiesStudyIdAssets(c *gin.Context, studyId string)
+
+	// (POST /studies/{studyId}/assets)
+	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context)
@@ -310,6 +399,54 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	siw.Handler.PostProfileTraining(c)
 }
 
+// GetStudiesStudyIdAssets operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssets(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAssets(c, studyId)
+}
+
+// PostStudiesStudyIdAssets operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -395,6 +532,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
+	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)

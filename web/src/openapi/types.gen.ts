@@ -107,6 +107,76 @@ export type UserTrainingUpdate = {
     training_date: string;
 };
 
+/**
+ * A data asset representing a set of related data entities
+ */
+export type Asset = {
+    /**
+     * Unique identifier for the asset
+     */
+    id: string;
+    /**
+     * Title of the asset
+     */
+    title: string;
+    /**
+     * Description of the asset
+     */
+    description: string;
+    /**
+     * Classification level of the asset
+     */
+    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
+    /**
+     * Storage locations and touchpoints for the asset
+     */
+    locations: Array<string>;
+    /**
+     * Type of protection applied to the asset
+     */
+    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    /**
+     * Legal basis for holding the asset
+     */
+    legal_basis: string;
+    /**
+     * Format of the asset
+     */
+    format: string;
+    /**
+     * Retention expiry date of the asset
+     */
+    expiry: string;
+    /**
+     * Whether there is an up to date Data Security & Protection Toolkit in place
+     */
+    has_dspt: boolean;
+    /**
+     * Whether the asset is stored or processed outside UK and EEA
+     */
+    stored_outside_uk_eea: boolean;
+    /**
+     * Whether the asset is accessed by or governed by third parties
+     */
+    accessed_by_third_parties: boolean;
+    /**
+     * Third party agreement identifier if asset is governed by third parties
+     */
+    third_party_agreement: string;
+    /**
+     * Status of the asset
+     */
+    status: 'Active' | 'Awaiting' | 'Destroyed';
+    /**
+     * Time in RFC3339 format when the asset was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the asset was last updated
+     */
+    updated_at: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -412,6 +482,87 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 };
 
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
+
+export type GetStudiesByStudyIdAssetsData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets';
+};
+
+export type GetStudiesByStudyIdAssetsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsResponses = {
+    200: Array<Asset>;
+};
+
+export type GetStudiesByStudyIdAssetsResponse = GetStudiesByStudyIdAssetsResponses[keyof GetStudiesByStudyIdAssetsResponses];
+
+export type PostStudiesByStudyIdAssetsData = {
+    body: Asset;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets';
+};
+
+export type PostStudiesByStudyIdAssetsErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdAssetsResponses = {
+    /**
+     * Asset created successfully
+     */
+    201: Asset;
+};
+
+export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v0` | (string & {});
