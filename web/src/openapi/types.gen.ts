@@ -162,7 +162,7 @@ export type Asset = {
     /**
      * Third party agreement identifier if asset is governed by third parties
      */
-    third_party_agreement?: string;
+    third_party_agreement: string;
     /**
      * Status of the asset
      */

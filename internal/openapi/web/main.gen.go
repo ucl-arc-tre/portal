@@ -107,7 +107,7 @@ type Asset struct {
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
 	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
-	ThirdPartyAgreement *string `json:"third_party_agreement,omitempty"`
+	ThirdPartyAgreement string `json:"third_party_agreement"`
 
 	// Title Title of the asset
 	Title string `json:"title"`

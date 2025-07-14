@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"gorm.io/gorm"
 )
 
@@ -30,30 +31,31 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	// Prepare the final response format
-	var response []map[string]any
+	// prepare the final response
+	var response []openapi.Asset
 	for _, asset := range assets {
 		var locations []string
 		for _, loc := range asset.Locations {
 			locations = append(locations, loc.Location)
 		}
 
-		response = append(response, map[string]any{
-			"id":                        asset.ID.String(),
-			"title":                     asset.Title,
-			"description":               asset.Description,
-			"classification_impact":     asset.ClassificationImpact,
-			"protection":                asset.Protection,
-			"legal_basis":               asset.LegalBasis,
-			"format":                    asset.Format,
-			"expiry":                    asset.Expiry,
-			"location":                  locations,
-			"has_dspt":                  asset.HasDspt,
-			"stored_outside_uk_eea":     asset.StoredOutsideUkEea,
-			"accessed_by_third_parties": asset.AccessedByThirdParties,
-			"status":                    asset.Status,
-			"created_at":                asset.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			"updated_at":                asset.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		response = append(response, openapi.Asset{
+			Id:                     asset.ID.String(),
+			Title:                  asset.Title,
+			Description:            asset.Description,
+			ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),
+			Protection:             openapi.AssetProtection(asset.Protection),
+			LegalBasis:             asset.LegalBasis,
+			Format:                 asset.Format,
+			Expiry:                 asset.Expiry,
+			Locations:              locations,
+			HasDspt:                asset.HasDspt,
+			StoredOutsideUkEea:     asset.StoredOutsideUkEea,
+			AccessedByThirdParties: asset.AccessedByThirdParties,
+			ThirdPartyAgreement:    asset.ThirdPartyAgreement,
+			Status:                 openapi.AssetStatus(asset.Status),
+			CreatedAt:              asset.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UpdatedAt:              asset.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		})
 	}
 

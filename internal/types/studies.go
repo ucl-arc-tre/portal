@@ -28,6 +28,7 @@ type Asset struct {
 	HasDspt                bool      `gorm:"not null;default:false"`
 	StoredOutsideUkEea     bool      `gorm:"not null;default:false"`
 	AccessedByThirdParties bool      `gorm:"not null;default:false"`
+	ThirdPartyAgreement    string    `gorm:""`
 	Status                 string    `gorm:"not null"`
 
 	// Relationships

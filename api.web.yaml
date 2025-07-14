@@ -476,6 +476,7 @@ components:
         - has_dspt
         - stored_outside_uk_eea
         - accessed_by_third_parties
+        - third_party_agreement
         - status
         - created_at
         - updated_at
