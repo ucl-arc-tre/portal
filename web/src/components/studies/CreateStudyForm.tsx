@@ -226,10 +226,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               )}
             />
             {controllerValue === "Other" && (
-              <Input
-                type="text"
-                placeholder="Please specify"
-                {...register("controllerOther", { required: "This field is required" })}
+              <Controller
+                name="controllerOther"
+                control={control}
+                rules={{ required: "This field is required" }}
+                render={({ field }) => <Input {...field} type="text" id="controllerOther" />}
               />
             )}
             {(errors.controller || errors.controllerOther) && (
