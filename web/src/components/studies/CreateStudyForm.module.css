@@ -1,0 +1,136 @@
+.study-dialog {
+  width: 70vw;
+  overflow: scroll;
+  position: absolute;
+  top: 5vh;
+}
+
+.form {
+  width: 100%;
+  margin-block: 1.8rem;
+  padding-inline: 4%;
+
+  a {
+    color: var(--form-link);
+    text-decoration: underline;
+  }
+
+  .fieldset {
+    border: 1px solid var(--text--secondary);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-block-end: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+
+    &.visible {
+      display: block;
+    }
+
+    &.hidden {
+      visibility: hidden;
+      display: none;
+    }
+
+    legend {
+      color: var(--text--secondary);
+      font-size: 0.75rem;
+    }
+
+    label {
+      padding: 0.4rem;
+      font-weight: 400;
+      max-width: 100%;
+
+      &.checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 0.4rem;
+      }
+
+      input,
+      textarea,
+      select {
+        accent-color: var(--green-200);
+
+        &:focus-visible {
+          /* overriding the uikit focus */
+          -webkit-box-shadow: 0 0 1px 1.2px var(--green-100);
+          -moz-box-shadow: 0 0 1px 1.2px var(--green-100);
+          box-shadow: 0 0 1px 1.2px var(--green-100);
+        }
+      }
+
+      textarea {
+        display: block;
+        max-width: 100%;
+      }
+
+      input[type="checkbox"] {
+        transform: scale(1.5);
+      }
+
+      small {
+        display: block;
+      }
+
+      #controller {
+        margin-inline-start: 0.3rem;
+        font-size: 1.2rem;
+        padding: 0.5rem;
+      }
+
+      .data-protection-wrapper {
+        display: flex;
+
+        input {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  .button--continue {
+    float: inline-end;
+  }
+
+  .button--continue,
+  .button--back {
+    margin-inline: 0.4%;
+  }
+
+  .form-helper--invalid {
+    text-align: center;
+    color: red;
+  }
+
+  .readonly {
+    cursor: not-allowed;
+
+    &:focus-visible {
+      box-shadow: none !important;
+    }
+  }
+}
+
+.step-progress {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .step-dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin: 0 0.5rem;
+
+    &.active,
+    &.valid {
+      background-color: var(--green-100);
+    }
+  }
+}

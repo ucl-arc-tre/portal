@@ -4,8 +4,9 @@ import Button from "../ui/Button";
 import { postUsersByUserIdTraining, TrainingKind, TrainingRecord } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
-import AdminDialog from "./AdminDialog";
-import { InfoIcon, TrainingKindOptions } from "../shared/exports";
+import Dialog from "../ui/Dialog";
+import { TrainingKindOptions } from "../assets/exports";
+import InfoTooltip from "../ui/InfoTooltip";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -71,7 +72,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
   };
 
   return (
-    <AdminDialog setDialogOpen={setTrainingDialogOpen} data-cy="training">
+    <Dialog setDialogOpen={setTrainingDialogOpen} cy="training" className={styles["training-dialog"]}>
       <form onSubmit={handleSubmit} noValidate className={styles.form}>
         <p>Use this form to validate a training certificate. Make sure you check the date on the certificate.</p>
 
@@ -96,10 +97,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         <div className={styles.date}>
           <label htmlFor="display_date">
             Date valid from{" "}
-            <InfoIcon
-              title="The date the training was completed, this can be found on the certificate."
-              className={styles.info}
-            />
+            <InfoTooltip text="The date the training was completed, this can be found on the certificate." />
           </label>
           <input
             type="date"
@@ -119,7 +117,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
               onClick={setDateToToday}
               size="small"
               variant="tertiary"
-              className={styles.todayButton}
+              className={styles["today-button"]}
               data-cy="set-to-today"
             >
               Set to Today
@@ -136,6 +134,6 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
 
         <Button type="submit">Submit</Button>
       </form>
-    </AdminDialog>
+    </Dialog>
   );
 }
