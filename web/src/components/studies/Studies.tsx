@@ -20,7 +20,7 @@ export default function Studies() {
           <h2>No Studies</h2>
           <p>
             You need to be an Approved Researcher to view and create Studies. Check your
-            <Button size="small" href="/profile" variant="tertiary" inline={true}>
+            <Button size="small" href="/profile" variant="tertiary" inline>
               profile
             </Button>
             for steps to become an Approved Researcher

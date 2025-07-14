@@ -20,7 +20,7 @@ export default function StudiesPage() {
         and <strong className={styles.coloured}>assets</strong>
         <InfoTooltip text="Assets can be owned directly by a study or by a project within a study" />, for more detailed
         information and an entity relationship diagram, look at our
-        <Button href="/glossary" variant="tertiary" size="small" inline={true}>
+        <Button href="/glossary" variant="tertiary" size="small" inline>
           Glossary
         </Button>
       </p>

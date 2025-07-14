@@ -36,6 +36,7 @@ export default function Dialog(DialogProps: DialogProps) {
           icon={<XIcon />}
           onClick={closeDialog}
           className={styles["close-button"]}
+          cy="close-dialog"
         ></Button>
         {children}
       </dialog>

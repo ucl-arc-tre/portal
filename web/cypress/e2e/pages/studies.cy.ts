@@ -77,6 +77,9 @@ describe("Checking conditionally rendered fields", () => {
     cy.waitForAuth();
     cy.contains("Create Study").click();
   });
+  afterEach(() => {
+    cy.get("[data-cy='close-dialog']").click();
+  });
 
   it("shows controller text input if not UCL", () => {
     cy.get("select[name='controller']").select("Other");
@@ -90,7 +93,9 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='next']").click();
 
     cy.get("input[name='dataProtection']").check();
-    cy.get("input[name='dataProtectionPrefix']").should("have.value", "Z6364106").should("have.attr", "readonly");
+    cy.get("input[name='dataProtectionPrefix']")
+      .should("have.value", "Z6364106")
+      .should("have.attr", "readonly", "readonly");
   });
 
   it("allows DPO id to be set if not UCL", () => {
@@ -100,7 +105,8 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='next']").click();
 
     cy.get("input[name='dataProtection']").check();
-    cy.get("input[name='dataProtectionPrefix']").should("not.have.attr", "readonly").type("A12345678"); // pragma: allowlist secret
+    cy.get("input[name='dataProtectionPrefix']").should("not.have.attr", "readonly");
+    cy.get("input[name='dataProtectionPrefix']").type("A12345678"); // pragma: allowlist secret
   });
 
   it("should show CAG ref when checked", () => {

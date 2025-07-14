@@ -219,7 +219,10 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               control={control}
               rules={{ required: "This field is required" }}
               render={({ field }) => (
-                <select {...field} id={styles.controller}>
+                <select {...field} id={styles.controller} defaultValue="select">
+                  <option value="select" disabled hidden>
+                    Select Controller
+                  </option>
                   <option value="UCL">UCL</option>
                   <option value="Other">Other</option>
                 </select>
@@ -317,7 +320,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               </Label>
               {showNhsEnglandRef && (
                 <Label htmlFor="nhsEnglandRef">
-                  NHS England NIC number (if applicable)
+                  NHSE{" "}
+                  <a href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number.">
+                    DARS NIC number
+                  </a>{" "}
+                  (if applicable)
                   <Input type="number" id="nhsEnglandRef" {...register("nhsEnglandRef")} />
                 </Label>
               )}
