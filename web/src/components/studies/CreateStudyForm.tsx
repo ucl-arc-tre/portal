@@ -363,14 +363,24 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 Eg. {UclDpoId}/2022/01/123
               </HelperText>
               <div className={styles["data-protection-wrapper"]}>
-                <Input
-                  type="text"
-                  id="dataProtectionPrefix"
-                  {...register("dataProtectionPrefix")}
-                  readOnly={true}
-                  value={UclDpoId}
-                  inputClassName={styles.readonly}
-                />
+                {controllerValue === "UCL" ? (
+                  <Input
+                    type="text"
+                    id="dataProtectionPrefix"
+                    {...register("dataProtectionPrefix")}
+                    readOnly={true}
+                    value={UclDpoId}
+                    inputClassName={styles.readonly}
+                  />
+                ) : (
+                  <Input
+                    type="text"
+                    id="dataProtectionPrefix"
+                    {...register("dataProtectionPrefix")}
+                    placeholder="Registry ID eg ZX1234"
+                  />
+                )}
+
                 <Input type="month" id="dataProtectionDate" {...register("dataProtectionDate")} />
                 <Input
                   type="number"
@@ -385,6 +395,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                       message: "Cannot be more than 3 digits",
                     },
                   })}
+                  placeholder="eg 123"
                 />
               </div>
               {(errors.dataProtectionDate || errors.dataProtectionId) && (
