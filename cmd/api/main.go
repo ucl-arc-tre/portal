@@ -15,21 +15,27 @@ import (
 )
 
 func main() {
-	config.Init()
-	graceful.InitDB()
-	rbac.Init()
-	agreements.Init()
+	initialise()
 	router := router.New()
 	addWeb(router.Group(config.BaseWebURL))
 	addTRE(router.Group(config.BaseTREURL))
 	graceful.Serve(router.Handler())
 }
 
+func initialise() {
+	config.Init()
+	graceful.InitDB()
+	rbac.Init()
+	agreements.Init()
+}
+
+// Add the web API defined by its OpenAPI spec with suitable middleware
 func addWeb(router gin.IRouter) {
 	router.Use(middleware.NewSecure(), middleware.NewSetUser(), middleware.NewAuthz())
 	apiweb.RegisterHandlers(router, web.New())
 }
 
+// Add the TRE API defined by its OpenAPI spec with suitable middleware
 func addTRE(router gin.IRouter) {
 	router.Use(gin.BasicAuth(config.TREUserAccounts()))
 	apitre.RegisterHandlers(router, tre.New())

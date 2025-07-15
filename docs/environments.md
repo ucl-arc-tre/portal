@@ -1,11 +1,11 @@
-# UCL ARC TRE Portal
+# UCL ARC Portal
 
 This project is a full-stack web application built with:
 
 - **Go** for backend services
 - **React (NextJS)** for the frontend
 - **Docker** for containerized development and deployment
-- **Nginx** as a reverse proxy
+- **Nginx** as a reverse proxy in dev
 - **PostgreSQL** as the database
 - **Cypress** for end-to-end (E2E) testing
 
@@ -40,9 +40,10 @@ All environments are dockerised for a self-contained service that builds all ver
 - Runs containers using `docker-compose` from [`deploy/dev/`](../deploy/dev/)
 - React frontend is served by **NextJS dev server** with live reloading
 - Go backend uses **Air** for live reloads
-- Nginx acts as a reverse proxy:
+- Nginx acts as a reverse proxy ([nginx.conf](../deploy/dev/nginx.conf)):
   - `/` → React dev server
   - `/api` → Go backend API
+  - `/oauth2` → OAuth2Proxy
 - Accessible at: [http://localhost:8000](http://localhost:8000)
 
 ### 🔐 Release
@@ -65,3 +66,10 @@ All environments are dockerised for a self-contained service that builds all ver
 <p align="center">
   <img src="./media/architecture.png" alt="architecture" width="650">
 </p>
+
+### API
+
+The API is a monolith which is the sole interface to the database. Services have their own top-level
+paths. The web API called by the web frontend is defined in [api.web.yaml](../api.web.yaml) and must
+be run behind an authentication proxy which forwards user identities. The TRE API consumed by the
+TRE is defined [api.tre.yaml](../api.tre.yaml) and uses basic authentication with service accounts.

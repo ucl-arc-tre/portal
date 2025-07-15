@@ -29,6 +29,7 @@ const (
 
 var k = koanf.New(".")
 
+// Initialise the configuration by loading the config file
 func Init() {
 	if err := k.Load(file.Provider(configPath), yaml.Parser()); err != nil {
 		log.Err(err).Msg("error loading config")
@@ -36,7 +37,7 @@ func Init() {
 	if k.Bool("debug") {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
-	log.Debug().Msg("Initalised config")
+	log.Debug().Msg("Initialised config")
 }
 
 func ServerAddress() string {
