@@ -105,7 +105,7 @@ export default function TrainingCertificate({ setTrainingCertificateCompleted }:
         setTrainingCertificateCompleted(true);
       }
     } catch (err) {
-      setErrorMessage(`Certificate upload failed: ${err instanceof Error ? err.message : "Unknown error"}`);
+      setErrorMessage(`Certificate upload failed: ${err instanceof Error ? err.message : "Unknown error"}. `);
       setErrorType("error");
     } finally {
       setIsSubmitting(false);
