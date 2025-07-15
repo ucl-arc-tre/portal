@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import AssetForm from "./AssetForm";
-import StudySelection from "./StudySelection";
+import StudySelection from "../studies/StudySelection";
 import Button from "@/components/ui/Button";
 
 import styles from "./Assets.module.css";

@@ -119,6 +119,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     console.log(updatedData);
     //todo: do the things
   };
+
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
 
@@ -451,11 +452,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             &larr; Back
           </Button>
         )}
+
         {currentStep < totalSteps && (
           <Button type="button" size="small" onClick={nextStep} className={styles["button--continue"]} cy="next">
             Next &rarr;
           </Button>
         )}
+
         {currentStep === totalSteps && (
           <>
             {!isValid && (

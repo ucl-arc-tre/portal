@@ -1,34 +1,63 @@
-import { useAuth } from "@/hooks/useAuth";
-import LoginFallback from "@/components/ui/LoginFallback";
-import ApprovedResearcherView from "./ApprovedResearcherView";
+import { useState } from "react";
 import Button from "../ui/Button";
+import StudySelection from "../studies/StudySelection";
+import CreateStudyForm from "./CreateStudyForm";
 
-export default function Studies() {
-  const { authInProgress, isAuthed, userData } = useAuth();
-  if (authInProgress) return null;
+import styles from "./ApprovedResearcherView.module.css";
 
-  if (!isAuthed) return <LoginFallback />;
+type Props = {
+  username: string;
+  studies: Study[];
+};
 
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+export default function Studies(props: Props) {
+  const { username, studies } = props;
+  const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
+  const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
 
-  const username = userData!.username;
+  const handleCreateStudyClick = () => {
+    setCreateStudyFormOpen(true);
+  };
+
+  if (!selectedStudy) {
+    return (
+      <>
+        <Button onClick={handleCreateStudyClick} size="small" className={styles["create-study-button"]}>
+          Create Study
+        </Button>
+
+        <StudySelection studies={studies} setSelectedStudy={setSelectedStudy} />
+      </>
+    );
+  }
 
   return (
     <>
-      {!isApprovedResearcher && (
-        <>
-          <h2>No Studies</h2>
-          <p>
-            You need to be an Approved Researcher to view and create Studies. Check your
-            <Button size="small" href="/profile" variant="tertiary" inline>
-              profile
-            </Button>
-            for steps to become an Approved Researcher
-          </p>
-        </>
-      )}
+      {createStudyFormOpen && <CreateStudyForm username={username} setCreateStudyFormOpen={setCreateStudyFormOpen} />}
 
-      {isApprovedResearcher && <ApprovedResearcherView username={username} />}
+      <h2 className={styles["content-heading"]}>Your Studies</h2>
+
+      <div className={styles["content-wrapper"]}>
+        <div className={styles["create-study-container"]}>
+          <Button onClick={handleCreateStudyClick} size="small" className={styles["create-study-button"]}>
+            Create Study
+          </Button>
+        </div>
+        Studies
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>View full details</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
     </>
   );
 }
