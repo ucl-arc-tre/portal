@@ -565,5 +565,5 @@ export type PostStudiesByStudyIdAssetsResponses = {
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
 export type ClientOptions = {
-    baseUrl: `${string}://${string}/api/v0` | (string & {});
+    baseUrl: `${string}://${string}/web/api/v0` | (string & {});
 };

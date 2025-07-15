@@ -14,7 +14,7 @@ const (
 	initConnectRetryDelay = 1 * time.Second
 )
 
-// Initalise the database with the required types
+// Initialise the database and migrate required types
 func InitDB() {
 	types := []any{
 		&types.User{},

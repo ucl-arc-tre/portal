@@ -8,7 +8,7 @@ services.
 ### dev
 
 1. Create `deploy/dev/oauth2-proxy.cfg` from [deploy/dev/oauth2-proxy.sample.cfg](./deploy/dev/oauth2-proxy.sample.cfg)
-1. Create `deploy/dev/config.web.yaml` from [deploy/dev/config.web.sample.yaml](./deploy/dev/config.web.sample.yaml)
+1. Create `deploy/dev/config.yaml` from [deploy/dev/config.sample.yaml](./deploy/dev/config.sample.yaml)
 1. Install the [development prerequisites](#dev-prerequisites)
 1. Spin up a development environment by running:
 

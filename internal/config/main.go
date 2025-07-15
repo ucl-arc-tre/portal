@@ -15,9 +15,11 @@ import (
 )
 
 const (
-	webConfigPath = "/etc/portal/config.web.yaml"
+	BaseWebURL = "/web/api/v0"
+	BaseTREURL = "/tre/api/v0"
 
-	BaseURL        = "/api/v0"
+	configPath = "/etc/portal/config.yaml"
+
 	TimeFormat     = time.RFC3339
 	MaxUploadBytes = 1e7 // 10 MB
 
@@ -27,14 +29,15 @@ const (
 
 var k = koanf.New(".")
 
+// Initialise the configuration by loading the config file
 func Init() {
-	if err := k.Load(file.Provider(webConfigPath), yaml.Parser()); err != nil {
+	if err := k.Load(file.Provider(configPath), yaml.Parser()); err != nil {
 		log.Err(err).Msg("error loading config")
 	}
 	if k.Bool("debug") {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
-	log.Debug().Msg("Initalised config")
+	log.Debug().Msg("Initialised config")
 }
 
 func ServerAddress() string {
@@ -52,6 +55,11 @@ func IsTesting() bool {
 
 func DBDataSourceName() string {
 	return k.String("db.dsn")
+}
+
+// TREUserAccounts are the username:password pairs used to access the TRE API
+func TREUserAccounts() map[string]string {
+	return k.StringMap("tre.users")
 }
 
 func EntraCredentials() EntraCredentialBundle {

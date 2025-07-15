@@ -1,13 +1,13 @@
 services:
-  web-api:
+  api:
     build:
       context: ..
-      target: web-api-release
+      target: api-release
     environment:
       PORT: "8080"
       IS_TESTING: true
     volumes:
-      - ./config.web.yaml:/etc/portal/config.web.yaml:ro
+      - ./config.yaml:/etc/portal/config.yaml:ro
     depends_on:
       - postgres
 
@@ -17,7 +17,7 @@ services:
     volumes:
       - "./oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
     depends_on:
-      - web-api
+      - api
 
   web-frontend:
     build:
@@ -35,7 +35,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./tls:/etc/nginx/tls:ro
     depends_on:
-      - web-api
+      - api
       - web-frontend
       - oauth2-proxy
 
@@ -60,3 +60,17 @@ services:
       npm ci &&
       npx cypress run --config-file cypress.config.ts --browser electron
       "
+
+  tre-api-test:
+    build:
+      context: ..
+      target: builder
+    entrypoint:
+      - "go"
+      - "test"
+      - "./e2e/..."
+    working_dir: /repo
+    volumes:
+      - ./..:/repo
+    depends_on:
+      - api

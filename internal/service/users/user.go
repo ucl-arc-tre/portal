@@ -6,6 +6,7 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"gorm.io/gorm"
 )
 
 func (s *Service) AllUsers() ([]openapi.UserData, error) {
@@ -55,8 +56,15 @@ func (s *Service) GetUser(id string) (types.User, error) {
 	person := types.User{}
 	result := s.db.Where("id = ?", id).
 		First(&person)
-	if result.Error != nil {
-		return person, result.Error
+	return person, result.Error
+}
+
+// Get an persisted user. Optional
+func (s *Service) GetUserByUsername(username types.Username) (*types.User, error) {
+	user := types.User{}
+	result := s.db.Where("username = ?", username).First(&user)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
 	}
-	return person, nil
+	return &user, result.Error
 }
