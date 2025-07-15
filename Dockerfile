@@ -23,7 +23,7 @@ RUN go install github.com/air-verse/air@latest
 
 WORKDIR /repo
 ENV GIN_MODE="debug"
-CMD ["air", "--build.cmd", "go build -o bin/api cmd/api/main.go", "--build.bin", "./bin/api", "--build.exclude_dir", "web,bin,deploy,tmp"]
+CMD ["air", "--build.cmd", "go build -o bin/api cmd/api/main.go", "--build.bin", "./bin/api", "--build.exclude_dir", "web,bin,deploy,tmp,e2e,docs"]
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo

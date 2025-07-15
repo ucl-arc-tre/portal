@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	isValidPattern   = `This is to certify that.*completed the course Data Security Awareness`
+	isValidPattern   = `This is to certify that.*completed the (?:course|programme) Data Security Awareness`
 	issuedAtPattern  = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})`
 	firstNamePattern = `certify that[\s]*(\w+)`
 	lastNamePattern  = `certify that[\s]*\w+ (\w+)`
