@@ -30,6 +30,16 @@ func TestInvalidNHSDCertificateParse(t *testing.T) {
 	assert.False(t, certificate.IsValid)
 }
 
+func TestValidRegex(t *testing.T) {
+	validTexts := []string{
+		"This is to certify that Bob Smith completed the programme Data Security Awareness",
+		"This is to certify that Alice Taylor-Smith completed the course Data Security Awareness",
+	}
+	for _, text := range validTexts {
+		assert.True(t, isValidRegex.MatchString(text))
+	}
+}
+
 func mustBase64Encode(t *testing.T, filepath string) string {
 	content, err := os.ReadFile(filepath)
 	assert.NoError(t, err)
