@@ -574,14 +574,14 @@ components:
       description: A research study
       required:
         - id
+        - created_at
+        - updated_at
         - title
         - description
         - owner_user_id
         - controller
-        - created_at
-        - updated_at
-        - admin
         - controller_other
+        - admin
         - ucl_sponsorship
         - cag
         - cag_ref

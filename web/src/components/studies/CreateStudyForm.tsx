@@ -27,38 +27,7 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 type CreateStudyProps = {
   username: string;
   setCreateStudyFormOpen: (name: boolean) => void;
-};
-
-type CreateStudyValues = {
-  studyName: string;
-  studyDescription: string;
-  owner: string;
-  admin: string;
-  controller: string;
-  controllerOther: string;
-  cagRef: number;
-  dataProtectionPrefix: string;
-  dataProtectionDate: string;
-  dataProtectionId: number;
-  dataProtectionNumber: string; // prefix/date/id
-  nhsEnglandRef: number;
-  irasId: string; // might be number, unclear
-  // checkboxes
-  uclSponsorship: boolean;
-  cag: boolean;
-  ethics: boolean;
-  hra: boolean;
-  dbs: boolean;
-  dataProtection: boolean;
-  thirdParty: boolean;
-  externalUsers: boolean;
-  consent: boolean;
-  nonConsent: boolean;
-  extEea: boolean;
-  nhs: boolean;
-  nhsEngland: boolean;
-  mnca: boolean;
-  dspt: boolean;
+  onSubmit: (data: Study) => Promise<void>;
 };
 
 // what is this?
@@ -66,18 +35,18 @@ type CreateStudyValues = {
 const UclDpoId = "Z6364106";
 
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
-  const { username, setCreateStudyFormOpen } = CreateStudyProps;
+  const { username, setCreateStudyFormOpen, onSubmit: onSubmitProp } = CreateStudyProps;
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isValid, isSubmitting },
-  } = useForm<CreateStudyValues>({
+  } = useForm<Study>({
     mode: "onChange",
     criteriaMode: "all",
     defaultValues: {
-      studyName: "",
-      studyDescription: "",
+      title: "",
+      description: "",
       owner: username,
       admin: "",
       controller: "",
@@ -137,16 +106,14 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     control,
   });
 
-  const onSubmit: SubmitHandler<CreateStudyValues> = (data) => {
-    console.log(data);
-    // set the dataProtectionNumber
-    //TODO: may need to change - to / from the date
-    const updatedData = {
-      ...data,
-      dataProtectionNumber: `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`,
-    };
-    console.log(updatedData);
-    //todo: do the things
+  const onSubmit: SubmitHandler<Study> = async (data) => {
+    try {
+      await onSubmitProp(data);
+      setCreateStudyFormOpen(false);
+    } catch (error) {
+      console.error("Failed to create study:", error);
+      // TODO: Show error message to user
+    }
   };
 
   const getFieldsetClass = (step: number) =>
@@ -172,7 +139,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           <Label htmlFor="studyName">
             Study Name*:
             <Controller
-              name="studyName"
+              name="title"
               control={control}
               rules={{
                 required: "This field is required",
@@ -188,16 +155,16 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               render={({ field }) => <Input {...field} type="text" id="studyName" />}
             />
             <HelperText>Maximum 55 characters, do not include any special characters</HelperText>
-            {errors.studyName && (
+            {errors.title && (
               <Alert type="error">
-                <AlertMessage>{errors.studyName.message}</AlertMessage>
+                <AlertMessage>{errors.title.message}</AlertMessage>
               </Alert>
             )}
           </Label>
 
-          <Label htmlFor="studyDescription">
+          <Label htmlFor="description">
             Study Description:
-            <Textarea id="studyDescription" {...register("studyDescription", { maxLength: 255 })} />
+            <Textarea id="description" {...register("description", { maxLength: 255 })} />
           </Label>
         </fieldset>
 
