@@ -1,7 +1,7 @@
 import { useState } from "react";
 import StudySelection from "../studies/StudySelection";
 import CreateStudyForm from "./CreateStudyForm";
-import { Button } from "uikit-react-public";
+import Button from "@/components/ui/Button";
 
 import styles from "./Studies.module.css";
 
