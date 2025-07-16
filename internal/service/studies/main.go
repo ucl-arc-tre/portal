@@ -17,6 +17,16 @@ func New() *Service {
 	}
 }
 
+func (s *Service) CreateStudy(userID uuid.UUID, studyData types.Study) (*types.Study, error) {
+	studyData.OwnerUserID = userID
+
+	if err := s.db.Create(&studyData).Error; err != nil {
+		return nil, err
+	}
+
+	return &studyData, nil
+}
+
 // GetStudyAssets retrieves all assets for a study,
 // ensures that the user owns the study (this might be refactored later to allow shared access)
 func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for AgreementType.
@@ -42,6 +43,12 @@ const (
 	AuthRolesAdmin              AuthRoles = "admin"
 	AuthRolesApprovedResearcher AuthRoles = "approved-researcher"
 	AuthRolesBase               AuthRoles = "base"
+)
+
+// Defines values for StudyController.
+const (
+	Other StudyController = "Other"
+	UCL   StudyController = "UCL"
 )
 
 // Defines values for TrainingKind.
@@ -178,6 +185,105 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// Study A research study
+type Study struct {
+	// Admin Email of the study administrator
+	Admin *openapi_types.Email `json:"admin,omitempty"`
+
+	// Cag Confidentiality Advisory Group approval sought/obtained
+	Cag *bool `json:"cag,omitempty"`
+
+	// CagRef CAG reference number
+	CagRef *string `json:"cag_ref,omitempty"`
+
+	// Consent Participant consent will be sought
+	Consent *bool `json:"consent,omitempty"`
+
+	// Controller Data controller organization
+	Controller StudyController `json:"controller"`
+
+	// ControllerOther Other data controller if controller is "Other"
+	ControllerOther *string `json:"controller_other,omitempty"`
+
+	// CreatedAt Time in RFC3339 format when the study was created
+	CreatedAt string `json:"created_at"`
+
+	// DataProtection Registered with UCL Data Protection Office
+	DataProtection *bool `json:"data_protection,omitempty"`
+
+	// DataProtectionDate Data protection registration date (YYYY-MM format)
+	DataProtectionDate *string `json:"data_protection_date,omitempty"`
+
+	// DataProtectionId Data protection registration number
+	DataProtectionId *int `json:"data_protection_id,omitempty"`
+
+	// DataProtectionNumber Full data protection registration number
+	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+
+	// DataProtectionPrefix Data protection registry ID
+	DataProtectionPrefix *string `json:"data_protection_prefix,omitempty"`
+
+	// Dbs DBS check required for staff
+	Dbs *bool `json:"dbs,omitempty"`
+
+	// Description Description of the study
+	Description string `json:"description"`
+
+	// Dspt NHS Data Security & Protection Toolkit required
+	Dspt *bool `json:"dspt,omitempty"`
+
+	// Ethics Research Ethics Committee approval sought/obtained
+	Ethics *bool `json:"ethics,omitempty"`
+
+	// ExtEea Data processed outside UK/EEA
+	ExtEea *bool `json:"ext_eea,omitempty"`
+
+	// ExternalUsers External users will have access
+	ExternalUsers *bool `json:"external_users,omitempty"`
+
+	// Hra Health Research Authority approval sought/obtained
+	Hra *bool `json:"hra,omitempty"`
+
+	// Id Unique identifier for the study
+	Id string `json:"id"`
+
+	// IrasId IRAS ID if applicable
+	IrasId *string `json:"iras_id,omitempty"`
+
+	// Mnca HRA Model Non-Commercial Agreement in place
+	Mnca *bool `json:"mnca,omitempty"`
+
+	// Nhs Research associated with NHS
+	Nhs *bool `json:"nhs,omitempty"`
+
+	// NhsEngland NHS England involvement
+	NhsEngland *bool `json:"nhs_england,omitempty"`
+
+	// NhsEnglandRef NHS England DARS NIC number
+	NhsEnglandRef *string `json:"nhs_england_ref,omitempty"`
+
+	// NonConsent Data collected indirectly
+	NonConsent *bool `json:"non_consent,omitempty"`
+
+	// OwnerUserId ID of the user who owns the study
+	OwnerUserId string `json:"owner_user_id"`
+
+	// ThirdParty Third party organizations involved
+	ThirdParty *bool `json:"third_party,omitempty"`
+
+	// Title Title of the study
+	Title string `json:"title"`
+
+	// UclSponsorship UCL sponsorship sought/obtained
+	UclSponsorship *bool `json:"ucl_sponsorship,omitempty"`
+
+	// UpdatedAt Time in RFC3339 format when the study was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
+// StudyController Data controller organization
+type StudyController string
+
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -226,6 +332,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
+type PostStudiesJSONRequestBody = Study
+
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = Asset
 
@@ -258,6 +367,9 @@ type ServerInterface interface {
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
+
+	// (POST /studies)
+	PostStudies(c *gin.Context)
 
 	// (GET /studies/{studyId}/assets)
 	GetStudiesStudyIdAssets(c *gin.Context, studyId string)
@@ -399,6 +511,19 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	siw.Handler.PostProfileTraining(c)
 }
 
+// PostStudies operation middleware
+func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudies(c)
+}
+
 // GetStudiesStudyIdAssets operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssets(c *gin.Context) {
 
@@ -532,6 +657,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

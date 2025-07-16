@@ -274,6 +274,32 @@ paths:
         default:
           description: Unexpected error
 
+  # Study Management
+  /studies:
+    post:
+      description: Create a new study
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Study"
+      responses:
+        "201":
+          description: Study created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Study"
+        "400":
+          description: Invalid request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   schemas:
     Auth:
@@ -542,3 +568,115 @@ components:
         updated_at:
           type: string
           description: Time in RFC3339 format when the asset was last updated
+
+    Study:
+      type: object
+      description: A research study
+      required:
+        - id
+        - title
+        - description
+        - owner_user_id
+        - controller
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the study
+        title:
+          type: string
+          description: Title of the study
+        description:
+          type: string
+          description: Description of the study
+        owner_user_id:
+          type: string
+          description: ID of the user who owns the study
+        # Study Personnel
+        admin:
+          type: string
+          format: email
+          description: Email of the study administrator
+        controller:
+          type: string
+          enum: ["UCL", "Other"]
+          description: Data controller organization
+        controller_other:
+          type: string
+          description: Other data controller if controller is "Other"
+        # Approvals and sponsorship
+        ucl_sponsorship:
+          type: boolean
+          description: UCL sponsorship sought/obtained
+        cag:
+          type: boolean
+          description: Confidentiality Advisory Group approval sought/obtained
+        cag_ref:
+          type: string
+          description: CAG reference number
+        ethics:
+          type: boolean
+          description: Research Ethics Committee approval sought/obtained
+        hra:
+          type: boolean
+          description: Health Research Authority approval sought/obtained
+        iras_id:
+          type: string
+          description: IRAS ID if applicable
+        # NHS related
+        nhs:
+          type: boolean
+          description: Research associated with NHS
+        nhs_england:
+          type: boolean
+          description: NHS England involvement
+        nhs_england_ref:
+          type: string
+          description: NHS England DARS NIC number
+        mnca:
+          type: boolean
+          description: HRA Model Non-Commercial Agreement in place
+        dspt:
+          type: boolean
+          description: NHS Data Security & Protection Toolkit required
+        # Data protection and privacy
+        dbs:
+          type: boolean
+          description: DBS check required for staff
+        data_protection:
+          type: boolean
+          description: Registered with UCL Data Protection Office
+        data_protection_prefix:
+          type: string
+          description: Data protection registry ID
+        data_protection_date:
+          type: string
+          description: Data protection registration date (YYYY-MM format)
+        data_protection_id:
+          type: integer
+          description: Data protection registration number
+        data_protection_number:
+          type: string
+          description: Full data protection registration number
+        third_party:
+          type: boolean
+          description: Third party organizations involved
+        external_users:
+          type: boolean
+          description: External users will have access
+        consent:
+          type: boolean
+          description: Participant consent will be sought
+        non_consent:
+          type: boolean
+          description: Data collected indirectly
+        ext_eea:
+          type: boolean
+          description: Data processed outside UK/EEA
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the study was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the study was last updated

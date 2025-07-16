@@ -10,6 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
+func (h *Handler) PostStudies(ctx *gin.Context) {
+	// This function will handle the creation of a new study.
+}
+
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	user := middleware.GetUser(ctx)
 

@@ -177,6 +177,136 @@ export type Asset = {
     updated_at: string;
 };
 
+/**
+ * A research study
+ */
+export type Study = {
+    /**
+     * Unique identifier for the study
+     */
+    id: string;
+    /**
+     * Title of the study
+     */
+    title: string;
+    /**
+     * Description of the study
+     */
+    description: string;
+    /**
+     * ID of the user who owns the study
+     */
+    owner_user_id: string;
+    /**
+     * Email of the study administrator
+     */
+    admin?: string;
+    /**
+     * Data controller organization
+     */
+    controller: 'UCL' | 'Other';
+    /**
+     * Other data controller if controller is "Other"
+     */
+    controller_other?: string;
+    /**
+     * UCL sponsorship sought/obtained
+     */
+    ucl_sponsorship?: boolean;
+    /**
+     * Confidentiality Advisory Group approval sought/obtained
+     */
+    cag?: boolean;
+    /**
+     * CAG reference number
+     */
+    cag_ref?: string;
+    /**
+     * Research Ethics Committee approval sought/obtained
+     */
+    ethics?: boolean;
+    /**
+     * Health Research Authority approval sought/obtained
+     */
+    hra?: boolean;
+    /**
+     * IRAS ID if applicable
+     */
+    iras_id?: string;
+    /**
+     * Research associated with NHS
+     */
+    nhs?: boolean;
+    /**
+     * NHS England involvement
+     */
+    nhs_england?: boolean;
+    /**
+     * NHS England DARS NIC number
+     */
+    nhs_england_ref?: string;
+    /**
+     * HRA Model Non-Commercial Agreement in place
+     */
+    mnca?: boolean;
+    /**
+     * NHS Data Security & Protection Toolkit required
+     */
+    dspt?: boolean;
+    /**
+     * DBS check required for staff
+     */
+    dbs?: boolean;
+    /**
+     * Registered with UCL Data Protection Office
+     */
+    data_protection?: boolean;
+    /**
+     * Data protection registry ID
+     */
+    data_protection_prefix?: string;
+    /**
+     * Data protection registration date (YYYY-MM format)
+     */
+    data_protection_date?: string;
+    /**
+     * Data protection registration number
+     */
+    data_protection_id?: number;
+    /**
+     * Full data protection registration number
+     */
+    data_protection_number?: string;
+    /**
+     * Third party organizations involved
+     */
+    third_party?: boolean;
+    /**
+     * External users will have access
+     */
+    external_users?: boolean;
+    /**
+     * Participant consent will be sought
+     */
+    consent?: boolean;
+    /**
+     * Data collected indirectly
+     */
+    non_consent?: boolean;
+    /**
+     * Data processed outside UK/EEA
+     */
+    ext_eea?: boolean;
+    /**
+     * Time in RFC3339 format when the study was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the study was last updated
+     */
+    updated_at: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -563,6 +693,41 @@ export type PostStudiesByStudyIdAssetsResponses = {
 };
 
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
+
+export type PostStudiesData = {
+    body: Study;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type PostStudiesErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesResponses = {
+    /**
+     * Study created successfully
+     */
+    201: Study;
+};
+
+export type PostStudiesResponse = PostStudiesResponses[keyof PostStudiesResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/web/api/v0` | (string & {});
