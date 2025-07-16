@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import styles from "./CreateStudyForm.module.css";
@@ -40,6 +40,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors, isValid, isSubmitting },
   } = useForm<Study>({
     mode: "onChange",
@@ -52,7 +53,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
       controller: "",
       controllerOther: "",
       cagRef: 0,
-      dataProtectionPrefix: UclDpoId,
+      dataProtectionPrefix: "",
       dataProtectionDate: "",
       dataProtectionId: 0,
       dataProtectionNumber: "",
@@ -105,6 +106,15 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     name: "controller",
     control,
   });
+
+  // Update dataProtectionPrefix when controller changes
+  useEffect(() => {
+    if (controllerValue === "UCL") {
+      setValue("dataProtectionPrefix", UclDpoId);
+    } else if (controllerValue === "Other") {
+      setValue("dataProtectionPrefix", "");
+    }
+  }, [controllerValue, setValue]);
 
   const onSubmit: SubmitHandler<Study> = async (data) => {
     try {
@@ -372,29 +382,37 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 Eg. {UclDpoId}/2022/01/123
               </HelperText>
               <div className={styles["data-protection-wrapper"]}>
-                {controllerValue === "UCL" ? (
-                  <Input
-                    type="text"
-                    id="dataProtectionPrefix"
-                    {...register("dataProtectionPrefix")}
-                    readOnly={true}
-                    value={UclDpoId}
-                    inputClassName={styles.readonly}
-                  />
-                ) : (
-                  <Input
-                    type="text"
-                    id="dataProtectionPrefix"
-                    {...register("dataProtectionPrefix")}
-                    placeholder="Registry ID eg ZX1234"
-                  />
-                )}
+                <Controller
+                  name="dataProtectionPrefix"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      type="text"
+                      id="dataProtectionPrefix"
+                      readOnly={controllerValue === "UCL"}
+                      placeholder={controllerValue === "UCL" ? "" : "Registry ID eg ZX1234"}
+                      inputClassName={controllerValue === "UCL" ? styles.readonly : ""}
+                    />
+                  )}
+                />
 
-                <Input type="month" id="dataProtectionDate" {...register("dataProtectionDate")} />
-                <Input
-                  type="number"
-                  id="dataProtectionId"
-                  {...register("dataProtectionId", {
+                <Controller
+                  name="dataProtectionDate"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="month"
+                      id="dataProtectionDate"
+                      style={{ padding: "0.5rem", fontSize: "1rem", border: "1px solid #ccc", borderRadius: "4px" }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="dataProtectionId"
+                  control={control}
+                  rules={{
                     min: {
                       value: 0,
                       message: "Cannot be a negative number",
@@ -403,8 +421,18 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                       value: 999,
                       message: "Cannot be more than 3 digits",
                     },
-                  })}
-                  placeholder="eg 123"
+                  }}
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="number"
+                      id="dataProtectionId"
+                      placeholder="eg 123"
+                      style={{ padding: "0.5rem", fontSize: "1rem", border: "1px solid #ccc", borderRadius: "4px" }}
+                      value={field.value === 0 ? "" : field.value}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                    />
+                  )}
                 />
               </div>
               {(errors.dataProtectionDate || errors.dataProtectionId) && (

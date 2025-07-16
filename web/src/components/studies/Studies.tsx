@@ -26,9 +26,15 @@ export default function Studies(props: Props) {
 
     // Convert form data to Study API format
     const studyData = {
+      // Required fields that will be set by backend
+      id: "",
+      owner_user_id: "",
+      created_at: "",
+      updated_at: "",
+
+      // Form data
       title: data.title,
       description: data.description,
-      owner_user_id: "", // Will be set by backend
       admin: data.admin,
       controller: data.controller as "UCL" | "Other",
       controller_other: data.controllerOther,
@@ -54,10 +60,6 @@ export default function Studies(props: Props) {
       consent: data.consent,
       non_consent: data.nonConsent,
       ext_eea: data.extEea,
-      // These will be set by the backend
-      id: "",
-      created_at: "",
-      updated_at: "",
     };
 
     // Submit to backend

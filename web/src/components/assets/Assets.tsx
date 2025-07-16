@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import AssetForm from "./AssetForm";
-import StudySelection from "../studies/StudySelection";
 import Button from "@/components/ui/Button";
 
 import styles from "./Assets.module.css";
@@ -26,9 +25,9 @@ type AssetsProps = {
 };
 
 export default function Assets(props: AssetsProps) {
-  const { studies } = props;
-
   const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
+
+  console.log(props);
 
   const handleAssetSubmit = async (data: AssetFormData) => {
     // TODO: Implement API call to create asset
@@ -40,10 +39,6 @@ export default function Assets(props: AssetsProps) {
     // const response = await createAsset({ ...data, studyId: selectedStudy?.id });
     // if (!response.ok) throw new Error('Failed to create asset');
   };
-
-  if (!selectedStudy) {
-    return <StudySelection studies={studies} setSelectedStudy={setSelectedStudy} />;
-  }
 
   return (
     <>

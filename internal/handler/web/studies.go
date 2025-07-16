@@ -51,7 +51,6 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		ExtEea:               request.ExtEea,
 	}
 
-	// Create the study
 	createdStudy, err := h.studies.CreateStudy(user.ID, studyData)
 	if err != nil {
 		setServerError(ctx, err, "Failed to create study")

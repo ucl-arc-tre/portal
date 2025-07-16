@@ -574,14 +574,14 @@ components:
       description: A research study
       required:
         - id
+        - owner_user_id
         - created_at
         - updated_at
         - title
         - description
-        - owner_user_id
+        - admin
         - controller
         - controller_other
-        - admin
         - ucl_sponsorship
         - cag
         - cag_ref
@@ -619,7 +619,6 @@ components:
           description: ID of the user who owns the study
         admin:
           type: string
-          format: email
           description: Email of the study administrator
         controller:
           type: string

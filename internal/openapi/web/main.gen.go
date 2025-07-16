@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
-	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for AgreementType.
@@ -188,7 +187,7 @@ type ProfileUpdate struct {
 // Study A research study
 type Study struct {
 	// Admin Email of the study administrator
-	Admin openapi_types.Email `json:"admin"`
+	Admin string `json:"admin"`
 
 	// Cag Confidentiality Advisory Group approval sought/obtained
 	Cag bool `json:"cag"`
