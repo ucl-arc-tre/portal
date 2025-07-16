@@ -1,48 +1,46 @@
-import { useState } from "react";
+// import { useState } from "react";
 
-import AssetForm from "./AssetForm";
-import Button from "@/components/ui/Button";
+// import AssetForm from "./AssetForm";
+// import Button from "@/components/ui/Button";
 
-import styles from "./Assets.module.css";
+// import styles from "./Assets.module.css";
 
-type AssetFormData = {
-  title: string;
-  description: string;
-  classification_impact: string;
-  protection: string;
-  legal_basis: string;
-  format: string;
-  expiry: string;
-  location: string[];
-  has_dspt: boolean;
-  stored_outside_uk_eea: boolean;
-  accessed_by_third_parties: boolean;
-  status: string;
-};
+// type AssetFormData = {
+//   title: string;
+//   description: string;
+//   classification_impact: string;
+//   protection: string;
+//   legal_basis: string;
+//   format: string;
+//   expiry: string;
+//   location: string[];
+//   has_dspt: boolean;
+//   stored_outside_uk_eea: boolean;
+//   accessed_by_third_parties: boolean;
+//   status: string;
+// };
 
-type AssetsProps = {
-  studies: Study[];
-};
+// type AssetsProps = {
+//   studies: Study[];
+// };
 
-export default function Assets(props: AssetsProps) {
-  const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
+export default function Assets() {
+  // const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
 
-  console.log(props);
+  // const handleAssetSubmit = async (data: AssetFormData) => {
+  //   // TODO: Implement API call to create asset
+  //   console.log("Asset data:", { ...data, studyId: selectedStudy?.id });
 
-  const handleAssetSubmit = async (data: AssetFormData) => {
-    // TODO: Implement API call to create asset
-    console.log("Asset data:", { ...data, studyId: selectedStudy?.id });
+  //   // Simulate API call
+  //   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // const response = await createAsset({ ...data, studyId: selectedStudy?.id });
-    // if (!response.ok) throw new Error('Failed to create asset');
-  };
+  //   // const response = await createAsset({ ...data, studyId: selectedStudy?.id });
+  //   // if (!response.ok) throw new Error('Failed to create asset');
+  // };
 
   return (
     <>
-      <div className={styles["selected-study-header"]}>
+      {/* <div className={styles["selected-study-header"]}>
         <div className={styles["study-breadcrumb"]}>
           <span>
             Study: <strong>{selectedStudy?.title}</strong>
@@ -54,7 +52,8 @@ export default function Assets(props: AssetsProps) {
         </div>
       </div>
 
-      <AssetForm onSubmit={handleAssetSubmit} setSelectedStudy={setSelectedStudy} />
+      <AssetForm onSubmit={handleAssetSubmit} setSelectedStudy={setSelectedStudy} /> */}
+      Placeholder
     </>
   );
 }

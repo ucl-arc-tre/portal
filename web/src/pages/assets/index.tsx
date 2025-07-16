@@ -105,7 +105,7 @@ export default function AssetsPage() {
         </>
       )}
 
-      {isApprovedResearcher && !studiesLoading && studies.length > 0 && <Assets studies={studies} />}
+      {isApprovedResearcher && !studiesLoading && studies.length > 0 && <Assets />}
     </>
   );
 }
