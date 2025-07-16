@@ -61,6 +61,8 @@ type CreateStudyValues = {
   dspt: boolean;
 };
 
+// what is this?
+// A brief comment for context might be good here
 const UclDpoId = "Z6364106";
 
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
@@ -74,10 +76,37 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     mode: "onChange",
     criteriaMode: "all",
     defaultValues: {
+      studyName: "",
+      studyDescription: "",
       owner: username,
+      admin: "",
+      controller: "",
+      controllerOther: "",
+      cagRef: 0,
       dataProtectionPrefix: UclDpoId,
+      dataProtectionDate: "",
+      dataProtectionId: 0,
+      dataProtectionNumber: "",
+      nhsEnglandRef: 0,
+      irasId: "",
+      uclSponsorship: false,
+      cag: false,
+      ethics: false,
+      hra: false,
+      dbs: false,
+      dataProtection: false,
+      thirdParty: false,
+      externalUsers: false,
+      consent: false,
+      nonConsent: false,
+      extEea: false,
+      nhs: false,
+      nhsEngland: false,
+      mnca: false,
+      dspt: false,
     },
   });
+
   const [currentStep, setCurrentStep] = useState(1);
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
@@ -221,9 +250,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               rules={{ required: "This field is required" }}
               render={({ field }) => (
                 <select {...field} id={styles.controller} defaultValue="select">
-                  <option value="select" disabled hidden>
-                    Select Controller
-                  </option>
+                  <option value="select">Select Controller</option>
                   <option value="UCL">UCL</option>
                   <option value="Other">Other</option>
                 </select>
@@ -345,6 +372,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   will be in place across all sites when working with NHS sites
                 </span>
               </Label>
+
               <Label htmlFor="dspt" className={styles["checkbox-label"]}>
                 <input type="checkbox" id="dspt" {...register("dspt")} />
                 This research requires an NHS Data Security & Protection Toolkit registration to be in place at UCL.

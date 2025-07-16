@@ -7,11 +7,58 @@ import (
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
-	// This function will handle the creation of a new study.
+	user := middleware.GetUser(ctx)
+
+	var request openapi.Study
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		setInvalid(ctx, err, "Invalid request body")
+		return
+	}
+
+	// Convert OpenAPI request to database model
+	studyData := types.Study{
+		Title:                request.Title,
+		Description:          request.Description,
+		Controller:           string(request.Controller),
+		Admin:                string(request.Admin),
+		ControllerOther:      request.ControllerOther,
+		UclSponsorship:       request.UclSponsorship,
+		Cag:                  request.Cag,
+		CagRef:               request.CagRef,
+		Ethics:               request.Ethics,
+		Hra:                  request.Hra,
+		IrasId:               request.IrasId,
+		Nhs:                  request.Nhs,
+		NhsEngland:           request.NhsEngland,
+		NhsEnglandRef:        request.NhsEnglandRef,
+		Mnca:                 request.Mnca,
+		Dspt:                 request.Dspt,
+		Dbs:                  request.Dbs,
+		DataProtection:       request.DataProtection,
+		DataProtectionPrefix: request.DataProtectionPrefix,
+		DataProtectionDate:   request.DataProtectionDate,
+		DataProtectionId:     request.DataProtectionId,
+		DataProtectionNumber: request.DataProtectionNumber,
+		ThirdParty:           request.ThirdParty,
+		ExternalUsers:        request.ExternalUsers,
+		Consent:              request.Consent,
+		NonConsent:           request.NonConsent,
+		ExtEea:               request.ExtEea,
+	}
+
+	// Create the study
+	createdStudy, err := h.studies.CreateStudy(user.ID, studyData)
+	if err != nil {
+		setServerError(ctx, err, "Failed to create study")
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, createdStudy)
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {

@@ -188,94 +188,94 @@ type ProfileUpdate struct {
 // Study A research study
 type Study struct {
 	// Admin Email of the study administrator
-	Admin *openapi_types.Email `json:"admin,omitempty"`
+	Admin openapi_types.Email `json:"admin"`
 
 	// Cag Confidentiality Advisory Group approval sought/obtained
-	Cag *bool `json:"cag,omitempty"`
+	Cag bool `json:"cag"`
 
 	// CagRef CAG reference number
-	CagRef *string `json:"cag_ref,omitempty"`
+	CagRef string `json:"cag_ref"`
 
 	// Consent Participant consent will be sought
-	Consent *bool `json:"consent,omitempty"`
+	Consent bool `json:"consent"`
 
 	// Controller Data controller organization
 	Controller StudyController `json:"controller"`
 
 	// ControllerOther Other data controller if controller is "Other"
-	ControllerOther *string `json:"controller_other,omitempty"`
+	ControllerOther string `json:"controller_other"`
 
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
 
 	// DataProtection Registered with UCL Data Protection Office
-	DataProtection *bool `json:"data_protection,omitempty"`
+	DataProtection bool `json:"data_protection"`
 
 	// DataProtectionDate Data protection registration date (YYYY-MM format)
-	DataProtectionDate *string `json:"data_protection_date,omitempty"`
+	DataProtectionDate string `json:"data_protection_date"`
 
 	// DataProtectionId Data protection registration number
-	DataProtectionId *int `json:"data_protection_id,omitempty"`
+	DataProtectionId int `json:"data_protection_id"`
 
 	// DataProtectionNumber Full data protection registration number
-	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+	DataProtectionNumber string `json:"data_protection_number"`
 
 	// DataProtectionPrefix Data protection registry ID
-	DataProtectionPrefix *string `json:"data_protection_prefix,omitempty"`
+	DataProtectionPrefix string `json:"data_protection_prefix"`
 
 	// Dbs DBS check required for staff
-	Dbs *bool `json:"dbs,omitempty"`
+	Dbs bool `json:"dbs"`
 
 	// Description Description of the study
 	Description string `json:"description"`
 
 	// Dspt NHS Data Security & Protection Toolkit required
-	Dspt *bool `json:"dspt,omitempty"`
+	Dspt bool `json:"dspt"`
 
 	// Ethics Research Ethics Committee approval sought/obtained
-	Ethics *bool `json:"ethics,omitempty"`
+	Ethics bool `json:"ethics"`
 
 	// ExtEea Data processed outside UK/EEA
-	ExtEea *bool `json:"ext_eea,omitempty"`
+	ExtEea bool `json:"ext_eea"`
 
 	// ExternalUsers External users will have access
-	ExternalUsers *bool `json:"external_users,omitempty"`
+	ExternalUsers bool `json:"external_users"`
 
 	// Hra Health Research Authority approval sought/obtained
-	Hra *bool `json:"hra,omitempty"`
+	Hra bool `json:"hra"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
 
 	// IrasId IRAS ID if applicable
-	IrasId *string `json:"iras_id,omitempty"`
+	IrasId string `json:"iras_id"`
 
 	// Mnca HRA Model Non-Commercial Agreement in place
-	Mnca *bool `json:"mnca,omitempty"`
+	Mnca bool `json:"mnca"`
 
 	// Nhs Research associated with NHS
-	Nhs *bool `json:"nhs,omitempty"`
+	Nhs bool `json:"nhs"`
 
 	// NhsEngland NHS England involvement
-	NhsEngland *bool `json:"nhs_england,omitempty"`
+	NhsEngland bool `json:"nhs_england"`
 
 	// NhsEnglandRef NHS England DARS NIC number
-	NhsEnglandRef *string `json:"nhs_england_ref,omitempty"`
+	NhsEnglandRef string `json:"nhs_england_ref"`
 
 	// NonConsent Data collected indirectly
-	NonConsent *bool `json:"non_consent,omitempty"`
+	NonConsent bool `json:"non_consent"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId string `json:"owner_user_id"`
 
 	// ThirdParty Third party organizations involved
-	ThirdParty *bool `json:"third_party,omitempty"`
+	ThirdParty bool `json:"third_party"`
 
 	// Title Title of the study
 	Title string `json:"title"`
 
 	// UclSponsorship UCL sponsorship sought/obtained
-	UclSponsorship *bool `json:"ucl_sponsorship,omitempty"`
+	UclSponsorship bool `json:"ucl_sponsorship"`
 
 	// UpdatedAt Time in RFC3339 format when the study was last updated
 	UpdatedAt string `json:"updated_at"`

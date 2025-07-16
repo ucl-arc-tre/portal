@@ -580,6 +580,30 @@ components:
         - controller
         - created_at
         - updated_at
+        - admin
+        - controller_other
+        - ucl_sponsorship
+        - cag
+        - cag_ref
+        - ethics
+        - hra
+        - iras_id
+        - nhs
+        - nhs_england
+        - nhs_england_ref
+        - mnca
+        - dspt
+        - dbs
+        - data_protection
+        - data_protection_prefix
+        - data_protection_date
+        - data_protection_id
+        - data_protection_number
+        - third_party
+        - external_users
+        - consent
+        - non_consent
+        - ext_eea
       properties:
         id:
           type: string
@@ -593,7 +617,6 @@ components:
         owner_user_id:
           type: string
           description: ID of the user who owns the study
-        # Study Personnel
         admin:
           type: string
           format: email
@@ -605,7 +628,6 @@ components:
         controller_other:
           type: string
           description: Other data controller if controller is "Other"
-        # Approvals and sponsorship
         ucl_sponsorship:
           type: boolean
           description: UCL sponsorship sought/obtained
@@ -624,7 +646,6 @@ components:
         iras_id:
           type: string
           description: IRAS ID if applicable
-        # NHS related
         nhs:
           type: boolean
           description: Research associated with NHS
@@ -640,7 +661,6 @@ components:
         dspt:
           type: boolean
           description: NHS Data Security & Protection Toolkit required
-        # Data protection and privacy
         dbs:
           type: boolean
           description: DBS check required for staff
