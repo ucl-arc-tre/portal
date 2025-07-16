@@ -258,6 +258,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               of this research
             </span>
           </Label>
+
           <Label htmlFor="cag" className={styles["checkbox-label"]}>
             <input type="checkbox" id="cag" {...register("cag")} />
             <span>
@@ -269,6 +270,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               for this research
             </span>
           </Label>
+
           {showCagRef && (
             <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
@@ -291,6 +293,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               approval of this research
             </span>
           </Label>
+
           {showIrasId && (
             <Label htmlFor="irasId">
               <span>
@@ -305,6 +308,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             </Label>
           )}
         </fieldset>
+
         <fieldset className={getFieldsetClass(2)}>
           <legend>NHS</legend>
 
@@ -313,6 +317,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             This research is associated with the NHS, uses NHS data, works with NHS sites or has use of a/some NHS
             facilities
           </Label>
+
           {showNhsRelated && (
             <>
               <Label htmlFor="nhsEngland" className={styles["checkbox-label"]}>
@@ -363,6 +368,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             <input type="checkbox" id="dataProtection" {...register("dataProtection")} />
             The research is already registered with the UCL Data Protection Office
           </Label>
+
           {showDataProtectionNumber && (
             <Label htmlFor="dataProtectionNumber">
               Data Protection Registration Number:
@@ -415,6 +421,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               )}
             </Label>
           )}
+
           <Label htmlFor="thirdParty" className={styles["checkbox-label"]}>
             <input type="checkbox" id="thirdParty" {...register("thirdParty")} />
             Organisations or businesses other than UCL will be involved in creating, storing, modifying, gatekeeping or
@@ -464,6 +471,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             {!isValid && (
               <HelperText className={styles["form-helper--invalid"]}>Please fill out all required fields</HelperText>
             )}
+
             <Button type="submit" disabled={!isValid || isSubmitting}>
               {isSubmitting ? "Submitting..." : "Submit Request"}
             </Button>

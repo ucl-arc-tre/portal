@@ -1,5 +1,6 @@
 .study-dialog {
-  width: 70vw;
+  width: 70dvw;
+
   overflow: scroll;
   position: absolute;
   top: 5vh;

@@ -1,24 +1,5 @@
-.page-description {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-left: 4px solid #007bff;
-  border-radius: 4px;
-}
-
-.page-description p {
-  margin: 0;
-  color: #666;
-  line-height: 1.6;
-}
-
-.page-description a {
-  color: #0066cc;
-  text-decoration: underline;
-}
-
-.page-description a:hover {
-  color: #004499;
+.studies-description {
+  margin: 1.4rem;
 }
 
 .not-approved-section {
@@ -35,8 +16,7 @@
 }
 
 @media (max-width: 768px) {
-  .page-description {
-    margin: 1rem 0;
-    padding: 1rem;
+  .studies-description {
+    margin: 1rem;
   }
 }

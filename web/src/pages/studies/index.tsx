@@ -30,6 +30,7 @@ export default function StudiesPage() {
 
         // Dummy data for now
         await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+        // setStudies([]);
         setStudies([
           {
             id: "1",
@@ -64,11 +65,10 @@ export default function StudiesPage() {
       />
       <Title text={"Studies"} />
 
-      <p className={styles.subtitle}>
-        <span className={styles.highlighted}>Studies</span> are a top level entity. They can contain{" "}
-        <strong className={styles.coloured}>projects</strong>
+      <p className={styles["studies-description"]}>
+        Studies are a top level entity. They can contain <strong>projects</strong>
         <InfoTooltip text="Projects are owned by a study and can contain assets" />
-        and <strong className={styles.coloured}>assets</strong>
+        and <strong>assets</strong>
         <InfoTooltip text="Assets can be owned directly by a study or by a project within a study" />, for more detailed
         information and an entity relationship diagram, look at our
         <Button href="/glossary" variant="tertiary" size="small" inline>
@@ -91,21 +91,7 @@ export default function StudiesPage() {
 
       {isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
 
-      {isApprovedResearcher && !studiesLoading && studies.length === 0 && (
-        <>
-          <h4>You do not have any studies to view. Click the button below to create a study.</h4>
-
-          <Button href="/studies" size="large">
-            Go to studies page
-          </Button>
-        </>
-      )}
-
-      {/* {isApprovedResearcher && !studiesLoading && studies.length > 0 && <Assets studies={studies} />} */}
-
-      {isApprovedResearcher && !studiesLoading && studies.length > 0 && (
-        <Studies username={userData!.username} studies={studies} />
-      )}
+      {isApprovedResearcher && !studiesLoading && <Studies username={userData!.username} studies={studies} />}
     </>
   );
 }
