@@ -10,7 +10,7 @@ describe(`Studies page content`, () => {
     cy.visit("/studies");
     cy.waitForAuth();
 
-    cy.contains("No Studies").should("be.visible");
+    cy.contains("Complete your profile").should("be.visible");
   });
 
   it("should show content for base approved researcher", () => {
@@ -19,8 +19,7 @@ describe(`Studies page content`, () => {
     cy.visit("/studies");
     cy.waitForAuth();
 
-    cy.contains("No Studies").should("not.exist");
-    cy.contains("Your Studies").should("be.visible");
+    cy.contains("Create Your First Study").should("be.visible");
   });
 });
 
@@ -33,7 +32,7 @@ describe("Approved researcher can create studies", () => {
   });
 
   it("can bring up the form", () => {
-    cy.contains("Create Study").should("be.visible").click();
+    cy.contains("Create Your First Study").should("be.visible").click();
     cy.get("[data-cy='create-study-form']").should("be.visible");
   });
 
@@ -41,7 +40,7 @@ describe("Approved researcher can create studies", () => {
     cy.fixture("auth-base-approved-researcher.json").then((data) => {
       const username = data.username;
 
-      cy.contains("Create Study").should("be.visible").click();
+      cy.contains("Create Your First Study").should("be.visible").click();
 
       cy.get("input[name='owner']").should("have.attr", "readonly");
       cy.get("input[name='owner']").should("have.value", username);
@@ -49,7 +48,7 @@ describe("Approved researcher can create studies", () => {
   });
 
   it("can't submit without filling in required fields", () => {
-    cy.contains("Create Study").should("be.visible").click();
+    cy.contains("Create Your First Study").should("be.visible").click();
 
     // click through form
     cy.get("[data-cy='next']").click();
@@ -59,7 +58,7 @@ describe("Approved researcher can create studies", () => {
     // go back to start of form and fill in the fields
     cy.get("[data-cy='back']").click();
     cy.get("[data-cy='back']").click();
-    cy.get("input[name='studyName']").type("Test Study");
+    cy.get("input[name='title']").type("Test Study");
     cy.get("select[name='controller']").select("UCL");
 
     // go to the end and submit
@@ -75,7 +74,7 @@ describe("Checking conditionally rendered fields", () => {
     cy.mockAuthAsBaseApprovedResearcher();
     cy.visit("/studies");
     cy.waitForAuth();
-    cy.contains("Create Study").click();
+    cy.contains("Create Your First Study").click();
   });
   afterEach(() => {
     cy.get("[data-cy='close-dialog']").click();
