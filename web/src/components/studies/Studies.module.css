@@ -45,6 +45,20 @@
   border-radius: 2px;
 }
 
+.error-message {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: #721c24;
+}
+
+.error-message p {
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .no-studies-message {
     padding: 2rem 1rem;

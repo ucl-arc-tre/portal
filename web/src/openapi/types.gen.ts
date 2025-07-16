@@ -613,6 +613,69 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
 
+export type GetStudiesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type GetStudiesErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesResponses = {
+    200: Array<Study>;
+};
+
+export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
+
+export type PostStudiesData = {
+    body: Study;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type PostStudiesErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesResponses = {
+    /**
+     * Study created successfully
+     */
+    201: Study;
+};
+
+export type PostStudiesResponse = PostStudiesResponses[keyof PostStudiesResponses];
+
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
     path: {
@@ -693,41 +756,6 @@ export type PostStudiesByStudyIdAssetsResponses = {
 };
 
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
-
-export type PostStudiesData = {
-    body: Study;
-    path?: never;
-    query?: never;
-    url: '/studies';
-};
-
-export type PostStudiesErrors = {
-    /**
-     * Invalid request
-     */
-    400: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PostStudiesResponses = {
-    /**
-     * Study created successfully
-     */
-    201: Study;
-};
-
-export type PostStudiesResponse = PostStudiesResponses[keyof PostStudiesResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/web/api/v0` | (string & {});

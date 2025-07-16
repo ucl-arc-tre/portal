@@ -214,6 +214,48 @@ paths:
         default:
           description: Unexpected error
 
+  # Study Management
+  /studies:
+    get:
+      description: Get all studies accessible to the current user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Study"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a new study
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Study"
+      responses:
+        "201":
+          description: Study created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Study"
+        "400":
+          description: Invalid request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -269,32 +311,6 @@ paths:
           description: Forbidden
         "404":
           description: Study not found
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
-  # Study Management
-  /studies:
-    post:
-      description: Create a new study
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Study"
-      responses:
-        "201":
-          description: Study created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Study"
-        "400":
-          description: Invalid request
-        "403":
-          description: Forbidden
         "500":
           description: Internal server error
         default:

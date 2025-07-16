@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { getStudies, Study } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import Studies from "@/components/studies/Studies";
@@ -18,39 +19,21 @@ export default function StudiesPage() {
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
+  const fetchStudies = async () => {
+    setStudiesLoading(true);
+    try {
+      const response = await getStudies();
+      setStudies(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch studies:", error);
+      setStudies([]);
+    } finally {
+      setStudiesLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isApprovedResearcher) return;
-
-    const fetchStudies = async () => {
-      setStudiesLoading(true);
-      try {
-        // TODO: Replace with actual API call
-        // const response = await getStudies();
-        // setStudies(response.data);
-
-        // Dummy data for now
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-        setStudies([]);
-        // setStudies([
-        //   {
-        //     id: "1",
-        //     title: "COVID-19 Research Study",
-        //     description: "A comprehensive study on COVID-19 impacts and treatments",
-        //   },
-        //   {
-        //     id: "2",
-        //     title: "Cancer Treatment Analysis",
-        //     description: "Analysis of various cancer treatment methodologies",
-        //   },
-        // ]);
-      } catch (error) {
-        console.error("Failed to fetch studies:", error);
-        setStudies([]);
-      } finally {
-        setStudiesLoading(false);
-      }
-    };
-
     fetchStudies();
   }, [isApprovedResearcher]);
 
@@ -91,7 +74,9 @@ export default function StudiesPage() {
 
       {isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
 
-      {isApprovedResearcher && !studiesLoading && <Studies username={userData!.username} studies={studies} />}
+      {isApprovedResearcher && !studiesLoading && (
+        <Studies username={userData!.username} studies={studies} fetchStudies={fetchStudies} />
+      )}
     </>
   );
 }

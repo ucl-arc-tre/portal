@@ -24,10 +24,41 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
+export type StudyFormData = {
+  title: string;
+  description: string;
+  owner: string;
+  admin: string;
+  controller: string;
+  controllerOther: string;
+  cagRef: number;
+  dataProtectionPrefix: string;
+  dataProtectionDate: string;
+  dataProtectionId: number;
+  dataProtectionNumber: string;
+  nhsEnglandRef: number;
+  irasId: string;
+  uclSponsorship: boolean;
+  cag: boolean;
+  ethics: boolean;
+  hra: boolean;
+  dbs: boolean;
+  dataProtection: boolean;
+  thirdParty: boolean;
+  externalUsers: boolean;
+  consent: boolean;
+  nonConsent: boolean;
+  extEea: boolean;
+  nhs: boolean;
+  nhsEngland: boolean;
+  mnca: boolean;
+  dspt: boolean;
+};
+
 type CreateStudyProps = {
   username: string;
   setCreateStudyFormOpen: (name: boolean) => void;
-  onSubmit: (data: Study) => Promise<void>;
+  onSubmit: (data: StudyFormData) => Promise<void>;
 };
 
 // what is this?
@@ -42,7 +73,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     control,
     setValue,
     formState: { errors, isValid, isSubmitting },
-  } = useForm<Study>({
+  } = useForm<StudyFormData>({
     mode: "onChange",
     criteriaMode: "all",
     defaultValues: {
@@ -116,7 +147,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     }
   }, [controllerValue, setValue]);
 
-  const onSubmit: SubmitHandler<Study> = async (data) => {
+  const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
     try {
       await onSubmitProp(data);
       setCreateStudyFormOpen(false);
@@ -174,7 +205,12 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           <Label htmlFor="description">
             Study Description:
-            <Textarea id="description" {...register("description", { maxLength: 255 })} />
+            <Controller
+              name="description"
+              control={control}
+              rules={{ maxLength: 255 }}
+              render={({ field }) => <Textarea {...field} id="description" />}
+            />
           </Label>
         </fieldset>
 

@@ -27,6 +27,19 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData types.Study) (*types.S
 	return &studyData, nil
 }
 
+// GetStudies retrieves all studies that the user owns or has access to
+func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
+	var studies []types.Study
+
+	// For now, only return studies owned by the user
+	// This could be expanded later to include shared studies
+	if err := s.db.Where("owner_user_id = ?", userID).Find(&studies).Error; err != nil {
+		return nil, err
+	}
+
+	return studies, nil
+}
+
 // GetStudyAssets retrieves all assets for a study,
 // ensures that the user owns the study (this might be refactored later to allow shared access)
 func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {

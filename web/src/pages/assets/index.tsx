@@ -12,7 +12,7 @@ import styles from "./index.module.css";
 
 export default function AssetsPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
-  const [studies, setStudies] = useState<Study[]>([]);
+  const [studies, setStudies] = useState([]);
   const [studiesLoading, setStudiesLoading] = useState(true);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
@@ -29,18 +29,19 @@ export default function AssetsPage() {
 
         // Dummy data for now
         await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
-        setStudies([
-          {
-            id: "1",
-            title: "COVID-19 Research Study",
-            description: "A comprehensive study on COVID-19 impacts and treatments",
-          },
-          {
-            id: "2",
-            title: "Cancer Treatment Analysis",
-            description: "Analysis of various cancer treatment methodologies",
-          },
-        ]);
+        setStudies([]);
+        // setStudies([
+        //   {
+        //     id: "1",
+        //     title: "COVID-19 Research Study",
+        //     description: "A comprehensive study on COVID-19 impacts and treatments",
+        //   },
+        //   {
+        //     id: "2",
+        //     title: "Cancer Treatment Analysis",
+        //     description: "Analysis of various cancer treatment methodologies",
+        //   },
+        // ]);
       } catch (error) {
         console.error("Failed to fetch studies:", error);
         setStudies([]);

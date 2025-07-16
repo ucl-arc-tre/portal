@@ -367,6 +367,9 @@ type ServerInterface interface {
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
 
+	// (GET /studies)
+	GetStudies(c *gin.Context)
+
 	// (POST /studies)
 	PostStudies(c *gin.Context)
 
@@ -508,6 +511,19 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfileTraining(c)
+}
+
+// GetStudies operation middleware
+func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudies(c)
 }
 
 // PostStudies operation middleware
@@ -656,6 +672,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)

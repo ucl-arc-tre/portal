@@ -1,4 +1,5 @@
 import Button from "@/components/ui/Button";
+import { Study } from "@/openapi";
 import styles from "./StudySelection.module.css";
 
 type StudySelectionProps = {

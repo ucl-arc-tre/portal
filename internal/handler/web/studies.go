@@ -11,6 +11,56 @@ import (
 	"gorm.io/gorm"
 )
 
+func (h *Handler) GetStudies(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+
+	studies, err := h.studies.GetStudies(user.ID)
+	if err != nil {
+		setServerError(ctx, err, "Failed to retrieve studies")
+		return
+	}
+
+	// Convert database studies to OpenAPI format
+	var response []openapi.Study
+	for _, study := range studies {
+		response = append(response, openapi.Study{
+			Id:                   study.ID.String(),
+			Title:                study.Title,
+			Description:          study.Description,
+			OwnerUserId:          study.OwnerUserID.String(),
+			Admin:                study.Admin,
+			Controller:           openapi.StudyController(study.Controller),
+			ControllerOther:      study.ControllerOther,
+			UclSponsorship:       study.UclSponsorship,
+			Cag:                  study.Cag,
+			CagRef:               study.CagRef,
+			Ethics:               study.Ethics,
+			Hra:                  study.Hra,
+			IrasId:               study.IrasId,
+			Nhs:                  study.Nhs,
+			NhsEngland:           study.NhsEngland,
+			NhsEnglandRef:        study.NhsEnglandRef,
+			Mnca:                 study.Mnca,
+			Dspt:                 study.Dspt,
+			Dbs:                  study.Dbs,
+			DataProtection:       study.DataProtection,
+			DataProtectionPrefix: study.DataProtectionPrefix,
+			DataProtectionDate:   study.DataProtectionDate,
+			DataProtectionId:     study.DataProtectionId,
+			DataProtectionNumber: study.DataProtectionNumber,
+			ThirdParty:           study.ThirdParty,
+			ExternalUsers:        study.ExternalUsers,
+			Consent:              study.Consent,
+			NonConsent:           study.NonConsent,
+			ExtEea:               study.ExtEea,
+			CreatedAt:            study.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UpdatedAt:            study.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		})
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 func (h *Handler) PostStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
