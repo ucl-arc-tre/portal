@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -53,8 +54,8 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 			Consent:              study.Consent,
 			NonConsent:           study.NonConsent,
 			ExtEea:               study.ExtEea,
-			CreatedAt:            study.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt:            study.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			CreatedAt:            study.CreatedAt.Format(config.TimeFormat),
+			UpdatedAt:            study.UpdatedAt.Format(config.TimeFormat),
 		})
 	}
 
@@ -70,7 +71,6 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	// Convert OpenAPI request to database model
 	studyData := types.Study{
 		Title:                request.Title,
 		Description:          request.Description,

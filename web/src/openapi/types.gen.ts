@@ -650,13 +650,13 @@ export type PostStudiesData = {
 
 export type PostStudiesErrors = {
     /**
-     * Invalid request
-     */
-    400: unknown;
-    /**
      * Forbidden
      */
     403: unknown;
+    /**
+     * Invalid request
+     */
+    406: unknown;
     /**
      * Internal server error
      */
