@@ -247,7 +247,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Study"
-        "400":
+        "406":
           description: Invalid request
         "403":
           description: Forbidden
