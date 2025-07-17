@@ -57,10 +57,7 @@ func (s *Service) GetUser(id string) (types.User, error) {
 	user := types.User{}
 	result := s.db.Where("id = ?", id).
 		First(&user)
-	if result.Error != nil {
-		return user, types.NewErrServerError(result.Error)
-	}
-	return user, nil
+	return user, types.NewErrServerError(result.Error)
 }
 
 // Get an persisted user. Optional

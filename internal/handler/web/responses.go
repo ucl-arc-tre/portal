@@ -22,8 +22,7 @@ func setError(ctx *gin.Context, err error, message string) {
 		setErrResponse(ctx, err, http.StatusNotAcceptable, message)
 		return
 	}
-	log.Warn().Msg("Unknown error")
-	setErrResponse(ctx, err, 520, message)
+	setErrResponse(ctx, fmt.Errorf("unknown error: %v", err), 520, message)
 }
 
 func setErrResponse(ctx *gin.Context, err error, status int, message string) {

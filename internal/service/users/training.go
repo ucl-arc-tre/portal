@@ -146,7 +146,7 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	} else if result.Error != nil {
-		return nil, fmt.Errorf("%w: %w", types.ErrServerError, result.Error)
+		return nil, types.NewErrServerError(result.Error)
 	}
 	expiresAt := record.CompletedAt.Add(config.TrainingValidity)
 	return &expiresAt, nil
