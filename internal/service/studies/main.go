@@ -1,6 +1,9 @@
 package studies
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -18,6 +21,30 @@ func New() *Service {
 }
 
 func (s *Service) CreateStudy(userID uuid.UUID, studyData types.Study) (*types.Study, error) {
+	if strings.TrimSpace(studyData.Title) == "" {
+		return nil, errors.New("study title is required")
+	}
+
+	if strings.TrimSpace(studyData.Controller) == "" {
+		return nil, errors.New("controller is required")
+	}
+
+	if studyData.Controller != "UCL" && studyData.Controller != "Other" {
+		return nil, errors.New("controller must be either 'UCL' or 'Other'")
+	}
+
+	if studyData.Controller == "Other" && strings.TrimSpace(studyData.ControllerOther) == "" {
+		return nil, errors.New("controller_other is required when controller is 'Other'")
+	}
+
+	if len(studyData.Title) > 50 {
+		return nil, errors.New("study title must be 50 characters or less")
+	}
+
+	if len(studyData.Description) > 255 {
+		return nil, errors.New("study description must be 255 characters or less")
+	}
+
 	studyData.OwnerUserID = userID
 
 	if err := s.db.Create(&studyData).Error; err != nil {
