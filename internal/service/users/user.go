@@ -2,6 +2,7 @@ package users
 
 import (
 	"errors"
+	"fmt"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -16,24 +17,24 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 	users := []types.User{}
 	result := s.db.Find(&users)
 	if result.Error != nil {
-		return usersData, result.Error
+		return usersData, types.NewErrServerError(result.Error)
 	}
 
 	// then loop through each and get their agreements & roles
 	for _, user := range users {
 		agreements, err := s.ConfirmedAgreements(user)
 		if err != nil {
-			return usersData, errors.New("failed to get agreements for user")
+			return usersData, fmt.Errorf("failed to get agreements for user: %w", err)
 		}
 
 		roles, err := rbac.GetRoles(user)
 		if err != nil {
-			return usersData, errors.New("failed to get roles for user")
+			return usersData, fmt.Errorf("failed to get roles for user: %w", err)
 		}
 
 		training, err := s.GetTrainingRecord(user)
 		if err != nil {
-			return usersData, errors.New("failed to get training for user")
+			return usersData, fmt.Errorf("failed to get training for user: %w", err)
 		}
 
 		userData := openapi.UserData{
@@ -53,10 +54,13 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 }
 
 func (s *Service) GetUser(id string) (types.User, error) {
-	person := types.User{}
+	user := types.User{}
 	result := s.db.Where("id = ?", id).
-		First(&person)
-	return person, result.Error
+		First(&user)
+	if result.Error != nil {
+		return user, types.NewErrServerError(result.Error)
+	}
+	return user, nil
 }
 
 // Get an persisted user. Optional
@@ -66,5 +70,5 @@ func (s *Service) GetUserByUsername(username types.Username) (*types.User, error
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
-	return &user, result.Error
+	return &user, types.NewErrServerError(result.Error)
 }

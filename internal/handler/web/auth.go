@@ -14,7 +14,7 @@ func (h *Handler) GetAuth(ctx *gin.Context) {
 	auth := openapi.Auth{Username: string(user.Username)}
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
-		setServerError(ctx, err, "Failed to get roles for user")
+		setError(ctx, err, "Failed to get roles for user")
 		return
 	}
 	for _, role := range roles {

@@ -15,7 +15,7 @@ import (
 func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement types.Agreement) error {
 	records, err := approvedResearcherImportRecordsFromCSV(csvContent)
 	if err != nil {
-		return err
+		return types.NewErrInvalidObject(err)
 	}
 	for _, record := range records {
 		user, err := s.persistedUser(record.Username)
@@ -42,7 +42,7 @@ func (s *Service) persistedUser(username types.Username) (types.User, error) {
 			Model:    types.Model{CreatedAt: time.Now()},
 		}).
 		FirstOrCreate(&user)
-	return user, result.Error
+	return user, types.NewErrServerError(result.Error)
 }
 
 func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResearcherImportRecord, error) {

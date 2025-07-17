@@ -27,8 +27,11 @@ func (s *Service) LatestApprovedResearcher() (*types.Agreement, error) {
 		Order("created_at desc").
 		Limit(1).
 		Find(&agreemeents)
-	if result.Error != nil || len(agreemeents) == 0 {
-		return nil, fmt.Errorf("failed to get agreement %v", result.Error)
+	if result.Error != nil {
+		return nil, types.NewErrServerError(result.Error)
+	}
+	if len(agreemeents) == 0 {
+		return nil, types.NewErrServerError(fmt.Errorf("no agreements"))
 	}
 	return &agreemeents[0], nil
 }

@@ -1,18 +1,20 @@
 package web
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType openapi.AgreementType) {
 	switch agreementType {
 	case openapi.AgreementTypeApprovedResearcher:
 		agreement, err := h.agreements.LatestApprovedResearcher()
-		if err != nil {
-			setServerError(ctx, err, "Failed to get approved researcher agreement")
+		if err != nil && errors.Is(err, types.ErrServerError) {
+			setError(ctx, err, "Failed to get approved researcher agreement")
 			return
 		}
 		ctx.JSON(http.StatusOK, openapi.Agreement{
