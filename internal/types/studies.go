@@ -8,32 +8,32 @@ type Study struct {
 	ModelAuditable
 	OwnerUserID          uuid.UUID `gorm:"not null;index"`
 	Title                string    `gorm:"not null"`
-	Description          string    `gorm:"type:text"`
-	Admin                string    `gorm:"type:varchar(255)"`
+	Description          *string   `gorm:"type:text"`
+	Admin                *string   `gorm:"type:varchar(255)"`
 	Controller           string    `gorm:"not null"`
-	ControllerOther      string    `gorm:"type:varchar(255)"`
-	UclSponsorship       bool      `gorm:"default:false"`
-	Cag                  bool      `gorm:"default:false"`
-	CagRef               string    `gorm:"type:varchar(255)"`
-	Ethics               bool      `gorm:"default:false"`
-	Hra                  bool      `gorm:"default:false"`
-	IrasId               string    `gorm:"type:varchar(255)"`
-	Nhs                  bool      `gorm:"default:false"`
-	NhsEngland           bool      `gorm:"default:false"`
-	NhsEnglandRef        string    `gorm:"type:varchar(255)"`
-	Mnca                 bool      `gorm:"default:false"`
-	Dspt                 bool      `gorm:"default:false"`
-	Dbs                  bool      `gorm:"default:false"`
-	DataProtection       bool      `gorm:"default:false"`
-	DataProtectionPrefix string    `gorm:"type:varchar(255)"`
-	DataProtectionDate   string    `gorm:"type:varchar(255)"`
-	DataProtectionId     int       `gorm:""`
-	DataProtectionNumber string    `gorm:"type:varchar(255)"`
-	ThirdParty           bool      `gorm:"default:false"`
-	ExternalUsers        bool      `gorm:"default:false"`
-	Consent              bool      `gorm:"default:false"`
-	NonConsent           bool      `gorm:"default:false"`
-	ExtEea               bool      `gorm:"default:false"`
+	ControllerOther      *string   `gorm:"type:varchar(255)"`
+	UclSponsorship       *bool     `gorm:""`
+	Cag                  *bool     `gorm:""`
+	CagRef               *string   `gorm:"type:varchar(255)"`
+	Ethics               *bool     `gorm:""`
+	Hra                  *bool     `gorm:""`
+	IrasId               *string   `gorm:"type:varchar(255)"`
+	Nhs                  *bool     `gorm:""`
+	NhsEngland           *bool     `gorm:""`
+	NhsEnglandRef        *string   `gorm:"type:varchar(255)"`
+	Mnca                 *bool     `gorm:""`
+	Dspt                 *bool     `gorm:""`
+	Dbs                  *bool     `gorm:""`
+	DataProtection       *bool     `gorm:""`
+	DataProtectionPrefix *string   `gorm:"type:varchar(255)"`
+	DataProtectionDate   *string   `gorm:"type:varchar(255)"`
+	DataProtectionId     *int      `gorm:""`
+	DataProtectionNumber *string   `gorm:"type:varchar(255)"`
+	ThirdParty           *bool     `gorm:""`
+	ExternalUsers        *bool     `gorm:""`
+	Consent              *bool     `gorm:""`
+	NonConsent           *bool     `gorm:""`
+	ExtEea               *bool     `gorm:""`
 
 	// Relationships
 	Owner  User    `gorm:"foreignKey:OwnerUserID"`

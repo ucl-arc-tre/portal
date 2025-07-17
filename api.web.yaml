@@ -239,7 +239,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Study"
+              $ref: "#/components/schemas/StudyCreateRequest"
       responses:
         "201":
           description: Study created successfully
@@ -585,54 +585,19 @@ components:
           type: string
           description: Time in RFC3339 format when the asset was last updated
 
-    Study:
+    StudyBase:
       type: object
-      description: A research study
+      description: Base study properties
       required:
-        - id
-        - owner_user_id
-        - created_at
-        - updated_at
         - title
-        - description
-        - admin
         - controller
-        - controller_other
-        - ucl_sponsorship
-        - cag
-        - cag_ref
-        - ethics
-        - hra
-        - iras_id
-        - nhs
-        - nhs_england
-        - nhs_england_ref
-        - mnca
-        - dspt
-        - dbs
-        - data_protection
-        - data_protection_prefix
-        - data_protection_date
-        - data_protection_id
-        - data_protection_number
-        - third_party
-        - external_users
-        - consent
-        - non_consent
-        - ext_eea
       properties:
-        id:
-          type: string
-          description: Unique identifier for the study
         title:
           type: string
           description: Title of the study
         description:
           type: string
           description: Description of the study
-        owner_user_id:
-          type: string
-          description: ID of the user who owns the study
         admin:
           type: string
           description: Email of the study administrator
@@ -709,9 +674,31 @@ components:
         ext_eea:
           type: boolean
           description: Data processed outside UK/EEA
-        created_at:
+        owner_user_id:
           type: string
-          description: Time in RFC3339 format when the study was created
-        updated_at:
-          type: string
-          description: Time in RFC3339 format when the study was last updated
+          description: ID of the user who owns the study
+
+    StudyCreateRequest:
+      allOf:
+        - $ref: "#/components/schemas/StudyBase"
+      description: Request payload for creating a new study
+
+    Study:
+      allOf:
+        - $ref: "#/components/schemas/StudyBase"
+        - type: object
+          required:
+            - id
+            - created_at
+            - updated_at
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the study
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the study was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the study was last updated
+      description: A research study

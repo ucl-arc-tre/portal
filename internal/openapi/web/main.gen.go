@@ -46,8 +46,14 @@ const (
 
 // Defines values for StudyController.
 const (
-	Other StudyController = "Other"
-	UCL   StudyController = "UCL"
+	StudyControllerOther StudyController = "Other"
+	StudyControllerUCL   StudyController = "UCL"
+)
+
+// Defines values for StudyBaseController.
+const (
+	StudyBaseControllerOther StudyBaseController = "Other"
+	StudyBaseControllerUCL   StudyBaseController = "UCL"
 )
 
 // Defines values for TrainingKind.
@@ -184,97 +190,97 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
-// Study A research study
+// Study defines model for Study.
 type Study struct {
 	// Admin Email of the study administrator
-	Admin string `json:"admin"`
+	Admin *string `json:"admin,omitempty"`
 
 	// Cag Confidentiality Advisory Group approval sought/obtained
-	Cag bool `json:"cag"`
+	Cag *bool `json:"cag,omitempty"`
 
 	// CagRef CAG reference number
-	CagRef string `json:"cag_ref"`
+	CagRef *string `json:"cag_ref,omitempty"`
 
 	// Consent Participant consent will be sought
-	Consent bool `json:"consent"`
+	Consent *bool `json:"consent,omitempty"`
 
 	// Controller Data controller organization
 	Controller StudyController `json:"controller"`
 
 	// ControllerOther Other data controller if controller is "Other"
-	ControllerOther string `json:"controller_other"`
+	ControllerOther *string `json:"controller_other,omitempty"`
 
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
 
 	// DataProtection Registered with UCL Data Protection Office
-	DataProtection bool `json:"data_protection"`
+	DataProtection *bool `json:"data_protection,omitempty"`
 
 	// DataProtectionDate Data protection registration date (YYYY-MM format)
-	DataProtectionDate string `json:"data_protection_date"`
+	DataProtectionDate *string `json:"data_protection_date,omitempty"`
 
 	// DataProtectionId Data protection registration number
-	DataProtectionId int `json:"data_protection_id"`
+	DataProtectionId *int `json:"data_protection_id,omitempty"`
 
 	// DataProtectionNumber Full data protection registration number
-	DataProtectionNumber string `json:"data_protection_number"`
+	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
 
 	// DataProtectionPrefix Data protection registry ID
-	DataProtectionPrefix string `json:"data_protection_prefix"`
+	DataProtectionPrefix *string `json:"data_protection_prefix,omitempty"`
 
 	// Dbs DBS check required for staff
-	Dbs bool `json:"dbs"`
+	Dbs *bool `json:"dbs,omitempty"`
 
 	// Description Description of the study
-	Description string `json:"description"`
+	Description *string `json:"description,omitempty"`
 
 	// Dspt NHS Data Security & Protection Toolkit required
-	Dspt bool `json:"dspt"`
+	Dspt *bool `json:"dspt,omitempty"`
 
 	// Ethics Research Ethics Committee approval sought/obtained
-	Ethics bool `json:"ethics"`
+	Ethics *bool `json:"ethics,omitempty"`
 
 	// ExtEea Data processed outside UK/EEA
-	ExtEea bool `json:"ext_eea"`
+	ExtEea *bool `json:"ext_eea,omitempty"`
 
 	// ExternalUsers External users will have access
-	ExternalUsers bool `json:"external_users"`
+	ExternalUsers *bool `json:"external_users,omitempty"`
 
 	// Hra Health Research Authority approval sought/obtained
-	Hra bool `json:"hra"`
+	Hra *bool `json:"hra,omitempty"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
 
 	// IrasId IRAS ID if applicable
-	IrasId string `json:"iras_id"`
+	IrasId *string `json:"iras_id,omitempty"`
 
 	// Mnca HRA Model Non-Commercial Agreement in place
-	Mnca bool `json:"mnca"`
+	Mnca *bool `json:"mnca,omitempty"`
 
 	// Nhs Research associated with NHS
-	Nhs bool `json:"nhs"`
+	Nhs *bool `json:"nhs,omitempty"`
 
 	// NhsEngland NHS England involvement
-	NhsEngland bool `json:"nhs_england"`
+	NhsEngland *bool `json:"nhs_england,omitempty"`
 
 	// NhsEnglandRef NHS England DARS NIC number
-	NhsEnglandRef string `json:"nhs_england_ref"`
+	NhsEnglandRef *string `json:"nhs_england_ref,omitempty"`
 
 	// NonConsent Data collected indirectly
-	NonConsent bool `json:"non_consent"`
+	NonConsent *bool `json:"non_consent,omitempty"`
 
 	// OwnerUserId ID of the user who owns the study
-	OwnerUserId string `json:"owner_user_id"`
+	OwnerUserId *string `json:"owner_user_id,omitempty"`
 
 	// ThirdParty Third party organizations involved
-	ThirdParty bool `json:"third_party"`
+	ThirdParty *bool `json:"third_party,omitempty"`
 
 	// Title Title of the study
 	Title string `json:"title"`
 
 	// UclSponsorship UCL sponsorship sought/obtained
-	UclSponsorship bool `json:"ucl_sponsorship"`
+	UclSponsorship *bool `json:"ucl_sponsorship,omitempty"`
 
 	// UpdatedAt Time in RFC3339 format when the study was last updated
 	UpdatedAt string `json:"updated_at"`
@@ -282,6 +288,99 @@ type Study struct {
 
 // StudyController Data controller organization
 type StudyController string
+
+// StudyBase Base study properties
+type StudyBase struct {
+	// Admin Email of the study administrator
+	Admin *string `json:"admin,omitempty"`
+
+	// Cag Confidentiality Advisory Group approval sought/obtained
+	Cag *bool `json:"cag,omitempty"`
+
+	// CagRef CAG reference number
+	CagRef *string `json:"cag_ref,omitempty"`
+
+	// Consent Participant consent will be sought
+	Consent *bool `json:"consent,omitempty"`
+
+	// Controller Data controller organization
+	Controller StudyBaseController `json:"controller"`
+
+	// ControllerOther Other data controller if controller is "Other"
+	ControllerOther *string `json:"controller_other,omitempty"`
+
+	// DataProtection Registered with UCL Data Protection Office
+	DataProtection *bool `json:"data_protection,omitempty"`
+
+	// DataProtectionDate Data protection registration date (YYYY-MM format)
+	DataProtectionDate *string `json:"data_protection_date,omitempty"`
+
+	// DataProtectionId Data protection registration number
+	DataProtectionId *int `json:"data_protection_id,omitempty"`
+
+	// DataProtectionNumber Full data protection registration number
+	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+
+	// DataProtectionPrefix Data protection registry ID
+	DataProtectionPrefix *string `json:"data_protection_prefix,omitempty"`
+
+	// Dbs DBS check required for staff
+	Dbs *bool `json:"dbs,omitempty"`
+
+	// Description Description of the study
+	Description *string `json:"description,omitempty"`
+
+	// Dspt NHS Data Security & Protection Toolkit required
+	Dspt *bool `json:"dspt,omitempty"`
+
+	// Ethics Research Ethics Committee approval sought/obtained
+	Ethics *bool `json:"ethics,omitempty"`
+
+	// ExtEea Data processed outside UK/EEA
+	ExtEea *bool `json:"ext_eea,omitempty"`
+
+	// ExternalUsers External users will have access
+	ExternalUsers *bool `json:"external_users,omitempty"`
+
+	// Hra Health Research Authority approval sought/obtained
+	Hra *bool `json:"hra,omitempty"`
+
+	// IrasId IRAS ID if applicable
+	IrasId *string `json:"iras_id,omitempty"`
+
+	// Mnca HRA Model Non-Commercial Agreement in place
+	Mnca *bool `json:"mnca,omitempty"`
+
+	// Nhs Research associated with NHS
+	Nhs *bool `json:"nhs,omitempty"`
+
+	// NhsEngland NHS England involvement
+	NhsEngland *bool `json:"nhs_england,omitempty"`
+
+	// NhsEnglandRef NHS England DARS NIC number
+	NhsEnglandRef *string `json:"nhs_england_ref,omitempty"`
+
+	// NonConsent Data collected indirectly
+	NonConsent *bool `json:"non_consent,omitempty"`
+
+	// OwnerUserId ID of the user who owns the study
+	OwnerUserId *string `json:"owner_user_id,omitempty"`
+
+	// ThirdParty Third party organizations involved
+	ThirdParty *bool `json:"third_party,omitempty"`
+
+	// Title Title of the study
+	Title string `json:"title"`
+
+	// UclSponsorship UCL sponsorship sought/obtained
+	UclSponsorship *bool `json:"ucl_sponsorship,omitempty"`
+}
+
+// StudyBaseController Data controller organization
+type StudyBaseController string
+
+// StudyCreateRequest Base study properties
+type StudyCreateRequest = StudyBase
 
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
@@ -332,7 +431,7 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
-type PostStudiesJSONRequestBody = Study
+type PostStudiesJSONRequestBody = StudyCreateRequest
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = Asset

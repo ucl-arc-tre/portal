@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -20,12 +21,12 @@ func New() *Service {
 	}
 }
 
-func (s *Service) CreateStudy(userID uuid.UUID, studyData types.Study) (*types.Study, error) {
+func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
 	if strings.TrimSpace(studyData.Title) == "" {
 		return nil, errors.New("study title is required")
 	}
 
-	if strings.TrimSpace(studyData.Controller) == "" {
+	if strings.TrimSpace(string(studyData.Controller)) == "" {
 		return nil, errors.New("controller is required")
 	}
 
@@ -33,7 +34,7 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData types.Study) (*types.S
 		return nil, errors.New("controller must be either 'UCL' or 'Other'")
 	}
 
-	if studyData.Controller == "Other" && strings.TrimSpace(studyData.ControllerOther) == "" {
+	if studyData.Controller == "Other" && (studyData.ControllerOther == nil || strings.TrimSpace(*studyData.ControllerOther) == "") {
 		return nil, errors.New("controller_other is required when controller is 'Other'")
 	}
 
@@ -41,17 +42,47 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData types.Study) (*types.S
 		return nil, errors.New("study title must be 50 characters or less")
 	}
 
-	if len(studyData.Description) > 255 {
+	if studyData.Description != nil && len(*studyData.Description) > 255 {
 		return nil, errors.New("study description must be 255 characters or less")
 	}
 
-	studyData.OwnerUserID = userID
+	dbStudy := types.Study{
+		OwnerUserID: userID,
+		Title:       studyData.Title,
+		Controller:  string(studyData.Controller),
+	}
 
-	if err := s.db.Create(&studyData).Error; err != nil {
+	dbStudy.Description = studyData.Description
+	dbStudy.Admin = studyData.Admin
+	dbStudy.ControllerOther = studyData.ControllerOther
+	dbStudy.UclSponsorship = studyData.UclSponsorship
+	dbStudy.Cag = studyData.Cag
+	dbStudy.CagRef = studyData.CagRef
+	dbStudy.Ethics = studyData.Ethics
+	dbStudy.Hra = studyData.Hra
+	dbStudy.IrasId = studyData.IrasId
+	dbStudy.Nhs = studyData.Nhs
+	dbStudy.NhsEngland = studyData.NhsEngland
+	dbStudy.NhsEnglandRef = studyData.NhsEnglandRef
+	dbStudy.Mnca = studyData.Mnca
+	dbStudy.Dspt = studyData.Dspt
+	dbStudy.Dbs = studyData.Dbs
+	dbStudy.DataProtection = studyData.DataProtection
+	dbStudy.DataProtectionPrefix = studyData.DataProtectionPrefix
+	dbStudy.DataProtectionDate = studyData.DataProtectionDate
+	dbStudy.DataProtectionId = studyData.DataProtectionId
+	dbStudy.DataProtectionNumber = studyData.DataProtectionNumber
+	dbStudy.ThirdParty = studyData.ThirdParty
+	dbStudy.ExternalUsers = studyData.ExternalUsers
+	dbStudy.Consent = studyData.Consent
+	dbStudy.NonConsent = studyData.NonConsent
+	dbStudy.ExtEea = studyData.ExtEea
+
+	if err := s.db.Create(&dbStudy).Error; err != nil {
 		return nil, err
 	}
 
-	return &studyData, nil
+	return &dbStudy, nil
 }
 
 // GetStudies retrieves all studies that the user owns or has access to

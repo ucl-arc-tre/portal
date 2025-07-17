@@ -178,13 +178,9 @@ export type Asset = {
 };
 
 /**
- * A research study
+ * Base study properties
  */
-export type Study = {
-    /**
-     * Unique identifier for the study
-     */
-    id: string;
+export type StudyBase = {
     /**
      * Title of the study
      */
@@ -192,15 +188,11 @@ export type Study = {
     /**
      * Description of the study
      */
-    description: string;
-    /**
-     * ID of the user who owns the study
-     */
-    owner_user_id: string;
+    description?: string;
     /**
      * Email of the study administrator
      */
-    admin: string;
+    admin?: string;
     /**
      * Data controller organization
      */
@@ -208,95 +200,114 @@ export type Study = {
     /**
      * Other data controller if controller is "Other"
      */
-    controller_other: string;
+    controller_other?: string;
     /**
      * UCL sponsorship sought/obtained
      */
-    ucl_sponsorship: boolean;
+    ucl_sponsorship?: boolean;
     /**
      * Confidentiality Advisory Group approval sought/obtained
      */
-    cag: boolean;
+    cag?: boolean;
     /**
      * CAG reference number
      */
-    cag_ref: string;
+    cag_ref?: string;
     /**
      * Research Ethics Committee approval sought/obtained
      */
-    ethics: boolean;
+    ethics?: boolean;
     /**
      * Health Research Authority approval sought/obtained
      */
-    hra: boolean;
+    hra?: boolean;
     /**
      * IRAS ID if applicable
      */
-    iras_id: string;
+    iras_id?: string;
     /**
      * Research associated with NHS
      */
-    nhs: boolean;
+    nhs?: boolean;
     /**
      * NHS England involvement
      */
-    nhs_england: boolean;
+    nhs_england?: boolean;
     /**
      * NHS England DARS NIC number
      */
-    nhs_england_ref: string;
+    nhs_england_ref?: string;
     /**
      * HRA Model Non-Commercial Agreement in place
      */
-    mnca: boolean;
+    mnca?: boolean;
     /**
      * NHS Data Security & Protection Toolkit required
      */
-    dspt: boolean;
+    dspt?: boolean;
     /**
      * DBS check required for staff
      */
-    dbs: boolean;
+    dbs?: boolean;
     /**
      * Registered with UCL Data Protection Office
      */
-    data_protection: boolean;
+    data_protection?: boolean;
     /**
      * Data protection registry ID
      */
-    data_protection_prefix: string;
+    data_protection_prefix?: string;
     /**
      * Data protection registration date (YYYY-MM format)
      */
-    data_protection_date: string;
+    data_protection_date?: string;
     /**
      * Data protection registration number
      */
-    data_protection_id: number;
+    data_protection_id?: number;
     /**
      * Full data protection registration number
      */
-    data_protection_number: string;
+    data_protection_number?: string;
     /**
      * Third party organizations involved
      */
-    third_party: boolean;
+    third_party?: boolean;
     /**
      * External users will have access
      */
-    external_users: boolean;
+    external_users?: boolean;
     /**
      * Participant consent will be sought
      */
-    consent: boolean;
+    consent?: boolean;
     /**
      * Data collected indirectly
      */
-    non_consent: boolean;
+    non_consent?: boolean;
     /**
      * Data processed outside UK/EEA
      */
-    ext_eea: boolean;
+    ext_eea?: boolean;
+    /**
+     * ID of the user who owns the study
+     */
+    owner_user_id?: string;
+};
+
+/**
+ * Request payload for creating a new study
+ */
+export type StudyCreateRequest = StudyBase;
+
+/**
+ * A research study
+ */
+export type Study = StudyBase & {
+    /**
+     * Unique identifier for the study
+     */
+    id: string;
     /**
      * Time in RFC3339 format when the study was created
      */
@@ -642,7 +653,7 @@ export type GetStudiesResponses = {
 export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
 
 export type PostStudiesData = {
-    body: Study;
+    body: StudyCreateRequest;
     path?: never;
     query?: never;
     url: '/studies';

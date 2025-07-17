@@ -3,7 +3,7 @@ import StudySelection from "../studies/StudySelection";
 import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
-import { postStudies, Study } from "@/openapi";
+import { postStudies, Study, StudyCreateRequest } from "@/openapi";
 
 import styles from "./Studies.module.css";
 
@@ -29,45 +29,40 @@ export default function Studies(props: Props) {
     setSubmitError(null);
 
     try {
-      // Build the data protection number
-      const dataProtectionNumber = `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`;
-
-      // Convert form data to Study API format
-      const studyData: Study = {
-        id: "",
-        owner_user_id: "",
-        created_at: "",
-        updated_at: "",
+      // Convert form data to StudyCreateRequest API format
+      const studyData: StudyCreateRequest = {
         title: data.title,
-        description: data.description,
-        admin: data.admin,
         controller: data.controller as "UCL" | "Other",
-        controller_other: data.controllerOther,
-        ucl_sponsorship: data.uclSponsorship,
-        cag: data.cag,
-        cag_ref: data.cagRef.toString(),
-        ethics: data.ethics,
-        hra: data.hra,
-        iras_id: data.irasId,
-        nhs: data.nhs,
-        nhs_england: data.nhsEngland,
-        nhs_england_ref: data.nhsEnglandRef.toString(),
-        mnca: data.mnca,
-        dspt: data.dspt,
-        dbs: data.dbs,
-        data_protection: data.dataProtection,
-        data_protection_prefix: data.dataProtectionPrefix,
-        data_protection_date: data.dataProtectionDate,
-        data_protection_id: data.dataProtectionId,
-        data_protection_number: dataProtectionNumber,
-        third_party: data.thirdParty,
-        external_users: data.externalUsers,
-        consent: data.consent,
-        non_consent: data.nonConsent,
-        ext_eea: data.extEea,
+        description: data.description ? data.description : undefined,
+        admin: data.admin ? data.admin : undefined,
+        controller_other: data.controllerOther ? data.controllerOther : undefined,
+        ucl_sponsorship: data.uclSponsorship ? data.uclSponsorship : undefined,
+        cag: data.cag ? data.cag : undefined,
+        cag_ref: data.cagRef ? data.cagRef.toString() : undefined,
+        ethics: data.ethics ? data.ethics : undefined,
+        hra: data.hra ? data.hra : undefined,
+        iras_id: data.irasId ? data.irasId : undefined,
+        nhs: data.nhs ? data.nhs : undefined,
+        nhs_england: data.nhsEngland ? data.nhsEngland : undefined,
+        nhs_england_ref: data.nhsEnglandRef ? data.nhsEnglandRef.toString() : undefined,
+        mnca: data.mnca ? data.mnca : undefined,
+        dspt: data.dspt ? data.dspt : undefined,
+        dbs: data.dbs ? data.dbs : undefined,
+        data_protection: data.dataProtection ? data.dataProtection : undefined,
+        data_protection_prefix: data.dataProtectionPrefix ? data.dataProtectionPrefix : undefined,
+        data_protection_date: data.dataProtectionDate ? data.dataProtectionDate : undefined,
+        data_protection_id: data.dataProtectionId ? data.dataProtectionId : undefined,
+        data_protection_number:
+          data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
+            ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
+            : undefined,
+        third_party: data.thirdParty ? data.thirdParty : undefined,
+        external_users: data.externalUsers ? data.externalUsers : undefined,
+        consent: data.consent ? data.consent : undefined,
+        non_consent: data.nonConsent ? data.nonConsent : undefined,
+        ext_eea: data.extEea ? data.extEea : undefined,
       };
 
-      // Submit to backend
       const response = await postStudies({
         body: studyData,
       });

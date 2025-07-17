@@ -20,9 +20,6 @@ func setErrResponse(ctx *gin.Context, err error, status int, message string) {
 	user := middleware.GetUser(ctx)
 	if err != nil {
 		log.Err(err).Any("username", user.Username).Msg(message)
-		ctx.JSON(status, gin.H{
-			"error":   message,
-			"details": err.Error(),
-		})
+		ctx.Status(status)
 	}
 }

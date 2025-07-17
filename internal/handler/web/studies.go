@@ -8,7 +8,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
 
@@ -24,11 +23,12 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	// Convert database studies to OpenAPI format
 	var response []openapi.Study
 	for _, study := range studies {
+		ownerUserIDStr := study.OwnerUserID.String()
 		response = append(response, openapi.Study{
 			Id:                   study.ID.String(),
 			Title:                study.Title,
 			Description:          study.Description,
-			OwnerUserId:          study.OwnerUserID.String(),
+			OwnerUserId:          &ownerUserIDStr,
 			Admin:                study.Admin,
 			Controller:           openapi.StudyController(study.Controller),
 			ControllerOther:      study.ControllerOther,
@@ -65,40 +65,10 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 func (h *Handler) PostStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	var request openapi.Study
-	if err := ctx.ShouldBindJSON(&request); err != nil {
+	var studyData openapi.StudyCreateRequest
+	if err := ctx.ShouldBindJSON(&studyData); err != nil {
 		setInvalid(ctx, err, "Invalid request body")
 		return
-	}
-
-	studyData := types.Study{
-		Title:                request.Title,
-		Description:          request.Description,
-		Controller:           string(request.Controller),
-		Admin:                string(request.Admin),
-		ControllerOther:      request.ControllerOther,
-		UclSponsorship:       request.UclSponsorship,
-		Cag:                  request.Cag,
-		CagRef:               request.CagRef,
-		Ethics:               request.Ethics,
-		Hra:                  request.Hra,
-		IrasId:               request.IrasId,
-		Nhs:                  request.Nhs,
-		NhsEngland:           request.NhsEngland,
-		NhsEnglandRef:        request.NhsEnglandRef,
-		Mnca:                 request.Mnca,
-		Dspt:                 request.Dspt,
-		Dbs:                  request.Dbs,
-		DataProtection:       request.DataProtection,
-		DataProtectionPrefix: request.DataProtectionPrefix,
-		DataProtectionDate:   request.DataProtectionDate,
-		DataProtectionId:     request.DataProtectionId,
-		DataProtectionNumber: request.DataProtectionNumber,
-		ThirdParty:           request.ThirdParty,
-		ExternalUsers:        request.ExternalUsers,
-		Consent:              request.Consent,
-		NonConsent:           request.NonConsent,
-		ExtEea:               request.ExtEea,
 	}
 
 	createdStudy, err := h.studies.CreateStudy(user.ID, studyData)
@@ -107,7 +77,42 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, createdStudy)
+	ownerUserIDStr := createdStudy.OwnerUserID.String()
+	response := openapi.Study{
+		Id:                   createdStudy.ID.String(),
+		Title:                createdStudy.Title,
+		Description:          createdStudy.Description,
+		OwnerUserId:          &ownerUserIDStr,
+		Admin:                createdStudy.Admin,
+		Controller:           openapi.StudyController(createdStudy.Controller),
+		ControllerOther:      createdStudy.ControllerOther,
+		UclSponsorship:       createdStudy.UclSponsorship,
+		Cag:                  createdStudy.Cag,
+		CagRef:               createdStudy.CagRef,
+		Ethics:               createdStudy.Ethics,
+		Hra:                  createdStudy.Hra,
+		IrasId:               createdStudy.IrasId,
+		Nhs:                  createdStudy.Nhs,
+		NhsEngland:           createdStudy.NhsEngland,
+		NhsEnglandRef:        createdStudy.NhsEnglandRef,
+		Mnca:                 createdStudy.Mnca,
+		Dspt:                 createdStudy.Dspt,
+		Dbs:                  createdStudy.Dbs,
+		DataProtection:       createdStudy.DataProtection,
+		DataProtectionPrefix: createdStudy.DataProtectionPrefix,
+		DataProtectionDate:   createdStudy.DataProtectionDate,
+		DataProtectionId:     createdStudy.DataProtectionId,
+		DataProtectionNumber: createdStudy.DataProtectionNumber,
+		ThirdParty:           createdStudy.ThirdParty,
+		ExternalUsers:        createdStudy.ExternalUsers,
+		Consent:              createdStudy.Consent,
+		NonConsent:           createdStudy.NonConsent,
+		ExtEea:               createdStudy.ExtEea,
+		CreatedAt:            createdStudy.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:            createdStudy.UpdatedAt.Format(config.TimeFormat),
+	}
+
+	ctx.JSON(http.StatusCreated, response)
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
