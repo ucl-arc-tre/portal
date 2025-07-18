@@ -63,9 +63,6 @@ func (s *Service) updateNHSD(
 		if err := s.CreateNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
 			return response, err
 		}
-		if err := s.updateApprovedResearcherStatus(user); err != nil {
-			return response, err
-		}
 	}
 	return response, nil
 }
@@ -84,6 +81,7 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 	return NHSDTrainingIsValid(record.CompletedAt), nil
 }
 
+// Create a NHSD training record for a user and update the approved researcher status if required
 func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Time) error {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
@@ -93,7 +91,10 @@ func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Tim
 		Model:       types.Model{CreatedAt: time.Now()},
 		CompletedAt: completedAt,
 	}).FirstOrCreate(&record)
-	return types.NewErrServerError(result.Error)
+	if result.Error != nil {
+		return types.NewErrServerError(result.Error)
+	}
+	return s.updateApprovedResearcherStatus(user)
 }
 
 // returns all training records for a user
