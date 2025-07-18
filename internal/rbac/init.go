@@ -16,6 +16,7 @@ func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewEnforcer()
 	addBasePolicies(enforcer)
+	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
 	addAdminUserRoleBindings()
 }
@@ -30,6 +31,18 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 		{RoleName: Base, Resource: "/profile/agreements", Action: WriteAction},
 		{RoleName: Base, Resource: "/profile/training", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile/training", Action: WriteAction},
+	}
+	for _, policy := range policies {
+		addPolicy(enforcer, policy)
+	}
+}
+
+func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
+	policies := []Policy{
+		{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
+		{RoleName: ApprovedResearcher, Resource: "/studies", Action: WriteAction},
+		{RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: ReadAction},
+		{RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: WriteAction},
 	}
 	for _, policy := range policies {
 		addPolicy(enforcer, policy)
