@@ -11,6 +11,7 @@ import (
 	pdfref "github.com/klippa-app/go-pdfium/references"
 	pdfreq "github.com/klippa-app/go-pdfium/requests"
 	pdfwasm "github.com/klippa-app/go-pdfium/webassembly"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
@@ -39,7 +40,7 @@ var pdfWasmPool = must(pdfwasm.Init(pdfwasm.Config{
 func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
 	content, err := base64.StdEncoding.DecodeString(contentBase64)
 	if err != nil {
-		return nil, err
+		return nil, types.NewErrInvalidObject(err)
 	}
 	text, err := getFirstPageText(content)
 	if err != nil {
@@ -95,7 +96,7 @@ func setNHSDCertificateIssuedAt(certificate *TrainingCertificate, text string) e
 func getFirstPageText(content []byte) (string, error) {
 	instance, err := pdfWasmPool.GetInstance(100 * time.Millisecond)
 	if err != nil {
-		return "", err
+		return "", types.NewErrServerError(err)
 	}
 	//nolint:errcheck // always non nil error
 	defer instance.Close()
@@ -103,7 +104,7 @@ func getFirstPageText(content []byte) (string, error) {
 		File: &content,
 	})
 	if err != nil {
-		return "", err
+		return "", types.NewErrServerError(err)
 	}
 	//nolint:errcheck // always non nil error
 	defer instance.FPDF_CloseDocument(&pdfreq.FPDF_CloseDocument{
@@ -113,9 +114,9 @@ func getFirstPageText(content []byte) (string, error) {
 		Document: doc.Document,
 	})
 	if err != nil {
-		return "", err
+		return "", types.NewErrServerError(err)
 	} else if pageCountResult.PageCount == 0 {
-		return "", fmt.Errorf("PDF had no pages")
+		return "", types.NewErrInvalidObject(fmt.Errorf("PDF had no pages"))
 	}
 	return firstPageTextFromDoc(instance, doc.Document)
 }
@@ -130,10 +131,9 @@ func firstPageTextFromDoc(instance pdfium.Pdfium, doc pdfref.FPDF_DOCUMENT) (str
 		},
 	})
 	if err != nil {
-		return "", err
-	} else {
-		return pageTextResult.Text, nil
+		return "", types.NewErrServerError(err)
 	}
+	return pageTextResult.Text, nil
 }
 
 func must[T any](value T, err error) T {

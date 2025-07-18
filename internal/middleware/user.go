@@ -67,7 +67,7 @@ func (u *UserSetter) persistedUser(username types.Username) (types.User, error) 
 		}).
 		FirstOrCreate(&user)
 	if result.Error != nil {
-		return user, result.Error
+		return user, types.NewErrServerError(result.Error)
 	}
 	userWasCreated := result.RowsAffected > 0
 	if userWasCreated {

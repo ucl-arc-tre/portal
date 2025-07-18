@@ -18,7 +18,7 @@ func (s *Service) ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&confirmation)
 	if result.Error != nil {
-		return result.Error
+		return types.NewErrServerError(result.Error)
 	}
 	return s.updateApprovedResearcherStatus(user)
 }
@@ -40,7 +40,7 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 			ConfirmedAt:   item.CreatedAt.Format(config.TimeFormat),
 		})
 	}
-	return agreements, result.Error
+	return agreements, types.NewErrServerError(result.Error)
 }
 
 func (s *Service) hasAgreedToApprovedResarcherAgreement(user types.User) (bool, error) {

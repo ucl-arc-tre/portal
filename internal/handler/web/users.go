@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
+	"github.com/ucl-arc-tre/portal/internal/types"
 
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
@@ -19,7 +19,7 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
-		setServerError(ctx, err, "Failed to get roles for user")
+		setError(ctx, err, "Failed to get roles for user")
 		return
 	}
 
@@ -27,7 +27,7 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 		// retrieve auth + agreements + training info
 		people, err := h.users.AllUsers()
 		if err != nil {
-			setServerError(ctx, err, "Failed to get people")
+			setError(ctx, err, "Failed to get people")
 			return
 		}
 		ctx.JSON(http.StatusOK, people)
@@ -39,27 +39,26 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 
 func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 	var update openapi.UserTrainingUpdate
-	if err := ctx.ShouldBindJSON(&update); err != nil {
-		setInvalid(ctx, err, "Invalid JSON object")
+	if err := bindJSONOrSetError(ctx, &update); err != nil {
 		return
 	}
 
 	trainingDate, err := time.Parse(config.TimeFormat, update.TrainingDate)
 	if err != nil {
-		setInvalid(ctx, err, fmt.Sprintf("Failed to parse date [%v]", update.TrainingDate))
+		setError(ctx, types.NewErrInvalidObject(err), "Failed to parse date")
 		return
 	}
 
 	person, err := h.users.GetUser(userId)
 	if err != nil {
-		setServerError(ctx, err, "Failed to get person")
+		setError(ctx, err, "Failed to get person")
 		return
 	}
 
 	switch update.TrainingKind {
 	case openapi.TrainingKindNhsd:
 		if err := h.users.CreateNHSDTrainingRecord(person, trainingDate); err != nil {
-			setServerError(ctx, err, "Failed to update training validity")
+			setError(ctx, err, "Failed to update training validity")
 			return
 		}
 	default:
@@ -76,16 +75,16 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	content, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
-		setServerError(ctx, err, "Failed to read body")
+		setError(ctx, types.NewErrServerError(err), "Failed to read body")
 		return
 	}
 	agreement, err := h.agreements.LatestApprovedResearcher()
 	if err != nil {
-		setServerError(ctx, err, "Failed to get approved researcher agreement")
+		setError(ctx, types.NewErrServerError(err), "Failed to get approved researcher agreement")
 		return
 	}
 	if err := h.users.ImportApprovedResearchersCSV(content, *agreement); err != nil {
-		setServerError(ctx, err, "Failed to import")
+		setError(ctx, err, "Failed to import")
 		return
 	}
 	ctx.Status(http.StatusNoContent)

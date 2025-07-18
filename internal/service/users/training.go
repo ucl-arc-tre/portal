@@ -22,7 +22,8 @@ func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUp
 	case openapi.TrainingKindNhsd:
 		return s.updateNHSD(user, data)
 	default:
-		return openapi.ProfileTrainingResponse{}, fmt.Errorf("unsupported training kind [%v]", data.Kind)
+		err := fmt.Errorf("unsupported training kind [%v]", data.Kind)
+		return openapi.ProfileTrainingResponse{}, types.NewErrInvalidObject(err)
 	}
 }
 
@@ -78,7 +79,7 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return false, nil
 	} else if result.Error != nil {
-		return false, result.Error
+		return false, types.NewErrServerError(result.Error)
 	}
 	return NHSDTrainingIsValid(record.CompletedAt), nil
 }
@@ -92,7 +93,7 @@ func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Tim
 		Model:       types.Model{CreatedAt: time.Now()},
 		CompletedAt: completedAt,
 	}).FirstOrCreate(&record)
-	return result.Error
+	return types.NewErrServerError(result.Error)
 }
 
 // returns all training records for a user
@@ -115,7 +116,7 @@ func (s *Service) GetTrainingRecord(user types.User) (openapi.ProfileTraining, e
 		trainingRecords = append(trainingRecords, nhsdRecord)
 	} else if result.Error != nil {
 		// Database error
-		return openapi.ProfileTraining{}, result.Error
+		return openapi.ProfileTraining{}, types.NewErrServerError(result.Error)
 	} else {
 		// Record found - check if it's still valid
 		completedAt := record.CompletedAt.Format(config.TimeFormat)
@@ -145,7 +146,7 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	} else if result.Error != nil {
-		return nil, result.Error
+		return nil, types.NewErrServerError(result.Error)
 	}
 	expiresAt := record.CompletedAt.Add(config.TrainingValidity)
 	return &expiresAt, nil

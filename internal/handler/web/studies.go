@@ -8,6 +8,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
 
@@ -120,19 +121,19 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
-		setInvalid(ctx, err, "Invalid study ID format")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
+	// todo - use portal not gorm errors
 	assets, err := h.studies.GetStudyAssets(studyUUID, user.ID)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			setInvalid(ctx, err, "Study not found or you don't have permission to access it")
+			setError(ctx, types.NewErrInvalidObject(err), "Study not found or you don't have permission to access it")
 			return
 		}
-
-		setServerError(ctx, err, "Failed to retrieve assets")
+		setError(ctx, types.NewErrServerError(err), "Failed to retrieve assets")
 		return
 	}
 
