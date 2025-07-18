@@ -411,14 +411,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 <Controller
                   name="dataProtectionDate"
                   control={control}
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      type="month"
-                      id="dataProtectionDate"
-                      style={{ padding: "0.5rem", fontSize: "1rem", border: "1px solid #ccc", borderRadius: "4px" }}
-                    />
-                  )}
+                  render={({ field }) => <input {...field} type="month" id="dataProtectionDate" />}
                 />
                 <Controller
                   name="dataProtectionId"
@@ -439,7 +432,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                       type="number"
                       id="dataProtectionId"
                       placeholder="eg 123"
-                      style={{ padding: "0.5rem", fontSize: "1rem", border: "1px solid #ccc", borderRadius: "4px" }}
                       value={field.value === 0 ? "" : field.value}
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                     />

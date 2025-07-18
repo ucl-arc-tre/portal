@@ -20,7 +20,6 @@
   width: 60px;
   height: 2px;
   background: linear-gradient(90deg, #007bff, #0056b3);
-  border-radius: 2px;
   margin-left: 0.4rem;
 }
 
@@ -34,7 +33,6 @@
 .study-card {
   background: white;
   border: 1px solid #e9ecef;
-  border-radius: 12px;
   padding: 2rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
