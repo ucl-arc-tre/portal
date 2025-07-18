@@ -12,7 +12,7 @@ func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType ope
 	case openapi.AgreementTypeApprovedResearcher:
 		agreement, err := h.agreements.LatestApprovedResearcher()
 		if err != nil {
-			setServerError(ctx, err, "Failed to get approved researcher agreement")
+			setError(ctx, err, "Failed to get approved researcher agreement")
 			return
 		}
 		ctx.JSON(http.StatusOK, openapi.Agreement{

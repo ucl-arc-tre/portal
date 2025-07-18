@@ -37,16 +37,19 @@ func NewEnforcer() *casbin.Enforcer {
 
 // Add a role for a user
 func AddRole(user types.User, role RoleName) (bool, error) {
-	return enforcer.AddRoleForUser(user.ID.String(), string(role))
+	roleAdded, err := enforcer.AddRoleForUser(user.ID.String(), string(role))
+	return roleAdded, types.NewErrServerError(err)
 }
 
 // Get all roles of a user
 func GetRoles(user types.User) ([]string, error) {
-	return enforcer.GetRolesForUser(user.ID.String())
+	roles, err := enforcer.GetRolesForUser(user.ID.String())
+	return roles, types.NewErrServerError(err)
 }
 
 func HasRole(user types.User, role RoleName) (bool, error) {
-	return enforcer.HasRoleForUser(user.ID.String(), string(role))
+	hasRole, err := enforcer.HasRoleForUser(user.ID.String(), string(role))
+	return hasRole, types.NewErrServerError(err)
 }
 
 func must[T any](value T, err error) T {
