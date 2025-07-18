@@ -17,7 +17,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 
 	studies, err := h.studies.GetStudies(user.ID)
 	if err != nil {
-		setServerError(ctx, err, "Failed to retrieve studies")
+		setError(ctx, err, "Failed to retrieve studies")
 		return
 	}
 
@@ -68,13 +68,13 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 
 	var studyData openapi.StudyCreateRequest
 	if err := ctx.ShouldBindJSON(&studyData); err != nil {
-		setInvalid(ctx, err, "Invalid request body")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid request body")
 		return
 	}
 
 	createdStudy, err := h.studies.CreateStudy(user.ID, studyData)
 	if err != nil {
-		setServerError(ctx, err, "Failed to create study")
+		setError(ctx, err, "Failed to create study")
 		return
 	}
 
