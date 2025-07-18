@@ -192,67 +192,67 @@ export type StudyBase = {
     /**
      * Email of the study administrator
      */
-    admin?: string;
+    admin_email?: string;
     /**
-     * Data controller organization
+     * The organisation acting as data controller for the study
      */
-    controller: 'UCL' | 'Other';
+    data_controller_organisation?: 'UCL' | 'Other';
     /**
      * Other data controller if controller is "Other"
      */
-    controller_other?: string;
+    data_controller_organisation_other?: string;
     /**
-     * UCL sponsorship sought/obtained
+     * Whether UCL sponsorship is involved (seeking/have sought)
      */
-    ucl_sponsorship?: boolean;
+    involves_ucl_sponsorship?: boolean;
     /**
-     * Confidentiality Advisory Group approval sought/obtained
+     * Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
      */
-    cag?: boolean;
+    involves_cag?: boolean;
     /**
      * CAG reference number
      */
-    cag_ref?: string;
+    cag_reference?: string;
     /**
-     * Research Ethics Committee approval sought/obtained
+     * Whether Research Ethics Committee approval is involved (seeking/have sought)
      */
-    ethics?: boolean;
+    involves_ethics_approval?: boolean;
     /**
-     * Health Research Authority approval sought/obtained
+     * Whether Health Research Authority approval is involved (seeking/have sought)
      */
-    hra?: boolean;
+    involves_hra_approval?: boolean;
     /**
      * IRAS ID if applicable
      */
     iras_id?: string;
     /**
-     * Research associated with NHS
+     * Whether the research is associated with NHS
      */
-    nhs?: boolean;
+    is_nhs_associated?: boolean;
     /**
-     * NHS England involvement
+     * Whether NHS England is involved in the research
      */
-    nhs_england?: boolean;
+    involves_nhs_england?: boolean;
     /**
      * NHS England DARS NIC number
      */
-    nhs_england_ref?: string;
+    nhs_england_reference?: string;
     /**
-     * HRA Model Non-Commercial Agreement in place
+     * Whether the HRA Model Non-Commercial Agreement is involved
      */
-    mnca?: boolean;
+    involves_mnca?: boolean;
     /**
-     * NHS Data Security & Protection Toolkit required
+     * Whether NHS Data Security & Protection Toolkit is required
      */
-    dspt?: boolean;
+    requires_dspt?: boolean;
     /**
-     * DBS check required for staff
+     * Whether a DBS check is required for staff
      */
-    dbs?: boolean;
+    requires_dbs?: boolean;
     /**
-     * Registered with UCL Data Protection Office
+     * Whether the study is registered with the UCL Data Protection Office
      */
-    data_protection?: boolean;
+    is_data_protection_office_registered?: boolean;
     /**
      * Data protection registry ID
      */
@@ -270,25 +270,25 @@ export type StudyBase = {
      */
     data_protection_number?: string;
     /**
-     * Third party organizations involved
+     * Whether third party organizations are involved
      */
-    third_party?: boolean;
+    involves_third_party?: boolean;
     /**
-     * External users will have access
+     * Whether external users will have access to the study
      */
-    external_users?: boolean;
+    involves_external_users?: boolean;
     /**
-     * Participant consent will be sought
+     * Whether participant consent is involved (seeking/have sought)
      */
-    consent?: boolean;
+    involves_participant_consent?: boolean;
     /**
-     * Data collected indirectly
+     * Whether data is collected indirectly for the study (e.g. via a third party)
      */
-    non_consent?: boolean;
+    involves_indirect_data_collection?: boolean;
     /**
-     * Data processed outside UK/EEA
+     * Whether data is processed outside UK/EEA
      */
-    ext_eea?: boolean;
+    involves_data_processing_outside_eea?: boolean;
     /**
      * ID of the user who owns the study
      */

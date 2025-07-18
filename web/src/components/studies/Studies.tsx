@@ -32,23 +32,27 @@ export default function Studies(props: Props) {
       // Convert form data to StudyCreateRequest API format
       const studyData: StudyCreateRequest = {
         title: data.title,
-        controller: data.controller as "UCL" | "Other",
+        data_controller_organisation: data.dataControllerOrganisation as "UCL" | "Other",
         description: data.description ? data.description : undefined,
-        admin: data.admin ? data.admin : undefined,
-        controller_other: data.controllerOther ? data.controllerOther : undefined,
-        ucl_sponsorship: data.uclSponsorship ? data.uclSponsorship : undefined,
-        cag: data.cag ? data.cag : undefined,
-        cag_ref: data.cagRef ? data.cagRef.toString() : undefined,
-        ethics: data.ethics ? data.ethics : undefined,
-        hra: data.hra ? data.hra : undefined,
+        admin_email: data.adminEmail ? data.adminEmail : undefined,
+        data_controller_organisation_other: data.dataControllerOrganisationOther
+          ? data.dataControllerOrganisationOther
+          : undefined,
+        involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
+        involves_cag: data.involvesCag ? data.involvesCag : undefined,
+        cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
+        involves_ethics_approval: data.involvesEthicsApproval ? data.involvesEthicsApproval : undefined,
+        involves_hra_approval: data.involvesHraApproval ? data.involvesHraApproval : undefined,
         iras_id: data.irasId ? data.irasId : undefined,
-        nhs: data.nhs ? data.nhs : undefined,
-        nhs_england: data.nhsEngland ? data.nhsEngland : undefined,
-        nhs_england_ref: data.nhsEnglandRef ? data.nhsEnglandRef.toString() : undefined,
-        mnca: data.mnca ? data.mnca : undefined,
-        dspt: data.dspt ? data.dspt : undefined,
-        dbs: data.dbs ? data.dbs : undefined,
-        data_protection: data.dataProtection ? data.dataProtection : undefined,
+        is_nhs_associated: data.isNhsAssociated ? data.isNhsAssociated : undefined,
+        involves_nhs_england: data.involvesNhsEngland ? data.involvesNhsEngland : undefined,
+        nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+        involves_mnca: data.involvesMnca ? data.involvesMnca : undefined,
+        requires_dspt: data.requiresDspt ? data.requiresDspt : undefined,
+        requires_dbs: data.requiresDbs ? data.requiresDbs : undefined,
+        is_data_protection_office_registered: data.isDataProtectionOfficeRegistered
+          ? data.isDataProtectionOfficeRegistered
+          : undefined,
         data_protection_prefix: data.dataProtectionPrefix ? data.dataProtectionPrefix : undefined,
         data_protection_date: data.dataProtectionDate ? data.dataProtectionDate : undefined,
         data_protection_id: data.dataProtectionId ? data.dataProtectionId : undefined,
@@ -56,11 +60,15 @@ export default function Studies(props: Props) {
           data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
             ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
             : undefined,
-        third_party: data.thirdParty ? data.thirdParty : undefined,
-        external_users: data.externalUsers ? data.externalUsers : undefined,
-        consent: data.consent ? data.consent : undefined,
-        non_consent: data.nonConsent ? data.nonConsent : undefined,
-        ext_eea: data.extEea ? data.extEea : undefined,
+        involves_third_party: data.involvesThirdParty ? data.involvesThirdParty : undefined,
+        involves_external_users: data.involvesExternalUsers ? data.involvesExternalUsers : undefined,
+        involves_participant_consent: data.involvesParticipantConsent ? data.involvesParticipantConsent : undefined,
+        involves_indirect_data_collection: data.involvesIndirectDataCollection
+          ? data.involvesIndirectDataCollection
+          : undefined,
+        involves_data_processing_outside_eea: data.involvesDataProcessingOutsideEea
+          ? data.involvesDataProcessingOutsideEea
+          : undefined,
       };
 
       const response = await postStudies({

@@ -598,55 +598,55 @@ components:
         description:
           type: string
           description: Description of the study
-        admin:
+        admin_email:
           type: string
           description: Email of the study administrator
-        controller:
+        data_controller_organisation:
           type: string
           enum: ["UCL", "Other"]
-          description: Data controller organization
-        controller_other:
+          description: The organisation acting as data controller for the study
+        data_controller_organisation_other:
           type: string
           description: Other data controller if controller is "Other"
-        ucl_sponsorship:
+        involves_ucl_sponsorship:
           type: boolean
-          description: UCL sponsorship sought/obtained
-        cag:
+          description: Whether UCL sponsorship is involved (seeking/have sought)
+        involves_cag:
           type: boolean
-          description: Confidentiality Advisory Group approval sought/obtained
-        cag_ref:
+          description: Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
+        cag_reference:
           type: string
           description: CAG reference number
-        ethics:
+        involves_ethics_approval:
           type: boolean
-          description: Research Ethics Committee approval sought/obtained
-        hra:
+          description: Whether Research Ethics Committee approval is involved (seeking/have sought)
+        involves_hra_approval:
           type: boolean
-          description: Health Research Authority approval sought/obtained
+          description: Whether Health Research Authority approval is involved (seeking/have sought)
         iras_id:
           type: string
           description: IRAS ID if applicable
-        nhs:
+        is_nhs_associated:
           type: boolean
-          description: Research associated with NHS
-        nhs_england:
+          description: Whether the research is associated with NHS
+        involves_nhs_england:
           type: boolean
-          description: NHS England involvement
-        nhs_england_ref:
+          description: Whether NHS England is involved in the research
+        nhs_england_reference:
           type: string
           description: NHS England DARS NIC number
-        mnca:
+        involves_mnca:
           type: boolean
-          description: HRA Model Non-Commercial Agreement in place
-        dspt:
+          description: Whether the HRA Model Non-Commercial Agreement is involved
+        requires_dspt:
           type: boolean
-          description: NHS Data Security & Protection Toolkit required
-        dbs:
+          description: Whether NHS Data Security & Protection Toolkit is required
+        requires_dbs:
           type: boolean
-          description: DBS check required for staff
-        data_protection:
+          description: Whether a DBS check is required for staff
+        is_data_protection_office_registered:
           type: boolean
-          description: Registered with UCL Data Protection Office
+          description: Whether the study is registered with the UCL Data Protection Office
         data_protection_prefix:
           type: string
           description: Data protection registry ID
@@ -659,21 +659,21 @@ components:
         data_protection_number:
           type: string
           description: Full data protection registration number
-        third_party:
+        involves_third_party:
           type: boolean
-          description: Third party organizations involved
-        external_users:
+          description: Whether third party organizations are involved
+        involves_external_users:
           type: boolean
-          description: External users will have access
-        consent:
+          description: Whether external users will have access to the study
+        involves_participant_consent:
           type: boolean
-          description: Participant consent will be sought
-        non_consent:
+          description: Whether participant consent is involved (seeking/have sought)
+        involves_indirect_data_collection:
           type: boolean
-          description: Data collected indirectly
-        ext_eea:
+          description: Whether data is collected indirectly for the study (e.g. via a third party)
+        involves_data_processing_outside_eea:
           type: boolean
-          description: Data processed outside UK/EEA
+          description: Whether data is processed outside UK/EEA
         owner_user_id:
           type: string
           description: ID of the user who owns the study

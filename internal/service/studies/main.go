@@ -26,16 +26,16 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateReq
 		return nil, errors.New("study title is required")
 	}
 
-	if strings.TrimSpace(string(studyData.Controller)) == "" {
-		return nil, errors.New("controller is required")
+	if studyData.DataControllerOrganisation == nil || strings.TrimSpace(string(*studyData.DataControllerOrganisation)) == "" {
+		return nil, errors.New("data_controller_organisation is required")
 	}
 
-	if studyData.Controller != "UCL" && studyData.Controller != "Other" {
-		return nil, errors.New("controller must be either 'UCL' or 'Other'")
+	if *studyData.DataControllerOrganisation != "UCL" && *studyData.DataControllerOrganisation != "Other" {
+		return nil, errors.New("data_controller_organisation must be either 'UCL' or 'Other'")
 	}
 
-	if studyData.Controller == "Other" && (studyData.ControllerOther == nil || strings.TrimSpace(*studyData.ControllerOther) == "") {
-		return nil, errors.New("controller_other is required when controller is 'Other'")
+	if *studyData.DataControllerOrganisation == "Other" && (studyData.DataControllerOrganisationOther == nil || strings.TrimSpace(*studyData.DataControllerOrganisationOther) == "") {
+		return nil, errors.New("data_controller_organisation_other is required when data_controller_organisation is 'Other'")
 	}
 
 	if len(studyData.Title) > 50 {
@@ -49,34 +49,34 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateReq
 	dbStudy := types.Study{
 		OwnerUserID: userID,
 		Title:       studyData.Title,
-		Controller:  string(studyData.Controller),
+		Controller:  string(*studyData.DataControllerOrganisation),
 	}
 
 	dbStudy.Description = studyData.Description
-	dbStudy.Admin = studyData.Admin
-	dbStudy.ControllerOther = studyData.ControllerOther
-	dbStudy.UclSponsorship = studyData.UclSponsorship
-	dbStudy.Cag = studyData.Cag
-	dbStudy.CagRef = studyData.CagRef
-	dbStudy.Ethics = studyData.Ethics
-	dbStudy.Hra = studyData.Hra
+	dbStudy.Admin = studyData.AdminEmail
+	dbStudy.ControllerOther = studyData.DataControllerOrganisationOther
+	dbStudy.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
+	dbStudy.InvolvesCag = studyData.InvolvesCag
+	dbStudy.CagReference = studyData.CagReference
+	dbStudy.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
+	dbStudy.InvolvesHraApproval = studyData.InvolvesHraApproval
 	dbStudy.IrasId = studyData.IrasId
-	dbStudy.Nhs = studyData.Nhs
-	dbStudy.NhsEngland = studyData.NhsEngland
-	dbStudy.NhsEnglandRef = studyData.NhsEnglandRef
-	dbStudy.Mnca = studyData.Mnca
-	dbStudy.Dspt = studyData.Dspt
-	dbStudy.Dbs = studyData.Dbs
-	dbStudy.DataProtection = studyData.DataProtection
+	dbStudy.IsNhsAssociated = studyData.IsNhsAssociated
+	dbStudy.InvolvesNhsEngland = studyData.InvolvesNhsEngland
+	dbStudy.NhsEnglandReference = studyData.NhsEnglandReference
+	dbStudy.InvolvesMnca = studyData.InvolvesMnca
+	dbStudy.RequiresDspt = studyData.RequiresDspt
+	dbStudy.RequiresDbs = studyData.RequiresDbs
+	dbStudy.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
 	dbStudy.DataProtectionPrefix = studyData.DataProtectionPrefix
 	dbStudy.DataProtectionDate = studyData.DataProtectionDate
 	dbStudy.DataProtectionId = studyData.DataProtectionId
 	dbStudy.DataProtectionNumber = studyData.DataProtectionNumber
-	dbStudy.ThirdParty = studyData.ThirdParty
-	dbStudy.ExternalUsers = studyData.ExternalUsers
-	dbStudy.Consent = studyData.Consent
-	dbStudy.NonConsent = studyData.NonConsent
-	dbStudy.ExtEea = studyData.ExtEea
+	dbStudy.InvolvesThirdParty = studyData.InvolvesThirdParty
+	dbStudy.InvolvesExternalUsers = studyData.InvolvesExternalUsers
+	dbStudy.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
+	dbStudy.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
+	dbStudy.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
 
 	if err := s.db.Create(&dbStudy).Error; err != nil {
 		return nil, err
