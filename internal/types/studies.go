@@ -6,9 +6,34 @@ import (
 
 type Study struct {
 	ModelAuditable
-	OwnerUserID uuid.UUID `gorm:"not null;index"`
-	Title       string    `gorm:"not null"`
-	Description string    `gorm:"type:text"`
+	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
+	Title                            string    `gorm:"not null"`
+	Description                      *string   `gorm:"type:text"`
+	Admin                            *string   `gorm:"type:varchar(255)"`
+	Controller                       string    `gorm:"not null"`
+	ControllerOther                  *string   `gorm:"type:varchar(255)"`
+	InvolvesUclSponsorship           *bool     `gorm:""`
+	InvolvesCag                      *bool     `gorm:""`
+	CagReference                     *string   `gorm:"type:varchar(255)"`
+	InvolvesEthicsApproval           *bool     `gorm:""`
+	InvolvesHraApproval              *bool     `gorm:""`
+	IrasId                           *string   `gorm:"type:varchar(255)"`
+	IsNhsAssociated                  *bool     `gorm:""`
+	InvolvesNhsEngland               *bool     `gorm:""`
+	NhsEnglandReference              *string   `gorm:"type:varchar(255)"`
+	InvolvesMnca                     *bool     `gorm:""`
+	RequiresDspt                     *bool     `gorm:""`
+	RequiresDbs                      *bool     `gorm:""`
+	IsDataProtectionOfficeRegistered *bool     `gorm:""`
+	DataProtectionPrefix             *string   `gorm:"type:varchar(255)"`
+	DataProtectionDate               *string   `gorm:"type:varchar(255)"`
+	DataProtectionId                 *int      `gorm:""`
+	DataProtectionNumber             *string   `gorm:"type:varchar(255)"`
+	InvolvesThirdParty               *bool     `gorm:""`
+	InvolvesExternalUsers            *bool     `gorm:""`
+	InvolvesParticipantConsent       *bool     `gorm:""`
+	InvolvesIndirectDataCollection   *bool     `gorm:""`
+	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
 
 	// Relationships
 	Owner  User    `gorm:"foreignKey:OwnerUserID"`

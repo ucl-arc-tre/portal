@@ -40,7 +40,7 @@ export default function Dialog(DialogProps: DialogProps) {
         ></Button>
         {children}
       </dialog>
-      <Blanket className={styles.blanket} />
+      <Blanket onClick={closeDialog} className={styles.blanket} />
     </>
   );
 }

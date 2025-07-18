@@ -5,11 +5,118 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
+
+func (h *Handler) GetStudies(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+
+	studies, err := h.studies.GetStudies(user.ID)
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve studies")
+		return
+	}
+
+	// Convert database studies to OpenAPI format
+	var response []openapi.Study
+	for _, study := range studies {
+		ownerUserIDStr := study.OwnerUserID.String()
+		dataControllerOrg := openapi.StudyDataControllerOrganisation(study.Controller)
+		response = append(response, openapi.Study{
+			Id:                               study.ID.String(),
+			Title:                            study.Title,
+			Description:                      study.Description,
+			OwnerUserId:                      &ownerUserIDStr,
+			AdminEmail:                       study.Admin,
+			DataControllerOrganisation:       &dataControllerOrg,
+			DataControllerOrganisationOther:  study.ControllerOther,
+			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
+			InvolvesCag:                      study.InvolvesCag,
+			CagReference:                     study.CagReference,
+			InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
+			InvolvesHraApproval:              study.InvolvesHraApproval,
+			IrasId:                           study.IrasId,
+			IsNhsAssociated:                  study.IsNhsAssociated,
+			InvolvesNhsEngland:               study.InvolvesNhsEngland,
+			NhsEnglandReference:              study.NhsEnglandReference,
+			InvolvesMnca:                     study.InvolvesMnca,
+			RequiresDspt:                     study.RequiresDspt,
+			RequiresDbs:                      study.RequiresDbs,
+			IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
+			DataProtectionPrefix:             study.DataProtectionPrefix,
+			DataProtectionDate:               study.DataProtectionDate,
+			DataProtectionId:                 study.DataProtectionId,
+			DataProtectionNumber:             study.DataProtectionNumber,
+			InvolvesThirdParty:               study.InvolvesThirdParty,
+			InvolvesExternalUsers:            study.InvolvesExternalUsers,
+			InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
+			InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
+			InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
+			CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
+			UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
+		})
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) PostStudies(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+
+	var studyData openapi.StudyCreateRequest
+	if err := ctx.ShouldBindJSON(&studyData); err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid request body")
+		return
+	}
+
+	createdStudy, err := h.studies.CreateStudy(user.ID, studyData)
+	if err != nil {
+		setError(ctx, err, "Failed to create study")
+		return
+	}
+
+	ownerUserIDStr := createdStudy.OwnerUserID.String()
+	dataControllerOrg := openapi.StudyDataControllerOrganisation(createdStudy.Controller)
+	response := openapi.Study{
+		Id:                               createdStudy.ID.String(),
+		Title:                            createdStudy.Title,
+		Description:                      createdStudy.Description,
+		OwnerUserId:                      &ownerUserIDStr,
+		AdminEmail:                       createdStudy.Admin,
+		DataControllerOrganisation:       &dataControllerOrg,
+		DataControllerOrganisationOther:  createdStudy.ControllerOther,
+		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,
+		InvolvesCag:                      createdStudy.InvolvesCag,
+		CagReference:                     createdStudy.CagReference,
+		InvolvesEthicsApproval:           createdStudy.InvolvesEthicsApproval,
+		InvolvesHraApproval:              createdStudy.InvolvesHraApproval,
+		IrasId:                           createdStudy.IrasId,
+		IsNhsAssociated:                  createdStudy.IsNhsAssociated,
+		InvolvesNhsEngland:               createdStudy.InvolvesNhsEngland,
+		NhsEnglandReference:              createdStudy.NhsEnglandReference,
+		InvolvesMnca:                     createdStudy.InvolvesMnca,
+		RequiresDspt:                     createdStudy.RequiresDspt,
+		RequiresDbs:                      createdStudy.RequiresDbs,
+		IsDataProtectionOfficeRegistered: createdStudy.IsDataProtectionOfficeRegistered,
+		DataProtectionPrefix:             createdStudy.DataProtectionPrefix,
+		DataProtectionDate:               createdStudy.DataProtectionDate,
+		DataProtectionId:                 createdStudy.DataProtectionId,
+		DataProtectionNumber:             createdStudy.DataProtectionNumber,
+		InvolvesThirdParty:               createdStudy.InvolvesThirdParty,
+		InvolvesExternalUsers:            createdStudy.InvolvesExternalUsers,
+		InvolvesParticipantConsent:       createdStudy.InvolvesParticipantConsent,
+		InvolvesIndirectDataCollection:   createdStudy.InvolvesIndirectDataCollection,
+		InvolvesDataProcessingOutsideEea: createdStudy.InvolvesDataProcessingOutsideEea,
+		CreatedAt:                        createdStudy.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:                        createdStudy.UpdatedAt.Format(config.TimeFormat),
+	}
+
+	ctx.JSON(http.StatusCreated, response)
+}
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	user := middleware.GetUser(ctx)

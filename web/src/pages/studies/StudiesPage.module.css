@@ -1,13 +1,22 @@
-.subtitle {
+.studies-description {
+  margin: 1.4rem;
+}
+
+.not-approved-section {
   text-align: center;
+  margin: 2rem 0;
+}
 
-  .highlighted {
-    color: var(--green-300);
-    background-color: color-mix(in srgb, var(--green-50) 40%, transparent 60%);
-    padding-inline: 0.2rem;
-  }
+.not-approved-section h2 {
+  margin-bottom: 1.5rem;
+}
 
-  .coloured {
-    color: var(--green-200);
+.not-approved-section button {
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .studies-description {
+    margin: 1rem;
   }
 }

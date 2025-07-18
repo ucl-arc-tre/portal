@@ -32,12 +32,12 @@ type AssetFormData = {
 
 type AssetFormProps = {
   onSubmit: (data: AssetFormData) => Promise<void>;
-  setSelectedStudy: (study: Study | null) => void;
+  // setSelectedStudy: (study: Study | null) => void;
   isSubmitting?: boolean;
 };
 
 export default function AssetForm(props: AssetFormProps) {
-  const { onSubmit, setSelectedStudy, isSubmitting = false } = props;
+  const { onSubmit, isSubmitting = false } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -423,7 +423,12 @@ export default function AssetForm(props: AssetFormProps) {
             {isSubmitting ? "Creating..." : "Create Asset"}
           </Button>
 
-          <Button type="button" variant="secondary" onClick={() => setSelectedStudy(null)} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="secondary"
+            // onClick={() => setSelectedStudy(null)}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
         </div>
