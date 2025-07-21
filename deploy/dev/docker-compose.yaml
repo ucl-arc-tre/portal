@@ -32,6 +32,7 @@ services:
       - type: bind
         source: ../..
         target: /repo
+      - ./config.ts:/repo/web/src/config.ts:ro
       - type: volume
         target: /repo/web/node_modules
 
