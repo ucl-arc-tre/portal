@@ -28,7 +28,7 @@ export type StudyFormData = {
   title: string;
   description: string;
   owner: string;
-  additionalStudyAdminUsernames: string[];
+  additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
   dataControllerOrganisationOther: string;
   cagReference: number;
@@ -84,15 +84,15 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "additionalStudyAdminUsernames",
-  });
-
   const [currentStep, setCurrentStep] = useState(1);
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
   const totalSteps = 3;
+
+  const { fields, append, remove } = useFieldArray<StudyFormData, "additionalStudyAdminUsernames", "id">({
+    control,
+    name: "additionalStudyAdminUsernames",
+  });
 
   const showCagRef = useWatch({
     name: "involvesCag",
@@ -220,32 +220,19 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             </HelperText>
 
             {fields.map((field, index) => (
-              <div
-                key={field.id}
-                style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem", marginBottom: "1rem" }}
-              >
-                <Label htmlFor={`admin-${index}`} style={{ flex: 1 }}>
+              <div key={field.id}>
+                <Label htmlFor={`admin-${index}`}>
                   Administrator {index + 1}:
                   <Controller
-                    name={`additionalStudyAdminUsernames.${index}` as const}
+                    name={`additionalStudyAdminUsernames.${index}.value` as const}
                     control={control}
-                    // rules={{
-                    //   pattern: {
-                    //     value: /^[a-zA-Z0-9._-]+$/,
-                    //     message: "Username must contain only letters, numbers, dots, hyphens, and underscores",
-                    //   },
-                    // }}
-                    render={({ field: inputField }) => (
-                      <Input {...inputField} type="text" id={`admin-${index}`} placeholder="username (e.g., jbloggs)" />
+                    render={({ field }) => (
+                      <Input {...field} type="text" id={`admin-${index}`} placeholder="username (e.g., jbloggs)" />
                     )}
                   />
-                  {errors.additionalStudyAdminUsernames?.[index] && (
-                    <Alert type="error">
-                      <AlertMessage>{errors.additionalStudyAdminUsernames[index]?.message}</AlertMessage>
-                    </Alert>
-                  )}
                 </Label>
-                <Button type="button" variant="secondary" size="small" onClick={() => remove(index)}>
+
+                <Button type="button" onClick={() => remove(index)}>
                   Remove
                 </Button>
               </div>
@@ -255,7 +242,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               type="button"
               variant="secondary"
               size="small"
-              onClick={() => append("")}
+              onClick={() => append({ value: "" })}
               style={{ marginTop: "0.5rem" }}
             >
               Add Administrator

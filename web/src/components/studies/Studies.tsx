@@ -35,7 +35,9 @@ export default function Studies(props: Props) {
         data_controller_organisation: data.dataControllerOrganisation as "UCL" | "Other",
         description: data.description ? data.description : undefined,
         additional_study_admin_usernames:
-          data.additionalStudyAdminUsernames.length > 0 ? data.additionalStudyAdminUsernames : undefined,
+          data.additionalStudyAdminUsernames.length > 0
+            ? data.additionalStudyAdminUsernames.map((admin) => admin.value)
+            : undefined,
         data_controller_organisation_other: data.dataControllerOrganisationOther
           ? data.dataControllerOrganisationOther
           : undefined,
