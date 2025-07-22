@@ -18,8 +18,7 @@ func main() {
 	router.Use(middleware.NewSecure())
 
 	router.Static("/_next", "./_next")
-	router.StaticFile("/favicon.ico", "./favicon.ico")
-
+	registerStaticFiles(router, ".")
 	registerHTMLRoutes(router, ".")
 
 	// serve fallback 404 page
@@ -33,13 +32,7 @@ func main() {
 
 // mount every *.html file as its own route
 func registerHTMLRoutes(router *gin.Engine, dir string) {
-	items, err := os.ReadDir(dir)
-
-	if err != nil {
-		panic(fmt.Sprintf("failed to read dir [%v]", err))
-	}
-
-	for _, item := range items {
+	for _, item := range mustReadDir(dir) {
 		if item.IsDir() {
 			registerHTMLRoutes(router, filepath.Join(dir, item.Name()))
 			continue
@@ -58,4 +51,23 @@ func registerHTMLRoutes(router *gin.Engine, dir string) {
 			c.File(filePath)
 		})
 	}
+}
+
+func registerStaticFiles(router *gin.Engine, dir string) {
+	extensions := []string{".svg", ".ico"}
+	for _, item := range mustReadDir(dir) {
+		for _, extension := range extensions {
+			if strings.HasSuffix(item.Name(), extension) {
+				router.StaticFile("/"+item.Name(), fmt.Sprintf("%v/%v", dir, item.Name()))
+			}
+		}
+	}
+}
+
+func mustReadDir(dir string) []os.DirEntry {
+	items, err := os.ReadDir(dir)
+	if err != nil {
+		panic(fmt.Sprintf("failed to read dir [%v]", err))
+	}
+	return items
 }
