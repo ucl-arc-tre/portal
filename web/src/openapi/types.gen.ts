@@ -194,13 +194,9 @@ export type StudyBase = {
      */
     additional_study_admin_usernames?: Array<string>;
     /**
-     * The organisation acting as data controller for the study
+     * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
      */
-    data_controller_organisation?: 'UCL' | 'Other';
-    /**
-     * Other data controller if controller is "Other"
-     */
-    data_controller_organisation_other?: string;
+    data_controller_organisation: string;
     /**
      * Whether UCL sponsorship is involved (seeking/have sought)
      */

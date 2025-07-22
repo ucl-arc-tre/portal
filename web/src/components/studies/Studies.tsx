@@ -32,15 +32,12 @@ export default function Studies(props: Props) {
       // Convert form data to StudyCreateRequest API format
       const studyData: StudyCreateRequest = {
         title: data.title,
-        data_controller_organisation: data.dataControllerOrganisation as "UCL" | "Other",
+        data_controller_organisation: data.dataControllerOrganisation,
         description: data.description ? data.description : undefined,
         additional_study_admin_usernames:
           data.additionalStudyAdminUsernames.length > 0
             ? data.additionalStudyAdminUsernames.map((admin) => admin.value)
             : undefined,
-        data_controller_organisation_other: data.dataControllerOrganisationOther
-          ? data.dataControllerOrganisationOther
-          : undefined,
         involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
         involves_cag: data.involvesCag ? data.involvesCag : undefined,
         cag_reference: data.cagReference ? data.cagReference.toString() : undefined,

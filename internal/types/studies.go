@@ -4,13 +4,13 @@ import (
 	"github.com/google/uuid"
 )
 
+// for descriptions of the Study fields, see /api.web.yaml
 type Study struct {
 	ModelAuditable
 	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
 	Title                            string    `gorm:"not null"`
 	Description                      *string   `gorm:"type:text"`
-	Controller                       string    `gorm:"not null"`
-	ControllerOther                  *string   `gorm:"type:varchar(255)"`
+	DataControllerOrganisation       string    `gorm:"not null"`
 	InvolvesUclSponsorship           *bool     `gorm:""`
 	InvolvesCag                      *bool     `gorm:""`
 	CagReference                     *string   `gorm:"type:varchar(255)"`

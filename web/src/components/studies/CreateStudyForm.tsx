@@ -30,7 +30,6 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  dataControllerOrganisationOther: string;
   cagReference: number;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
@@ -123,7 +122,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   useEffect(() => {
     if (controllerValue === "UCL") {
       setValue("dataProtectionPrefix", UclDpoId);
-    } else if (controllerValue === "Other") {
+    } else {
       setValue("dataProtectionPrefix", "");
     }
   }, [controllerValue, setValue]);
@@ -255,27 +254,12 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               name="dataControllerOrganisation"
               control={control}
               rules={{ required: "This field is required" }}
-              render={({ field }) => (
-                <select {...field} id={styles.controller} defaultValue="select">
-                  <option value="select">Select Controller</option>
-                  <option value="UCL">UCL</option>
-                  <option value="Other">Other</option>
-                </select>
-              )}
+              render={({ field }) => <Input {...field} type="text" id="controller" placeholder="e.g. UCL" />}
             />
-            {controllerValue === "Other" && (
-              <Controller
-                name="dataControllerOrganisationOther"
-                control={control}
-                rules={{ required: "This field is required" }}
-                render={({ field }) => <Input {...field} type="text" id="controllerOther" />}
-              />
-            )}
-            {(errors.dataControllerOrganisation || errors.dataControllerOrganisationOther) && (
+            <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
+            {errors.dataControllerOrganisation && (
               <Alert type="error">
-                <AlertMessage>
-                  {errors.dataControllerOrganisation?.message || errors.dataControllerOrganisationOther?.message}
-                </AlertMessage>
+                <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
               </Alert>
             )}
           </Label>

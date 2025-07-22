@@ -590,7 +590,7 @@ components:
       description: Base study properties
       required:
         - title
-        - controller
+        - data_controller_organisation
       properties:
         title:
           type: string
@@ -605,11 +605,7 @@ components:
           description: List of additional study administrator usernames
         data_controller_organisation:
           type: string
-          enum: ["UCL", "Other"]
-          description: The organisation acting as data controller for the study
-        data_controller_organisation_other:
-          type: string
-          description: Other data controller if controller is "Other"
+          description: The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
         involves_ucl_sponsorship:
           type: boolean
           description: Whether UCL sponsorship is involved (seeking/have sought)

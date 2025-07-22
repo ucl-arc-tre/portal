@@ -25,7 +25,6 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	var response []openapi.Study
 	for _, study := range studies {
 		ownerUserIDStr := study.OwnerUserID.String()
-		dataControllerOrg := openapi.StudyDataControllerOrganisation(study.Controller)
 
 		// Extract admin usernames from StudyAdmins
 		var adminUsernames []string
@@ -43,8 +42,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 			Description:                      study.Description,
 			OwnerUserId:                      &ownerUserIDStr,
 			AdditionalStudyAdminUsernames:    adminUsernamesPtr,
-			DataControllerOrganisation:       &dataControllerOrg,
-			DataControllerOrganisationOther:  study.ControllerOther,
+			DataControllerOrganisation:       study.DataControllerOrganisation,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
 			InvolvesCag:                      study.InvolvesCag,
 			CagReference:                     study.CagReference,
@@ -91,7 +89,6 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	}
 
 	ownerUserIDStr := createdStudy.OwnerUserID.String()
-	dataControllerOrg := openapi.StudyDataControllerOrganisation(createdStudy.Controller)
 
 	// Extract admin usernames from StudyAdmins
 	var adminUsernames []string
@@ -109,8 +106,7 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		Description:                      createdStudy.Description,
 		OwnerUserId:                      &ownerUserIDStr,
 		AdditionalStudyAdminUsernames:    adminUsernamesPtr,
-		DataControllerOrganisation:       &dataControllerOrg,
-		DataControllerOrganisationOther:  createdStudy.ControllerOther,
+		DataControllerOrganisation:       createdStudy.DataControllerOrganisation,
 		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,
 		InvolvesCag:                      createdStudy.InvolvesCag,
 		CagReference:                     createdStudy.CagReference,

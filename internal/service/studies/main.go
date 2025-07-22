@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -105,29 +106,26 @@ func (s *Service) validateAndCreateAdmins(ctx context.Context, usernames []strin
 	return users, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
-	if strings.TrimSpace(studyData.Title) == "" {
-		return nil, errors.New("study title is required")
+func validateStudyData(studyData openapi.StudyCreateRequest) error {
+	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
+	if !titlePattern.MatchString(studyData.Title) {
+		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
 	}
 
-	if studyData.DataControllerOrganisation == nil || strings.TrimSpace(string(*studyData.DataControllerOrganisation)) == "" {
-		return nil, errors.New("data_controller_organisation is required")
-	}
-
-	if *studyData.DataControllerOrganisation != "UCL" && *studyData.DataControllerOrganisation != "Other" {
-		return nil, errors.New("data_controller_organisation must be either 'UCL' or 'Other'")
-	}
-
-	if *studyData.DataControllerOrganisation == "Other" && (studyData.DataControllerOrganisationOther == nil || strings.TrimSpace(*studyData.DataControllerOrganisationOther) == "") {
-		return nil, errors.New("data_controller_organisation_other is required when data_controller_organisation is 'Other'")
-	}
-
-	if len(studyData.Title) > 50 {
-		return nil, errors.New("study title must be 50 characters or less")
+	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
+		return errors.New("data_controller_organisation is required")
 	}
 
 	if studyData.Description != nil && len(*studyData.Description) > 255 {
-		return nil, errors.New("study description must be 255 characters or less")
+		return errors.New("study description must be 255 characters or less")
+	}
+
+	return nil
+}
+
+func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
+	if err := validateStudyData(studyData); err != nil {
+		return nil, err
 	}
 
 	// Validate and create admin users if any are provided
@@ -150,13 +148,12 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 	}()
 
 	dbStudy := types.Study{
-		OwnerUserID: userID,
-		Title:       studyData.Title,
-		Controller:  string(*studyData.DataControllerOrganisation),
+		OwnerUserID:                userID,
+		Title:                      studyData.Title,
+		DataControllerOrganisation: studyData.DataControllerOrganisation,
 	}
 
 	dbStudy.Description = studyData.Description
-	dbStudy.ControllerOther = studyData.DataControllerOrganisationOther
 	dbStudy.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	dbStudy.InvolvesCag = studyData.InvolvesCag
 	dbStudy.CagReference = studyData.CagReference

@@ -44,18 +44,6 @@ const (
 	AuthRolesBase               AuthRoles = "base"
 )
 
-// Defines values for StudyDataControllerOrganisation.
-const (
-	StudyDataControllerOrganisationOther StudyDataControllerOrganisation = "Other"
-	StudyDataControllerOrganisationUCL   StudyDataControllerOrganisation = "UCL"
-)
-
-// Defines values for StudyBaseDataControllerOrganisation.
-const (
-	StudyBaseDataControllerOrganisationOther StudyBaseDataControllerOrganisation = "Other"
-	StudyBaseDataControllerOrganisationUCL   StudyBaseDataControllerOrganisation = "UCL"
-)
-
 // Defines values for TrainingKind.
 const (
 	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
@@ -201,11 +189,8 @@ type Study struct {
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
 
-	// DataControllerOrganisation The organisation acting as data controller for the study
-	DataControllerOrganisation *StudyDataControllerOrganisation `json:"data_controller_organisation,omitempty"`
-
-	// DataControllerOrganisationOther Other data controller if controller is "Other"
-	DataControllerOrganisationOther *string `json:"data_controller_organisation_other,omitempty"`
+	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
+	DataControllerOrganisation string `json:"data_controller_organisation"`
 
 	// DataProtectionDate Data protection registration date (YYYY-MM format)
 	DataProtectionDate *string `json:"data_protection_date,omitempty"`
@@ -286,9 +271,6 @@ type Study struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// StudyDataControllerOrganisation The organisation acting as data controller for the study
-type StudyDataControllerOrganisation string
-
 // StudyBase Base study properties
 type StudyBase struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames
@@ -297,11 +279,8 @@ type StudyBase struct {
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
 
-	// DataControllerOrganisation The organisation acting as data controller for the study
-	DataControllerOrganisation *StudyBaseDataControllerOrganisation `json:"data_controller_organisation,omitempty"`
-
-	// DataControllerOrganisationOther Other data controller if controller is "Other"
-	DataControllerOrganisationOther *string `json:"data_controller_organisation_other,omitempty"`
+	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
+	DataControllerOrganisation string `json:"data_controller_organisation"`
 
 	// DataProtectionDate Data protection registration date (YYYY-MM format)
 	DataProtectionDate *string `json:"data_protection_date,omitempty"`
@@ -375,9 +354,6 @@ type StudyBase struct {
 	// Title Title of the study
 	Title string `json:"title"`
 }
-
-// StudyBaseDataControllerOrganisation The organisation acting as data controller for the study
-type StudyBaseDataControllerOrganisation string
 
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase
