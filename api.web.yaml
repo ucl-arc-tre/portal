@@ -598,9 +598,11 @@ components:
         description:
           type: string
           description: Description of the study
-        admin_email:
-          type: string
-          description: Email of the study administrator
+        additional_study_admin_usernames:
+          type: array
+          items:
+            type: string
+          description: List of additional study administrator usernames
         data_controller_organisation:
           type: string
           enum: ["UCL", "Other"]

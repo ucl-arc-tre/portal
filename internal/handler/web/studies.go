@@ -26,12 +26,23 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	for _, study := range studies {
 		ownerUserIDStr := study.OwnerUserID.String()
 		dataControllerOrg := openapi.StudyDataControllerOrganisation(study.Controller)
+
+		// Extract admin usernames from StudyAdmins
+		var adminUsernames []string
+		for _, studyAdmin := range study.StudyAdmins {
+			adminUsernames = append(adminUsernames, string(studyAdmin.User.Username))
+		}
+		var adminUsernamesPtr *[]string
+		if len(adminUsernames) > 0 {
+			adminUsernamesPtr = &adminUsernames
+		}
+
 		response = append(response, openapi.Study{
 			Id:                               study.ID.String(),
 			Title:                            study.Title,
 			Description:                      study.Description,
 			OwnerUserId:                      &ownerUserIDStr,
-			AdminEmail:                       study.Admin,
+			AdditionalStudyAdminUsernames:    adminUsernamesPtr,
 			DataControllerOrganisation:       &dataControllerOrg,
 			DataControllerOrganisationOther:  study.ControllerOther,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
@@ -73,20 +84,31 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	createdStudy, err := h.studies.CreateStudy(user.ID, studyData)
+	createdStudy, err := h.studies.CreateStudy(ctx.Request.Context(), user.ID, studyData)
 	if err != nil {
-		setError(ctx, err, "Failed to create study")
+		setError(ctx, types.NewErrServerError(err), "Failed to create study")
 		return
 	}
 
 	ownerUserIDStr := createdStudy.OwnerUserID.String()
 	dataControllerOrg := openapi.StudyDataControllerOrganisation(createdStudy.Controller)
+
+	// Extract admin usernames from StudyAdmins
+	var adminUsernames []string
+	for _, studyAdmin := range createdStudy.StudyAdmins {
+		adminUsernames = append(adminUsernames, string(studyAdmin.User.Username))
+	}
+	var adminUsernamesPtr *[]string
+	if len(adminUsernames) > 0 {
+		adminUsernamesPtr = &adminUsernames
+	}
+
 	response := openapi.Study{
 		Id:                               createdStudy.ID.String(),
 		Title:                            createdStudy.Title,
 		Description:                      createdStudy.Description,
 		OwnerUserId:                      &ownerUserIDStr,
-		AdminEmail:                       createdStudy.Admin,
+		AdditionalStudyAdminUsernames:    adminUsernamesPtr,
 		DataControllerOrganisation:       &dataControllerOrg,
 		DataControllerOrganisationOther:  createdStudy.ControllerOther,
 		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,

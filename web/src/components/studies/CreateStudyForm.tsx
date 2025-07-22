@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import styles from "./CreateStudyForm.module.css";
-import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 import dynamic from "next/dynamic";
 
 const Label = dynamic(() => import("uikit-react-public").then((mod) => mod.Label), {
@@ -28,7 +28,7 @@ export type StudyFormData = {
   title: string;
   description: string;
   owner: string;
-  adminEmail: string;
+  additionalStudyAdminUsernames: string[];
   dataControllerOrganisation: string;
   dataControllerOrganisationOther: string;
   cagReference: number;
@@ -80,7 +80,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
       title: "",
       dataControllerOrganisation: "",
       owner: username,
+      additionalStudyAdminUsernames: [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "additionalStudyAdminUsernames",
   });
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -206,29 +212,55 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             </HelperText>
           </Label>
 
-          <Label htmlFor="admin">
-            Study Administrator:
-            <Controller
-              name="adminEmail"
-              control={control}
-              rules={{
-                pattern: {
-                  value: /@ucl\.ac\.uk$/,
-                  message: "Email must be a UCL email address",
-                },
-              }}
-              render={({ field }) => <Input {...field} type="email" id="admin" placeholder="ccbcabc@ucl.ac.uk" />}
-            />
-            {errors.adminEmail && (
-              <Alert type="error">
-                <AlertMessage>{errors.adminEmail.message}</AlertMessage>
-              </Alert>
-            )}
-            <HelperText>
-              {" "}
-              <strong>Must</strong> be a full UCL staff member, not honorary or affiliated
+          <fieldset>
+            <legend>Additional Study Administrators (Optional)</legend>
+            <HelperText style={{ marginBottom: "1rem" }}>
+              Add UCL staff members who will help administer this study. <strong>Must</strong> be valid UCL staff
+              usernames.
             </HelperText>
-          </Label>
+
+            {fields.map((field, index) => (
+              <div
+                key={field.id}
+                style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem", marginBottom: "1rem" }}
+              >
+                <Label htmlFor={`admin-${index}`} style={{ flex: 1 }}>
+                  Administrator {index + 1}:
+                  <Controller
+                    name={`additionalStudyAdminUsernames.${index}` as const}
+                    control={control}
+                    // rules={{
+                    //   pattern: {
+                    //     value: /^[a-zA-Z0-9._-]+$/,
+                    //     message: "Username must contain only letters, numbers, dots, hyphens, and underscores",
+                    //   },
+                    // }}
+                    render={({ field: inputField }) => (
+                      <Input {...inputField} type="text" id={`admin-${index}`} placeholder="username (e.g., jbloggs)" />
+                    )}
+                  />
+                  {errors.additionalStudyAdminUsernames?.[index] && (
+                    <Alert type="error">
+                      <AlertMessage>{errors.additionalStudyAdminUsernames[index]?.message}</AlertMessage>
+                    </Alert>
+                  )}
+                </Label>
+                <Button type="button" variant="secondary" size="small" onClick={() => remove(index)}>
+                  Remove
+                </Button>
+              </div>
+            ))}
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              onClick={() => append("")}
+              style={{ marginTop: "0.5rem" }}
+            >
+              Add Administrator
+            </Button>
+          </fieldset>
 
           <Label htmlFor="controller">
             Data Controller (organisation)*:

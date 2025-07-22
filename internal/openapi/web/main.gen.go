@@ -192,8 +192,8 @@ type ProfileUpdate struct {
 
 // Study defines model for Study.
 type Study struct {
-	// AdminEmail Email of the study administrator
-	AdminEmail *string `json:"admin_email,omitempty"`
+	// AdditionalStudyAdminUsernames List of additional study administrator usernames
+	AdditionalStudyAdminUsernames *[]string `json:"additional_study_admin_usernames,omitempty"`
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
@@ -291,8 +291,8 @@ type StudyDataControllerOrganisation string
 
 // StudyBase Base study properties
 type StudyBase struct {
-	// AdminEmail Email of the study administrator
-	AdminEmail *string `json:"admin_email,omitempty"`
+	// AdditionalStudyAdminUsernames List of additional study administrator usernames
+	AdditionalStudyAdminUsernames *[]string `json:"additional_study_admin_usernames,omitempty"`
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`

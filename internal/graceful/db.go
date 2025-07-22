@@ -23,6 +23,7 @@ func InitDB() {
 		&types.UserTrainingRecord{},
 		&types.UserAttributes{},
 		&types.Study{},
+		&types.StudyAdmin{},
 		&types.Asset{},
 		&types.AssetLocation{},
 	}

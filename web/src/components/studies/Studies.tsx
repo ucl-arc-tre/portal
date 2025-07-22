@@ -34,7 +34,8 @@ export default function Studies(props: Props) {
         title: data.title,
         data_controller_organisation: data.dataControllerOrganisation as "UCL" | "Other",
         description: data.description ? data.description : undefined,
-        admin_email: data.adminEmail ? data.adminEmail : undefined,
+        additional_study_admin_usernames:
+          data.additionalStudyAdminUsernames.length > 0 ? data.additionalStudyAdminUsernames : undefined,
         data_controller_organisation_other: data.dataControllerOrganisationOther
           ? data.dataControllerOrganisationOther
           : undefined,
@@ -75,8 +76,11 @@ export default function Studies(props: Props) {
         body: studyData,
       });
 
+      if (response.response.ok === false) {
+        setSubmitError("Failed to create study. Please try again.");
+      }
+
       if (response.data) {
-        console.log("Study created successfully:", response.data);
         setCreateStudyFormOpen(false);
         fetchStudies();
       }

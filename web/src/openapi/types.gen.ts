@@ -190,9 +190,9 @@ export type StudyBase = {
      */
     description?: string;
     /**
-     * Email of the study administrator
+     * List of additional study administrator usernames
      */
-    admin_email?: string;
+    additional_study_admin_usernames?: Array<string>;
     /**
      * The organisation acting as data controller for the study
      */

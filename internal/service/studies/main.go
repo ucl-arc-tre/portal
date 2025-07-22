@@ -1,10 +1,14 @@
 package studies
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -12,16 +16,96 @@ import (
 )
 
 type Service struct {
-	db *gorm.DB
+	db    *gorm.DB
+	entra *entra.Controller
 }
 
 func New() *Service {
 	return &Service{
-		db: graceful.NewDB(),
+		db:    graceful.NewDB(),
+		entra: entra.New(1 * time.Hour),
 	}
 }
 
-func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
+// check if a username exists in Entra and is a valid staff member
+func (s *Service) validateUsername(ctx context.Context, username string) error {
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+
+	userData, err := s.entra.UserData(ctx, types.Username(username))
+	if err != nil {
+		return fmt.Errorf("username '%s' not found in directory", username)
+	}
+
+	fmt.Println("entra userData:", userData) // Debugging line to check userData
+
+	// if userData.EmployeeType == nil || *userData.EmployeeType == "" {
+	// 	return fmt.Errorf("username '%s' does not have an employee type set", username)
+	// }
+
+	// if *userData.EmployeeType != "staff" {
+	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
+	// }
+
+	return nil
+}
+
+// find a user in the database or create one if it doesn't exist
+func (s *Service) findOrCreateUser(username string) (*types.User, error) {
+	// find existing user
+	var user types.User
+	err := s.db.Where("username = ?", username).First(&user).Error
+	if err == nil {
+		return &user, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("error querying user: %w", err)
+	}
+
+	// User doesn't exist, create new one
+	user = types.User{
+		Username: types.Username(username),
+	}
+	if err := s.db.Create(&user).Error; err != nil {
+		return nil, fmt.Errorf("error creating user: %w", err)
+	}
+
+	return &user, nil
+}
+
+// validate all admin usernames and create/find corresponding users
+func (s *Service) validateAndCreateAdmins(ctx context.Context, usernames []string) ([]types.User, error) {
+	if len(usernames) == 0 {
+		return []types.User{}, nil
+	}
+
+	// Validate all usernames
+	var validationErrors []string
+	for _, username := range usernames {
+		if err := s.validateUsername(ctx, username); err != nil {
+			validationErrors = append(validationErrors, err.Error())
+		}
+	}
+
+	if len(validationErrors) > 0 {
+		return nil, fmt.Errorf("validation failed: %s", strings.Join(validationErrors, "; "))
+	}
+
+	// All usernames are valid, now find or create users
+	var users []types.User
+	for _, username := range usernames {
+		user, err := s.findOrCreateUser(username)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, *user)
+	}
+
+	return users, nil
+}
+
+func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
 	if strings.TrimSpace(studyData.Title) == "" {
 		return nil, errors.New("study title is required")
 	}
@@ -46,6 +130,25 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateReq
 		return nil, errors.New("study description must be 255 characters or less")
 	}
 
+	// Validate and create admin users if any are provided
+	var adminUsernames []string
+	if studyData.AdditionalStudyAdminUsernames != nil {
+		adminUsernames = *studyData.AdditionalStudyAdminUsernames
+	}
+
+	adminUsers, err := s.validateAndCreateAdmins(ctx, adminUsernames)
+	if err != nil {
+		return nil, err
+	}
+
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	dbStudy := types.Study{
 		OwnerUserID: userID,
 		Title:       studyData.Title,
@@ -53,7 +156,6 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateReq
 	}
 
 	dbStudy.Description = studyData.Description
-	dbStudy.Admin = studyData.AdminEmail
 	dbStudy.ControllerOther = studyData.DataControllerOrganisationOther
 	dbStudy.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	dbStudy.InvolvesCag = studyData.InvolvesCag
@@ -78,11 +180,36 @@ func (s *Service) CreateStudy(userID uuid.UUID, studyData openapi.StudyCreateReq
 	dbStudy.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
 	dbStudy.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
 
-	if err := s.db.Create(&dbStudy).Error; err != nil {
+	// Create the study
+	if err := tx.Create(&dbStudy).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
-	return &dbStudy, nil
+	// Create StudyAdmin records for each admin user
+	for _, adminUser := range adminUsers {
+		studyAdmin := types.StudyAdmin{
+			StudyID: dbStudy.ID,
+			UserID:  adminUser.ID,
+		}
+		if err := tx.Create(&studyAdmin).Error; err != nil {
+			tx.Rollback()
+			return nil, fmt.Errorf("failed to create study admin: %w", err)
+		}
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	// Reload the study with StudyAdmins populated
+	var studyWithAdmins types.Study
+	if err := s.db.Preload("StudyAdmins.User").First(&studyWithAdmins, dbStudy.ID).Error; err != nil {
+		return nil, fmt.Errorf("failed to reload study with admins: %w", err)
+	}
+
+	return &studyWithAdmins, nil
 }
 
 // GetStudies retrieves all studies that the user owns or has access to
@@ -91,7 +218,7 @@ func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
 
 	// For now, only return studies owned by the user
 	// This could be expanded later to include shared studies
-	if err := s.db.Where("owner_user_id = ?", userID).Find(&studies).Error; err != nil {
+	if err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error; err != nil {
 		return nil, err
 	}
 

@@ -60,5 +60,6 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	}
 	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType()}
 	_ = c.userDataCache.Add(username, userData)
+
 	return &userData, nil
 }

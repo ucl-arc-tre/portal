@@ -9,7 +9,6 @@ type Study struct {
 	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
 	Title                            string    `gorm:"not null"`
 	Description                      *string   `gorm:"type:text"`
-	Admin                            *string   `gorm:"type:varchar(255)"`
 	Controller                       string    `gorm:"not null"`
 	ControllerOther                  *string   `gorm:"type:varchar(255)"`
 	InvolvesUclSponsorship           *bool     `gorm:""`
@@ -36,8 +35,19 @@ type Study struct {
 	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
 
 	// Relationships
-	Owner  User    `gorm:"foreignKey:OwnerUserID"`
-	Assets []Asset `gorm:"foreignKey:StudyID"`
+	Owner       User         `gorm:"foreignKey:OwnerUserID"`
+	Assets      []Asset      `gorm:"foreignKey:StudyID"`
+	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
+}
+
+type StudyAdmin struct {
+	ModelAuditable
+	StudyID uuid.UUID `gorm:"not null;index"`
+	UserID  uuid.UUID `gorm:"not null;index"`
+
+	// Relationships
+	Study Study `gorm:"foreignKey:StudyID"`
+	User  User  `gorm:"foreignKey:UserID"`
 }
 
 type Asset struct {
