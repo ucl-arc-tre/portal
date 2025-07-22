@@ -45,14 +45,19 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
 
   return (
     <div className={styles.wrapper}>
-      {!canAgree && (
-        <Alert type="info">
-          Please read this agreement carefully. Agreement possible in {secondsRemaining} seconds.
-        </Alert>
-      )}
+      <Alert type="info">
+        Please read this agreement carefully.{" "}
+        {canAgree ? "You can now agree." : <>Agreement possible in {secondsRemaining} seconds.</>}
+      </Alert>
       {!agreed && (
         <form onSubmit={handleSubmit}>
-          <Button size="large" type="submit" disabled={!canAgree} cy="approved-researcher-agreement-agree">
+          <Button
+            size="large"
+            type="submit"
+            disabled={!canAgree}
+            cy="approved-researcher-agreement-agree"
+            aria-label="I agree to the approved researcher agreement"
+          >
             I Agree
           </Button>
         </form>
