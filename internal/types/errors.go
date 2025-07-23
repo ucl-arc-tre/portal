@@ -8,6 +8,7 @@ import (
 var (
 	ErrInvalidObject = errors.New("invalid object")
 	ErrServerError   = errors.New("server error")
+	ErrNotFound      = errors.New("not found")
 )
 
 func NewErrInvalidObject(err error) error {
@@ -16,6 +17,10 @@ func NewErrInvalidObject(err error) error {
 
 func NewErrServerError(err error) error {
 	return newErrorWithType(err, ErrServerError)
+}
+
+func NewNotFoundError(err error) error {
+	return newErrorWithType(err, ErrNotFound)
 }
 
 func newErrorWithType(err error, errorType error) error {
