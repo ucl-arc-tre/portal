@@ -392,7 +392,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
           {showDataProtectionNumber && (
             <Label htmlFor="dataProtectionNumber">
-              Data Protection Registration Number:
+              Data Protection Registration Number*:
               <HelperText>
                 This is comprised of a registry ID, the year and month the data was registered and a 2-3 digit number.
                 Eg. {UclDpoId}/2022/01/123
