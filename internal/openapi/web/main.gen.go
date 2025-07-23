@@ -192,17 +192,8 @@ type Study struct {
 	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
-	// DataProtectionDate Data protection registration date (YYYY-MM format)
-	DataProtectionDate *string `json:"data_protection_date,omitempty"`
-
-	// DataProtectionId Data protection registration number
-	DataProtectionId *int `json:"data_protection_id,omitempty"`
-
 	// DataProtectionNumber Full data protection registration number
 	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
-
-	// DataProtectionPrefix Data protection registry ID
-	DataProtectionPrefix *string `json:"data_protection_prefix,omitempty"`
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
@@ -282,17 +273,8 @@ type StudyBase struct {
 	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
-	// DataProtectionDate Data protection registration date (YYYY-MM format)
-	DataProtectionDate *string `json:"data_protection_date,omitempty"`
-
-	// DataProtectionId Data protection registration number
-	DataProtectionId *int `json:"data_protection_id,omitempty"`
-
 	// DataProtectionNumber Full data protection registration number
 	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
-
-	// DataProtectionPrefix Data protection registry ID
-	DataProtectionPrefix *string `json:"data_protection_prefix,omitempty"`
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`

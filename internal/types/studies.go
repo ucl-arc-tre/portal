@@ -24,9 +24,6 @@ type Study struct {
 	RequiresDspt                     *bool     `gorm:""`
 	RequiresDbs                      *bool     `gorm:""`
 	IsDataProtectionOfficeRegistered *bool     `gorm:""`
-	DataProtectionPrefix             *string   `gorm:"type:varchar(255)"`
-	DataProtectionDate               *string   `gorm:"type:varchar(255)"`
-	DataProtectionId                 *int      `gorm:""`
 	DataProtectionNumber             *string   `gorm:"type:varchar(255)"`
 	InvolvesThirdParty               *bool     `gorm:""`
 	InvolvesExternalUsers            *bool     `gorm:""`

@@ -250,18 +250,6 @@ export type StudyBase = {
      */
     is_data_protection_office_registered?: boolean;
     /**
-     * Data protection registry ID
-     */
-    data_protection_prefix?: string;
-    /**
-     * Data protection registration date (YYYY-MM format)
-     */
-    data_protection_date?: string;
-    /**
-     * Data protection registration number
-     */
-    data_protection_id?: number;
-    /**
      * Full data protection registration number
      */
     data_protection_number?: string;

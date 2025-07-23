@@ -167,9 +167,6 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 	dbStudy.RequiresDspt = studyData.RequiresDspt
 	dbStudy.RequiresDbs = studyData.RequiresDbs
 	dbStudy.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
-	dbStudy.DataProtectionPrefix = studyData.DataProtectionPrefix
-	dbStudy.DataProtectionDate = studyData.DataProtectionDate
-	dbStudy.DataProtectionId = studyData.DataProtectionId
 	dbStudy.DataProtectionNumber = studyData.DataProtectionNumber
 	dbStudy.InvolvesThirdParty = studyData.InvolvesThirdParty
 	dbStudy.InvolvesExternalUsers = studyData.InvolvesExternalUsers

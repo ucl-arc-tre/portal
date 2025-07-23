@@ -53,9 +53,6 @@ export default function Studies(props: Props) {
         is_data_protection_office_registered: data.isDataProtectionOfficeRegistered
           ? data.isDataProtectionOfficeRegistered
           : undefined,
-        data_protection_prefix: data.dataProtectionPrefix ? data.dataProtectionPrefix : undefined,
-        data_protection_date: data.dataProtectionDate ? data.dataProtectionDate : undefined,
-        data_protection_id: data.dataProtectionId ? data.dataProtectionId : undefined,
         data_protection_number:
           data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
             ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`

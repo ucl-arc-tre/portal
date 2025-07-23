@@ -645,15 +645,6 @@ components:
         is_data_protection_office_registered:
           type: boolean
           description: Whether the study is registered with the UCL Data Protection Office
-        data_protection_prefix:
-          type: string
-          description: Data protection registry ID
-        data_protection_date:
-          type: string
-          description: Data protection registration date (YYYY-MM format)
-        data_protection_id:
-          type: integer
-          description: Data protection registration number
         data_protection_number:
           type: string
           description: Full data protection registration number
