@@ -177,6 +177,131 @@ export type Asset = {
     updated_at: string;
 };
 
+/**
+ * Base study properties
+ */
+export type StudyBase = {
+    /**
+     * Title of the study
+     */
+    title: string;
+    /**
+     * Description of the study
+     */
+    description?: string;
+    /**
+     * List of additional study administrator usernames (empty array if none)
+     */
+    additional_study_admin_usernames: Array<string>;
+    /**
+     * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
+     */
+    data_controller_organisation: string;
+    /**
+     * Whether UCL sponsorship is involved (seeking/have sought)
+     */
+    involves_ucl_sponsorship?: boolean;
+    /**
+     * Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
+     */
+    involves_cag?: boolean;
+    /**
+     * CAG reference number
+     */
+    cag_reference?: string;
+    /**
+     * Whether Research Ethics Committee approval is involved (seeking/have sought)
+     */
+    involves_ethics_approval?: boolean;
+    /**
+     * Whether Health Research Authority approval is involved (seeking/have sought)
+     */
+    involves_hra_approval?: boolean;
+    /**
+     * IRAS ID if applicable
+     */
+    iras_id?: string;
+    /**
+     * Whether the research is associated with NHS
+     */
+    is_nhs_associated?: boolean;
+    /**
+     * Whether NHS England is involved in the research
+     */
+    involves_nhs_england?: boolean;
+    /**
+     * NHS England DARS NIC number
+     */
+    nhs_england_reference?: string;
+    /**
+     * Whether the HRA Model Non-Commercial Agreement is involved
+     */
+    involves_mnca?: boolean;
+    /**
+     * Whether NHS Data Security & Protection Toolkit is required
+     */
+    requires_dspt?: boolean;
+    /**
+     * Whether a DBS check is required for staff
+     */
+    requires_dbs?: boolean;
+    /**
+     * Whether the study is registered with the UCL Data Protection Office
+     */
+    is_data_protection_office_registered?: boolean;
+    /**
+     * Full data protection registration number
+     */
+    data_protection_number?: string;
+    /**
+     * Whether third party organizations are involved
+     */
+    involves_third_party?: boolean;
+    /**
+     * Whether external users will have access to the study
+     */
+    involves_external_users?: boolean;
+    /**
+     * Whether participant consent is involved (seeking/have sought)
+     */
+    involves_participant_consent?: boolean;
+    /**
+     * Whether data is collected indirectly for the study (e.g. via a third party)
+     */
+    involves_indirect_data_collection?: boolean;
+    /**
+     * Whether data is processed outside UK/EEA
+     */
+    involves_data_processing_outside_eea?: boolean;
+    /**
+     * ID of the user who owns the study
+     */
+    owner_user_id?: string;
+};
+
+/**
+ * Request payload for creating a new study
+ */
+export type StudyCreateRequest = StudyBase;
+
+/**
+ * A research study
+ */
+export type Study = StudyBase & {
+    /**
+     * Unique identifier for the study
+     */
+    id: string;
+    /**
+     * Time in RFC3339 format when the study was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the study was last updated
+     */
+    updated_at: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -482,6 +607,69 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 };
 
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
+
+export type GetStudiesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type GetStudiesErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesResponses = {
+    200: Array<Study>;
+};
+
+export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
+
+export type PostStudiesData = {
+    body: StudyCreateRequest;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type PostStudiesErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Invalid request
+     */
+    406: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesResponses = {
+    /**
+     * Study created successfully
+     */
+    201: Study;
+};
+
+export type PostStudiesResponse = PostStudiesResponses[keyof PostStudiesResponses];
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
