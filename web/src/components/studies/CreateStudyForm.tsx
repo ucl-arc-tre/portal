@@ -164,18 +164,18 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               control={control}
               rules={{
                 required: "This field is required",
-                maxLength: {
-                  value: 55,
-                  message: "Maximum 55 characters",
-                },
                 pattern: {
-                  value: /^[a-zA-Z0-9 ]+$/,
-                  message: "Do not include any special characters",
+                  value: /^\w[\w\s\-]{2,48}\w$/,
+                  message:
+                    "Study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens",
                 },
               }}
               render={({ field }) => <Input {...field} type="text" id="studyName" />}
             />
-            <HelperText>Maximum 55 characters, do not include any special characters</HelperText>
+            <HelperText>
+              Study title must be 4-50 characters, start and end with a letter/number, only letters, numbers, spaces,
+              and hyphens allowed
+            </HelperText>
             {errors.title && (
               <Alert type="error">
                 <AlertMessage>{errors.title.message}</AlertMessage>

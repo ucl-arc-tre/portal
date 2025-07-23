@@ -36,10 +36,7 @@ export default function Studies(props: Props) {
         title: data.title,
         description: data.description ? data.description : undefined,
         data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
-        additional_study_admin_usernames:
-          data.additionalStudyAdminUsernames.length > 0
-            ? data.additionalStudyAdminUsernames.map((admin) => admin.value)
-            : undefined,
+        additional_study_admin_usernames: data.additionalStudyAdminUsernames.map((admin) => admin.value),
         involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
         involves_cag: data.involvesCag ? data.involvesCag : undefined,
         cag_reference: data.cagReference ? data.cagReference.toString() : undefined,

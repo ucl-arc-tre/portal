@@ -190,9 +190,9 @@ export type StudyBase = {
      */
     description?: string;
     /**
-     * List of additional study administrator usernames
+     * List of additional study administrator usernames (empty array if none)
      */
-    additional_study_admin_usernames?: Array<string>;
+    additional_study_admin_usernames: Array<string>;
     /**
      * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
      */

@@ -75,16 +75,16 @@ func (s *Service) findOrCreateUser(username string) (*types.User, error) {
 	return &user, nil
 }
 
-// validate all admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateAdmins(ctx context.Context, usernames []string) ([]types.User, error) {
-	if len(usernames) == 0 {
+// validate all study admin usernames and create/find corresponding users
+func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []string) ([]types.User, error) {
+	if len(studyAdminUsernames) == 0 {
 		return []types.User{}, nil
 	}
 
-	// Validate all usernames
+	// Validate all study admin usernames
 	var validationErrors []string
-	for _, username := range usernames {
-		if err := s.validateUsername(ctx, username); err != nil {
+	for _, studyAdminUsername := range studyAdminUsernames {
+		if err := s.validateUsername(ctx, studyAdminUsername); err != nil {
 			validationErrors = append(validationErrors, err.Error())
 		}
 	}
@@ -93,17 +93,17 @@ func (s *Service) validateAndCreateAdmins(ctx context.Context, usernames []strin
 		return nil, fmt.Errorf("validation failed: %s", strings.Join(validationErrors, "; "))
 	}
 
-	// All usernames are valid, now find or create users
-	var users []types.User
-	for _, username := range usernames {
-		user, err := s.findOrCreateUser(username)
+	// All study admin usernames are valid, now find or create users
+	var studyAdminUsers []types.User
+	for _, studyAdminUsername := range studyAdminUsernames {
+		user, err := s.findOrCreateUser(studyAdminUsername)
 		if err != nil {
 			return nil, err
 		}
-		users = append(users, *user)
+		studyAdminUsers = append(studyAdminUsers, *user)
 	}
 
-	return users, nil
+	return studyAdminUsers, nil
 }
 
 func validateStudyData(studyData openapi.StudyCreateRequest) error {
@@ -134,13 +134,8 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 		return nil, err
 	}
 
-	// Validate and create admin users if any are provided
-	var adminUsernames []string
-	if studyData.AdditionalStudyAdminUsernames != nil {
-		adminUsernames = *studyData.AdditionalStudyAdminUsernames
-	}
-
-	adminUsers, err := s.validateAndCreateAdmins(ctx, adminUsernames)
+	// Validate and create study admin users if any are provided
+	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData.AdditionalStudyAdminUsernames)
 	if err != nil {
 		return nil, err
 	}
@@ -186,11 +181,11 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 		return nil, err
 	}
 
-	// Create StudyAdmin records for each admin user
-	for _, adminUser := range adminUsers {
+	// Create StudyAdmin records for each study admin user
+	for _, studyAdminUser := range studyAdminUsers {
 		studyAdmin := types.StudyAdmin{
 			StudyID: dbStudy.ID,
-			UserID:  adminUser.ID,
+			UserID:  studyAdminUser.ID,
 		}
 		if err := tx.Create(&studyAdmin).Error; err != nil {
 			tx.Rollback()

@@ -27,13 +27,9 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 		ownerUserIDStr := study.OwnerUserID.String()
 
 		// Extract admin usernames from StudyAdmins
-		var adminUsernames []string
+		studyAdminUsernames := make([]string, 0)
 		for _, studyAdmin := range study.StudyAdmins {
-			adminUsernames = append(adminUsernames, string(studyAdmin.User.Username))
-		}
-		var adminUsernamesPtr *[]string
-		if len(adminUsernames) > 0 {
-			adminUsernamesPtr = &adminUsernames
+			studyAdminUsernames = append(studyAdminUsernames, string(studyAdmin.User.Username))
 		}
 
 		response = append(response, openapi.Study{
@@ -41,7 +37,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 			Title:                            study.Title,
 			Description:                      study.Description,
 			OwnerUserId:                      &ownerUserIDStr,
-			AdditionalStudyAdminUsernames:    adminUsernamesPtr,
+			AdditionalStudyAdminUsernames:    studyAdminUsernames,
 			DataControllerOrganisation:       study.DataControllerOrganisation,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
 			InvolvesCag:                      study.InvolvesCag,
@@ -88,13 +84,9 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	ownerUserIDStr := createdStudy.OwnerUserID.String()
 
 	// Extract admin usernames from StudyAdmins
-	var adminUsernames []string
+	studyAdminUsernames := make([]string, 0)
 	for _, studyAdmin := range createdStudy.StudyAdmins {
-		adminUsernames = append(adminUsernames, string(studyAdmin.User.Username))
-	}
-	var adminUsernamesPtr *[]string
-	if len(adminUsernames) > 0 {
-		adminUsernamesPtr = &adminUsernames
+		studyAdminUsernames = append(studyAdminUsernames, string(studyAdmin.User.Username))
 	}
 
 	response := openapi.Study{
@@ -102,7 +94,7 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		Title:                            createdStudy.Title,
 		Description:                      createdStudy.Description,
 		OwnerUserId:                      &ownerUserIDStr,
-		AdditionalStudyAdminUsernames:    adminUsernamesPtr,
+		AdditionalStudyAdminUsernames:    studyAdminUsernames,
 		DataControllerOrganisation:       createdStudy.DataControllerOrganisation,
 		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,
 		InvolvesCag:                      createdStudy.InvolvesCag,

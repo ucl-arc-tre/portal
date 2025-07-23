@@ -180,8 +180,8 @@ type ProfileUpdate struct {
 
 // Study defines model for Study.
 type Study struct {
-	// AdditionalStudyAdminUsernames List of additional study administrator usernames
-	AdditionalStudyAdminUsernames *[]string `json:"additional_study_admin_usernames,omitempty"`
+	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
+	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
@@ -264,8 +264,8 @@ type Study struct {
 
 // StudyBase Base study properties
 type StudyBase struct {
-	// AdditionalStudyAdminUsernames List of additional study administrator usernames
-	AdditionalStudyAdminUsernames *[]string `json:"additional_study_admin_usernames,omitempty"`
+	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
+	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`

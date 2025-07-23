@@ -591,6 +591,7 @@ components:
       required:
         - title
         - data_controller_organisation
+        - additional_study_admin_usernames
       properties:
         title:
           type: string
@@ -602,7 +603,7 @@ components:
           type: array
           items:
             type: string
-          description: List of additional study administrator usernames
+          description: List of additional study administrator usernames (empty array if none)
         data_controller_organisation:
           type: string
           description: The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
