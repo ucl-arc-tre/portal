@@ -28,12 +28,14 @@ export default function Studies(props: Props) {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    console.log("Submitting study data:", data);
+
     try {
       // Convert form data to StudyCreateRequest API format
       const studyData: StudyCreateRequest = {
         title: data.title,
-        data_controller_organisation: data.dataControllerOrganisation,
         description: data.description ? data.description : undefined,
+        data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
         additional_study_admin_usernames:
           data.additionalStudyAdminUsernames.length > 0
             ? data.additionalStudyAdminUsernames.map((admin) => admin.value)

@@ -120,6 +120,12 @@ func validateStudyData(studyData openapi.StudyCreateRequest) error {
 		return errors.New("study description must be 255 characters or less")
 	}
 
+	if studyData.IsDataProtectionOfficeRegistered != nil {
+		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
+			return errors.New("data protection registry ID, registration date, and registration number are required when registered with data protection office")
+		}
+	}
+
 	return nil
 }
 

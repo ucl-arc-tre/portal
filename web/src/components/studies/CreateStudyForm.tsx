@@ -401,14 +401,17 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 <Controller
                   name="dataProtectionPrefix"
                   control={control}
+                  rules={{
+                    required: showDataProtectionNumber ? "Registry ID is required" : false,
+                  }}
                   render={({ field }) => (
                     <Input
                       {...field}
                       type="text"
                       id="dataProtectionPrefix"
-                      readOnly={controllerValue === "UCL"}
-                      placeholder={controllerValue === "UCL" ? "" : "Registry ID eg ZX1234"}
-                      inputClassName={controllerValue === "UCL" ? styles.readonly : ""}
+                      readOnly={controllerValue?.toLowerCase() === "ucl"}
+                      placeholder={controllerValue?.toLowerCase() === "ucl" ? "" : "Registry ID eg ZX1234"}
+                      inputClassName={controllerValue?.toLowerCase() === "ucl" ? styles.readonly : ""}
                     />
                   )}
                 />
@@ -416,12 +419,16 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 <Controller
                   name="dataProtectionDate"
                   control={control}
+                  rules={{
+                    required: showDataProtectionNumber ? "Registration date is required" : false,
+                  }}
                   render={({ field }) => <input {...field} type="month" id="dataProtectionDate" />}
                 />
                 <Controller
                   name="dataProtectionId"
                   control={control}
                   rules={{
+                    required: showDataProtectionNumber ? "Registration number is required" : false,
                     min: {
                       value: 0,
                       message: "Cannot be a negative number",
@@ -432,21 +439,16 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                     },
                   }}
                   render={({ field }) => (
-                    <input
-                      {...field}
-                      type="number"
-                      id="dataProtectionId"
-                      placeholder="eg 123"
-                      value={field.value === 0 ? "" : field.value}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                    />
+                    <input {...field} type="number" id="dataProtectionId" placeholder="eg 123" value={field.value} />
                   )}
                 />
               </div>
-              {(errors.dataProtectionDate || errors.dataProtectionId) && (
+              {(errors.dataProtectionPrefix || errors.dataProtectionDate || errors.dataProtectionId) && (
                 <Alert type="error">
                   <AlertMessage>
-                    {errors.dataProtectionNumber?.message || errors.dataProtectionId?.message}
+                    {errors.dataProtectionPrefix?.message ||
+                      errors.dataProtectionDate?.message ||
+                      errors.dataProtectionId?.message}
                   </AlertMessage>
                 </Alert>
               )}
