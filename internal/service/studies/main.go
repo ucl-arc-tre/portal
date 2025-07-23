@@ -12,6 +12,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -19,12 +20,14 @@ import (
 type Service struct {
 	db    *gorm.DB
 	entra *entra.Controller
+	users *users.Service
 }
 
 func New() *Service {
 	return &Service{
 		db:    graceful.NewDB(),
 		entra: entra.New(1 * time.Hour),
+		users: users.New(),
 	}
 }
 
@@ -52,29 +55,6 @@ func (s *Service) validateUsername(ctx context.Context, username string) error {
 	return nil
 }
 
-// find a user in the database or create one if it doesn't exist
-func (s *Service) findOrCreateUser(username string) (*types.User, error) {
-	// find existing user
-	var user types.User
-	err := s.db.Where("username = ?", username).First(&user).Error
-	if err == nil {
-		return &user, nil
-	}
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("error querying user: %w", err)
-	}
-
-	// User doesn't exist, create new one
-	user = types.User{
-		Username: types.Username(username),
-	}
-	if err := s.db.Create(&user).Error; err != nil {
-		return nil, fmt.Errorf("error creating user: %w", err)
-	}
-
-	return &user, nil
-}
-
 // validate all study admin usernames and create/find corresponding users
 func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []string) ([]types.User, error) {
 	if len(studyAdminUsernames) == 0 {
@@ -96,11 +76,11 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	// All study admin usernames are valid, now find or create users
 	var studyAdminUsers []types.User
 	for _, studyAdminUsername := range studyAdminUsernames {
-		user, err := s.findOrCreateUser(studyAdminUsername)
+		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
 			return nil, err
 		}
-		studyAdminUsers = append(studyAdminUsers, *user)
+		studyAdminUsers = append(studyAdminUsers, user)
 	}
 
 	return studyAdminUsers, nil
