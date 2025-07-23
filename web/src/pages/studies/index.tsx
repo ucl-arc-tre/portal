@@ -17,7 +17,7 @@ export default function StudiesPage() {
   const [studies, setStudies] = useState<Study[]>([]);
   const [studiesLoading, setStudiesLoading] = useState(true);
 
-  const isAdmin = userData?.roles.includes("admin");
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   const fetchStudies = async () => {
     setStudiesLoading(true);
@@ -33,9 +33,9 @@ export default function StudiesPage() {
   };
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isApprovedResearcher) return;
     fetchStudies();
-  }, [isAdmin]);
+  }, [isApprovedResearcher]);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -59,7 +59,7 @@ export default function StudiesPage() {
         </Button>
       </p>
 
-      {!isAdmin && (
+      {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
             To create and manage your studies, please first set up your profile by completing the approved researcher
@@ -72,9 +72,9 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {isAdmin && studiesLoading && <Loading message="Loading studies..." />}
+      {isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
 
-      {isAdmin && !studiesLoading && (
+      {isApprovedResearcher && !studiesLoading && (
         <Studies username={userData!.username} studies={studies} fetchStudies={fetchStudies} />
       )}
     </>
