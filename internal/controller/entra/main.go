@@ -63,3 +63,28 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 
 	return &userData, nil
 }
+
+func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string) error {
+	if username == "" {
+		return fmt.Errorf("username cannot be empty")
+	}
+
+	userData, err := c.UserData(ctx, types.Username(username))
+	if err != nil {
+		return fmt.Errorf("username '%s' not found in directory", username)
+	}
+
+	// Log for debugging - can be removed later
+	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
+
+	// TODO: Add employee type validation when requirements are clarified
+	// if userData.EmployeeType == nil || *userData.EmployeeType == "" {
+	// 	return fmt.Errorf("username '%s' does not have an employee type set", username)
+	// }
+	//
+	// if *userData.EmployeeType != "staff" {
+	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
+	// }
+
+	return nil
+}

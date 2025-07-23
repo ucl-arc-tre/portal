@@ -31,40 +31,16 @@ func New() *Service {
 	}
 }
 
-// check if a username exists in Entra and is a valid staff member
-func (s *Service) validateUsername(ctx context.Context, username string) error {
-	if username == "" {
-		return errors.New("username cannot be empty")
-	}
-
-	userData, err := s.entra.UserData(ctx, types.Username(username))
-	if err != nil {
-		return fmt.Errorf("username '%s' not found in directory", username)
-	}
-
-	fmt.Println("entra userData:", userData) // Debugging line to check userData
-
-	// if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-	// 	return fmt.Errorf("username '%s' does not have an employee type set", username)
-	// }
-
-	// if *userData.EmployeeType != "staff" {
-	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
-	// }
-
-	return nil
-}
-
 // validate all study admin usernames and create/find corresponding users
 func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []string) ([]types.User, error) {
 	if len(studyAdminUsernames) == 0 {
 		return []types.User{}, nil
 	}
 
-	// Validate all study admin usernames
+	// Validate all study admin usernames (they must be staff members)
 	var validationErrors []string
 	for _, studyAdminUsername := range studyAdminUsernames {
-		if err := s.validateUsername(ctx, studyAdminUsername); err != nil {
+		if err := s.entra.ValidateEmployeeStatus(ctx, studyAdminUsername); err != nil {
 			validationErrors = append(validationErrors, err.Error())
 		}
 	}
