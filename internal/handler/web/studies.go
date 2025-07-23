@@ -79,7 +79,7 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	createdStudy, err := h.studies.CreateStudy(ctx.Request.Context(), user.ID, studyData)
+	createdStudy, err := h.studies.CreateStudy(ctx, user.ID, studyData)
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Failed to create study")
 		return
