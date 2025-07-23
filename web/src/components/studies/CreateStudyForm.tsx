@@ -120,7 +120,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
   // Update dataProtectionPrefix when controller changes
   useEffect(() => {
-    if (controllerValue === "UCL") {
+    if (controllerValue?.toLowerCase() === "ucl") {
       setValue("dataProtectionPrefix", UclDpoId);
     } else {
       setValue("dataProtectionPrefix", "");

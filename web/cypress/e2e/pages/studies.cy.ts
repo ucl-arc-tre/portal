@@ -59,7 +59,7 @@ describe("Approved researcher can create studies", () => {
     cy.get("[data-cy='back']").click();
     cy.get("[data-cy='back']").click();
     cy.get("input[name='title']").type("Test Study");
-    cy.get("select[name='dataControllerOrganisation']").select("UCL");
+    cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
     // go to the end and submit
     cy.get("[data-cy='next']").click();
@@ -80,13 +80,8 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='close-dialog']").click();
   });
 
-  it("shows controller text input if not UCL", () => {
-    cy.get("select[name='dataControllerOrganisation']").select("Other");
-    cy.get("input[name='dataControllerOrganisationOther']").type("Test Controller");
-  });
-
   it("sets DPO id to UCL's if UCL selected", () => {
-    cy.get("select[name='dataControllerOrganisation']").select("UCL");
+    cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
     cy.get("[data-cy='next']").click();
     cy.get("[data-cy='next']").click();
@@ -98,7 +93,7 @@ describe("Checking conditionally rendered fields", () => {
   });
 
   it("allows DPO id to be set if not UCL", () => {
-    cy.get("select[name='dataControllerOrganisation']").select("Other");
+    cy.get("input[name='dataControllerOrganisation']").type("Other Organization");
 
     cy.get("[data-cy='next']").click();
     cy.get("[data-cy='next']").click();
