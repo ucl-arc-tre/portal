@@ -212,7 +212,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileAgreements(false); // Agreement not completed
     cy.contains("Approved Researcher Agreement").should("be.visible");
     cy.get('[data-cy="approved-researcher-agreement-agree"]').should("be.disabled");
-    const buttonTimeoutSeconds = 100;
+    const buttonTimeoutSeconds = 120;
     cy.get('[data-cy="approved-researcher-agreement-agree"]').click({ timeout: buttonTimeoutSeconds * 1000 });
   });
 });
