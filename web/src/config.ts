@@ -1,1 +1,1 @@
-export const approvedAgreementRequiredReadingSeconds = 90;
+export const approvedAgreementRequiredReadingSeconds = 100;

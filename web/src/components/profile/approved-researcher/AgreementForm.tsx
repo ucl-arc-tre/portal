@@ -20,16 +20,14 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
   const canAgree = secondsRemaining === 0;
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setSecondsRemaining((secondsRemaining) => {
-        if (secondsRemaining === 0) {
-          clearInterval(timer);
-          return 0;
-        }
-        return secondsRemaining - 1;
-      });
+    if (secondsRemaining === 0) return;
+
+    const timer = setTimeout(() => {
+      setSecondsRemaining((prev) => prev - 1);
     }, 1000);
-  }, []);
+
+    return () => clearTimeout(timer);
+  }, [secondsRemaining]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
