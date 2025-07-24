@@ -225,8 +225,30 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   <Controller
                     name={`additionalStudyAdminUsernames.${index}.value` as const}
                     control={control}
-                    render={({ field }) => (
-                      <Input {...field} type="text" id={`admin-${index}`} placeholder="username (e.g., jbloggs)" />
+                    rules={{
+                      required: "Username is required",
+                      validate: (value) => {
+                        if (!value || value.trim() === "") {
+                          return "Username is required";
+                        }
+                        if (value.includes("@")) {
+                          return "Enter only the username part (without @ucl.ac.uk)";
+                        }
+                        return true;
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <div className={styles["username-input-wrapper"]}>
+                        <div>
+                          <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
+                          <span className={styles["domain-suffix"]}>@ucl.ac.uk</span>
+                        </div>
+                        {fieldState.error && (
+                          <Alert type="error">
+                            <AlertMessage>{fieldState.error.message}</AlertMessage>
+                          </Alert>
+                        )}
+                      </div>
                     )}
                   />
                 </Label>

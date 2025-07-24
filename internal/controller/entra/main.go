@@ -3,6 +3,7 @@ package entra
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -77,14 +78,13 @@ func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string
 	// Log for debugging - can be removed later
 	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
 
-	// TODO: Add employee type validation when requirements are clarified
-	// if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-	// 	return fmt.Errorf("username '%s' does not have an employee type set", username)
-	// }
-	//
-	// if *userData.EmployeeType != "staff" {
-	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
-	// }
+	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
+		return fmt.Errorf("username '%s' does not have an employee type set", username)
+	}
+
+	if strings.ToLower(*userData.EmployeeType) != "staff" {
+		return fmt.Errorf("username '%s' is not a valid staff member", username)
+	}
 
 	return nil
 }
