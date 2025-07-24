@@ -37,6 +37,14 @@ type Study struct {
 	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
 }
 
+func (s Study) AdminUsernames() []string {
+	usernames := []string{}
+	for _, studyAdmin := range s.StudyAdmins {
+		usernames = append(usernames, string(studyAdmin.User.Username))
+	}
+	return usernames
+}
+
 type StudyAdmin struct {
 	ModelAuditable
 	StudyID uuid.UUID `gorm:"not null;index"`
@@ -66,6 +74,14 @@ type Asset struct {
 	// Relationships
 	Study     Study           `gorm:"foreignKey:StudyID"`
 	Locations []AssetLocation `gorm:"foreignKey:AssetID"`
+}
+
+func (a Asset) LocationStrings() []string {
+	locationsStrings := []string{}
+	for _, location := range a.Locations {
+		locationsStrings = append(locationsStrings, location.Location)
+	}
+	return locationsStrings
 }
 
 type AssetLocation struct {

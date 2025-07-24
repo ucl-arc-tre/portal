@@ -9,7 +9,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
-	"gorm.io/gorm"
 )
 
 func (h *Handler) GetStudies(ctx *gin.Context) {
@@ -26,18 +25,12 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	for _, study := range studies {
 		ownerUserIDStr := study.OwnerUserID.String()
 
-		// Extract admin usernames from StudyAdmins
-		studyAdminUsernames := make([]string, 0)
-		for _, studyAdmin := range study.StudyAdmins {
-			studyAdminUsernames = append(studyAdminUsernames, string(studyAdmin.User.Username))
-		}
-
 		response = append(response, openapi.Study{
 			Id:                               study.ID.String(),
 			Title:                            study.Title,
 			Description:                      study.Description,
 			OwnerUserId:                      &ownerUserIDStr,
-			AdditionalStudyAdminUsernames:    studyAdminUsernames,
+			AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 			DataControllerOrganisation:       study.DataControllerOrganisation,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
 			InvolvesCag:                      study.InvolvesCag,
@@ -70,31 +63,24 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
 	var studyData openapi.StudyCreateRequest
-	if err := ctx.ShouldBindJSON(&studyData); err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid request body")
+	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
 
 	createdStudy, err := h.studies.CreateStudy(ctx, user.ID, studyData)
 	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Failed to create study")
+		setError(ctx, err, "Failed to create study")
 		return
 	}
 
 	ownerUserIDStr := createdStudy.OwnerUserID.String()
-
-	// Extract admin usernames from StudyAdmins
-	studyAdminUsernames := make([]string, 0)
-	for _, studyAdmin := range createdStudy.StudyAdmins {
-		studyAdminUsernames = append(studyAdminUsernames, string(studyAdmin.User.Username))
-	}
 
 	response := openapi.Study{
 		Id:                               createdStudy.ID.String(),
 		Title:                            createdStudy.Title,
 		Description:                      createdStudy.Description,
 		OwnerUserId:                      &ownerUserIDStr,
-		AdditionalStudyAdminUsernames:    studyAdminUsernames,
+		AdditionalStudyAdminUsernames:    createdStudy.AdminUsernames(),
 		DataControllerOrganisation:       createdStudy.DataControllerOrganisation,
 		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,
 		InvolvesCag:                      createdStudy.InvolvesCag,
@@ -133,23 +119,14 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 	// todo - use portal not gorm errors
 	assets, err := h.studies.GetStudyAssets(studyUUID, user.ID)
-
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			setError(ctx, types.NewErrInvalidObject(err), "Study not found or you don't have permission to access it")
-			return
-		}
-		setError(ctx, types.NewErrServerError(err), "Failed to retrieve assets")
+		setError(ctx, err, "Failed to retrieve assets")
 		return
 	}
 
 	// prepare the final response
 	var response []openapi.Asset
 	for _, asset := range assets {
-		var locations []string
-		for _, loc := range asset.Locations {
-			locations = append(locations, loc.Location)
-		}
 
 		response = append(response, openapi.Asset{
 			Id:                     asset.ID.String(),
@@ -160,7 +137,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 			LegalBasis:             asset.LegalBasis,
 			Format:                 asset.Format,
 			Expiry:                 asset.Expiry,
-			Locations:              locations,
+			Locations:              asset.LocationStrings(),
 			HasDspt:                asset.HasDspt,
 			StoredOutsideUkEea:     asset.StoredOutsideUkEea,
 			AccessedByThirdParties: asset.AccessedByThirdParties,

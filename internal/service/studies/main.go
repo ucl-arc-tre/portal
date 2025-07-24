@@ -38,15 +38,15 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	}
 
 	// Validate all study admin usernames (they must be staff members)
-	var validationErrors []string
+	validationErrors := []error{}
 	for _, studyAdminUsername := range studyAdminUsernames {
 		if err := s.entra.ValidateEmployeeStatus(ctx, studyAdminUsername); err != nil {
-			validationErrors = append(validationErrors, err.Error())
+			validationErrors = append(validationErrors, err)
 		}
 	}
 
 	if len(validationErrors) > 0 {
-		return nil, fmt.Errorf("validation failed: %s", strings.Join(validationErrors, "; "))
+		return nil, types.NewErrInvalidObject(errors.Join(validationErrors...))
 	}
 
 	// All study admin usernames are valid, now find or create users
@@ -87,7 +87,7 @@ func validateStudyData(studyData openapi.StudyCreateRequest) error {
 
 func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
 	if err := validateStudyData(studyData); err != nil {
-		return nil, err
+		return nil, types.NewErrInvalidObject(err)
 	}
 
 	// Validate and create study admin users if any are provided
@@ -169,11 +169,8 @@ func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
 
 	// For now, only return studies owned by the user
 	// This could be expanded later to include shared studies
-	if err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error; err != nil {
-		return nil, err
-	}
-
-	return studies, nil
+	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error
+	return studies, types.NewErrServerError(err)
 }
 
 // GetStudyAssets retrieves all assets for a study,
@@ -181,8 +178,11 @@ func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
 func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
 	// verify the user owns the study
 	var study types.Study
-	if err := s.db.Where("id = ? AND owner_user_id = ?", studyID, userID).First(&study).Error; err != nil {
-		return nil, err
+	err := s.db.Where("id = ? AND owner_user_id = ?", studyID, userID).First(&study).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, types.NewNotFoundError(err)
+	} else if err != nil {
+		return nil, types.NewErrServerError(err)
 	}
 
 	// Get all assets for this study with their locations
