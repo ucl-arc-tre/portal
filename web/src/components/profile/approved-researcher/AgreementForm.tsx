@@ -3,7 +3,6 @@ import { postProfileAgreements } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./AgreementForm.module.css";
 import dynamic from "next/dynamic";
-import { approvedAgreementRequiredReadingSeconds } from "@/config";
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
@@ -16,7 +15,7 @@ type ApprovedResearcherFormProps = {
 export default function ApprovedResearcherForm(props: ApprovedResearcherFormProps) {
   const { agreementId, setAgreementCompleted } = props;
   const [agreed, setAgreed] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(approvedAgreementRequiredReadingSeconds);
+  const [secondsRemaining, setSecondsRemaining] = useState(Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER));
   const canAgree = secondsRemaining === 0;
 
   useEffect(() => {
@@ -44,7 +43,7 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
   return (
     <div className={styles.wrapper}>
       <Alert type="info">
-        Please read this agreement carefully.{" "}
+        Please <strong>read this agreement carefully</strong>.{" "}
         {canAgree ? "You can now agree." : <>Agreement possible in {secondsRemaining} seconds.</>}
       </Alert>
       {!agreed && (

@@ -15,12 +15,6 @@
 /dist
 /dist-ssr
 
-
-# Environment
-.env*
-.env.local
-.env.*.local
-
 # Cypress and testing
 cypress/videos
 cypress/screenshots
@@ -37,7 +31,6 @@ logs
 # System / Misc
 .DS_Store
 *.pem
-*.local
 *.tsbuildinfo
 next-env.d.ts
 .eslintcache
