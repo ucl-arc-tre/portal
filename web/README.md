@@ -10,6 +10,10 @@ Development files are located in '/src' with all components routed into the app 
 
 Make sure you have read through the root [`README.md`](../README.md) file. This will give you more background on the application architecture.
 
+## Environment variables
+
+This project checks in to git both the `.env.development` and `.env.production` files. Make sure not to include any sensitive information in either of the environment variable files. This is because the frontend is statically exported and so all environment variables will be publicly available. Please use environment variables for config setup that differs between development and production.
+
 ## Nodejs and npm
 
 You need to have [Node.js](https://nodejs.org/en/download/) installed on your local development machine. Nodejs comes bundled with npm which is used for managing the libraries that are used for the frontend.
