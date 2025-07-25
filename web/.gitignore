@@ -15,6 +15,13 @@
 /dist
 /dist-ssr
 
+# Environment
+.env*
+.env.local
+.env.*.local
+!.env.production
+!.env.development
+
 # Cypress and testing
 cypress/videos
 cypress/screenshots
