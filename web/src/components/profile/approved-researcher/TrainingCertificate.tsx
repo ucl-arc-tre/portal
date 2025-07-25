@@ -7,6 +7,7 @@ import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import dynamic from "next/dynamic";
+import Box from "@/components/ui/Box";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -149,43 +150,45 @@ export default function TrainingCertificate({ setTrainingCertificateCompleted }:
 
   return (
     <section data-cy="training-certificate" className={styles.wrapper}>
-      <h2 className="subtitle">Training Certificate</h2>
-      <p>
-        All members of UCL who manage highly confidential research information must undertake annual training on
-        handling sensitive information. Anyone with an &apos;.ac.uk&apos; or NHS email address can self-register for{" "}
-        <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
-          NHS Digital Data Security Awareness Level 1 course
-        </a>{" "}
-        provided by e-Learning for Health. When asked, you can register your role as a &quot;Further Education and
-        Higher Education Researcher (Education)&quot; which should provide you access to the course.
-        <br />
-        <br />
-        <strong>Please complete the course and upload the PDF certificate below.</strong>
-      </p>
-      <p>
-        Note that the name on your certificate must match the chosen name you entered in step 1 for validation to
-        succeed.
-      </p>
+      <Box>
+        <h2 className="subtitle">Training Certificate</h2>
+        <p>
+          All members of UCL who manage highly confidential research information must undertake annual training on
+          handling sensitive information. Anyone with an &apos;.ac.uk&apos; or NHS email address can self-register for{" "}
+          <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
+            NHS Digital Data Security Awareness Level 1 course
+          </a>{" "}
+          provided by e-Learning for Health. When asked, you can register your role as a &quot;Further Education and
+          Higher Education Researcher (Education)&quot; which should provide you access to the course.
+          <br />
+          <br />
+          <strong>Please complete the course and upload the PDF certificate below.</strong>
+        </p>
+        <p>
+          Note that the name on your certificate must match the chosen name you entered in step 1 for validation to
+          succeed.
+        </p>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <Input
-          type="file"
-          name="certificate"
-          aria-label="certificate-upload"
-          accept="application/pdf"
-          required
-          onChange={checkIsPDF}
-        />
-        <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF || isSubmitting}>
-          Submit
-        </Button>
-      </form>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <Input
+            type="file"
+            name="certificate"
+            aria-label="certificate-upload"
+            accept="application/pdf"
+            required
+            onChange={checkIsPDF}
+          />
+          <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF || isSubmitting}>
+            Submit
+          </Button>
+        </form>
 
-      {errorMessage && (
-        <Alert type={errorType}>
-          <TrainingCertificateError text={errorMessage} showExtra={errorType === "error"} />
-        </Alert>
-      )}
+        {errorMessage && (
+          <Alert type={errorType}>
+            <TrainingCertificateError text={errorMessage} showExtra={errorType === "error"} />
+          </Alert>
+        )}
+      </Box>
     </section>
   );
 }

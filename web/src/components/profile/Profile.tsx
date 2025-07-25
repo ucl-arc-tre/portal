@@ -112,7 +112,6 @@ export default function Profile() {
             setAgreementCompleted={setAgreementCompleted}
             agreementCompleted={agreementCompleted}
           />
-          <hr className={styles.divider} />
           <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
         </div>
       );
