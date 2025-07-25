@@ -1,3 +1,4 @@
+import Box from "../ui/Box";
 import Button from "../ui/Button";
 import styles from "./ProfileStepProgress.module.css";
 import dynamic from "next/dynamic";
@@ -15,7 +16,7 @@ export default function ProfileStepProgress(props: ProfileStepProgressProps) {
   const { steps, profileIsComplete } = props;
 
   return (
-    <div className={styles.container}>
+    <Box>
       <div className={styles["completion-header"]}>
         {profileIsComplete ? (
           <>
@@ -94,6 +95,6 @@ export default function ProfileStepProgress(props: ProfileStepProgressProps) {
           ))}
         </ol>
       </div>
-    </div>
+    </Box>
   );
 }

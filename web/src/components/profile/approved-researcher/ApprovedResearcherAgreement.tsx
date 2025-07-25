@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "./AgreementForm";
 import AgreementText from "./AgreementText";
+import Box from "@/components/ui/Box";
 
 type ApprovedResearcherAgreementProps = {
   setAgreementCompleted: (completed: boolean) => void;
@@ -62,10 +63,12 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   return (
     agreement && (
       <section data-cy="approved-researcher-agreement">
-        <h2 className="subtitle">Approved Researcher Agreement</h2>
-        <AgreementText text={agreement.text} />
+        <Box>
+          <h2 className="subtitle">Approved Researcher Agreement</h2>
+          <AgreementText text={agreement.text} />
 
-        <AgreementForm agreementId={agreement.id} setAgreementCompleted={setAgreementCompleted} />
+          <AgreementForm agreementId={agreement.id} setAgreementCompleted={setAgreementCompleted} />
+        </Box>
       </section>
     )
   );
