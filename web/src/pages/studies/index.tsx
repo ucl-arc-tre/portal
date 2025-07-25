@@ -74,9 +74,7 @@ export default function StudiesPage() {
 
       {isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
 
-      {isApprovedResearcher && !studiesLoading && (
-        <Studies username={userData!.username} studies={studies} fetchStudies={fetchStudies} />
-      )}
+      {isApprovedResearcher && !studiesLoading && <Studies studies={studies} fetchStudies={fetchStudies} />}
     </>
   );
 }

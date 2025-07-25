@@ -55,7 +55,6 @@ export type StudyFormData = {
 };
 
 type CreateStudyProps = {
-  username: string;
   setCreateStudyFormOpen: (name: boolean) => void;
   onSubmit: (data: StudyFormData) => Promise<void>;
 };
@@ -65,7 +64,7 @@ type CreateStudyProps = {
 const UclDpoId = "Z6364106";
 
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
-  const { username, setCreateStudyFormOpen, onSubmit: onSubmitProp } = CreateStudyProps;
+  const { setCreateStudyFormOpen, onSubmit: onSubmitProp } = CreateStudyProps;
   const {
     register,
     handleSubmit,
@@ -78,7 +77,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     defaultValues: {
       title: "",
       dataControllerOrganisation: "",
-      owner: username,
+      owner: "",
       additionalStudyAdminUsernames: [],
     },
   });
@@ -197,18 +196,37 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <fieldset className={getFieldsetClass(1)}>
           <legend>Ownership</legend>
           <Label htmlFor="owner">
-            Study Owner (PI):
-            <Input
-              type="email"
-              id="owner"
-              {...register("owner")}
-              readOnly={true}
-              value={username}
-              inputClassName={styles.readonly}
+            Study Owner (PI)*:
+            <Controller
+              name="owner"
+              control={control}
+              rules={{
+                required: "Study owner username is required",
+                validate: (value) => {
+                  if (!value || value.trim() === "") {
+                    return "Study owner username is required";
+                  }
+                  if (value.includes("@")) {
+                    return "Enter only the username part (without @ucl.ac.uk)";
+                  }
+                  return true;
+                },
+              }}
+              render={({ field, fieldState }) => (
+                <div className={`${styles["username-input-wrapper"]} ${styles["owner-input"]}`}>
+                  <div>
+                    <Input {...field} type="text" id="owner" placeholder="Study owner UCL username" />
+                    <span className={styles["domain-suffix"]}>@ucl.ac.uk</span>
+                  </div>
+                  {fieldState.error && (
+                    <Alert type="error">
+                      <AlertMessage>{fieldState.error.message}</AlertMessage>
+                    </Alert>
+                  )}
+                </div>
+              )}
             />
-            <HelperText>
-              If you are not the study owner, contact the owner and ask them to fill out this form on their account.
-            </HelperText>
+            <HelperText>Enter the UCL username of the principal investigator who will own this study.</HelperText>
           </Label>
 
           <fieldset>
@@ -240,7 +258,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                     render={({ field, fieldState }) => (
                       <div className={styles["username-input-wrapper"]}>
                         <div>
-                          <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
+                          <Input {...field} type="text" id={`admin-${index}`} placeholder="Admin UCL username" />
                           <span className={styles["domain-suffix"]}>@ucl.ac.uk</span>
                         </div>
                         {fieldState.error && (

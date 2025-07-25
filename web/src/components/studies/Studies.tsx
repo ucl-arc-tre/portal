@@ -8,13 +8,12 @@ import { postStudies, Study, StudyCreateRequest } from "@/openapi";
 import styles from "./Studies.module.css";
 
 type Props = {
-  username: string;
   studies: Study[];
   fetchStudies: () => void;
 };
 
 export default function Studies(props: Props) {
-  const { username, studies, fetchStudies } = props;
+  const { studies, fetchStudies } = props;
   const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -95,11 +94,7 @@ export default function Studies(props: Props) {
   return (
     <>
       {createStudyFormOpen && (
-        <CreateStudyForm
-          username={username}
-          setCreateStudyFormOpen={setCreateStudyFormOpen}
-          onSubmit={handleStudySubmit}
-        />
+        <CreateStudyForm setCreateStudyFormOpen={setCreateStudyFormOpen} onSubmit={handleStudySubmit} />
       )}
 
       {isSubmitting && <Loading message="Creating study..." />}
