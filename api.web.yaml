@@ -589,10 +589,18 @@ components:
       type: object
       description: Base study properties
       required:
+        - created_by_user_id
+        - study_owner_user_id
         - title
         - data_controller_organisation
         - additional_study_admin_usernames
       properties:
+        created_by_user_id:
+          type: string
+          description: ID of the user who created the study (might not be UCL staff)
+        study_owner_user_id:
+          type: string
+          description: ID of the user who owns the study (must be a valid UCL staff)
         title:
           type: string
           description: Title of the study
@@ -664,9 +672,6 @@ components:
         involves_data_processing_outside_eea:
           type: boolean
           description: Whether data is processed outside UK/EEA
-        owner_user_id:
-          type: string
-          description: ID of the user who owns the study
 
     StudyCreateRequest:
       allOf:

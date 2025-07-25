@@ -7,7 +7,8 @@ import (
 // for descriptions of the Study fields, see /api.web.yaml
 type Study struct {
 	ModelAuditable
-	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
+	StudyOwnerUserID                 uuid.UUID `gorm:"not null;index"`
+	CreatedByUserID                  uuid.UUID `gorm:"not null;index"`
 	Title                            string    `gorm:"not null"`
 	Description                      *string   `gorm:"type:text"`
 	DataControllerOrganisation       string    `gorm:"not null"`
@@ -32,7 +33,7 @@ type Study struct {
 	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
 
 	// Relationships
-	Owner       User         `gorm:"foreignKey:OwnerUserID"`
+	Owner       User         `gorm:"foreignKey:CreatedByUserID"`
 	Assets      []Asset      `gorm:"foreignKey:StudyID"`
 	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
 }

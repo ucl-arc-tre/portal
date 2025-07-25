@@ -62,10 +62,29 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	return studyAdminUsers, nil
 }
 
+func (s *Service) validateStudyOwner(ctx context.Context, studyOwnerUsername string) (*types.User, error) {
+	if err := s.entra.ValidateEmployeeStatus(ctx, studyOwnerUsername); err != nil {
+		return nil, types.NewErrInvalidObject(fmt.Errorf("study owner validation failed: %w", err))
+	}
+
+	// Create or find the owner user
+	studyOwnerUser, err := s.users.PersistedUser(types.Username(studyOwnerUsername))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create/find study owner user: %w", err)
+	}
+
+	return &studyOwnerUser, nil
+}
+
 func validateStudyData(studyData openapi.StudyCreateRequest) error {
+
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
 		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
+	}
+
+	if strings.TrimSpace(studyData.StudyOwnerUserId) == "" {
+		return errors.New("study_owner_user_id is required")
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
@@ -90,7 +109,13 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 		return nil, types.NewErrInvalidObject(err)
 	}
 
-	// Validate and create study admin users if any are provided
+	// Validate the study owner is a valid UCL staff member
+	studyOwnerUser, err := s.validateStudyOwner(ctx, studyData.StudyOwnerUserId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate and create study admin users if any are provided (must be valid UCL staff members)
 	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData.AdditionalStudyAdminUsernames)
 	if err != nil {
 		return nil, err
@@ -105,7 +130,8 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 	}()
 
 	dbStudy := types.Study{
-		OwnerUserID:                userID,
+		StudyOwnerUserID:           studyOwnerUser.ID,
+		CreatedByUserID:            userID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
 	}
@@ -167,18 +193,17 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
 	var studies []types.Study
 
-	// For now, only return studies owned by the user
-	// This could be expanded later to include shared studies
-	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error
+	// Return studies where the user is either the owner or the creator
+	err := s.db.Preload("StudyAdmins.User").Where("study_owner_user_id = ? OR created_by_user_id = ?", userID, userID).Find(&studies).Error
 	return studies, types.NewErrServerError(err)
 }
 
 // GetStudyAssets retrieves all assets for a study,
-// ensures that the user owns the study (this might be refactored later to allow shared access)
+// ensures that the user has access to the study (either as owner or creator)
 func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
-	// verify the user owns the study
+	// verify the user has access to the study (either as owner or creator)
 	var study types.Study
-	err := s.db.Where("id = ? AND owner_user_id = ?", studyID, userID).First(&study).Error
+	err := s.db.Where("id = ? AND (study_owner_user_id = ? OR created_by_user_id = ?)", studyID, userID, userID).First(&study).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, types.NewNotFoundError(err)
 	} else if err != nil {

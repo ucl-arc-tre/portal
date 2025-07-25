@@ -189,6 +189,9 @@ type Study struct {
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
 
+	// CreatedByUserId ID of the user who created the study (might not be UCL staff)
+	CreatedByUserId string `json:"created_by_user_id"`
+
 	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
@@ -246,14 +249,14 @@ type Study struct {
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
 
-	// OwnerUserId ID of the user who owns the study
-	OwnerUserId *string `json:"owner_user_id,omitempty"`
-
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`
 
 	// RequiresDspt Whether NHS Data Security & Protection Toolkit is required
 	RequiresDspt *bool `json:"requires_dspt,omitempty"`
+
+	// StudyOwnerUserId ID of the user who owns the study (must be a valid UCL staff)
+	StudyOwnerUserId string `json:"study_owner_user_id"`
 
 	// Title Title of the study
 	Title string `json:"title"`
@@ -269,6 +272,9 @@ type StudyBase struct {
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
+
+	// CreatedByUserId ID of the user who created the study (might not be UCL staff)
+	CreatedByUserId string `json:"created_by_user_id"`
 
 	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
 	DataControllerOrganisation string `json:"data_controller_organisation"`
@@ -324,14 +330,14 @@ type StudyBase struct {
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
 
-	// OwnerUserId ID of the user who owns the study
-	OwnerUserId *string `json:"owner_user_id,omitempty"`
-
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`
 
 	// RequiresDspt Whether NHS Data Security & Protection Toolkit is required
 	RequiresDspt *bool `json:"requires_dspt,omitempty"`
+
+	// StudyOwnerUserId ID of the user who owns the study (must be a valid UCL staff)
+	StudyOwnerUserId string `json:"study_owner_user_id"`
 
 	// Title Title of the study
 	Title string `json:"title"`

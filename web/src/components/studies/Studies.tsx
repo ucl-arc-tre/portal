@@ -8,12 +8,13 @@ import { postStudies, Study, StudyCreateRequest } from "@/openapi";
 import styles from "./Studies.module.css";
 
 type Props = {
+  username: string;
   studies: Study[];
   fetchStudies: () => void;
 };
 
 export default function Studies(props: Props) {
-  const { studies, fetchStudies } = props;
+  const { username, studies, fetchStudies } = props;
   const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -35,9 +36,11 @@ export default function Studies(props: Props) {
     try {
       // Convert form data to StudyCreateRequest API format
       const studyData: StudyCreateRequest = {
+        created_by_user_id: username,
         title: data.title,
         description: data.description ? data.description : undefined,
         data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
+        study_owner_user_id: `${data.owner.trim()}${domainName}`,
         additional_study_admin_usernames: data.additionalStudyAdminUsernames
           .map((admin) => admin.value.trim())
           .map((username) => `${username}${domainName}`),

@@ -182,6 +182,14 @@ export type Asset = {
  */
 export type StudyBase = {
     /**
+     * ID of the user who created the study (might not be UCL staff)
+     */
+    created_by_user_id: string;
+    /**
+     * ID of the user who owns the study (must be a valid UCL staff)
+     */
+    study_owner_user_id: string;
+    /**
      * Title of the study
      */
     title: string;
@@ -273,10 +281,6 @@ export type StudyBase = {
      * Whether data is processed outside UK/EEA
      */
     involves_data_processing_outside_eea?: boolean;
-    /**
-     * ID of the user who owns the study
-     */
-    owner_user_id?: string;
 };
 
 /**

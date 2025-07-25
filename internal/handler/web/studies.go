@@ -23,13 +23,13 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	// Convert database studies to OpenAPI format
 	var response []openapi.Study
 	for _, study := range studies {
-		ownerUserIDStr := study.OwnerUserID.String()
 
 		response = append(response, openapi.Study{
+			CreatedByUserId:                  study.CreatedByUserID.String(),
 			Id:                               study.ID.String(),
 			Title:                            study.Title,
 			Description:                      study.Description,
-			OwnerUserId:                      &ownerUserIDStr,
+			StudyOwnerUserId:                 study.StudyOwnerUserID.String(),
 			AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 			DataControllerOrganisation:       study.DataControllerOrganisation,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
@@ -73,13 +73,12 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	ownerUserIDStr := createdStudy.OwnerUserID.String()
-
 	response := openapi.Study{
 		Id:                               createdStudy.ID.String(),
+		CreatedByUserId:                  createdStudy.CreatedByUserID.String(),
 		Title:                            createdStudy.Title,
 		Description:                      createdStudy.Description,
-		OwnerUserId:                      &ownerUserIDStr,
+		StudyOwnerUserId:                 createdStudy.StudyOwnerUserID.String(),
 		AdditionalStudyAdminUsernames:    createdStudy.AdminUsernames(),
 		DataControllerOrganisation:       createdStudy.DataControllerOrganisation,
 		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,
