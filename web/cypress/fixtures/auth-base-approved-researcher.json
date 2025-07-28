@@ -1,4 +1,5 @@
 {
   "username": "cypress-approved-researcher@example.com",
-  "roles": ["base", "approved-researcher"]
+  "roles": ["base", "approved-researcher"],
+  "isUclStaff": true
 }
