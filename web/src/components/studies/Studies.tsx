@@ -117,7 +117,7 @@ export default function Studies(props: Props) {
           <h2>UCL Staff Only</h2>
           <p>Only UCL staff members can create studies.</p>
           <p>If you believe this is an error, please contact your administrator.</p>
-          <div style={{ marginTop: "1.5rem", textAlign: "right" }}>
+          <div className={styles["ucl-staff-modal-actions"]}>
             <Button onClick={() => setShowUclStaffModal(false)} variant="secondary">
               Close
             </Button>
