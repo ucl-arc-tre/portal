@@ -3,6 +3,10 @@
 export type Auth = {
     username: string;
     roles: Array<'admin' | 'base' | 'approved-researcher'>;
+    /**
+     * Whether the user is a valid UCL staff member
+     */
+    isUclStaff: boolean;
 };
 
 export type Profile = {

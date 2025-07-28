@@ -37,26 +37,35 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 		return []types.User{}, nil
 	}
 
+	var (
+		validationErrors []error
+		studyAdminUsers  []types.User
+	)
+
 	// Validate all study admin usernames (they must be staff members)
-	validationErrors := []error{}
 	for _, studyAdminUsername := range studyAdminUsernames {
-		if err := s.entra.ValidateEmployeeStatus(ctx, studyAdminUsername); err != nil {
-			validationErrors = append(validationErrors, err)
+		isStaff, err := s.entra.ValidateEmployeeStatus(ctx, studyAdminUsername)
+
+		if err != nil {
+			validationErrors = append(validationErrors, fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
+			continue
 		}
+		if !isStaff {
+			validationErrors = append(validationErrors, fmt.Errorf("user %s is not a UCL staff member", studyAdminUsername))
+			continue
+		}
+
+		// All study admin usernames are valid, now find or create users
+		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
+		if err != nil {
+			return nil, fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err)
+		}
+		studyAdminUsers = append(studyAdminUsers, user)
+
 	}
 
 	if len(validationErrors) > 0 {
 		return nil, types.NewErrInvalidObject(errors.Join(validationErrors...))
-	}
-
-	// All study admin usernames are valid, now find or create users
-	var studyAdminUsers []types.User
-	for _, studyAdminUsername := range studyAdminUsernames {
-		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
-		if err != nil {
-			return nil, err
-		}
-		studyAdminUsers = append(studyAdminUsers, user)
 	}
 
 	return studyAdminUsers, nil

@@ -6,19 +6,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	auth := openapi.Auth{Username: string(user.Username)}
-	roles, err := rbac.GetRoles(user)
+
+	roles, isUclStaff, err := h.auth.GetAuthInfo(ctx, user)
 	if err != nil {
-		setError(ctx, err, "Failed to get roles for user")
+		setError(ctx, err, "Failed to get auth info")
 		return
 	}
+
+	auth := openapi.Auth{
+		Username:   string(user.Username),
+		IsUclStaff: isUclStaff,
+	}
+
 	for _, role := range roles {
 		auth.Roles = append(auth.Roles, openapi.AuthRoles(role))
 	}
+
 	ctx.JSON(http.StatusOK, auth)
 }

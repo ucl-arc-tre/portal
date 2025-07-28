@@ -323,6 +323,7 @@ components:
       required:
         - username
         - roles
+        - isUclStaff
       properties:
         username:
           type: string
@@ -334,6 +335,9 @@ components:
               - admin
               - base
               - approved-researcher
+        isUclStaff:
+          type: boolean
+          description: Whether the user is a valid UCL staff member
 
     Profile:
       type: object

@@ -65,26 +65,28 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	return &userData, nil
 }
 
-func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string) error {
+func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string) (bool, error) {
 	if username == "" {
-		return fmt.Errorf("username cannot be empty")
+		return false, fmt.Errorf("username cannot be empty")
 	}
 
 	userData, err := c.UserData(ctx, types.Username(username))
 	if err != nil {
-		return fmt.Errorf("username '%s' not found in directory", username)
+		return false, fmt.Errorf("username '%s' not found in directory", username)
 	}
 
 	// Log for debugging - can be removed later
 	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
 
 	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-		return fmt.Errorf("username '%s' does not have an employee type set", username)
+		return false, fmt.Errorf("username '%s' does not have an employee type set", username)
 	}
 
 	if strings.ToLower(*userData.EmployeeType) != "staff" {
-		return fmt.Errorf("username '%s' is not a valid staff member", username)
+		return false, fmt.Errorf("username '%s' is not a valid staff member", username)
 	}
 
-	return nil
+	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
+
+	return isStaff, nil
 }
