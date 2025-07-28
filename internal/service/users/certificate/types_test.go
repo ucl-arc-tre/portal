@@ -7,10 +7,12 @@ import (
 )
 
 func TestNameMatches(t *testing.T) {
-	assert.True(t, newCertificateWithName("bob", "Smith").NameMatches("Bob Smith"))
-	assert.True(t, newCertificateWithName("alice", "smith-Jones").NameMatches("Alice Smith Jones"))
+	assert.True(t, newCertificateWithName("bob Smith").NameMatches("Bob Smith"))
+	assert.True(t, newCertificateWithName("alice smith-Jones").NameMatches("Alice Smith Jones"))
+	assert.True(t, newCertificateWithName("alice smith Jones").NameMatches("Alice Smith Jones"))
+	assert.True(t, newCertificateWithName("alice Renée").NameMatches("Alice Renee"))
 }
 
-func newCertificateWithName(firstName string, lastName string) *TrainingCertificate {
-	return &TrainingCertificate{FirstName: firstName, LastName: lastName}
+func newCertificateWithName(name string) *TrainingCertificate {
+	return &TrainingCertificate{Name: name}
 }
