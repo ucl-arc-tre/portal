@@ -82,10 +82,6 @@ func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string
 		return false, fmt.Errorf("username '%s' does not have an employee type set", username)
 	}
 
-	if strings.ToLower(*userData.EmployeeType) != "staff" {
-		return false, fmt.Errorf("username '%s' is not a valid staff member", username)
-	}
-
 	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
 
 	return isStaff, nil
