@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +28,7 @@ func (s *Service) GetAuthInfo(ctx *gin.Context, user types.User) ([]string, bool
 		return nil, false, types.NewErrServerError(err)
 	}
 
-	isUclStaff, err := s.entra.ValidateEmployeeStatus(context.Background(), string(user.Username))
+	isUclStaff, err := s.entra.ValidateEmployeeStatus(ctx, string(user.Username))
 	if err != nil {
 		log.Warn().Err(err).Str("user", string(user.Username)).Msg("Failed to validate employee status")
 		isUclStaff = false // Default to false if there's an error
