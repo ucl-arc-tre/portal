@@ -8,6 +8,10 @@ export const InfoIcon = dynamic(() => import("uikit-react-public").then((mod) =>
   ssr: false,
 });
 
+export const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
+  ssr: false,
+});
+
 export const TrainingKindOptions = {
   //  is there a better way of doing this? Won't let me use type as a value
   nhsd: "training_kind_nhsd",
