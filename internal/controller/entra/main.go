@@ -56,7 +56,7 @@ func New() *Controller {
 	return controller
 }
 
-func (c *Controller) UserData(ctx context.Context, username types.Username) (*UserData, error) {
+func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
 	}
@@ -81,7 +81,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username string) (bool, 
 		return false, fmt.Errorf("username cannot be empty")
 	}
 
-	userData, err := c.UserData(ctx, types.Username(username))
+	userData, err := c.userData(ctx, types.Username(username))
 	if err != nil {
 		return false, fmt.Errorf("username [%v] not found in directory", username)
 	}
