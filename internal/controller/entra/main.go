@@ -100,5 +100,12 @@ func (c *Controller) SendInvite(ctx context.Context, email string) error {
 
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 
+	invitation, err := c.client.Invitations().Post(context.Background(), requestBody, nil)
+	if err != nil {
+		return fmt.Errorf("failed to send invite to '%s': %v", invitedUserEmailAddress, err)
+	}
+
+	log.Printf("Invitation sent: %+v\n", invitation)
+
 	return nil
 }
