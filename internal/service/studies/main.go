@@ -89,6 +89,16 @@ func (s *Service) validateStudyData(ctx context.Context, username string, studyD
 		}
 	}
 
+	// Check if the study title already exists
+	var existingStudy types.Study
+	result := s.db.Where("title = ?", studyData.Title).First(&existingStudy)
+	if result.RowsAffected > 0 {
+		return fmt.Errorf("a study with the title [%v] already exists", studyData.Title)
+	}
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("failed to check for duplicate study title: %w", result.Error)
+	}
+
 	// Check if the study submitter (the owner-user-id) is a valid staff member
 	isStaff, err := s.entra.IsStaffMember(ctx, username)
 	if err != nil {
