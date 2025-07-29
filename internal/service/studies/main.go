@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
@@ -26,7 +25,7 @@ type Service struct {
 func New() *Service {
 	return &Service{
 		db:    graceful.NewDB(),
-		entra: entra.New(1 * time.Hour),
+		entra: entra.New(),
 		users: users.New(),
 	}
 }

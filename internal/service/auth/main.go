@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
@@ -16,7 +15,7 @@ type Service struct {
 
 func New() *Service {
 	service := Service{
-		entra: entra.New(1 * time.Hour),
+		entra: entra.New(),
 	}
 	return &service
 }

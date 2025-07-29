@@ -16,13 +16,22 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+const (
+	cacheTTL = 1 * time.Hour
+)
+
+var controller *Controller
+
 type Controller struct {
 	client        *graph.GraphServiceClient
 	userDataCache *expirable.LRU[types.Username, UserData]
 }
 
-// Create a new entra controller using client credentials
-func New(cacheTTL time.Duration) *Controller {
+// Create or get a new entra controller using client credentials
+func New() *Controller {
+	if controller != nil {
+		return controller
+	}
 	log.Info().Float64("cacheTTL seconds", cacheTTL.Seconds()).Msg("Creating entra controller")
 	credentials := config.EntraCredentials()
 	// See: https://learn.microsoft.com/en-us/graph/sdks/choose-authentication-providers?tabs=go#client-credentials-provider
@@ -40,10 +49,11 @@ func New(cacheTTL time.Duration) *Controller {
 	if err != nil {
 		panic(fmt.Errorf("failed to create msgraph client [%v]", err))
 	}
-	return &Controller{
+	controller = &Controller{
 		client:        graphClient,
 		userDataCache: expirable.NewLRU[types.Username, UserData](1000, nil, cacheTTL),
 	}
+	return controller
 }
 
 func (c *Controller) UserData(ctx context.Context, username types.Username) (*UserData, error) {
