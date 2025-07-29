@@ -1,5 +1,5 @@
 {
   "username": "cypress-base-user@example.com",
   "roles": ["base"],
-  "isStaff": true
+  "is_staff": true
 }
