@@ -30,7 +30,7 @@ export default function Studies(props: Props) {
   };
 
   const handleCreateStudyClick = () => {
-    if (!userData.isUclStaff) {
+    if (!userData.is_staff) {
       setShowUclStaffModal(true);
       return;
     }

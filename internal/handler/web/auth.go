@@ -11,15 +11,15 @@ import (
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	roles, isUclStaff, err := h.auth.GetAuthInfo(ctx, user)
+	roles, isStaff, err := h.auth.GetAuthInfo(ctx, user)
 	if err != nil {
 		setError(ctx, err, "Failed to get auth info")
 		return
 	}
 
 	auth := openapi.Auth{
-		Username:   string(user.Username),
-		IsUclStaff: isUclStaff,
+		Username: string(user.Username),
+		IsStaff:  isStaff,
 	}
 
 	for _, role := range roles {

@@ -6,7 +6,7 @@ export type Auth = {
     /**
      * Whether the user is a valid UCL staff member
      */
-    isUclStaff: boolean;
+    is_staff: boolean;
 };
 
 export type Profile = {

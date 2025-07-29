@@ -65,7 +65,7 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	return &userData, nil
 }
 
-func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string) (bool, error) {
+func (c *Controller) IsStaffMember(ctx context.Context, username string) (bool, error) {
 	if username == "" {
 		return false, fmt.Errorf("username cannot be empty")
 	}

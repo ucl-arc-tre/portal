@@ -127,10 +127,10 @@ type AssetStatus string
 
 // Auth defines model for Auth.
 type Auth struct {
-	// IsUclStaff Whether the user is a valid UCL staff member
-	IsUclStaff bool        `json:"isUclStaff"`
-	Roles      []AuthRoles `json:"roles"`
-	Username   string      `json:"username"`
+	// IsStaff Whether the user is a valid UCL staff member
+	IsStaff  bool        `json:"is_staff"`
+	Roles    []AuthRoles `json:"roles"`
+	Username string      `json:"username"`
 }
 
 // AuthRoles defines model for Auth.Roles.

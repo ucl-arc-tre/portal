@@ -28,17 +28,17 @@ func (s *Service) GetAuthInfo(ctx *gin.Context, user types.User) ([]string, bool
 		return nil, false, types.NewErrServerError(err)
 	}
 
-	isUclStaff, err := s.entra.ValidateEmployeeStatus(ctx, string(user.Username))
+	isStaff, err := s.entra.IsStaffMember(ctx, string(user.Username))
 	if err != nil {
 		log.Warn().Err(err).Str("user", string(user.Username)).Msg("Failed to validate employee status")
-		isUclStaff = false // Default to false if there's an error
+		isStaff = false // Default to false if there's an error
 	}
 
 	log.Debug().
 		Str("user", string(user.Username)).
 		Strs("roles", roles).
-		Bool("isUclStaff", isUclStaff).
+		Bool("isStaff", isStaff).
 		Msg("Retrieved auth info for user")
 
-	return roles, isUclStaff, nil
+	return roles, isStaff, nil
 }

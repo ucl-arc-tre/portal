@@ -44,7 +44,7 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 
 	// Validate all study admin usernames (they must be staff members)
 	for _, studyAdminUsername := range studyAdminUsernames {
-		isStaff, err := s.entra.ValidateEmployeeStatus(ctx, studyAdminUsername)
+		isStaff, err := s.entra.IsStaffMember(ctx, studyAdminUsername)
 
 		if err != nil {
 			validationErrors = append(validationErrors, fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
