@@ -37,10 +37,8 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 		return []types.User{}, nil
 	}
 
-	var (
-		validationErrors []error
-		studyAdminUsers  []types.User
-	)
+	validationErrors := []error{}
+	studyAdminUsers := []types.User{}
 
 	// Validate all study admin usernames (they must be staff members)
 	for _, studyAdminUsername := range studyAdminUsernames {
