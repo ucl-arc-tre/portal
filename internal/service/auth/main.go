@@ -21,7 +21,7 @@ func New() *Service {
 	return &service
 }
 
-func (s *Service) GetAuthInfo(ctx *gin.Context, user types.User) ([]string, bool, error) {
+func (s *Service) AuthInfo(ctx *gin.Context, user types.User) ([]string, bool, error) {
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
 		log.Error().Err(err).Str("user", string(user.Username)).Msg("Failed to get user roles")
