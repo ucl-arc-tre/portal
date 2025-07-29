@@ -11,7 +11,7 @@ import (
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	roles, isStaff, err := h.auth.AuthInfo(ctx, user)
+	authInfo, err := h.auth.AuthInfo(ctx.Request.Context(), user)
 	if err != nil {
 		setError(ctx, err, "Failed to get auth info")
 		return
@@ -19,10 +19,10 @@ func (h *Handler) GetAuth(ctx *gin.Context) {
 
 	auth := openapi.Auth{
 		Username: string(user.Username),
-		IsStaff:  isStaff,
+		IsStaff:  authInfo.IsStaff,
 	}
 
-	for _, role := range roles {
+	for _, role := range authInfo.Roles {
 		auth.Roles = append(auth.Roles, openapi.AuthRoles(role))
 	}
 

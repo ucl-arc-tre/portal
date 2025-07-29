@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"context"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -21,11 +21,11 @@ func New() *Service {
 	return &service
 }
 
-func (s *Service) AuthInfo(ctx *gin.Context, user types.User) ([]string, bool, error) {
+func (s *Service) AuthInfo(ctx context.Context, user types.User) (*types.AuthInfo, error) {
 	roles, err := rbac.GetRoles(user)
 	if err != nil {
 		log.Error().Err(err).Str("user", string(user.Username)).Msg("Failed to get user roles")
-		return nil, false, types.NewErrServerError(err)
+		return nil, types.NewErrServerError(err)
 	}
 
 	isStaff, err := s.entra.IsStaffMember(ctx, string(user.Username))
@@ -34,11 +34,16 @@ func (s *Service) AuthInfo(ctx *gin.Context, user types.User) ([]string, bool, e
 		isStaff = false // Default to false if there's an error
 	}
 
+	authInfo := &types.AuthInfo{
+		Roles:   roles,
+		IsStaff: isStaff,
+	}
+
 	log.Debug().
 		Str("user", string(user.Username)).
-		Strs("roles", roles).
-		Bool("isStaff", isStaff).
+		Strs("roles", authInfo.Roles).
+		Bool("isStaff", authInfo.IsStaff).
 		Msg("Retrieved auth info for user")
 
-	return roles, isStaff, nil
+	return authInfo, nil
 }
