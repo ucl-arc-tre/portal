@@ -65,6 +65,7 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	return &userData, nil
 }
 
+// checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type
 func (c *Controller) IsStaffMember(ctx context.Context, username string) (bool, error) {
 	if username == "" {
 		return false, fmt.Errorf("username cannot be empty")

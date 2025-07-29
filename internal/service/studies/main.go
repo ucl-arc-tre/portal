@@ -51,7 +51,7 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 			continue
 		}
 		if !isStaff {
-			validationErrors = append(validationErrors, fmt.Errorf("user %s is not a UCL staff member", studyAdminUsername))
+			validationErrors = append(validationErrors, fmt.Errorf("user %s is not a staff member", studyAdminUsername))
 			continue
 		}
 
@@ -71,7 +71,7 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	return studyAdminUsers, nil
 }
 
-func validateStudyData(studyData openapi.StudyCreateRequest) error {
+func (s *Service) validateStudyData(ctx context.Context, username string, studyData openapi.StudyCreateRequest) error {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
 		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
@@ -91,11 +91,20 @@ func validateStudyData(studyData openapi.StudyCreateRequest) error {
 		}
 	}
 
+	// Check if the study submitter (the owner-user-id) is a valid staff member
+	isStaff, err := s.entra.IsStaffMember(ctx, username)
+	if err != nil {
+		return fmt.Errorf("failed to check staff status for user %s: %w", username, err)
+	}
+	if !isStaff {
+		return fmt.Errorf("user is not a staff member")
+	}
+
 	return nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
-	if err := validateStudyData(studyData); err != nil {
+func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*types.Study, error) {
+	if err := s.validateStudyData(ctx, string(user.Username), studyData); err != nil {
 		return nil, types.NewErrInvalidObject(err)
 	}
 
@@ -114,7 +123,7 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 	}()
 
 	dbStudy := types.Study{
-		OwnerUserID:                userID,
+		OwnerUserID:                user.ID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
 	}
