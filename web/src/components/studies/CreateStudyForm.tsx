@@ -64,6 +64,8 @@ type CreateStudyProps = {
 // A brief comment for context might be good here
 const UclDpoId = "Z6364106";
 
+const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME;
+
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   const { username, setCreateStudyFormOpen, onSubmit: onSubmitProp } = CreateStudyProps;
   const {
@@ -232,7 +234,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                           return "Username is required";
                         }
                         if (value.includes("@")) {
-                          return "Enter only the username part (without @ucl.ac.uk)";
+                          return `Enter only the username part (without ${domainName})`;
                         }
                         return true;
                       },
@@ -241,7 +243,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                       <div className={styles["username-input-wrapper"]}>
                         <div>
                           <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
-                          <span className={styles["domain-suffix"]}>@ucl.ac.uk</span>
+                          <span className={styles["domain-suffix"]}>{domainName}</span>
                         </div>
                         {fieldState.error && (
                           <Alert type="error">
@@ -276,9 +278,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               name="dataControllerOrganisation"
               control={control}
               rules={{ required: "This field is required" }}
-              render={({ field }) => <Input {...field} type="text" id="controller" placeholder="e.g. UCL" />}
+              render={({ field }) => (
+                <Input {...field} type="text" id="controller" placeholder={`e.g. ${domainName}`} />
+              )}
             />
-            <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
+            <HelperText>Enter the organization acting as data controller (e.g., &quot;{domainName}&quot;)</HelperText>
             {errors.dataControllerOrganisation && (
               <Alert type="error">
                 <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
