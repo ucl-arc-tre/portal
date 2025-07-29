@@ -278,11 +278,9 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               name="dataControllerOrganisation"
               control={control}
               rules={{ required: "This field is required" }}
-              render={({ field }) => (
-                <Input {...field} type="text" id="controller" placeholder={`e.g. ${domainName}`} />
-              )}
+              render={({ field }) => <Input {...field} type="text" id="controller" placeholder={`e.g. "UCL"`} />}
             />
-            <HelperText>Enter the organization acting as data controller (e.g., &quot;{domainName}&quot;)</HelperText>
+            <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
             {errors.dataControllerOrganisation && (
               <Alert type="error">
                 <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
