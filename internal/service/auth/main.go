@@ -27,7 +27,7 @@ func (s *Service) AuthInfo(ctx context.Context, user types.User) (*types.AuthInf
 		return nil, types.NewErrServerError(err)
 	}
 
-	isStaff, err := s.entra.IsStaffMember(ctx, string(user.Username))
+	isStaff, err := s.entra.IsStaffMember(ctx, user.Username)
 	if err != nil {
 		log.Warn().Err(err).Str("user", string(user.Username)).Msg("Failed to validate employee status")
 		isStaff = false // Default to false if there's an error

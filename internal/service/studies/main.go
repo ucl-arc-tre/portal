@@ -31,7 +31,7 @@ func New() *Service {
 }
 
 // validate all study admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []string) ([]types.User, error) {
+func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []types.Username) ([]types.User, error) {
 	if len(studyAdminUsernames) == 0 {
 		return []types.User{}, nil
 	}
@@ -68,7 +68,7 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	return studyAdminUsers, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, username string, studyData openapi.StudyCreateRequest) error {
+func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) error {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
 		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
@@ -101,12 +101,16 @@ func (s *Service) validateStudyData(ctx context.Context, username string, studyD
 }
 
 func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*types.Study, error) {
-	if err := s.validateStudyData(ctx, string(user.Username), studyData); err != nil {
+	if err := s.validateStudyData(ctx, user.Username, studyData); err != nil {
 		return nil, types.NewErrInvalidObject(err)
+	}
+	additionalStudyAdminUsernames := []types.Username{}
+	for _, username := range studyData.AdditionalStudyAdminUsernames {
+		additionalStudyAdminUsernames = append(additionalStudyAdminUsernames, types.Username(username))
 	}
 
 	// Validate and create study admin users if any are provided
-	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData.AdditionalStudyAdminUsernames)
+	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, additionalStudyAdminUsernames)
 	if err != nil {
 		return nil, err
 	}

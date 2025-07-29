@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	cacheTTL = 1 * time.Hour
+	cacheTTL = 12 * time.Hour
 )
 
 var controller *Controller
@@ -56,6 +56,7 @@ func New() *Controller {
 	return controller
 }
 
+// Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
@@ -75,19 +76,18 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 	return &userData, nil
 }
 
-// checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type
-func (c *Controller) IsStaffMember(ctx context.Context, username string) (bool, error) {
+// checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type. Returns a cached response
+func (c *Controller) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
 	if username == "" {
 		return false, fmt.Errorf("username cannot be empty")
 	}
 
 	userData, err := c.userData(ctx, types.Username(username))
 	if err != nil {
-		return false, fmt.Errorf("username [%v] not found in directory", username)
+		return false, types.NewNotFoundError(fmt.Errorf("username [%v] not found in directory", username))
 	}
 
-	// Log for debugging - can be removed later
-	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
+	log.Debug().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
 
 	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
 		return false, fmt.Errorf("username [%v] does not have an employee type set", username)
