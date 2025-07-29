@@ -64,6 +64,8 @@ type CreateStudyProps = {
 // A brief comment for context might be good here
 const UclDpoId = "Z6364106";
 
+const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME;
+
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   const { username, setCreateStudyFormOpen, onSubmit: onSubmitProp } = CreateStudyProps;
   const {
@@ -225,8 +227,30 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   <Controller
                     name={`additionalStudyAdminUsernames.${index}.value` as const}
                     control={control}
-                    render={({ field }) => (
-                      <Input {...field} type="text" id={`admin-${index}`} placeholder="username (e.g., jbloggs)" />
+                    rules={{
+                      required: "Username is required",
+                      validate: (value) => {
+                        if (!value || value.trim() === "") {
+                          return "Username is required";
+                        }
+                        if (value.includes("@")) {
+                          return `Enter only the username part (without ${domainName})`;
+                        }
+                        return true;
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <div className={styles["username-input-wrapper"]}>
+                        <div>
+                          <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
+                          <span className={styles["domain-suffix"]}>{domainName}</span>
+                        </div>
+                        {fieldState.error && (
+                          <Alert type="error">
+                            <AlertMessage>{fieldState.error.message}</AlertMessage>
+                          </Alert>
+                        )}
+                      </div>
                     )}
                   />
                 </Label>
@@ -254,7 +278,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               name="dataControllerOrganisation"
               control={control}
               rules={{ required: "This field is required" }}
-              render={({ field }) => <Input {...field} type="text" id="controller" placeholder="e.g. UCL" />}
+              render={({ field }) => <Input {...field} type="text" id="controller" placeholder={`e.g. "UCL"`} />}
             />
             <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
             {errors.dataControllerOrganisation && (

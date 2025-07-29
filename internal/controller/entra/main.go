@@ -3,6 +3,7 @@ package entra
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -64,27 +65,25 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	return &userData, nil
 }
 
-func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string) error {
+// checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type
+func (c *Controller) IsStaffMember(ctx context.Context, username string) (bool, error) {
 	if username == "" {
-		return fmt.Errorf("username cannot be empty")
+		return false, fmt.Errorf("username cannot be empty")
 	}
 
 	userData, err := c.UserData(ctx, types.Username(username))
 	if err != nil {
-		return fmt.Errorf("username '%s' not found in directory", username)
+		return false, fmt.Errorf("username [%v] not found in directory", username)
 	}
 
 	// Log for debugging - can be removed later
 	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
 
-	// TODO: Add employee type validation when requirements are clarified
-	// if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-	// 	return fmt.Errorf("username '%s' does not have an employee type set", username)
-	// }
-	//
-	// if *userData.EmployeeType != "staff" {
-	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
-	// }
+	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
+		return false, fmt.Errorf("username [%v] does not have an employee type set", username)
+	}
 
-	return nil
+	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
+
+	return isStaff, nil
 }

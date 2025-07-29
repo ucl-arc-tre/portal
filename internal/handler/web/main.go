@@ -3,6 +3,7 @@ package web
 import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
+	"github.com/ucl-arc-tre/portal/internal/service/auth"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
@@ -11,6 +12,7 @@ type Handler struct {
 	agreements *agreements.Service
 	users      *users.Service
 	studies    *studies.Service
+	auth       *auth.Service
 }
 
 func New() *Handler {
@@ -19,5 +21,6 @@ func New() *Handler {
 		agreements: agreements.New(),
 		users:      users.New(),
 		studies:    studies.New(),
+		auth:       auth.New(),
 	}
 }
