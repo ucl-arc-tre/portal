@@ -73,14 +73,14 @@ func (c *Controller) IsStaffMember(ctx context.Context, username string) (bool, 
 
 	userData, err := c.UserData(ctx, types.Username(username))
 	if err != nil {
-		return false, fmt.Errorf("username '%s' not found in directory", username)
+		return false, fmt.Errorf("username [%v] not found in directory", username)
 	}
 
 	// Log for debugging - can be removed later
 	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
 
 	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-		return false, fmt.Errorf("username '%s' does not have an employee type set", username)
+		return false, fmt.Errorf("username [%v] does not have an employee type set", username)
 	}
 
 	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
