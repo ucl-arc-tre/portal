@@ -1,0 +1,9 @@
+.container {
+  justify-self: end;
+  margin-bottom: 0.8rem;
+
+  .send-button {
+    color: white;
+    width: 100%;
+  }
+}
