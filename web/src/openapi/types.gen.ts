@@ -608,6 +608,25 @@ export type PostUsersApprovedResearchersImportCsvResponses = {
 
 export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
 
+export type PostUsersInviteData = {
+    body: {
+        /**
+         * Email address of the person to be invited
+         */
+        email: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/invite';
+};
+
+export type PostUsersInviteResponses = {
+    /**
+     * Successfully sent invite
+     */
+    200: unknown;
+};
+
 export type GetStudiesData = {
     body?: never;
     path?: never;

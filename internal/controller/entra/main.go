@@ -8,6 +8,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
+	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
 
 	"github.com/rs/zerolog/log"
@@ -85,6 +86,19 @@ func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string
 	// if *userData.EmployeeType != "staff" {
 	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
 	// }
+
+	return nil
+}
+
+func (c *Controller) SendInvite(ctx context.Context, email string) error {
+	credentials := config.EntraCredentials()
+
+	requestBody := graphmodels.NewInvitation()
+	invitedUserEmailAddress := email
+	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
+	inviteRedirectUrl := credentials.RedirectURL
+
+	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 
 	return nil
 }

@@ -214,6 +214,24 @@ paths:
         default:
           description: Unexpected error
 
+  /users/invite:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  description: Email address of the person to be invited
+      responses:
+        "200":
+          description: Successfully sent invite
+
   # Study Management
   /studies:
     get:

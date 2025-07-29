@@ -89,3 +89,16 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusNoContent)
 }
+
+func (h *Handler) PostUsersInvite(ctx *gin.Context) {
+	var invite openapi.PostUsersInviteJSONRequestBody
+	if err := bindJSONOrSetError(ctx, &invite); err != nil {
+		return
+	}
+	if err := h.users.InviteUser(ctx, invite.Email); err != nil {
+		setError(ctx, err, "Failed to send invite")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
