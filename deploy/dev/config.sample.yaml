@@ -8,7 +8,7 @@ entra:
   tenant_id: <CHANGE_ME>
   client_id: <CHANGE_ME>
   client_secret: <CHANGE_ME>
-  redirect_url: <CHANGE_ME>
+  invite_redirect_url: <CHANGE_ME> # where you want to send the user when they accept the invite, eg. localhost:8000/profile
 tre:
   users:
     username: password # pragma: allowlist secret

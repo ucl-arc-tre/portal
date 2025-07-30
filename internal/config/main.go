@@ -67,8 +67,11 @@ func EntraCredentials() EntraCredentialBundle {
 		TenantID:     k.String("entra.tenant_id"),
 		ClientID:     k.String("entra.client_id"),
 		ClientSecret: k.String("entra.client_secret"),
-		RedirectURL:  k.String("entra.redirect_url"),
 	}
+}
+
+func EntraInviteRedirectURL() string {
+	return k.String("entra.invite_redirect_url")
 }
 
 func AdminUsernames() []types.Username {

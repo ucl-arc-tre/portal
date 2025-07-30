@@ -100,11 +100,9 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
-	credentials := config.EntraCredentials()
-
 	requestBody := graphmodels.NewInvitation()
 	invitedUserEmailAddress := email
-	inviteRedirectUrl := credentials.RedirectURL
+	inviteRedirectUrl := config.EntraInviteRedirectURL()
 	sendInvitationMessage := true
 
 	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
