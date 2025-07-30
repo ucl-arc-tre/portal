@@ -15,20 +15,18 @@ import (
 )
 
 const (
-	isValidPattern   = `This is to certify that.*completed the (?:course|programme) Data Security Awareness`
-	issuedAtPattern  = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})`
-	firstNamePattern = `certify that[\s]*(\w+)`
-	lastNamePattern  = `certify that[\s]*\w+ (\w+)`
+	isValidPattern  = `This is to certify that.*completed the (?:course|programme) Data Security Awareness`
+	issuedAtPattern = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})`
+	namePattern     = `certify that[\s]*([\w+\s?]+) completed the`
 
 	nhsdCertificateDateFormat = "02 January 2006"
 )
 
 var (
-	isValidRegex   = regexp.MustCompile(isValidPattern)
-	issuedAtRegex  = regexp.MustCompile(issuedAtPattern)
-	firstNameRegex = regexp.MustCompile(firstNamePattern)
-	lastNameRegex  = regexp.MustCompile(lastNamePattern)
-	newLinesRegex  = regexp.MustCompile(`\r?\n`)
+	isValidRegex  = regexp.MustCompile(isValidPattern)
+	issuedAtRegex = regexp.MustCompile(issuedAtPattern)
+	nameRegex     = regexp.MustCompile(namePattern)
+	newLinesRegex = regexp.MustCompile(`\r?\n`)
 )
 
 var pdfWasmPool = must(pdfwasm.Init(pdfwasm.Config{
@@ -54,26 +52,16 @@ func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
 		IsValid: true,
 	}
 	errs := []error{}
-	errs = append(errs, setNHSDCertificateFirstName(&certificate, text))
-	errs = append(errs, setNHSDCertificateLastName(&certificate, text))
+	errs = append(errs, setNHSDCertificateName(&certificate, text))
 	errs = append(errs, setNHSDCertificateIssuedAt(&certificate, text))
 	return &certificate, errors.Join(errs...)
 }
 
-func setNHSDCertificateFirstName(certificate *TrainingCertificate, text string) error {
-	if matches := firstNameRegex.FindStringSubmatch(text); len(matches) < 2 {
-		return fmt.Errorf("failed to match first name")
+func setNHSDCertificateName(certificate *TrainingCertificate, text string) error {
+	if matches := nameRegex.FindStringSubmatch(text); len(matches) < 2 {
+		return fmt.Errorf("failed to match name")
 	} else {
-		certificate.FirstName = matches[1]
-	}
-	return nil
-}
-
-func setNHSDCertificateLastName(certificate *TrainingCertificate, text string) error {
-	if matches := lastNameRegex.FindStringSubmatch(text); len(matches) < 2 {
-		return fmt.Errorf("failed to match last name")
-	} else {
-		certificate.LastName = matches[1]
+		certificate.Name = matches[1]
 	}
 	return nil
 }

@@ -54,7 +54,7 @@ func (s *Service) updateNHSD(
 		return response, err
 	}
 	if !certificate.NameMatches(string(chosenName)) {
-		response.CertificateMessage = ptr(fmt.Sprintf("Name '%v' does not match '%v'.", certificate.Name(), chosenName))
+		response.CertificateMessage = ptr(fmt.Sprintf("Name '%v' does not match '%v'.", certificate.Name, chosenName))
 		return response, err
 	}
 	response.CertificateIsValid = &certificate.IsValid
