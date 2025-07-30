@@ -31,12 +31,12 @@ func New() *Service {
 }
 
 // validate all study admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) ([]types.User, error) {
+func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) ([]types.User, *openapi.StudyCreateValidationError, error) {
 	if len(studyData.AdditionalStudyAdminUsernames) == 0 {
-		return []types.User{}, nil
+		return []types.User{}, nil, nil
 	}
 
-	validationErrors := []error{}
+	var validationErrorMessage []string
 	studyAdminUsers := []types.User{}
 
 	// Validate all study admin usernames (they must be staff members)
@@ -44,50 +44,50 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData op
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
 
 		if err != nil {
-			validationErrors = append(validationErrors, fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
-			continue
+			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
 		}
+
 		if !isStaff {
-			validationErrors = append(validationErrors, fmt.Errorf("user %s is not a staff member", studyAdminUsername))
+			validationErrorMessage = append(validationErrorMessage, fmt.Sprintf("user %s is not a staff member", studyAdminUsername))
 			continue
 		}
 
 		// All study admin usernames are valid, now find or create users
 		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
-			return nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
+			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
 		}
 		studyAdminUsers = append(studyAdminUsers, user)
 	}
 
-	if len(validationErrors) > 0 {
+	if len(validationErrorMessage) > 0 {
 		message := ""
-		for _, err := range validationErrors {
-			message += fmt.Sprintf("• %v\n\n", err)
+		for _, msg := range validationErrorMessage {
+			message += fmt.Sprintf("• %s\n\n", msg)
 		}
-		return nil, types.NewErrInvalidObject(fmt.Errorf("%s", message))
+		return nil, &openapi.StudyCreateValidationError{ErrorMessage: message}, nil
 	}
 
-	return studyAdminUsers, nil
+	return studyAdminUsers, nil, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) error {
+func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
-		return types.NewErrInvalidObject(errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"))
+		return &openapi.StudyCreateValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
-		return types.NewErrInvalidObject(errors.New("data_controller_organisation is required"))
+		return &openapi.StudyCreateValidationError{ErrorMessage: "data_controller_organisation is required"}, nil
 	}
 
 	if studyData.Description != nil && len(*studyData.Description) > 255 {
-		return types.NewErrInvalidObject(errors.New("study description must be 255 characters or less"))
+		return &openapi.StudyCreateValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
 	}
 
 	if studyData.IsDataProtectionOfficeRegistered != nil {
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
-			return types.NewErrInvalidObject(errors.New("data protection registry ID, registration date, and registration number are required when registered with data protection office"))
+			return &openapi.StudyCreateValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
 	}
 
@@ -95,41 +95,48 @@ func (s *Service) validateStudyData(ctx context.Context, username types.Username
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
 	if err != nil {
-		return types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
+		return nil, types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
 	}
 	if count > 0 {
-		return types.NewErrConflict(fmt.Errorf("a study with the title [%v] already exists", studyData.Title))
+		return &openapi.StudyCreateValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
 	// Check if the study submitter (the owner-user-id) is a valid staff member
 	isStaff, err := s.entra.IsStaffMember(ctx, username)
 	if err != nil {
-		return types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", username, err))
+		return nil, types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", username, err))
 	}
 	if !isStaff {
-		return types.NewErrInvalidObject(fmt.Errorf("user is not a staff member"))
+		return &openapi.StudyCreateValidationError{ErrorMessage: "user is not a staff member"}, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) error {
-	if err := s.validateStudyData(ctx, user.Username, studyData); err != nil {
-		return types.NewErrInvalidObject(err)
+func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+	studyFormValidationError, err := s.validateStudyData(ctx, user.Username, studyData)
+	if err != nil {
+		return nil, err
+	}
+	if studyFormValidationError != nil {
+		return studyFormValidationError, nil
 	}
 
 	// Validate and create study admin users if any are provided
-	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData)
+	studyAdminUsers, studyAdminValidationError, err := s.validateAndCreateStudyAdmins(ctx, studyData)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if studyAdminValidationError != nil {
+		return studyAdminValidationError, nil
 	}
 
 	err = s.createStudy(user, studyData, studyAdminUsers)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }
 
 // GetStudies retrieves all studies that the user owns or has access to
