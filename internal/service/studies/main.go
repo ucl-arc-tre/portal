@@ -147,12 +147,13 @@ func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
 // ensures that the user owns the study (this might be refactored later to allow shared access)
 func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
 	// verify the user owns the study
-	var study types.Study
-	err := s.db.Where("id = ? AND owner_user_id = ?", studyID, userID).First(&study).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, types.NewNotFoundError(err)
-	} else if err != nil {
+	var count int64
+	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, userID).Count(&count).Error
+	if err != nil {
 		return nil, types.NewErrServerError(err)
+	}
+	if count == 0 {
+		return nil, types.NewNotFoundError(errors.New("study not found or access denied"))
 	}
 
 	// Get all assets for this study with their locations
