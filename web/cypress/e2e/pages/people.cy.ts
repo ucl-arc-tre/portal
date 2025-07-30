@@ -46,7 +46,7 @@ describe("Import approved researchers", () => {
       .should("equal", 403);
   });
 
-  it("should be uploadable by a admin user", () => {
+  it("should be uploadable by an admin user", () => {
     cy.loginAsAdmin();
     cy.visit("/people");
     const username = "laura@example.com";
@@ -55,5 +55,22 @@ describe("Import approved researchers", () => {
     cy.get("input[type=file]").selectFile(filename, { force: true });
     cy.visit("/people");
     cy.get("table").contains(username).should("be.visible");
+  });
+});
+
+describe("Invite externalss", () => {
+  it("should not be visible to a base user", () => {
+    cy.loginAsBase();
+    cy.visit("/people");
+    cy.get("[data-cy='show-invite-input']").should("not.exist");
+  });
+
+  it("should be visable to & usable by an admin user", () => {
+    cy.loginAsAdmin();
+    cy.visit("/people");
+    cy.get("[data-cy='show-invite-input']").should("be.visible").click();
+
+    cy.get("input[name='email']").should("be.visible").type("lab.amanda.ch@gmail.com");
+    cy.get("[data-cy='send-invite']").should("be.visible").click();
   });
 });

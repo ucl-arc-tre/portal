@@ -10,6 +10,7 @@ export default function ExternalInvite() {
   const [isInputVisible, setInputVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   function handleShowInput() {
     setInputVisible(true);
@@ -33,19 +34,16 @@ export default function ExternalInvite() {
       setButtonDisabled(false);
       setIsLoading(false);
       setEmail("");
-      // todo: add success message?
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 1000);
     }
-
-    console.log("sending...", email);
   }
 
   return (
     <div className={styles.container}>
-      {/* todo: change rendering for transition with classes */}
-      <form
-        onSubmit={handleSumbit}
-        className={`${styles["slide-fade-down"]} ${isInputVisible ? styles.visible : styles.hidden}`}
-      >
+      <form onSubmit={handleSumbit} className={`${styles["slide-fade-down"]} ${isInputVisible ? "" : styles.hidden}`}>
         <Input
           type="email"
           placeholder="Email address"
@@ -59,11 +57,11 @@ export default function ExternalInvite() {
               <Loading message="" size="small" />
             </span>
           )}
-          Send Invitation
+          {showSuccessMessage ? "Sent!" : "Send Invitation"}
         </Button>{" "}
       </form>
       <Button
-        className={`${styles["slide-right-fade"]} ${isInputVisible ? styles.hidden : styles.visible}`}
+        className={`${styles["slide-right-fade"]} ${isInputVisible ? styles.hidden : ""}`}
         onClick={handleShowInput}
         disabled={buttonDisabled}
         variant="secondary"
