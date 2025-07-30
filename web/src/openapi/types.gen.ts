@@ -624,6 +624,13 @@ export type PostUsersInviteData = {
     url: '/users/invite';
 };
 
+export type PostUsersInviteErrors = {
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
 export type PostUsersInviteResponses = {
     /**
      * Successfully sent invite

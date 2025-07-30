@@ -231,6 +231,8 @@ paths:
       responses:
         "200":
           description: Successfully sent invite
+        default:
+          description: Unexpected error
 
   # Study Management
   /studies:
