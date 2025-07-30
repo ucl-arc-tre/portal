@@ -306,13 +306,6 @@ export type Study = StudyBase & {
     updated_at: string;
 };
 
-export type StudyCreateResponse = {
-    /**
-     * Success message
-     */
-    message?: string;
-};
-
 export type StudyCreateValidationError = {
     /**
      * Validation error message explaining why study creation failed
@@ -690,10 +683,8 @@ export type PostStudiesResponses = {
     /**
      * Study created successfully
      */
-    201: StudyCreateResponse;
+    201: unknown;
 };
-
-export type PostStudiesResponse = PostStudiesResponses[keyof PostStudiesResponses];
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;

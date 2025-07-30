@@ -243,10 +243,6 @@ paths:
       responses:
         "201":
           description: Study created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StudyCreateResponse"
         "400":
           description: Validation error
           content:
@@ -702,14 +698,6 @@ components:
               type: string
               description: Time in RFC3339 format when the study was last updated
       description: A research study
-
-    StudyCreateResponse:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Success message
-          example: "Study created successfully"
 
     StudyCreateValidationError:
       type: object
