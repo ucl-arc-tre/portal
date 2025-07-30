@@ -3,6 +3,7 @@ package entra
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -16,13 +17,22 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+const (
+	cacheTTL = 12 * time.Hour
+)
+
+var controller *Controller
+
 type Controller struct {
 	client        *graph.GraphServiceClient
 	userDataCache *expirable.LRU[types.Username, UserData]
 }
 
-// Create a new entra controller using client credentials
-func New(cacheTTL time.Duration) *Controller {
+// Create or get a new entra controller using client credentials
+func New() *Controller {
+	if controller != nil {
+		return controller
+	}
 	log.Info().Float64("cacheTTL seconds", cacheTTL.Seconds()).Msg("Creating entra controller")
 	credentials := config.EntraCredentials()
 	// See: https://learn.microsoft.com/en-us/graph/sdks/choose-authentication-providers?tabs=go#client-credentials-provider
@@ -40,13 +50,15 @@ func New(cacheTTL time.Duration) *Controller {
 	if err != nil {
 		panic(fmt.Errorf("failed to create msgraph client [%v]", err))
 	}
-	return &Controller{
+	controller = &Controller{
 		client:        graphClient,
 		userDataCache: expirable.NewLRU[types.Username, UserData](1000, nil, cacheTTL),
 	}
+	return controller
 }
 
-func (c *Controller) UserData(ctx context.Context, username types.Username) (*UserData, error) {
+// Get the cached user data for a user
+func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
 	}
@@ -65,29 +77,26 @@ func (c *Controller) UserData(ctx context.Context, username types.Username) (*Us
 	return &userData, nil
 }
 
-func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string) error {
+// checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type. Returns a cached response
+func (c *Controller) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
 	if username == "" {
-		return fmt.Errorf("username cannot be empty")
+		return false, fmt.Errorf("username cannot be empty")
 	}
 
-	userData, err := c.UserData(ctx, types.Username(username))
+	userData, err := c.userData(ctx, types.Username(username))
 	if err != nil {
-		return fmt.Errorf("username '%s' not found in directory", username)
+		return false, types.NewNotFoundError(fmt.Errorf("username [%v] not found in directory", username))
 	}
 
-	// Log for debugging - can be removed later
-	log.Debug().Any("userData", userData).Str("username", username).Msg("Retrieved user data from Entra")
+	log.Debug().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
 
-	// TODO: Add employee type validation when requirements are clarified
-	// if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-	// 	return fmt.Errorf("username '%s' does not have an employee type set", username)
-	// }
-	//
-	// if *userData.EmployeeType != "staff" {
-	// 	return fmt.Errorf("username '%s' is not a valid staff member", username)
-	// }
+	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
+		return false, fmt.Errorf("username [%v] does not have an employee type set", username)
+	}
 
-	return nil
+	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
+
+	return isStaff, nil
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {

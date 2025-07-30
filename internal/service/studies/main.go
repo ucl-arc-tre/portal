@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
@@ -26,43 +25,50 @@ type Service struct {
 func New() *Service {
 	return &Service{
 		db:    graceful.NewDB(),
-		entra: entra.New(1 * time.Hour),
+		entra: entra.New(),
 		users: users.New(),
 	}
 }
 
 // validate all study admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []string) ([]types.User, error) {
+func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []types.Username) ([]types.User, error) {
 	if len(studyAdminUsernames) == 0 {
 		return []types.User{}, nil
 	}
 
-	// Validate all study admin usernames (they must be staff members)
 	validationErrors := []error{}
+	studyAdminUsers := []types.User{}
+
+	// Validate all study admin usernames (they must be staff members)
 	for _, studyAdminUsername := range studyAdminUsernames {
-		if err := s.entra.ValidateEmployeeStatus(ctx, studyAdminUsername); err != nil {
-			validationErrors = append(validationErrors, err)
+		isStaff, err := s.entra.IsStaffMember(ctx, studyAdminUsername)
+
+		if err != nil {
+			validationErrors = append(validationErrors, fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
+			continue
 		}
+		if !isStaff {
+			validationErrors = append(validationErrors, fmt.Errorf("user %s is not a staff member", studyAdminUsername))
+			continue
+		}
+
+		// All study admin usernames are valid, now find or create users
+		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
+		if err != nil {
+			return nil, fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err)
+		}
+		studyAdminUsers = append(studyAdminUsers, user)
+
 	}
 
 	if len(validationErrors) > 0 {
 		return nil, types.NewErrInvalidObject(errors.Join(validationErrors...))
 	}
 
-	// All study admin usernames are valid, now find or create users
-	var studyAdminUsers []types.User
-	for _, studyAdminUsername := range studyAdminUsernames {
-		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
-		if err != nil {
-			return nil, err
-		}
-		studyAdminUsers = append(studyAdminUsers, user)
-	}
-
 	return studyAdminUsers, nil
 }
 
-func validateStudyData(studyData openapi.StudyCreateRequest) error {
+func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) error {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
 		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
@@ -82,16 +88,29 @@ func validateStudyData(studyData openapi.StudyCreateRequest) error {
 		}
 	}
 
+	// Check if the study submitter (the owner-user-id) is a valid staff member
+	isStaff, err := s.entra.IsStaffMember(ctx, username)
+	if err != nil {
+		return fmt.Errorf("failed to check staff status for user %s: %w", username, err)
+	}
+	if !isStaff {
+		return fmt.Errorf("user is not a staff member")
+	}
+
 	return nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData openapi.StudyCreateRequest) (*types.Study, error) {
-	if err := validateStudyData(studyData); err != nil {
+func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*types.Study, error) {
+	if err := s.validateStudyData(ctx, user.Username, studyData); err != nil {
 		return nil, types.NewErrInvalidObject(err)
+	}
+	additionalStudyAdminUsernames := []types.Username{}
+	for _, username := range studyData.AdditionalStudyAdminUsernames {
+		additionalStudyAdminUsernames = append(additionalStudyAdminUsernames, types.Username(username))
 	}
 
 	// Validate and create study admin users if any are provided
-	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData.AdditionalStudyAdminUsernames)
+	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, additionalStudyAdminUsernames)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +124,7 @@ func (s *Service) CreateStudy(ctx context.Context, userID uuid.UUID, studyData o
 	}()
 
 	dbStudy := types.Study{
-		OwnerUserID:                userID,
+		OwnerUserID:                user.ID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
 	}

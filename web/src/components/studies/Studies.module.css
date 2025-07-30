@@ -59,6 +59,10 @@
   font-weight: 500;
 }
 
+.ucl-staff-modal-actions {
+  margin-top: 1.5rem;
+}
+
 @media (max-width: 768px) {
   .no-studies-message {
     padding: 2rem 1rem;

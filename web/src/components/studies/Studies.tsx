@@ -1,27 +1,40 @@
 import { useState } from "react";
+import { postStudies, Study, StudyCreateRequest, Auth } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
 import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
-import { postStudies, Study, StudyCreateRequest } from "@/openapi";
+import Dialog from "@/components/ui/Dialog";
 
 import styles from "./Studies.module.css";
 
 type Props = {
-  username: string;
+  userData: Auth;
   studies: Study[];
   fetchStudies: () => void;
 };
 
 export default function Studies(props: Props) {
-  const { username, studies, fetchStudies } = props;
+  const { userData, studies, fetchStudies } = props;
   const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
+  const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // this should match the domain that is used for the entra ID users in the portal
+  const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
   const handleStudySelect = (study: Study) => {
     // TODO: Navigate to study detail page or show study-specific content
     console.log("Selected study:", study);
+  };
+
+  const handleCreateStudyClick = () => {
+    if (!userData.is_staff) {
+      setShowUclStaffModal(true);
+      return;
+    }
+    setCreateStudyFormOpen(true);
   };
 
   const handleStudySubmit = async (data: StudyFormData) => {
@@ -36,7 +49,9 @@ export default function Studies(props: Props) {
         title: data.title,
         description: data.description ? data.description : undefined,
         data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
-        additional_study_admin_usernames: data.additionalStudyAdminUsernames.map((admin) => admin.value),
+        additional_study_admin_usernames: data.additionalStudyAdminUsernames
+          .map((admin) => admin.value.trim())
+          .map((username) => `${username}${domainName}`),
         involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
         involves_cag: data.involvesCag ? data.involvesCag : undefined,
         cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
@@ -91,10 +106,23 @@ export default function Studies(props: Props) {
     <>
       {createStudyFormOpen && (
         <CreateStudyForm
-          username={username}
+          username={userData.username}
           setCreateStudyFormOpen={setCreateStudyFormOpen}
           onSubmit={handleStudySubmit}
         />
+      )}
+
+      {showUclStaffModal && (
+        <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
+          <h2>UCL Staff Only</h2>
+          <p>Only UCL staff members can create studies.</p>
+          <p>If you believe this is an error, please contact your administrator.</p>
+          <div className={styles["ucl-staff-modal-actions"]}>
+            <Button onClick={() => setShowUclStaffModal(false)} variant="secondary">
+              Close
+            </Button>
+          </div>
+        </Dialog>
       )}
 
       {isSubmitting && <Loading message="Creating study..." />}
@@ -112,14 +140,14 @@ export default function Studies(props: Props) {
         <div className={styles["no-studies-message"]}>
           <p>You haven&apos;t created any studies yet. Click the button below to create your first study.</p>
 
-          <Button onClick={() => setCreateStudyFormOpen(true)} size="large">
+          <Button onClick={handleCreateStudyClick} size="large">
             Create Your First Study
           </Button>
         </div>
       ) : (
         <>
           <div className={styles["create-study-section"]}>
-            <Button onClick={() => setCreateStudyFormOpen(true)} size="large">
+            <Button onClick={handleCreateStudyClick} size="large">
               Create New Study
             </Button>
           </div>

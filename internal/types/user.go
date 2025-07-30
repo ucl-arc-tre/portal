@@ -2,9 +2,9 @@ package types
 
 import "github.com/google/uuid"
 
-type Username string
+type Username string // e.g. ccxyz@ucl.ac.uk
 
-type ChosenName string
+type ChosenName string // e.g. Alice Smith
 
 type User struct {
 	Model
