@@ -342,6 +342,15 @@ type StudyBase struct {
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase
 
+// StudyCreateResponse defines model for StudyCreateResponse.
+type StudyCreateResponse struct {
+	// ErrorMessage Error message explaining why study creation failed
+	ErrorMessage *string `json:"errorMessage,omitempty"`
+
+	// IsValid Whether the study creation was successful
+	IsValid *bool `json:"isValid,omitempty"`
+}
+
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 

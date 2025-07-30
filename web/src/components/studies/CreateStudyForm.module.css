@@ -6,6 +6,14 @@
   top: 5vh;
 }
 
+.error-line {
+  margin-bottom: 0.75rem;
+}
+
+.error-line:empty {
+  margin-bottom: 0;
+}
+
 .form {
   width: 100%;
   margin-block: 1.8rem;

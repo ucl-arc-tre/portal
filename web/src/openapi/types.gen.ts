@@ -306,6 +306,17 @@ export type Study = StudyBase & {
     updated_at: string;
 };
 
+export type StudyCreateResponse = {
+    /**
+     * Error message explaining why study creation failed
+     */
+    errorMessage?: string;
+    /**
+     * Whether the study creation was successful
+     */
+    isValid?: boolean;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -649,6 +660,10 @@ export type PostStudiesData = {
 
 export type PostStudiesErrors = {
     /**
+     * Validation error
+     */
+    400: StudyCreateResponse;
+    /**
      * Forbidden
      */
     403: unknown;
@@ -666,11 +681,13 @@ export type PostStudiesErrors = {
     default: unknown;
 };
 
+export type PostStudiesError = PostStudiesErrors[keyof PostStudiesErrors];
+
 export type PostStudiesResponses = {
     /**
      * Study created successfully
      */
-    201: Study;
+    201: StudyCreateResponse;
 };
 
 export type PostStudiesResponse = PostStudiesResponses[keyof PostStudiesResponses];

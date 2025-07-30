@@ -57,7 +57,10 @@ export type StudyFormData = {
 type CreateStudyProps = {
   username: string;
   setCreateStudyFormOpen: (name: boolean) => void;
-  onSubmit: (data: StudyFormData) => Promise<void>;
+  handleStudySubmit: (data: StudyFormData) => Promise<void>;
+  submitError: string | null;
+  isSubmitting: boolean;
+  setSubmitError: (error: string | null) => void;
 };
 
 // what is this?
@@ -67,13 +70,14 @@ const UclDpoId = "Z6364106";
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
-  const { username, setCreateStudyFormOpen, onSubmit: onSubmitProp } = CreateStudyProps;
+  const { username, setCreateStudyFormOpen, handleStudySubmit, submitError, isSubmitting, setSubmitError } =
+    CreateStudyProps;
   const {
     register,
     handleSubmit,
     control,
     setValue,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid },
   } = useForm<StudyFormData>({
     mode: "onChange",
     criteriaMode: "all",
@@ -130,20 +134,19 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   }, [controllerValue, setValue]);
 
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    try {
-      await onSubmitProp(data);
-      setCreateStudyFormOpen(false);
-    } catch (error) {
-      console.error("Failed to create study:", error);
-      // TODO: Show error message to user
-    }
+    await handleStudySubmit(data);
+  };
+
+  const handleCloseForm = () => {
+    setSubmitError(null);
+    setCreateStudyFormOpen(false);
   };
 
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
 
   return (
-    <Dialog setDialogOpen={setCreateStudyFormOpen} className={styles["study-dialog"]} cy="create-study-form">
+    <Dialog setDialogOpen={handleCloseForm} className={styles["study-dialog"]} cy="create-study-form">
       <h2>Create Study</h2>
       <div className={styles["step-progress"]}>
         <div
@@ -156,6 +159,18 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        {submitError && (
+          <Alert type="error" style={{ marginBottom: "1rem" }}>
+            <AlertMessage>
+              {submitError.split("\n").map((line, index) => (
+                <div key={index} className={styles["error-line"]}>
+                  {line}
+                </div>
+              ))}
+            </AlertMessage>
+          </Alert>
+        )}
+
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>
           <legend>Study Details</legend>

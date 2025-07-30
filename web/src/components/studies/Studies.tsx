@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { postStudies, Study, StudyCreateRequest, Auth } from "@/openapi";
+import { postStudies, Study, StudyCreateRequest, Auth, StudyCreateResponse } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
 import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
 import Button from "@/components/ui/Button";
-import Loading from "@/components/ui/Loading";
 import Dialog from "@/components/ui/Dialog";
 
 import styles from "./Studies.module.css";
@@ -86,14 +85,21 @@ export default function Studies(props: Props) {
         body: studyData,
       });
 
-      if (response.response.ok === false) {
-        setSubmitError("Failed to create study. Please try again.");
-      }
-
-      if (response.data) {
+      if (response.data?.isValid) {
         setCreateStudyFormOpen(false);
         fetchStudies();
+        return;
       }
+
+      if (response.error) {
+        const errorData = response.error as StudyCreateResponse;
+        if (errorData?.errorMessage) {
+          setSubmitError(errorData.errorMessage);
+          return;
+        }
+      }
+
+      setSubmitError("An unknown error occurred.");
     } catch (error) {
       console.error("Failed to create study:", error);
       setSubmitError("Failed to create study. Please try again.");
@@ -108,7 +114,10 @@ export default function Studies(props: Props) {
         <CreateStudyForm
           username={userData.username}
           setCreateStudyFormOpen={setCreateStudyFormOpen}
-          onSubmit={handleStudySubmit}
+          handleStudySubmit={handleStudySubmit}
+          submitError={submitError}
+          isSubmitting={isSubmitting}
+          setSubmitError={setSubmitError}
         />
       )}
 
@@ -123,17 +132,6 @@ export default function Studies(props: Props) {
             </Button>
           </div>
         </Dialog>
-      )}
-
-      {isSubmitting && <Loading message="Creating study..." />}
-
-      {submitError && (
-        <div className={styles["error-message"]}>
-          <p>{submitError}</p>
-          <Button onClick={() => setSubmitError(null)} variant="secondary" size="small">
-            Dismiss
-          </Button>
-        </div>
       )}
 
       {studies.length === 0 ? (

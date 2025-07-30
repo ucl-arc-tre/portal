@@ -246,7 +246,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Study"
+                $ref: "#/components/schemas/StudyCreateResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyCreateResponse"
         "406":
           description: Invalid request
         "403":
@@ -696,3 +702,13 @@ components:
               type: string
               description: Time in RFC3339 format when the study was last updated
       description: A research study
+
+    StudyCreateResponse:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          description: Error message explaining why study creation failed
+        isValid:
+          type: boolean
+          description: Whether the study creation was successful
