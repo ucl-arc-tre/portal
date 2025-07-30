@@ -342,6 +342,12 @@ type StudyBase struct {
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase
 
+// StudyCreateValidationError defines model for StudyCreateValidationError.
+type StudyCreateValidationError struct {
+	// ErrorMessage Validation error message explaining why study creation failed
+	ErrorMessage string `json:"error_message"`
+}
+
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 

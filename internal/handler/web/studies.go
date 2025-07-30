@@ -67,45 +67,18 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	createdStudy, err := h.studies.CreateStudy(ctx, user, studyData)
+	validationError, err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to create study")
 		return
 	}
 
-	ownerUserIDStr := createdStudy.OwnerUserID.String()
-
-	response := openapi.Study{
-		Id:                               createdStudy.ID.String(),
-		Title:                            createdStudy.Title,
-		Description:                      createdStudy.Description,
-		OwnerUserId:                      &ownerUserIDStr,
-		AdditionalStudyAdminUsernames:    createdStudy.AdminUsernames(),
-		DataControllerOrganisation:       createdStudy.DataControllerOrganisation,
-		InvolvesUclSponsorship:           createdStudy.InvolvesUclSponsorship,
-		InvolvesCag:                      createdStudy.InvolvesCag,
-		CagReference:                     createdStudy.CagReference,
-		InvolvesEthicsApproval:           createdStudy.InvolvesEthicsApproval,
-		InvolvesHraApproval:              createdStudy.InvolvesHraApproval,
-		IrasId:                           createdStudy.IrasId,
-		IsNhsAssociated:                  createdStudy.IsNhsAssociated,
-		InvolvesNhsEngland:               createdStudy.InvolvesNhsEngland,
-		NhsEnglandReference:              createdStudy.NhsEnglandReference,
-		InvolvesMnca:                     createdStudy.InvolvesMnca,
-		RequiresDspt:                     createdStudy.RequiresDspt,
-		RequiresDbs:                      createdStudy.RequiresDbs,
-		IsDataProtectionOfficeRegistered: createdStudy.IsDataProtectionOfficeRegistered,
-		DataProtectionNumber:             createdStudy.DataProtectionNumber,
-		InvolvesThirdParty:               createdStudy.InvolvesThirdParty,
-		InvolvesExternalUsers:            createdStudy.InvolvesExternalUsers,
-		InvolvesParticipantConsent:       createdStudy.InvolvesParticipantConsent,
-		InvolvesIndirectDataCollection:   createdStudy.InvolvesIndirectDataCollection,
-		InvolvesDataProcessingOutsideEea: createdStudy.InvolvesDataProcessingOutsideEea,
-		CreatedAt:                        createdStudy.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:                        createdStudy.UpdatedAt.Format(config.TimeFormat),
+	if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
 	}
 
-	ctx.JSON(http.StatusCreated, response)
+	ctx.Status(http.StatusCreated)
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
