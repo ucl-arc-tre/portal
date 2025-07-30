@@ -3,10 +3,12 @@ import { useState } from "react";
 import { Input } from "../shared/exports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
+import Loading from "@/components/ui/Loading";
 
 export default function ExternalInvite() {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [isInputVisible, setInputVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleShowInput() {
     setInputVisible(true);
@@ -19,6 +21,7 @@ export default function ExternalInvite() {
     const email = formData.get("email");
     try {
       setButtonDisabled(true);
+      setIsLoading(true);
       if (typeof email === "string") {
         const response = await postUsersInvite({ body: { email } });
         console.log("response", response);
@@ -30,6 +33,7 @@ export default function ExternalInvite() {
       console.error("Invite post error:", err);
     } finally {
       setButtonDisabled(false);
+      setIsLoading(false);
     }
 
     console.log("sending...", email);
@@ -47,6 +51,7 @@ export default function ExternalInvite() {
             size="small"
             className={styles["send-button"]}
           >
+            {isLoading && <Loading message="" size="small" />}
             Send Invitation
           </Button>{" "}
         </form>
