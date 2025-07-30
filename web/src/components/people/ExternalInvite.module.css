@@ -1,9 +1,56 @@
 .container {
   justify-self: end;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1.8rem;
+  height: 4rem;
+  transform: translateY(-1rem);
+  display: grid;
+}
 
-  .send-button {
-    color: white;
-    width: 100%;
+.send-button {
+  color: white;
+  width: 100%;
+}
+
+.slide-fade-down {
+  animation: fade-slide-down 1.4s ease 0s 1 normal forwards;
+  transition:
+    opacity 1.5s,
+    transform 1s 1.5s;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.slide-right-fade {
+  align-self: end;
+
+  &.hidden {
+    animation: slide-right-fade 0.8s ease 0s 1 normal forwards;
+  }
+}
+
+@keyframes fade-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-200px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-right-fade {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(80px);
+    display: none;
   }
 }
