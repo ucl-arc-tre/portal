@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
@@ -26,14 +25,14 @@ type Service struct {
 func New() *Service {
 	return &Service{
 		db:    graceful.NewDB(),
-		entra: entra.New(1 * time.Hour),
+		entra: entra.New(),
 		users: users.New(),
 	}
 }
 
 // validate all study admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []string) ([]types.User, error) {
-	if len(studyAdminUsernames) == 0 {
+func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) ([]types.User, error) {
+	if len(studyData.AdditionalStudyAdminUsernames) == 0 {
 		return []types.User{}, nil
 	}
 
@@ -41,8 +40,8 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	studyAdminUsers := []types.User{}
 
 	// Validate all study admin usernames (they must be staff members)
-	for _, studyAdminUsername := range studyAdminUsernames {
-		isStaff, err := s.entra.IsStaffMember(ctx, studyAdminUsername)
+	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
+		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
 
 		if err != nil {
 			validationErrors = append(validationErrors, fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
@@ -74,7 +73,7 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUs
 	return studyAdminUsers, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, username string, studyData openapi.StudyCreateRequest) error {
+func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) error {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
 		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
@@ -117,7 +116,7 @@ func (s *Service) validateStudyData(ctx context.Context, username string, studyD
 }
 
 func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (openapi.StudyCreateResponse, error) {
-	if err := s.validateStudyData(ctx, string(user.Username), studyData); err != nil {
+	if err := s.validateStudyData(ctx, user.Username, studyData); err != nil {
 		isValid := false
 		errorMessage := err.Error()
 		return openapi.StudyCreateResponse{
@@ -126,7 +125,8 @@ func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData op
 		}, nil
 	}
 
-	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData.AdditionalStudyAdminUsernames)
+	// Validate and create study admin users if any are provided
+	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData)
 	if err != nil {
 		// Check if this is a validation error that should be returned as structured response
 		if errors.Is(err, types.ErrInvalidObject) {
