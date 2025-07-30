@@ -344,11 +344,14 @@ type StudyCreateRequest = StudyBase
 
 // StudyCreateResponse defines model for StudyCreateResponse.
 type StudyCreateResponse struct {
-	// ErrorMessage Error message explaining why study creation failed
-	ErrorMessage *string `json:"errorMessage,omitempty"`
+	// Message Success message
+	Message *string `json:"message,omitempty"`
+}
 
-	// IsValid Whether the study creation was successful
-	IsValid *bool `json:"isValid,omitempty"`
+// StudyCreateValidationError defines model for StudyCreateValidationError.
+type StudyCreateValidationError struct {
+	// ErrorMessage Validation error message explaining why study creation failed
+	ErrorMessage string `json:"error_message"`
 }
 
 // TrainingKind defines model for TrainingKind.

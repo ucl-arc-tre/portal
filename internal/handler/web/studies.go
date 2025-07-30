@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -67,19 +68,34 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	response, err := h.studies.CreateStudy(ctx, user, studyData)
+	err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
+		// Check if this is a validation error or conflict (both should be HTTP 400)
+		if errors.Is(err, types.ErrInvalidObject) || errors.Is(err, types.ErrConflict) {
+			validationError := openapi.StudyCreateValidationError{
+				ErrorMessage: err.Error(),
+			}
+			ctx.JSON(http.StatusBadRequest, validationError)
+			return
+		}
+
+		// Check if this is a server error (database, entra, etc.)
+		if errors.Is(err, types.ErrServerError) {
+			setError(ctx, err, "Failed to create study")
+			return
+		}
+
+		// Any other error types
 		setError(ctx, err, "Failed to create study")
 		return
 	}
 
-	// Handle validation failures
-	if response.IsValid != nil && !*response.IsValid {
-		ctx.JSON(http.StatusBadRequest, response)
-		return
+	// Success response
+	message := "Study created successfully"
+	successResponse := openapi.StudyCreateResponse{
+		Message: &message,
 	}
-
-	ctx.JSON(http.StatusCreated, response)
+	ctx.JSON(http.StatusCreated, successResponse)
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {

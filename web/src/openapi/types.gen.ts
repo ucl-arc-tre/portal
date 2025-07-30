@@ -308,13 +308,16 @@ export type Study = StudyBase & {
 
 export type StudyCreateResponse = {
     /**
-     * Error message explaining why study creation failed
+     * Success message
      */
-    errorMessage?: string;
+    message?: string;
+};
+
+export type StudyCreateValidationError = {
     /**
-     * Whether the study creation was successful
+     * Validation error message explaining why study creation failed
      */
-    isValid?: boolean;
+    error_message: string;
 };
 
 export type GetAuthData = {
@@ -662,7 +665,7 @@ export type PostStudiesErrors = {
     /**
      * Validation error
      */
-    400: StudyCreateResponse;
+    400: StudyCreateValidationError;
     /**
      * Forbidden
      */

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { postStudies, Study, StudyCreateRequest, Auth, StudyCreateResponse } from "@/openapi";
+import { postStudies, Study, StudyCreateRequest, Auth, StudyCreateValidationError } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
 import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
 import Button from "@/components/ui/Button";
@@ -85,16 +85,16 @@ export default function Studies(props: Props) {
         body: studyData,
       });
 
-      if (response.data?.isValid) {
+      if (response.data) {
         setCreateStudyFormOpen(false);
         fetchStudies();
         return;
       }
 
       if (response.error) {
-        const errorData = response.error as StudyCreateResponse;
-        if (errorData?.errorMessage) {
-          setSubmitError(errorData.errorMessage);
+        const errorData = response.error as StudyCreateValidationError;
+        if (errorData?.error_message) {
+          setSubmitError(errorData.error_message);
           return;
         }
       }

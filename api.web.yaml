@@ -252,7 +252,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StudyCreateResponse"
+                $ref: "#/components/schemas/StudyCreateValidationError"
         "406":
           description: Invalid request
         "403":
@@ -706,9 +706,16 @@ components:
     StudyCreateResponse:
       type: object
       properties:
-        errorMessage:
+        message:
           type: string
-          description: Error message explaining why study creation failed
-        isValid:
-          type: boolean
-          description: Whether the study creation was successful
+          description: Success message
+          example: "Study created successfully"
+
+    StudyCreateValidationError:
+      type: object
+      required:
+        - error_message
+      properties:
+        error_message:
+          type: string
+          description: Validation error message explaining why study creation failed

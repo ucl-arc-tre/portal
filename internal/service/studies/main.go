@@ -55,19 +55,18 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData op
 		// All study admin usernames are valid, now find or create users
 		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
-			return nil, fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err)
+			return nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
 		}
 		studyAdminUsers = append(studyAdminUsers, user)
 
 	}
 
 	if len(validationErrors) > 0 {
-		var messages []string
+		message := ""
 		for _, err := range validationErrors {
-			messages = append(messages, "• "+err.Error())
+			message += fmt.Sprintf("• %v\n\n", err)
 		}
-		combinedMessage := strings.Join(messages, "\n\n")
-		return nil, types.NewErrInvalidObject(fmt.Errorf("%s", combinedMessage))
+		return nil, types.NewErrInvalidObject(fmt.Errorf("%s", message))
 	}
 
 	return studyAdminUsers, nil
@@ -76,20 +75,20 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData op
 func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) error {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
-		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
+		return types.NewErrInvalidObject(errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"))
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
-		return errors.New("data_controller_organisation is required")
+		return types.NewErrInvalidObject(errors.New("data_controller_organisation is required"))
 	}
 
 	if studyData.Description != nil && len(*studyData.Description) > 255 {
-		return errors.New("study description must be 255 characters or less")
+		return types.NewErrInvalidObject(errors.New("study description must be 255 characters or less"))
 	}
 
 	if studyData.IsDataProtectionOfficeRegistered != nil {
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
-			return errors.New("data protection registry ID, registration date, and registration number are required when registered with data protection office")
+			return types.NewErrInvalidObject(errors.New("data protection registry ID, registration date, and registration number are required when registered with data protection office"))
 		}
 	}
 
@@ -97,61 +96,41 @@ func (s *Service) validateStudyData(ctx context.Context, username types.Username
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
 	if err != nil {
-		return fmt.Errorf("failed to check for duplicate study title: %v", err)
+		return types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
 	}
 	if count > 0 {
-		return fmt.Errorf("a study with the title [%v] already exists", studyData.Title)
+		return types.NewErrConflict(fmt.Errorf("a study with the title [%v] already exists", studyData.Title))
 	}
 
 	// Check if the study submitter (the owner-user-id) is a valid staff member
 	isStaff, err := s.entra.IsStaffMember(ctx, username)
 	if err != nil {
-		return fmt.Errorf("failed to check staff status for user %s: %w", username, err)
+		return types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", username, err))
 	}
 	if !isStaff {
-		return fmt.Errorf("user is not a staff member")
+		return types.NewErrInvalidObject(fmt.Errorf("user is not a staff member"))
 	}
 
 	return nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (openapi.StudyCreateResponse, error) {
+func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) error {
 	if err := s.validateStudyData(ctx, user.Username, studyData); err != nil {
-		isValid := false
-		errorMessage := err.Error()
-		return openapi.StudyCreateResponse{
-			IsValid:      &isValid,
-			ErrorMessage: &errorMessage,
-		}, nil
+		return types.NewErrInvalidObject(err)
 	}
 
 	// Validate and create study admin users if any are provided
 	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, studyData)
 	if err != nil {
-		// Check if this is a validation error that should be returned as structured response
-		if errors.Is(err, types.ErrInvalidObject) {
-			isValid := false
-			errorMessage := err.Error()
-			return openapi.StudyCreateResponse{
-				IsValid:      &isValid,
-				ErrorMessage: &errorMessage,
-			}, nil
-		}
-
-		// Otherwise, return a server error
-		return openapi.StudyCreateResponse{}, err
+		return err
 	}
 
-	err = s.createStudyInDatabase(user, studyData, studyAdminUsers)
+	err = s.createStudy(user, studyData, studyAdminUsers)
 	if err != nil {
-		return openapi.StudyCreateResponse{}, err
+		return err
 	}
 
-	// Success response
-	isValid := true
-	return openapi.StudyCreateResponse{
-		IsValid: &isValid,
-	}, nil
+	return nil
 }
 
 // GetStudies retrieves all studies that the user owns or has access to
@@ -186,7 +165,7 @@ func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.A
 }
 
 // handles the database transaction for creating a study and its admins
-func (s *Service) createStudyInDatabase(user types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) error {
+func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) error {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
