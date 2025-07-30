@@ -58,7 +58,7 @@ describe("Import approved researchers", () => {
   });
 });
 
-describe("Invite externalss", () => {
+describe("Invite externals", () => {
   it("should not be visible to a base user", () => {
     cy.loginAsBase();
     cy.visit("/people");
@@ -68,10 +68,13 @@ describe("Invite externalss", () => {
   it("should be visable to & usable by an admin user", () => {
     cy.loginAsAdmin();
     cy.visit("/people");
+    cy.mockInviteExternalResearcher("hello@example.com");
+
     cy.get("[data-cy='show-invite-input']").should("be.visible").click();
 
-    cy.get("input[name='email']").should("be.visible");
-    cy.get("[data-cy='send-invite']").should("be.visible");
-    cy.mockInviteExternalResearcher("hello@example.com");
+    cy.get("input[name='email']").should("be.visible").type("hello@example.com");
+    cy.get("[data-cy='send-invite']").should("be.visible").click();
+
+    cy.get("input[name='email']").should("not.have.value", "hello@example.com");
   });
 });

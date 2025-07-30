@@ -258,8 +258,8 @@ Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: str
   }).as("getTraining");
 });
 
-Cypress.Commands.add("mockInviteExternalResearcher", (email?: string) => {
-  const body = email === undefined ? {} : { email: email };
+Cypress.Commands.add("mockInviteExternalResearcher", (email: string) => {
+  const body = { email: email };
   cy.intercept("POST", "/web/api/v0/users/invite", {
     statusCode: 204,
     body,
