@@ -78,12 +78,7 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 		return
 	}
 
-	// Success response
-	message := "Study created successfully"
-	successResponse := openapi.StudyCreateResponse{
-		Message: &message,
-	}
-	ctx.JSON(http.StatusCreated, successResponse)
+	ctx.Status(http.StatusCreated)
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
