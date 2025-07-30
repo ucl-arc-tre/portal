@@ -1,8 +1,6 @@
 package users
 
 import (
-	"time"
-
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"gorm.io/gorm"
@@ -16,7 +14,7 @@ type Service struct {
 func New() *Service {
 	service := Service{
 		db:    graceful.NewDB(),
-		entra: entra.New(1 * time.Hour),
+		entra: entra.New(),
 	}
 	return &service
 }

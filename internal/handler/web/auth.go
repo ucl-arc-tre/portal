@@ -11,7 +11,7 @@ import (
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	authInfo, err := h.auth.AuthInfo(ctx.Request.Context(), user)
+	authInfo, err := h.auth.AuthInfo(ctx, user)
 	if err != nil {
 		setError(ctx, err, "Failed to get auth info")
 		return
