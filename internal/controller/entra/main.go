@@ -90,22 +90,29 @@ func (c *Controller) ValidateEmployeeStatus(ctx context.Context, username string
 	return nil
 }
 
-func (c *Controller) SendInvite(ctx context.Context, email string) error {
+func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
 	credentials := config.EntraCredentials()
 
 	requestBody := graphmodels.NewInvitation()
 	invitedUserEmailAddress := email
-	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
 	inviteRedirectUrl := credentials.RedirectURL
+	sendInvitationMessage := true
 
+	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
+	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
 
-	invitation, err := c.client.Invitations().Post(context.Background(), requestBody, nil)
+	message := "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
+	requestBody.GetInvitedUserMessageInfo().SetCustomizedMessageBody(&message)
+
+	// todo: set sponsor (separate func)
+
+	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
 		return fmt.Errorf("failed to send invite to '%s': %v", invitedUserEmailAddress, err)
 	}
 
-	log.Printf("Invitation sent: %+v\n", invitation)
+	log.Printf("Invitation sent: %+v\n", invitedUserEmailAddress)
 
 	return nil
 }

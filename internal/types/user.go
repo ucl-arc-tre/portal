@@ -17,3 +17,8 @@ type UserAttributes struct {
 	UserID     uuid.UUID
 	ChosenName ChosenName
 }
+
+type Sponsor struct {
+	Username   Username
+	ChosenName ChosenName
+}

@@ -91,11 +91,25 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 }
 
 func (h *Handler) PostUsersInvite(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	attributes, err := h.users.Attributes(user)
+	if err != nil {
+		setError(ctx, err, "Failed to get user attributes")
+		return
+	}
+
+	sponsor := types.Sponsor{
+		Username:   user.Username,
+		ChosenName: attributes.ChosenName,
+	}
+
 	var invite openapi.PostUsersInviteJSONRequestBody
 	if err := bindJSONOrSetError(ctx, &invite); err != nil {
 		return
 	}
-	if err := h.users.InviteUser(ctx, invite.Email); err != nil {
+	// todo: check if invitee already exists in our db
+
+	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}
