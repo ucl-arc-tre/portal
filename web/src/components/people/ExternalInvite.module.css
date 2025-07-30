@@ -7,8 +7,18 @@
 }
 
 .send-button {
-  color: white;
   width: 100%;
+  align-items: center;
+}
+
+.loader {
+  padding: 0;
+  transform: translateY(0.2rem);
+  align-self: end;
+
+  * {
+    padding: 0;
+  }
 }
 
 .slide-fade-down {

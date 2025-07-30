@@ -54,7 +54,11 @@ export default function ExternalInvite() {
           onChange={(e) => setEmail(e.target.value)}
         />
         <Button disabled={buttonDisabled} type="submit" cy="send-invite" size="small" className={styles["send-button"]}>
-          {isLoading && <Loading message="" size="small" />}
+          {isLoading && (
+            <span className={styles.loader}>
+              <Loading message="" size="small" />
+            </span>
+          )}
           Send Invitation
         </Button>{" "}
       </form>
