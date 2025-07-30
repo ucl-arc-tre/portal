@@ -160,15 +160,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         {submitError && (
-          <Alert type="error" style={{ marginBottom: "1rem" }}>
-            <AlertMessage>
-              {submitError.split("\n").map((line, index) => (
-                <div key={index} className={styles["error-line"]}>
-                  {line}
-                </div>
-              ))}
-            </AlertMessage>
-          </Alert>
+          <div className={styles["error-alert"]}>
+            {submitError.split("\n").map((line, index) => (
+              <div key={index} className={styles["error-line"]}>
+                {line}
+              </div>
+            ))}
+          </div>
         )}
 
         {/* first step */}

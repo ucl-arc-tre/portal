@@ -58,7 +58,6 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData op
 			return nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
 		}
 		studyAdminUsers = append(studyAdminUsers, user)
-
 	}
 
 	if len(validationErrors) > 0 {

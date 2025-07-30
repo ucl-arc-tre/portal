@@ -70,7 +70,7 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 
 	err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
-		// Check if this is a validation error or conflict (both should be HTTP 400)
+		// Check for validation errors
 		if errors.Is(err, types.ErrInvalidObject) || errors.Is(err, types.ErrConflict) {
 			validationError := openapi.StudyCreateValidationError{
 				ErrorMessage: err.Error(),
