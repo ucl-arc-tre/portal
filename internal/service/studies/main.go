@@ -31,90 +31,148 @@ func New() *Service {
 }
 
 // validate all study admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyAdminUsernames []types.Username) ([]types.User, error) {
-	if len(studyAdminUsernames) == 0 {
-		return []types.User{}, nil
+func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) ([]types.User, *openapi.StudyCreateValidationError, error) {
+	if len(studyData.AdditionalStudyAdminUsernames) == 0 {
+		return []types.User{}, nil, nil
 	}
 
-	validationErrors := []error{}
+	var validationErrorMessage []string
 	studyAdminUsers := []types.User{}
 
 	// Validate all study admin usernames (they must be staff members)
-	for _, studyAdminUsername := range studyAdminUsernames {
-		isStaff, err := s.entra.IsStaffMember(ctx, studyAdminUsername)
+	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
+		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
 
 		if err != nil {
-			validationErrors = append(validationErrors, fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
-			continue
+			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
 		}
+
 		if !isStaff {
-			validationErrors = append(validationErrors, fmt.Errorf("user %s is not a staff member", studyAdminUsername))
+			validationErrorMessage = append(validationErrorMessage, fmt.Sprintf("user %s is not a staff member", studyAdminUsername))
 			continue
 		}
 
 		// All study admin usernames are valid, now find or create users
 		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
-			return nil, fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err)
+			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
 		}
 		studyAdminUsers = append(studyAdminUsers, user)
-
 	}
 
-	if len(validationErrors) > 0 {
-		return nil, types.NewErrInvalidObject(errors.Join(validationErrors...))
+	if len(validationErrorMessage) > 0 {
+		message := ""
+		for _, msg := range validationErrorMessage {
+			message += fmt.Sprintf("• %s\n\n", msg)
+		}
+		return nil, &openapi.StudyCreateValidationError{ErrorMessage: message}, nil
 	}
 
-	return studyAdminUsers, nil
+	return studyAdminUsers, nil, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) error {
+func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
 	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	if !titlePattern.MatchString(studyData.Title) {
-		return errors.New("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
+		return &openapi.StudyCreateValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
-		return errors.New("data_controller_organisation is required")
+		return &openapi.StudyCreateValidationError{ErrorMessage: "data_controller_organisation is required"}, nil
 	}
 
 	if studyData.Description != nil && len(*studyData.Description) > 255 {
-		return errors.New("study description must be 255 characters or less")
+		return &openapi.StudyCreateValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
 	}
 
 	if studyData.IsDataProtectionOfficeRegistered != nil {
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
-			return errors.New("data protection registry ID, registration date, and registration number are required when registered with data protection office")
+			return &openapi.StudyCreateValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
+	}
+
+	// Check if the study title already exists
+	var count int64
+	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
+	if err != nil {
+		return nil, types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
+	}
+	if count > 0 {
+		return &openapi.StudyCreateValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
 	// Check if the study submitter (the owner-user-id) is a valid staff member
 	isStaff, err := s.entra.IsStaffMember(ctx, username)
 	if err != nil {
-		return fmt.Errorf("failed to check staff status for user %s: %w", username, err)
+		return nil, types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", username, err))
 	}
 	if !isStaff {
-		return fmt.Errorf("user is not a staff member")
+		return &openapi.StudyCreateValidationError{ErrorMessage: "user is not a staff member"}, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*types.Study, error) {
-	if err := s.validateStudyData(ctx, user.Username, studyData); err != nil {
-		return nil, types.NewErrInvalidObject(err)
+func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+	studyFormValidationError, err := s.validateStudyData(ctx, user.Username, studyData)
+	if err != nil {
+		return nil, err
 	}
-	additionalStudyAdminUsernames := []types.Username{}
-	for _, username := range studyData.AdditionalStudyAdminUsernames {
-		additionalStudyAdminUsernames = append(additionalStudyAdminUsernames, types.Username(username))
+	if studyFormValidationError != nil {
+		return studyFormValidationError, nil
 	}
 
 	// Validate and create study admin users if any are provided
-	studyAdminUsers, err := s.validateAndCreateStudyAdmins(ctx, additionalStudyAdminUsernames)
+	studyAdminUsers, studyAdminValidationError, err := s.validateAndCreateStudyAdmins(ctx, studyData)
+	if err != nil {
+		return nil, err
+	}
+	if studyAdminValidationError != nil {
+		return studyAdminValidationError, nil
+	}
+
+	err = s.createStudy(user, studyData, studyAdminUsers)
 	if err != nil {
 		return nil, err
 	}
 
+	return nil, nil
+}
+
+// GetStudies retrieves all studies that the user owns or has access to
+func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
+	var studies []types.Study
+
+	// For now, only return studies owned by the user
+	// This could be expanded later to include shared studies
+	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error
+	return studies, types.NewErrServerError(err)
+}
+
+// GetStudyAssets retrieves all assets for a study,
+// ensures that the user owns the study (this might be refactored later to allow shared access)
+func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
+	// verify the user owns the study
+	var count int64
+	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, userID).Count(&count).Error
+	if err != nil {
+		return nil, types.NewErrServerError(err)
+	}
+	if count == 0 {
+		return nil, types.NewNotFoundError(errors.New("study not found or access denied"))
+	}
+
+	// Get all assets for this study with their locations
+	var assets []types.Asset
+	if err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error; err != nil {
+		return nil, err
+	}
+
+	return assets, nil
+}
+
+// handles the database transaction for creating a study and its admins
+func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) error {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
@@ -153,7 +211,7 @@ func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData op
 	// Create the study
 	if err := tx.Create(&dbStudy).Error; err != nil {
 		tx.Rollback()
-		return nil, err
+		return err
 	}
 
 	// Create StudyAdmin records for each study admin user
@@ -164,51 +222,14 @@ func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData op
 		}
 		if err := tx.Create(&studyAdmin).Error; err != nil {
 			tx.Rollback()
-			return nil, fmt.Errorf("failed to create study admin: %w", err)
+			return fmt.Errorf("failed to create study admin: %w", err)
 		}
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	// Reload the study with StudyAdmins populated
-	var studyWithAdmins types.Study
-	if err := s.db.Preload("StudyAdmins.User").First(&studyWithAdmins, dbStudy.ID).Error; err != nil {
-		return nil, fmt.Errorf("failed to reload study with admins: %w", err)
-	}
-
-	return &studyWithAdmins, nil
-}
-
-// GetStudies retrieves all studies that the user owns or has access to
-func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
-	var studies []types.Study
-
-	// For now, only return studies owned by the user
-	// This could be expanded later to include shared studies
-	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error
-	return studies, types.NewErrServerError(err)
-}
-
-// GetStudyAssets retrieves all assets for a study,
-// ensures that the user owns the study (this might be refactored later to allow shared access)
-func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
-	// verify the user owns the study
-	var study types.Study
-	err := s.db.Where("id = ? AND owner_user_id = ?", studyID, userID).First(&study).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, types.NewNotFoundError(err)
-	} else if err != nil {
-		return nil, types.NewErrServerError(err)
-	}
-
-	// Get all assets for this study with their locations
-	var assets []types.Asset
-	if err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error; err != nil {
-		return nil, err
-	}
-
-	return assets, nil
+	return nil
 }
