@@ -109,7 +109,12 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
 
-	message := "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
+	var message string
+	if sponsor.ChosenName != "" {
+		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
+	} else {
+		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
+	}
 	messageInfo := graphmodels.NewInvitedUserMessageInfo()
 
 	messageInfo.SetCustomizedMessageBody(&message)
