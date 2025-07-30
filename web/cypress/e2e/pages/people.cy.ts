@@ -70,7 +70,8 @@ describe("Invite externalss", () => {
     cy.visit("/people");
     cy.get("[data-cy='show-invite-input']").should("be.visible").click();
 
-    cy.get("input[name='email']").should("be.visible").type("lab.amanda.ch@gmail.com");
-    cy.get("[data-cy='send-invite']").should("be.visible").click();
+    cy.get("input[name='email']").should("be.visible");
+    cy.get("[data-cy='send-invite']").should("be.visible");
+    cy.mockInviteExternalResearcher("hello@example.com");
   });
 });

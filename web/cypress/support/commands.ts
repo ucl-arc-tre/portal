@@ -80,6 +80,13 @@ declare global {
        */
       mockProfileTraining(isValid: boolean, completedAt?: string): Chainable<any>;
 
+      /**
+       * Mock inviting external user
+       * @param email - The email address to invite
+       * @example cy.mockInviteExternalResearcher("hello@example.com")
+       */
+      mockInviteExternalResearcher(email: string): Chainable<any>;
+
       // Wait commands for fixtures
       /**
        * Wait for the mocked auth request to complete
@@ -249,6 +256,14 @@ Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: str
       training_records: [trainingRecord],
     },
   }).as("getTraining");
+});
+
+Cypress.Commands.add("mockInviteExternalResearcher", (email?: string) => {
+  const body = email === undefined ? {} : { email: email };
+  cy.intercept("POST", "/web/api/v0/users/invite", {
+    statusCode: 204,
+    body,
+  }).as("postUserIvite");
 });
 
 Cypress.Commands.add("checkAccessibility", (selector?: string) => {
