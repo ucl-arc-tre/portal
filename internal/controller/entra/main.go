@@ -103,7 +103,10 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
 
 	message := "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
-	requestBody.GetInvitedUserMessageInfo().SetCustomizedMessageBody(&message)
+	messageInfo := graphmodels.NewInvitedUserMessageInfo()
+
+	messageInfo.SetCustomizedMessageBody(&message)
+	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
 	// todo: set sponsor (separate func)
 
