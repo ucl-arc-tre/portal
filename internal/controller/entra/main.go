@@ -109,20 +109,16 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
 
-	message := "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
+	message := "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
 	messageInfo := graphmodels.NewInvitedUserMessageInfo()
 
 	messageInfo.SetCustomizedMessageBody(&message)
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
-	// todo: set sponsor (separate func)
-
 	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
-		return fmt.Errorf("failed to send invite to '%s': %v", invitedUserEmailAddress, err)
+		return types.NewErrServerError(err)
 	}
-
-	log.Printf("Invitation sent: %+v\n", invitedUserEmailAddress)
 
 	return nil
 }
