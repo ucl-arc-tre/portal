@@ -91,6 +91,11 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 }
 
 func (h *Handler) PostUsersInvite(ctx *gin.Context) {
+	var invite openapi.PostUsersInviteJSONRequestBody
+	if err := bindJSONOrSetError(ctx, &invite); err != nil {
+		return
+	}
+
 	user := middleware.GetUser(ctx)
 	attributes, err := h.users.Attributes(user)
 	if err != nil {
@@ -103,10 +108,6 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	var invite openapi.PostUsersInviteJSONRequestBody
-	if err := bindJSONOrSetError(ctx, &invite); err != nil {
-		return
-	}
 	// todo: check if invitee already exists in our db
 
 	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
