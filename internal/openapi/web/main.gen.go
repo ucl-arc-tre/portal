@@ -200,6 +200,9 @@ type Study struct {
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
 
+	// HasExistingData Whether the study involves existing data (e.g., data already collected or available)
+	HasExistingData bool `json:"has_existing_data"`
+
 	// Id Unique identifier for the study
 	Id string `json:"id"`
 
@@ -280,6 +283,9 @@ type StudyBase struct {
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
+
+	// HasExistingData Whether the study involves existing data (e.g., data already collected or available)
+	HasExistingData bool `json:"has_existing_data"`
 
 	// InvolvesCag Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
 	InvolvesCag *bool `json:"involves_cag,omitempty"`

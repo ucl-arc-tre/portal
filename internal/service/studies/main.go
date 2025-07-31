@@ -185,6 +185,7 @@ func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequ
 		OwnerUserID:                user.ID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
+		HasExistingData:            studyData.HasExistingData,
 	}
 
 	dbStudy.Description = studyData.Description

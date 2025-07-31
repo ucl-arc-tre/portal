@@ -32,6 +32,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 			OwnerUserId:                      &ownerUserIDStr,
 			AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 			DataControllerOrganisation:       study.DataControllerOrganisation,
+			HasExistingData:                  study.HasExistingData,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
 			InvolvesCag:                      study.InvolvesCag,
 			CagReference:                     study.CagReference,

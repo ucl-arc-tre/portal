@@ -11,6 +11,7 @@ type Study struct {
 	Title                            string    `gorm:"not null"`
 	Description                      *string   `gorm:"type:text"`
 	DataControllerOrganisation       string    `gorm:"not null"`
+	HasExistingData                  bool      `gorm:"not null"`
 	InvolvesUclSponsorship           *bool     `gorm:""`
 	InvolvesCag                      *bool     `gorm:""`
 	CagReference                     *string   `gorm:"type:varchar(255)"`

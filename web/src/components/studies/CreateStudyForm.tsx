@@ -29,6 +29,7 @@ export type StudyFormData = {
   description: string;
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
+  hasExistingData: boolean;
   dataControllerOrganisation: string;
   cagReference: number;
   dataProtectionPrefix: string;
@@ -303,6 +304,46 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         </fieldset>
 
         {/* second step */}
+        <fieldset className={getFieldsetClass(2)}>
+          <legend>Existing data</legend>
+
+          <Label>
+            Does your study involve existing data? *
+            <div className={styles["existing-data-radio-group"]}>
+              <Label className={styles["radio-label"]} htmlFor="has-existing-data-true">
+                <input
+                  type="radio"
+                  id="has-existing-data-true"
+                  value="true"
+                  {...register("hasExistingData", {
+                    required: "Please select whether your study involves existing data",
+                    setValueAs: (value) => value === "true",
+                  })}
+                />
+                Yes - we have existing data
+              </Label>
+
+              <Label className={styles["radio-label"]} htmlFor="has-existing-data-false">
+                <input
+                  type="radio"
+                  id="has-existing-data-false"
+                  value="false"
+                  {...register("hasExistingData", {
+                    required: "Please select whether your study involves existing data",
+                    setValueAs: (value) => value === "true",
+                  })}
+                />
+                No - we do not yet have any data but intend to collect it
+              </Label>
+            </div>
+            {errors.hasExistingData && (
+              <Alert type="error">
+                <AlertMessage>{errors.hasExistingData.message}</AlertMessage>
+              </Alert>
+            )}
+          </Label>
+        </fieldset>
+
         <fieldset className={getFieldsetClass(2)}>
           <legend>Sponsorship & Approvals</legend>
           <Label htmlFor="uclSponsorship" className={styles["checkbox-label"]}>

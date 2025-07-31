@@ -51,6 +51,7 @@ export default function Studies(props: Props) {
         additional_study_admin_usernames: data.additionalStudyAdminUsernames
           .map((admin) => admin.value.trim())
           .map((username) => `${username}${domainName}`),
+        has_existing_data: data.hasExistingData,
         involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
         involves_cag: data.involvesCag ? data.involvesCag : undefined,
         cag_reference: data.cagReference ? data.cagReference.toString() : undefined,

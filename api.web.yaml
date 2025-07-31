@@ -598,6 +598,7 @@ components:
         - title
         - data_controller_organisation
         - additional_study_admin_usernames
+        - has_existing_data
       properties:
         title:
           type: string
@@ -610,6 +611,9 @@ components:
           items:
             type: string
           description: List of additional study administrator usernames (empty array if none)
+        has_existing_data:
+          type: boolean
+          description: Whether the study involves existing data (e.g., data already collected or available)
         data_controller_organisation:
           type: string
           description: The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)

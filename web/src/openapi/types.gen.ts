@@ -198,6 +198,10 @@ export type StudyBase = {
      */
     additional_study_admin_usernames: Array<string>;
     /**
+     * Whether the study involves existing data (e.g., data already collected or available)
+     */
+    has_existing_data: boolean;
+    /**
      * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
      */
     data_controller_organisation: string;
