@@ -1,8 +1,10 @@
 package web
 
 import (
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -114,6 +116,19 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}
+	// todo: create the user with ext format then add sponsors
+	convertEmail(invite.Email)
 
 	ctx.Status(http.StatusNoContent)
+}
+func convertEmail(email string) string {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return ""
+	}
+
+	domain := strings.ReplaceAll(parts[1], ".", "_")
+
+	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
+	return newEmail
 }
