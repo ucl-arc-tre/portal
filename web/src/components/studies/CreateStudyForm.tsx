@@ -29,7 +29,7 @@ export type StudyFormData = {
   description: string;
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
-  hasExistingData: boolean;
+  hasExistingData: string;
   dataControllerOrganisation: string;
   cagReference: number;
   dataProtectionPrefix: string;
@@ -317,7 +317,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   value="true"
                   {...register("hasExistingData", {
                     required: "Please select whether your study involves existing data",
-                    setValueAs: (value) => value === "true",
                   })}
                 />
                 Yes - we have existing data
@@ -330,7 +329,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   value="false"
                   {...register("hasExistingData", {
                     required: "Please select whether your study involves existing data",
-                    setValueAs: (value) => value === "true",
                   })}
                 />
                 No - we do not yet have any data but intend to collect it
