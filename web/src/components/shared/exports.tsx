@@ -12,6 +12,10 @@ export const Input = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
+export const Label = dynamic(() => import("uikit-react-public").then((mod) => mod.Label), {
+  ssr: false,
+});
+
 export const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
