@@ -11,6 +11,13 @@
   align-items: center;
 }
 
+.success-message {
+  transform: translateY(-1rem);
+  color: var(--green-200);
+  position: absolute;
+  cursor: pointer;
+}
+
 .loader {
   padding: 0;
   transform: translateY(0.2rem);

@@ -35,14 +35,16 @@ export default function ExternalInvite() {
       setIsLoading(false);
       setEmail("");
       setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 1000);
     }
   }
 
   return (
     <div className={styles.container}>
+      {showSuccessMessage && (
+        <small onClick={() => setShowSuccessMessage(false)} className={styles["success-message"]}>
+          Invitation sent!
+        </small>
+      )}
       <form onSubmit={handleSumbit} className={`${styles["slide-fade-down"]} ${isInputVisible ? "" : styles.hidden}`}>
         <Input
           type="email"
@@ -57,7 +59,7 @@ export default function ExternalInvite() {
               <Loading message="" size="small" />
             </span>
           )}
-          {showSuccessMessage ? "Sent!" : "Send Invitation"}
+          Send Invitation
         </Button>{" "}
       </form>
       <Button
