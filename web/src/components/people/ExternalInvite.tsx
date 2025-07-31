@@ -22,11 +22,7 @@ export default function ExternalInvite() {
       setButtonDisabled(true);
       setIsLoading(true);
       if (typeof email === "string") {
-        const response = await postUsersInvite({ body: { email } });
-        console.log("response", response);
-      } else {
-        // redundant maybe?
-        console.error("Email not in correct format.");
+        await postUsersInvite({ body: { email } });
       }
     } catch (err) {
       console.error("Invite post error:", err);
