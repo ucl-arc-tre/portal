@@ -4,10 +4,9 @@
 
 .container {
   justify-self: end;
-  margin-bottom: 1.8rem;
   height: 4rem;
-  transform: translateY(-1rem);
   display: grid;
+  margin-block: 0.5rem;
 }
 
 .send-button {
