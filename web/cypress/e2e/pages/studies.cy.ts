@@ -61,8 +61,11 @@ describe("Approved researcher can create studies", () => {
     cy.get("input[name='title']").type("Test Study");
     cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
-    // go to the end and submit
+    // go to step 2 and fill in the existing data field
     cy.get("[data-cy='next']").click();
+    cy.get("input[name='hasExistingData'][value='true']").check();
+
+    // go to the end and submit
     cy.get("[data-cy='next']").click();
     cy.get("button[type='submit']").should("not.be.disabled");
   });
