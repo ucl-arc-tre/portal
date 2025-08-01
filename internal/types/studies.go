@@ -30,6 +30,7 @@ type Study struct {
 	InvolvesParticipantConsent       *bool     `gorm:""`
 	InvolvesIndirectDataCollection   *bool     `gorm:""`
 	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
+	ApprovalStatus                   string    `gorm:"not null"`
 
 	// Relationships
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`

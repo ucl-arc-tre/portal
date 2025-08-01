@@ -95,6 +95,7 @@ export default function AdminView() {
   }
   return (
     <>
+      <h4>View and manage portal users, including adding via invitation or upload</h4>
       <ExternalInvite />
 
       {trainingDialogOpen && (

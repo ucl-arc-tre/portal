@@ -1,32 +1,43 @@
 import Button from "@/components/ui/Button";
-import { useState } from "react";
-import { Input } from "../shared/exports";
+import { useEffect, useState } from "react";
+import { Input, Alert, AlertMessage, Label } from "../shared/exports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
 import Loading from "@/components/ui/Loading";
+import Dialog from "../ui/Dialog";
 
 export default function ExternalInvite() {
   const [buttonDisabled, setButtonDisabled] = useState(false);
-  const [isInputVisible, setInputVisible] = useState(false);
+  const [isDialogVisible, setDialogVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState("");
 
-  function handleShowInput() {
-    setInputVisible(true);
+  function handleShowDialog() {
+    setDialogVisible(true);
   }
 
-  async function handleSumbit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       setButtonDisabled(true);
       setIsLoading(true);
-      if (typeof email === "string") {
+      if (email) {
         const response = await postUsersInvite({ body: { email } });
-        console.log("response", response);
-      } else {
-        // redundant maybe?
-        console.error("Email not in correct format.");
+        if (response.response.ok) {
+          setShowSuccessMessage(true);
+        } else {
+          let errMessage;
+          if (response.response.status === 406) {
+            errMessage = "Sorry, your request wasn't valid. Please try again.";
+          } else if (response.response.status === 500) {
+            errMessage = "Sorry, something went wrong. Please try again.";
+          } else {
+            errMessage = "An unknown error occurred. Please refresh and try again.";
+          }
+          setShowErrorMessage(errMessage);
+        }
       }
     } catch (err) {
       console.error("Invite post error:", err);
@@ -34,43 +45,67 @@ export default function ExternalInvite() {
       setButtonDisabled(false);
       setIsLoading(false);
       setEmail("");
-      setShowSuccessMessage(true);
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-      }, 1000);
     }
   }
 
+  useEffect(() => {
+    if (isDialogVisible === false) {
+      setShowSuccessMessage(false);
+      setShowErrorMessage("");
+    }
+  }, [isDialogVisible]);
+
   return (
-    <div className={styles.container}>
-      <form onSubmit={handleSumbit} className={`${styles["slide-fade-down"]} ${isInputVisible ? "" : styles.hidden}`}>
-        <Input
-          type="email"
-          placeholder="Email address"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Button disabled={buttonDisabled} type="submit" cy="send-invite" size="small" className={styles["send-button"]}>
-          {isLoading && (
-            <span className={styles.loader}>
-              <Loading message="" size="small" />
-            </span>
-          )}
-          {showSuccessMessage ? "Sent!" : "Send Invitation"}
-        </Button>{" "}
-      </form>
-      <Button
-        className={`${styles["slide-right-fade"]} ${isInputVisible ? styles.hidden : ""}`}
-        onClick={handleShowInput}
-        disabled={buttonDisabled}
-        variant="secondary"
-        cy="show-invite-input"
-        type="button"
-        size="small"
-      >
-        Invite external researcher
-      </Button>
-    </div>
+    <>
+      {isDialogVisible && (
+        <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
+          <div className={styles["dialog-content"]}>
+            {showSuccessMessage && (
+              <small onClick={() => setShowSuccessMessage(false)} className={styles["success-message"]}>
+                &times; Invitation sent!
+              </small>
+            )}
+            {showErrorMessage && (
+              <Alert type="error">
+                <AlertMessage>{showErrorMessage}</AlertMessage>
+              </Alert>
+            )}
+            <form onSubmit={handleSubmit} className={styles["invite-form"]}>
+              <Label htmlFor="email">Invite a researcher to the portal</Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="Email address"
+                name="email"
+                required={true}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button disabled={buttonDisabled} type="submit" cy="send-invite" className={styles["send-button"]}>
+                {isLoading && (
+                  <span className={styles.loader}>
+                    <Loading message="" size="small" />
+                  </span>
+                )}
+                Send Invitation
+              </Button>{" "}
+            </form>
+          </div>
+        </Dialog>
+      )}
+
+      <div className={styles.container}>
+        <Button
+          onClick={handleShowDialog}
+          disabled={buttonDisabled}
+          variant="secondary"
+          cy="show-invite-input"
+          type="button"
+          size="small"
+        >
+          Invite external researcher
+        </Button>
+      </div>
+    </>
   );
 }

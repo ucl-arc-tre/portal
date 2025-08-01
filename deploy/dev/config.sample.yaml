@@ -9,7 +9,6 @@ entra:
   client_id: <CHANGE_ME>
   client_secret: <CHANGE_ME>
   invite_redirect_url: <CHANGE_ME> # where you want to send the user when they accept the invite, eg. http://localhost:8000/profile
-  tenant_primary_domain: <CHANGE_ME> # eg. arctretest.onmicrosoft.com
 tre:
   users:
     username: password # pragma: allowlist secret

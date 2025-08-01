@@ -1,14 +1,37 @@
+.dialog {
+  width: clamp(40vw, 60vw, 80vw);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.invite-form {
+  padding: 1rem;
+}
+
 .container {
   justify-self: end;
-  margin-bottom: 1.8rem;
   height: 4rem;
-  transform: translateY(-1rem);
   display: grid;
+  margin-block: 0.5rem;
 }
 
 .send-button {
   width: 100%;
   align-items: center;
+}
+
+.success-message {
+  color: var(--green-200);
+  cursor: pointer;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
+  display: block;
+  width: 100%;
 }
 
 .loader {
@@ -18,49 +41,5 @@
 
   * {
     padding: 0;
-  }
-}
-
-.slide-fade-down {
-  animation: fade-slide-down 1.4s ease 0s 1 normal forwards;
-  transition:
-    opacity 1.5s,
-    transform 1s 1.5s;
-
-  &.hidden {
-    display: none;
-  }
-}
-
-.slide-right-fade {
-  align-self: end;
-
-  &.hidden {
-    animation: slide-right-fade 0.8s ease 0s 1 normal forwards;
-  }
-}
-
-@keyframes fade-slide-down {
-  0% {
-    opacity: 0;
-    transform: translateY(-200px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-right-fade {
-  0% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateX(80px);
-    display: none;
   }
 }
