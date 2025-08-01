@@ -25,23 +25,28 @@ export default function ExternalInvite() {
       setButtonDisabled(true);
       setIsLoading(true);
       if (typeof email === "string") {
-        await postUsersInvite({ body: { email } });
+        const response = await postUsersInvite({ body: { email } });
+        if (response.response.ok) {
+          setShowSuccessMessage(true);
+        } else {
+          let errMessage;
+          if (response.response.status === 406) {
+            errMessage = "Sorry, your request wasn't valid. Please try again.";
+          } else if (response.response.status === 500) {
+            errMessage = "Sorry, something went wrong. Please try again.";
+          } else {
+            errMessage = "An unknown error occurred. Please refresh and try again.";
+          }
+          setErrorMessage(errMessage);
+          setShowErrorMessage(true);
+        }
       }
     } catch (err) {
       console.error("Invite post error:", err);
-      let errMessage;
-      if (err instanceof Error) {
-        errMessage = err.message;
-      } else {
-        errMessage = "An unknown error occurred";
-      }
-      setErrorMessage(errMessage);
-      setShowErrorMessage(true);
     } finally {
       setButtonDisabled(false);
       setIsLoading(false);
       setEmail("");
-      setShowSuccessMessage(true);
     }
   }
 
