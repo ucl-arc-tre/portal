@@ -401,6 +401,12 @@ type UserTrainingUpdate struct {
 	TrainingKind TrainingKind `json:"training_kind"`
 }
 
+// PostUsersInviteJSONBody defines parameters for PostUsersInvite.
+type PostUsersInviteJSONBody struct {
+	// Email Email address of the person to be invited
+	Email string `json:"email"`
+}
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -415,6 +421,9 @@ type PostStudiesJSONRequestBody = StudyCreateRequest
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = Asset
+
+// PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
+type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
 
 // PostUsersUserIdTrainingJSONRequestBody defines body for PostUsersUserIdTraining for application/json ContentType.
 type PostUsersUserIdTrainingJSONRequestBody = UserTrainingUpdate
@@ -463,6 +472,9 @@ type ServerInterface interface {
 
 	// (POST /users/approved-researchers/import/csv)
 	PostUsersApprovedResearchersImportCsv(c *gin.Context)
+
+	// (POST /users/invite)
+	PostUsersInvite(c *gin.Context)
 
 	// (POST /users/{userId}/training)
 	PostUsersUserIdTraining(c *gin.Context, userId string)
@@ -692,6 +704,19 @@ func (siw *ServerInterfaceWrapper) PostUsersApprovedResearchersImportCsv(c *gin.
 	siw.Handler.PostUsersApprovedResearchersImportCsv(c)
 }
 
+// PostUsersInvite operation middleware
+func (siw *ServerInterfaceWrapper) PostUsersInvite(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostUsersInvite(c)
+}
+
 // PostUsersUserIdTraining operation middleware
 func (siw *ServerInterfaceWrapper) PostUsersUserIdTraining(c *gin.Context) {
 
@@ -757,5 +782,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
+	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
 }
