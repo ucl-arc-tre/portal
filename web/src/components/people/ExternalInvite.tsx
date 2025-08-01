@@ -48,6 +48,8 @@ export default function ExternalInvite() {
   useEffect(() => {
     if (isDialogVisible === false) {
       setShowSuccessMessage(false);
+      setShowErrorMessage(false);
+      setErrorMessage("");
     }
   }, [isDialogVisible]);
 
