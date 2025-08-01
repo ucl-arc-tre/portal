@@ -304,6 +304,10 @@ export type Study = StudyBase & {
      * Time in RFC3339 format when the study was last updated
      */
     updated_at: string;
+    /**
+     * Current approval status of the study
+     */
+    approval_status: 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 };
 
 export type StudyCreateValidationError = {
