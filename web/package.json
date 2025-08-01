@@ -14,8 +14,8 @@
     "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.13.1",
     "next": "15.4.5",
+    "@hey-api/openapi-ts": "^0.80.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.61.1",
@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@hey-api/openapi-ts": "^0.80.1",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
