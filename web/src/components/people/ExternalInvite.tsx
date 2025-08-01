@@ -68,22 +68,18 @@ export default function ExternalInvite() {
                 <AlertMessage>{errorMessage}</AlertMessage>
               </Alert>
             )}
-            <form onSubmit={handleSumbit} className={styles["invite-form"]}>
+            <form onSubmit={handleSubmit} className={styles["invite-form"]}>
               <Label htmlFor="email">Invite a researcher to the portal</Label>
               <Input
                 type="email"
                 id="email"
                 placeholder="Email address"
                 name="email"
+                required={true}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Button
-                disabled={!(email.length > 6) || buttonDisabled}
-                type="submit"
-                cy="send-invite"
-                className={styles["send-button"]}
-              >
+              <Button disabled={buttonDisabled} type="submit" cy="send-invite" className={styles["send-button"]}>
                 {isLoading && (
                   <span className={styles.loader}>
                     <Loading message="" size="small" />
