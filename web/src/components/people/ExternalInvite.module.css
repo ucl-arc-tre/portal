@@ -1,3 +1,13 @@
+.dialog {
+  width: clamp(40vw, 60vw, 80vw);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .invite-form {
   padding: 1rem;
 }

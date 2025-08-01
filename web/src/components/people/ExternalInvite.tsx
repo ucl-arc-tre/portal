@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Alert, AlertMessage, Label } from "../shared/exports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
@@ -45,11 +45,17 @@ export default function ExternalInvite() {
     }
   }
 
+  useEffect(() => {
+    if (isDialogVisible === false) {
+      setShowSuccessMessage(false);
+    }
+  }, [isDialogVisible]);
+
   return (
     <>
       {isDialogVisible && (
-        <Dialog setDialogOpen={setDialogVisible}>
-          <div>
+        <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
+          <div className={styles["dialog-content"]}>
             {showSuccessMessage && (
               <small onClick={() => setShowSuccessMessage(false)} className={styles["success-message"]}>
                 &times; Invitation sent!
