@@ -46,18 +46,10 @@ const (
 
 // Defines values for StudyApprovalStatus.
 const (
-	StudyApprovalStatusApproved   StudyApprovalStatus = "Approved"
-	StudyApprovalStatusIncomplete StudyApprovalStatus = "Incomplete"
-	StudyApprovalStatusPending    StudyApprovalStatus = "Pending"
-	StudyApprovalStatusRejected   StudyApprovalStatus = "Rejected"
-)
-
-// Defines values for StudyBaseApprovalStatus.
-const (
-	StudyBaseApprovalStatusApproved   StudyBaseApprovalStatus = "Approved"
-	StudyBaseApprovalStatusIncomplete StudyBaseApprovalStatus = "Incomplete"
-	StudyBaseApprovalStatusPending    StudyBaseApprovalStatus = "Pending"
-	StudyBaseApprovalStatusRejected   StudyBaseApprovalStatus = "Rejected"
+	Approved   StudyApprovalStatus = "Approved"
+	Incomplete StudyApprovalStatus = "Incomplete"
+	Pending    StudyApprovalStatus = "Pending"
+	Rejected   StudyApprovalStatus = "Rejected"
 )
 
 // Defines values for TrainingKind.
@@ -291,9 +283,6 @@ type StudyBase struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
-	// ApprovalStatus Current approval status of the study
-	ApprovalStatus StudyBaseApprovalStatus `json:"approval_status"`
-
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
 
@@ -363,9 +352,6 @@ type StudyBase struct {
 	// Title Title of the study
 	Title string `json:"title"`
 }
-
-// StudyBaseApprovalStatus Current approval status of the study
-type StudyBaseApprovalStatus string
 
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase

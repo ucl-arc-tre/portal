@@ -598,7 +598,6 @@ components:
         - title
         - data_controller_organisation
         - additional_study_admin_usernames
-        - approval_status
       properties:
         title:
           type: string
@@ -674,14 +673,6 @@ components:
         owner_user_id:
           type: string
           description: ID of the user who owns the study
-        approval_status:
-          type: string
-          enum:
-            - Incomplete
-            - Pending
-            - Approved
-            - Rejected
-          description: Current approval status of the study
 
     StudyCreateRequest:
       allOf:
@@ -696,6 +687,7 @@ components:
             - id
             - created_at
             - updated_at
+            - approval_status
           properties:
             id:
               type: string
@@ -706,6 +698,14 @@ components:
             updated_at:
               type: string
               description: Time in RFC3339 format when the study was last updated
+            approval_status:
+              type: string
+              enum:
+                - Incomplete
+                - Pending
+                - Approved
+                - Rejected
+              description: Current approval status of the study
       description: A research study
 
     StudyCreateValidationError:

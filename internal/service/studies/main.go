@@ -185,7 +185,7 @@ func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequ
 		OwnerUserID:                user.ID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
-		ApprovalStatus:             string(openapi.StudyBaseApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 
 	dbStudy.Description = studyData.Description
