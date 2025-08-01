@@ -22,7 +22,6 @@
     line-height: 1.2;
 
     position: absolute;
-    z-index: 1;
 
     opacity: 0;
     transition: opacity 0.3s;

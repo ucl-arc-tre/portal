@@ -1,0 +1,13 @@
+.manage-study {
+  padding: 2rem 0;
+}
+
+.manage-study h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.manage-study p {
+  color: #666;
+  font-size: 1.1rem;
+}
