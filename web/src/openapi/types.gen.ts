@@ -281,6 +281,10 @@ export type StudyBase = {
      * ID of the user who owns the study
      */
     owner_user_id?: string;
+    /**
+     * Current approval status of the study
+     */
+    approval_status: 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 };
 
 /**

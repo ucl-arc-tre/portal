@@ -598,6 +598,7 @@ components:
         - title
         - data_controller_organisation
         - additional_study_admin_usernames
+        - approval_status
       properties:
         title:
           type: string
@@ -673,6 +674,14 @@ components:
         owner_user_id:
           type: string
           description: ID of the user who owns the study
+        approval_status:
+          type: string
+          enum:
+            - Incomplete
+            - Pending
+            - Approved
+            - Rejected
+          description: Current approval status of the study
 
     StudyCreateRequest:
       allOf:
