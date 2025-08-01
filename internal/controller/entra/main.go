@@ -9,6 +9,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
+	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
 
 	"github.com/rs/zerolog/log"
@@ -96,4 +97,33 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
 
 	return isStaff, nil
+}
+
+func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
+	requestBody := graphmodels.NewInvitation()
+	invitedUserEmailAddress := email
+	inviteRedirectUrl := config.EntraInviteRedirectURL()
+	sendInvitationMessage := true
+
+	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
+	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
+	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
+
+	var message string
+	if sponsor.ChosenName != "" {
+		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
+	} else {
+		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
+	}
+	messageInfo := graphmodels.NewInvitedUserMessageInfo()
+
+	messageInfo.SetCustomizedMessageBody(&message)
+	requestBody.SetInvitedUserMessageInfo(messageInfo)
+
+	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
+	if err != nil {
+		return types.NewErrServerError(err)
+	}
+
+	return nil
 }

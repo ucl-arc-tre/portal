@@ -70,6 +70,10 @@ func EntraCredentials() EntraCredentialBundle {
 	}
 }
 
+func EntraInviteRedirectURL() string {
+	return k.String("entra.invite_redirect_url")
+}
+
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
 	for _, username := range k.Strings("admin_usernames") {

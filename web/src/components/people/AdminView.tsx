@@ -7,6 +7,7 @@ import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
 import { TrainingKindOptions, XIcon } from "../shared/exports";
 import Loading from "../ui/Loading";
+import ExternalInvite from "./ExternalInvite";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
@@ -94,6 +95,9 @@ export default function AdminView() {
   }
   return (
     <>
+      <h4>View and manage portal users, including adding via invitation or upload</h4>
+      <ExternalInvite />
+
       {trainingDialogOpen && (
         <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
       )}
