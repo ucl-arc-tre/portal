@@ -727,3 +727,14 @@ components:
         error_message:
           type: string
           description: Validation error message explaining why study creation failed
+
+    UserSponsorship:
+      type: object
+      properties:
+        username:
+          type: string
+        sponsor:
+          type: string
+      required:
+        - username
+        - sponsor

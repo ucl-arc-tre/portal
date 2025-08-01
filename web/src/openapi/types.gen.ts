@@ -313,6 +313,11 @@ export type StudyCreateValidationError = {
     error_message: string;
 };
 
+export type UserSponsorship = {
+    username: string;
+    sponsor: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;

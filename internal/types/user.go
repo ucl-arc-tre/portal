@@ -22,3 +22,9 @@ type Sponsor struct {
 	Username   Username
 	ChosenName ChosenName
 }
+
+type UserSponsorship struct {
+	Model
+	Username Username
+	Sponsor  Username
+}

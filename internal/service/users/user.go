@@ -69,3 +69,14 @@ func (s *Service) GetUserByUsername(username types.Username) (*types.User, error
 	}
 	return &user, types.NewErrServerError(result.Error)
 }
+
+func (s *Service) CreateUserSponsorship(username types.Username, sponsor types.Username) (types.UserSponsorship, error) {
+
+	result := s.db.Create(&types.UserSponsorship{
+		Username: username,
+		Sponsor:  sponsor,
+	})
+
+	return types.UserSponsorship{}, types.NewErrServerError(result.Error)
+
+}
