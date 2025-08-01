@@ -44,6 +44,14 @@ const (
 	AuthRolesBase               AuthRoles = "base"
 )
 
+// Defines values for StudyApprovalStatus.
+const (
+	Approved   StudyApprovalStatus = "Approved"
+	Incomplete StudyApprovalStatus = "Incomplete"
+	Pending    StudyApprovalStatus = "Pending"
+	Rejected   StudyApprovalStatus = "Rejected"
+)
+
 // Defines values for TrainingKind.
 const (
 	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
@@ -185,6 +193,9 @@ type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
+	// ApprovalStatus Current approval status of the study
+	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
+
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
 
@@ -263,6 +274,9 @@ type Study struct {
 	// UpdatedAt Time in RFC3339 format when the study was last updated
 	UpdatedAt string `json:"updated_at"`
 }
+
+// StudyApprovalStatus Current approval status of the study
+type StudyApprovalStatus string
 
 // StudyBase Base study properties
 type StudyBase struct {
