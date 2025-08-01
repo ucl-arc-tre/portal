@@ -19,7 +19,7 @@ export default function ExternalInvite() {
     setDialogVisible(true);
   }
 
-  async function handleSumbit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       setButtonDisabled(true);
