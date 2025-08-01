@@ -18,7 +18,7 @@ func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement type
 		return types.NewErrInvalidObject(err)
 	}
 	for _, record := range records {
-		user, err := s.PersistedUser(record.Username)
+		user, _, err := s.PersistedUser(record.Username)
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement type
 }
 
 // Get or create a user for a unique username
-func (s *Service) PersistedUser(username types.Username) (types.User, error) {
+func (s *Service) PersistedUser(username types.Username) (types.User, bool, error) {
 	user := types.User{}
 	result := s.db.Where("username = ?", username).
 		Attrs(types.User{
@@ -42,7 +42,9 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 			Model:    types.Model{CreatedAt: time.Now()},
 		}).
 		FirstOrCreate(&user)
-	return user, types.NewErrServerError(result.Error)
+	userWasCreated := result.RowsAffected > 0
+
+	return user, userWasCreated, types.NewErrServerError(result.Error)
 }
 
 func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResearcherImportRecord, error) {

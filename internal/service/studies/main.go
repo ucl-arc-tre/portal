@@ -53,7 +53,7 @@ func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData op
 		}
 
 		// All study admin usernames are valid, now find or create users
-		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
+		user, _, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
 			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
 		}

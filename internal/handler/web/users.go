@@ -1,10 +1,8 @@
 package web
 
 import (
-	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -110,25 +108,23 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	// todo: check if invitee already exists in our db
+	// check if the user exists in our db, if yes, send custom email
+	// if no, create the user and attach sponsor + invite via entra
 
-	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
-		setError(ctx, err, "Failed to send invite")
+	_, userWasCreated, err := h.users.PersistedUser(types.Username(invite.Email))
+	if err != nil {
+		setError(ctx, err, "Failed to get or create invitee")
 		return
 	}
-	// todo: create the user with ext format then add sponsors
-	convertEmail(invite.Email)
 
-	ctx.Status(http.StatusNoContent)
-}
-func convertEmail(email string) string {
-	parts := strings.Split(email, "@")
-	if len(parts) != 2 {
-		return ""
+	if !userWasCreated {
+
+		if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
+			setError(ctx, err, "Failed to send invite")
+			return
+		}
+
 	}
 
-	domain := strings.ReplaceAll(parts[1], ".", "_")
-
-	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
-	return newEmail
+	ctx.Status(http.StatusNoContent)
 }
