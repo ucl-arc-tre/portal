@@ -25,7 +25,7 @@
 
 .studies-list {
   display: grid;
-  gap: 1.25rem;
+  gap: 2rem;
   margin-top: 0;
   padding-top: 0.2rem;
 }
@@ -37,20 +37,55 @@
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: relative;
-  overflow: hidden;
 }
 
-.study-card::before {
-  content: "";
+.status-indicator {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #007bff, #0056b3);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
+  top: 1.2rem;
+  right: 1.2rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tooltip-wrapper {
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: inherit;
+}
+
+.status-incomplete {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+
+.status-pending {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #60a5fa;
+}
+
+.status-approved {
+  background-color: #d1fae5;
+  color: #047857;
+  border: 1px solid #34d399;
+}
+
+.status-rejected {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #f87171;
 }
 
 .study-card:hover {
