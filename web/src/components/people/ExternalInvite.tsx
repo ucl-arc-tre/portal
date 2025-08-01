@@ -12,8 +12,7 @@ export default function ExternalInvite() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState("");
 
   function handleShowDialog() {
     setDialogVisible(true);
@@ -24,7 +23,7 @@ export default function ExternalInvite() {
     try {
       setButtonDisabled(true);
       setIsLoading(true);
-      if (typeof email === "string") {
+      if (email) {
         const response = await postUsersInvite({ body: { email } });
         if (response.response.ok) {
           setShowSuccessMessage(true);
@@ -37,8 +36,7 @@ export default function ExternalInvite() {
           } else {
             errMessage = "An unknown error occurred. Please refresh and try again.";
           }
-          setErrorMessage(errMessage);
-          setShowErrorMessage(true);
+          setShowErrorMessage(errMessage);
         }
       }
     } catch (err) {
@@ -53,8 +51,7 @@ export default function ExternalInvite() {
   useEffect(() => {
     if (isDialogVisible === false) {
       setShowSuccessMessage(false);
-      setShowErrorMessage(false);
-      setErrorMessage("");
+      setShowErrorMessage("");
     }
   }, [isDialogVisible]);
 
@@ -70,7 +67,7 @@ export default function ExternalInvite() {
             )}
             {showErrorMessage && (
               <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
+                <AlertMessage>{showErrorMessage}</AlertMessage>
               </Alert>
             )}
             <form onSubmit={handleSubmit} className={styles["invite-form"]}>
