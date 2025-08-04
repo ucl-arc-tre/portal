@@ -80,6 +80,7 @@ export default function ExternalInvite() {
                 required={true}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoFocus
               />
               <Button disabled={buttonDisabled} type="submit" cy="send-invite" className={styles["send-button"]}>
                 {isLoading && (
