@@ -106,6 +106,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	sponsor := types.Sponsor{
 		Username:   user.Username,
 		ChosenName: attributes.ChosenName,
+		UserID:     user.ID,
 	}
 
 	invitedUser, userWasCreated, err := h.users.PersistedUser(types.Username(invite.Email))
@@ -114,7 +115,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if _, err := h.users.CreateUserSponsorship(invitedUser.Username, sponsor.Username); err != nil {
+	if _, err := h.users.CreateUserSponsorship(invitedUser.ID, sponsor.UserID); err != nil {
 		setError(ctx, err, "Failed to connect sponsorship")
 		return
 	}

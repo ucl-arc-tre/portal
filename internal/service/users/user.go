@@ -74,11 +74,11 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	return user, types.NewErrServerError(result.Error)
 }
 
-func (s *Service) CreateUserSponsorship(username types.Username, sponsor types.Username) (types.UserSponsorship, error) {
+func (s *Service) CreateUserSponsorship(userId uuid.UUID, sponsorId uuid.UUID) (types.UserSponsorship, error) {
 
 	result := s.db.Create(&types.UserSponsorship{
-		Username: username,
-		Sponsor:  sponsor,
+		UserID:    userId,
+		SponsorID: sponsorId,
 	})
 
 	return types.UserSponsorship{}, types.NewErrServerError(result.Error)
