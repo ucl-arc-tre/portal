@@ -21,7 +21,5 @@ func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType ope
 		})
 	default:
 		ctx.JSON(http.StatusOK, http.StatusNotFound)
-		return
 	}
-
 }

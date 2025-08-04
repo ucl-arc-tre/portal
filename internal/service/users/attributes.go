@@ -9,6 +9,10 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+var (
+	chosenNamePattern = regexp.MustCompile(`^[A-Za-z\s\-\p{L}\p{M}]*$`)
+)
+
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 	attrs := types.UserAttributes{}
 	result := s.db.Find(&attrs, "user_id = ?", user.ID)
@@ -16,10 +20,7 @@ func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 }
 
 func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
-	const isValidPattern = `^[A-Za-z\s\-\p{L}\p{M}]*$`
-	isValidRegex := regexp.MustCompile(isValidPattern)
-
-	if isValid := isValidRegex.MatchString(string(chosenName)); !isValid {
+	if isValid := chosenNamePattern.MatchString(string(chosenName)); !isValid {
 		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", chosenName))
 	}
 	attrs := types.UserAttributes{UserID: user.ID}
