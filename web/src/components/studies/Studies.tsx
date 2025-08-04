@@ -134,9 +134,14 @@ export default function Studies(props: Props) {
         </Dialog>
       )}
 
-      {studies.length === 0 ? (
+      {!userData.is_staff && studies.length === 0 ? (
         <div className={styles["no-studies-message"]}>
-          <p>You haven&apos;t created any studies yet. Click the button below to create your first study.</p>
+          <h2>You haven&apos;t been added to any studies yet</h2>
+          <p>Any studies you are added to will appear here once they have been created by a member of staff.</p>
+        </div>
+      ) : studies.length === 0 ? (
+        <div className={styles["no-studies-message"]}>
+          <h2>You haven&apos;t created any studies yet</h2>
 
           <Button onClick={handleCreateStudyClick} size="large">
             Create Your First Study

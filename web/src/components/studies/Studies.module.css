@@ -7,6 +7,10 @@
   border: 1px solid #dee2e6;
 }
 
+.no-studies-message h2 {
+  margin-bottom: 2rem;
+}
+
 .no-studies-message p {
   color: #6c757d;
   margin-bottom: 2rem;
