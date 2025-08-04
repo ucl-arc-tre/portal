@@ -30,9 +30,23 @@ The portal is comprised of a React frontend that uses a web api to interact with
 
 ![Architecture](./media/Architecture_3.drawio.svg)
 
-
 ### Physical View
 
+The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. An nginx reverse proxy receives all incoming http(s) requests, serving the web frontend at `/`, routing `/web/api` requests via an oauth2-proxy, and forwarding `/tre/api` requests.
+
+> [!NOTE]
+> The `/tre/api` endpoint is not currently exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal access. External access will be added in future updates to support integration with other consumers and TREs.
+
+| Component           | Resource Type |
+|---------------------|----------------|
+| Web Frontend        | Deployment     |
+| API                 | Deployment     |
+| Nginx Reverse Proxy | Ingress        |
+| OAuth Proxy         | Helm Chart     |
+| Postgres Database   | Helm Chart     |
+
+
+![C2-Portal_Containers](./c4/C2-Portal_Containers.svg)
 
 ## Design Principles
 
