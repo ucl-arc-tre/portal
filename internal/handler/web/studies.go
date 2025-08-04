@@ -14,7 +14,7 @@ import (
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	studies, err := h.studies.StudiesWithOwner(user.ID)
+	studies, err := h.studies.StudiesWithOwner(user)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve studies")
 		return
@@ -91,7 +91,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	}
 
 	// todo - use portal not gorm errors
-	assets, err := h.studies.StudyAssetsWithOwner(studyUUID, user.ID)
+	assets, err := h.studies.StudyAssetsWithOwner(studyUUID, user)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return

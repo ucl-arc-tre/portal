@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -111,7 +110,6 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 		return validationError, nil
 	}
 
-	log.Debug().Str("title", studyData.Title).Msg("Study is valid")
 	return nil, nil
 }
 
@@ -137,21 +135,21 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 }
 
 // StudiesWithOwner retrieves all studies that the user owns or has access to
-func (s *Service) StudiesWithOwner(userID uuid.UUID) ([]types.Study, error) {
+func (s *Service) StudiesWithOwner(owner types.User) ([]types.Study, error) {
 	studies := []types.Study{}
 
 	// For now, only return studies owned by the user
 	// This could be expanded later to include shared studies
-	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", owner.ID).Find(&studies).Error
 	return studies, types.NewErrServerError(err)
 }
 
 // StudyAssetsWithOwner retrieves all assets for a study,
 // ensures that the user owns the study (this might be refactored later to allow shared access)
-func (s *Service) StudyAssetsWithOwner(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
+func (s *Service) StudyAssetsWithOwner(studyID uuid.UUID, owner types.User) ([]types.Asset, error) {
 	// verify the user owns the study
 	var count int64
-	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, userID).Count(&count).Error
+	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, owner.ID).Count(&count).Error
 	if err != nil {
 		return nil, types.NewErrServerError(err)
 	}
@@ -178,36 +176,36 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 		}
 	}()
 
-	sudy := types.Study{
+	study := types.Study{
 		OwnerUserID:                owner.ID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
 		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 
-	sudy.Description = studyData.Description
-	sudy.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
-	sudy.InvolvesCag = studyData.InvolvesCag
-	sudy.CagReference = studyData.CagReference
-	sudy.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
-	sudy.InvolvesHraApproval = studyData.InvolvesHraApproval
-	sudy.IrasId = studyData.IrasId
-	sudy.IsNhsAssociated = studyData.IsNhsAssociated
-	sudy.InvolvesNhsEngland = studyData.InvolvesNhsEngland
-	sudy.NhsEnglandReference = studyData.NhsEnglandReference
-	sudy.InvolvesMnca = studyData.InvolvesMnca
-	sudy.RequiresDspt = studyData.RequiresDspt
-	sudy.RequiresDbs = studyData.RequiresDbs
-	sudy.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
-	sudy.DataProtectionNumber = studyData.DataProtectionNumber
-	sudy.InvolvesThirdParty = studyData.InvolvesThirdParty
-	sudy.InvolvesExternalUsers = studyData.InvolvesExternalUsers
-	sudy.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
-	sudy.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
-	sudy.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
+	study.Description = studyData.Description
+	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
+	study.InvolvesCag = studyData.InvolvesCag
+	study.CagReference = studyData.CagReference
+	study.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
+	study.InvolvesHraApproval = studyData.InvolvesHraApproval
+	study.IrasId = studyData.IrasId
+	study.IsNhsAssociated = studyData.IsNhsAssociated
+	study.InvolvesNhsEngland = studyData.InvolvesNhsEngland
+	study.NhsEnglandReference = studyData.NhsEnglandReference
+	study.InvolvesMnca = studyData.InvolvesMnca
+	study.RequiresDspt = studyData.RequiresDspt
+	study.RequiresDbs = studyData.RequiresDbs
+	study.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
+	study.DataProtectionNumber = studyData.DataProtectionNumber
+	study.InvolvesThirdParty = studyData.InvolvesThirdParty
+	study.InvolvesExternalUsers = studyData.InvolvesExternalUsers
+	study.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
+	study.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
+	study.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
 
 	// Create the study
-	if err := tx.Create(&sudy).Error; err != nil {
+	if err := tx.Create(&study).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -215,7 +213,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	// Create StudyAdmin records for each study admin user
 	for _, studyAdminUser := range studyAdminUsers {
 		studyAdmin := types.StudyAdmin{
-			StudyID: sudy.ID,
+			StudyID: study.ID,
 			UserID:  studyAdminUser.ID,
 		}
 		if err := tx.Create(&studyAdmin).Error; err != nil {
