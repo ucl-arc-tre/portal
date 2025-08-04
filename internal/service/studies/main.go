@@ -144,6 +144,21 @@ func (s *Service) StudiesWithOwner(owner types.User) ([]types.Study, error) {
 	return studies, types.NewErrServerError(err)
 }
 
+// retrieve a single study by its ID and ensures that the user owns the study
+func (s *Service) StudyWithOwner(studyID uuid.UUID, owner types.User) (types.Study, error) {
+	study := types.Study{}
+
+	// For now, only return the study owned by the user
+	// This could be expanded later to include shared studies
+	err := s.db.Preload("StudyAdmins.User").Where("id = ? AND owner_user_id = ?", studyID, owner.ID).First(&study).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return study, types.NewNotFoundError("study not found or access denied")
+	}
+
+	return study, nil
+}
+
 // StudyAssetsWithOwner retrieves all assets for a study,
 // ensures that the user owns the study (this might be refactored later to allow shared access)
 func (s *Service) StudyAssetsWithOwner(studyID uuid.UUID, owner types.User) ([]types.Asset, error) {

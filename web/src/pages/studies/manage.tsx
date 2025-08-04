@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { Study } from "@/openapi";
+import { Study, getStudyByStudyId } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import ManageStudy from "@/components/studies/ManageStudy";
@@ -17,7 +17,7 @@ export default function ManageStudyPage() {
   const { studyId } = router.query;
   const { authInProgress, isAuthed, userData } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
-  const [studyLoading, setStudyLoading] = useState(true);
+  const [studyLoading, setStudyLoading] = useState(false);
   const [studyError, setStudyError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
@@ -25,20 +25,35 @@ export default function ManageStudyPage() {
   const fetchStudy = async (id: string) => {
     setStudyLoading(true);
     setStudyError(null);
+
     try {
-      // TODO: Implement getStudy API call when available
-      console.log(`Fetching study with ID: ${id}`);
-      setStudy(null); // Placeholder
+      const response = await getStudyByStudyId({
+        path: { studyId: id },
+      });
+
+      if (response.response.ok && response.data) {
+        setStudy(response.data);
+      } else {
+        if (response.response.status === 404) {
+          setStudyError("Study not found or you don't have access to it.");
+        } else if (response.response.status === 403) {
+          setStudyError("You don't have permission to access this study.");
+        } else if (response.response.status === 406) {
+          setStudyError("The study ID is not valid. Please check and try again.");
+        } else {
+          setStudyError("Failed to load study. Please try again later.");
+        }
+      }
     } catch (error) {
       console.error("Failed to fetch study:", error);
-      setStudyError("Failed to load study. Please try again.");
+      setStudyError("Failed to load study. Please try again later.");
     } finally {
       setStudyLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!studyId || !isApprovedResearcher) return;
+    if (studyId == undefined || !isApprovedResearcher) return;
     fetchStudy(studyId as string);
   }, [studyId, isApprovedResearcher]);
 
@@ -57,6 +72,28 @@ export default function ManageStudyPage() {
           <div className={styles["profile-completion-action"]}>
             <Button onClick={() => router.push("/profile")} size="large">
               Complete your profile
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!studyId) {
+    return (
+      <>
+        <MetaHead
+          title="Manage Study | ARC Services Portal"
+          description="Manage your study in the ARC Services Portal"
+        />
+
+        <div className={styles["not-found-section"]}>
+          <h2>Study ID not provided</h2>
+          <p>Please go back to your studies list and select a study to manage.</p>
+
+          <div className={styles["navigation-action"]}>
+            <Button onClick={() => router.push("/studies")} variant="secondary">
+              Back to Studies
             </Button>
           </div>
         </div>
@@ -87,8 +124,8 @@ export default function ManageStudyPage() {
           <h2>Error Loading Study</h2>
           <p>{studyError}</p>
           <div className={styles["error-recovery-actions"]}>
-            <Button onClick={() => router.back()} variant="secondary">
-              Go Back
+            <Button onClick={() => router.push("/studies")} variant="secondary">
+              Back to Studies
             </Button>
             <Button onClick={() => fetchStudy(studyId as string)}>Try Again</Button>
           </div>

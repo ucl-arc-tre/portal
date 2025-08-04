@@ -716,6 +716,43 @@ export type PostStudiesResponses = {
     201: unknown;
 };
 
+export type GetStudyByStudyIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/study/{studyId}';
+};
+
+export type GetStudyByStudyIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudyByStudyIdResponses = {
+    200: Study;
+};
+
+export type GetStudyByStudyIdResponse = GetStudyByStudyIdResponses[keyof GetStudyByStudyIdResponses];
+
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
     path: {
