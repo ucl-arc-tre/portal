@@ -64,14 +64,14 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 	}
 	configuration := &graphusers.UserItemRequestBuilderGetRequestConfiguration{
 		QueryParameters: &graphusers.UserItemRequestBuilderGetQueryParameters{
-			Select: []string{"mail", "employeeType"},
+			Select: []string{"mail", "employeeType", "id"},
 		},
 	}
 	data, err := c.client.Users().ByUserId(string(username)).Get(ctx, configuration)
 	if err != nil {
 		return nil, err
 	}
-	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType()}
+	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType(), Id: data.GetId()}
 	_ = c.userDataCache.Add(username, userData)
 
 	return &userData, nil
@@ -127,4 +127,21 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 		return types.NewErrServerError(err)
 	}
 	return nil
+}
+
+func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) error {
+
+	user, err := c.userData(ctx, types.Username(email))
+	if err != nil {
+		return err
+	}
+
+	groupId := config.EntraInvitedUserGroup()
+	requestBody := graphmodels.NewReferenceCreate()
+	odataId := fmt.Sprintf("https://graph.microsoft.com/v1.0/directoryObjects/%s", *user.Id)
+	requestBody.SetOdataId(&odataId)
+
+	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(context.Background(), requestBody, nil)
+	return err
+
 }
