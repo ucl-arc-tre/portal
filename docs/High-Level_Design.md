@@ -46,7 +46,7 @@ The portal is deployed as a set of Kubernetes resources onto the ARC TRE's produ
 | Postgres Database   | Helm Chart     |
 
 
-![C2-Portal_Containers](./c4/C2-Portal_Containers.svg)
+![C2-Portal_Containers](./c4/C2-Portal_Containers.png)
 
 ## Design Principles
 
