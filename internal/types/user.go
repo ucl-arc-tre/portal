@@ -25,6 +25,6 @@ type Sponsor struct {
 
 type UserSponsorship struct {
 	Model
-	UserID    uuid.UUID
-	SponsorID uuid.UUID
+	UserID    uuid.UUID `gorm:"foreignKey:UserID"`
+	SponsorID uuid.UUID `gorm:"foreignKey:UserID"`
 }
