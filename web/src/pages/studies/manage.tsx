@@ -38,8 +38,8 @@ export default function ManageStudyPage() {
   };
 
   useEffect(() => {
-    if (!studyId || typeof studyId !== "string" || !isApprovedResearcher) return;
-    fetchStudy(studyId);
+    if (!studyId || !isApprovedResearcher) return;
+    fetchStudy(studyId as string);
   }, [studyId, isApprovedResearcher]);
 
   if (authInProgress) return null;
