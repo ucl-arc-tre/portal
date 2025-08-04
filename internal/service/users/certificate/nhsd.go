@@ -104,7 +104,7 @@ func getFirstPageText(content []byte) (string, error) {
 	if err != nil {
 		return "", types.NewErrServerError(err)
 	} else if pageCountResult.PageCount == 0 {
-		return "", types.NewErrInvalidObject(fmt.Errorf("PDF had no pages"))
+		return "", types.NewErrInvalidObject("PDF had no pages")
 	}
 	return firstPageTextFromDoc(instance, doc.Document)
 }

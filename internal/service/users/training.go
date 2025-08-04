@@ -1,7 +1,6 @@
 package users
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/users/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
-	"gorm.io/gorm"
 )
 
 func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
@@ -72,8 +70,8 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
 	}
-	result := s.db.Order("completed_at desc").Where(&record).First(&record)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	result := s.db.Order("completed_at desc").Where(&record).Find(&record)
+	if result.RowsAffected == 0 {
 		return false, nil
 	} else if result.Error != nil {
 		return false, types.NewErrServerError(result.Error)
@@ -98,43 +96,29 @@ func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Tim
 }
 
 // returns all training records for a user
-func (s *Service) GetTrainingRecord(user types.User) (openapi.ProfileTraining, error) {
-	var trainingRecords []openapi.TrainingRecord
+func (s *Service) TrainingRecords(user types.User) ([]openapi.TrainingRecord, error) {
+	trainingRecords := []openapi.TrainingRecord{}
 
-	// Get NHSD training record with single DB query
-	record := types.UserTrainingRecord{
-		UserID: user.ID,
-		Kind:   types.TrainingKindNHSD,
-	}
-	result := s.db.Order("completed_at desc").Where(&record).First(&record)
-
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		// No NHSD training record found
-		nhsdRecord := openapi.TrainingRecord{
-			Kind:    openapi.TrainingKindNhsd,
-			IsValid: false,
-		}
-		trainingRecords = append(trainingRecords, nhsdRecord)
-	} else if result.Error != nil {
-		// Database error
-		return openapi.ProfileTraining{}, types.NewErrServerError(result.Error)
-	} else {
-		// Record found - check if it's still valid
-		completedAt := record.CompletedAt.Format(config.TimeFormat)
-
-		nhsdRecord := openapi.TrainingRecord{
-			Kind:        openapi.TrainingKindNhsd,
-			IsValid:     NHSDTrainingIsValid(record.CompletedAt),
-			CompletedAt: &completedAt,
-		}
-		trainingRecords = append(trainingRecords, nhsdRecord)
+	records := []types.UserTrainingRecord{}
+	err := s.db.Order("completed_at desc").Where("user_id = ?", user.ID).Find(&records).Error
+	if err != nil {
+		return trainingRecords, types.NewErrServerError(err)
 	}
 
-	// TODO: Add other training types here in the future
-
-	return openapi.ProfileTraining{
-		TrainingRecords: trainingRecords,
-	}, nil
+	for _, record := range records {
+		switch record.Kind {
+		case types.TrainingKindNHSD:
+			completedAt := record.CompletedAt.Format(config.TimeFormat)
+			trainingRecords = append(trainingRecords, openapi.TrainingRecord{
+				Kind:        openapi.TrainingKindNhsd,
+				CompletedAt: &completedAt,
+				IsValid:     NHSDTrainingIsValid(record.CompletedAt),
+			})
+		default:
+			panic("unsupported training type")
+		}
+	}
+	return trainingRecords, nil
 }
 
 // Get the time at which a users NHSD training expires. Optional
@@ -143,9 +127,9 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
 	}
-	result := s.db.Order("completed_at desc").Where(&record).First(&record)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nil
+	result := s.db.Order("completed_at desc").Where(&record).Find(&record)
+	if result.RowsAffected == 0 {
+		return nil, types.NewNotFoundError("")
 	} else if result.Error != nil {
 		return nil, types.NewErrServerError(result.Error)
 	}

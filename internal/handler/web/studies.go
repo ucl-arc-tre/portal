@@ -14,14 +14,14 @@ import (
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	studies, err := h.studies.GetStudies(user.ID)
+	studies, err := h.studies.StudiesWithOwner(user)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve studies")
 		return
 	}
 
 	// Convert database studies to OpenAPI format
-	var response []openapi.Study
+	response := []openapi.Study{}
 	for _, study := range studies {
 		ownerUserIDStr := study.OwnerUserID.String()
 
@@ -63,7 +63,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 func (h *Handler) PostStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	var studyData openapi.StudyCreateRequest
+	studyData := openapi.StudyCreateRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
@@ -92,7 +92,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	}
 
 	// todo - use portal not gorm errors
-	assets, err := h.studies.GetStudyAssets(studyUUID, user.ID)
+	assets, err := h.studies.StudyAssetsWithOwner(studyUUID, user)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return
