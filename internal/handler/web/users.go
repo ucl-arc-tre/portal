@@ -49,7 +49,7 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 		return
 	}
 
-	person, err := h.users.GetUser(userId)
+	user, err := h.users.UserById(userId)
 	if err != nil {
 		setError(ctx, err, "Failed to get person")
 		return
@@ -57,7 +57,7 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 
 	switch update.TrainingKind {
 	case openapi.TrainingKindNhsd:
-		if err := h.users.CreateNHSDTrainingRecord(person, trainingDate); err != nil {
+		if err := h.users.CreateNHSDTrainingRecord(*user, trainingDate); err != nil {
 			setError(ctx, err, "Failed to update training validity")
 			return
 		}
@@ -80,7 +80,7 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	}
 	agreement, err := h.agreements.LatestApprovedResearcher()
 	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Failed to get approved researcher agreement")
+		setError(ctx, err, "Failed to get approved researcher agreement")
 		return
 	}
 	if err := h.users.ImportApprovedResearchersCSV(content, *agreement); err != nil {

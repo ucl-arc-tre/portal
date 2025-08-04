@@ -70,12 +70,14 @@ func (h *Handler) GetProfileAgreements(ctx *gin.Context) {
 
 func (h *Handler) GetProfileTraining(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	status, err := h.users.GetTrainingRecord(user)
+	trainingRecords, err := h.users.TrainingRecords(user)
 	if err != nil {
 		setError(ctx, err, "Failed to get training status")
 		return
 	}
-	ctx.JSON(http.StatusOK, status)
+	ctx.JSON(http.StatusOK, openapi.ProfileTraining{
+		TrainingRecords: trainingRecords,
+	})
 }
 
 func (h *Handler) PostProfileTraining(ctx *gin.Context) {

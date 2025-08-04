@@ -16,6 +16,10 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	titlePattern = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
+)
+
 type Service struct {
 	db    *gorm.DB
 	entra *entra.Controller
@@ -30,49 +34,39 @@ func New() *Service {
 	}
 }
 
-// validate all study admin usernames and create/find corresponding users
-func (s *Service) validateAndCreateStudyAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) ([]types.User, *openapi.StudyCreateValidationError, error) {
-	if len(studyData.AdditionalStudyAdminUsernames) == 0 {
-		return []types.User{}, nil, nil
-	}
-
-	var validationErrorMessage []string
-	studyAdminUsers := []types.User{}
-
-	// Validate all study admin usernames (they must be staff members)
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
 
-		if err != nil {
-			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
+		if errors.Is(err, types.ErrNotFound) {
+			errorMessage += fmt.Sprintf("• User '%s' not found in directory\n\n", studyAdminUsername)
+		} else if err != nil {
+			return nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
+		} else if !isStaff {
+			errorMessage += fmt.Sprintf("• User '%s' is not a staff member\n\n", studyAdminUsername)
 		}
-
-		if !isStaff {
-			validationErrorMessage = append(validationErrorMessage, fmt.Sprintf("user %s is not a staff member", studyAdminUsername))
-			continue
-		}
-
-		// All study admin usernames are valid, now find or create users
-		user, _, err := s.users.PersistedUser(types.Username(studyAdminUsername))
-		if err != nil {
-			return nil, nil, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
-		}
-		studyAdminUsers = append(studyAdminUsers, user)
 	}
-
-	if len(validationErrorMessage) > 0 {
-		message := ""
-		for _, msg := range validationErrorMessage {
-			message += fmt.Sprintf("• %s\n\n", msg)
-		}
-		return nil, &openapi.StudyCreateValidationError{ErrorMessage: message}, nil
+	if errorMessage == "" {
+		return nil, nil
 	}
-
-	return studyAdminUsers, nil, nil
+	return &openapi.StudyCreateValidationError{ErrorMessage: errorMessage}, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, username types.Username, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
-	titlePattern := regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
+func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]types.User, error) {
+	admins := []types.User{}
+
+	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
+		user, _, err := s.users.PersistedUser(types.Username(studyAdminUsername))
+		if err != nil {
+			return admins, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
+		}
+		admins = append(admins, user)
+	}
+	return admins, nil
+}
+
+func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
 		return &openapi.StudyCreateValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
@@ -102,36 +96,37 @@ func (s *Service) validateStudyData(ctx context.Context, username types.Username
 	}
 
 	// Check if the study submitter (the owner-user-id) is a valid staff member
-	isStaff, err := s.entra.IsStaffMember(ctx, username)
+	isStaff, err := s.entra.IsStaffMember(ctx, owner.Username)
 	if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", username, err))
+		return nil, types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", owner.Username, err))
+	} else if !isStaff {
+		return &openapi.StudyCreateValidationError{ErrorMessage: "owner is not a staff member"}, nil
 	}
-	if !isStaff {
-		return &openapi.StudyCreateValidationError{ErrorMessage: "user is not a staff member"}, nil
+
+	validationError, err := s.validateAdmins(ctx, studyData)
+	if err != nil {
+		return nil, err
+	} else if validationError != nil {
+		return validationError, nil
 	}
 
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
-	studyFormValidationError, err := s.validateStudyData(ctx, user.Username, studyData)
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+	validationError, err := s.validateStudyData(ctx, owner, studyData)
+	if err != nil {
+		return nil, err
+	} else if validationError != nil {
+		return validationError, nil
+	}
+
+	studyAdmins, err := s.createStudyAdmins(studyData)
 	if err != nil {
 		return nil, err
 	}
-	if studyFormValidationError != nil {
-		return studyFormValidationError, nil
-	}
 
-	// Validate and create study admin users if any are provided
-	studyAdminUsers, studyAdminValidationError, err := s.validateAndCreateStudyAdmins(ctx, studyData)
-	if err != nil {
-		return nil, err
-	}
-	if studyAdminValidationError != nil {
-		return studyAdminValidationError, nil
-	}
-
-	err = s.createStudy(user, studyData, studyAdminUsers)
+	err = s.createStudy(owner, studyData, studyAdmins)
 	if err != nil {
 		return nil, err
 	}
@@ -139,27 +134,27 @@ func (s *Service) CreateStudy(ctx context.Context, user types.User, studyData op
 	return nil, nil
 }
 
-// GetStudies retrieves all studies that the user owns or has access to
-func (s *Service) GetStudies(userID uuid.UUID) ([]types.Study, error) {
-	var studies []types.Study
+// StudiesWithOwner retrieves all studies that the user owns or has access to
+func (s *Service) StudiesWithOwner(owner types.User) ([]types.Study, error) {
+	studies := []types.Study{}
 
 	// For now, only return studies owned by the user
 	// This could be expanded later to include shared studies
-	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", userID).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", owner.ID).Find(&studies).Error
 	return studies, types.NewErrServerError(err)
 }
 
-// GetStudyAssets retrieves all assets for a study,
+// StudyAssetsWithOwner retrieves all assets for a study,
 // ensures that the user owns the study (this might be refactored later to allow shared access)
-func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.Asset, error) {
+func (s *Service) StudyAssetsWithOwner(studyID uuid.UUID, owner types.User) ([]types.Asset, error) {
 	// verify the user owns the study
 	var count int64
-	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, userID).Count(&count).Error
+	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, owner.ID).Count(&count).Error
 	if err != nil {
 		return nil, types.NewErrServerError(err)
 	}
 	if count == 0 {
-		return nil, types.NewNotFoundError(errors.New("study not found or access denied"))
+		return nil, types.NewNotFoundError("study not found or access denied")
 	}
 
 	// Get all assets for this study with their locations
@@ -172,7 +167,7 @@ func (s *Service) GetStudyAssets(studyID uuid.UUID, userID uuid.UUID) ([]types.A
 }
 
 // handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) error {
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) error {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
@@ -181,36 +176,36 @@ func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequ
 		}
 	}()
 
-	dbStudy := types.Study{
-		OwnerUserID:                user.ID,
+	study := types.Study{
+		OwnerUserID:                owner.ID,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
 		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 
-	dbStudy.Description = studyData.Description
-	dbStudy.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
-	dbStudy.InvolvesCag = studyData.InvolvesCag
-	dbStudy.CagReference = studyData.CagReference
-	dbStudy.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
-	dbStudy.InvolvesHraApproval = studyData.InvolvesHraApproval
-	dbStudy.IrasId = studyData.IrasId
-	dbStudy.IsNhsAssociated = studyData.IsNhsAssociated
-	dbStudy.InvolvesNhsEngland = studyData.InvolvesNhsEngland
-	dbStudy.NhsEnglandReference = studyData.NhsEnglandReference
-	dbStudy.InvolvesMnca = studyData.InvolvesMnca
-	dbStudy.RequiresDspt = studyData.RequiresDspt
-	dbStudy.RequiresDbs = studyData.RequiresDbs
-	dbStudy.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
-	dbStudy.DataProtectionNumber = studyData.DataProtectionNumber
-	dbStudy.InvolvesThirdParty = studyData.InvolvesThirdParty
-	dbStudy.InvolvesExternalUsers = studyData.InvolvesExternalUsers
-	dbStudy.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
-	dbStudy.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
-	dbStudy.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
+	study.Description = studyData.Description
+	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
+	study.InvolvesCag = studyData.InvolvesCag
+	study.CagReference = studyData.CagReference
+	study.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
+	study.InvolvesHraApproval = studyData.InvolvesHraApproval
+	study.IrasId = studyData.IrasId
+	study.IsNhsAssociated = studyData.IsNhsAssociated
+	study.InvolvesNhsEngland = studyData.InvolvesNhsEngland
+	study.NhsEnglandReference = studyData.NhsEnglandReference
+	study.InvolvesMnca = studyData.InvolvesMnca
+	study.RequiresDspt = studyData.RequiresDspt
+	study.RequiresDbs = studyData.RequiresDbs
+	study.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
+	study.DataProtectionNumber = studyData.DataProtectionNumber
+	study.InvolvesThirdParty = studyData.InvolvesThirdParty
+	study.InvolvesExternalUsers = studyData.InvolvesExternalUsers
+	study.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
+	study.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
+	study.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
 
 	// Create the study
-	if err := tx.Create(&dbStudy).Error; err != nil {
+	if err := tx.Create(&study).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -218,7 +213,7 @@ func (s *Service) createStudy(user types.User, studyData openapi.StudyCreateRequ
 	// Create StudyAdmin records for each study admin user
 	for _, studyAdminUser := range studyAdminUsers {
 		studyAdmin := types.StudyAdmin{
-			StudyID: dbStudy.ID,
+			StudyID: study.ID,
 			UserID:  studyAdminUser.ID,
 		}
 		if err := tx.Create(&studyAdmin).Error; err != nil {
