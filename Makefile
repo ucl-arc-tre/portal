@@ -27,7 +27,10 @@ dev-up: ## Docker compose up on the dev environment
 	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) up
 
 dev-destroy: ## Destroy the dev environment
-	cd deploy/dev &&  docker compose -p $(DEV_PROJECT_NAME) down
+	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) down
+
+dev-destroy-all: ## Destroy the dev environment along with volumes and images
+	cd deploy/dev && docker compose -p $(DEV_PROJECT_NAME) down --volumes --rmi all --remove-orphans
 
 dev-psql: ## Get an interactive psql shell in dev
 	docker exec -it ucl-arc-tre-portal-dev-postgres-1 psql --dbname=dev --user=postgres

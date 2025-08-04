@@ -1,6 +1,7 @@
 package tre
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,13 +23,13 @@ func New() *Handler {
 }
 
 func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusParams) {
-	user, err := h.users.GetUserByUsername(types.Username(params.Username))
-	if err != nil {
+	user, err := h.users.UserByUsername(types.Username(params.Username))
+	if errors.Is(err, types.ErrNotFound) {
+		ctx.Status(http.StatusNotFound)
+		return
+	} else if err != nil {
 		log.Err(err).Any("params", params).Msg("Failed to get user")
 		ctx.Status(http.StatusInternalServerError)
-		return
-	} else if user == nil {
-		ctx.Status(http.StatusNotFound)
 		return
 	}
 	userStatus := openapi.UserStatus{}
@@ -39,11 +40,13 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 	} else {
 		userStatus.IsApprovedResearcher = isApprovedResearcher
 	}
-	if expiresAt, err := h.users.NHSDTrainingExpiresAt(*user); err != nil {
+	if expiresAt, err := h.users.NHSDTrainingExpiresAt(*user); errors.Is(err, types.ErrNotFound) {
+		log.Trace().Msg("User missing NHSD training date")
+	} else if err != nil {
 		log.Err(err).Any("username", user.Username).Msg("Failed to get training expiry for user")
 		ctx.Status(http.StatusInternalServerError)
 		return
-	} else if expiresAt != nil {
+	} else {
 		userStatus.NhsdTrainingExpiresAt = ptr(expiresAt.Format(config.TimeFormat))
 	}
 	ctx.JSON(http.StatusOK, userStatus)

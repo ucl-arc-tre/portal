@@ -80,18 +80,20 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 // checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type. Returns a cached response
 func (c *Controller) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
 	if username == "" {
-		return false, fmt.Errorf("username cannot be empty")
+		return false, types.NewErrInvalidObject("username cannot be empty")
 	}
 
 	userData, err := c.userData(ctx, types.Username(username))
-	if err != nil {
-		return false, types.NewNotFoundError(fmt.Errorf("username [%v] not found in directory", username))
+	if err != nil && strings.Contains(err.Error(), "does not exist") {
+		return false, types.NewNotFoundError("user not found in entra directory")
+	} else if err != nil {
+		return false, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
 	}
 
 	log.Debug().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
 
 	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-		return false, fmt.Errorf("username [%v] does not have an employee type set", username)
+		return false, types.NewNotFoundError("employee type unset")
 	}
 
 	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
@@ -109,7 +111,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
 
-	var message string
+	message := ""
 	if sponsor.ChosenName != "" {
 		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
 	} else {
@@ -124,6 +126,5 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	if err != nil {
 		return types.NewErrServerError(err)
 	}
-
 	return nil
 }
