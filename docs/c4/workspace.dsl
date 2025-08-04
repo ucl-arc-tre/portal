@@ -59,9 +59,9 @@ workspace "ARC Services Portal" "Models the architecture of a research services 
                 api.userService -> postgres "Reads/writes data"
                 api.otherService -> postgres "Read/writes data"
                 nginx -> api.trehttpHandlers "Proxies /tre/api requests"
-                webFrontend.apiClient -> nginx "Sends frontend requests via reverse proxy"
-                nginx -> oauth2Proxy "Proxies /web/api requests for authentication"
-                oauth2Proxy -> api.webhttpHandlers "Proxies authenticated /web/api requests to backend"
+                nginx -> webFrontend.pages "Serves"
+                webFrontend.apiClient -> oauth2Proxy "Forwards /web/api requests for authentication"
+                oauth2Proxy -> api.webhttpHandlers "Forwards authenticated /web/api requests to backend"
 
             }
 
