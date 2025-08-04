@@ -33,18 +33,6 @@ func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement type
 	return nil
 }
 
-// Get or create a user for a unique username
-func (s *Service) PersistedUser(username types.Username) (types.User, error) {
-	user := types.User{}
-	result := s.db.Where("username = ?", username).
-		Attrs(types.User{
-			Username: username,
-			Model:    types.Model{CreatedAt: time.Now()},
-		}).
-		FirstOrCreate(&user)
-	return user, types.NewErrServerError(result.Error)
-}
-
 func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResearcherImportRecord, error) {
 	reader := csv.NewReader(bytes.NewReader(csvContent))
 	records := []ApprovedResearcherImportRecord{}
