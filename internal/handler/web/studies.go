@@ -11,73 +11,9 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) GetStudies(ctx *gin.Context) {
-	user := middleware.GetUser(ctx)
-
-	studies, err := h.studies.StudiesWithOwner(user)
-	if err != nil {
-		setError(ctx, err, "Failed to retrieve studies")
-		return
-	}
-
-	// Convert database studies to OpenAPI format
-	response := []openapi.Study{}
-	for _, study := range studies {
-		ownerUserIDStr := study.OwnerUserID.String()
-
-		response = append(response, openapi.Study{
-			Id:                               study.ID.String(),
-			Title:                            study.Title,
-			Description:                      study.Description,
-			OwnerUserId:                      &ownerUserIDStr,
-			ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
-			AdditionalStudyAdminUsernames:    study.AdminUsernames(),
-			DataControllerOrganisation:       study.DataControllerOrganisation,
-			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
-			InvolvesCag:                      study.InvolvesCag,
-			CagReference:                     study.CagReference,
-			InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
-			InvolvesHraApproval:              study.InvolvesHraApproval,
-			IrasId:                           study.IrasId,
-			IsNhsAssociated:                  study.IsNhsAssociated,
-			InvolvesNhsEngland:               study.InvolvesNhsEngland,
-			NhsEnglandReference:              study.NhsEnglandReference,
-			InvolvesMnca:                     study.InvolvesMnca,
-			RequiresDspt:                     study.RequiresDspt,
-			RequiresDbs:                      study.RequiresDbs,
-			IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
-			DataProtectionNumber:             study.DataProtectionNumber,
-			InvolvesThirdParty:               study.InvolvesThirdParty,
-			InvolvesExternalUsers:            study.InvolvesExternalUsers,
-			InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
-			InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
-			InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
-			CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
-			UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
-		})
-	}
-
-	ctx.JSON(http.StatusOK, response)
-}
-
-func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
-	studyUUID, err := uuid.Parse(studyId)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
-		return
-	}
-
-	study, err := h.studies.StudyWithOwner(studyUUID, user)
-	if err != nil {
-		setError(ctx, err, "Failed to retrieve study")
-		return
-	}
-
+func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
-
-	response := openapi.Study{
+	return openapi.Study{
 		Id:                               study.ID.String(),
 		Title:                            study.Title,
 		Description:                      study.Description,
@@ -108,7 +44,43 @@ func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 	}
 
+}
+
+func (h *Handler) GetStudies(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+
+	studies, err := h.studies.StudiesWithOwner(user)
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve studies")
+		return
+	}
+
+	response := []openapi.Study{}
+	for _, study := range studies {
+		response = append(response, studyToOpenApiStudy(study))
+	}
+
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
+	user := middleware.GetUser(ctx)
+
+	studyUUID, err := uuid.Parse(studyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		return
+	}
+
+	study, err := h.studies.StudyWithOwner(studyUUID, user)
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve study")
+		return
+	}
+
+	studyResponse := studyToOpenApiStudy(study)
+
+	ctx.JSON(http.StatusOK, studyResponse)
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
