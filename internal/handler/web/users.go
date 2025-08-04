@@ -108,15 +108,12 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	// check if the user exists in our db, if yes, send custom email
-	// if no, create the user and attach sponsor + invite via entra
-
 	invitedUser, userWasCreated, err := h.users.PersistedUser(types.Username(invite.Email))
 	if err != nil {
 		setError(ctx, err, "Failed to get or create invitee")
 		return
 	}
-	// connect sponsorship
+
 	if _, err := h.users.CreateUserSponsorship(invitedUser.Username, sponsor.Username); err != nil {
 		setError(ctx, err, "Failed to connect sponsorship")
 		return
