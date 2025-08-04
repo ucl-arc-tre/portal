@@ -141,7 +141,7 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 	odataId := fmt.Sprintf("https://graph.microsoft.com/v1.0/directoryObjects/%s", *user.Id)
 	requestBody.SetOdataId(&odataId)
 
-	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(context.Background(), requestBody, nil)
+	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
 	return err
 
 }
