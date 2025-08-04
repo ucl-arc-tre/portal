@@ -23,11 +23,6 @@ export default function Studies(props: Props) {
   // this should match the domain that is used for the entra ID users in the portal
   const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
-  const handleStudySelect = (study: Study) => {
-    // TODO: Navigate to study detail page or show study-specific content
-    console.log("Selected study:", study);
-  };
-
   const handleCreateStudyClick = () => {
     if (!userData.is_staff) {
       setShowUclStaffModal(true);
@@ -155,7 +150,7 @@ export default function Studies(props: Props) {
             </Button>
           </div>
 
-          <StudySelection studies={studies} handleStudySelect={handleStudySelect} />
+          <StudySelection studies={studies} />
         </>
       )}
     </>

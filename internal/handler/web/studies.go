@@ -30,6 +30,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 			Title:                            study.Title,
 			Description:                      study.Description,
 			OwnerUserId:                      &ownerUserIDStr,
+			ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
 			AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 			DataControllerOrganisation:       study.DataControllerOrganisation,
 			InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
