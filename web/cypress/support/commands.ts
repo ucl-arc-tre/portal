@@ -87,6 +87,24 @@ declare global {
        */
       mockInviteExternalResearcher(email: string): Chainable<any>;
 
+      /**
+       * Mock studies list to be empty
+       * @example cy.mockStudiesEmpty()
+       */
+      mockStudiesEmpty(): Chainable<any>;
+
+      /**
+       * Mock studies list with a new study
+       * @example cy.mockStudiesWithNewStudy()
+       */
+      mockStudiesWithNewStudy(): Chainable<any>;
+
+      /**
+       * Mock successful study creation
+       * @example cy.mockStudyCreation()
+       */
+      mockStudyCreation(): Chainable<any>;
+
       // Wait commands for fixtures
       /**
        * Wait for the mocked auth request to complete
@@ -117,6 +135,18 @@ declare global {
        * @example cy.waitForProfileData()
        */
       waitForProfileData(): Chainable<any>;
+
+      /**
+       * Wait for the mocked studies request to complete
+       * @example cy.waitForStudies()
+       */
+      waitForStudies(): Chainable<any>;
+
+      /**
+       * Wait for the mocked study creation request to complete
+       * @example cy.waitForStudyCreation()
+       */
+      waitForStudyCreation(): Chainable<any>;
 
       /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
@@ -294,4 +324,32 @@ Cypress.Commands.add("waitForProfileData", () => {
   cy.wait("@getChosenName");
   cy.wait("@getAgreements");
   cy.wait("@getTraining");
+});
+
+// Studies fixture commands
+Cypress.Commands.add("mockStudiesEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies", {
+    fixture: "studies-empty.json",
+  }).as("getStudiesEmpty");
+});
+
+Cypress.Commands.add("mockStudiesWithNewStudy", () => {
+  cy.intercept("GET", "/web/api/v0/studies", {
+    fixture: "studies-with-new-study.json",
+  }).as("getStudiesWithNew");
+});
+
+Cypress.Commands.add("mockStudyCreation", () => {
+  cy.intercept("POST", "/web/api/v0/studies", {
+    statusCode: 201,
+  }).as("createStudy");
+});
+
+// Wait commands for studies
+Cypress.Commands.add("waitForStudies", () => {
+  cy.wait(["@getStudiesEmpty", "@getStudiesWithNew"]);
+});
+
+Cypress.Commands.add("waitForStudyCreation", () => {
+  cy.wait("@createStudy");
 });

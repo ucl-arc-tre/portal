@@ -127,3 +127,46 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("input[name='requiresDspt']").should("be.visible");
   });
 });
+
+describe("Study creation end-to-end", () => {
+  beforeEach(() => {
+    cy.loginAsBase();
+  });
+
+  it("should successfully create a study and see it in the list", () => {
+    cy.mockAuthAsBaseApprovedResearcher();
+
+    // Mock initial empty studies list
+    cy.mockStudiesEmpty();
+
+    // Visit page and wait for initial load
+    cy.visit("/studies");
+    cy.waitForAuth();
+    cy.wait("@getStudiesEmpty");
+
+    cy.contains("Create Your First Study").should("be.visible").click();
+
+    // Fill in required fields
+    cy.get("input[name='title']").type("My New Test Study");
+    cy.get("input[name='dataControllerOrganisation']").type("UCL");
+
+    // Navigate through form steps
+    cy.get("[data-cy='next']").click();
+    cy.get("[data-cy='next']").click();
+
+    cy.mockStudyCreation();
+    cy.mockStudiesWithNewStudy();
+
+    cy.get("button[type='submit']").click();
+
+    cy.waitForStudyCreation();
+    cy.wait("@getStudiesWithNew");
+
+    // Verify the form closes
+    cy.get("[data-cy='create-study-form']").should("not.exist");
+
+    // Verify the new study appears in the studies list
+    cy.contains("My New Test Study").should("be.visible");
+    cy.contains("Manage Study").should("be.visible");
+  });
+});
