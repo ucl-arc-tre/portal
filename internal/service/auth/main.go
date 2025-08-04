@@ -21,15 +21,15 @@ func New() *Service {
 }
 
 func (s *Service) AuthInfo(ctx context.Context, user types.User) (*types.AuthInfo, error) {
-	roles, err := rbac.GetRoles(user)
+	roles, err := rbac.Roles(user)
 	if err != nil {
-		log.Error().Err(err).Str("user", string(user.Username)).Msg("Failed to get user roles")
+		log.Error().Err(err).Any("user", user.Username).Msg("Failed to get user roles")
 		return nil, types.NewErrServerError(err)
 	}
 
 	isStaff, err := s.entra.IsStaffMember(ctx, user.Username)
 	if err != nil {
-		log.Warn().Err(err).Str("user", string(user.Username)).Msg("Failed to validate employee status")
+		log.Warn().Err(err).Any("user", user.Username).Msg("Failed to validate employee status")
 		isStaff = false // Default to false if there's an error
 	}
 
@@ -39,7 +39,7 @@ func (s *Service) AuthInfo(ctx context.Context, user types.User) (*types.AuthInf
 	}
 
 	log.Debug().
-		Str("user", string(user.Username)).
+		Any("user", user.Username).
 		Strs("roles", authInfo.Roles).
 		Bool("isStaff", authInfo.IsStaff).
 		Msg("Retrieved auth info for user")
