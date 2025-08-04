@@ -42,7 +42,7 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 }
 
 // Get all roles of a user
-func GetRoles(user types.User) ([]string, error) {
+func Roles(user types.User) ([]string, error) {
 	roles, err := enforcer.GetRolesForUser(user.ID.String())
 	return roles, types.NewErrServerError(err)
 }
