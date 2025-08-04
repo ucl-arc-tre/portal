@@ -92,7 +92,7 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func convertEmail(email string) string {
+func EntraUsernameForExternalEmail(email string) string {
 	parts := strings.Split(email, "@")
 	if len(parts) != 2 {
 		return ""
@@ -143,7 +143,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	} //else todo: send email...
 
 	// update entra group with the ext format email, needs to be after invite sent
-	extFormatEmail := convertEmail(invite.Email)
+	extFormatEmail := EntraUsernameForExternalEmail(invite.Email)
 	if err := h.users.AddtoInvitedUserGroup(ctx, extFormatEmail); err != nil {
 		setError(ctx, err, "Failed to update entra group")
 		return
