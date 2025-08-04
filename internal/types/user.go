@@ -21,7 +21,6 @@ type UserAttributes struct {
 type Sponsor struct {
 	Username   Username
 	ChosenName ChosenName
-	UserID     uuid.UUID
 }
 
 type UserSponsorship struct {
