@@ -38,8 +38,8 @@ export default function ManageStudyPage() {
   };
 
   useEffect(() => {
-    if (!studyId || !isApprovedResearcher) return;
-    fetchStudy(studyId as string);
+    if (!studyId || typeof studyId !== "string" || !isApprovedResearcher) return;
+    fetchStudy(studyId);
   }, [studyId, isApprovedResearcher]);
 
   if (authInProgress) return null;
@@ -52,7 +52,6 @@ export default function ManageStudyPage() {
           title="Manage Study | ARC Services Portal"
           description="Manage your study in the ARC Services Portal"
         />
-
         <div className={styles["not-approved-section"]}>
           <h2>To manage studies, please first set up your profile by completing the approved researcher process.</h2>
           <div className={styles["profile-completion-action"]}>
@@ -84,13 +83,12 @@ export default function ManageStudyPage() {
           title="Manage Study | ARC Services Portal"
           description="Manage your study in the ARC Services Portal"
         />
-
         <div className={styles["error-section"]}>
           <h2>Error Loading Study</h2>
           <p>{studyError}</p>
           <div className={styles["error-recovery-actions"]}>
             <Button onClick={() => router.back()} variant="secondary">
-              Back to Studies
+              Go Back
             </Button>
             <Button onClick={() => fetchStudy(studyId as string)}>Try Again</Button>
           </div>
@@ -127,7 +125,7 @@ export default function ManageStudyPage() {
       />
       <Title text={`Manage Study: ${study.title}`} />
 
-      <div>
+      <div className={styles["breadcrumb"]}>
         <Button onClick={() => router.push("/studies")} variant="tertiary" size="small">
           ← Back to Studies
         </Button>

@@ -50,7 +50,7 @@ export default function StudySelection(props: StudySelectionProps) {
             </div>
 
             <div className={styles["study-actions"]}>
-              <Button onClick={() => router.push(`/studies/${study.id}/manage`)} size="small">
+              <Button onClick={() => router.push(`/studies/manage?studyId=${study.id}`)} size="small">
                 Manage Study
               </Button>
             </div>

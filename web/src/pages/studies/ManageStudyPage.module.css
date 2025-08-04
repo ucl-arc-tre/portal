@@ -76,6 +76,10 @@
   text-align: center;
 }
 
+.breadcrumb {
+  margin-bottom: 1.5rem;
+}
+
 @media (max-width: 768px) {
   .not-approved-section,
   .error-section,
@@ -84,7 +88,7 @@
     margin: 1rem 0;
   }
 
-  .error-section button {
+  .error-recovery-actions button {
     display: block;
     margin: 0.5rem auto;
     width: 100%;
@@ -93,7 +97,7 @@
 }
 
 @media (max-width: 480px) {
-  .error-section button {
+  .error-recovery-actions button {
     margin: 0.75rem auto;
   }
 }
