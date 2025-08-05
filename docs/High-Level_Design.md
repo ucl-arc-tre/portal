@@ -5,7 +5,7 @@ The ARC services portal will support users creating and managing resources on AR
 
 ## The IG/TRE use case
 
-In order to run the Research Data ISMS, ARC needs to ensure processes such as study creation and user onboarding are managed and collect quality data. The ISMS is documented [here](https://isms.arc.ucl.ac.uk/).
+In order to run the [Research Data ISMS](https://isms.arc.ucl.ac.uk/), ARC needs to ensure processes such as study creation and user onboarding are managed and collect quality data.
 
 The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will use the pathfinder project for ARC's metadata store based on
 [this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
