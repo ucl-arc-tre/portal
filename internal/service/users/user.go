@@ -104,7 +104,10 @@ func (s *Service) CreateUserSponsorship(userId uuid.UUID, sponsorId uuid.UUID) (
 		SponsorID: sponsorId,
 	}
 
-	result := s.db.FirstOrCreate(&userSponsorship)
+	result := s.db.Where(&userSponsorship).Assign(types.UserSponsorship{
+		Model: types.Model{CreatedAt: time.Now()},
+	}).FirstOrCreate(&userSponsorship)
+
 	if result.Error != nil {
 		return types.UserSponsorship{}, types.NewErrServerError(result.Error)
 	}
