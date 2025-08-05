@@ -99,12 +99,16 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 }
 
 func (s *Service) CreateUserSponsorship(userId uuid.UUID, sponsorId uuid.UUID) (types.UserSponsorship, error) {
-
-	result := s.db.Create(&types.UserSponsorship{
+	userSponsorship := types.UserSponsorship{
 		UserID:    userId,
 		SponsorID: sponsorId,
-	})
+	}
 
-	return types.UserSponsorship{}, types.NewErrServerError(result.Error)
+	result := s.db.FirstOrCreate(&userSponsorship)
+	if result.Error != nil {
+		return types.UserSponsorship{}, types.NewErrServerError(result.Error)
+	}
+
+	return userSponsorship, nil
 
 }
