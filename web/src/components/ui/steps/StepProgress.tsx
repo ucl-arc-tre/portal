@@ -1,5 +1,4 @@
-import Box from "./Box";
-import Button from "./Button";
+import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
 
@@ -20,7 +19,7 @@ export default function StepProgress(props: StepProgressProps) {
   } = props;
 
   return (
-    <Box>
+    <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
         {isComplete ? (
           <>
@@ -96,6 +95,6 @@ export default function StepProgress(props: StepProgressProps) {
           ))}
         </ol>
       </div>
-    </Box>
+    </div>
   );
 }
