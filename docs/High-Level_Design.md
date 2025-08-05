@@ -139,7 +139,7 @@ See also [Metadata Store conceptual model](https://github.com/UCL-ARC/metadata-s
 
 ## Roles
 
-The portal superimposes additional roles to the roles defined in the [Research Data ISMS](https://isms.arc.ucl.ac.uk/rism02-roles_and_responsibilities/). The following roles and their corresponding permissions may be assigned to qualifying authenitcated users of the portal:
+The portal superimposes additional roles to the roles defined in the [Research Data ISMS](https://isms.arc.ucl.ac.uk/rism02-roles_and_responsibilities/). The following roles and their corresponding permissions may be assigned to qualifying authenticated users of the portal:
 
 | Role               | Description                                                                 | Permissions                                                                 | Prerequisites                                      |
 |--------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------------------------------------------------|
