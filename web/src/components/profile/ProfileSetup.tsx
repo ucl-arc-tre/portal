@@ -1,11 +1,11 @@
 import ProfileChosenName from "./approved-researcher-components/ChosenName";
 import ApprovedResearcherAgreement from "./approved-researcher-components/ApprovedResearcherAgreement";
 import TrainingCertificate from "./approved-researcher-components/TrainingCertificate";
+import StepArrow from "../ui/steps/StepArrow";
+import StepProgress from "../ui/steps/StepProgress";
 import { Auth } from "@/openapi";
 
 import styles from "./ProfileSetup.module.css";
-import StepProgress from "../ui/steps/StepProgress";
-import StepArrow from "../ui/steps/StepArrow";
 
 type Props = {
   chosenName: string | undefined;
