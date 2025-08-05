@@ -81,7 +81,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 		extFormatEmail, err := entraUsernameForExternalEmail(string(username))
 		if err != nil {
 
-			return nil, types.NewErrServerError(err)
+			return nil, err
 		}
 		username = types.Username(extFormatEmail)
 	}
