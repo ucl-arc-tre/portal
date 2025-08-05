@@ -57,7 +57,7 @@ func New() *Controller {
 	return controller
 }
 
-func EntraUsernameForExternalEmail(email string) (string, error) {
+func entraUsernameForExternalEmail(email string) (string, error) {
 	if config.EntraTenantPrimaryDomain() == "" {
 		return "", types.NewErrServerError("Entra tenant primary domain is not set")
 	}
@@ -78,7 +78,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 
 	if !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain()) {
 
-		extFormatEmail, err := EntraUsernameForExternalEmail(string(username))
+		extFormatEmail, err := entraUsernameForExternalEmail(string(username))
 		if err != nil {
 
 			return nil, types.NewErrServerError(err)
