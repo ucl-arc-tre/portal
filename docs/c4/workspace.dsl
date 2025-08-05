@@ -14,12 +14,13 @@ workspace "ARC Services Portal" "Models the architecture of a research services 
         entra = softwareSystem "Microsoft Entra" "Identity provider (SSO)" "Existing System"
         tre = softwareSystem "TRE" "Secure processing environment for sensitive research data" "Existing System"
         ghcr = softwareSystem "GitHub Container Registry" "Stores container images" "Existing System"
+        uclSystem = softwareSystem "..." "Other UCL consumer of portal data" "Existing System"
 
         portal = softwareSystem "ARC Services Portal" "Enables management of Studies, Projects, user training and information governance" {
 
             group "K8S cluster" {
 
-                api = container "API" "API backend with /web/api and /tre/api endpoints" "Go" {
+                api = container "API" "API backend with /web/api and /tre/api (and other) endpoints" "Go" {
 
                     group "Shared Services" {
                         projectService = component "Project Service" "Handles project workflows" "Go"
@@ -40,6 +41,11 @@ workspace "ARC Services Portal" "Models the architecture of a research services 
                         trehttpHandlers -> projectService "Calls"
                         trehttpHandlers -> otherService "Calls"
                     }
+
+                    group "Other API" {
+                        otherhttpHandlers = component "HTTP Handlers for other UCL systems" "Handles REST endpoints" "Go"
+                        otherhttpHandlers -> otherService "Calls"
+                    }
                 }
 
                 webFrontend = container "Web Frontend" "User-facing web app" "React, TypeScript" {
@@ -59,6 +65,7 @@ workspace "ARC Services Portal" "Models the architecture of a research services 
                 api.userService -> postgres "Reads/writes data"
                 api.otherService -> postgres "Read/writes data"
                 nginx -> api.trehttpHandlers "Proxies /tre/api requests"
+                nginx -> api.otherhttpHandlers "Proxies other api requests"
                 nginx -> webFrontend.pages "Serves"
                 webFrontend.apiClient -> oauth2Proxy "Forwards /web/api requests for authentication"
                 oauth2Proxy -> api.webhttpHandlers "Forwards authenticated /web/api requests to backend"
@@ -78,14 +85,15 @@ workspace "ARC Services Portal" "Models the architecture of a research services 
                 }
             }
 
-            portal.deploy.gha_portal -> ghcr "Pushes container images"
             portal.deploy.tf -> ghcr "Pulls images for deployment"
+            portal.deploy.gha_portal -> ghcr "Pushes container images"
         }
 
         user -> portal.webFrontend.pages "Accesses via browser"
         admin -> portal.webFrontend.pages "Administers via browser"
         portal.oauth2Proxy -> entra "Authenticates requests against" "SSO"
-        tre -> portal.nginx "Accesses /tre/api for data lookup"" "REST/JSON"
+        tre -> portal.nginx "Accesses /tre/api for data retrieval" "REST/JSON"
+        uclSystem -> portal.nginx "Accesses api for data retrieval" "REST/JSON"
     }
 
     views {
