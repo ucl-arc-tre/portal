@@ -10,5 +10,8 @@ import (
 func TestEntraUsernameForExternalEmail(t *testing.T) {
 	email := "hello@example.com"
 	expectedEmail := "hello_example.com#EXT#@" + config.EntraTenantPrimaryDomain()
-	assert.Equal(t, expectedEmail, EntraUsernameForExternalEmail(email))
+
+	extFormatEmail, err := EntraUsernameForExternalEmail(email)
+	assert.NoError(t, err, "EntraUsernameForExternalEmail returned an error")
+	assert.Equal(t, expectedEmail, extFormatEmail)
 }
