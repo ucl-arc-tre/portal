@@ -2,6 +2,7 @@ package users
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -52,6 +53,29 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 		usersData = append(usersData, userData)
 	}
 	return usersData, nil
+}
+
+// Get or create a user for a unique username. Returns the user, whether
+// they were created or not and an error
+// If they do not exist then they will be created with the base role
+func (s *Service) PersistedUser(username types.Username) (types.User, bool, error) {
+	user := types.User{}
+	result := s.db.Where("username = ?", username).
+		Attrs(types.User{
+			Username: username,
+			Model:    types.Model{CreatedAt: time.Now()},
+		}).
+		FirstOrCreate(&user)
+	if result.Error != nil {
+		return user, false, types.NewErrServerError(result.Error)
+	}
+	userWasCreated := result.RowsAffected > 0
+	if userWasCreated {
+		if _, err := rbac.AddRole(user, rbac.Base); err != nil {
+			return user, userWasCreated, fmt.Errorf("failed assign user base role: %v", err)
+		}
+	}
+	return user, userWasCreated, nil
 }
 
 func (s *Service) UserById(id string) (*types.User, error) {
