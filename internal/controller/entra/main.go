@@ -57,8 +57,35 @@ func New() *Controller {
 	return controller
 }
 
+func EntraUsernameForExternalEmail(email string) (string, error) {
+	if config.EntraTenantPrimaryDomain() == "" {
+		return "", types.NewErrServerError("Entra tenant primary domain is not set")
+	}
+
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return email, types.NewErrInvalidObject("invalid email")
+	}
+
+	domain := parts[1]
+
+	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
+	return newEmail, nil
+}
+
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
+
+	if !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain()) {
+
+		extFormatEmail, err := EntraUsernameForExternalEmail(string(username))
+		if err != nil {
+
+			return nil, types.NewErrServerError(err)
+		}
+		username = types.Username(extFormatEmail)
+	}
+
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
 	}

@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -93,22 +92,6 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func EntraUsernameForExternalEmail(email string) (string, error) {
-	if config.EntraTenantPrimaryDomain() == "" {
-		return "", types.NewErrServerError("Entra tenant primary domain is not set")
-	}
-
-	parts := strings.Split(email, "@")
-	if len(parts) != 2 {
-		return email, types.NewErrInvalidObject("invalid email")
-	}
-
-	domain := parts[1]
-
-	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
-	return newEmail, nil
-}
-
 func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	var invite openapi.PostUsersInviteJSONRequestBody
 	if err := bindJSONOrSetError(ctx, &invite); err != nil {
@@ -147,13 +130,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 
 	}
 
-	extFormatEmail, err := EntraUsernameForExternalEmail(invite.Email)
-	if err != nil {
-		setError(ctx, err, "Failed to convert email")
-		return
-	}
-
-	if err := h.users.AddtoInvitedUserGroup(ctx, extFormatEmail); err != nil {
+	if err := h.users.AddtoInvitedUserGroup(ctx, invite.Email); err != nil {
 		if strings.Contains(err.Error(), "One or more added object references already exist for the following modified properties") {
 			log.Warn().Msg("User is already in group")
 			return
