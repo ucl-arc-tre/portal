@@ -18,7 +18,7 @@ func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement type
 		return types.NewErrInvalidObject(err)
 	}
 	for _, record := range records {
-		user, err := s.PersistedUser(record.Username)
+		user, _, err := s.PersistedUser(record.Username)
 		if err != nil {
 			return err
 		}
