@@ -1,7 +1,7 @@
 # ARC Services Portal HLD
 ## Introduction
 
-The ARC services portal will support users creating and managing resources on ARC services such as TRE projects, RDSS shares, HPC access and Condenser namespaces. The initial use case laid out below is in support of the ARC TRE, Data Safe Haven and associated IG processes.
+The ARC services portal will support users creating and managing resources on ARC services such as TRE projects, RDSS shares, HPC access and Condenser projects. The initial use case laid out below is in support of the ARC TRE, Data Safe Haven and associated IG processes.
 
 ## The IG/TRE use case
 
