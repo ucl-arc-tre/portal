@@ -81,11 +81,8 @@ func EntraInvitedUserGroup() string {
 	return k.String("entra.invited_user_group_id")
 }
 
-func EntraDomainForTesting() (string, error) {
-	if err := k.Set("entra.primary_domain", "testTenant.com"); err != nil {
-		return "", err
-	}
-	return k.String("entra.primary_domain"), nil
+func SetforTesting(key string, value string) error {
+	return k.Set(key, value)
 }
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
