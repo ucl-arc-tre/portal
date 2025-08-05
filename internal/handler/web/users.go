@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -140,11 +141,14 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 			return
 		}
 
-	} //else todo: send email...
-
-	// update entra group with the ext format email, needs to be after invite sent
+	}
 	extFormatEmail := EntraUsernameForExternalEmail(invite.Email)
 	if err := h.users.AddtoInvitedUserGroup(ctx, extFormatEmail); err != nil {
+		if strings.Contains(err.Error(), "One or more added object references already exist for the following modified properties") {
+			log.Warn().Msg("User is already in group")
+			return
+		}
+
 		setError(ctx, err, "Failed to update entra group")
 		return
 	}
