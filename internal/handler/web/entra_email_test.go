@@ -8,8 +8,10 @@ import (
 )
 
 func TestEntraUsernameForExternalEmail(t *testing.T) {
+
+	testTenantDomain, _ := config.EntraDomainForTesting()
 	email := "hello@example.com"
-	expectedEmail := "hello_example.com#EXT#@" + config.EntraTenantPrimaryDomain()
+	expectedEmail := "hello_example.com#EXT#@" + testTenantDomain
 
 	extFormatEmail, err := EntraUsernameForExternalEmail(email)
 	assert.NoError(t, err, "EntraUsernameForExternalEmail returned an error")
