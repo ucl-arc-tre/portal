@@ -39,11 +39,11 @@ The portal is deployed as a set of Kubernetes resources onto the ARC TRE's produ
 
 | Component           | Resource Type |
 |---------------------|----------------|
-| Web Frontend        | Deployment     |
-| API                 | Deployment     |
-| Nginx Reverse Proxy | Ingress        |
-| OAuth Proxy         | Helm Chart     |
-| Postgres Database   | Helm Chart     |
+| Web Frontend        | Deployment using custom image       |
+| API                 | Deployment using custom image       |
+| Nginx Reverse Proxy | Ingress using Nginx ingress cluster |
+| OAuth Proxy         | Third party Helm Chart     |
+| Postgres Database   | Third party Helm Chart     |
 
 
 ![C2-Portal_Containers](./c4/C2-Portal_Containers.png)
