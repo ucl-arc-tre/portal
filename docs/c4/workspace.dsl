@@ -36,7 +36,7 @@ workspace "ARC Services Portal" "Models the architecture of a research services 
                     }
 
                     group "TRE API" {
-                        trehttpHandlers = component "HTTP Handlers for UCL TRE's" "Handles REST endpoints" "Go"
+                        trehttpHandlers = component "HTTP Handlers for UCL TREs" "Handles REST endpoints" "Go"
                         trehttpHandlers -> userService "Calls"
                         trehttpHandlers -> projectService "Calls"
                         trehttpHandlers -> otherService "Calls"
