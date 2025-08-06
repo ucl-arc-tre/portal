@@ -19,6 +19,16 @@ func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType ope
 			Id:   agreement.ID.String(),
 			Text: agreement.Text,
 		})
+	case openapi.AgreementTypeStudyOwner:
+		agreement, err := h.agreements.StudyOwnerAgreementText()
+		if err != nil {
+			setError(ctx, err, "Failed to get study owner agreement")
+			return
+		}
+		ctx.JSON(http.StatusOK, openapi.Agreement{
+			Id:   agreement.ID.String(),
+			Text: agreement.Text,
+		})
 	default:
 		ctx.JSON(http.StatusOK, http.StatusNotFound)
 	}

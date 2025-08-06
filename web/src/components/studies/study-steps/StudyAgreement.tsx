@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Agreement, getAgreementsByAgreementType, postProfileAgreements } from "@/openapi";
+import { Agreement, getAgreementsByAgreementType } from "@/openapi";
 import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 
@@ -50,8 +50,9 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   if (agreementCompleted) return null;
 
   const handleAgreementSubmit = async (agreementId: string) => {
+    console.log("submitting study agreement", agreementId);
     // TODO: change this to post study agreements
-    await postProfileAgreements({ body: { agreement_id: agreementId } });
+    // await postProfileAgreements({ body: { agreement_id: agreementId } });
   };
 
   return (
