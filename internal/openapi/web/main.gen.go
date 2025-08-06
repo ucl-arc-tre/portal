@@ -437,6 +437,9 @@ type ServerInterface interface {
 	// (GET /auth)
 	GetAuth(c *gin.Context)
 
+	// (GET /logout)
+	GetLogout(c *gin.Context)
+
 	// (GET /profile)
 	GetProfile(c *gin.Context)
 
@@ -527,6 +530,19 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	}
 
 	siw.Handler.GetAuth(c)
+}
+
+// GetLogout operation middleware
+func (siw *ServerInterfaceWrapper) GetLogout(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetLogout(c)
 }
 
 // GetProfile operation middleware
@@ -797,6 +813,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/:agreementType", wrapper.GetAgreementsAgreementType)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
+	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

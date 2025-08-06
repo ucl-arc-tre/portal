@@ -362,6 +362,14 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+  /logout:
+    get:
+      description: Log the user out
+      responses:
+        "302":
+          description: Successfully logged out
+        default:
+          description: Unexpected error
 
 components:
   schemas:
