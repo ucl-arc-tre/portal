@@ -34,7 +34,7 @@ The portal is comprised of a NextJS frontend that uses a web api to interact wit
 
 ### Overview
 
-The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. An nginx reverse proxy receives all incoming http(s) requests, serving the web frontend at `/`, routing `/web/api` requests via an oauth2-proxy, and forwarding `/tre/api` requests.
+The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. A reverse proxy receives all incoming HTTPS requests, serving the web frontend at `/`, routing `/web/api` requests via an authentication proxy. TRE API requests are east-west to `/tre/api`.
 
 As a target architecture, the diagram below shows how in the future, in addition to existing UCL TREs, other UCL systems and services will be able to access data in the portal database via api.
 
@@ -43,13 +43,13 @@ As a target architecture, the diagram below shows how in the future, in addition
 > [!NOTE]
 > The `/tre/api` endpoint is not currently exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal access. External access will be added in future updates to support integration with other consumers and TREs.
 
-| Component           | Resource Type |
-|---------------------|----------------|
-| Web Frontend        | Deployment using custom image       |
-| API                 | Deployment using custom image       |
-| Nginx Reverse Proxy | Ingress using Nginx ingress cluster |
-| OAuth Proxy         | Third party Helm Chart     |
-| Postgres Database   | Third party Helm Chart     |
+| Component            | Resource Type                 |
+|----------------------|-------------------------------|
+| Web Frontend         | Deployment using custom image |
+| API                  | Deployment using custom image |
+| Reverse Proxy        | Third party Helm Chart        |
+| Authentication Proxy | Third party Helm Chart        |
+| Postgres Database    | Third party Helm Chart        |
 
 ### Deployment Worflow
 
