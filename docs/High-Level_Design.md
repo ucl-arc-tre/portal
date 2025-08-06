@@ -143,14 +143,14 @@ The portal superimposes additional roles to the roles defined in the [Research D
 
 | Role               | Description                                                                 | Permissions                                                                 | Prerequisites                                      |
 |--------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------------------------------------------------|
-| Base               | Standard user with limited access                                            | - Access to basic services                                                  | Has UCL account                                    |
-| Approved Researcher| Approved Researchers can access their Projects                              | - Access to specific Projects                                               | Is an Approved Researcher                          |
-| Asset Owner/ Administrator | Manage Studies, maintain information asset register, contracts and metadata                     | - Create/update asset metadata<br>- Assign asset access                     | Is  an Information Asset Owner or Administrator   |
-| IG Admin           | Manage Information Governance via Study review and approval                 | - Write Study data<br>- Write Study status                                  | Is an ARC Info Gov Advisory Team member            |
-| TRE Admin          | TRE service member, view Project and role data                              | - Read Project and Role data<br>- Write Project status                      | Is a UCL TRE service member                            |
+| Base               | Standard user with limited access                                            | - Access to basic services                                                  | Exists in UCL Entra tenant                                   |
+| Approved Researcher| Approved Researchers can access their Projects, or manage Study data if they are an IAO/IAA                              | - Access to specific Projects<br>- Access to Study creation if eleigible                                               | Is an Approved Researcher                          |
+| IG Admin           | Manage Information Governance via Study reviews and approvals, training certification reviews                 | - Write Study data<br>- Write Study status                                  | Is an ARC Info Gov Advisory Team member            |
+| TRE Ops staff         | TRE service member, view Project and role data                              | - Read Project and Role data<br>- Write Project status                      | Is a UCL TRE service member                            |
 | Global Admin       | Full control over portal                                                     | - Assign roles<br>- Read/write everything                                   | Is an ARC Services Portal Admin                    |
 
-
+> [!NOTE]
+> Individuals eligible to become Information Asset Owners or Administrators (IAO/IAA) can use the portal to obtain these ISMS roles. However, holding an IAO/IAA role does not grant any additional permissions *within the portal itself*. The portal performs real-time eligibility checks to determine IAO/IAA status, so there's no need for a separate portal role to distinguish IAO/IAA from Approved Researchers.
 
 ## Application, database and integration design
 
