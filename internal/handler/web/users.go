@@ -1,14 +1,11 @@
 package web
 
 import (
-	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -93,18 +90,6 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func EntraUsernameForExternalEmail(email string) string {
-	parts := strings.Split(email, "@")
-	if len(parts) != 2 {
-		return ""
-	}
-
-	domain := parts[1]
-
-	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
-	return newEmail
-}
-
 func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	var invite openapi.PostUsersInviteJSONRequestBody
 	if err := bindJSONOrSetError(ctx, &invite); err != nil {
@@ -123,7 +108,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	invitedUser, userWasCreated, err := h.users.PersistedUser(types.Username(invite.Email))
+	invitedUser, err := h.users.PersistedUser(types.Username(invite.Email))
 	if err != nil {
 		setError(ctx, err, "Failed to get or create invitee")
 		return
@@ -134,22 +119,8 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if userWasCreated {
-
-		if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
-			setError(ctx, err, "Failed to send invite")
-			return
-		}
-
-	}
-	extFormatEmail := EntraUsernameForExternalEmail(invite.Email)
-	if err := h.users.AddtoInvitedUserGroup(ctx, extFormatEmail); err != nil {
-		if strings.Contains(err.Error(), "One or more added object references already exist for the following modified properties") {
-			log.Warn().Msg("User is already in group")
-			return
-		}
-
-		setError(ctx, err, "Failed to update entra group")
+	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
+		setError(ctx, err, "Failed to send invite")
 		return
 	}
 
@@ -160,6 +131,6 @@ func (h *Handler) GetLogout(ctx *gin.Context) {
 
 	logoutUrl := "https://login.microsoftonline.com/" + config.EntraCredentials().TenantID + "/oauth2/v2.0/logout?post_logout_redirect_uri=" + config.EntraInviteRedirectURL()
 
-	log.Debug().Msg(logoutUrl)
+	// log.Debug().Msg(logoutUrl)
 	ctx.Redirect(http.StatusFound, logoutUrl)
 }

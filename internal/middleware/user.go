@@ -45,7 +45,7 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		ctx.Set(userContextKey, user)
 		return
 	}
-	user, _, err := u.users.PersistedUser(username)
+	user, err := u.users.PersistedUser(username)
 	if err != nil {
 		log.Err(err).Msg("Failed to get user")
 		ctx.AbortWithStatus(http.StatusInternalServerError)

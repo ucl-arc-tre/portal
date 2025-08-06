@@ -58,7 +58,7 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 // Get or create a user for a unique username. Returns the user, whether
 // they were created or not and an error
 // If they do not exist then they will be created with the base role
-func (s *Service) PersistedUser(username types.Username) (types.User, bool, error) {
+func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	user := types.User{}
 	result := s.db.Where("username = ?", username).
 		Attrs(types.User{
@@ -67,15 +67,15 @@ func (s *Service) PersistedUser(username types.Username) (types.User, bool, erro
 		}).
 		FirstOrCreate(&user)
 	if result.Error != nil {
-		return user, false, types.NewErrServerError(result.Error)
+		return user, types.NewErrServerError(result.Error)
 	}
 	userWasCreated := result.RowsAffected > 0
 	if userWasCreated {
 		if _, err := rbac.AddRole(user, rbac.Base); err != nil {
-			return user, userWasCreated, fmt.Errorf("failed assign user base role: %v", err)
+			return user, fmt.Errorf("failed assign user base role: %v", err)
 		}
 	}
-	return user, userWasCreated, nil
+	return user, nil
 }
 
 func (s *Service) UserById(id string) (*types.User, error) {
@@ -96,15 +96,4 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 		return nil, types.NewNotFoundError("user not found")
 	}
 	return user, types.NewErrServerError(result.Error)
-}
-
-func (s *Service) CreateUserSponsorship(userId uuid.UUID, sponsorId uuid.UUID) (types.UserSponsorship, error) {
-
-	result := s.db.Create(&types.UserSponsorship{
-		UserID:    userId,
-		SponsorID: sponsorId,
-	})
-
-	return types.UserSponsorship{}, types.NewErrServerError(result.Error)
-
 }
