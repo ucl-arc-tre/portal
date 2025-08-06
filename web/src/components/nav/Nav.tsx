@@ -3,7 +3,7 @@ import styles from "./Nav.module.css";
 import Button from "../ui/Button";
 import dynamic from "next/dynamic";
 import { ReactElement } from "react";
-import { getLogout } from "@/openapi";
+import { client } from "@/openapi/client.gen";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -39,6 +39,7 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 }
 
 export default function Nav() {
+  const logoutUrl = client.getConfig().baseUrl + "/logout";
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
@@ -58,7 +59,7 @@ export default function Nav() {
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
       </nav>
-      <Button variant="tertiary" className={styles.logout} href="/web/api/v0/logout">
+      <Button variant="tertiary" className={styles.logout} href={logoutUrl}>
         Log out <LogoutIcon />
       </Button>
     </aside>
