@@ -133,7 +133,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	// check if user exists in entra, if yes, don't send invite
 	user, err := c.userData(ctx, types.Username(email))
 	if err != nil {
-		return types.NewErrServerError(err)
+		return err
 	}
 
 	if user != nil {
