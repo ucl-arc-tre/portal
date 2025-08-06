@@ -129,6 +129,18 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
+
+	// check if user exists in entra, if yes, don't send invite
+	user, err := c.userData(ctx, types.Username(email))
+	if err != nil {
+		return types.NewErrServerError(err)
+	}
+
+	if user != nil {
+		log.Debug().Any("user", user).Msg("User already exists in entra")
+		return nil
+	}
+
 	requestBody := graphmodels.NewInvitation()
 	invitedUserEmailAddress := email
 	inviteRedirectUrl := config.EntraInviteRedirectURL()
@@ -149,7 +161,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	messageInfo.SetCustomizedMessageBody(&message)
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
-	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
+	_, err = c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
 		return types.NewErrServerError(err)
 	}

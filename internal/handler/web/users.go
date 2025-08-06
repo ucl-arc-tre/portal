@@ -3,11 +3,9 @@ package web
 import (
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -110,7 +108,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	invitedUser, userWasCreated, err := h.users.PersistedUser(types.Username(invite.Email))
+	invitedUser, err := h.users.PersistedUser(types.Username(invite.Email))
 	if err != nil {
 		setError(ctx, err, "Failed to get or create invitee")
 		return
@@ -121,22 +119,8 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if userWasCreated {
-
-		if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
-			setError(ctx, err, "Failed to send invite")
-			return
-		}
-
-	}
-
-	if err := h.users.AddtoInvitedUserGroup(ctx, invite.Email); err != nil {
-		if strings.Contains(err.Error(), "One or more added object references already exist for the following modified properties") {
-			log.Warn().Msg("User is already in group")
-			return
-		}
-
-		setError(ctx, err, "Failed to update entra group")
+	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
+		setError(ctx, err, "Failed to send invite")
 		return
 	}
 
