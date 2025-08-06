@@ -1,10 +1,19 @@
-# Portal HLD
+# ARC Services Portal HLD
+## Introduction
 
-## As-is Portal(s)
+The ARC services portal will support users creating and managing resources on ARC services such as TRE projects, RDSS shares, HPC access and Condenser projects. The initial use case laid out below is in support of the ARC TRE, Data Safe Haven and associated IG processes.
+
+## The IG/TRE use case
+
+In order to run the [Research Data ISMS](https://isms.arc.ucl.ac.uk/), ARC needs to ensure processes such as study creation and user onboarding are managed and collect quality data.
+
+The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will use the pathfinder project for ARC's metadata store based on
+[this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
+Some processes such as incident and service request will be managed through "MyServices" (Xurrent) as per the pattern detailed [here in option 2](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md).
+
+##  As-is IG Portal(s)
 
 ![As-is](./media/ARC_Portals_Current.drawio.svg)
-
-
 
 Current portal is hosted in SharePoint, the data related to cases and (AKA studies and projects) researchers etc. in several SharePoint lists. Users logon to the sharepoint portal with their UCL username and password and are able to see and update their existing studies, make requests for new studies and complete other compliance processes such as user onboarding and registering data assets.
 
@@ -15,14 +24,38 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 
 ## To-be Portal
 
-<p align="center">
-  <img src="./media/architecture.png" alt="architecture" width="650">
-</p>
+The portal is comprised of a NextJS frontend that uses a web api to interact with a backend database. Further APIs for supported platforms (initially the ARC TRE) connect the to the data to provide or configure access to resources. The app will access UCL enterprise systems using one of the [UCL producer patterns](https://liveuclac.sharepoint.com/sites/it-architecture/SitePages/integration-patterns.aspx).
 
+### Logical View
 
-The replacement portal will manage [key ISMS processes](https://github.com/UCL-ARC/research-data-isms/tree/main/docs/Controlled_Processes). This portal will use the pathfinder project for ARC's metadata store based on
-[this design](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md).
-Some processes such as incident and service request will be managed through "MyServices" (Xurrent) as per the pattern detailed [here in option 2](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md).
+![Architecture](./media/architecture_2.drawio.png)
+
+## Physical View
+
+### Overview
+
+The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. A reverse proxy receives all incoming HTTPS requests, serving the web frontend at `/`, routing `/web/api` requests via an authentication proxy. TRE API requests are east-west to `/tre/api`.
+
+As a target architecture, the diagram below shows how in the future, in addition to existing UCL TREs, other UCL systems and services will be able to access data in the portal database via api.
+
+![C2-Portal_Containers](./c4/C2-Portal_Containers.png)
+
+> [!NOTE]
+> The `/tre/api` endpoint is not currently exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal access. External access will be added in future updates to support integration with other consumers and TREs.
+
+| Component            | Resource Type                 |
+|----------------------|-------------------------------|
+| Web Frontend         | Deployment using custom image |
+| API                  | Deployment using custom image |
+| Reverse Proxy        | Third party Helm Chart        |
+| Authentication Proxy | Third party Helm Chart        |
+| Postgres Database    | Third party Helm Chart        |
+
+### Deployment Worflow
+
+The diagram below shows the workflow that deploys the portal into the AWS VPC it currently resides in. The two sets of GitHub actions that run to deploy the app are grouped into the "Portal App Respository" and the "Infrastructure Respository". At present, the Portal App Repository is this GitHub repo. The Infrastructure Repository is the UCL ARC TRE's monorepo, a private repo which belongs to the [ucl-arc-tre GitHub organisation](https://github.com/ucl-arc-tre).
+
+![C3-Deployment_Workflow](./c4/C3-Deployment_Workflow.png)
 
 ## Design Principles
 
@@ -103,6 +136,21 @@ The **Project** entity type is expected to be subtyped for specific Environments
   - The Condenser Project subject is called a "Tenancy"
 
 See also [Metadata Store conceptual model](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md#7-entity-relationship-er-logical-models)
+
+## Roles
+
+The portal superimposes additional roles to the roles defined in the [Research Data ISMS](https://isms.arc.ucl.ac.uk/rism02-roles_and_responsibilities/). The following roles and their corresponding permissions may be assigned to qualifying authenticated users of the portal:
+
+| Role               | Description                                                                 | Permissions                                                                 | Prerequisites                                      |
+|--------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------------------------------------------------|
+| Base               | Standard user with limited access                                            | - Access to basic services                                                  | Exists in UCL Entra tenant                                   |
+| Approved Researcher| User with Approved Researchers role. Allows them to access their Projects, or manage Study data if they are an IAO/IAA                              | - Access to specific Projects<br>- Access to Study creation if eleigible                                               | Is an Approved Researcher                          |
+| IG Admin           | Manage Information Governance via Study reviews and approvals, training certification reviews                 | - Write Study data<br>- Write Study status                                  | Is an ARC Info Gov Advisory Team member            |
+| TRE Ops staff         | TRE service member, view Project and role data                              | - Read Project and Role data<br>- Write Project status                      | Is a UCL TRE service member                            |
+| Global Admin       | Full control over portal                                                     | - Assign roles<br>- Read/write everything                                   | Is an ARC Services Portal Admin                    |
+
+> [!NOTE]
+> Although "Approved Researcher" and "IAO"/"IAA" are different roles in the Researcch Data ISMS, there is no additional user role beyond "Approved Researcher" in the portal. The portal performs real-time checks to determine IAO/IAA eligibility, so there's no need for a separate role.
 
 ## Application, database and integration design
 

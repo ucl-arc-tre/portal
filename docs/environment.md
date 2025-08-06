@@ -64,7 +64,7 @@ All environments are dockerised for a self-contained service that builds all ver
 ## 🏛️ Architecture
 
 <p align="center">
-  <img src="./media/architecture.png" alt="architecture" width="650">
+  <img src="./media/architecture.drawio.png" alt="architecture" width="650">
 </p>
 
 ### API

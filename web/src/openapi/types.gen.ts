@@ -834,6 +834,27 @@ export type PostStudiesByStudyIdAssetsResponses = {
 
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
+export type GetLogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/logout';
+};
+
+export type GetLogoutErrors = {
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetLogoutResponses = {
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
 export type GetStudiesByStudyIdAgreementsData = {
     body?: never;
     path: {
