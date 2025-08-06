@@ -150,7 +150,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
 | Global Admin       | Full control over portal                                                     | - Assign roles<br>- Read/write everything                                   | Is an ARC Services Portal Admin                    |
 
 > [!NOTE]
-> Individuals eligible to become Information Asset Owners or Administrators (IAO/IAA) can use the portal to obtain these ISMS roles. However, holding an IAO/IAA role does not grant any additional permissions *within the portal itself*. The portal performs real-time eligibility checks to determine IAO/IAA status, so there's no need for a separate portal role to distinguish IAO/IAA from Approved Researchers.
+> The distinction between ISMS roles and portal roles: individuals eligible to become Information Asset Owners or Administrators (IAOs/IAAs) can use the portal to obtain these ISMS roles. However, holding an IAO/IAA role does not grant any additional role *within the portal itself*. The portal performs real-time checks to determine IAO/IAA eligibility, so there's no need for a separate portal role to distinguish an IAO/IAA from an Approved Researcher.
 
 ## Application, database and integration design
 
