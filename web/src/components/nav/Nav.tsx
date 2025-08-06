@@ -3,6 +3,7 @@ import styles from "./Nav.module.css";
 import Button from "../ui/Button";
 import dynamic from "next/dynamic";
 import { ReactElement } from "react";
+import { getLogout } from "@/openapi";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -35,6 +36,9 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 }
 
 export default function Nav() {
+  const handleLogout = async () => {
+    await getLogout();
+  };
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
@@ -54,6 +58,7 @@ export default function Nav() {
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
       </nav>
+      <Button onClick={handleLogout}>Logout</Button>
     </aside>
   );
 }

@@ -155,3 +155,11 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 
 	ctx.Status(http.StatusNoContent)
 }
+
+func (h *Handler) GetLogout(ctx *gin.Context) {
+
+	logoutUrl := "https://login.microsoftonline.com/" + config.EntraCredentials().TenantID + "/oauth2/v2.0/logout?post_logout_redirect_uri=" + config.EntraInviteRedirectURL()
+
+	log.Debug().Msg(logoutUrl)
+	ctx.Redirect(http.StatusFound, logoutUrl)
+}
