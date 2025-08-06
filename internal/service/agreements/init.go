@@ -28,9 +28,8 @@ func initApprovedResearcher(db *gorm.DB) {
 		approvedResearcherMarkdown,
 		ApprovedResearcherType,
 	).Attrs(types.Agreement{
-		Text:  approvedResearcherMarkdown,
-		Type:  ApprovedResearcherType,
-		Model: types.Model{CreatedAt: time.Now()},
+		Text: approvedResearcherMarkdown,
+		Type: ApprovedResearcherType,
 	}).FirstOrCreate(&types.Agreement{})
 	if result.Error != nil {
 		panic(result.Error)
