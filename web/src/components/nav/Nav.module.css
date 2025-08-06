@@ -64,7 +64,7 @@
 .logout {
   position: absolute !important;
   width: 150px;
-  bottom: 10vh;
+  bottom: 0;
   font-weight: 400 !important;
   color: var(--green-200) !important;
   transition: background-color 0.3s ease;
