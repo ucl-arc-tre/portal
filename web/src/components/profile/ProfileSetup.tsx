@@ -30,7 +30,7 @@ export default function ProfileSetup(props: Props) {
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
 
-  const profileSetupSteps: ProfileStep[] = [
+  const profileSetupSteps: Step[] = [
     {
       id: "chosen-name",
       title: "Set Your Chosen Name",
