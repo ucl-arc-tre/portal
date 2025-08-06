@@ -45,4 +45,13 @@ describe(`Homepage Tests`, () => {
       cy.contains("You have completed all your tasks").should("be.visible");
     });
   });
+
+  describe("log out", () => {
+    it("can log out", () => {
+      cy.loginAsBase();
+      cy.visit("/");
+      cy.contains("Log out").click();
+      cy.contains("Log out").should("not.exist");
+    });
+  });
 });
