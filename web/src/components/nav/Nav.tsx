@@ -39,12 +39,6 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 }
 
 export default function Nav() {
-  const handleLogout = async () => {
-    const response = await getLogout();
-    if (!response) return; // TODO: handle error
-    const logoutUrl = response.data as string;
-    window.location.href = logoutUrl;
-  };
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
@@ -64,7 +58,7 @@ export default function Nav() {
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
       </nav>
-      <Button onClick={handleLogout} variant="tertiary" className={styles.logout}>
+      <Button variant="tertiary" className={styles.logout} href="/web/api/v0/logout">
         Log out <LogoutIcon />
       </Button>
     </aside>
