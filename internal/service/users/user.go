@@ -69,8 +69,11 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	if result.Error != nil {
 		return user, types.NewErrServerError(result.Error)
 	}
-	if _, err := rbac.AddRole(user, rbac.Base); err != nil {
-		return user, fmt.Errorf("failed assign user base role: %v", err)
+	userWasCreated := result.RowsAffected > 0
+	if userWasCreated {
+		if _, err := rbac.AddRole(user, rbac.Base); err != nil {
+			return user, fmt.Errorf("failed assign user base role: %v", err)
+		}
 	}
 	return user, nil
 }
