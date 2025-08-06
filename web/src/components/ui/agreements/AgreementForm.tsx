@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { postProfileAgreements } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./AgreementForm.module.css";
 import dynamic from "next/dynamic";
@@ -7,14 +6,17 @@ const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert
   ssr: false,
 });
 
-type ApprovedResearcherFormProps = {
+type AgreementFormProps = {
   agreementId: string;
   setAgreementCompleted: (completed: boolean) => void;
+  handleAgreementSubmit: (agreementId: string) => Promise<void>;
+  agreementLabel?: string;
 };
 
-export default function ApprovedResearcherForm(props: ApprovedResearcherFormProps) {
-  const { agreementId, setAgreementCompleted } = props;
+export default function AgreementForm(props: AgreementFormProps) {
+  const { agreementId, setAgreementCompleted, handleAgreementSubmit, agreementLabel = "this agreement" } = props;
   const [agreed, setAgreed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER));
   const canAgree = secondsRemaining === 0;
 
@@ -28,34 +30,38 @@ export default function ApprovedResearcherForm(props: ApprovedResearcherFormProp
     return () => clearTimeout(timer);
   }, [secondsRemaining]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      postProfileAgreements({ body: { agreement_id: agreementId } });
+      await handleAgreementSubmit(agreementId);
       setAgreed(true);
       setAgreementCompleted(true);
     } catch (err) {
       console.error("Agreement post error:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles["agreement-form-container"]}>
       <Alert type="info">
         Please <strong>read this agreement carefully</strong>.{" "}
         {canAgree ? "You can now agree." : <>Agreement possible in {secondsRemaining} seconds.</>}
       </Alert>
+
       {!agreed && (
         <form onSubmit={handleSubmit}>
           <Button
             size="large"
             type="submit"
-            disabled={!canAgree}
-            cy="approved-researcher-agreement-agree"
-            aria-label="I agree to the approved researcher agreement"
+            disabled={!canAgree || isSubmitting}
+            cy="agreement-agree"
+            aria-label={`I agree to ${agreementLabel}`}
           >
-            I Agree
+            {isSubmitting ? "Submitting..." : "I Agree"}
           </Button>
         </form>
       )}

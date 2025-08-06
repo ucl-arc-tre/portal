@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Agreement, getAgreementsByAgreementType, getProfileAgreements } from "@/openapi";
+import { Agreement, getAgreementsByAgreementType, getProfileAgreements, postProfileAgreements } from "@/openapi";
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
-import AgreementForm from "./AgreementForm";
-import AgreementText from "./AgreementText";
+import AgreementForm from "../../ui/agreements/AgreementForm";
+import AgreementText from "../../ui/agreements/AgreementText";
 import Box from "@/components/ui/Box";
 
 type ApprovedResearcherAgreementProps = {
@@ -60,6 +60,10 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   // allow the user to show/hide the agreement if they want to see it again?
   if (agreementCompleted) return null;
 
+  const handleAgreementSubmit = async (agreementId: string) => {
+    await postProfileAgreements({ body: { agreement_id: agreementId } });
+  };
+
   return (
     agreement && (
       <section data-cy="approved-researcher-agreement">
@@ -67,7 +71,12 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
           <h2 className="subtitle">Approved Researcher Agreement</h2>
           <AgreementText text={agreement.text} />
 
-          <AgreementForm agreementId={agreement.id} setAgreementCompleted={setAgreementCompleted} />
+          <AgreementForm
+            agreementId={agreement.id}
+            setAgreementCompleted={setAgreementCompleted}
+            handleAgreementSubmit={handleAgreementSubmit}
+            agreementLabel="the approved researcher agreement"
+          />
         </Box>
       </section>
     )

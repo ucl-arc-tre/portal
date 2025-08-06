@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Study, Auth } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
@@ -9,27 +10,29 @@ type ManageStudyProps = {
 };
 
 export default function ManageStudy({ study }: ManageStudyProps) {
-  const studyStepsCompleted = false;
+  const [agreementCompleted, setAgreementCompleted] = useState(false);
+
+  const studyStepsCompleted = agreementCompleted;
 
   const studySteps: Step[] = [
     {
       id: "study-agreement",
       title: "Study Agreement",
       description: "Review and accept the study agreement terms",
-      completed: false,
-      current: true,
+      completed: agreementCompleted,
+      current: !agreementCompleted,
     },
     {
       id: "study-asset",
       title: "Study Asset",
       description: "Create and manage at least one study asset",
       completed: false,
-      current: false,
+      current: agreementCompleted,
     },
   ];
 
   const getCurrentStepComponent = () => {
-    return <StudyAgreement />;
+    return <StudyAgreement agreementCompleted={agreementCompleted} setAgreementCompleted={setAgreementCompleted} />;
   };
 
   return (

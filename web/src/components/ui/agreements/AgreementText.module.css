@@ -1,9 +1,9 @@
-.wrapper {
+.agreement-text-container {
   padding: 1rem;
   padding-top: 0;
 }
 
-.text {
+.agreement-text-content {
   list-style: inside;
 
   p {
