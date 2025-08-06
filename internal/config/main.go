@@ -73,6 +73,17 @@ func EntraInviteRedirectURL() string {
 	return k.String("entra.invite_redirect_url")
 }
 
+func EntraTenantPrimaryDomain() string {
+	return k.String("entra.primary_domain")
+}
+
+func EntraInvitedUserGroup() string {
+	return k.String("entra.invited_user_group_id")
+}
+
+func SetforTesting(key string, value string) error {
+	return k.Set(key, value)
+}
 func AdminUsernames() []types.Username {
 	usernames := []types.Username{}
 	for _, username := range k.Strings("admin_usernames") {

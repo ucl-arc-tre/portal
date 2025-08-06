@@ -57,7 +57,7 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]typ
 	admins := []types.User{}
 
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
-		user, _, err := s.users.PersistedUser(types.Username(studyAdminUsername))
+		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
 			return admins, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
 		}
