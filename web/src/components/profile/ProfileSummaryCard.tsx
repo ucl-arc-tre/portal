@@ -8,7 +8,7 @@ type ProfileSummaryCardProps = {
 
 export default function ProfileSummaryCard({ chosenName, username, roles }: ProfileSummaryCardProps) {
   return (
-    <div className={styles.card}>
+    <div className={styles["profile-summary-container"]}>
       <h3 className={styles.title}>Profile Information</h3>
       <div className={styles.content}>
         <div className={styles.row}>
@@ -21,6 +21,7 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
             <span className={styles.value}>{username}</span>
           </div>
         </div>
+
         <div className={styles.row}>
           <div className={styles.field}>
             <span className={styles.label}>Roles:</span>

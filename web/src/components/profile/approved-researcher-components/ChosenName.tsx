@@ -1,9 +1,10 @@
 import { FormEvent, useState } from "react";
-import styles from "./ProfileChosenName.module.css";
-import Button from "../ui/Button";
 import { postProfile } from "@/openapi";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
+import Button from "../../ui/Button";
+
+import styles from "./ChosenName.module.css";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -53,7 +54,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
   };
 
   return (
-    <section className={styles.section} data-cy="chosen-name-form">
+    <section className={styles["chosen-name-container"]} data-cy="chosen-name-form">
       <h3 className={styles.title}>Set Your Chosen Name</h3>
       <div className={styles.description}>
         Please enter your name as you would choose to have it appear on forms related to our services.

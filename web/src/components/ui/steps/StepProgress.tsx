@@ -1,42 +1,42 @@
-import Box from "../ui/Box";
-import Button from "../ui/Button";
-import styles from "./ProfileStepProgress.module.css";
+import Button from "../Button";
+import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
 });
 
-type ProfileStepProgressProps = {
-  steps: ProfileStep[];
-  profileIsComplete?: boolean;
-};
-
-export default function ProfileStepProgress(props: ProfileStepProgressProps) {
-  const { steps, profileIsComplete } = props;
+export default function StepProgress(props: StepProgressProps) {
+  const {
+    steps,
+    isComplete = false,
+    completionTitle = "Complete!",
+    completionSubtitle = "You have successfully completed all steps.",
+    completionButtonText,
+    completionButtonHref,
+    introText = "Complete the following steps.",
+    ariaLabel = "Progress steps",
+  } = props;
 
   return (
-    <Box>
+    <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
-        {profileIsComplete ? (
+        {isComplete ? (
           <>
-            <h3 className={styles["completion-title"]}>Profile Complete!</h3>
-            <p className={styles["completion-subtitle"]}>
-              You have successfully completed all profile setup steps and are now an approved researcher. You can now
-              create and manage studies.
-            </p>
-            <Button href="/studies" size="default">
-              Go to studies
-            </Button>
+            <h3 className={styles["completion-title"]}>{completionTitle}</h3>
+            <p className={styles["completion-subtitle"]}>{completionSubtitle}</p>
+            {completionButtonText && completionButtonHref && (
+              <Button href={completionButtonHref} size="default">
+                {completionButtonText}
+              </Button>
+            )}
           </>
         ) : (
-          <p className={styles["intro-text"]}>
-            Complete the following steps to set up your profile and become an approved researcher.
-          </p>
+          <p className={styles["intro-text"]}>{introText}</p>
         )}
       </div>
 
-      <div aria-label="Profile setup progress">
+      <div aria-label={ariaLabel}>
         <ol className={styles["step-list"]}>
           {steps.map((step, stepIndex) => (
             <li key={step.id} className={styles.step}>
@@ -95,6 +95,6 @@ export default function ProfileStepProgress(props: ProfileStepProgressProps) {
           ))}
         </ol>
       </div>
-    </Box>
+    </div>
   );
 }
