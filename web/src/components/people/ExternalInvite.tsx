@@ -7,51 +7,42 @@ import Loading from "@/components/ui/Loading";
 import Dialog from "../ui/Dialog";
 
 export default function ExternalInvite() {
-  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showErrorMessage, setShowErrorMessage] = useState("");
-
-  function handleShowDialog() {
-    setDialogVisible(true);
-  }
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      setButtonDisabled(true);
       setIsLoading(true);
-      if (email) {
-        const response = await postUsersInvite({ body: { email } });
-        if (response.response.ok) {
-          setShowSuccessMessage(true);
+      const response = await postUsersInvite({ body: { email } });
+      if (response.response.ok) {
+        setShowSuccessMessage(true);
+        setEmail("");
+      } else {
+        let errMessage;
+        if (response.response.status === 406) {
+          errMessage = "Sorry, your request wasn't valid. Please try again.";
+        } else if (response.response.status === 500) {
+          errMessage = "Sorry, something went wrong. Please try again.";
         } else {
-          let errMessage;
-          if (response.response.status === 406) {
-            errMessage = "Sorry, your request wasn't valid. Please try again.";
-          } else if (response.response.status === 500) {
-            errMessage = "Sorry, something went wrong. Please try again.";
-          } else {
-            errMessage = "An unknown error occurred. Please refresh and try again.";
-          }
-          setShowErrorMessage(errMessage);
+          errMessage = "An unknown error occurred. Please refresh and try again.";
         }
+        setErrorMessage(errMessage);
       }
     } catch (err) {
       console.error("Invite post error:", err);
     } finally {
-      setButtonDisabled(false);
       setIsLoading(false);
-      setEmail("");
     }
   }
 
   useEffect(() => {
     if (isDialogVisible === false) {
       setShowSuccessMessage(false);
-      setShowErrorMessage("");
+      setErrorMessage("");
     }
   }, [isDialogVisible]);
 
@@ -65,9 +56,9 @@ export default function ExternalInvite() {
                 &times; Invitation sent!
               </small>
             )}
-            {showErrorMessage && (
+            {errorMessage && (
               <Alert type="error">
-                <AlertMessage>{showErrorMessage}</AlertMessage>
+                <AlertMessage>{errorMessage}</AlertMessage>
               </Alert>
             )}
             <form onSubmit={handleSubmit} className={styles["invite-form"]}>
@@ -80,8 +71,9 @@ export default function ExternalInvite() {
                 required={true}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoFocus
               />
-              <Button disabled={buttonDisabled} type="submit" cy="send-invite" className={styles["send-button"]}>
+              <Button disabled={isLoading} type="submit" cy="send-invite" className={styles["send-button"]}>
                 {isLoading && (
                   <span className={styles.loader}>
                     <Loading message="" size="small" />
@@ -96,8 +88,7 @@ export default function ExternalInvite() {
 
       <div className={styles.container}>
         <Button
-          onClick={handleShowDialog}
-          disabled={buttonDisabled}
+          onClick={() => setDialogVisible(true)}
           variant="secondary"
           cy="show-invite-input"
           type="button"

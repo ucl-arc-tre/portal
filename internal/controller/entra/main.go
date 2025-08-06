@@ -57,21 +57,48 @@ func New() *Controller {
 	return controller
 }
 
+func entraUsernameForExternalEmail(email string) (string, error) {
+	if config.EntraTenantPrimaryDomain() == "" {
+		return "", types.NewErrServerError("Entra tenant primary domain is not set")
+	}
+
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return email, types.NewErrInvalidObject("invalid email")
+	}
+
+	domain := parts[1]
+
+	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
+	return newEmail, nil
+}
+
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
+
+	if !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain()) {
+
+		extFormatEmail, err := entraUsernameForExternalEmail(string(username))
+		if err != nil {
+
+			return nil, err
+		}
+		username = types.Username(extFormatEmail)
+	}
+
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
 	}
 	configuration := &graphusers.UserItemRequestBuilderGetRequestConfiguration{
 		QueryParameters: &graphusers.UserItemRequestBuilderGetQueryParameters{
-			Select: []string{"mail", "employeeType"},
+			Select: []string{"mail", "employeeType", "id"},
 		},
 	}
 	data, err := c.client.Users().ByUserId(string(username)).Get(ctx, configuration)
 	if err != nil {
 		return nil, err
 	}
-	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType()}
+	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType(), Id: data.GetId()}
 	_ = c.userDataCache.Add(username, userData)
 
 	return &userData, nil
@@ -102,6 +129,18 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
+
+	// check if user exists in entra, if yes, don't send invite
+	user, err := c.userData(ctx, types.Username(email))
+	if err != nil {
+		return err
+	}
+
+	if user != nil {
+		log.Debug().Any("user", user).Msg("User already exists in entra")
+		return nil
+	}
+
 	requestBody := graphmodels.NewInvitation()
 	invitedUserEmailAddress := email
 	inviteRedirectUrl := config.EntraInviteRedirectURL()
@@ -122,9 +161,26 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	messageInfo.SetCustomizedMessageBody(&message)
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
-	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
+	_, err = c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
 		return types.NewErrServerError(err)
 	}
 	return nil
+}
+
+func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) error {
+
+	user, err := c.userData(ctx, types.Username(email))
+	if err != nil {
+		return err
+	}
+
+	groupId := config.EntraInvitedUserGroup()
+	requestBody := graphmodels.NewReferenceCreate()
+	odataId := fmt.Sprintf("https://graph.microsoft.com/v1.0/directoryObjects/%s", *user.Id)
+	requestBody.SetOdataId(&odataId)
+
+	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
+	return err
+
 }
