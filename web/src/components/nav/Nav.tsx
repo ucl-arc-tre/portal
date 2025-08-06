@@ -23,6 +23,9 @@ const PaperclipIcon = dynamic(() => import("uikit-react-public").then((mod) => m
 const UsersIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Users), {
   ssr: false,
 });
+const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.LogOut), {
+  ssr: false,
+});
 
 function NavItem({ href, icon, title }: { href: string; icon: ReactElement; title: string }) {
   const pathname = usePathname();
@@ -37,7 +40,10 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 
 export default function Nav() {
   const handleLogout = async () => {
-    await getLogout();
+    const response = await getLogout();
+    if (!response) return; // TODO: handle error
+    const logoutUrl = response.data as string;
+    window.location.href = logoutUrl;
   };
   return (
     <aside className={styles.sidebar}>
@@ -58,7 +64,9 @@ export default function Nav() {
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
       </nav>
-      <Button onClick={handleLogout}>Logout</Button>
+      <Button onClick={handleLogout} variant="tertiary" className={styles.logout}>
+        Log out <LogoutIcon />
+      </Button>
     </aside>
   );
 }
