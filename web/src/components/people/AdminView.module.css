@@ -2,21 +2,45 @@
   width: 100%;
   margin-block: 1rem;
   font-size: 110%;
+  border-collapse: collapse;
 
-  tbody {
-    border-top: 1px solid var(--foreground);
+  th {
+    padding-inline: 0.5rem;
   }
 
-  td {
-    padding: 0.5rem;
+  .tbody {
+    border-top: 2px solid var(--foreground);
+  }
+
+  .row {
+    border-bottom: 1px solid var(--text--secondary);
+    margin-bottom: 0.8rem;
+
+    td {
+      padding-block: 0.6rem;
+      padding-inline: 0.5rem;
+    }
   }
 
   .user {
     display: flex;
     flex-direction: column;
+    gap: 0.3rem;
 
     small {
-      color: rgb(70, 70, 70);
+      color: var(--text--secondary);
+      font-size: 0.8rem;
+    }
+  }
+
+  .edit {
+    font-weight: 400;
+    font-size: 0.8rem;
+    padding-inline-start: 0.4rem;
+    color: var(--green-100);
+
+    &:hover {
+      color: var(--green-50);
     }
   }
 
@@ -26,45 +50,39 @@
 
   .agreements {
     text-align: right;
-    grid-template-columns: repeat(1fr);
   }
 
-  .agreement {
+  .agreement,
+  .training {
     display: grid;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 0.5fr;
     grid-template-columns: 3fr 0.2fr;
 
-    .confirmed svg {
+    .valid svg {
       grid-row: 1;
       stroke: var(--green-100);
     }
 
-    .unconfirmed svg {
+    .invalid svg {
       grid-row: 1;
-      stroke: red;
+      stroke: #ff6161;
     }
 
-    /* small {
-            grid-row: 2;
-        } */
+    small {
+      grid-row: 2;
+    }
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  .table {
-    color: var(--foreground);
-    background-color: var(--background);
+  .training-info {
+    text-align: right;
+    display: grid;
+    grid-template-columns: 4fr 0.5fr;
+  }
 
-    tbody {
-      border-top: 1px solid var(--foreground);
-    }
-
-    td {
-      color: var(--foreground);
-    }
-
-    .user small {
-      color: rgb(150, 150, 150);
-    }
+  .training-record {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    gap: 0.5rem;
   }
 }

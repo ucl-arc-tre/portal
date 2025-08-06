@@ -4,7 +4,7 @@ info:
   title: portal
   description: UCL ARC portal web API
 servers:
-  - url: /api/v0
+  - url: /web/api/v0
 
 paths:
   /auth:
@@ -31,7 +31,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: "#/components/schemas/Profile"
         default:
           description: Unexpected error
     post:
@@ -47,7 +47,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileResponse"
+                $ref: "#/components/schemas/Profile"
         "500":
           description: Internal server error
         default:
@@ -61,7 +61,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileAgreements"
+                $ref: "#/components/schemas/UserAgreements"
         "500":
           description: Internal server error
         default:
@@ -79,7 +79,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileAgreements"
+                $ref: "#/components/schemas/UserAgreements"
         "500":
           description: Internal server error
         default:
@@ -93,7 +93,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProfileTrainingStatus"
+                $ref: "#/components/schemas/ProfileTraining"
         "500":
           description: Internal server error
         default:
@@ -118,9 +118,16 @@ paths:
         default:
           description: Unexpected error
 
-  /agreements/approved-researcher:
+  /agreements/{agreementType}:
     get:
       description: Get the latest approved researcher agreement
+      parameters:
+        - in: path
+          name: agreementType
+          required: true
+          description: Type of agreement to get
+          schema:
+            $ref: "#/components/schemas/AgreementType"
       responses:
         "200":
           content:
@@ -134,17 +141,223 @@ paths:
         default:
           description: Unexpected error
 
-  /people:
+  /users:
     get:
-      description: Get all the people a user has access to
+      description: Get all the users a user has access to view
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/People"
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserData"
         "403":
           description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /users/{userId}/training:
+    post:
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user to be updated
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserTrainingUpdate"
+      responses:
+        "200":
+          description: Successfully updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingRecord"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /users/approved-researchers/import/csv:
+    post:
+      description: |
+        Upload a CSV file with fields
+        <username: string, e.g. "bob@example.com">,
+        <agreed to agreement: bool, e.g. true>,
+        <NHSD training completed at date: string, e.g. 2021-03-11>
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: OK
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /users/invite:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  description: Email address of the person to be invited
+      responses:
+        "200":
+          description: Successfully sent invite
+        default:
+          description: Unexpected error
+
+  # Study Management
+  /studies:
+    get:
+      description: Get all studies accessible to the current user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Study"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a new study
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyCreateRequest"
+      responses:
+        "201":
+          description: Study created successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyCreateValidationError"
+        "406":
+          description: Invalid request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /study/{studyId}:
+    get:
+      description: Get details of a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Study"
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  # Study Asset Management
+  /studies/{studyId}/assets:
+    get:
+      description: Get all assets for a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Asset"
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a new asset for a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Asset"
+      responses:
+        "201":
+          description: Asset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
+        "400":
+          description: Invalid request
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
         "500":
           description: Internal server error
         default:
@@ -157,6 +370,7 @@ components:
       required:
         - username
         - roles
+        - is_staff
       properties:
         username:
           type: string
@@ -168,8 +382,11 @@ components:
               - admin
               - base
               - approved-researcher
+        is_staff:
+          type: boolean
+          description: Whether the user is a valid UCL staff member
 
-    ProfileResponse:
+    Profile:
       type: object
       required:
         - username
@@ -228,7 +445,7 @@ components:
         - approved-researcher
         - study-owner
 
-    ProfileAgreements:
+    UserAgreements:
       type: object
       required:
         - confirmed_agreements
@@ -237,6 +454,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConfirmedAgreement"
+
+    TrainingKind:
+      type: string
+      enum:
+        - training_kind_nhsd
 
     ProfileTrainingUpdate:
       type: object
@@ -278,7 +500,7 @@ components:
           type: string
           description: Time in RFC3339 format when the training was completed
 
-    ProfileTrainingStatus:
+    ProfileTraining:
       type: object
       required:
         - training_records
@@ -300,12 +522,13 @@ components:
         id:
           type: string
 
-    Person:
+    UserData:
       type: object
       required:
         - user
         - roles
         - agreements
+        - training_record
       properties:
         user:
           $ref: "#/components/schemas/User"
@@ -314,14 +537,227 @@ components:
           items:
             type: string
         agreements:
-          $ref: "#/components/schemas/ProfileAgreements"
+          $ref: "#/components/schemas/UserAgreements"
+        training_record:
+          $ref: "#/components/schemas/ProfileTraining"
 
-    People:
-      type: array
-      items:
-        $ref: "#/components/schemas/Person"
+    UserTrainingUpdate:
+      type: object
+      required:
+        - training_kind
+        - training_date
+      properties:
+        training_kind:
+          $ref: "#/components/schemas/TrainingKind"
+        training_date:
+          type: string
+          description: Time in RFC3339 format at which the the certificate was issued
 
-    TrainingKind:
-      type: string
-      enum:
-        - "training_kind_nhsd"
+    Asset:
+      type: object
+      description: A data asset representing a set of related data entities
+      required:
+        - id
+        - title
+        - description
+        - classification_impact
+        - locations
+        - protection
+        - legal_basis
+        - format
+        - expiry
+        - has_dspt
+        - stored_outside_uk_eea
+        - accessed_by_third_parties
+        - third_party_agreement
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the asset
+        title:
+          type: string
+          description: Title of the asset
+        description:
+          type: string
+          description: Description of the asset
+        classification_impact:
+          type: string
+          enum:
+            - Public
+            - Confidential
+            - Highly confidential
+          description: Classification level of the asset
+        locations:
+          type: array
+          items:
+            type: string
+          description: Storage locations and touchpoints for the asset
+        protection:
+          type: string
+          enum:
+            - anonymisation
+            - identifiable_low_confidence_pseudonymisation
+          description: Type of protection applied to the asset
+        legal_basis:
+          type: string
+          description: Legal basis for holding the asset
+        format:
+          type: string
+          description: Format of the asset
+        expiry:
+          type: string
+          description: Retention expiry date of the asset
+        has_dspt:
+          type: boolean
+          description: Whether there is an up to date Data Security & Protection Toolkit in place
+        stored_outside_uk_eea:
+          type: boolean
+          description: Whether the asset is stored or processed outside UK and EEA
+        accessed_by_third_parties:
+          type: boolean
+          description: Whether the asset is accessed by or governed by third parties
+        third_party_agreement:
+          type: string
+          description: Third party agreement identifier if asset is governed by third parties
+        status:
+          type: string
+          enum:
+            - Active
+            - Awaiting
+            - Destroyed
+          description: Status of the asset
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the asset was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the asset was last updated
+
+    StudyBase:
+      type: object
+      description: Base study properties
+      required:
+        - title
+        - data_controller_organisation
+        - additional_study_admin_usernames
+      properties:
+        title:
+          type: string
+          description: Title of the study
+        description:
+          type: string
+          description: Description of the study
+        additional_study_admin_usernames:
+          type: array
+          items:
+            type: string
+          description: List of additional study administrator usernames (empty array if none)
+        data_controller_organisation:
+          type: string
+          description: The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
+        involves_ucl_sponsorship:
+          type: boolean
+          description: Whether UCL sponsorship is involved (seeking/have sought)
+        involves_cag:
+          type: boolean
+          description: Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
+        cag_reference:
+          type: string
+          description: CAG reference number
+        involves_ethics_approval:
+          type: boolean
+          description: Whether Research Ethics Committee approval is involved (seeking/have sought)
+        involves_hra_approval:
+          type: boolean
+          description: Whether Health Research Authority approval is involved (seeking/have sought)
+        iras_id:
+          type: string
+          description: IRAS ID if applicable
+        is_nhs_associated:
+          type: boolean
+          description: Whether the research is associated with NHS
+        involves_nhs_england:
+          type: boolean
+          description: Whether NHS England is involved in the research
+        nhs_england_reference:
+          type: string
+          description: NHS England DARS NIC number
+        involves_mnca:
+          type: boolean
+          description: Whether the HRA Model Non-Commercial Agreement is involved
+        requires_dspt:
+          type: boolean
+          description: Whether NHS Data Security & Protection Toolkit is required
+        requires_dbs:
+          type: boolean
+          description: Whether a DBS check is required for staff
+        is_data_protection_office_registered:
+          type: boolean
+          description: Whether the study is registered with the UCL Data Protection Office
+        data_protection_number:
+          type: string
+          description: Full data protection registration number
+        involves_third_party:
+          type: boolean
+          description: Whether third party organizations are involved
+        involves_external_users:
+          type: boolean
+          description: Whether external users will have access to the study
+        involves_participant_consent:
+          type: boolean
+          description: Whether participant consent is involved (seeking/have sought)
+        involves_indirect_data_collection:
+          type: boolean
+          description: Whether data is collected indirectly for the study (e.g. via a third party)
+        involves_data_processing_outside_eea:
+          type: boolean
+          description: Whether data is processed outside UK/EEA
+        owner_user_id:
+          type: string
+          description: ID of the user who owns the study
+
+    StudyCreateRequest:
+      allOf:
+        - $ref: "#/components/schemas/StudyBase"
+      description: Request payload for creating a new study
+
+    Study:
+      allOf:
+        - $ref: "#/components/schemas/StudyBase"
+        - type: object
+          required:
+            - id
+            - created_at
+            - updated_at
+            - approval_status
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the study
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the study was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the study was last updated
+            approval_status:
+              type: string
+              enum:
+                - Incomplete
+                - Pending
+                - Approved
+                - Rejected
+              description: Current approval status of the study
+      description: A research study
+
+    StudyCreateValidationError:
+      type: object
+      required:
+        - error_message
+      properties:
+        error_message:
+          type: string
+          description: Validation error message explaining why study creation failed

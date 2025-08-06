@@ -4,7 +4,7 @@ import { login } from "./auth";
 
 const botAdminUsername = Cypress.env("botAdminUsername") as string;
 const botAdminPassword = Cypress.env("botAdminPassword") as string;
-const botBaseUsername = Cypress.env("botBaseUsername") as string;
+export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
 
 declare global {
@@ -41,6 +41,7 @@ declare global {
        */
       clearChosenName(chosenName?: string): Chainable<any>;
 
+      // Auth fixture commands
       /**
        * Mock auth response to return base user role only
        * @example cy.mockAuthAsBaseUser()
@@ -53,32 +54,7 @@ declare global {
        */
       mockAuthAsBaseApprovedResearcher(): Chainable<any>;
 
-      /**
-       * Wait for the mocked auth request to complete
-       * @example cy.waitForMockedAuth()
-       */
-      waitForMockedAuth(): Chainable<any>;
-
-      /**
-       * Force light mode for testing
-       * @example cy.forceLightMode()
-       */
-      forceLightMode(): Chainable<any>;
-
-      /**
-       * Force dark mode for testing
-       * @example cy.forceDarkMode()
-       */
-      forceDarkMode(): Chainable<any>;
-
-      /**
-       * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
-       * @param selector - Optional selector to check specific element (defaults to entire page)
-       * @example cy.checkAccessibility()
-       * @example cy.checkAccessibility('[data-cy="profile-form"]')
-       */
-      checkAccessibility(selector?: string): Chainable<any>;
-
+      // Profile fixture commands
       /**
        * Mock profile chosen name endpoint
        * @param chosenName - The chosen name to return, empty string for no name, undefined for empty response
@@ -103,6 +79,82 @@ declare global {
        * @example cy.mockProfileTraining(true, "2024-01-01T00:00:00Z")
        */
       mockProfileTraining(isValid: boolean, completedAt?: string): Chainable<any>;
+
+      /**
+       * Mock inviting external user
+       * @param email - The email address to invite
+       * @example cy.mockInviteExternalResearcher("hello@example.com")
+       */
+      mockInviteExternalResearcher(email: string): Chainable<any>;
+
+      /**
+       * Mock studies list to be empty
+       * @example cy.mockStudiesEmpty()
+       */
+      mockStudiesEmpty(): Chainable<any>;
+
+      /**
+       * Mock studies list with a new study
+       * @example cy.mockStudiesWithNewStudy()
+       */
+      mockStudiesWithNewStudy(): Chainable<any>;
+
+      /**
+       * Mock successful study creation
+       * @example cy.mockStudyCreation()
+       */
+      mockStudyCreation(): Chainable<any>;
+
+      // Wait commands for fixtures
+      /**
+       * Wait for the mocked auth request to complete
+       * @example cy.waitForAuth()
+       */
+      waitForAuth(): Chainable<any>;
+
+      /**
+       * Wait for the mocked chosen name request to complete
+       * @example cy.waitForChosenName()
+       */
+      waitForChosenName(): Chainable<any>;
+
+      /**
+       * Wait for the mocked profile agreements request to complete
+       * @example cy.waitForAgreements()
+       */
+      waitForAgreements(): Chainable<any>;
+
+      /**
+       * Wait for the mocked profile training request to complete
+       * @example cy.waitForTraining()
+       */
+      waitForTraining(): Chainable<any>;
+
+      /**
+       * Wait for all profile-related requests to complete
+       * @example cy.waitForProfileData()
+       */
+      waitForProfileData(): Chainable<any>;
+
+      /**
+       * Wait for the mocked studies request to complete
+       * @example cy.waitForStudies()
+       */
+      waitForStudies(): Chainable<any>;
+
+      /**
+       * Wait for the mocked study creation request to complete
+       * @example cy.waitForStudyCreation()
+       */
+      waitForStudyCreation(): Chainable<any>;
+
+      /**
+       * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
+       * @param selector - Optional selector to check specific element (defaults to entire page)
+       * @example cy.checkAccessibility()
+       * @example cy.checkAccessibility('[data-cy="profile-form"]')
+       */
+      checkAccessibility(selector?: string): Chainable<any>;
     }
   }
 }
@@ -118,7 +170,7 @@ Cypress.Commands.add("waitForApi", (retries: number = 5, delay: number = 2000) =
     return cy
       .request({
         method: "GET",
-        url: "/api/v0/profile",
+        url: "/web/api/v0/profile",
         failOnStatusCode: false, // we want to allow 401's as we only care that the api is up
       })
       .then((res) => {
@@ -172,76 +224,32 @@ Cypress.Commands.add("loginAsBase", () => {
 Cypress.Commands.add("clearChosenName", () => {
   cy.request({
     method: "POST",
-    url: "/api/v0/profile",
+    url: "/web/api/v0/profile",
     body: {
       chosen_name: "",
     },
   });
 });
 
+// Auth fixture commands
 Cypress.Commands.add("mockAuthAsBaseUser", () => {
-  cy.intercept("GET", "/api/v0/auth", {
+  cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-user.json",
-  }).as("authRequest");
+  }).as("getAuth");
 });
 
 Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
-  cy.intercept("GET", "/api/v0/auth", {
+  cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-approved-researcher.json",
-  }).as("authRequest");
-});
-
-Cypress.Commands.add("waitForMockedAuth", () => {
-  cy.wait("@authRequest");
-});
-
-Cypress.Commands.add("forceLightMode", () => {
-  cy.wrap(
-    Cypress.automation("remote:debugger:protocol", {
-      command: "Emulation.setEmulatedMedia",
-      params: {
-        media: "screen",
-        features: [
-          {
-            name: "prefers-color-scheme",
-            value: "light",
-          },
-        ],
-      },
-    })
-  );
-});
-
-Cypress.Commands.add("forceDarkMode", () => {
-  cy.wrap(
-    Cypress.automation("remote:debugger:protocol", {
-      command: "Emulation.setEmulatedMedia",
-      params: {
-        media: "screen",
-        features: [
-          {
-            name: "prefers-color-scheme",
-            value: "dark",
-          },
-        ],
-      },
-    })
-  );
-});
-
-Cypress.Commands.add("checkAccessibility", (selector?: string) => {
-  cy.injectAxe();
-  cy.checkA11y(selector, {
-    includedImpacts: ["critical", "serious"],
-  });
+  }).as("getAuth");
 });
 
 Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
   const body = chosenName === undefined ? {} : { chosen_name: chosenName };
-  cy.intercept("GET", "/api/v0/profile", {
+  cy.intercept("GET", "/web/api/v0/profile", {
     statusCode: 200,
     body,
-  }).as("getProfile");
+  }).as("getChosenName");
 });
 
 Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
@@ -254,7 +262,7 @@ Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) =
       ]
     : [];
 
-  cy.intercept("GET", "/api/v0/profile/agreements", {
+  cy.intercept("GET", "/web/api/v0/profile/agreements", {
     statusCode: 200,
     body: {
       confirmed_agreements: confirmedAgreements,
@@ -272,10 +280,76 @@ Cypress.Commands.add("mockProfileTraining", (isValid: boolean, completedAt?: str
     trainingRecord.completed_at = completedAt;
   }
 
-  cy.intercept("GET", "/api/v0/profile/training", {
+  cy.intercept("GET", "/web/api/v0/profile/training", {
     statusCode: 200,
     body: {
       training_records: [trainingRecord],
     },
   }).as("getTraining");
+});
+
+Cypress.Commands.add("mockInviteExternalResearcher", (email: string) => {
+  const body = { email: email };
+  cy.intercept("POST", "/web/api/v0/users/invite", {
+    statusCode: 204,
+    body,
+  }).as("postUserIvite");
+});
+
+Cypress.Commands.add("checkAccessibility", (selector?: string) => {
+  cy.injectAxe();
+  cy.checkA11y(selector, {
+    includedImpacts: ["critical", "serious"],
+  });
+});
+
+// Wait commands for fixtures
+Cypress.Commands.add("waitForAuth", () => {
+  cy.wait("@getAuth");
+});
+
+Cypress.Commands.add("waitForChosenName", () => {
+  cy.wait("@getChosenName");
+});
+
+Cypress.Commands.add("waitForAgreements", () => {
+  cy.wait("@getAgreements");
+});
+
+Cypress.Commands.add("waitForTraining", () => {
+  cy.wait("@getTraining");
+});
+
+Cypress.Commands.add("waitForProfileData", () => {
+  cy.wait("@getChosenName");
+  cy.wait("@getAgreements");
+  cy.wait("@getTraining");
+});
+
+// Studies fixture commands
+Cypress.Commands.add("mockStudiesEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies", {
+    fixture: "studies-empty.json",
+  }).as("getStudiesEmpty");
+});
+
+Cypress.Commands.add("mockStudiesWithNewStudy", () => {
+  cy.intercept("GET", "/web/api/v0/studies", {
+    fixture: "studies-with-new-study.json",
+  }).as("getStudiesWithNew");
+});
+
+Cypress.Commands.add("mockStudyCreation", () => {
+  cy.intercept("POST", "/web/api/v0/studies", {
+    statusCode: 201,
+  }).as("createStudy");
+});
+
+// Wait commands for studies
+Cypress.Commands.add("waitForStudies", () => {
+  cy.wait(["@getStudiesEmpty", "@getStudiesWithNew"]);
+});
+
+Cypress.Commands.add("waitForStudyCreation", () => {
+  cy.wait("@createStudy");
 });

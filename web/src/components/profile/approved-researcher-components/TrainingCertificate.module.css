@@ -1,0 +1,21 @@
+.form {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 1rem;
+  display: grid;
+
+  input {
+    justify-self: center;
+  }
+}
+
+.wrapper {
+  p {
+    padding-top: 0.7rem;
+  }
+
+  a {
+    text-decoration: underline;
+    color: var(--form-link);
+  }
+}

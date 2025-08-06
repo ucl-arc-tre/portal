@@ -39,8 +39,8 @@ describe(`Homepage Tests`, () => {
       cy.mockAuthAsBaseApprovedResearcher();
 
       cy.visit("/");
-      cy.waitForMockedAuth();
-      cy.wait("@getProfile");
+      cy.waitForAuth();
+      cy.waitForChosenName();
 
       cy.contains("You have completed all your tasks").should("be.visible");
     });

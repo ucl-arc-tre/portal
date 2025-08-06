@@ -6,20 +6,22 @@ const UCLButton = dynamic(() => import("uikit-react-public").then((mod) => mod.B
 });
 
 type Props = React.ComponentProps<typeof UCLButton> & {
-  type?: string;
+  type?: "button" | "submit" | "reset";
   name?: string;
   value?: string;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   cy?: string;
   as?: string;
+  className?: string;
+  inline?: boolean;
 };
 
 export default function Button(props: Props) {
   return (
     <UCLButton
       data-cy={props.cy}
-      className={`${styles.button} ${props.type === "submit" && styles.submit}`}
+      className={`${styles.button} ${props.type === "submit" ? styles.submit : ""} ${props.inline && styles.inline} ${props.className || ""} `}
       type={props.type}
       onClick={props.onClick}
       disabled={props.disabled}

@@ -1,0 +1,74 @@
+.no-studies-message {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  margin: 2rem 0;
+  border: 1px solid #dee2e6;
+}
+
+.no-studies-message h2 {
+  margin-bottom: 2rem;
+}
+
+.no-studies-message p {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.create-study-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  padding: 0;
+}
+
+.studies-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.studies-heading::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  border-radius: 2px;
+}
+
+.error-message {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: #721c24;
+}
+
+.error-message p {
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.ucl-staff-modal-actions {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .no-studies-message {
+    padding: 2rem 1rem;
+  }
+}

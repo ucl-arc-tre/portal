@@ -1,0 +1,29 @@
+.current-step {
+  width: 100%;
+  margin: 1rem 0 0 0;
+}
+
+.approved-researcher-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.completed-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--background);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.completed-message h2 {
+  margin: 0 0 1rem 0;
+  color: var(--green-200);
+}
+
+.completed-message p {
+  margin: 0;
+  color: #37393d;
+  line-height: 1.5;
+}

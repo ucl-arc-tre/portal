@@ -1,0 +1,8 @@
+.error-wrapper {
+  color: black;
+
+  a {
+    text-decoration: underline;
+    color: var(--form-link);
+  }
+}

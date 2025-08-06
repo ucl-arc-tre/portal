@@ -1,0 +1,16 @@
+debug: true
+admin_usernames:
+  - bob@example.com
+db:
+  dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
+entra:
+  # EntraID app registration with User.Read.All & User.Invite.All application permissions
+  tenant_id: <CHANGE_ME>
+  client_id: <CHANGE_ME>
+  client_secret: <CHANGE_ME>
+  invite_redirect_url: <CHANGE_ME> # where you want to send the user when they accept the invite, eg. http://localhost:8000/profile
+  primary_domain: <CHANGE_ME> # eg. arctretest.onmicrosoft.com
+  invited_user_group_id: <CHANGE_ME> # found in the Azure portal, eg Invited Users group
+tre:
+  users:
+    username: password # pragma: allowlist secret

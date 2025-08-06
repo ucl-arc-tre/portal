@@ -8,7 +8,7 @@ describe(`People page content`, () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseUser();
     cy.visit("/people");
-    cy.waitForMockedAuth();
+    cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("be.visible");
   });
@@ -17,7 +17,7 @@ describe(`People page content`, () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseApprovedResearcher();
     cy.visit("/people");
-    cy.waitForMockedAuth();
+    cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("not.exist");
     cy.contains("Approved Researcher").should("be.visible");
@@ -30,5 +30,51 @@ describe(`People page content`, () => {
     cy.contains("You do not have permission to view this page").should("not.exist");
     cy.get("table").contains("User").should("be.visible");
     cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
+  });
+});
+
+describe("Import approved researchers", () => {
+  it("should not be uploadable by a base user", () => {
+    cy.loginAsBase();
+    cy.request({
+      method: "POST",
+      url: "/web/api/v0/users/approved-researchers/import/csv",
+      body: "some-bytes",
+      failOnStatusCode: false,
+    })
+      .its("status")
+      .should("equal", 403);
+  });
+
+  it("should be uploadable by an admin user", () => {
+    cy.loginAsAdmin();
+    cy.visit("/people");
+    const username = "laura@example.com";
+    const filename = "tmp_approved_researchers.csv";
+    cy.writeFile(filename, `${username},true,2025-07-01`);
+    cy.get("input[type=file]").selectFile(filename, { force: true });
+    cy.visit("/people");
+    cy.get("table").contains(username).should("be.visible");
+  });
+});
+
+describe("Invite externals", () => {
+  it("should not be visible to a base user", () => {
+    cy.loginAsBase();
+    cy.visit("/people");
+    cy.get("[data-cy='show-invite-input']").should("not.exist");
+  });
+
+  it("should be visable to & usable by an admin user", () => {
+    cy.loginAsAdmin();
+    cy.visit("/people");
+    cy.mockInviteExternalResearcher("hello@example.com");
+
+    cy.get("[data-cy='show-invite-input']").should("be.visible").click();
+
+    cy.get("input[name='email']").should("be.visible").type("hello@example.com");
+    cy.get("[data-cy='send-invite']").should("be.visible").click();
+
+    cy.get("input[name='email']").should("not.have.value", "hello@example.com");
   });
 });

@@ -1,0 +1,22 @@
+.studies-description {
+  margin: 1.4rem;
+}
+
+.not-approved-section {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.not-approved-section h2 {
+  margin-bottom: 1.5rem;
+}
+
+.not-approved-section button {
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .studies-description {
+    margin: 1rem;
+  }
+}

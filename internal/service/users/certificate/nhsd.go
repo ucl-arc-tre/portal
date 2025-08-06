@@ -11,23 +11,22 @@ import (
 	pdfref "github.com/klippa-app/go-pdfium/references"
 	pdfreq "github.com/klippa-app/go-pdfium/requests"
 	pdfwasm "github.com/klippa-app/go-pdfium/webassembly"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
-	isValidPattern   = `This is to certify that.*completed the course Data Security Awareness`
-	issuedAtPattern  = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})`
-	firstNamePattern = `certify that[\s]*(\w+)`
-	lastNamePattern  = `certify that[\s]*\w+ (\w+)`
+	isValidPattern  = `This is to certify that.*completed the (?:course|programme) Data Security Awareness`
+	issuedAtPattern = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})`
+	namePattern     = `certify that[\s]*([\w+\s?]+) completed the`
 
 	nhsdCertificateDateFormat = "02 January 2006"
 )
 
 var (
-	isValidRegex   = regexp.MustCompile(isValidPattern)
-	issuedAtRegex  = regexp.MustCompile(issuedAtPattern)
-	firstNameRegex = regexp.MustCompile(firstNamePattern)
-	lastNameRegex  = regexp.MustCompile(lastNamePattern)
-	newLinesRegex  = regexp.MustCompile(`\r?\n`)
+	isValidRegex  = regexp.MustCompile(isValidPattern)
+	issuedAtRegex = regexp.MustCompile(issuedAtPattern)
+	nameRegex     = regexp.MustCompile(namePattern)
+	newLinesRegex = regexp.MustCompile(`\r?\n`)
 )
 
 var pdfWasmPool = must(pdfwasm.Init(pdfwasm.Config{
@@ -39,7 +38,7 @@ var pdfWasmPool = must(pdfwasm.Init(pdfwasm.Config{
 func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
 	content, err := base64.StdEncoding.DecodeString(contentBase64)
 	if err != nil {
-		return nil, err
+		return nil, types.NewErrInvalidObject(err)
 	}
 	text, err := getFirstPageText(content)
 	if err != nil {
@@ -53,26 +52,16 @@ func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
 		IsValid: true,
 	}
 	errs := []error{}
-	errs = append(errs, setNHSDCertificateFirstName(&certificate, text))
-	errs = append(errs, setNHSDCertificateLastName(&certificate, text))
+	errs = append(errs, setNHSDCertificateName(&certificate, text))
 	errs = append(errs, setNHSDCertificateIssuedAt(&certificate, text))
 	return &certificate, errors.Join(errs...)
 }
 
-func setNHSDCertificateFirstName(certificate *TrainingCertificate, text string) error {
-	if matches := firstNameRegex.FindStringSubmatch(text); len(matches) < 2 {
-		return fmt.Errorf("failed to match first name")
+func setNHSDCertificateName(certificate *TrainingCertificate, text string) error {
+	if matches := nameRegex.FindStringSubmatch(text); len(matches) < 2 {
+		return fmt.Errorf("failed to match name")
 	} else {
-		certificate.FirstName = matches[1]
-	}
-	return nil
-}
-
-func setNHSDCertificateLastName(certificate *TrainingCertificate, text string) error {
-	if matches := lastNameRegex.FindStringSubmatch(text); len(matches) < 2 {
-		return fmt.Errorf("failed to match last name")
-	} else {
-		certificate.LastName = matches[1]
+		certificate.Name = matches[1]
 	}
 	return nil
 }
@@ -95,7 +84,7 @@ func setNHSDCertificateIssuedAt(certificate *TrainingCertificate, text string) e
 func getFirstPageText(content []byte) (string, error) {
 	instance, err := pdfWasmPool.GetInstance(100 * time.Millisecond)
 	if err != nil {
-		return "", err
+		return "", types.NewErrServerError(err)
 	}
 	//nolint:errcheck // always non nil error
 	defer instance.Close()
@@ -103,7 +92,7 @@ func getFirstPageText(content []byte) (string, error) {
 		File: &content,
 	})
 	if err != nil {
-		return "", err
+		return "", types.NewErrServerError(err)
 	}
 	//nolint:errcheck // always non nil error
 	defer instance.FPDF_CloseDocument(&pdfreq.FPDF_CloseDocument{
@@ -113,9 +102,9 @@ func getFirstPageText(content []byte) (string, error) {
 		Document: doc.Document,
 	})
 	if err != nil {
-		return "", err
+		return "", types.NewErrServerError(err)
 	} else if pageCountResult.PageCount == 0 {
-		return "", fmt.Errorf("PDF had no pages")
+		return "", types.NewErrInvalidObject("PDF had no pages")
 	}
 	return firstPageTextFromDoc(instance, doc.Document)
 }
@@ -130,10 +119,9 @@ func firstPageTextFromDoc(instance pdfium.Pdfium, doc pdfref.FPDF_DOCUMENT) (str
 		},
 	})
 	if err != nil {
-		return "", err
-	} else {
-		return pageTextResult.Text, nil
+		return "", types.NewErrServerError(err)
 	}
+	return pageTextResult.Text, nil
 }
 
 func must[T any](value T, err error) T {

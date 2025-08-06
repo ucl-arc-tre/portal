@@ -3,9 +3,13 @@
 export type Auth = {
     username: string;
     roles: Array<'admin' | 'base' | 'approved-researcher'>;
+    /**
+     * Whether the user is a valid UCL staff member
+     */
+    is_staff: boolean;
 };
 
-export type ProfileResponse = {
+export type Profile = {
     username: string;
     chosen_name: string;
 };
@@ -39,9 +43,11 @@ export type ConfirmedAgreement = {
 
 export type AgreementType = 'approved-researcher' | 'study-owner';
 
-export type ProfileAgreements = {
+export type UserAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
+
+export type TrainingKind = 'training_kind_nhsd';
 
 export type ProfileTrainingUpdate = {
     kind: TrainingKind;
@@ -78,7 +84,7 @@ export type TrainingRecord = {
     completed_at?: string;
 };
 
-export type ProfileTrainingStatus = {
+export type ProfileTraining = {
     /**
      * List of all training records for the user
      */
@@ -90,15 +96,226 @@ export type User = {
     id: string;
 };
 
-export type Person = {
+export type UserData = {
     user: User;
     roles: Array<string>;
-    agreements: ProfileAgreements;
+    agreements: UserAgreements;
+    training_record: ProfileTraining;
 };
 
-export type People = Array<Person>;
+export type UserTrainingUpdate = {
+    training_kind: TrainingKind;
+    /**
+     * Time in RFC3339 format at which the the certificate was issued
+     */
+    training_date: string;
+};
 
-export type TrainingKind = 'training_kind_nhsd';
+/**
+ * A data asset representing a set of related data entities
+ */
+export type Asset = {
+    /**
+     * Unique identifier for the asset
+     */
+    id: string;
+    /**
+     * Title of the asset
+     */
+    title: string;
+    /**
+     * Description of the asset
+     */
+    description: string;
+    /**
+     * Classification level of the asset
+     */
+    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
+    /**
+     * Storage locations and touchpoints for the asset
+     */
+    locations: Array<string>;
+    /**
+     * Type of protection applied to the asset
+     */
+    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    /**
+     * Legal basis for holding the asset
+     */
+    legal_basis: string;
+    /**
+     * Format of the asset
+     */
+    format: string;
+    /**
+     * Retention expiry date of the asset
+     */
+    expiry: string;
+    /**
+     * Whether there is an up to date Data Security & Protection Toolkit in place
+     */
+    has_dspt: boolean;
+    /**
+     * Whether the asset is stored or processed outside UK and EEA
+     */
+    stored_outside_uk_eea: boolean;
+    /**
+     * Whether the asset is accessed by or governed by third parties
+     */
+    accessed_by_third_parties: boolean;
+    /**
+     * Third party agreement identifier if asset is governed by third parties
+     */
+    third_party_agreement: string;
+    /**
+     * Status of the asset
+     */
+    status: 'Active' | 'Awaiting' | 'Destroyed';
+    /**
+     * Time in RFC3339 format when the asset was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the asset was last updated
+     */
+    updated_at: string;
+};
+
+/**
+ * Base study properties
+ */
+export type StudyBase = {
+    /**
+     * Title of the study
+     */
+    title: string;
+    /**
+     * Description of the study
+     */
+    description?: string;
+    /**
+     * List of additional study administrator usernames (empty array if none)
+     */
+    additional_study_admin_usernames: Array<string>;
+    /**
+     * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
+     */
+    data_controller_organisation: string;
+    /**
+     * Whether UCL sponsorship is involved (seeking/have sought)
+     */
+    involves_ucl_sponsorship?: boolean;
+    /**
+     * Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
+     */
+    involves_cag?: boolean;
+    /**
+     * CAG reference number
+     */
+    cag_reference?: string;
+    /**
+     * Whether Research Ethics Committee approval is involved (seeking/have sought)
+     */
+    involves_ethics_approval?: boolean;
+    /**
+     * Whether Health Research Authority approval is involved (seeking/have sought)
+     */
+    involves_hra_approval?: boolean;
+    /**
+     * IRAS ID if applicable
+     */
+    iras_id?: string;
+    /**
+     * Whether the research is associated with NHS
+     */
+    is_nhs_associated?: boolean;
+    /**
+     * Whether NHS England is involved in the research
+     */
+    involves_nhs_england?: boolean;
+    /**
+     * NHS England DARS NIC number
+     */
+    nhs_england_reference?: string;
+    /**
+     * Whether the HRA Model Non-Commercial Agreement is involved
+     */
+    involves_mnca?: boolean;
+    /**
+     * Whether NHS Data Security & Protection Toolkit is required
+     */
+    requires_dspt?: boolean;
+    /**
+     * Whether a DBS check is required for staff
+     */
+    requires_dbs?: boolean;
+    /**
+     * Whether the study is registered with the UCL Data Protection Office
+     */
+    is_data_protection_office_registered?: boolean;
+    /**
+     * Full data protection registration number
+     */
+    data_protection_number?: string;
+    /**
+     * Whether third party organizations are involved
+     */
+    involves_third_party?: boolean;
+    /**
+     * Whether external users will have access to the study
+     */
+    involves_external_users?: boolean;
+    /**
+     * Whether participant consent is involved (seeking/have sought)
+     */
+    involves_participant_consent?: boolean;
+    /**
+     * Whether data is collected indirectly for the study (e.g. via a third party)
+     */
+    involves_indirect_data_collection?: boolean;
+    /**
+     * Whether data is processed outside UK/EEA
+     */
+    involves_data_processing_outside_eea?: boolean;
+    /**
+     * ID of the user who owns the study
+     */
+    owner_user_id?: string;
+};
+
+/**
+ * Request payload for creating a new study
+ */
+export type StudyCreateRequest = StudyBase;
+
+/**
+ * A research study
+ */
+export type Study = StudyBase & {
+    /**
+     * Unique identifier for the study
+     */
+    id: string;
+    /**
+     * Time in RFC3339 format when the study was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the study was last updated
+     */
+    updated_at: string;
+    /**
+     * Current approval status of the study
+     */
+    approval_status: 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+};
+
+export type StudyCreateValidationError = {
+    /**
+     * Validation error message explaining why study creation failed
+     */
+    error_message: string;
+};
 
 export type GetAuthData = {
     body?: never;
@@ -143,7 +360,7 @@ export type GetProfileErrors = {
 };
 
 export type GetProfileResponses = {
-    200: ProfileResponse;
+    200: Profile;
 };
 
 export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
@@ -170,7 +387,7 @@ export type PostProfileResponses = {
     /**
      * Successfully updated profile
      */
-    200: ProfileResponse;
+    200: Profile;
 };
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
@@ -194,7 +411,7 @@ export type GetProfileAgreementsErrors = {
 };
 
 export type GetProfileAgreementsResponses = {
-    200: ProfileAgreements;
+    200: UserAgreements;
 };
 
 export type GetProfileAgreementsResponse = GetProfileAgreementsResponses[keyof GetProfileAgreementsResponses];
@@ -218,7 +435,7 @@ export type PostProfileAgreementsErrors = {
 };
 
 export type PostProfileAgreementsResponses = {
-    200: ProfileAgreements;
+    200: UserAgreements;
 };
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
@@ -242,7 +459,7 @@ export type GetProfileTrainingErrors = {
 };
 
 export type GetProfileTrainingResponses = {
-    200: ProfileTrainingStatus;
+    200: ProfileTraining;
 };
 
 export type GetProfileTrainingResponse = GetProfileTrainingResponses[keyof GetProfileTrainingResponses];
@@ -274,14 +491,19 @@ export type PostProfileTrainingResponses = {
 
 export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
 
-export type GetAgreementsApprovedResearcherData = {
+export type GetAgreementsByAgreementTypeData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * Type of agreement to get
+         */
+        agreementType: AgreementType;
+    };
     query?: never;
-    url: '/agreements/approved-researcher';
+    url: '/agreements/{agreementType}';
 };
 
-export type GetAgreementsApprovedResearcherErrors = {
+export type GetAgreementsByAgreementTypeErrors = {
     /**
      * Not acceptable
      */
@@ -296,20 +518,20 @@ export type GetAgreementsApprovedResearcherErrors = {
     default: unknown;
 };
 
-export type GetAgreementsApprovedResearcherResponses = {
+export type GetAgreementsByAgreementTypeResponses = {
     200: Agreement;
 };
 
-export type GetAgreementsApprovedResearcherResponse = GetAgreementsApprovedResearcherResponses[keyof GetAgreementsApprovedResearcherResponses];
+export type GetAgreementsByAgreementTypeResponse = GetAgreementsByAgreementTypeResponses[keyof GetAgreementsByAgreementTypeResponses];
 
-export type GetPeopleData = {
+export type GetUsersData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/people';
+    url: '/users';
 };
 
-export type GetPeopleErrors = {
+export type GetUsersErrors = {
     /**
      * Forbidden
      */
@@ -324,12 +546,294 @@ export type GetPeopleErrors = {
     default: unknown;
 };
 
-export type GetPeopleResponses = {
-    200: People;
+export type GetUsersResponses = {
+    200: Array<UserData>;
 };
 
-export type GetPeopleResponse = GetPeopleResponses[keyof GetPeopleResponses];
+export type GetUsersResponse = GetUsersResponses[keyof GetUsersResponses];
+
+export type PostUsersByUserIdTrainingData = {
+    body: UserTrainingUpdate;
+    path: {
+        /**
+         * ID of the user to be updated
+         */
+        userId: string;
+    };
+    query?: never;
+    url: '/users/{userId}/training';
+};
+
+export type PostUsersByUserIdTrainingErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostUsersByUserIdTrainingResponses = {
+    /**
+     * Successfully updated user
+     */
+    200: TrainingRecord;
+};
+
+export type PostUsersByUserIdTrainingResponse = PostUsersByUserIdTrainingResponses[keyof PostUsersByUserIdTrainingResponses];
+
+export type PostUsersApprovedResearchersImportCsvData = {
+    body: Blob | File;
+    path?: never;
+    query?: never;
+    url: '/users/approved-researchers/import/csv';
+};
+
+export type PostUsersApprovedResearchersImportCsvErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostUsersApprovedResearchersImportCsvResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostUsersApprovedResearchersImportCsvResponse = PostUsersApprovedResearchersImportCsvResponses[keyof PostUsersApprovedResearchersImportCsvResponses];
+
+export type PostUsersInviteData = {
+    body: {
+        /**
+         * Email address of the person to be invited
+         */
+        email: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/invite';
+};
+
+export type PostUsersInviteErrors = {
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostUsersInviteResponses = {
+    /**
+     * Successfully sent invite
+     */
+    200: unknown;
+};
+
+export type GetStudiesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type GetStudiesErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesResponses = {
+    200: Array<Study>;
+};
+
+export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
+
+export type PostStudiesData = {
+    body: StudyCreateRequest;
+    path?: never;
+    query?: never;
+    url: '/studies';
+};
+
+export type PostStudiesErrors = {
+    /**
+     * Validation error
+     */
+    400: StudyCreateValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Invalid request
+     */
+    406: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesError = PostStudiesErrors[keyof PostStudiesErrors];
+
+export type PostStudiesResponses = {
+    /**
+     * Study created successfully
+     */
+    201: unknown;
+};
+
+export type GetStudyByStudyIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/study/{studyId}';
+};
+
+export type GetStudyByStudyIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudyByStudyIdResponses = {
+    200: Study;
+};
+
+export type GetStudyByStudyIdResponse = GetStudyByStudyIdResponses[keyof GetStudyByStudyIdResponses];
+
+export type GetStudiesByStudyIdAssetsData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets';
+};
+
+export type GetStudiesByStudyIdAssetsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsResponses = {
+    200: Array<Asset>;
+};
+
+export type GetStudiesByStudyIdAssetsResponse = GetStudiesByStudyIdAssetsResponses[keyof GetStudiesByStudyIdAssetsResponses];
+
+export type PostStudiesByStudyIdAssetsData = {
+    body: Asset;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets';
+};
+
+export type PostStudiesByStudyIdAssetsErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdAssetsResponses = {
+    /**
+     * Asset created successfully
+     */
+    201: Asset;
+};
+
+export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
 export type ClientOptions = {
-    baseUrl: `${string}://${string}/api/v0` | (string & {});
+    baseUrl: `${string}://${string}/web/api/v0` | (string & {});
 };

@@ -9,12 +9,12 @@ import (
 
 // Create secure middleware. Disabled in dev/testing
 func NewSecure() gin.HandlerFunc {
-	isDevelopment := config.IsDevDeploy() || config.IsTesting()
-	if isDevelopment {
+	if config.IsTesting() || config.IsDevDeploy() {
 		log.Warn().Msg("Secure middleware disabled in development + testing")
+		return func(c *gin.Context) {}
 	}
 	return secure.New(secure.Config{
-		IsDevelopment:         isDevelopment,
+		IsDevelopment:         false,
 		SSLRedirect:           true,
 		STSSeconds:            315360000,
 		STSIncludeSubdomains:  true,

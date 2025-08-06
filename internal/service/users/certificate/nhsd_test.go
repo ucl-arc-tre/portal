@@ -15,8 +15,7 @@ func TestValidNHSDCertificateParse(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.True(t, certificate.IsValid)
-	assert.Equal(t, "Tom", certificate.FirstName)
-	assert.Equal(t, "Young", certificate.LastName)
+	assert.Equal(t, "Tom Young", certificate.Name)
 	expectedExpiry, err := time.Parse("2006-01-02", "2024-10-23")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExpiry, certificate.IssuedAt)
@@ -28,6 +27,16 @@ func TestInvalidNHSDCertificateParse(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.False(t, certificate.IsValid)
+}
+
+func TestValidRegex(t *testing.T) {
+	validTexts := []string{
+		"This is to certify that Bob Smith completed the programme Data Security Awareness",
+		"This is to certify that Alice Taylor-Smith completed the course Data Security Awareness",
+	}
+	for _, text := range validTexts {
+		assert.True(t, isValidRegex.MatchString(text))
+	}
 }
 
 func mustBase64Encode(t *testing.T, filepath string) string {

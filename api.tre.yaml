@@ -1,0 +1,50 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.0
+  title: portal-tre
+  description: UCL ARC portal TRE API
+servers:
+  - url: /tre/api/v0
+
+paths:
+  /user-status:
+    parameters:
+      - in: query
+        name: username
+        required: true
+        schema:
+          type: string
+        description: Username of the user to get the status of. e.g. ccxyz@ucl.ac.uk
+    get:
+      description: Get the status of a user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStatus"
+        "401":
+          description: Unauthenticated
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    UserStatus:
+      type: object
+      required:
+        - is_approved_researcher
+      properties:
+        is_approved_researcher:
+          type: boolean
+          description: Is the user an approved researcher?
+        nhsd_training_expires_at:
+          type: string
+          description: Instanc at which the user's training expires in RFC3339 format
+
+security:
+  - basicAuth: []

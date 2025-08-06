@@ -1,16 +1,14 @@
 services:
-  web-api:
+  api:
     build:
       context: ../..
-      target: web-api-dev
+      target: api-dev
     restart: always
     environment:
-      DEBUG: true
       PORT: "8080"
       IS_DEV_DEPLOY: true
-      ADMIN_USERNAMES: "cceatyo-test@arctretest.onmicrosoft.com,ccaeaho@ucl.ac.uk,cceajeh@ucl.ac.uk,portal-e2e-admin@arctretest.onmicrosoft.com,portal-ahl-admin@arctretest.onmicrosoft.com,portal-jh-admin@arctretest.onmicrosoft.com"
-      DATABASE_DSN: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
     volumes:
+      - ./config.yaml:/etc/portal/config.yaml:ro
       - type: bind
         source: ../..
         target: /repo
@@ -23,7 +21,7 @@ services:
       - "./oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
     restart: unless-stopped
     depends_on:
-      - web-api
+      - api
 
   web-frontend:
     build:
@@ -44,7 +42,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - web-api
+      - api
       - web-frontend
 
   postgres:

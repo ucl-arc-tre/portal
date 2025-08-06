@@ -1,0 +1,46 @@
+.training-dialog {
+  width: 28rem;
+
+  .form {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.2rem;
+    gap: 0.8rem;
+    margin-inline: 4%;
+
+    p {
+      margin-bottom: 0.5rem;
+    }
+
+    input {
+      font-size: 1.4rem;
+      padding: 0.2rem;
+      margin-top: 0.4rem;
+
+      &:focus {
+        outline-color: var(--green-200);
+      }
+    }
+
+    select {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert {
+      margin-inline: 4%;
+    }
+  }
+
+  /* training only - put in new file? */
+  .date {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .today-button {
+    font-weight: 400 !important;
+    font-size: 0.8rem !important;
+  }
+}

@@ -1,0 +1,21 @@
+.wrapper {
+  padding: 1rem;
+  padding-top: 0;
+}
+
+.text {
+  list-style: inside;
+
+  p {
+    padding-top: 0.7rem;
+  }
+
+  li {
+    padding-top: 0.4rem;
+  }
+
+  a {
+    text-decoration: underline;
+    color: var(--form-link);
+  }
+}

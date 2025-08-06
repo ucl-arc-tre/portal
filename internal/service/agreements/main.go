@@ -1,8 +1,6 @@
 package agreements
 
 import (
-	"fmt"
-
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -22,13 +20,16 @@ func New() *Service {
 }
 
 func (s *Service) LatestApprovedResearcher() (*types.Agreement, error) {
-	agreemeents := []types.Agreement{}
+	agreemeent := types.Agreement{}
 	result := s.db.Where("type = ?", ApprovedResearcherType).
 		Order("created_at desc").
 		Limit(1).
-		Find(&agreemeents)
-	if result.Error != nil || len(agreemeents) == 0 {
-		return nil, fmt.Errorf("failed to get agreement %v", result.Error)
+		Find(&agreemeent)
+	if result.Error != nil {
+		return nil, types.NewErrServerError(result.Error)
 	}
-	return &agreemeents[0], nil
+	if result.RowsAffected == 0 {
+		return nil, types.NewNotFoundError("no agreements")
+	}
+	return &agreemeent, nil
 }

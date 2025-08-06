@@ -2,22 +2,19 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  --green-300: #165823;
-  --green-200: #237b35;
-  --green-100: #359749;
-  --green-50: #64bb75;
-}
+  --text--secondary: #595959;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --green-300: #10431a;
+  --green-200: #1b6229;
+  --green-100: #328543;
+  --green-50: #64bb75;
+
+  --form-link: #4023a7;
 }
 
 html,
 body {
-  max-width: 100vw;
+  max-width: 100dvw;
   overflow-x: hidden;
 }
 
@@ -45,14 +42,7 @@ a {
 }
 
 .subtitle {
-  padding-top: 2rem;
   padding-bottom: 1rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
 
 dialog {

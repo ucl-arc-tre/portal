@@ -14,7 +14,7 @@ const (
 	initConnectRetryDelay = 1 * time.Second
 )
 
-// Initalise the database with the required types
+// Initialise the database and migrate required types
 func InitDB() {
 	types := []any{
 		&types.User{},
@@ -22,6 +22,11 @@ func InitDB() {
 		&types.UserAgreementConfirmation{},
 		&types.UserTrainingRecord{},
 		&types.UserAttributes{},
+		&types.Study{},
+		&types.StudyAdmin{},
+		&types.Asset{},
+		&types.AssetLocation{},
+		&types.UserSponsorship{},
 	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
