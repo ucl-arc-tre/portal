@@ -3,6 +3,7 @@ import styles from "./Nav.module.css";
 import Button from "../ui/Button";
 import dynamic from "next/dynamic";
 import { ReactElement } from "react";
+import { client } from "@/openapi/client.gen";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -22,6 +23,9 @@ const PaperclipIcon = dynamic(() => import("uikit-react-public").then((mod) => m
 const UsersIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Users), {
   ssr: false,
 });
+const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.LogOut), {
+  ssr: false,
+});
 
 function NavItem({ href, icon, title }: { href: string; icon: ReactElement; title: string }) {
   const pathname = usePathname();
@@ -35,6 +39,7 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 }
 
 export default function Nav() {
+  const logoutUrl = client.getConfig().baseUrl + "/logout";
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
@@ -54,6 +59,9 @@ export default function Nav() {
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
       </nav>
+      <Button variant="tertiary" className={styles.logout} href={logoutUrl}>
+        Log out <LogoutIcon />
+      </Button>
     </aside>
   );
 }

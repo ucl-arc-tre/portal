@@ -31,6 +31,7 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 		{RoleName: Base, Resource: "/profile/agreements", Action: WriteAction},
 		{RoleName: Base, Resource: "/profile/training", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile/training", Action: WriteAction},
+		{RoleName: Base, Resource: "/logout", Action: ReadAction},
 	}
 	for _, policy := range policies {
 		addPolicy(enforcer, policy)
