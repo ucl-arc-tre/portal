@@ -27,12 +27,19 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       title: "Study Asset",
       description: "Create and manage at least one study asset",
       completed: false,
-      current: agreementCompleted,
+      current: agreementCompleted, // replace with actual asset management step logic
     },
   ];
 
   const getCurrentStepComponent = () => {
-    return <StudyAgreement agreementCompleted={agreementCompleted} setAgreementCompleted={setAgreementCompleted} />;
+    return (
+      <StudyAgreement
+        studyId={study.id}
+        agreementCompleted={agreementCompleted}
+        setAgreementCompleted={setAgreementCompleted}
+      />
+    );
+    // Todo: insert next step (asset creation)
   };
 
   return (

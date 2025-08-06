@@ -834,6 +834,85 @@ export type PostStudiesByStudyIdAssetsResponses = {
 
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
+export type GetStudiesByStudyIdAgreementsData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/agreements';
+};
+
+export type GetStudiesByStudyIdAgreementsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAgreementsResponses = {
+    200: UserAgreements;
+};
+
+export type GetStudiesByStudyIdAgreementsResponse = GetStudiesByStudyIdAgreementsResponses[keyof GetStudiesByStudyIdAgreementsResponses];
+
+export type PostStudiesByStudyIdAgreementsData = {
+    body: AgreementConfirmation;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/agreements';
+};
+
+export type PostStudiesByStudyIdAgreementsErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdAgreementsResponses = {
+    /**
+     * Agreement signed successfully
+     */
+    200: unknown;
+};
+
 export type ClientOptions = {
     baseUrl: `${string}://${string}/web/api/v0` | (string & {});
 };

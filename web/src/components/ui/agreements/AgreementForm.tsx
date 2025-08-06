@@ -15,6 +15,7 @@ type AgreementFormProps = {
 
 export default function AgreementForm(props: AgreementFormProps) {
   const { agreementId, setAgreementCompleted, handleAgreementSubmit, agreementLabel = "this agreement" } = props;
+
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER));
