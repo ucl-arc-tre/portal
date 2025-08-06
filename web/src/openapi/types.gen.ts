@@ -850,9 +850,9 @@ export type GetLogoutErrors = {
 
 export type GetLogoutResponses = {
     /**
-     * Successfully logged out
+     * Unexpected error
      */
-    200: unknown;
+    default: unknown;
 };
 
 export type ClientOptions = {

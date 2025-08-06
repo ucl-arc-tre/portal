@@ -366,7 +366,7 @@ paths:
     get:
       description: Log the user out
       responses:
-        "200":
+        "302":
           description: Successfully logged out
         default:
           description: Unexpected error
