@@ -56,19 +56,3 @@ func (s *Service) GetStudyAgreementSignatures(user types.User, studyID uuid.UUID
 
 	return signatures, nil
 }
-
-// HasSignedStudyOwnerAgreement checks if the user has signed the study-owner agreement for a specific study
-func (s *Service) HasSignedStudyOwnerAgreement(user types.User, studyID uuid.UUID) (bool, error) {
-	signatures, err := s.GetStudyAgreementSignatures(user, studyID)
-	if err != nil {
-		return false, err
-	}
-
-	for _, signature := range signatures {
-		if signature.AgreementType == openapi.AgreementTypeStudyOwner {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
