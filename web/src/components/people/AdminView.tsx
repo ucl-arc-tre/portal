@@ -8,19 +8,11 @@ import ApprovedResearcherImport from "./ApprovedResearcherImport";
 import { TrainingKindOptions, XIcon } from "../shared/exports";
 import Loading from "../ui/Loading";
 import ExternalInvite from "./ExternalInvite";
+import { convertRFC3339ToDDMMYYYY } from "../shared/exports";
 
 const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
 });
-
-function convertRFC3339ToDDMMYYYY(dateString: string) {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
-}
 
 function getHumanReadableTrainingKind(trainingKind: string) {
   // getting the key from the value

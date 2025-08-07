@@ -6,6 +6,8 @@ import StepProgress from "../ui/steps/StepProgress";
 import { Auth } from "@/openapi";
 
 import styles from "./ProfileSetup.module.css";
+import Button from "../ui/Button";
+import { useState } from "react";
 
 type Props = {
   chosenName: string | undefined;
@@ -15,6 +17,7 @@ type Props = {
   trainingCertificateCompleted: boolean;
   setTrainingCertificateCompleted: (completed: boolean) => void;
   userData: Auth | null;
+  expiryWarningVisible: boolean;
 };
 
 export default function ProfileSetup(props: Props) {
@@ -25,10 +28,20 @@ export default function ProfileSetup(props: Props) {
     setAgreementCompleted,
     trainingCertificateCompleted,
     setTrainingCertificateCompleted,
+    expiryWarningVisible,
   } = props;
 
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
+  console.log(
+    "Profile steps completed:",
+    profileStepsCompleted,
+    hasChosenName,
+    agreementCompleted,
+    trainingCertificateCompleted
+  );
+  const [showCertReupload, setShowCertReupload] = useState(false);
+  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const profileSetupSteps: ProfileStep[] = [
     {
@@ -37,6 +50,7 @@ export default function ProfileSetup(props: Props) {
       description: "Enter your preferred name - this must match the name on your training certificate",
       completed: hasChosenName,
       current: !hasChosenName,
+      expiring: false,
     },
     {
       id: "agreement",
@@ -44,13 +58,15 @@ export default function ProfileSetup(props: Props) {
       description: "Review and accept the terms to become an approved researcher",
       completed: agreementCompleted,
       current: hasChosenName && !agreementCompleted,
+      expiring: false,
     },
     {
       id: "certificate",
       title: "Training Certificate",
       description: "Upload your NHS Digital Data Security Awareness certificate",
-      completed: trainingCertificateCompleted,
-      current: hasChosenName && agreementCompleted && !trainingCertificateCompleted,
+      completed: !expiryWarningVisible && trainingCertificateCompleted,
+      current: hasChosenName && agreementCompleted,
+      expiring: expiryWarningVisible,
     },
   ];
 
@@ -60,18 +76,37 @@ export default function ProfileSetup(props: Props) {
     }
 
     if (hasChosenName && !(agreementCompleted && trainingCertificateCompleted)) {
+      // if training completed and expiry not showing, show button to upload another certificate
+      // if expiring soon show it in orange?
+
       return (
         <div className={styles["approved-researcher-steps"]}>
           <ApprovedResearcherAgreement
             setAgreementCompleted={setAgreementCompleted}
             agreementCompleted={agreementCompleted}
           />
-          <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
+          <TrainingCertificate
+            setTrainingCertificateCompleted={setTrainingCertificateCompleted}
+            expiryWarningVisible={expiryWarningVisible}
+          />
         </div>
       );
     }
 
     return null;
+  };
+
+  const toggleShowCertReupload = () => {
+    // for smooth collapse
+    if (showCertReupload) {
+      setIsCollapsing(true);
+      setTimeout(() => {
+        setShowCertReupload(false);
+        setIsCollapsing(false);
+      }, 1800);
+    } else {
+      setShowCertReupload(true);
+    }
   };
 
   return (
@@ -86,7 +121,32 @@ export default function ProfileSetup(props: Props) {
         introText="Complete the following steps to set up your profile and become an approved researcher."
         ariaLabel="Profile setup progress"
       />
-
+      {/* profile complete & show option to upload another cert */}
+      {profileStepsCompleted && (
+        <div className={styles["reupload-option"]}>
+          <p>
+            Your current training certificate is within date, but you may update your certification at any time by
+            uploading a new document.
+          </p>
+          <Button variant="secondary" size="small" onClick={toggleShowCertReupload}>
+            {!showCertReupload ? "Upload another certificate" : "Cancel"}
+          </Button>
+          <div
+            className={`${styles["certificate-container"]} ${
+              showCertReupload
+                ? styles["cert-visible"]
+                : isCollapsing
+                  ? styles["cert-collapsing"]
+                  : styles["cert-hidden"]
+            }`}
+          >
+            <TrainingCertificate
+              setTrainingCertificateCompleted={setTrainingCertificateCompleted}
+              expiryWarningVisible={expiryWarningVisible}
+            />
+          </div>
+        </div>
+      )}
       {!profileStepsCompleted && <StepArrow />}
 
       <div className={styles["current-step"]}>{getCurrentStepComponent()}</div>

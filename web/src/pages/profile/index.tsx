@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(false);
+  const [expiryWarningVisible, setExpiryWarningVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -44,6 +45,20 @@ export default function ProfilePage() {
             (record) => record.kind === "training_kind_nhsd"
           );
           setTrainingCertificateCompleted(nhsdTraining?.is_valid || false);
+          if (nhsdTraining?.is_valid) {
+            const completedDate = new Date(nhsdTraining.completed_at!);
+            const today = new Date();
+
+            // check if the cert was completed 10 months ago
+
+            const diffTime = today.getTime() - completedDate.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            console.log("difference in days", diffDays);
+
+            if (diffDays > 10 * 30) {
+              setExpiryWarningVisible(true);
+            }
+          }
         }
       } catch (error) {
         console.error("Failed to get profile data:", error);
@@ -90,6 +105,7 @@ export default function ProfilePage() {
         trainingCertificateCompleted={trainingCertificateCompleted}
         setTrainingCertificateCompleted={setTrainingCertificateCompleted}
         userData={userData}
+        expiryWarningVisible={expiryWarningVisible}
       />
     </>
   );
