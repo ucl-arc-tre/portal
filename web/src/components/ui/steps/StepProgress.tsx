@@ -1,10 +1,6 @@
+import { CheckIcon } from "@/components/shared/exports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
-import dynamic from "next/dynamic";
-
-const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
-  ssr: false,
-});
 
 export default function StepProgress(props: StepProgressProps) {
   const {
@@ -16,12 +12,20 @@ export default function StepProgress(props: StepProgressProps) {
     completionButtonHref,
     introText = "Complete the following steps.",
     ariaLabel = "Progress steps",
+    isExpiring = false,
   } = props;
 
   return (
     <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
-        {isComplete ? (
+        {isExpiring ? (
+          <>
+            <h3 className={styles["expiring-title"]}>Your certificate is expiring soon!</h3>
+            <p className={styles["expiring-subtitle"]}>
+              To retain access to the portal, please upload a new certificate.
+            </p>
+          </>
+        ) : isComplete ? (
           <>
             <h3 className={styles["completion-title"]}>{completionTitle}</h3>
             <p className={styles["completion-subtitle"]}>{completionSubtitle}</p>
@@ -36,6 +40,7 @@ export default function StepProgress(props: StepProgressProps) {
         )}
       </div>
       {/* todo: add expiring styling */}
+
       <div aria-label={ariaLabel}>
         <ol className={styles["step-list"]}>
           {steps.map((step, stepIndex) => (

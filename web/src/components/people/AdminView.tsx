@@ -1,18 +1,13 @@
 import { ConfirmedAgreement, getUsers, UserData, TrainingRecord } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
-import dynamic from "next/dynamic";
 import Button from "../ui/Button";
 import TrainingForm from "./TrainingForm";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
-import { TrainingKindOptions, XIcon } from "../shared/exports";
+import { CheckIcon, TrainingKindOptions, XIcon } from "../shared/exports";
 import Loading from "../ui/Loading";
 import ExternalInvite from "./ExternalInvite";
 import { convertRFC3339ToDDMMYYYY } from "../shared/exports";
-
-const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
-  ssr: false,
-});
 
 function getHumanReadableTrainingKind(trainingKind: string) {
   // getting the key from the value

@@ -19,7 +19,12 @@ export const Label = dynamic(() => import("uikit-react-public").then((mod) => mo
 export const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
+
 export const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
+  ssr: false,
+});
+
+export const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
 });
 
