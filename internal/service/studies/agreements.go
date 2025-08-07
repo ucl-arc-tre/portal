@@ -38,8 +38,7 @@ func (s *Service) GetStudyAgreementSignatures(user types.User, studyID uuid.UUID
 	}
 
 	var studySignatures []types.StudyAgreementSignature
-	result := s.db.Preload("Agreement").
-		Where("user_id = ? AND study_id = ?", user.ID, studyID).
+	result := s.db.Where("user_id = ? AND study_id = ?", user.ID, studyID).
 		Find(&studySignatures)
 
 	if result.Error != nil {
@@ -49,7 +48,7 @@ func (s *Service) GetStudyAgreementSignatures(user types.User, studyID uuid.UUID
 	signatures := []openapi.ConfirmedAgreement{}
 	for _, signature := range studySignatures {
 		signatures = append(signatures, openapi.ConfirmedAgreement{
-			AgreementType: openapi.AgreementType(signature.Agreement.Type),
+			AgreementType: openapi.AgreementTypeStudyOwner,
 			ConfirmedAt:   signature.CreatedAt.Format(config.TimeFormat),
 		})
 	}
