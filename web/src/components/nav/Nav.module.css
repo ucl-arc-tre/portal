@@ -9,7 +9,6 @@
   width: 180px;
   padding: 1rem;
   background-color: var(--nav-base);
-  position: sticky;
 
   hr {
     border-color: var(--green--hover);
@@ -63,9 +62,7 @@
 }
 
 .logout {
-  position: absolute !important;
   width: 150px;
-  bottom: 0.5rem;
   font-weight: 400 !important;
   color: var(--green-200) !important;
   transition: background-color 0.3s ease;
@@ -75,6 +72,6 @@
   }
 
   &:hover {
-    background-color: color-mix(in srgb, var(--green--background) 90%, var(--green-200) 10%);
+    background-color: var(--green--background);
   }
 }
