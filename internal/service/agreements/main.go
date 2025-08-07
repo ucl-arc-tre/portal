@@ -21,23 +21,16 @@ func New() *Service {
 }
 
 func (s *Service) LatestApprovedResearcher() (*types.Agreement, error) {
-	agreemeent := types.Agreement{}
-	result := s.db.Where("type = ?", ApprovedResearcherType).
-		Order("created_at desc").
-		Limit(1).
-		Find(&agreemeent)
-	if result.Error != nil {
-		return nil, types.NewErrServerError(result.Error)
-	}
-	if result.RowsAffected == 0 {
-		return nil, types.NewNotFoundError("no agreements")
-	}
-	return &agreemeent, nil
+	return s.latestAgreement(ApprovedResearcherType)
 }
 
-func (s *Service) StudyOwnerAgreementText() (*types.Agreement, error) {
+func (s *Service) LatestStudyOwner() (*types.Agreement, error) {
+	return s.latestAgreement(StudyOwnerType)
+}
+
+func (s *Service) latestAgreement(agreementType types.AgreementType) (*types.Agreement, error) {
 	agreemeent := types.Agreement{}
-	result := s.db.Where("type = ?", StudyOwnerType).
+	result := s.db.Where("type = ?", agreementType).
 		Order("created_at desc").
 		Limit(1).
 		Find(&agreemeent)

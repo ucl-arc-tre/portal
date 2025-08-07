@@ -20,7 +20,7 @@ func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType ope
 			Text: agreement.Text,
 		})
 	case openapi.AgreementTypeStudyOwner:
-		agreement, err := h.agreements.StudyOwnerAgreementText()
+		agreement, err := h.agreements.LatestStudyOwner()
 		if err != nil {
 			setError(ctx, err, "Failed to get study owner agreement")
 			return
