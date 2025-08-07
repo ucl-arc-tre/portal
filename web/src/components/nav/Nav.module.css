@@ -9,6 +9,7 @@
   width: 180px;
   padding: 1rem;
   background-color: var(--nav-base);
+  position: sticky;
 
   hr {
     border-color: var(--green--hover);
