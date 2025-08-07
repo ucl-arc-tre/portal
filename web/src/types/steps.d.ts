@@ -4,6 +4,7 @@ type Step = {
   description: string;
   completed: boolean;
   current: boolean;
+  expiring: boolean;
 };
 
 type StepProgressProps = {
@@ -15,4 +16,5 @@ type StepProgressProps = {
   completionButtonHref?: string;
   introText?: string;
   ariaLabel?: string;
+  isExpiring?: boolean;
 };
