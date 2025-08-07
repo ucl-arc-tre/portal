@@ -43,6 +43,9 @@
   }
 
   .certificate-container {
+    overflow: hidden;
+    transition: height 1.8s ease 0.4s;
+
     &.cert-hidden {
       display: none;
     }
@@ -88,5 +91,15 @@
   100% {
     opacity: 0;
     transform: translateY(-200px);
+  }
+}
+
+@keyframes shrink {
+  0% {
+    height: 100%;
+  }
+
+  90% {
+    height: 0;
   }
 }

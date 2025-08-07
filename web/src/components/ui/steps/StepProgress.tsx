@@ -1,6 +1,11 @@
 import { CheckIcon } from "@/components/shared/exports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
+import dynamic from "next/dynamic";
+
+export const AlertTriangleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertTriangle), {
+  ssr: false,
+});
 
 export default function StepProgress(props: StepProgressProps) {
   const {
@@ -48,14 +53,18 @@ export default function StepProgress(props: StepProgressProps) {
               <div className={styles["step-content"]}>
                 <div
                   className={`${styles["step-icon"]} ${
-                    step.completed
-                      ? styles["step-icon-completed"]
-                      : step.current
-                        ? styles["step-icon-current"]
-                        : styles["step-icon-pending"]
+                    step.expiring
+                      ? styles["step-icon-pending"]
+                      : step.completed
+                        ? styles["step-icon-completed"]
+                        : step.current
+                          ? styles["step-icon-current"]
+                          : styles["step-icon-pending"]
                   }`}
                 >
-                  {step.completed ? (
+                  {step.expiring ? (
+                    <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
+                  ) : step.completed ? (
                     <CheckIcon className={styles["check-icon"]} />
                   ) : (
                     <span className={styles["step-number"]}>{stepIndex + 1}</span>
@@ -65,11 +74,13 @@ export default function StepProgress(props: StepProgressProps) {
                 <div className={styles["step-details"]}>
                   <h3
                     className={`${styles["step-title"]} ${
-                      step.completed
-                        ? styles["step-title-completed"]
-                        : step.current
-                          ? styles["step-title-current"]
-                          : styles["step-title-pending"]
+                      step.expiring
+                        ? styles["step-title-pending"]
+                        : step.completed
+                          ? styles["step-title-completed"]
+                          : step.current
+                            ? styles["step-title-current"]
+                            : styles["step-title-pending"]
                     }`}
                   >
                     {step.title}
@@ -77,11 +88,13 @@ export default function StepProgress(props: StepProgressProps) {
 
                   <p
                     className={`${styles["step-description"]} ${
-                      step.completed
-                        ? styles["step-description-completed"]
-                        : step.current
-                          ? styles["step-description-current"]
-                          : styles["step-description-pending"]
+                      step.expiring
+                        ? styles["step-description-pending"]
+                        : step.completed
+                          ? styles["step-description-completed"]
+                          : step.current
+                            ? styles["step-description-current"]
+                            : styles["step-description-pending"]
                     }`}
                   >
                     {step.description}
@@ -92,7 +105,11 @@ export default function StepProgress(props: StepProgressProps) {
               {stepIndex < steps.length - 1 && (
                 <div
                   className={`${styles["step-connector"]} ${
-                    step.completed ? styles["step-connector-completed"] : styles["step-connector-pending"]
+                    step.expiring
+                      ? styles["step-connector-pending"]
+                      : step.completed
+                        ? styles["step-connector-completed"]
+                        : styles["step-connector-pending"]
                   }`}
                 />
               )}

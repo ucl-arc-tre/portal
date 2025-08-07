@@ -158,3 +158,18 @@
   line-height: 1.5;
   padding-bottom: 1rem;
 }
+
+.expiring-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #b80f0f;
+}
+
+.expiring-subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.5;
+  padding-bottom: 1rem;
+}

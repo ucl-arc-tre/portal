@@ -33,13 +33,6 @@ export default function ProfileSetup(props: Props) {
 
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
-  console.log(
-    "Profile steps completed:",
-    profileStepsCompleted,
-    hasChosenName,
-    agreementCompleted,
-    trainingCertificateCompleted
-  );
   const [showCertReupload, setShowCertReupload] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
 
@@ -70,13 +63,13 @@ export default function ProfileSetup(props: Props) {
     },
   ];
 
+  console.log("expiryWarningVisible", expiryWarningVisible);
   const getCurrentStepComponent = () => {
     if (!hasChosenName) {
       return <ProfileChosenName currentName={chosenName} setChosenName={setChosenName} />;
     }
 
     if (hasChosenName && !(agreementCompleted && trainingCertificateCompleted)) {
-      // if training completed and expiry not showing, show button to upload another certificate
       // if expiring soon show it in orange?
 
       return (
@@ -97,13 +90,15 @@ export default function ProfileSetup(props: Props) {
   };
 
   const toggleShowCertReupload = () => {
-    // for smooth collapse
+    // for smooth collapse: TODO: fix
+    console.log("showCertReupload", showCertReupload);
     if (showCertReupload) {
       setIsCollapsing(true);
+      console.log("isCollapsing", isCollapsing);
       setTimeout(() => {
         setShowCertReupload(false);
         setIsCollapsing(false);
-      }, 1800);
+      }, 1900);
     } else {
       setShowCertReupload(true);
     }
@@ -120,10 +115,11 @@ export default function ProfileSetup(props: Props) {
         completionButtonHref="/studies"
         introText="Complete the following steps to set up your profile and become an approved researcher."
         ariaLabel="Profile setup progress"
+        isExpiring={expiryWarningVisible}
       />
       {/* profile complete & show option to upload another cert */}
       {profileStepsCompleted && (
-        <div className={styles["reupload-option"]}>
+        <div className={`${styles["reupload-option"]} ${isCollapsing ? styles.collapsing : ""}`}>
           <p>
             Your current training certificate is within date, but you may update your certification at any time by
             uploading a new document.
@@ -133,10 +129,10 @@ export default function ProfileSetup(props: Props) {
           </Button>
           <div
             className={`${styles["certificate-container"]} ${
-              showCertReupload
-                ? styles["cert-visible"]
-                : isCollapsing
-                  ? styles["cert-collapsing"]
+              isCollapsing
+                ? styles["cert-collapsing"]
+                : showCertReupload
+                  ? styles["cert-visible"]
                   : styles["cert-hidden"]
             }`}
           >
