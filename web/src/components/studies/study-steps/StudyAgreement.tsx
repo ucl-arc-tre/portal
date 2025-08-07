@@ -11,12 +11,13 @@ import styles from "./StudyAgreement.module.css";
 
 type StudyAgreementProps = {
   studyId: string;
+  studyName: string;
   agreementCompleted: boolean;
   setAgreementCompleted: (completed: boolean) => void;
 };
 
 export default function StudyAgreement(props: StudyAgreementProps) {
-  const { studyId, agreementCompleted, setAgreementCompleted } = props;
+  const { studyId, studyName, agreementCompleted, setAgreementCompleted } = props;
 
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -85,7 +86,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   };
 
   return (
-    <section data-cy="study-agreement">
+    <section className={styles["study-agreement-container"]} data-cy="study-agreement">
       <h2 className="subtitle">Study Owner Agreement</h2>
 
       {error && (
@@ -99,7 +100,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
         agreementId={studyAgreementText.id}
         setAgreementCompleted={setAgreementCompleted}
         handleAgreementSubmit={handleAgreementSubmit}
-        agreementLabel="the study owner agreement"
+        confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset Owner in UCL of the following study: ${studyName}`}
       />
     </section>
   );

@@ -18,4 +18,9 @@
     text-decoration: underline;
     color: var(--form-link);
   }
+
+  h2,
+  h3 {
+    margin-top: 1.5rem;
+  }
 }

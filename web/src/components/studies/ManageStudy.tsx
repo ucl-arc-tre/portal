@@ -35,6 +35,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     return (
       <StudyAgreement
         studyId={study.id}
+        studyName={study.title}
         agreementCompleted={agreementCompleted}
         setAgreementCompleted={setAgreementCompleted}
       />

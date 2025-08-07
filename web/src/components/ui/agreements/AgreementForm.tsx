@@ -6,15 +6,22 @@ const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert
   ssr: false,
 });
 
+const confirmationTextDefault = "By clicking agree, I confirm that I have read and understood the agreement.";
+
 type AgreementFormProps = {
   agreementId: string;
   setAgreementCompleted: (completed: boolean) => void;
   handleAgreementSubmit: (agreementId: string) => Promise<void>;
-  agreementLabel?: string;
+  confirmationText?: string;
 };
 
 export default function AgreementForm(props: AgreementFormProps) {
-  const { agreementId, setAgreementCompleted, handleAgreementSubmit, agreementLabel = "this agreement" } = props;
+  const {
+    agreementId,
+    setAgreementCompleted,
+    handleAgreementSubmit,
+    confirmationText = confirmationTextDefault,
+  } = props;
 
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,9 +56,11 @@ export default function AgreementForm(props: AgreementFormProps) {
   return (
     <div className={styles["agreement-form-container"]}>
       <Alert type="info">
-        Please <strong>read this agreement carefully</strong>.{" "}
+        Please <strong>read the above agreement carefully</strong>.{" "}
         {canAgree ? "You can now agree." : <>Agreement possible in {secondsRemaining} seconds.</>}
       </Alert>
+
+      <p className={styles["confirmation-text"]}>{confirmationText}</p>
 
       {!agreed && (
         <form onSubmit={handleSubmit}>
@@ -60,7 +69,7 @@ export default function AgreementForm(props: AgreementFormProps) {
             type="submit"
             disabled={!canAgree || isSubmitting}
             cy="agreement-agree"
-            aria-label={`I agree to ${agreementLabel}`}
+            aria-label={`I agree to the above agreement`}
           >
             {isSubmitting ? "Submitting..." : "I Agree"}
           </Button>

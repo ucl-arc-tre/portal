@@ -1,4 +1,9 @@
 .agreement-form-container {
-  max-width: 400px;
+  max-width: 500px;
   margin: 1rem auto;
+}
+
+.confirmation-text {
+  font-style: italic;
+  margin: 1rem 0;
 }

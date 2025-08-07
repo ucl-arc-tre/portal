@@ -75,7 +75,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
             agreementId={agreement.id}
             setAgreementCompleted={setAgreementCompleted}
             handleAgreementSubmit={handleAgreementSubmit}
-            agreementLabel="the approved researcher agreement"
+            confirmationText="I confirm that I have read and agree to the terms of the above agreement."
           />
         </Box>
       </section>
