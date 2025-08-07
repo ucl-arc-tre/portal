@@ -87,7 +87,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
 
   return (
     <section className={styles["study-agreement-container"]} data-cy="study-agreement">
-      <h2 className="subtitle">Study Owner Agreement</h2>
+      <h2 className="subtitle">Study Owner Agreement for study: {studyTitle}</h2>
 
       {error && (
         <div className={styles["error-message"]}>
