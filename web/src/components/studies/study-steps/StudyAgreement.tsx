@@ -11,13 +11,13 @@ import styles from "./StudyAgreement.module.css";
 
 type StudyAgreementProps = {
   studyId: string;
-  studyName: string;
+  studyTitle: string;
   agreementCompleted: boolean;
   setAgreementCompleted: (completed: boolean) => void;
 };
 
 export default function StudyAgreement(props: StudyAgreementProps) {
-  const { studyId, studyName, agreementCompleted, setAgreementCompleted } = props;
+  const { studyId, studyTitle, agreementCompleted, setAgreementCompleted } = props;
 
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +100,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
         agreementId={studyAgreementText.id}
         setAgreementCompleted={setAgreementCompleted}
         handleAgreementSubmit={handleAgreementSubmit}
-        confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset Owner in UCL of the following study: ${studyName}`}
+        confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset Owner in UCL of the following study: ${studyTitle}`}
       />
     </section>
   );
