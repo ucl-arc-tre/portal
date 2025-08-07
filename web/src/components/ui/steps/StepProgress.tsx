@@ -35,7 +35,7 @@ export default function StepProgress(props: StepProgressProps) {
           <p className={styles["intro-text"]}>{introText}</p>
         )}
       </div>
-
+      {/* todo: add expiring styling */}
       <div aria-label={ariaLabel}>
         <ol className={styles["step-list"]}>
           {steps.map((step, stepIndex) => (
