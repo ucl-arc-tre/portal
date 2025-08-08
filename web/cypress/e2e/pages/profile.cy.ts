@@ -192,7 +192,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, "2024-01-01T00:00:00Z"); // Training completed
+    cy.mockProfileTraining(true, new Date().toISOString()); // Training completed
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -202,7 +202,65 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.contains("Profile Complete").should("be.visible");
     cy.get("[data-cy='chosen-name-form']").should("not.exist");
     cy.get("[data-cy='approved-researcher-agreement']").should("not.exist");
-    cy.get("[data-cy='training-certificate']").should("not.exist");
+
+    // Should have the option to upload another certificate
+    cy.contains("Upload another certificate").should("be.visible");
+  });
+
+  const getDateMonthsAgo = (months: number) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - months);
+    return date.toISOString();
+  };
+
+  it("should show low urgency when training has 2 months left", () => {
+    // Mock auth as approved researcher (complete profile)
+    cy.mockAuthAsBaseApprovedResearcher();
+
+    cy.mockProfileChosenName("Complete User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(true, getDateMonthsAgo(10)); // Training completed 10 months ago
+
+    cy.visit("/profile");
+    cy.waitForAuth();
+    cy.waitForProfileData();
+
+    cy.contains("Your certificate is expiring soon!")
+      .should("be.visible")
+      .should("have.css", "color", "rgb(22, 163, 74)");
+  });
+
+  it("should show medium urgency when training has 1 month left", () => {
+    // Mock auth as approved researcher (complete profile)
+    cy.mockAuthAsBaseApprovedResearcher();
+
+    cy.mockProfileChosenName("Complete User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(true, getDateMonthsAgo(11)); // Training completed 11 months ago
+
+    cy.visit("/profile");
+    cy.waitForAuth();
+    cy.waitForProfileData();
+
+    cy.contains("Your certificate is expiring soon!")
+      .should("be.visible")
+      .should("have.css", "color", "rgb(183, 83, 1)");
+  });
+
+  it("should show high urgency when training has less than 1 month left", () => {
+    // Mock auth as approved researcher (complete profile)
+    cy.mockAuthAsBaseApprovedResearcher();
+
+    cy.mockProfileChosenName("Complete User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(true, getDateMonthsAgo(12)); // Training completed 12 months ago
+    cy.visit("/profile");
+    cy.waitForAuth();
+    cy.waitForProfileData();
+
+    cy.contains("Your certificate is expiring soon!")
+      .should("be.visible")
+      .should("have.css", "color", "rgb(184, 15, 15)");
   });
 
   it("approved researcher agreement can be agreed to", () => {
