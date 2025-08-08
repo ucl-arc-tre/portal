@@ -63,7 +63,6 @@ export default function ProfileSetup(props: Props) {
     },
   ];
 
-  console.log("expiryWarningVisible", expiryUrgency);
   const getCurrentStepComponent = () => {
     if (!hasChosenName) {
       return <ProfileChosenName currentName={chosenName} setChosenName={setChosenName} />;
@@ -89,10 +88,8 @@ export default function ProfileSetup(props: Props) {
 
   const toggleShowCertReupload = () => {
     // for smooth collapse: TODO: fix
-    console.log("showCertReupload", showCertReupload);
     if (showCertReupload) {
       setIsCollapsing(true);
-      console.log("isCollapsing", isCollapsing);
       setTimeout(() => {
         setShowCertReupload(false);
         setIsCollapsing(false);

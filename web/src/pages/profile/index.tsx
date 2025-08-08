@@ -49,11 +49,8 @@ export default function ProfilePage() {
             const completedDate = new Date(nhsdTraining.completed_at!);
             const today = new Date();
 
-            // check if the cert was completed 10 months ago
-
             const diffTime = today.getTime() - completedDate.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            console.log("difference in days", diffDays);
 
             // low: 2 months remaining; medium: 1 month remaining; high: less than 1 month
             if (diffDays > 10 * 30) {
