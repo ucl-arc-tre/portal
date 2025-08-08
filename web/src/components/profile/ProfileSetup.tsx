@@ -43,7 +43,6 @@ export default function ProfileSetup(props: Props) {
       description: "Enter your preferred name - this must match the name on your training certificate",
       completed: hasChosenName,
       current: !hasChosenName,
-      expiryUrgency: null,
     },
     {
       id: "agreement",
@@ -51,7 +50,6 @@ export default function ProfileSetup(props: Props) {
       description: "Review and accept the terms to become an approved researcher",
       completed: agreementCompleted,
       current: hasChosenName && !agreementCompleted,
-      expiryUrgency: null,
     },
     {
       id: "certificate",
@@ -75,10 +73,7 @@ export default function ProfileSetup(props: Props) {
             setAgreementCompleted={setAgreementCompleted}
             agreementCompleted={agreementCompleted}
           />
-          <TrainingCertificate
-            setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-            expiryUrgency={expiryUrgency}
-          />
+          <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
         </div>
       );
     }
@@ -101,16 +96,27 @@ export default function ProfileSetup(props: Props) {
 
   return (
     <>
-      <StepProgress
-        steps={profileSetupSteps}
-        isComplete={profileStepsCompleted}
-        completionTitle="Profile Complete!"
-        completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
-        completionButtonText="Go to studies"
-        completionButtonHref="/studies"
-        introText="Complete the following steps to set up your profile and become an approved researcher."
-        ariaLabel="Profile setup progress"
-      />
+      {expiryUrgency ? (
+        <StepProgress
+          steps={profileSetupSteps}
+          isComplete={profileStepsCompleted}
+          completionTitle="Your certificate is expiring soon!"
+          completionSubtitle=" To retain access to the portal, please upload a new certificate."
+          ariaLabel="Profile setup progress"
+        />
+      ) : (
+        <StepProgress
+          steps={profileSetupSteps}
+          isComplete={profileStepsCompleted}
+          completionTitle="Profile Complete!"
+          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
+          completionButtonText="Go to studies"
+          completionButtonHref="/studies"
+          introText="Complete the following steps to set up your profile and become an approved researcher."
+          ariaLabel="Profile setup progress"
+        />
+      )}
+
       {/* profile complete & show option to upload another cert */}
       {profileStepsCompleted && (
         <div className={`${styles["reupload-option"]} ${isCollapsing ? styles.collapsing : ""}`}>
@@ -130,10 +136,7 @@ export default function ProfileSetup(props: Props) {
                   : styles["cert-hidden"]
             }`}
           >
-            <TrainingCertificate
-              setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-              expiryUrgency={expiryUrgency}
-            />
+            <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
           </div>
         </div>
       )}

@@ -17,7 +17,6 @@ type StepProgressProps = {
   completionButtonHref?: string;
   introText?: string;
   ariaLabel?: string;
-  expiryUrgency?: ExpiryUrgency | null;
 };
 
 type ExpiryUrgency = {

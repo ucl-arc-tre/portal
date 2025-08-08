@@ -17,7 +17,6 @@ export default function StepProgress(props: StepProgressProps) {
     completionButtonHref,
     introText = "Complete the following steps.",
     ariaLabel = "Progress steps",
-    expiryUrgency,
   } = props;
 
   const getTitleClasses = (step: Step) => {
@@ -36,29 +35,24 @@ export default function StepProgress(props: StepProgressProps) {
     }
   };
 
+  const urgencyLevel = steps.filter((step) => step.expiryUrgency).map((step) => step.expiryUrgency?.level);
+
   return (
     <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
-        {expiryUrgency ? (
+        {isComplete ? (
           <>
             <h3
               className={
-                expiryUrgency?.level == "medium"
+                urgencyLevel.includes("medium")
                   ? styles["expiring-title-urgency-medium"]
-                  : expiryUrgency?.level == "high"
+                  : urgencyLevel.includes("high")
                     ? styles["expiring-title-urgency-high"]
                     : styles["completion-title"]
               }
             >
-              Your certificate is expiring soon!
+              {completionTitle}
             </h3>
-            <p className={styles["completion-subtitle"]}>
-              To retain access to the portal, please upload a new certificate.
-            </p>
-          </>
-        ) : isComplete ? (
-          <>
-            <h3 className={styles["completion-title"]}>{completionTitle}</h3>
             <p className={styles["completion-subtitle"]}>{completionSubtitle}</p>
             {completionButtonText && completionButtonHref && (
               <Button href={completionButtonHref} size="default">
