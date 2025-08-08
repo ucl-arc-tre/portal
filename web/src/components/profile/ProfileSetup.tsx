@@ -110,7 +110,6 @@ export default function ProfileSetup(props: Props) {
         completionButtonHref="/studies"
         introText="Complete the following steps to set up your profile and become an approved researcher."
         ariaLabel="Profile setup progress"
-        expiryUrgency={expiryUrgency}
       />
       {/* profile complete & show option to upload another cert */}
       {profileStepsCompleted && (
