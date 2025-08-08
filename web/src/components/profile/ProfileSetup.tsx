@@ -87,7 +87,7 @@ export default function ProfileSetup(props: Props) {
   };
 
   const toggleShowCertReupload = () => {
-    // for smooth collapse: TODO: fix
+    // for smooth collapse
     if (showCertReupload) {
       setIsCollapsing(true);
       setTimeout(() => {

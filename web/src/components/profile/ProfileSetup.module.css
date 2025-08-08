@@ -44,10 +44,12 @@
 
   .certificate-container {
     overflow: hidden;
-    transition: height 1.8s ease 0.4s;
+    transition: all 1.6s ease 0.2s;
+    max-height: 0px;
 
     &.cert-hidden {
       display: none;
+      max-height: 0px;
     }
 
     &.cert-collapsing {
@@ -60,6 +62,8 @@
     }
 
     &.cert-visible {
+      max-height: 100vh;
+
       section {
         animation: fade-slide-down 1.8s ease 0s 1 normal forwards;
         transition:
