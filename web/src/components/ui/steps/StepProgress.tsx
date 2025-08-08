@@ -20,6 +20,22 @@ export default function StepProgress(props: StepProgressProps) {
     expiryUrgency,
   } = props;
 
+  const getTitleClasses = (step: Step) => {
+    if (!step.expiryUrgency) {
+      return step.completed
+        ? styles["step-title-completed"]
+        : step.current
+          ? styles["step-title-current"]
+          : styles["step-title-pending"];
+    } else if (step.expiryUrgency.level == "low") {
+      return styles["step-title-completed"];
+    } else if (step.expiryUrgency.level == "medium") {
+      return styles["step-title-expiry-urgency-medium"];
+    } else if (step.expiryUrgency.level == "high") {
+      return styles["step-title-pending"];
+    }
+  };
+
   return (
     <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
@@ -84,23 +100,7 @@ export default function StepProgress(props: StepProgressProps) {
                 </div>
 
                 <div className={styles["step-details"]}>
-                  <h3
-                    className={`${styles["step-title"]} ${
-                      step.expiryUrgency?.level == "low"
-                        ? styles["step-title-completed"]
-                        : step.expiryUrgency?.level == "medium"
-                          ? styles["step-title-expiry-urgency-medium"]
-                          : step.expiryUrgency?.level == "high"
-                            ? styles["step-title-pending"]
-                            : step.completed
-                              ? styles["step-title-completed"]
-                              : step.current
-                                ? styles["step-title-current"]
-                                : styles["step-title-pending"]
-                    }`}
-                  >
-                    {step.title}
-                  </h3>
+                  <h3 className={` ${styles["step-title"]} ${getTitleClasses(step)}`}>{step.title}</h3>
 
                   <p
                     className={`${styles["step-description"]} ${
