@@ -419,6 +419,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyCreateRequest
 
+// PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
+type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
+
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = Asset
 
@@ -463,6 +466,12 @@ type ServerInterface interface {
 
 	// (POST /studies)
 	PostStudies(c *gin.Context)
+
+	// (GET /studies/{studyId}/agreements)
+	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
+
+	// (POST /studies/{studyId}/agreements)
+	PostStudiesStudyIdAgreements(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/assets)
 	GetStudiesStudyIdAssets(c *gin.Context, studyId string)
@@ -649,6 +658,54 @@ func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
 	siw.Handler.PostStudies(c)
 }
 
+// GetStudiesStudyIdAgreements operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAgreements(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAgreements(c, studyId)
+}
+
+// PostStudiesStudyIdAgreements operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAgreements(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdAgreements(c, studyId)
+}
+
 // GetStudiesStudyIdAssets operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssets(c *gin.Context) {
 
@@ -822,6 +879,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
+	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
+	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/study/:studyId", wrapper.GetStudyStudyId)

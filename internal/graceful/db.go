@@ -24,6 +24,7 @@ func InitDB() {
 		&types.UserAttributes{},
 		&types.Study{},
 		&types.StudyAdmin{},
+		&types.StudyAgreementSignature{},
 		&types.Asset{},
 		&types.AssetLocation{},
 		&types.UserSponsorship{},

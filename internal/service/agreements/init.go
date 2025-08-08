@@ -12,20 +12,24 @@ import (
 //go:embed approved_researcher.md
 var approvedResearcherMarkdown string
 
+//go:embed study_owner.md
+var studyOwnerMarkdown string
+
 // Initalise the agreements
 func Init() {
 	db := graceful.NewDB()
-	initApprovedResearcher(db)
+	initAgreement(db, approvedResearcherMarkdown, ApprovedResearcherType)
+	initAgreement(db, studyOwnerMarkdown, StudyOwnerType)
 }
 
-func initApprovedResearcher(db *gorm.DB) {
+func initAgreement(db *gorm.DB, agreementMarkdown string, agreementType types.AgreementType) {
 	result := db.Where(
 		"text = ? AND type = ?",
-		approvedResearcherMarkdown,
-		ApprovedResearcherType,
+		agreementMarkdown,
+		agreementType,
 	).Attrs(types.Agreement{
-		Text:  approvedResearcherMarkdown,
-		Type:  ApprovedResearcherType,
+		Text:  agreementMarkdown,
+		Type:  agreementType,
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&types.Agreement{})
 	if result.Error != nil {

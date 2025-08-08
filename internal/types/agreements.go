@@ -17,3 +17,12 @@ type UserAgreementConfirmation struct {
 	Agreement   Agreement
 	AgreementID uuid.UUID
 }
+
+type StudyAgreementSignature struct {
+	Model
+	User        User      `gorm:"foreignKey:UserID"`
+	UserID      uuid.UUID `gorm:"not null;index"`
+	StudyID     uuid.UUID `gorm:"not null;index"`
+	Agreement   Agreement `gorm:"foreignKey:AgreementID"`
+	AgreementID uuid.UUID `gorm:"not null;index"`
+}
