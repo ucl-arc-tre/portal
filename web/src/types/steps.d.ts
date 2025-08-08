@@ -5,7 +5,7 @@ type Step = {
   description: string;
   completed: boolean;
   current: boolean;
-  expiryUrgency: ExpiryUrgency | null;
+  expiryUrgency?: ExpiryUrgency | null;
 };
 
 type StepProgressProps = {
