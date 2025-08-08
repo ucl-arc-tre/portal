@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(false);
-  const [expiryWarningVisible, setExpiryWarningVisible] = useState(false);
+  const [expiryUrgency, setExpiryUrgency] = useState<ExpiryUrgency | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -55,8 +55,13 @@ export default function ProfilePage() {
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             console.log("difference in days", diffDays);
 
+            // low: 2 months remaining; medium: 1 month remaining; high: less than 1 month
             if (diffDays > 10 * 30) {
-              setExpiryWarningVisible(true);
+              setExpiryUrgency({ level: "low" });
+            } else if (diffDays > 11 * 30) {
+              setExpiryUrgency({ level: "medium" });
+            } else if (diffDays > 11.5 * 30) {
+              setExpiryUrgency({ level: "high" });
             }
           }
         }
@@ -105,7 +110,7 @@ export default function ProfilePage() {
         trainingCertificateCompleted={trainingCertificateCompleted}
         setTrainingCertificateCompleted={setTrainingCertificateCompleted}
         userData={userData}
-        expiryWarningVisible={expiryWarningVisible}
+        expiryUrgency={expiryUrgency}
       />
     </>
   );

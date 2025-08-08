@@ -4,5 +4,5 @@ type ProfileStep = {
   description: string;
   completed: boolean;
   current: boolean;
-  expiring: boolean;
+  expiryUrgency: ExpiryUrgency | null;
 };

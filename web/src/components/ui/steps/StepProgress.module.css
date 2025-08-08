@@ -65,6 +65,12 @@
   border: 2px solid var(--green-200);
 }
 
+.step-icon-expiry-urgency-medium {
+  background-color: #b75301;
+  color: white;
+  border: 2px solid #b75301;
+}
+
 .step-number {
   font-size: 1rem;
   font-weight: 600;
@@ -101,6 +107,10 @@
 
 .step-title-completed {
   color: #218646;
+}
+
+.step-title-expiry-urgency-medium {
+  color: #b75301;
 }
 
 .step-description {
@@ -159,17 +169,16 @@
   padding-bottom: 1rem;
 }
 
-.expiring-title {
+.expiring-title-urgency-high {
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
   color: #b80f0f;
 }
 
-.expiring-subtitle {
-  margin: 0;
-  font-size: 1rem;
-  color: #6b7280;
-  line-height: 1.5;
-  padding-bottom: 1rem;
+.expiring-title-urgency-medium {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #b75301;
 }

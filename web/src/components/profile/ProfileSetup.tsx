@@ -17,7 +17,7 @@ type Props = {
   trainingCertificateCompleted: boolean;
   setTrainingCertificateCompleted: (completed: boolean) => void;
   userData: Auth | null;
-  expiryWarningVisible: boolean;
+  expiryUrgency: ExpiryUrgency | null;
 };
 
 export default function ProfileSetup(props: Props) {
@@ -28,7 +28,7 @@ export default function ProfileSetup(props: Props) {
     setAgreementCompleted,
     trainingCertificateCompleted,
     setTrainingCertificateCompleted,
-    expiryWarningVisible,
+    expiryUrgency,
   } = props;
 
   const hasChosenName = !!chosenName;
@@ -43,7 +43,7 @@ export default function ProfileSetup(props: Props) {
       description: "Enter your preferred name - this must match the name on your training certificate",
       completed: hasChosenName,
       current: !hasChosenName,
-      expiring: false,
+      expiryUrgency: null,
     },
     {
       id: "agreement",
@@ -51,27 +51,25 @@ export default function ProfileSetup(props: Props) {
       description: "Review and accept the terms to become an approved researcher",
       completed: agreementCompleted,
       current: hasChosenName && !agreementCompleted,
-      expiring: false,
+      expiryUrgency: null,
     },
     {
       id: "certificate",
       title: "Training Certificate",
       description: "Upload your NHS Digital Data Security Awareness certificate",
-      completed: !expiryWarningVisible && trainingCertificateCompleted,
+      completed: !expiryUrgency && trainingCertificateCompleted,
       current: hasChosenName && agreementCompleted,
-      expiring: expiryWarningVisible,
+      expiryUrgency: expiryUrgency,
     },
   ];
 
-  console.log("expiryWarningVisible", expiryWarningVisible);
+  console.log("expiryWarningVisible", expiryUrgency);
   const getCurrentStepComponent = () => {
     if (!hasChosenName) {
       return <ProfileChosenName currentName={chosenName} setChosenName={setChosenName} />;
     }
 
     if (hasChosenName && !(agreementCompleted && trainingCertificateCompleted)) {
-      // if expiring soon show it in orange?
-
       return (
         <div className={styles["approved-researcher-steps"]}>
           <ApprovedResearcherAgreement
@@ -80,7 +78,7 @@ export default function ProfileSetup(props: Props) {
           />
           <TrainingCertificate
             setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-            expiryWarningVisible={expiryWarningVisible}
+            expiryUrgency={expiryUrgency}
           />
         </div>
       );
@@ -115,7 +113,7 @@ export default function ProfileSetup(props: Props) {
         completionButtonHref="/studies"
         introText="Complete the following steps to set up your profile and become an approved researcher."
         ariaLabel="Profile setup progress"
-        isExpiring={expiryWarningVisible}
+        expiryUrgency={expiryUrgency}
       />
       {/* profile complete & show option to upload another cert */}
       {profileStepsCompleted && (
@@ -138,7 +136,7 @@ export default function ProfileSetup(props: Props) {
           >
             <TrainingCertificate
               setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-              expiryWarningVisible={expiryWarningVisible}
+              expiryUrgency={expiryUrgency}
             />
           </div>
         </div>

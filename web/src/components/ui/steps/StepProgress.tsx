@@ -17,16 +17,26 @@ export default function StepProgress(props: StepProgressProps) {
     completionButtonHref,
     introText = "Complete the following steps.",
     ariaLabel = "Progress steps",
-    isExpiring = false,
+    expiryUrgency,
   } = props;
 
   return (
     <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
-        {isExpiring ? (
+        {expiryUrgency ? (
           <>
-            <h3 className={styles["expiring-title"]}>Your certificate is expiring soon!</h3>
-            <p className={styles["expiring-subtitle"]}>
+            <h3
+              className={
+                expiryUrgency?.level == "medium"
+                  ? styles["expiring-title-urgency-medium"]
+                  : expiryUrgency?.level == "high"
+                    ? styles["expiring-title-urgency-high"]
+                    : styles["completion-title"]
+              }
+            >
+              Your certificate is expiring soon!
+            </h3>
+            <p className={styles["completion-subtitle"]}>
               To retain access to the portal, please upload a new certificate.
             </p>
           </>
@@ -53,16 +63,18 @@ export default function StepProgress(props: StepProgressProps) {
               <div className={styles["step-content"]}>
                 <div
                   className={`${styles["step-icon"]} ${
-                    step.expiring
-                      ? styles["step-icon-pending"]
-                      : step.completed
-                        ? styles["step-icon-completed"]
-                        : step.current
-                          ? styles["step-icon-current"]
-                          : styles["step-icon-pending"]
+                    step.expiryUrgency?.level == "medium"
+                      ? styles["step-icon-expiry-urgency-medium"]
+                      : step.expiryUrgency?.level == "high"
+                        ? styles["step-icon-pending"]
+                        : step.completed
+                          ? styles["step-icon-completed"]
+                          : step.current
+                            ? styles["step-icon-current"]
+                            : styles["step-icon-pending"]
                   }`}
                 >
-                  {step.expiring ? (
+                  {step.expiryUrgency?.level == "medium" || step.expiryUrgency?.level == "high" ? (
                     <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
                   ) : step.completed ? (
                     <CheckIcon className={styles["check-icon"]} />
@@ -74,13 +86,17 @@ export default function StepProgress(props: StepProgressProps) {
                 <div className={styles["step-details"]}>
                   <h3
                     className={`${styles["step-title"]} ${
-                      step.expiring
-                        ? styles["step-title-pending"]
-                        : step.completed
-                          ? styles["step-title-completed"]
-                          : step.current
-                            ? styles["step-title-current"]
-                            : styles["step-title-pending"]
+                      step.expiryUrgency?.level == "low"
+                        ? styles["step-title-completed"]
+                        : step.expiryUrgency?.level == "medium"
+                          ? styles["step-title-expiry-urgency-medium"]
+                          : step.expiryUrgency?.level == "high"
+                            ? styles["step-title-pending"]
+                            : step.completed
+                              ? styles["step-title-completed"]
+                              : step.current
+                                ? styles["step-title-current"]
+                                : styles["step-title-pending"]
                     }`}
                   >
                     {step.title}
@@ -88,7 +104,7 @@ export default function StepProgress(props: StepProgressProps) {
 
                   <p
                     className={`${styles["step-description"]} ${
-                      step.expiring
+                      step.expiryUrgency
                         ? styles["step-description-pending"]
                         : step.completed
                           ? styles["step-description-completed"]
@@ -105,7 +121,7 @@ export default function StepProgress(props: StepProgressProps) {
               {stepIndex < steps.length - 1 && (
                 <div
                   className={`${styles["step-connector"]} ${
-                    step.expiring
+                    step.expiryUrgency
                       ? styles["step-connector-pending"]
                       : step.completed
                         ? styles["step-connector-completed"]
