@@ -52,13 +52,13 @@ export default function ProfilePage() {
             const diffTime = today.getTime() - completedDate.getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            // low: 2 months remaining; medium: 1 month remaining; high: less than 1 month
-            if (diffDays > 10 * 30) {
-              setExpiryUrgency({ level: "low" });
+            // high: less than 1 month; medium: 1 month remaining; low: 2 months remaining
+            if (diffDays > 11.5 * 30) {
+              setExpiryUrgency({ level: "high" });
             } else if (diffDays > 11 * 30) {
               setExpiryUrgency({ level: "medium" });
-            } else if (diffDays > 11.5 * 30) {
-              setExpiryUrgency({ level: "high" });
+            } else if (diffDays > 10 * 30) {
+              setExpiryUrgency({ level: "low" });
             }
           }
         }
