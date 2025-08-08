@@ -45,6 +45,8 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 // 		{RoleName: ApprovedResearcher, Resource: "/studies", Action: WriteAction},
 // 		{RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: ReadAction},
 // 		{RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: WriteAction},
+// 		{RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: ReadAction},
+// 		{RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: WriteAction},
 // 	}
 // 	for _, policy := range policies {
 // 		addPolicy(enforcer, policy)

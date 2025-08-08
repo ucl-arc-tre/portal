@@ -1,3 +1,4 @@
+// a generic type for completing the 'steps' involved in various aspects of the portal (e.g. profile steps, study steps etc.)
 type Step = {
   id: string;
   title: string;

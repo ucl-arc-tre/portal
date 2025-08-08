@@ -141,6 +141,7 @@ export default function ManageStudyPage() {
           title="Study Not Found | ARC Services Portal"
           description="Study not found in the ARC Services Portal"
         />
+
         <div className={styles["not-found-section"]}>
           <h2>Study Not Found</h2>
           <p>The study you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.</p>

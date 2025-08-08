@@ -156,3 +156,52 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 		"studyId": studyId,
 	})
 }
+
+// confirms a study agreement for the study ID and user
+func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
+	user := middleware.GetUser(ctx)
+
+	studyUUID, err := uuid.Parse(studyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		return
+	}
+
+	confirmation := openapi.AgreementConfirmation{}
+	if err := bindJSONOrSetError(ctx, &confirmation); err != nil {
+		return
+	}
+
+	agreementId, err := uuid.Parse(confirmation.AgreementId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid agreement ID")
+		return
+	}
+
+	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
+		setError(ctx, err, "Failed to confirm study agreement")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
+	user := middleware.GetUser(ctx)
+
+	studyUUID, err := uuid.Parse(studyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		return
+	}
+
+	signatures, err := h.studies.GetStudyAgreementSignatures(user, studyUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get study agreements")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, openapi.UserAgreements{
+		ConfirmedAgreements: signatures,
+	})
+}

@@ -36,7 +36,7 @@ export default function ProfileSetup(props: Props) {
   const [showCertReupload, setShowCertReupload] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
 
-  const profileSetupSteps: ProfileStep[] = [
+  const profileSetupSteps: Step[] = [
     {
       id: "chosen-name",
       title: "Set Your Chosen Name",
