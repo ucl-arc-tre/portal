@@ -6,6 +6,8 @@ import StepProgress from "../ui/steps/StepProgress";
 import { Auth } from "@/openapi";
 
 import styles from "./ProfileSetup.module.css";
+import Button from "../ui/Button";
+import { useState } from "react";
 
 type Props = {
   chosenName: string | undefined;
@@ -15,6 +17,7 @@ type Props = {
   trainingCertificateCompleted: boolean;
   setTrainingCertificateCompleted: (completed: boolean) => void;
   userData: Auth | null;
+  expiryUrgency: ExpiryUrgency | null;
 };
 
 export default function ProfileSetup(props: Props) {
@@ -25,10 +28,13 @@ export default function ProfileSetup(props: Props) {
     setAgreementCompleted,
     trainingCertificateCompleted,
     setTrainingCertificateCompleted,
+    expiryUrgency,
   } = props;
 
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
+  const [showCertReupload, setShowCertReupload] = useState(false);
+  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const profileSetupSteps: Step[] = [
     {
@@ -49,8 +55,9 @@ export default function ProfileSetup(props: Props) {
       id: "certificate",
       title: "Training Certificate",
       description: "Upload your NHS Digital Data Security Awareness certificate",
-      completed: trainingCertificateCompleted,
-      current: hasChosenName && agreementCompleted && !trainingCertificateCompleted,
+      completed: !expiryUrgency && trainingCertificateCompleted,
+      current: hasChosenName && agreementCompleted,
+      expiryUrgency: expiryUrgency,
     },
   ];
 
@@ -74,19 +81,65 @@ export default function ProfileSetup(props: Props) {
     return null;
   };
 
+  const toggleShowCertReupload = () => {
+    // for smooth collapse
+    if (showCertReupload) {
+      setIsCollapsing(true);
+      setTimeout(() => {
+        setShowCertReupload(false);
+        setIsCollapsing(false);
+      }, 1900);
+    } else {
+      setShowCertReupload(true);
+    }
+  };
+
   return (
     <>
-      <StepProgress
-        steps={profileSetupSteps}
-        isComplete={profileStepsCompleted}
-        completionTitle="Profile Complete!"
-        completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
-        completionButtonText="Go to studies"
-        completionButtonHref="/studies"
-        introText="Complete the following steps to set up your profile and become an approved researcher."
-        ariaLabel="Profile setup progress"
-      />
+      {expiryUrgency ? (
+        <StepProgress
+          steps={profileSetupSteps}
+          isComplete={profileStepsCompleted}
+          completionTitle="Your certificate is expiring soon!"
+          completionSubtitle=" To retain access to the portal, please upload a new certificate."
+          ariaLabel="Profile setup progress"
+        />
+      ) : (
+        <StepProgress
+          steps={profileSetupSteps}
+          isComplete={profileStepsCompleted}
+          completionTitle="Profile Complete!"
+          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
+          completionButtonText="Go to studies"
+          completionButtonHref="/studies"
+          introText="Complete the following steps to set up your profile and become an approved researcher."
+          ariaLabel="Profile setup progress"
+        />
+      )}
 
+      {/* profile complete & show option to upload another cert */}
+      {profileStepsCompleted && (
+        <div className={`${styles["reupload-option"]} ${isCollapsing ? styles.collapsing : ""}`}>
+          <p>
+            Your current training certificate is within date, but you may update your certification at any time by
+            uploading a new document.
+          </p>
+          <Button variant="secondary" size="small" onClick={toggleShowCertReupload}>
+            {!showCertReupload ? "Upload another certificate" : "Cancel"}
+          </Button>
+          <div
+            className={`${styles["certificate-container"]} ${
+              isCollapsing
+                ? styles["cert-collapsing"]
+                : showCertReupload
+                  ? styles["cert-visible"]
+                  : styles["cert-hidden"]
+            }`}
+          >
+            <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
+          </div>
+        </div>
+      )}
       {!profileStepsCompleted && <StepArrow />}
 
       <div className={styles["current-step"]}>{getCurrentStepComponent()}</div>

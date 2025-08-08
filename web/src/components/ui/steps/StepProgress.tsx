@@ -1,8 +1,9 @@
+import { CheckIcon } from "@/components/shared/exports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
 
-const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
+export const AlertTriangleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertTriangle), {
   ssr: false,
 });
 
@@ -18,12 +19,40 @@ export default function StepProgress(props: StepProgressProps) {
     ariaLabel = "Progress steps",
   } = props;
 
+  const getTitleClasses = (step: Step) => {
+    if (!step.expiryUrgency) {
+      return step.completed
+        ? styles["step-title-completed"]
+        : step.current
+          ? styles["step-title-current"]
+          : styles["step-title-pending"];
+    } else if (step.expiryUrgency.level == "low") {
+      return styles["step-title-completed"];
+    } else if (step.expiryUrgency.level == "medium") {
+      return styles["step-title-expiry-urgency-medium"];
+    } else if (step.expiryUrgency.level == "high") {
+      return styles["step-title-pending"];
+    }
+  };
+
+  const urgencyLevel = steps.filter((step) => step.expiryUrgency).map((step) => step.expiryUrgency?.level);
+
   return (
     <div className={styles["step-progress-container"]}>
       <div className={styles["completion-header"]}>
         {isComplete ? (
           <>
-            <h3 className={styles["completion-title"]}>{completionTitle}</h3>
+            <h3
+              className={
+                urgencyLevel.includes("medium")
+                  ? styles["expiring-title-urgency-medium"]
+                  : urgencyLevel.includes("high")
+                    ? styles["expiring-title-urgency-high"]
+                    : styles["completion-title"]
+              }
+            >
+              {completionTitle}
+            </h3>
             <p className={styles["completion-subtitle"]}>{completionSubtitle}</p>
             {completionButtonText && completionButtonHref && (
               <Button href={completionButtonHref} size="default">
@@ -43,14 +72,20 @@ export default function StepProgress(props: StepProgressProps) {
               <div className={styles["step-content"]}>
                 <div
                   className={`${styles["step-icon"]} ${
-                    step.completed
-                      ? styles["step-icon-completed"]
-                      : step.current
-                        ? styles["step-icon-current"]
-                        : styles["step-icon-pending"]
+                    step.expiryUrgency?.level == "medium"
+                      ? styles["step-icon-expiry-urgency-medium"]
+                      : step.expiryUrgency?.level == "high"
+                        ? styles["step-icon-pending"]
+                        : step.completed
+                          ? styles["step-icon-completed"]
+                          : step.current
+                            ? styles["step-icon-current"]
+                            : styles["step-icon-pending"]
                   }`}
                 >
-                  {step.completed ? (
+                  {step.expiryUrgency?.level == "medium" || step.expiryUrgency?.level == "high" ? (
+                    <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
+                  ) : step.completed ? (
                     <CheckIcon className={styles["check-icon"]} />
                   ) : (
                     <span className={styles["step-number"]}>{stepIndex + 1}</span>
@@ -58,25 +93,17 @@ export default function StepProgress(props: StepProgressProps) {
                 </div>
 
                 <div className={styles["step-details"]}>
-                  <h3
-                    className={`${styles["step-title"]} ${
-                      step.completed
-                        ? styles["step-title-completed"]
-                        : step.current
-                          ? styles["step-title-current"]
-                          : styles["step-title-pending"]
-                    }`}
-                  >
-                    {step.title}
-                  </h3>
+                  <h3 className={` ${styles["step-title"]} ${getTitleClasses(step)}`}>{step.title}</h3>
 
                   <p
                     className={`${styles["step-description"]} ${
-                      step.completed
-                        ? styles["step-description-completed"]
-                        : step.current
-                          ? styles["step-description-current"]
-                          : styles["step-description-pending"]
+                      step.expiryUrgency
+                        ? styles["step-description-pending"]
+                        : step.completed
+                          ? styles["step-description-completed"]
+                          : step.current
+                            ? styles["step-description-current"]
+                            : styles["step-description-pending"]
                     }`}
                   >
                     {step.description}
@@ -87,7 +114,11 @@ export default function StepProgress(props: StepProgressProps) {
               {stepIndex < steps.length - 1 && (
                 <div
                   className={`${styles["step-connector"]} ${
-                    step.completed ? styles["step-connector-completed"] : styles["step-connector-pending"]
+                    step.expiryUrgency
+                      ? styles["step-connector-pending"]
+                      : step.completed
+                        ? styles["step-connector-completed"]
+                        : styles["step-connector-pending"]
                   }`}
                 />
               )}

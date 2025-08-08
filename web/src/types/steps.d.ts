@@ -5,6 +5,7 @@ type Step = {
   description: string;
   completed: boolean;
   current: boolean;
+  expiryUrgency?: ExpiryUrgency | null;
 };
 
 type StepProgressProps = {
@@ -16,4 +17,8 @@ type StepProgressProps = {
   completionButtonHref?: string;
   introText?: string;
   ariaLabel?: string;
+};
+
+type ExpiryUrgency = {
+  level: "low" | "medium" | "high";
 };

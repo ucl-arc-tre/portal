@@ -63,7 +63,7 @@ describe("Accessibility - Profile Page", () => {
     it("should have no accessibility violations when profile is complete", () => {
       cy.mockProfileChosenName("Test User"); // Has chosen name
       cy.mockProfileAgreements(true); // Agreement completed
-      cy.mockProfileTraining(true, "2024-01-01T00:00:00Z"); // Training completed
+      cy.mockProfileTraining(true, new Date().toISOString()); // Training completed
 
       cy.visit("/profile");
       cy.waitForAuth();
