@@ -27,11 +27,10 @@ interface FormEvent extends React.FormEvent<HTMLFormElement> {
 
 type TrainingCertificateProps = {
   setTrainingCertificateCompleted: (completed: boolean) => void;
-  expiryUrgency: ExpiryUrgency | null;
 };
 
 export default function TrainingCertificate(props: TrainingCertificateProps) {
-  const { setTrainingCertificateCompleted, expiryUrgency } = props;
+  const { setTrainingCertificateCompleted } = props;
 
   const { authInProgress, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
@@ -144,21 +143,11 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
   if (!isAuthed) return <LoginFallback />;
 
   if (isValid) {
-    if (expiryUrgency) {
-      return (
-        <Alert type="warning">
-          <AlertMessage>
-            Your training certificate is valid, but is expiring soon. Please upload a new certificate to retain access
-            to the portal{" "}
-          </AlertMessage>
-        </Alert>
-      );
-    } else
-      return (
-        <Alert type="success">
-          <AlertMessage>Valid training ✔</AlertMessage>
-        </Alert>
-      );
+    return (
+      <Alert type="success">
+        <AlertMessage>Valid training ✔</AlertMessage>
+      </Alert>
+    );
   }
 
   return (
