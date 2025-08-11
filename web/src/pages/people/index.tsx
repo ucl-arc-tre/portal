@@ -29,7 +29,7 @@ export default function PeoplePage() {
             ? "View and manage portal users, including adding via invitation or upload"
             : isApprovedResearcher
               ? "View users in your projects"
-              : isStaff
+              : isApprovedResearcher && isStaff
                 ? "View users in your projects or invite a collaborator"
                 : "You do not have permission to view this page"
         }
