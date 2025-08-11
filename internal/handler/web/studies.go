@@ -8,6 +8,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -181,6 +183,19 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
 		setError(ctx, err, "Failed to confirm study agreement")
 		return
+	}
+
+	agreementType, err := h.agreements.AgreementTypeById(agreementId)
+	if err != nil {
+		setError(ctx, err, "Failed to get agreement type")
+		return
+	}
+	switch *agreementType {
+	case agreements.StudyOwnerType:
+		if _, err := rbac.AddRole(user, rbac.InformationAssetOwner); err != nil {
+			setError(ctx, err, "Failed to assign IAO role")
+			return
+		}
 	}
 
 	ctx.Status(http.StatusOK)
