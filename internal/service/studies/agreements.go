@@ -9,12 +9,6 @@ import (
 
 // creates a signature record for a user confirming an agreement for a specific study
 func (s *Service) ConfirmStudyAgreement(user types.User, studyID uuid.UUID, agreementID uuid.UUID) error {
-	// Verify the study exists and the user has access to it
-	_, err := s.StudyWithOwner(studyID, user)
-	if err != nil {
-		return err
-	}
-
 	signature := types.StudyAgreementSignature{
 		UserID:      user.ID,
 		StudyID:     studyID,
@@ -31,13 +25,7 @@ func (s *Service) ConfirmStudyAgreement(user types.User, studyID uuid.UUID, agre
 
 // returns all agreement signatures for a specific study and user
 func (s *Service) GetStudyAgreementSignatures(user types.User, studyID uuid.UUID) ([]openapi.ConfirmedAgreement, error) {
-	// Verify the study exists and the user has access to it
-	_, err := s.StudyWithOwner(studyID, user)
-	if err != nil {
-		return nil, err
-	}
-
-	var studySignatures []types.StudyAgreementSignature
+	studySignatures := []types.StudyAgreementSignature{}
 	result := s.db.Where("user_id = ? AND study_id = ?", user.ID, studyID).
 		Find(&studySignatures)
 

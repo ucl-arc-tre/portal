@@ -113,76 +113,41 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*types.Study, *openapi.StudyCreateValidationError, error) {
 	validationError, err := s.validateStudyData(ctx, owner, studyData)
-	if err != nil {
-		return nil, err
-	} else if validationError != nil {
-		return validationError, nil
+	if err != nil || validationError != nil {
+		return nil, validationError, err
 	}
 
 	studyAdmins, err := s.createStudyAdmins(studyData)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	err = s.createStudy(owner, studyData, studyAdmins)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, nil
+	study, err := s.createStudy(owner, studyData, studyAdmins)
+	return study, nil, err
 }
 
 // StudiesWithOwner retrieves all studies that the user owns or has access to
-func (s *Service) StudiesWithOwner(owner types.User) ([]types.Study, error) {
+func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
-
-	// For now, only return studies owned by the user
-	// This could be expanded later to include shared studies
-	err := s.db.Preload("StudyAdmins.User").Where("owner_user_id = ?", owner.ID).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Where("id IN (?)", ids).Find(&studies).Error
 	return studies, types.NewErrServerError(err)
-}
-
-// retrieve a single study by its ID and ensures that the user owns the study
-func (s *Service) StudyWithOwner(studyID uuid.UUID, owner types.User) (types.Study, error) {
-	study := types.Study{}
-
-	// For now, only return the study owned by the user
-	// This could be expanded later to include shared studies
-	err := s.db.Preload("StudyAdmins.User").Where("id = ? AND owner_user_id = ?", studyID, owner.ID).First(&study).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return study, types.NewNotFoundError("study not found or access denied")
-	}
-
-	return study, nil
 }
 
 // StudyAssetsWithOwner retrieves all assets for a study,
 // ensures that the user owns the study (this might be refactored later to allow shared access)
-func (s *Service) StudyAssetsWithOwner(studyID uuid.UUID, owner types.User) ([]types.Asset, error) {
-	// verify the user owns the study
-	var count int64
-	err := s.db.Model(&types.Study{}).Where("id = ? AND owner_user_id = ?", studyID, owner.ID).Count(&count).Error
-	if err != nil {
-		return nil, types.NewErrServerError(err)
+func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
+	assets := []types.Asset{}
+	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return assets, types.NewNotFoundError(err)
 	}
-	if count == 0 {
-		return nil, types.NewNotFoundError("study not found or access denied")
-	}
-
-	// Get all assets for this study with their locations
-	var assets []types.Asset
-	if err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error; err != nil {
-		return nil, err
-	}
-
-	return assets, nil
+	return assets, types.NewErrServerError(err)
 }
 
 // handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) error {
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
@@ -222,7 +187,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	// Create the study
 	if err := tx.Create(&study).Error; err != nil {
 		tx.Rollback()
-		return err
+		return nil, types.NewErrServerError(err)
 	}
 
 	// Create StudyAdmin records for each study admin user
@@ -233,14 +198,14 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 		}
 		if err := tx.Create(&studyAdmin).Error; err != nil {
 			tx.Rollback()
-			return fmt.Errorf("failed to create study admin: %w", err)
+			return nil, types.NewErrServerError(fmt.Errorf("failed to create study admin: %w", err))
 		}
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		return nil, types.NewErrServerError(fmt.Errorf("failed to commit transaction: %w", err))
 	}
 
-	return nil
+	return &study, nil
 }

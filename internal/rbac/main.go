@@ -1,10 +1,13 @@
 package rbac
 
 import (
+	"fmt"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/util"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -45,6 +48,37 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 	return roleAdded, types.NewErrServerError(err)
 }
 
+// Add a study role for a user
+func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
+	roleName := makeStudyOwnerRole(studyId).RoleName()
+	for _, action := range []Action{ReadAction, WriteAction} {
+		_, err := addPolicy(enforcer, Policy{
+			RoleName: roleName,
+			Action:   action,
+			Resource: fmt.Sprintf("/studies/%v/*", studyId),
+		})
+		if err != nil {
+			return false, err
+		}
+	}
+	return AddRole(user, roleName)
+}
+
+// Get all study roles for a user
+func StudyRoles(user types.User) ([]StudyRole, error) {
+	roles, err := Roles(user)
+	studyRoles := []StudyRole{}
+	if err != nil {
+		return studyRoles, err
+	}
+	for _, role := range roles {
+		if isStudyRole(role) {
+			studyRoles = append(studyRoles, mustMakeStudyRole(role))
+		}
+	}
+	return studyRoles, nil
+}
+
 // Remove a role for a user
 func RemoveRole(user types.User, role RoleName) (bool, error) {
 	roleRemoved, err := enforcer.DeleteRoleForUser(user.ID.String(), string(role))
@@ -52,11 +86,19 @@ func RemoveRole(user types.User, role RoleName) (bool, error) {
 }
 
 // Get all roles of a user
-func Roles(user types.User) ([]string, error) {
-	roles, err := enforcer.GetRolesForUser(user.ID.String())
+func Roles(user types.User) ([]RoleName, error) {
+	rawRoles, err := enforcer.GetRolesForUser(user.ID.String())
+	roles := []RoleName{}
+	if err != nil {
+		return roles, err
+	}
+	for _, rawRole := range rawRoles {
+		roles = append(roles, RoleName(rawRole))
+	}
 	return roles, types.NewErrServerError(err)
 }
 
+// Does the user have a role?
 func HasRole(user types.User, role RoleName) (bool, error) {
 	hasRole, err := enforcer.HasRoleForUser(user.ID.String(), string(role))
 	return hasRole, types.NewErrServerError(err)

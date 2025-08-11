@@ -23,34 +23,32 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 
 	// then loop through each and get their agreements & roles
 	for _, user := range users {
+		userData := openapi.UserData{
+			User: openapi.User{
+				Id:       user.ID.String(),
+				Username: string(user.Username),
+			},
+		}
 		agreements, err := s.ConfirmedAgreements(user)
 		if err != nil {
 			return usersData, fmt.Errorf("failed to get agreements for user: %w", err)
 		}
+		userData.Agreements.ConfirmedAgreements = agreements
 
 		roles, err := rbac.Roles(user)
 		if err != nil {
 			return usersData, fmt.Errorf("failed to get roles for user: %w", err)
+		}
+		for _, role := range roles {
+			userData.Roles = append(userData.Roles, string(role))
 		}
 
 		trainingRecords, err := s.TrainingRecords(user)
 		if err != nil {
 			return usersData, fmt.Errorf("failed to get training for user: %w", err)
 		}
+		userData.TrainingRecord.TrainingRecords = trainingRecords
 
-		userData := openapi.UserData{
-			User: openapi.User{
-				Id:       user.ID.String(),
-				Username: string(user.Username),
-			},
-			Agreements: openapi.UserAgreements{
-				ConfirmedAgreements: agreements,
-			},
-			TrainingRecord: openapi.ProfileTraining{
-				TrainingRecords: trainingRecords,
-			},
-			Roles: roles,
-		}
 		usersData = append(usersData, userData)
 	}
 	return usersData, nil

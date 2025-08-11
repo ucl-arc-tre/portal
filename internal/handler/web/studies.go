@@ -45,13 +45,21 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 	}
-
 }
 
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
+	studyRoles, err := rbac.StudyRoles(user)
+	if err != nil {
+		setError(ctx, err, "Failed to get study roles")
+		return
+	}
+	studyIds := []uuid.UUID{}
+	for _, studyRole := range studyRoles {
+		studyIds = append(studyIds, studyRole.StudyID)
+	}
 
-	studies, err := h.studies.StudiesWithOwner(user)
+	studies, err := h.studies.StudiesById(studyIds...)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve studies")
 		return
@@ -66,41 +74,43 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
-	study, err := h.studies.StudyWithOwner(studyUUID, user)
+	studies, err := h.studies.StudiesById(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve study")
 		return
 	}
+	if len(studies) == 0 {
+		setError(ctx, types.NewNotFoundError("Study not found"), "Study not found")
+		return
+	}
 
-	studyResponse := studyToOpenApiStudy(study)
-
-	ctx.JSON(http.StatusOK, studyResponse)
+	ctx.JSON(http.StatusOK, studyToOpenApiStudy(studies[0]))
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
-	user := middleware.GetUser(ctx)
-
 	studyData := openapi.StudyCreateRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
 
-	validationError, err := h.studies.CreateStudy(ctx, user, studyData)
+	user := middleware.GetUser(ctx)
+	study, validationError, err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to create study")
 		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
 	}
 
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
+	if _, err := rbac.AddStudyOwnerRole(user, study.ID); err != nil {
+		setError(ctx, err, "Failed to add study owner role")
 		return
 	}
 
@@ -108,16 +118,13 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
-	// todo - use portal not gorm errors
-	assets, err := h.studies.StudyAssetsWithOwner(studyUUID, user)
+	assets, err := h.studies.StudyAssets(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return
