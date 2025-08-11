@@ -1,9 +1,10 @@
 .study-dialog {
   width: 70dvw;
-
-  overflow: scroll;
-  position: absolute;
   top: 5vh;
+
+  h2 {
+    text-align: center;
+  }
 }
 
 .error-alert {
@@ -64,7 +65,7 @@
         display: flex;
         align-items: center;
         justify-content: start;
-        gap: 0.4rem;
+        gap: 0.6rem;
       }
 
       input,
@@ -110,6 +111,14 @@
           margin: 2px;
           padding: 5px;
         }
+      }
+
+      .admin-wrapper {
+        margin-bottom: 0.5rem;
+      }
+
+      .admin-label {
+        padding-inline: 0;
       }
 
       .username-input-wrapper {
