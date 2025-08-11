@@ -5,7 +5,7 @@ export default function ApprovedResearcherView() {
     <>
       <h4>View users in your projects or invite a collaborator</h4>
       <ExternalInvite />
-      {/* to be implemented once projects has been done */}
+      {/* rest of content to be implemented once project logic has been done */}
     </>
   );
 }
