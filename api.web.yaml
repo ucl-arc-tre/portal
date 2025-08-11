@@ -432,7 +432,6 @@ components:
       required:
         - username
         - roles
-        - is_staff
       properties:
         username:
           type: string
@@ -445,6 +444,8 @@ components:
               - base
               - approved-researcher
               - approved-staff-researcher
+              - information-asset-owner
+              - information-asset-administrator
 
     Profile:
       type: object

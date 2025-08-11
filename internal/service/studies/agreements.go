@@ -2,8 +2,10 @@ package studies
 
 import (
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -24,6 +26,10 @@ func (s *Service) ConfirmStudyAgreement(user types.User, studyID uuid.UUID, agre
 	result := s.db.Where(&signature).FirstOrCreate(&signature)
 	if result.Error != nil {
 		return types.NewErrServerError(result.Error)
+	}
+	if assignedIAORole, err := rbac.AddRole(user, rbac.InformationAssetOwner); err != nil {
+		log.Debug().Bool("assigned", assignedIAORole).Any("user", user.Username).Msg("Set as information asset owner")
+		return err
 	}
 
 	return nil

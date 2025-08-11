@@ -12,12 +12,15 @@ import (
 )
 
 const (
-	Admin                   = RoleName(openapi.AuthRolesAdmin)                   // Global admin on everything
-	Base                    = RoleName(openapi.AuthRolesBase)                    // Most restricted role possible
-	ApprovedResearcher      = RoleName(openapi.AuthRolesApprovedResearcher)      // Trained and attested user
-	ApprovedStaffResearcher = RoleName(openapi.AuthRolesApprovedStaffResearcher) // Member of staff at the institution thats also an approved researcher
-	ReadAction              = Action("read")
-	WriteAction             = Action("write")
+	Admin                         = RoleName(openapi.AuthRolesAdmin)                         // Global admin on everything
+	Base                          = RoleName(openapi.AuthRolesBase)                          // Most restricted role possible
+	ApprovedResearcher            = RoleName(openapi.AuthRolesApprovedResearcher)            // Trained and attested user
+	ApprovedStaffResearcher       = RoleName(openapi.AuthRolesApprovedStaffResearcher)       // Member of staff at the institution thats also an approved researcher
+	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
+	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
+
+	ReadAction  = Action("read")
+	WriteAction = Action("write")
 )
 
 var enforcer *casbin.Enforcer

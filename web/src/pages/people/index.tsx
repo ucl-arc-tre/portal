@@ -3,7 +3,7 @@ import AdminView from "@/components/people/AdminView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
-import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
+import IAOView from "@/components/people/IAOView";
 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -12,10 +12,9 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isStaff = userData!.is_staff;
+  const isIAO = userData?.roles.includes("information-asset-owner");
 
-  const cannotView = !isAdmin && !isApprovedResearcher;
+  const cannotView = !isAdmin && !isIAO;
 
   return (
     <>
@@ -25,7 +24,7 @@ export default function PeoplePage() {
       />
       <Title text={"People"} />
       {cannotView && <h4>You do not have permission to view this page</h4>}
-      {isAdmin ? <AdminView /> : isApprovedResearcher && <ApprovedResearcherView isStaff={isStaff} />}
+      {isAdmin ? <AdminView /> : isIAO && <IAOView />}
     </>
   );
 }

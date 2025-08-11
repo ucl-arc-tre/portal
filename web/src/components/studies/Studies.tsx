@@ -24,7 +24,7 @@ export default function Studies(props: Props) {
   const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
   const handleCreateStudyClick = () => {
-    if (!userData.is_staff) {
+    if (!userData.roles.includes("approved-staff-researcher")) {
       setShowUclStaffModal(true);
       return;
     }
@@ -129,7 +129,7 @@ export default function Studies(props: Props) {
         </Dialog>
       )}
 
-      {!userData.is_staff && studies.length === 0 ? (
+      {!userData.roles.includes("approved-staff-researcher") && studies.length === 0 ? (
         <div className={styles["no-studies-message"]}>
           <h2>You haven&apos;t been added to any studies yet</h2>
           <p>Any studies you are added to will appear here once they have been created by a member of staff.</p>

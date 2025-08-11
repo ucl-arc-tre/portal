@@ -39,10 +39,12 @@ const (
 
 // Defines values for AuthRoles.
 const (
-	AuthRolesAdmin                   AuthRoles = "admin"
-	AuthRolesApprovedResearcher      AuthRoles = "approved-researcher"
-	AuthRolesApprovedStaffResearcher AuthRoles = "approved-staff-researcher"
-	AuthRolesBase                    AuthRoles = "base"
+	AuthRolesAdmin                         AuthRoles = "admin"
+	AuthRolesApprovedResearcher            AuthRoles = "approved-researcher"
+	AuthRolesApprovedStaffResearcher       AuthRoles = "approved-staff-researcher"
+	AuthRolesBase                          AuthRoles = "base"
+	AuthRolesInformationAssetAdministrator AuthRoles = "information-asset-administrator"
+	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
 )
 
 // Defines values for StudyApprovalStatus.
