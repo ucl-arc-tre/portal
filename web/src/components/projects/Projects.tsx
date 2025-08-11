@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
+import Callout from "../ui/Callout";
 
 export default function Projects() {
   const { authInProgress, isAuthed } = useAuth();
@@ -11,7 +12,9 @@ export default function Projects() {
 
   return (
     <>
-      <Title centered text={"Projects"} description={"This page is being built. Please check back soon for updates!"} />
+      <Title centered text={"Projects"} />
+
+      <Callout construction />
     </>
   );
 }
