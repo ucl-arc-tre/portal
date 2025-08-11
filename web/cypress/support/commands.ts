@@ -54,6 +54,12 @@ declare global {
        */
       mockAuthAsBaseApprovedResearcher(): Chainable<any>;
 
+      /**
+       * Mock auth response to return base and approved researcher roles with staff status
+       * @example cy.mockAuthAsBaseApprovedResearcher()
+       */
+      mockAuthAsBaseNonStaffApprovedResearcher(): Chainable<any>;
+
       // Profile fixture commands
       /**
        * Mock profile chosen name endpoint
@@ -241,6 +247,12 @@ Cypress.Commands.add("mockAuthAsBaseUser", () => {
 Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-approved-researcher.json",
+  }).as("getAuth");
+});
+
+Cypress.Commands.add("mockAuthAsBaseNonStaffApprovedResearcher", () => {
+  cy.intercept("GET", "/web/api/v0/auth", {
+    fixture: "auth-base-non-staff-approved-researcher.json",
   }).as("getAuth");
 });
 

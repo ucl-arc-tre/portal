@@ -16,7 +16,7 @@ func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewEnforcer()
 	addBasePolicies(enforcer)
-	// addApprovedResearcherPolicies(enforcer)
+	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
 	addAdminUserRoleBindings()
 }
@@ -39,19 +39,20 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 }
 
 // commented out until we have additional logic hooked up
-// func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
-// 	policies := []Policy{
-// 		{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
-// 		{RoleName: ApprovedResearcher, Resource: "/studies", Action: WriteAction},
-// 		{RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: ReadAction},
-// 		{RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: WriteAction},
-// 		{RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: ReadAction},
-// 		{RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: WriteAction},
-// 	}
-// 	for _, policy := range policies {
-// 		addPolicy(enforcer, policy)
-// 	}
-// }
+func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
+	policies := []Policy{
+		// {RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
+		// {RoleName: ApprovedResearcher, Resource: "/studies", Action: WriteAction},
+		// {RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: ReadAction},
+		// {RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: WriteAction},
+		// {RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: ReadAction},
+		// {RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: WriteAction},
+		{RoleName: ApprovedResearcher, Resource: "/users/invite", Action: WriteAction},
+	}
+	for _, policy := range policies {
+		addPolicy(enforcer, policy)
+	}
+}
 
 func addAdminPolicy(enforcer *casbin.Enforcer) {
 	addPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
