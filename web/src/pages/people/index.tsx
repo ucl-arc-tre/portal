@@ -13,6 +13,7 @@ export default function PeoplePage() {
 
   const isAdmin = userData?.roles.includes("admin");
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isStaff = userData!.is_staff;
 
   const cannotView = !isAdmin && !isApprovedResearcher;
 
@@ -24,7 +25,7 @@ export default function PeoplePage() {
       />
       <Title text={"People"} />
       {cannotView && <h4>You do not have permission to view this page</h4>}
-      {isAdmin ? <AdminView /> : isApprovedResearcher && <ApprovedResearcherView />}
+      {isAdmin ? <AdminView /> : isApprovedResearcher && <ApprovedResearcherView isStaff={isStaff} />}
     </>
   );
 }
