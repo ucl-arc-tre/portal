@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -76,6 +77,10 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 		}
 	}
 	return user, nil
+}
+
+func (s *Service) IsStaff(ctx context.Context, username types.Username) (bool, error) {
+	return s.entra.IsStaffMember(ctx, username)
 }
 
 func (s *Service) UserById(id string) (*types.User, error) {

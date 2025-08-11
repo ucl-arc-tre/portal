@@ -12,11 +12,12 @@ import (
 )
 
 const (
-	Admin              = RoleName(openapi.AuthRolesAdmin)              // Global admin on everything
-	Base               = RoleName(openapi.AuthRolesBase)               // Most restricted role possible
-	ApprovedResearcher = RoleName(openapi.AuthRolesApprovedResearcher) // Trained and attested user
-	ReadAction         = Action("read")
-	WriteAction        = Action("write")
+	Admin                   = RoleName(openapi.AuthRolesAdmin)                   // Global admin on everything
+	Base                    = RoleName(openapi.AuthRolesBase)                    // Most restricted role possible
+	ApprovedResearcher      = RoleName(openapi.AuthRolesApprovedResearcher)      // Trained and attested user
+	ApprovedStaffResearcher = RoleName(openapi.AuthRolesApprovedStaffResearcher) // Member of staff at the institution thats also an approved researcher
+	ReadAction              = Action("read")
+	WriteAction             = Action("write")
 )
 
 var enforcer *casbin.Enforcer
@@ -39,6 +40,12 @@ func NewEnforcer() *casbin.Enforcer {
 func AddRole(user types.User, role RoleName) (bool, error) {
 	roleAdded, err := enforcer.AddRoleForUser(user.ID.String(), string(role))
 	return roleAdded, types.NewErrServerError(err)
+}
+
+// Remove a role for a user
+func RemoveRole(user types.User, role RoleName) (bool, error) {
+	roleRemoved, err := enforcer.DeleteRoleForUser(user.ID.String(), string(role))
+	return roleRemoved, types.NewErrServerError(err)
 }
 
 // Get all roles of a user

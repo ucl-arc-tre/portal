@@ -444,9 +444,7 @@ components:
               - admin
               - base
               - approved-researcher
-        is_staff:
-          type: boolean
-          description: Whether the user is a valid UCL staff member
+              - approved-staff-researcher
 
     Profile:
       type: object

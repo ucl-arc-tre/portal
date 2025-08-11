@@ -2,11 +2,7 @@
 
 export type Auth = {
     username: string;
-    roles: Array<'admin' | 'base' | 'approved-researcher'>;
-    /**
-     * Whether the user is a valid UCL staff member
-     */
-    is_staff: boolean;
+    roles: Array<'admin' | 'base' | 'approved-researcher' | 'approved-staff-researcher'>;
 };
 
 export type Profile = {

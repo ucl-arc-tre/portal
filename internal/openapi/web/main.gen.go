@@ -39,9 +39,10 @@ const (
 
 // Defines values for AuthRoles.
 const (
-	AuthRolesAdmin              AuthRoles = "admin"
-	AuthRolesApprovedResearcher AuthRoles = "approved-researcher"
-	AuthRolesBase               AuthRoles = "base"
+	AuthRolesAdmin                   AuthRoles = "admin"
+	AuthRolesApprovedResearcher      AuthRoles = "approved-researcher"
+	AuthRolesApprovedStaffResearcher AuthRoles = "approved-staff-researcher"
+	AuthRolesBase                    AuthRoles = "base"
 )
 
 // Defines values for StudyApprovalStatus.
@@ -135,8 +136,6 @@ type AssetStatus string
 
 // Auth defines model for Auth.
 type Auth struct {
-	// IsStaff Whether the user is a valid UCL staff member
-	IsStaff  bool        `json:"is_staff"`
 	Roles    []AuthRoles `json:"roles"`
 	Username string      `json:"username"`
 }
