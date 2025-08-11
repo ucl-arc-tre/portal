@@ -27,3 +27,73 @@
   color: #37393d;
   line-height: 1.5;
 }
+
+.reupload-option {
+  width: 80%;
+  margin-block: 0.5rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  button {
+    align-self: end;
+  }
+
+  .certificate-container {
+    overflow: hidden;
+    transition: all 1.6s ease 0.2s;
+    max-height: 0px;
+
+    &.cert-hidden {
+      display: none;
+      max-height: 0px;
+    }
+
+    &.cert-collapsing {
+      section {
+        animation: slide-up-fade 1.8s ease 0s 1 normal forwards;
+        transition:
+          opacity 1.6s,
+          transform 1s 1.5s;
+      }
+    }
+
+    &.cert-visible {
+      max-height: 100vh;
+
+      section {
+        animation: fade-slide-down 1.8s ease 0s 1 normal forwards;
+        transition:
+          opacity 1.6s,
+          transform 1s 1.5s;
+      }
+    }
+  }
+}
+
+@keyframes fade-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-200px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-200px);
+  }
+}

@@ -29,7 +29,9 @@ type TrainingCertificateProps = {
   setTrainingCertificateCompleted: (completed: boolean) => void;
 };
 
-export default function TrainingCertificate({ setTrainingCertificateCompleted }: TrainingCertificateProps) {
+export default function TrainingCertificate(props: TrainingCertificateProps) {
+  const { setTrainingCertificateCompleted } = props;
+
   const { authInProgress, isAuthed } = useAuth();
   const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
