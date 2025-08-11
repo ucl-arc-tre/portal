@@ -3,6 +3,7 @@ import AdminView from "@/components/people/AdminView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
+import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -23,7 +24,7 @@ export default function PeoplePage() {
       />
       <Title text={"People"} />
       {cannotView && <h4>You do not have permission to view this page</h4>}
-      {isAdmin ? <AdminView /> : isApprovedResearcher && <p>Approved Researcher</p>}
+      {isAdmin ? <AdminView /> : isApprovedResearcher && <ApprovedResearcherView />}
     </>
   );
 }
