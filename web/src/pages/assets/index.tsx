@@ -10,6 +10,7 @@ import Title from "@/components/ui/Title";
 
 import styles from "./index.module.css";
 import Callout from "@/components/ui/Callout";
+import InfoTooltip from "@/components/ui/InfoTooltip";
 
 export default function AssetsPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -65,6 +66,17 @@ export default function AssetsPage() {
       />
 
       <Title text={"Assets"} centered description={"View and manage your information assets"} />
+
+      <Callout definition>
+        Assets are information entities. They are owned by a <strong>study</strong>
+        <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
+        <strong>projects</strong>
+        <InfoTooltip text="Projects are owned by a study and can contain assets" />, for more detailed information and
+        an entity relationship diagram, look at our
+        <Button href="/glossary" variant="tertiary" size="small" inline>
+          Glossary
+        </Button>
+      </Callout>
       <Callout>
         <p>
           Use this page to create data assets you would like to associate with your study. Assets can be any kind of

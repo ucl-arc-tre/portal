@@ -49,7 +49,7 @@ export default function StudiesPage() {
       />
       <Title text={"Studies"} centered />
 
-      <Callout>
+      <Callout definition>
         Studies are a top level entity. They can contain <strong>projects</strong>
         <InfoTooltip text="Projects are owned by a study and can contain assets" />
         and <strong>assets</strong>

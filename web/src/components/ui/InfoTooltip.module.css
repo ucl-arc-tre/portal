@@ -19,10 +19,12 @@
     font-size: 0.875rem;
     color: var(--foreground);
     width: clamp(10rem, 30vw, 16rem);
-    max-width: 18rem;
+    max-width: 17rem;
     line-height: 1.2;
 
     position: absolute;
+    right: -1rem;
+    top: 1rem;
 
     opacity: 0;
     transition: opacity 0.3s;
