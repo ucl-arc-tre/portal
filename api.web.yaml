@@ -278,7 +278,7 @@ paths:
         default:
           description: Unexpected error
 
-  /study/{studyId}:
+  /studies/{studyId}:
     get:
       description: Get details of a specific study
       parameters:

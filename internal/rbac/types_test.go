@@ -14,10 +14,11 @@ func TestStudyRoleMarshal(t *testing.T) {
 		Name:    "owner",
 	}
 	assert.Equal(t, studyRole, makeStudyOwnerRole(id))
-	assert.Equal(t, "study:618880a8-bb0e-413d-9c02-689d86905466:owner", string(studyRole.RoleName()))
+	assert.Equal(t, "study_618880a8-bb0e-413d-9c02-689d86905466:owner", string(studyRole.RoleName()))
+	assert.Equal(t, studyRole, mustMakeStudyRole(RoleName("study_618880a8-bb0e-413d-9c02-689d86905466:owner")))
 }
 
 func TestIsStudyRole(t *testing.T) {
-	assert.True(t, isStudyRole(RoleName("study:xyz")))
-	assert.False(t, isStudyRole(RoleName("thing:xyz")))
+	assert.True(t, isStudyRole(RoleName("study_xyz")))
+	assert.False(t, isStudyRole(RoleName("thing_xyz")))
 }

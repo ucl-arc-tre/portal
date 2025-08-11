@@ -51,13 +51,20 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 // Add a study role for a user
 func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	roleName := makeStudyOwnerRole(studyId).RoleName()
-	for _, action := range []Action{ReadAction, WriteAction} {
-		_, err := addPolicy(enforcer, Policy{
+	policies := []Policy{
+		{
 			RoleName: roleName,
-			Action:   action,
+			Action:   "*",
+			Resource: fmt.Sprintf("/studies/%v", studyId),
+		},
+		{
+			RoleName: roleName,
+			Action:   "*",
 			Resource: fmt.Sprintf("/studies/%v/*", studyId),
-		})
-		if err != nil {
+		},
+	}
+	for _, policy := range policies {
+		if _, err := addPolicy(enforcer, policy); err != nil {
 			return false, err
 		}
 	}
@@ -88,10 +95,10 @@ func RemoveRole(user types.User, role RoleName) (bool, error) {
 // Get all roles of a user
 func Roles(user types.User) ([]RoleName, error) {
 	rawRoles, err := enforcer.GetRolesForUser(user.ID.String())
-	roles := []RoleName{}
 	if err != nil {
-		return roles, err
+		return []RoleName{}, err
 	}
+	roles := []RoleName{}
 	for _, rawRole := range rawRoles {
 		roles = append(roles, RoleName(rawRole))
 	}

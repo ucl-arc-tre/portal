@@ -468,6 +468,9 @@ type ServerInterface interface {
 	// (POST /studies)
 	PostStudies(c *gin.Context)
 
+	// (GET /studies/{studyId})
+	GetStudiesStudyId(c *gin.Context, studyId string)
+
 	// (GET /studies/{studyId}/agreements)
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
 
@@ -479,9 +482,6 @@ type ServerInterface interface {
 
 	// (POST /studies/{studyId}/assets)
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
-
-	// (GET /study/{studyId})
-	GetStudyStudyId(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context)
@@ -659,6 +659,30 @@ func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
 	siw.Handler.PostStudies(c)
 }
 
+// GetStudiesStudyId operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyId(c, studyId)
+}
+
 // GetStudiesStudyIdAgreements operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAgreements(c *gin.Context) {
 
@@ -753,30 +777,6 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	}
 
 	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
-}
-
-// GetStudyStudyId operation middleware
-func (siw *ServerInterfaceWrapper) GetStudyStudyId(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "studyId" -------------
-	var studyId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetStudyStudyId(c, studyId)
 }
 
 // GetUsers operation middleware
@@ -880,11 +880,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
+	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
-	router.GET(options.BaseURL+"/study/:studyId", wrapper.GetStudyStudyId)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

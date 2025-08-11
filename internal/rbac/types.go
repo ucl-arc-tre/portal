@@ -7,6 +7,10 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	studyPrefix = "study_" // NOTE: Cannot use a : delimter with type prefix
+)
+
 type RoleName string
 
 type Action string
@@ -23,7 +27,7 @@ type StudyRole struct {
 }
 
 func (s StudyRole) RoleName() RoleName {
-	return RoleName(fmt.Sprintf("study:%v:%v", s.StudyID, s.Name))
+	return RoleName(fmt.Sprintf("%s%v_%v", studyPrefix, s.StudyID, s.Name))
 }
 
 func makeStudyOwnerRole(studyId uuid.UUID) StudyRole {
@@ -31,13 +35,13 @@ func makeStudyOwnerRole(studyId uuid.UUID) StudyRole {
 }
 
 func mustMakeStudyRole(role RoleName) StudyRole {
-	parts := strings.Split(string(role), ":")
-	if len(parts) != 3 || !isStudyRole(role) {
+	parts := strings.Split(strings.Replace(string(role), studyPrefix, "", 1), ":")
+	if len(parts) != 2 {
 		panic("not a study role")
 	}
-	return StudyRole{StudyID: uuid.MustParse(parts[1]), Name: parts[2]}
+	return StudyRole{StudyID: uuid.MustParse(parts[0]), Name: parts[1]}
 }
 
 func isStudyRole(role RoleName) bool {
-	return strings.HasPrefix(string(role), "study")
+	return strings.HasPrefix(string(role), studyPrefix)
 }

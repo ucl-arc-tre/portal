@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -73,7 +74,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
+func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
@@ -86,7 +87,7 @@ func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 	if len(studies) == 0 {
-		setError(ctx, types.NewNotFoundError("Study not found"), "Study not found")
+		setError(ctx, types.NewNotFoundError(fmt.Errorf("study [%v] not found", studyUUID)), "Study not found")
 		return
 	}
 

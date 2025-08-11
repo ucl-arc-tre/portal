@@ -10,11 +10,11 @@ import (
 func (h *Handler) GetAuth(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	info, err := h.auth.AuthInfo(ctx, user)
+	authInfo, err := h.auth.AuthInfo(ctx, user)
 	if err != nil {
 		setError(ctx, err, "Failed to get auth info")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, info)
+	ctx.JSON(http.StatusOK, authInfo)
 }
