@@ -20,7 +20,7 @@ describe(`People page content`, () => {
     cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.contains("Approved Researcher").should("be.visible");
+    cy.contains("your projects").should("be.visible");
   });
 
   it("should show content for admin", () => {
@@ -65,8 +65,29 @@ describe("Invite externals", () => {
     cy.get("[data-cy='show-invite-input']").should("not.exist");
   });
 
+  it("should not be visible to a an approved researcher who is not staff", () => {
+    cy.loginAsBase();
+    cy.mockAuthAsBaseNonStaffApprovedResearcher();
+    cy.visit("/people");
+    cy.get("[data-cy='show-invite-input']").should("not.exist");
+  });
+
   it("should be visable to & usable by an admin user", () => {
     cy.loginAsAdmin();
+    cy.visit("/people");
+    cy.mockInviteExternalResearcher("hello@example.com");
+
+    cy.get("[data-cy='show-invite-input']").should("be.visible").click();
+
+    cy.get("input[name='email']").should("be.visible").type("hello@example.com");
+    cy.get("[data-cy='send-invite']").should("be.visible").click();
+
+    cy.get("input[name='email']").should("not.have.value", "hello@example.com");
+  });
+
+  it("should be visable to & usable by an approved researcher who is staff", () => {
+    cy.loginAsBase();
+    cy.mockAuthAsBaseApprovedResearcher();
     cy.visit("/people");
     cy.mockInviteExternalResearcher("hello@example.com");
 
