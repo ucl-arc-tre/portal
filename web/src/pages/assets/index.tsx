@@ -63,8 +63,7 @@ export default function AssetsPage() {
         description="View and modify data assets in the ARC Services Portal"
       />
 
-      <Title text={"Data Assets"} />
-      <h2>View and manage your data assets.</h2>
+      <Title text={"Data Assets"} centered description={"View and manage your data assets"} />
       <div className={styles["page-description"]}>
         <p>
           Use this page to create data assets you would like to associate with your study. Assets can be any kind of

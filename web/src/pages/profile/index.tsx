@@ -7,6 +7,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import Loading from "@/components/ui/Loading";
 import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard";
+import styles from "./ProfilePage.module.css";
 
 export default function ProfilePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -82,7 +83,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <>
-        <Title text={"Profile Setup"} />
+        <Title text={"Profile Setup"} centered />
         <Loading message="Loading your profile..." />
       </>
     );
@@ -95,20 +96,21 @@ export default function ProfilePage() {
         description="View and manage your ARC profile and researcher status"
       />
 
-      <Title text={"Profile Setup"} />
+      <Title text={"Profile Setup"} centered />
+      <div className={styles["profile-content-container"]}>
+        <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
 
-      <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
-
-      <ProfileSetup
-        chosenName={chosenName}
-        setChosenName={setChosenName}
-        agreementCompleted={agreementCompleted}
-        setAgreementCompleted={setAgreementCompleted}
-        trainingCertificateCompleted={trainingCertificateCompleted}
-        setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-        userData={userData}
-        expiryUrgency={expiryUrgency}
-      />
+        <ProfileSetup
+          chosenName={chosenName}
+          setChosenName={setChosenName}
+          agreementCompleted={agreementCompleted}
+          setAgreementCompleted={setAgreementCompleted}
+          trainingCertificateCompleted={trainingCertificateCompleted}
+          setTrainingCertificateCompleted={setTrainingCertificateCompleted}
+          userData={userData}
+          expiryUrgency={expiryUrgency}
+        />
+      </div>
     </>
   );
 }

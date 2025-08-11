@@ -11,8 +11,7 @@ export default function Projects() {
 
   return (
     <>
-      <Title text={"Projects"} />
-      <p>This page is being built. Please check back soon for updates!</p>
+      <Title centered text={"Projects"} description={"This page is being built. Please check back soon for updates!"} />
     </>
   );
 }

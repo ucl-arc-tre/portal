@@ -9,8 +9,11 @@ export default function Index() {
       <MetaHead title="ARC Services Portal | UCL" description="ARC Services Portal homepage" />
 
       <div className={styles.title}>
-        <Title text={"Welcome to the ARC Services Portal"} centered={true} />
-        <p>This portal allows UCL researchers to manage ARC services and tasks.</p>
+        <Title
+          text={"Welcome to the ARC Services Portal"}
+          centered
+          description={"This portal allows UCL researchers to manage ARC services and tasks"}
+        />
       </div>
 
       <div className={styles["task-wrapper"]}>
