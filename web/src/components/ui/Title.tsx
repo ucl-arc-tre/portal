@@ -11,7 +11,7 @@ export default function Title(props: TitleProps) {
     <>
       {" "}
       <h1 className={`${styles.title} ${props.centered ? styles.centered : ""}`}>{props.text}</h1>
-      <h4 className={styles.description}>{props.description}</h4>{" "}
+      {props.description && <h4 className={styles.description}>{props.description}</h4>}
     </>
   );
 }
