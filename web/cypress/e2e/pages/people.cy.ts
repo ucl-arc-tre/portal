@@ -13,14 +13,13 @@ describe(`People page content`, () => {
     cy.contains("You do not have permission to view this page").should("be.visible");
   });
 
-  it("should show content for base approved researcher", () => {
+  it("should not show content for base approved researcher", () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseApprovedResearcher();
     cy.visit("/people");
     cy.waitForAuth();
 
-    cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.contains("your projects").should("be.visible");
+    cy.contains("You do not have permission to view this page").should("be.visible");
   });
 
   it("should show content for admin", () => {
@@ -87,7 +86,7 @@ describe("Invite externals", () => {
 
   it("should be visable to & usable by an approved researcher who is staff", () => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseInformationAssetOwner();
     cy.visit("/people");
     cy.mockInviteExternalResearcher("hello@example.com");
 

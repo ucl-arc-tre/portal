@@ -28,7 +28,7 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
             <div className={styles.roles}>
               {roles && roles.length > 0 ? (
                 roles
-                  .filter((role) => !role.includes(":")) // skip all object roles
+                  .filter((role) => !role.includes("_")) // skip all object roles
                   .map((role) => (
                     <span key={role} className={styles.role}>
                       {role}

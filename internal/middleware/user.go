@@ -56,8 +56,6 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	}
 	if err := u.setDynamicRoles(ctx, user); err != nil {
 		log.Err(err).Msg("Failed to set staff approved resarcher role")
-		ctx.AbortWithStatus(http.StatusInternalServerError)
-		return
 	}
 	ctx.Set(userContextKey, user)
 }
