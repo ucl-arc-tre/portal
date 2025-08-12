@@ -28,10 +28,20 @@ const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
   ssr: false,
 });
 
-function NavItem({ href, icon, title }: { href: string; icon: ReactElement; title: string }) {
+function NavItem({
+  href,
+  icon,
+  title,
+  className,
+}: {
+  href: string;
+  icon: ReactElement;
+  title: string;
+  className?: string;
+}) {
   const pathname = usePathname();
   return (
-    <li className={pathname === href ? styles.active : ""}>
+    <li className={pathname === href ? styles.active : className || ""}>
       <Button href={href} variant="tertiary" icon={icon}>
         {title}
       </Button>
@@ -62,12 +72,18 @@ export default function Nav() {
         <ul className={styles.nav__list}>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
 
-          {canSeeStudies && <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />}
+          {canSeeStudies && (
+            <NavItem className={styles.appearable} href="/studies" icon={<FolderIcon />} title="Studies" />
+          )}
 
-          {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
-          {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
+          {canSeeProjects && (
+            <NavItem className={styles.appearable} href="/projects" icon={<FileIcon />} title="Projects" />
+          )}
+          {canSeeAssets && (
+            <NavItem className={styles.appearable} href="/assets" icon={<PaperclipIcon />} title="Assets" />
+          )}
 
-          {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
+          {canSeePeople && <NavItem className={styles.appearable} href="/people" icon={<UsersIcon />} title="People" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
