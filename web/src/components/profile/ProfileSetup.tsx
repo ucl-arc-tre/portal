@@ -34,8 +34,6 @@ export default function ProfileSetup(props: Props) {
     refreshAuth,
   } = props;
 
-  console.log(userData);
-
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
   const [showCertReupload, setShowCertReupload] = useState(false);
