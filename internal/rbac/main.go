@@ -35,9 +35,8 @@ func NewEnforcer() *casbin.Enforcer {
 		return enforcer
 	}
 	log.Debug().Msg("Creating casbin enforcer")
-	model := must(model.NewModelFromString(casbinModel))
 	adapter := must(gormadapter.NewAdapterByDB(graceful.NewDB()))
-	enforcer = must(casbin.NewEnforcer(model, adapter))
+	enforcer = must(casbin.NewEnforcer(makeCasbinModel(), adapter))
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 	return enforcer
@@ -113,6 +112,10 @@ func Roles(user types.User) ([]RoleName, error) {
 func HasRole(user types.User, role RoleName) (bool, error) {
 	hasRole, err := enforcer.HasRoleForUser(user.ID.String(), string(role))
 	return hasRole, types.NewErrServerError(err)
+}
+
+func makeCasbinModel() model.Model {
+	return must(model.NewModelFromString(casbinModel))
 }
 
 func must[T any](value T, err error) T {
