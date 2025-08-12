@@ -7,7 +7,7 @@ import { Auth } from "@/openapi";
 
 import styles from "./ProfileSetup.module.css";
 import Button from "../ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   chosenName: string | undefined;
@@ -18,6 +18,7 @@ type Props = {
   setTrainingCertificateCompleted: (completed: boolean) => void;
   userData: Auth | null;
   expiryUrgency: ExpiryUrgency | null;
+  refreshAuth: () => Promise<void>;
 };
 
 export default function ProfileSetup(props: Props) {
@@ -30,12 +31,19 @@ export default function ProfileSetup(props: Props) {
     setTrainingCertificateCompleted,
     userData,
     expiryUrgency,
+    refreshAuth,
   } = props;
 
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
   const [showCertReupload, setShowCertReupload] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
+
+  useEffect(() => {
+    if (profileStepsCompleted) {
+      refreshAuth();
+    }
+  }, []);
 
   const profileSetupSteps: Step[] = [
     {
@@ -121,7 +129,7 @@ export default function ProfileSetup(props: Props) {
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
           completionTitle="Profile Complete!"
-          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
+          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher."
           introText="Complete the following steps to set up your profile and become an approved researcher."
           ariaLabel="Profile setup progress"
         />
