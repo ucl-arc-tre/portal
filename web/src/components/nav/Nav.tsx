@@ -28,17 +28,14 @@ const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
   ssr: false,
 });
 
-function NavItem({
-  href,
-  icon,
-  title,
-  className,
-}: {
+type NavItemProps = {
   href: string;
   icon: ReactElement;
   title: string;
   className?: string;
-}) {
+};
+function NavItem(NavItemProps: NavItemProps) {
+  const { href, icon, title, className } = NavItemProps;
   const pathname = usePathname();
   return (
     <li className={pathname === href ? styles.active : className || ""}>
