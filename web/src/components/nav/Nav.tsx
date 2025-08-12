@@ -46,14 +46,13 @@ export default function Nav() {
   if (authInProgress) return null;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isStaff = userData?.roles.includes("staff");
-  const isApprovedStudyResearcher = userData?.roles.includes("approved-staff-researcher");
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
+  const isIAO = userData?.roles.includes("information-asset-owner");
 
-  const canSeeStudies = (isApprovedResearcher && isStaff) || isAdmin;
-  const canSeeProjects = isApprovedStudyResearcher || isAdmin;
-  const canSeeAssets = isApprovedStudyResearcher || isAdmin;
-  const canSeePeople = isApprovedStudyResearcher || isAdmin;
+  const canSeeStudies = isApprovedStaffResearcher || isAdmin;
+  const canSeeProjects = isIAO || isAdmin;
+  const canSeeAssets = isIAO || isAdmin;
+  const canSeePeople = isIAO || isAdmin;
 
   return (
     <aside className={styles.sidebar}>
