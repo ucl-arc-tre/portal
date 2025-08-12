@@ -1,9 +1,9 @@
 import MetaHead from "@/components/meta/Head";
 import AdminView from "@/components/people/AdminView";
+import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
-import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -12,8 +12,8 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isStaff = userData!.is_staff;
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
+  const isIAO = userData?.roles.includes("information-asset-owner") || false;
 
   return (
     <>
@@ -27,14 +27,14 @@ export default function PeoplePage() {
         description={
           isAdmin
             ? "View and manage portal users, including adding via invitation or upload"
-            : isApprovedResearcher
+            : isApprovedStaffResearcher
               ? "View users in your projects"
-              : isApprovedResearcher && isStaff
+              : isIAO
                 ? "View users in your projects or invite a collaborator"
                 : "You do not have permission to view this page"
         }
       />
-      {isAdmin ? <AdminView /> : isApprovedResearcher && <ApprovedResearcherView isStaff={isStaff} />}
+      {isAdmin ? <AdminView /> : isApprovedStaffResearcher && <ApprovedResearcherView isIAO={isIAO} />}
     </>
   );
 }

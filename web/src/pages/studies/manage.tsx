@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { Study, getStudyByStudyId } from "@/openapi";
+import { Study, getStudiesByStudyId } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import ManageStudy from "@/components/studies/ManageStudy";
@@ -27,7 +27,7 @@ export default function ManageStudyPage() {
     setStudyError(null);
 
     try {
-      const response = await getStudyByStudyId({
+      const response = await getStudiesByStudyId({
         path: { studyId: id },
       });
 

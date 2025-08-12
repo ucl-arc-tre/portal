@@ -4,45 +4,35 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/controller/entra"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 type Service struct {
-	entra *entra.Controller
 }
 
 func New() *Service {
-	service := Service{
-		entra: entra.New(),
-	}
-	return &service
+	return &Service{}
 }
 
-func (s *Service) AuthInfo(ctx context.Context, user types.User) (*types.AuthInfo, error) {
+func (s *Service) AuthInfo(ctx context.Context, user types.User) (*openapi.Auth, error) {
 	roles, err := rbac.Roles(user)
 	if err != nil {
 		log.Error().Err(err).Any("user", user.Username).Msg("Failed to get user roles")
-		return nil, types.NewErrServerError(err)
+		return nil, err
 	}
 
-	isStaff, err := s.entra.IsStaffMember(ctx, user.Username)
-	if err != nil {
-		log.Warn().Err(err).Any("user", user.Username).Msg("Failed to validate employee status")
-		isStaff = false // Default to false if there's an error
+	info := &openapi.Auth{
+		Username: string(user.Username),
 	}
-
-	authInfo := &types.AuthInfo{
-		Roles:   roles,
-		IsStaff: isStaff,
+	for _, role := range roles {
+		info.Roles = append(info.Roles, openapi.AuthRoles(role))
 	}
 
 	log.Debug().
 		Any("user", user.Username).
-		Strs("roles", authInfo.Roles).
-		Bool("isStaff", authInfo.IsStaff).
+		Any("info", info).
 		Msg("Retrieved auth info for user")
-
-	return authInfo, nil
+	return info, nil
 }

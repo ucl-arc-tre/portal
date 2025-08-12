@@ -1,5 +1,9 @@
 package rbac
 
+const (
+	objectRoleDelimiter = "_" // NOTE: Cannot use :
+)
+
 type RoleName string
 
 type Action string

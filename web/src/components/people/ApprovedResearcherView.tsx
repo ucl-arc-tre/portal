@@ -1,13 +1,15 @@
+import Callout from "../ui/Callout";
 import ExternalInvite from "./ExternalInvite";
 
-export default function ApprovedResearcherView({ isStaff }: { isStaff: boolean }) {
+export default function ApprovedResearcherView({ isIAO }: { isIAO: boolean }) {
   return (
     <>
-      {isStaff && (
+      {isIAO && (
         <>
           <ExternalInvite />
         </>
       )}
+      <Callout construction />
       {/* rest of content to be implemented once project logic has been done */}
     </>
   );

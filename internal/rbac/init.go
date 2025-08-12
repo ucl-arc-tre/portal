@@ -34,32 +34,32 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 		{RoleName: Base, Resource: "/logout", Action: ReadAction},
 	}
 	for _, policy := range policies {
-		addPolicy(enforcer, policy)
+		mustAddPolicy(enforcer, policy)
 	}
 }
 
-// commented out until we have additional logic hooked up
 func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 	policies := []Policy{
-		// {RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
-		// {RoleName: ApprovedResearcher, Resource: "/studies", Action: WriteAction},
-		// {RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: ReadAction},
-		// {RoleName: ApprovedResearcher, Resource: "/studies/*/assets", Action: WriteAction},
-		// {RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: ReadAction},
-		// {RoleName: ApprovedResearcher, Resource: "/studies/*/agreements", Action: WriteAction},
-		{RoleName: ApprovedResearcher, Resource: "/users/invite", Action: WriteAction},
+		{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
+		{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
+		{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
+		{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
 	}
 	for _, policy := range policies {
-		addPolicy(enforcer, policy)
+		mustAddPolicy(enforcer, policy)
 	}
 }
 
 func addAdminPolicy(enforcer *casbin.Enforcer) {
-	addPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
+	mustAddPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
 }
 
-func addPolicy(enforcer *casbin.Enforcer, policy Policy) {
-	_ = must(enforcer.AddPolicy(string(policy.RoleName), policy.Resource, string(policy.Action)))
+func mustAddPolicy(enforcer *casbin.Enforcer, policy Policy) {
+	_ = must(addPolicy(enforcer, policy))
+}
+
+func addPolicy(enforcer *casbin.Enforcer, policy Policy) (bool, error) {
+	return enforcer.AddPolicy(string(policy.RoleName), policy.Resource, string(policy.Action))
 }
 
 func addAdminUserRoleBindings() {

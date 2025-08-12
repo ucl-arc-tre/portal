@@ -54,5 +54,34 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	if hasBaseRole, err := rbac.HasRole(user, rbac.Base); err != nil && !hasBaseRole {
 		_, _ = rbac.AddRole(user, rbac.Base)
 	}
+	if err := u.setDynamicRoles(ctx, user); err != nil {
+		log.Err(err).Msg("Failed to set dynamic roles")
+	}
 	ctx.Set(userContextKey, user)
+}
+
+func (u *UserSetter) setDynamicRoles(ctx *gin.Context, user types.User) error {
+	isStaff, err := u.users.IsStaff(ctx, user)
+	if err != nil {
+		return err
+	}
+	if isStaff {
+		_, err = rbac.AddRole(user, rbac.Staff)
+	} else {
+		_, err = rbac.RemoveRole(user, rbac.Staff)
+	}
+	if err != nil {
+		return err
+	}
+	isApprovedResearcher, err := rbac.HasRole(user, rbac.ApprovedResearcher)
+	if err != nil {
+		return err
+	}
+	if isStaff && isApprovedResearcher {
+		_, err = rbac.AddRole(user, rbac.ApprovedStaffResearcher)
+	} else {
+		// If the user is not longer staff the role should be removed
+		_, err = rbac.RemoveRole(user, rbac.ApprovedStaffResearcher)
+	}
+	return err
 }

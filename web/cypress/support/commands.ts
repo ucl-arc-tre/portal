@@ -60,6 +60,12 @@ declare global {
        */
       mockAuthAsBaseNonStaffApprovedResearcher(): Chainable<any>;
 
+      /**
+       * Mock auth response to return base and information asset owner roles with staff status
+       * @example cy.mockAuthAsBaseInformationAssetOwner()
+       */
+      mockAuthAsBaseInformationAssetOwner(): Chainable<any>;
+
       // Profile fixture commands
       /**
        * Mock profile chosen name endpoint
@@ -253,6 +259,12 @@ Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
 Cypress.Commands.add("mockAuthAsBaseNonStaffApprovedResearcher", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-non-staff-approved-researcher.json",
+  }).as("getAuth");
+});
+
+Cypress.Commands.add("mockAuthAsBaseInformationAssetOwner", () => {
+  cy.intercept("GET", "/web/api/v0/auth", {
+    fixture: "auth-base-information-asset-owner.json",
   }).as("getAuth");
 });
 
