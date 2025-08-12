@@ -51,7 +51,7 @@ export default function Nav() {
 
   const isApprovedStudyResearcher = isApprovedResearcher && isStaff; //todo: use new approved study researcher role when available
 
-  const canSeeStudies = isApprovedResearcher || isAdmin;
+  const canSeeStudies = isApprovedStudyResearcher || isAdmin;
   const canSeeProjects = isApprovedStudyResearcher || isAdmin;
   const canSeeAssets = isApprovedStudyResearcher || isAdmin;
   const canSeePeople = isApprovedStudyResearcher || isAdmin;
