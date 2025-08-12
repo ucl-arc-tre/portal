@@ -8,6 +8,7 @@ import {
 import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
+import { useAuth } from "@/hooks/useAuth";
 
 type StudyAgreementProps = {
   studyId: string;
@@ -22,6 +23,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { refreshAuth } = useAuth();
 
   useEffect(() => {
     const fetchStudyAgreementData = async () => {
@@ -78,7 +80,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
 
       if (response.response.status !== 200) {
         throw new Error("Failed to submit study agreement");
-      }
+      } else refreshAuth();
     } catch (err) {
       setError("Failed to submit agreement. Please try again.");
       throw err;

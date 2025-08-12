@@ -10,7 +10,7 @@ import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard";
 import styles from "./ProfilePage.module.css";
 
 export default function ProfilePage() {
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, refreshAuth } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(false);
@@ -109,6 +109,7 @@ export default function ProfilePage() {
           setTrainingCertificateCompleted={setTrainingCertificateCompleted}
           userData={userData}
           expiryUrgency={expiryUrgency}
+          refreshAuth={refreshAuth}
         />
       </div>
     </>

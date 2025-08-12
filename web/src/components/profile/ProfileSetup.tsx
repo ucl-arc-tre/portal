@@ -7,7 +7,7 @@ import { Auth } from "@/openapi";
 
 import styles from "./ProfileSetup.module.css";
 import Button from "../ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   chosenName: string | undefined;
@@ -18,6 +18,7 @@ type Props = {
   setTrainingCertificateCompleted: (completed: boolean) => void;
   userData: Auth | null;
   expiryUrgency: ExpiryUrgency | null;
+  refreshAuth: () => Promise<void>;
 };
 
 export default function ProfileSetup(props: Props) {
@@ -28,13 +29,22 @@ export default function ProfileSetup(props: Props) {
     setAgreementCompleted,
     trainingCertificateCompleted,
     setTrainingCertificateCompleted,
+    userData,
     expiryUrgency,
+    refreshAuth,
   } = props;
 
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
   const [showCertReupload, setShowCertReupload] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
+
+  // is there a better way of doing this so we don't get the warning but don't get infinite loops if appeasing the warning?
+  useEffect(() => {
+    if (profileStepsCompleted) {
+      refreshAuth();
+    }
+  }, [profileStepsCompleted]);
 
   const profileSetupSteps: Step[] = [
     {
@@ -104,7 +114,7 @@ export default function ProfileSetup(props: Props) {
           completionSubtitle=" To retain access to the portal, please upload a new certificate."
           ariaLabel="Profile setup progress"
         />
-      ) : (
+      ) : userData?.roles.includes("staff") ? (
         <StepProgress
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
@@ -112,6 +122,15 @@ export default function ProfileSetup(props: Props) {
           completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
           completionButtonText="Go to studies"
           completionButtonHref="/studies"
+          introText="Complete the following steps to set up your profile and become an approved researcher."
+          ariaLabel="Profile setup progress"
+        />
+      ) : (
+        <StepProgress
+          steps={profileSetupSteps}
+          isComplete={profileStepsCompleted}
+          completionTitle="Profile Complete!"
+          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher."
           introText="Complete the following steps to set up your profile and become an approved researcher."
           ariaLabel="Profile setup progress"
         />

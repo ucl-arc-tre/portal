@@ -133,7 +133,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
-
   return (
     <Dialog setDialogOpen={handleCloseForm} className={styles["study-dialog"]} cy="create-study-form">
       <h2>Create Study</h2>
@@ -141,9 +140,8 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <div
           className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""} ${isValid ? styles.valid : ""}`}
         ></div>
-        <div
-          className={`${styles["step-dot"]} ${currentStep === 2 ? styles["active"] : ""}${isValid ? styles.valid : ""}`}
-        ></div>
+        {/* not checking if valid because only optional fields */}
+        <div className={`${styles["step-dot"]} ${currentStep === 2 ? styles["active"] : ""}`}></div>{" "}
         <div className={`${styles["step-dot"]} ${currentStep === 3 ? styles["active"] : ""}`}></div>
       </div>
 
@@ -216,7 +214,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </Label>
           <Label>
             Additional Study Administrators (optional):
-            <fieldset className={getFieldsetClass(1)}>
+            <fieldset className={styles.fieldset}>
               <HelperText style={{ marginBottom: "1rem" }}>
                 Add UCL staff members who will help administrate this study. <strong>Must</strong> be valid UCL staff
                 usernames.
