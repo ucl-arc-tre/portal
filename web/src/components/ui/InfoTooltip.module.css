@@ -27,7 +27,7 @@
     top: 1rem;
 
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: all 0.3s;
     visibility: hidden;
   }
 
