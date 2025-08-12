@@ -73,3 +73,8 @@ The API is a monolith which is the sole interface to the database. Services have
 paths. The web API called by the web frontend is defined in [api.web.yaml](../api.web.yaml) and must
 be run behind an authentication proxy which forwards user identities. The TRE API consumed by the
 TRE is defined [api.tre.yaml](../api.tre.yaml) and uses basic authentication with service accounts.
+
+### RBAC
+
+Role base access control is implemented with [casbin](https://casbin.org/) using deploy-time
+set global administrators, and runtime set roles and policies. See the [HLD](./High-Level_Design.md#roles) for a description of the roles.
