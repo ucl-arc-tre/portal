@@ -41,7 +41,7 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 	policies := []Policy{
 		{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
-		{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: ReadAction},
+		{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
 		{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
 	}

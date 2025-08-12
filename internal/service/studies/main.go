@@ -96,14 +96,6 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 		return &openapi.StudyCreateValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
-	// Check if the study submitter (the owner-user-id) is a valid staff member
-	isStaff, err := s.entra.IsStaffMember(ctx, owner.Username)
-	if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to check staff status for user %s: %w", owner.Username, err))
-	} else if !isStaff {
-		return &openapi.StudyCreateValidationError{ErrorMessage: "owner is not a staff member"}, nil
-	}
-
 	validationError, err := s.validateAdmins(ctx, studyData)
 	if err != nil {
 		return nil, err

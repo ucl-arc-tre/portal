@@ -30,7 +30,7 @@ func (s *Service) updateApprovedResearcherStatus(user types.User) error {
 	if _, err := rbac.AddRole(user, rbac.ApprovedResearcher); err != nil {
 		return err
 	}
-	if isStaff, err := s.IsStaff(context.Background(), user.Username); err != nil {
+	if isStaff, err := s.IsStaff(context.Background(), user); err != nil {
 		return err
 	} else if isStaff {
 		if _, err := rbac.AddRole(user, rbac.ApprovedStaffResearcher); err != nil {

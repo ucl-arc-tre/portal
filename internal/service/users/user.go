@@ -77,8 +77,8 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	return user, nil
 }
 
-func (s *Service) IsStaff(ctx context.Context, username types.Username) (bool, error) {
-	return s.entra.IsStaffMember(ctx, username)
+func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {
+	return s.entra.IsStaffMember(ctx, user.Username)
 }
 
 func (s *Service) UserById(id string) (*types.User, error) {

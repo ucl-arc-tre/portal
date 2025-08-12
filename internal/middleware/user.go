@@ -55,13 +55,13 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		_, _ = rbac.AddRole(user, rbac.Base)
 	}
 	if err := u.setDynamicRoles(ctx, user); err != nil {
-		log.Err(err).Msg("Failed to set staff approved resarcher role")
+		log.Err(err).Msg("Failed to set dynamic roles")
 	}
 	ctx.Set(userContextKey, user)
 }
 
 func (u *UserSetter) setDynamicRoles(ctx *gin.Context, user types.User) error {
-	isStaff, err := u.users.IsStaff(ctx, user.Username)
+	isStaff, err := u.users.IsStaff(ctx, user)
 	if err != nil {
 		return err
 	}
