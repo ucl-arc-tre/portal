@@ -158,9 +158,6 @@ The portal superimposes additional roles to the roles defined in the [Research D
 | TRE Ops staff             | TRE service member, view Project and role data                                                | - Read Project and Role data<br>- Write Project status                                 | Is a UCL TRE service member                                        |
 | Global Admin              | Full control over portal                                                                      | - Assign roles<br>- Read/write everything                                              | Is an ARC Services Portal Admin                                    |
 
-> [!NOTE]
-> Although "Approved Researcher" and "IAO"/"IAA" are different roles in the Researcch Data ISMS, there is no additional user role beyond "Approved Researcher" in the portal. The portal performs real-time checks to determine IAO/IAA eligibility, so there's no need for a separate role.
-
 ## Application, database and integration design
 
 The portal and database will use the Experience Layers [here](https://github.com/UCL-ARC/ARC-Strategy-and-Design/blob/main/Docs/Service_Design/ARC_Experience_and_Service_Platforms.md#4-experience-layers).
