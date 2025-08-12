@@ -63,7 +63,7 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) GetStudyStudyId(ctx *gin.Context, studyId string) {
+func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 	user := middleware.GetUser(ctx)
 
 	studyUUID, err := uuid.Parse(studyId)
