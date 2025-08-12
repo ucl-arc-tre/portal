@@ -214,65 +214,66 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               If you are not the study owner, contact the owner and ask them to fill out this form on their account.
             </HelperText>
           </Label>
+          <Label>
+            Additional Study Administrators (optional):
+            <fieldset className={getFieldsetClass(1)}>
+              <HelperText style={{ marginBottom: "1rem" }}>
+                Add UCL staff members who will help administrate this study. <strong>Must</strong> be valid UCL staff
+                usernames.
+              </HelperText>
 
-          <fieldset>
-            <legend>Additional Study Administrators (Optional)</legend>
-            <HelperText style={{ marginBottom: "1rem" }}>
-              Add UCL staff members who will help administer this study. <strong>Must</strong> be valid UCL staff
-              usernames.
-            </HelperText>
-
-            {fields.map((field, index) => (
-              <div key={field.id}>
-                <Label htmlFor={`admin-${index}`}>
-                  Administrator {index + 1}:
-                  <Controller
-                    name={`additionalStudyAdminUsernames.${index}.value` as const}
-                    control={control}
-                    rules={{
-                      required: "Username is required",
-                      validate: (value) => {
-                        if (!value || value.trim() === "") {
-                          return "Username is required";
-                        }
-                        if (value.includes("@")) {
-                          return `Enter only the username part (without ${domainName})`;
-                        }
-                        return true;
-                      },
-                    }}
-                    render={({ field, fieldState }) => (
-                      <div className={styles["username-input-wrapper"]}>
-                        <div>
-                          <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
-                          <span className={styles["domain-suffix"]}>{domainName}</span>
+              {fields.map((field, index) => (
+                <div key={field.id} className={styles["admin-wrapper"]}>
+                  <Label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
+                    Administrator {index + 1}:
+                    <Controller
+                      name={`additionalStudyAdminUsernames.${index}.value` as const}
+                      control={control}
+                      rules={{
+                        required: "Username is required",
+                        validate: (value) => {
+                          if (!value || value.trim() === "") {
+                            return "Username is required";
+                          }
+                          if (value.includes("@")) {
+                            return `Enter only the username part (without ${domainName})`;
+                          }
+                          return true;
+                        },
+                      }}
+                      render={({ field, fieldState }) => (
+                        <div className={styles["username-input-wrapper"]}>
+                          <div>
+                            <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
+                            <span className={styles["domain-suffix"]}>{domainName}</span>
+                          </div>
+                          {fieldState.error && (
+                            <Alert type="error">
+                              <AlertMessage>{fieldState.error.message}</AlertMessage>
+                            </Alert>
+                          )}
                         </div>
-                        {fieldState.error && (
-                          <Alert type="error">
-                            <AlertMessage>{fieldState.error.message}</AlertMessage>
-                          </Alert>
-                        )}
-                      </div>
-                    )}
-                  />
-                </Label>
+                      )}
+                    />
+                  </Label>
 
-                <Button type="button" onClick={() => remove(index)}>
-                  Remove
-                </Button>
-              </div>
-            ))}
+                  <Button type="button" onClick={() => remove(index)} size="small">
+                    Remove
+                  </Button>
+                </div>
+              ))}
 
-            <Button
-              type="button"
-              variant="secondary"
-              size="small"
-              onClick={() => append({ value: "" })}
-              style={{ marginTop: "0.5rem" }}
-            >
-              Add Administrator
-            </Button>
-          </fieldset>
+              <Button
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => append({ value: "" })}
+                style={{ marginTop: "0.5rem" }}
+              >
+                Add Administrator
+              </Button>
+            </fieldset>
+          </Label>
 
           <Label htmlFor="controller">
             Data Controller (organisation)*:

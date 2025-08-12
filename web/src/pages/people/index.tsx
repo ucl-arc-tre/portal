@@ -15,16 +15,25 @@ export default function PeoplePage() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isStaff = userData!.is_staff;
 
-  const cannotView = !isAdmin && !isApprovedResearcher;
-
   return (
     <>
       <MetaHead
         title="People | ARC Services Portal"
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
-      <Title text={"People"} />
-      {cannotView && <h4>You do not have permission to view this page</h4>}
+      <Title
+        text={"People"}
+        centered
+        description={
+          isAdmin
+            ? "View and manage portal users, including adding via invitation or upload"
+            : isApprovedResearcher
+              ? "View users in your projects"
+              : isApprovedResearcher && isStaff
+                ? "View users in your projects or invite a collaborator"
+                : "You do not have permission to view this page"
+        }
+      />
       {isAdmin ? <AdminView /> : isApprovedResearcher && <ApprovedResearcherView isStaff={isStaff} />}
     </>
   );

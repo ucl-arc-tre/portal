@@ -3,6 +3,7 @@ import Title from "@/components/ui/Title";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./definitions.module.css";
+import Callout from "@/components/ui/Callout";
 
 export default function AssetDefinitionsPage() {
   return (
@@ -15,13 +16,11 @@ export default function AssetDefinitionsPage() {
       <div className={styles.container}>
         <Title text="Asset Storage Definitions" />
 
-        <div className={styles.intro}>
-          <p>
-            This page contains definitions and security requirements for all storage locations and touchpoints that may
-            be relevant when creating data assets. Please review these definitions carefully to understand the security
-            implications of each storage option.
-          </p>
-        </div>
+        <Callout
+          text={
+            "This page contains definitions and security requirements for all storage locations and touchpoints that may be relevant when creating data assets. Please review these definitions carefully to understand the security  implications of each storage option."
+          }
+        />
 
         <div className={styles.definitions}>
           {storageDefinitions.map((item, index) => (

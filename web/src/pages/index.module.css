@@ -2,3 +2,7 @@
   justify-items: center;
   padding: 2rem;
 }
+
+.task-wrapper {
+  display: grid;
+}

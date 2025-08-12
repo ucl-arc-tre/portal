@@ -12,15 +12,6 @@
   line-height: 1.6;
 }
 
-.page-description a {
-  color: #0066cc;
-  text-decoration: underline;
-}
-
-.page-description a:hover {
-  color: #004499;
-}
-
 .not-approved-section {
   text-align: center;
   margin: 2rem 0;
@@ -39,4 +30,8 @@
     margin: 1rem 0;
     padding: 1rem;
   }
+}
+
+.study-button {
+  margin-top: 1rem;
 }
