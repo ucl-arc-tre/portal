@@ -14,6 +14,7 @@ describe(`Accessibility - ARC Portal`, () => {
     pages.forEach(({ name, path }) => {
       it(`should have no critical accessibility violations on ${name} (login fallback)`, () => {
         cy.visit(path);
+        cy.wait(1000);
         cy.get("header").should("be.visible"); // wait for page layout to load
         cy.get("main").should("be.visible");
         cy.checkAccessibility();
@@ -29,6 +30,7 @@ describe(`Accessibility - ARC Portal`, () => {
     pages.forEach(({ name, path }) => {
       it(`should have no critical accessibility violations on ${name} (base user)`, () => {
         cy.visit(path);
+        cy.wait(1000);
         cy.get("header").should("be.visible"); // wait for page layout to load
         cy.get("main").should("be.visible");
         cy.checkAccessibility();
@@ -44,6 +46,7 @@ describe(`Accessibility - ARC Portal`, () => {
     pages.forEach(({ name, path }) => {
       it(`should have no critical accessibility violations on ${name} (admin user)`, () => {
         cy.visit(path);
+        cy.wait(1000);
         cy.get("header").should("be.visible"); // wait for page layout to load
         cy.get("main").should("be.visible");
         cy.checkAccessibility();
