@@ -38,7 +38,7 @@ export default function ApprovedResearcherImport() {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <form>
         <input ref={inputRef} type="file" hidden onChange={handleFileUpload} />
         <Button
