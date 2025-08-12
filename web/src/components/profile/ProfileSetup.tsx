@@ -34,16 +34,19 @@ export default function ProfileSetup(props: Props) {
     refreshAuth,
   } = props;
 
+  console.log(userData);
+
   const hasChosenName = !!chosenName;
   const profileStepsCompleted = hasChosenName && agreementCompleted && trainingCertificateCompleted;
   const [showCertReupload, setShowCertReupload] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
 
+  // is there a better way of doing this so we don't get the warning but don't get infinite loops if appeasing the warning?
   useEffect(() => {
     if (profileStepsCompleted) {
       refreshAuth();
     }
-  }, []);
+  }, [profileStepsCompleted]);
 
   const profileSetupSteps: Step[] = [
     {
@@ -113,7 +116,7 @@ export default function ProfileSetup(props: Props) {
           completionSubtitle=" To retain access to the portal, please upload a new certificate."
           ariaLabel="Profile setup progress"
         />
-      ) : userData?.is_staff ? (
+      ) : userData?.roles.includes("staff") ? (
         <StepProgress
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
