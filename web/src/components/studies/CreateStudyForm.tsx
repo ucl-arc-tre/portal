@@ -131,7 +131,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     setCreateStudyFormOpen(false);
   };
 
-  console.log("currentStep", currentStep);
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
   return (
