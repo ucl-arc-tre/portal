@@ -1,3 +1,5 @@
 .entity-relationships {
   max-width: 60vw;
+  margin-inline: 20vw;
+  margin-block: 1rem;
 }

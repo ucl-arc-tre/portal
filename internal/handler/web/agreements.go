@@ -12,6 +12,7 @@ import (
 func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType openapi.AgreementType) {
 	var agreement *types.Agreement
 	var err error
+
 	switch agreementType {
 	case openapi.AgreementTypeApprovedResearcher:
 		agreement, err = h.agreements.LatestApprovedResearcher()
@@ -21,6 +22,7 @@ func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType ope
 		ctx.Status(http.StatusNotFound)
 		return
 	}
+
 	if err != nil {
 		setError(ctx, err, fmt.Sprintf("Failed to get agreement of type [%v]", agreementType))
 		return

@@ -1,9 +1,9 @@
 import MetaHead from "@/components/meta/Head";
 import AdminView from "@/components/people/AdminView";
+import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
-import IAOView from "@/components/people/IAOView";
 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -12,9 +12,8 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isIAO = userData?.roles.includes("information-asset-owner");
-
-  const cannotView = !isAdmin && !isIAO;
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
+  const isIAO = userData?.roles.includes("information-asset-owner") || false;
 
   return (
     <>
@@ -22,9 +21,20 @@ export default function PeoplePage() {
         title="People | ARC Services Portal"
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
-      <Title text={"People"} />
-      {cannotView && <h4>You do not have permission to view this page</h4>}
-      {isAdmin ? <AdminView /> : isIAO && <IAOView />}
+      <Title
+        text={"People"}
+        centered
+        description={
+          isAdmin
+            ? "View and manage portal users, including adding via invitation or upload"
+            : isApprovedStaffResearcher
+              ? "View users in your projects"
+              : isIAO
+                ? "View users in your projects or invite a collaborator"
+                : "You do not have permission to view this page"
+        }
+      />
+      {isAdmin ? <AdminView /> : isApprovedStaffResearcher && <ApprovedResearcherView isIAO={isIAO} />}
     </>
   );
 }

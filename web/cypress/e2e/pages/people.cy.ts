@@ -19,7 +19,7 @@ describe(`People page content`, () => {
     cy.visit("/people");
     cy.waitForAuth();
 
-    cy.contains("You do not have permission to view this page").should("be.visible");
+    cy.contains("View users in your projects").should("be.visible");
   });
 
   it("should show content for admin", () => {

@@ -2,10 +2,11 @@
   max-width: 80vw;
   padding: 1rem;
   padding-top: 0.5rem;
-  border-radius: 8px;
-  position: fixed;
+  border: 1px solid black;
+  border-radius: 8px 8px 8px 8px;
 
   z-index: 1000;
+  margin-inline: 15vw;
 
   .close-button {
     top: 0;

@@ -9,6 +9,8 @@ import Loading from "@/components/ui/Loading";
 import Title from "@/components/ui/Title";
 
 import styles from "./index.module.css";
+import Callout from "@/components/ui/Callout";
+import InfoTooltip from "@/components/ui/InfoTooltip";
 
 export default function AssetsPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -63,9 +65,19 @@ export default function AssetsPage() {
         description="View and modify data assets in the ARC Services Portal"
       />
 
-      <Title text={"Data Assets"} />
-      <h2>View and manage your data assets.</h2>
-      <div className={styles["page-description"]}>
+      <Title text={"Assets"} centered description={"View and manage your information assets"} />
+
+      <Callout definition>
+        Assets are information entities. They are owned by a <strong>study</strong>
+        <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
+        <strong>projects</strong>
+        <InfoTooltip text="Projects are owned by a study and can contain assets" />, for more detailed information and
+        an entity relationship diagram, look at our
+        <Button href="/glossary" variant="tertiary" size="small" inline>
+          Glossary
+        </Button>
+      </Callout>
+      <Callout>
         <p>
           Use this page to create data assets you would like to associate with your study. Assets can be any kind of
           data entity you want to associate with your study (e.g. consent forms, physical study materials etc.). The
@@ -79,7 +91,7 @@ export default function AssetsPage() {
           </a>{" "}
           on what assets are and how to use them.
         </p>
-      </div>
+      </Callout>
 
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
@@ -99,7 +111,7 @@ export default function AssetsPage() {
         <>
           <h4>You do not have any studies to view. Click the button below to create a study.</h4>
 
-          <Button href="/studies" size="large">
+          <Button href="/studies" size="large" className={styles["study-button"]}>
             Go to studies page
           </Button>
         </>

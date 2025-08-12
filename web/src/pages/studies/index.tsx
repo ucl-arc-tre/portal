@@ -11,6 +11,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 
 import styles from "./StudiesPage.module.css";
+import Callout from "@/components/ui/Callout";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -46,9 +47,9 @@ export default function StudiesPage() {
         title="Studies | ARC Services Portal"
         description="View and modify studies in the ARC Services Portal"
       />
-      <Title text={"Studies"} />
+      <Title text={"Studies"} centered />
 
-      <p className={styles["studies-description"]}>
+      <Callout definition>
         Studies are a top level entity. They can contain <strong>projects</strong>
         <InfoTooltip text="Projects are owned by a study and can contain assets" />
         and <strong>assets</strong>
@@ -57,7 +58,7 @@ export default function StudiesPage() {
         <Button href="/glossary" variant="tertiary" size="small" inline>
           Glossary
         </Button>
-      </p>
+      </Callout>
 
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>

@@ -1,6 +1,7 @@
 .study-selection {
-  width: 60%;
+  width: 55vw;
   margin-top: 2rem;
+  margin-inline: 8vw;
 }
 
 .studies-heading {
