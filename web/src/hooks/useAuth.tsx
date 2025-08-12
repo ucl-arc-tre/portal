@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userData, setUserData] = useState<Auth | null>(null);
 
   const cancelled = useRef(false);
-  const checkAuth = async () => {
+  const refreshAuth = async () => {
     try {
       const response = await getAuth();
 
@@ -44,12 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const refreshAuth = async () => {
-    await checkAuth();
-  };
-
   useEffect(() => {
-    checkAuth();
+    refreshAuth();
 
     return () => {
       cancelled.current = true;
