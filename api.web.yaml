@@ -442,6 +442,7 @@ components:
             enum:
               - admin
               - base
+              - staff
               - approved-researcher
               - approved-staff-researcher
               - information-asset-owner

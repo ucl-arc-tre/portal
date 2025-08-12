@@ -17,6 +17,7 @@ import (
 const (
 	Admin                         = RoleName(openapi.AuthRolesAdmin)                         // Global admin on everything
 	Base                          = RoleName(openapi.AuthRolesBase)                          // Most restricted role possible
+	Staff                         = RoleName(openapi.AuthRolesStaff)                         // Staff member at the institution
 	ApprovedResearcher            = RoleName(openapi.AuthRolesApprovedResearcher)            // Trained and attested user
 	ApprovedStaffResearcher       = RoleName(openapi.AuthRolesApprovedStaffResearcher)       // Member of staff at the institution thats also an approved researcher
 	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
@@ -71,19 +72,22 @@ func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	return AddRole(user, roleName)
 }
 
-// Get all study roles for a user
-func StudyRoles(user types.User) ([]StudyRole, error) {
+// Study IDs where a user has a role
+func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID, error) {
 	roles, err := Roles(user)
-	studyRoles := []StudyRole{}
 	if err != nil {
-		return studyRoles, err
+		return []uuid.UUID{}, err
 	}
+	studyIDs := []uuid.UUID{}
 	for _, role := range roles {
 		if isStudyRole(role) {
-			studyRoles = append(studyRoles, mustMakeStudyRole(role))
+			studyRole := mustMakeStudyRole(role)
+			if studyRole.Name == studyRoleName {
+				studyIDs = append(studyIDs, studyRole.StudyID)
+			}
 		}
 	}
-	return studyRoles, nil
+	return studyIDs, nil
 }
 
 // Remove a role for a user

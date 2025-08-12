@@ -50,19 +50,9 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	studyRoles, err := rbac.StudyRoles(user)
+	studies, err := h.studies.Studies(user)
 	if err != nil {
-		setError(ctx, err, "Failed to get study roles")
-		return
-	}
-	studyIds := []uuid.UUID{}
-	for _, studyRole := range studyRoles {
-		studyIds = append(studyIds, studyRole.StudyID)
-	}
-
-	studies, err := h.studies.StudiesById(studyIds...)
-	if err != nil {
-		setError(ctx, err, "Failed to retrieve studies")
+		setError(ctx, err, "Failed to get studies")
 		return
 	}
 
@@ -87,7 +77,7 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 	if len(studies) == 0 {
-		setError(ctx, types.NewNotFoundError(fmt.Errorf("study [%v] not found", studyUUID)), "Study not found")
+		setError(ctx, types.NewNotFoundError(fmt.Errorf("study [%v] not found", studyUUID)), "Not found")
 		return
 	}
 

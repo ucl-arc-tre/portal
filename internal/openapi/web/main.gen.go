@@ -45,6 +45,7 @@ const (
 	AuthRolesBase                          AuthRoles = "base"
 	AuthRolesInformationAssetAdministrator AuthRoles = "information-asset-administrator"
 	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
+	AuthRolesStaff                         AuthRoles = "staff"
 )
 
 // Defines values for StudyApprovalStatus.

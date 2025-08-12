@@ -9,9 +9,12 @@ import (
 
 const (
 	studyPrefix = "study_" // NOTE: Cannot use a : delimter with type prefix
+	StudyOwner  = StudyRoleName("owner")
 )
 
 type RoleName string
+
+type StudyRoleName string
 
 type Action string
 
@@ -23,7 +26,7 @@ type Policy struct {
 
 type StudyRole struct {
 	StudyID uuid.UUID
-	Name    string
+	Name    StudyRoleName
 }
 
 func (s StudyRole) RoleName() RoleName {
@@ -31,7 +34,7 @@ func (s StudyRole) RoleName() RoleName {
 }
 
 func makeStudyOwnerRole(studyId uuid.UUID) StudyRole {
-	return StudyRole{StudyID: studyId, Name: "owner"}
+	return StudyRole{StudyID: studyId, Name: StudyOwner}
 }
 
 func mustMakeStudyRole(role RoleName) StudyRole {
@@ -39,7 +42,7 @@ func mustMakeStudyRole(role RoleName) StudyRole {
 	if len(parts) != 2 {
 		panic("not a study role")
 	}
-	return StudyRole{StudyID: uuid.MustParse(parts[0]), Name: parts[1]}
+	return StudyRole{StudyID: uuid.MustParse(parts[0]), Name: StudyRoleName(parts[1])}
 }
 
 func isStudyRole(role RoleName) bool {

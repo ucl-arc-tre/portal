@@ -11,6 +11,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
@@ -128,7 +129,28 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 	return study, nil, err
 }
 
-// StudiesWithOwner retrieves all studies that the user owns or has access to
+// Get all studies that a user has access to
+func (s *Service) Studies(user types.User) ([]types.Study, error) {
+	if isAdmin, err := rbac.HasRole(user, rbac.Admin); err != nil {
+		return []types.Study{}, err
+	} else if isAdmin {
+		return s.all()
+	}
+	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+	if err != nil {
+		return []types.Study{}, err
+	}
+	return s.StudiesById(studyIds...)
+}
+
+// All gets all studies
+func (s *Service) all() ([]types.Study, error) {
+	studies := []types.Study{}
+	err := s.db.Preload("StudyAdmins.User").Find(&studies).Error
+	return studies, types.NewErrServerError(err)
+}
+
+// StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Where("id IN (?)", ids).Find(&studies).Error
