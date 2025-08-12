@@ -716,7 +716,7 @@ export type PostStudiesResponses = {
     201: unknown;
 };
 
-export type GetStudyByStudyIdData = {
+export type GetStudiesByStudyIdData = {
     body?: never;
     path: {
         /**
@@ -725,10 +725,10 @@ export type GetStudyByStudyIdData = {
         studyId: string;
     };
     query?: never;
-    url: '/study/{studyId}';
+    url: '/studies/{studyId}';
 };
 
-export type GetStudyByStudyIdErrors = {
+export type GetStudiesByStudyIdErrors = {
     /**
      * Forbidden
      */
@@ -747,11 +747,11 @@ export type GetStudyByStudyIdErrors = {
     default: unknown;
 };
 
-export type GetStudyByStudyIdResponses = {
+export type GetStudiesByStudyIdResponses = {
     200: Study;
 };
 
-export type GetStudyByStudyIdResponse = GetStudyByStudyIdResponses[keyof GetStudyByStudyIdResponses];
+export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
