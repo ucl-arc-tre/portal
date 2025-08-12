@@ -106,19 +106,25 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*types.Study, *openapi.StudyCreateValidationError, error) {
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
 	validationError, err := s.validateStudyData(ctx, owner, studyData)
 	if err != nil || validationError != nil {
-		return nil, validationError, err
+		return validationError, err
 	}
 
 	studyAdmins, err := s.createStudyAdmins(studyData)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	study, err := s.createStudy(owner, studyData, studyAdmins)
-	return study, nil, err
+	if err != nil {
+		return nil, err
+	}
+	if _, err := rbac.AddStudyOwnerRole(owner, study.ID); err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 // Get all studies that a user has access to

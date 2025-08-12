@@ -91,17 +91,12 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	}
 
 	user := middleware.GetUser(ctx)
-	study, validationError, err := h.studies.CreateStudy(ctx, user, studyData)
+	validationError, err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to create study")
 		return
 	} else if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-
-	if _, err := rbac.AddStudyOwnerRole(user, study.ID); err != nil {
-		setError(ctx, err, "Failed to add study owner role")
 		return
 	}
 
