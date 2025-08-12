@@ -72,18 +72,12 @@ export default function Nav() {
         <ul className={styles.nav__list}>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
 
-          {canSeeStudies && (
-            <NavItem className={styles.appearable} href="/studies" icon={<FolderIcon />} title="Studies" />
-          )}
+          {canSeeStudies && <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />}
 
-          {canSeeProjects && (
-            <NavItem className={styles.appearable} href="/projects" icon={<FileIcon />} title="Projects" />
-          )}
-          {canSeeAssets && (
-            <NavItem className={styles.appearable} href="/assets" icon={<PaperclipIcon />} title="Assets" />
-          )}
+          {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
+          {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
 
-          {canSeePeople && <NavItem className={styles.appearable} href="/people" icon={<UsersIcon />} title="People" />}
+          {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
