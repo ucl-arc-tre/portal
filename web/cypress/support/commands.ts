@@ -321,6 +321,7 @@ Cypress.Commands.add("mockInviteExternalResearcher", (email: string) => {
 });
 
 Cypress.Commands.add("checkAccessibility", (selector?: string) => {
+  cy.wait(1000);
   cy.injectAxe();
   cy.checkA11y(selector, {
     includedImpacts: ["critical", "serious"],
