@@ -28,6 +28,7 @@ export default function ProfileSetup(props: Props) {
     setAgreementCompleted,
     trainingCertificateCompleted,
     setTrainingCertificateCompleted,
+    userData,
     expiryUrgency,
   } = props;
 
@@ -104,7 +105,7 @@ export default function ProfileSetup(props: Props) {
           completionSubtitle=" To retain access to the portal, please upload a new certificate."
           ariaLabel="Profile setup progress"
         />
-      ) : (
+      ) : userData?.is_staff ? (
         <StepProgress
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
@@ -112,6 +113,15 @@ export default function ProfileSetup(props: Props) {
           completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
           completionButtonText="Go to studies"
           completionButtonHref="/studies"
+          introText="Complete the following steps to set up your profile and become an approved researcher."
+          ariaLabel="Profile setup progress"
+        />
+      ) : (
+        <StepProgress
+          steps={profileSetupSteps}
+          isComplete={profileStepsCompleted}
+          completionTitle="Profile Complete!"
+          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
           introText="Complete the following steps to set up your profile and become an approved researcher."
           ariaLabel="Profile setup progress"
         />
