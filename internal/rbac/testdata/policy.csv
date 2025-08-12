@@ -1,0 +1,4 @@
+p, admin, *, *
+p, base, /info, read
+g, 3843ed01-1cb0-4cc8-a2fc-3556cc8f393a, admin
+g, 8ef0d19b-370c-40a6-a3ef-399dbebbbc8f, base

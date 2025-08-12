@@ -1,6 +1,7 @@
 package agreements
 
 import (
+	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -26,6 +27,15 @@ func (s *Service) LatestApprovedResearcher() (*types.Agreement, error) {
 
 func (s *Service) LatestStudyOwner() (*types.Agreement, error) {
 	return s.latestAgreement(StudyOwnerType)
+}
+
+func (s *Service) AgreementTypeById(id uuid.UUID) (*types.AgreementType, error) {
+	agreement := types.Agreement{Model: types.Model{ID: id}}
+	result := s.db.Select("type").Where("id = ?", id).Find(&agreement)
+	if result.Error != nil {
+		return nil, types.NewErrServerError(result.Error)
+	}
+	return &agreement.Type, nil
 }
 
 func (s *Service) latestAgreement(agreementType types.AgreementType) (*types.Agreement, error) {

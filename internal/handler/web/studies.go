@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -43,15 +46,13 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 	}
-
 }
 
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-
-	studies, err := h.studies.StudiesWithOwner(user)
+	studies, err := h.studies.Studies(user)
 	if err != nil {
-		setError(ctx, err, "Failed to retrieve studies")
+		setError(ctx, err, "Failed to get studies")
 		return
 	}
 
@@ -64,40 +65,37 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
-	study, err := h.studies.StudyWithOwner(studyUUID, user)
+	studies, err := h.studies.StudiesById(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve study")
 		return
 	}
+	if len(studies) == 0 {
+		setError(ctx, types.NewNotFoundError(fmt.Errorf("study [%v] not found", studyUUID)), "Not found")
+		return
+	}
 
-	studyResponse := studyToOpenApiStudy(study)
-
-	ctx.JSON(http.StatusOK, studyResponse)
+	ctx.JSON(http.StatusOK, studyToOpenApiStudy(studies[0]))
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
-	user := middleware.GetUser(ctx)
-
 	studyData := openapi.StudyCreateRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
 
+	user := middleware.GetUser(ctx)
 	validationError, err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to create study")
 		return
-	}
-
-	if validationError != nil {
+	} else if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
@@ -106,16 +104,13 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
 	studyUUID, err := uuid.Parse(studyId)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
-	// todo - use portal not gorm errors
-	assets, err := h.studies.StudyAssetsWithOwner(studyUUID, user)
+	assets, err := h.studies.StudyAssets(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return
@@ -181,6 +176,19 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
 		setError(ctx, err, "Failed to confirm study agreement")
 		return
+	}
+
+	agreementType, err := h.agreements.AgreementTypeById(agreementId)
+	if err != nil {
+		setError(ctx, err, "Failed to get agreement type")
+		return
+	}
+	switch *agreementType {
+	case agreements.StudyOwnerType:
+		if _, err := rbac.AddRole(user, rbac.InformationAssetOwner); err != nil {
+			setError(ctx, err, "Failed to assign IAO role")
+			return
+		}
 	}
 
 	ctx.Status(http.StatusOK)

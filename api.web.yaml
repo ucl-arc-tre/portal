@@ -432,7 +432,6 @@ components:
       required:
         - username
         - roles
-        - is_staff
       properties:
         username:
           type: string
@@ -443,10 +442,11 @@ components:
             enum:
               - admin
               - base
+              - staff
               - approved-researcher
-        is_staff:
-          type: boolean
-          description: Whether the user is a valid UCL staff member
+              - approved-staff-researcher
+              - information-asset-owner
+              - information-asset-administrator
 
     Profile:
       type: object

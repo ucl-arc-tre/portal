@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
 func (h *Handler) GetAuth(ctx *gin.Context) {
@@ -17,14 +16,5 @@ func (h *Handler) GetAuth(ctx *gin.Context) {
 		return
 	}
 
-	auth := openapi.Auth{
-		Username: string(user.Username),
-		IsStaff:  authInfo.IsStaff,
-	}
-
-	for _, role := range authInfo.Roles {
-		auth.Roles = append(auth.Roles, openapi.AuthRoles(role))
-	}
-
-	ctx.JSON(http.StatusOK, auth)
+	ctx.JSON(http.StatusOK, authInfo)
 }

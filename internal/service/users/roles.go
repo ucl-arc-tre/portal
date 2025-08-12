@@ -1,6 +1,8 @@
 package users
 
 import (
+	"context"
+
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -25,9 +27,15 @@ func (s *Service) updateApprovedResearcherStatus(user types.User) error {
 		log.Debug().Any("username", user.Username).Msg("Not yet completed NHSD training")
 		return nil
 	}
-	_, err := rbac.AddRole(user, rbac.ApprovedResearcher)
-	if err != nil {
+	if _, err := rbac.AddRole(user, rbac.ApprovedResearcher); err != nil {
 		return err
+	}
+	if isStaff, err := s.IsStaff(context.Background(), user); err != nil {
+		return err
+	} else if isStaff {
+		if _, err := rbac.AddRole(user, rbac.ApprovedStaffResearcher); err != nil {
+			return err
+		}
 	}
 	log.Info().Any("username", user.Username).Msg("Assigned approved researcher")
 	return nil
