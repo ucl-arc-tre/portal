@@ -4,6 +4,7 @@ import Button from "../ui/Button";
 import dynamic from "next/dynamic";
 import { ReactElement } from "react";
 import { client } from "@/openapi/client.gen";
+import { useAuth } from "@/hooks/useAuth";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -40,6 +41,21 @@ function NavItem({ href, icon, title }: { href: string; icon: ReactElement; titl
 
 export default function Nav() {
   const logoutUrl = client.getConfig().baseUrl + "/logout";
+
+  const { authInProgress, userData } = useAuth();
+  if (authInProgress) return null;
+
+  const isAdmin = userData?.roles.includes("admin");
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isStaff = userData!.is_staff;
+
+  const isApprovedStudyResearcher = isApprovedResearcher && isStaff; //todo: use new approved study researcher role when available
+
+  const canSeeStudies = isApprovedResearcher || isAdmin;
+  const canSeeProjects = isApprovedStudyResearcher || isAdmin;
+  const canSeeAssets = isApprovedStudyResearcher || isAdmin;
+  const canSeePeople = isApprovedStudyResearcher || isAdmin;
+
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
@@ -48,13 +64,12 @@ export default function Nav() {
         <ul className={styles.nav__list}>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
 
-          <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />
+          {canSeeStudies && <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />}
 
-          <NavItem href="/projects" icon={<FileIcon />} title="Projects" />
+          {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
+          {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
 
-          <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />
-
-          <NavItem href="/people" icon={<UsersIcon />} title="People" />
+          {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
