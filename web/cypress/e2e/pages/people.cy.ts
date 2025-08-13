@@ -19,7 +19,7 @@ describe(`People page content`, () => {
     cy.visit("/people");
     cy.waitForAuth();
 
-    cy.contains("View users in your projects").should("be.visible");
+    cy.contains("You do not have permission to view this page").should("be.visible");
   });
 
   it("should show content for admin", () => {
@@ -46,11 +46,13 @@ describe("Import approved researchers", () => {
   });
 
   it("should be uploadable by an admin user", () => {
-    cy.loginAsAdmin();
-    cy.visit("/people");
     const username = "laura@example.com";
     const filename = "tmp_approved_researchers.csv";
     cy.writeFile(filename, `${username},true,2025-07-01`);
+
+    cy.loginAsAdmin();
+    cy.visit("/people");
+    cy.get("[data-cy='approved-researcher-import']").click();
     cy.get("input[type=file]").selectFile(filename, { force: true });
     cy.visit("/people");
     cy.get("table").contains(username).should("be.visible");

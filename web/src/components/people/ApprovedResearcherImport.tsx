@@ -64,7 +64,7 @@ export default function ApprovedResearcherImport() {
                 ) containing approved researchers.
               </p>
               <input ref={inputRef} aria-label="file" type="file" hidden onChange={handleFileUpload} />
-              <Button disabled={isLoading} onClick={handleSumbit} type="submit" cy="send-invite">
+              <Button disabled={isLoading} onClick={handleSumbit} type="submit" cy="approved-researcher-upload">
                 {isLoading && (
                   <span className={styles.loader}>
                     <Loading message="" size="small" />
