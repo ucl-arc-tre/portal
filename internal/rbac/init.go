@@ -57,7 +57,7 @@ func addAdminPolicy(enforcer *casbin.Enforcer) {
 }
 
 func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
-	mustAddPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: ReadAction})
+	mustAddPolicy(enforcer, Policy{RoleName: TreOpsStaff, Resource: "*", Action: ReadAction})
 }
 
 func mustAddPolicy(enforcer *casbin.Enforcer, policy Policy) {
