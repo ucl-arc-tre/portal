@@ -26,13 +26,13 @@ export default function ApprovedResearcherImport() {
         body: files[0],
       });
       if (response.error) {
-        console.log(response.error);
+        console.error(response.error);
         setErrorMessage(`Failed with a ${response.response.status}`);
       } else {
         setButtonText("Imported ✔");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setErrorMessage("Failed");
     }
     setIsLoading(false);
