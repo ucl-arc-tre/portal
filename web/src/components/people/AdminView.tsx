@@ -82,8 +82,10 @@ export default function AdminView() {
   }
   return (
     <>
-      <ExternalInvite />
-
+      <div className={styles["button-container"]}>
+        <ApprovedResearcherImport />
+        <ExternalInvite />
+      </div>
       {trainingDialogOpen && (
         <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
       )}
@@ -148,7 +150,6 @@ export default function AdminView() {
           ))}
         </tbody>
       </table>
-      <ApprovedResearcherImport />
     </>
   );
 }

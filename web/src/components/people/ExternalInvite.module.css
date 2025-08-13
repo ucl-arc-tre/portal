@@ -10,14 +10,10 @@
 
 .invite-form {
   padding: 1rem;
-}
 
-.container {
-  justify-self: end;
-  justify-items: end;
-  height: 4rem;
-  display: grid;
-  margin-block: 0.5rem;
+  label {
+    padding-bottom: 0.5rem;
+  }
 }
 
 .send-button {

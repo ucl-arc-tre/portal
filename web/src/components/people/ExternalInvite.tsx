@@ -86,17 +86,15 @@ export default function ExternalInvite() {
         </Dialog>
       )}
 
-      <div className={styles.container}>
-        <Button
-          onClick={() => setDialogVisible(true)}
-          variant="secondary"
-          cy="show-invite-input"
-          type="button"
-          size="small"
-        >
-          Invite external researcher
-        </Button>
-      </div>
+      <Button
+        onClick={() => setDialogVisible(true)}
+        variant="secondary"
+        cy="show-invite-input"
+        type="button"
+        size="small"
+      >
+        Invite external researcher
+      </Button>
     </>
   );
 }
