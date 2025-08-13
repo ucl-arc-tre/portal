@@ -1,0 +1,92 @@
+.table {
+  width: 100%;
+  margin-block: 1rem;
+  font-size: 110%;
+  border-collapse: collapse;
+
+  th {
+    padding-inline: 0.5rem;
+  }
+
+  .tbody {
+    border-top: 2px solid var(--foreground);
+  }
+
+  .row {
+    border-bottom: 1px solid var(--text--secondary);
+    margin-bottom: 0.8rem;
+
+    td {
+      padding-block: 0.6rem;
+      padding-inline: 0.5rem;
+    }
+  }
+
+  .user {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    small {
+      color: var(--text--secondary);
+      font-size: 0.8rem;
+    }
+  }
+
+  .edit {
+    font-weight: 400;
+    font-size: 0.8rem;
+    padding-inline-start: 0.4rem;
+    color: var(--green-100);
+
+    &:hover {
+      color: var(--green-50);
+    }
+  }
+
+  .roles {
+    text-align: center;
+
+    .role {
+      margin-inline: 0.2rem;
+    }
+  }
+
+  .agreements {
+    text-align: right;
+  }
+
+  .agreement,
+  .training {
+    display: grid;
+    grid-template-rows: 1fr 0.5fr;
+    grid-template-columns: 3fr 0.2fr;
+
+    .valid svg {
+      grid-row: 1;
+      stroke: var(--green-100);
+    }
+
+    .invalid svg {
+      grid-row: 1;
+      stroke: #ff6161;
+    }
+
+    small {
+      grid-row: 2;
+    }
+  }
+
+  .training-info {
+    text-align: right;
+    display: grid;
+    grid-template-columns: 4fr 0.5fr;
+  }
+
+  .training-record {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    gap: 0.5rem;
+  }
+}

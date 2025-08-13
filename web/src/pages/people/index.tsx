@@ -1,6 +1,7 @@
 import MetaHead from "@/components/meta/Head";
 import AdminView from "@/components/people/AdminView";
 import IAOView from "@/components/people/IAOView";
+import TreOpsStaffView from "@/components/people/TreOpsStaffView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,7 +13,8 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isIAO = userData?.roles.includes("information-asset-owner") || false;
+  const isIAO = userData?.roles.includes("information-asset-owner");
+  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
 
   return (
     <>
@@ -26,12 +28,14 @@ export default function PeoplePage() {
         description={
           isAdmin
             ? "View and manage portal users, including adding via invitation or upload"
-            : isIAO
-              ? "View users in your projects or invite a collaborator"
-              : "You do not have permission to view this page"
+            : isTreOpsStaff
+              ? "View approved researchers"
+              : isIAO
+                ? "View users in your projects or invite a collaborator"
+                : "You do not have permission to view this page"
         }
       />
-      {isAdmin ? <AdminView /> : isIAO && <IAOView />}
+      {isAdmin ? <AdminView /> : isTreOpsStaff ? <TreOpsStaffView /> : isIAO && <IAOView />}
     </>
   );
 }
