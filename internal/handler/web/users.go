@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -22,10 +23,25 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 		setError(ctx, err, "Failed to get roles for user")
 		return
 	}
+	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to get roles for user")
+		return
+	}
 
 	if isAdmin {
 		// retrieve auth + agreements + training info
 		people, err := h.users.AllUsers()
+		if err != nil {
+			setError(ctx, err, "Failed to get people")
+			return
+		}
+		ctx.JSON(http.StatusOK, people)
+
+	} else if isTreOpsStaff {
+		log.Debug().Msg("tre ops staff route")
+		// retrieve auth + agreements + training info
+		people, err := h.users.AllApprovedResearcherUsers()
 		if err != nil {
 			setError(ctx, err, "Failed to get people")
 			return

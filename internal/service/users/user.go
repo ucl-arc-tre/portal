@@ -54,6 +54,49 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 	return usersData, nil
 }
 
+func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
+
+	// get all approved researcher users from db
+	users, err := rbac.GetUsersWithRole(rbac.ApprovedResearcher)
+	if err != nil {
+		return usersData, types.NewErrServerError(err)
+	}
+
+	// then loop through each and get their agreements & roles
+	for _, user := range users {
+		userData := openapi.UserData{
+			User: openapi.User{
+				Id:       user.ID.String(),
+				Username: string(user.Username),
+			},
+		}
+		agreements, err := s.ConfirmedAgreements(user)
+		if err != nil {
+			return usersData, fmt.Errorf("failed to get agreements for user: %w", err)
+		}
+		userData.Agreements.ConfirmedAgreements = agreements
+
+		roles, err := rbac.Roles(user)
+
+		if err != nil {
+			return usersData, fmt.Errorf("failed to get roles for user: %w", err)
+		}
+		for _, role := range roles {
+			userData.Roles = append(userData.Roles, string(role))
+		}
+
+		trainingRecords, err := s.TrainingRecords(user)
+		if err != nil {
+			return usersData, fmt.Errorf("failed to get training for user: %w", err)
+		}
+		userData.TrainingRecord.TrainingRecords = trainingRecords
+
+		usersData = append(usersData, userData)
+	}
+	return usersData, nil
+}
+
 // Get or create a user for a unique username. Returns the user, whether
 // they were created or not and an error
 // If they do not exist then they will be created with the base role
