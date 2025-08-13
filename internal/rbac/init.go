@@ -19,6 +19,7 @@ func Init() {
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
 	addAdminUserRoleBindings()
+	addTreOpsStaffUserRoleBindings()
 }
 
 func addBasePolicies(enforcer *casbin.Enforcer) {
@@ -68,6 +69,12 @@ func addAdminUserRoleBindings() {
 	}
 }
 
+func addTreOpsStaffUserRoleBindings() {
+	for _, user := range persistedTreOpsStaffUsers() {
+		_ = must(AddRole(user, TreOpsStaff))
+	}
+}
+
 func persistedAdminUsers() []types.User {
 	db := graceful.NewDB()
 	users := []types.User{}
@@ -84,6 +91,28 @@ func persistedAdminUsers() []types.User {
 			log.Info().Any("username", username).Msg("Created admin user")
 		} else if result.RowsAffected == 0 {
 			log.Info().Any("username", username).Msg("Found admin user")
+		}
+		users = append(users, user)
+	}
+	return users
+}
+
+func persistedTreOpsStaffUsers() []types.User {
+	db := graceful.NewDB()
+	users := []types.User{}
+	for _, username := range config.TreOpsStaffUsernames() {
+		user := types.User{}
+		result := db.Clauses(clause.OnConflict{DoNothing: true}).
+			Where("username = ?", username).
+			Attrs(types.User{
+				Username: username,
+				Model:    types.Model{CreatedAt: time.Now()},
+			}).
+			FirstOrCreate(&user)
+		if result.RowsAffected > 0 {
+			log.Info().Any("username", username).Msg("Created TRE ops staff user")
+		} else if result.RowsAffected == 0 {
+			log.Info().Any("username", username).Msg("Found TRE ops staff user")
 		}
 		users = append(users, user)
 	}

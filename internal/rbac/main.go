@@ -22,6 +22,7 @@ const (
 	ApprovedStaffResearcher       = RoleName(openapi.AuthRolesApprovedStaffResearcher)       // Member of staff at the institution thats also an approved researcher
 	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
 	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
+	TreOpsStaff                   = RoleName(openapi.AuthRolesTreOpsStaff)                   // Lesser admin role for tre ops staff
 
 	ReadAction  = Action("read")
 	WriteAction = Action("write")
