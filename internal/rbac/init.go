@@ -19,6 +19,7 @@ func Init() {
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
 	addAdminUserRoleBindings()
+	addTreOpsStaffPolicy(enforcer)
 	addTreOpsStaffUserRoleBindings()
 }
 
@@ -53,6 +54,10 @@ func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 
 func addAdminPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
+}
+
+func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
+	mustAddPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: ReadAction})
 }
 
 func mustAddPolicy(enforcer *casbin.Enforcer, policy Policy) {
