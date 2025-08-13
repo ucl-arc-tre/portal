@@ -1,6 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import AdminView from "@/components/people/AdminView";
-import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
+import IAOView from "@/components/people/IAOView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,7 +12,6 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
   const isIAO = userData?.roles.includes("information-asset-owner") || false;
 
   return (
@@ -27,14 +26,12 @@ export default function PeoplePage() {
         description={
           isAdmin
             ? "View and manage portal users, including adding via invitation or upload"
-            : isApprovedStaffResearcher
-              ? "View users in your projects"
-              : isIAO
-                ? "View users in your projects or invite a collaborator"
-                : "You do not have permission to view this page"
+            : isIAO
+              ? "View users in your projects or invite a collaborator"
+              : "You do not have permission to view this page"
         }
       />
-      {isAdmin ? <AdminView /> : isApprovedStaffResearcher && <ApprovedResearcherView isIAO={isIAO} />}
+      {isAdmin ? <AdminView /> : isIAO && <IAOView />}
     </>
   );
 }

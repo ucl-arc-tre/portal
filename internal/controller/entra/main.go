@@ -112,7 +112,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 
 	userData, err := c.userData(ctx, types.Username(username))
 	if err != nil && strings.Contains(err.Error(), "does not exist") {
-		return false, types.NewNotFoundError("user not found in entra directory")
+		return false, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
 	} else if err != nil {
 		return false, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
 	}

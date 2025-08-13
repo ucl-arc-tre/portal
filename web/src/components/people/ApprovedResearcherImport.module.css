@@ -1,11 +1,4 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .helptext {
-  font-size: 0.85rem;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
 
@@ -17,4 +10,14 @@
 
 .button {
   min-width: 23rem;
+}
+
+.dialog {
+  width: clamp(40vw, 50vw, 60vw);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }

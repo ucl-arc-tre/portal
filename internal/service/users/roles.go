@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"errors"
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -30,7 +31,9 @@ func (s *Service) updateApprovedResearcherStatus(user types.User) error {
 	if _, err := rbac.AddRole(user, rbac.ApprovedResearcher); err != nil {
 		return err
 	}
-	if isStaff, err := s.IsStaff(context.Background(), user); err != nil {
+	if isStaff, err := s.IsStaff(context.Background(), user); errors.Is(err, types.ErrNotFound) {
+		log.Warn().Err(err).Msg("failed to check staff status")
+	} else if err != nil {
 		return err
 	} else if isStaff {
 		if _, err := rbac.AddRole(user, rbac.ApprovedStaffResearcher); err != nil {
