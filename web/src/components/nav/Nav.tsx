@@ -53,13 +53,14 @@ export default function Nav() {
   if (authInProgress) return null;
 
   const isAdmin = userData?.roles.includes("admin");
+  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
   const isIAO = userData?.roles.includes("information-asset-owner");
 
   const canSeeStudies = isApprovedStaffResearcher || isAdmin;
-  const canSeeProjects = isIAO || isAdmin;
+  const canSeeProjects = isIAO || isTreOpsStaff || isAdmin;
   const canSeeAssets = isIAO || isAdmin;
-  const canSeePeople = isIAO || isAdmin;
+  const canSeePeople = isIAO || isTreOpsStaff || isAdmin;
 
   return (
     <aside className={styles.sidebar}>
