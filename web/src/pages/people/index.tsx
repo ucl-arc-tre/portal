@@ -1,6 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import AdminView from "@/components/people/AdminView";
-import ApprovedResearcherView from "@/components/people/ApprovedResearcherView";
+import IAOView from "@/components/people/IAOView";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,7 +31,7 @@ export default function PeoplePage() {
               : "You do not have permission to view this page"
         }
       />
-      {isAdmin ? <AdminView /> : isIAO && <ApprovedResearcherView isIAO={isIAO} />}
+      {isAdmin ? <AdminView /> : isIAO && <IAOView />}
     </>
   );
 }
