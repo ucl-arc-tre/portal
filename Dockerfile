@@ -1,5 +1,5 @@
 # ------------- DEV SECTION ----------------
-FROM golang:1.24.5-alpine AS builder
+FROM golang:1.24.6-alpine AS builder
 
 RUN adduser --uid 1000 --disabled-password user && \
     apk add -U --no-cache ca-certificates
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
-FROM golang:1.24.5-alpine AS api-dev
+FROM golang:1.24.6-alpine AS api-dev
 
 RUN go install github.com/air-verse/air@latest
 
