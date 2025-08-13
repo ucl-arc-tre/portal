@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import Callout from "../ui/Callout";
 import { getUsers, UserData } from "@/openapi";
-import styles from "./TreOpsStaffView.module.css";
-import Loading from "../ui/Loading";
 import UserDataTable from "./UserDataTable";
 
 export default function TreOpsStaffView() {
@@ -29,13 +27,6 @@ export default function TreOpsStaffView() {
 
   if (!users) return null;
 
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <Loading message="Loading users..." />
-      </div>
-    );
-  }
   return (
     <>
       <Callout construction />

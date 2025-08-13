@@ -46,10 +46,6 @@
 
   .roles {
     text-align: center;
-
-    .role {
-      margin-inline: 0.2rem;
-    }
   }
 
   .agreements {

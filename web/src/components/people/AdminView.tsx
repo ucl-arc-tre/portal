@@ -2,7 +2,6 @@ import { getUsers, UserData } from "@/openapi";
 import { useEffect, useState } from "react";
 import styles from "./AdminView.module.css";
 import ApprovedResearcherImport from "./ApprovedResearcherImport";
-import Loading from "../ui/Loading";
 import ExternalInvite from "./ExternalInvite";
 import UserDataTable from "./UserDataTable";
 
@@ -30,13 +29,6 @@ export default function AdminView() {
 
   if (!users) return null;
 
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <Loading message="Loading users..." />
-      </div>
-    );
-  }
   return (
     <>
       <div className={styles["button-container"]}>

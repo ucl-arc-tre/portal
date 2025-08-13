@@ -49,3 +49,13 @@ dialog {
   justify-items: center;
   justify-self: center;
 }
+
+.role {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-inline: 0.2rem;
+}
