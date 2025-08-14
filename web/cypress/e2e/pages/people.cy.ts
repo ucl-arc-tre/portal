@@ -30,6 +30,18 @@ describe(`People page content`, () => {
     cy.get("table").contains("User").should("be.visible");
     cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
   });
+
+  it("should show content for TRE ops staff", () => {
+    cy.loginAsBase();
+    cy.mockAuthAsTreOpsStaff();
+    cy.visit("/people");
+
+    cy.contains("You do not have permission to view this page").should("not.exist");
+    cy.contains("View approved researchers").should("be.visible");
+
+    // should only show approved researchers...best way to test this? Or not bother here?
+    // idea would be to create 2 users, one AR and only AR is in the response
+  });
 });
 
 describe("Import approved researchers", () => {
@@ -69,6 +81,13 @@ describe("Invite externals", () => {
   it("should not be visible to a an approved researcher who is not staff", () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseNonStaffApprovedResearcher();
+    cy.visit("/people");
+    cy.get("[data-cy='show-invite-input']").should("not.exist");
+  });
+
+  it("should not be visible to TRE ops staff staff", () => {
+    cy.loginAsBase();
+    cy.mockAuthAsTreOpsStaff();
     cy.visit("/people");
     cy.get("[data-cy='show-invite-input']").should("not.exist");
   });
