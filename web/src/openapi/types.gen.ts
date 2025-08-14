@@ -2,7 +2,7 @@
 
 export type Auth = {
     username: string;
-    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator'>;
+    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff'>;
 };
 
 export type Profile = {

@@ -41,3 +41,12 @@ export function convertRFC3339ToDDMMYYYY(dateString: string) {
 
   return `${day}/${month}/${year}`;
 }
+
+export function getHumanReadableTrainingKind(trainingKind: string) {
+  // getting the key from the value
+  const humanReadableTrainingKind = Object.entries(TrainingKindOptions).find(
+    ([, value]) => value === trainingKind
+  )?.[0];
+
+  return humanReadableTrainingKind;
+}

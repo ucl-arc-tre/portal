@@ -1,11 +1,9 @@
-import { getUsers, UserData } from "@/openapi";
 import { useEffect, useState } from "react";
-import styles from "./AdminView.module.css";
-import ApprovedResearcherImport from "./ApprovedResearcherImport";
-import ExternalInvite from "./ExternalInvite";
+import Callout from "../ui/Callout";
+import { getUsers, UserData } from "@/openapi";
 import UserDataTable from "./UserDataTable";
 
-export default function AdminView() {
+export default function TreOpsStaffView() {
   const [users, setUsers] = useState<Array<UserData> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,12 +29,8 @@ export default function AdminView() {
 
   return (
     <>
-      <div className={styles["button-container"]}>
-        <ApprovedResearcherImport />
-        <ExternalInvite />
-      </div>
-
-      <UserDataTable canEdit={true} users={users} setUsers={setUsers} isLoading={isLoading} />
+      <Callout construction />
+      <UserDataTable canEdit={false} users={users} setUsers={setUsers} isLoading={isLoading} />
     </>
   );
 }

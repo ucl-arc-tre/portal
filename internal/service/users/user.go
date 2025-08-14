@@ -21,7 +21,46 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 		return usersData, types.NewErrServerError(result.Error)
 	}
 
-	// then loop through each and get their agreements & roles
+	usersData, err := s.usersDetails(users)
+	if err != nil {
+		return usersData, err
+	}
+
+	return usersData, nil
+}
+
+func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
+
+	// get all approved researcher users from db
+	userIds, err := rbac.GetUserIdsWithRole(rbac.ApprovedResearcher)
+	if err != nil {
+		return usersData, types.NewErrServerError(err)
+	}
+
+	users := []types.User{}
+	for _, userId := range userIds {
+		user, err := s.UserById(string(userId))
+		if err != nil {
+			return usersData, err
+		}
+
+		users = append(users, types.User{Username: user.Username,
+			Model: types.Model{ID: user.ID}})
+	}
+
+	usersData, err = s.usersDetails(users)
+	if err != nil {
+		return usersData, err
+	}
+
+	return usersData, nil
+}
+
+func (s *Service) usersDetails(users []types.User) ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
+	// loops through all users given and get training, roles and agreements for each
+
 	for _, user := range users {
 		userData := openapi.UserData{
 			User: openapi.User{
