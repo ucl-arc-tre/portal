@@ -12,33 +12,46 @@ import (
 )
 
 func (s *Service) AllUsers() ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
 
 	// get all users from db
 	users := []types.User{}
 	result := s.db.Find(&users)
 	if result.Error != nil {
-		return nil, types.NewErrServerError(result.Error)
+		return usersData, types.NewErrServerError(result.Error)
 	}
 
 	usersData, err := s.usersDetails(users)
 	if err != nil {
-		return nil, err
+		return usersData, err
 	}
 
 	return usersData, nil
 }
 
 func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
 
 	// get all approved researcher users from db
-	users, err := rbac.GetUsersWithRole(rbac.ApprovedResearcher)
+	userIds, err := rbac.GetUserIdsWithRole(rbac.ApprovedResearcher)
 	if err != nil {
-		return nil, types.NewErrServerError(err)
+		return usersData, types.NewErrServerError(err)
 	}
 
-	usersData, err := s.usersDetails(users)
+	users := []types.User{}
+	for _, userId := range userIds {
+		user, err := s.UserById(string(userId))
+		if err != nil {
+			return usersData, err
+		}
+
+		users = append(users, types.User{Username: user.Username,
+			Model: types.Model{ID: user.ID}})
+	}
+
+	usersData, err = s.usersDetails(users)
 	if err != nil {
-		return nil, err
+		return usersData, err
 	}
 
 	return usersData, nil

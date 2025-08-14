@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -39,7 +38,6 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, people)
 
 	} else if isTreOpsStaff {
-		log.Debug().Msg("tre ops staff route")
 		// retrieve auth + agreements + training info
 		people, err := h.users.AllApprovedResearcherUsers()
 		if err != nil {
