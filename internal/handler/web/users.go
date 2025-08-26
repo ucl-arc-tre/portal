@@ -66,7 +66,7 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 
 	uid, err := uuid.Parse(userId)
 	if err != nil {
-		setError(ctx, err, "Invalid uuid")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid uuid")
 		return
 	}
 	user, err := h.users.UserById(uid)
