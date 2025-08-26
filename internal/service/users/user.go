@@ -39,14 +39,9 @@ func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
 	}
 
 	users := []types.User{}
-	for _, userId := range userIds {
-		user, err := s.UserById(userId)
-		if err != nil {
-			return usersData, err
-		}
-
-		users = append(users, types.User{Username: user.Username,
-			Model: types.Model{ID: user.ID}})
+	err = s.db.Where("id IN (?)", userIds).Find(&users).Error
+	if err != nil {
+		return usersData, types.NewErrServerError(err)
 	}
 
 	usersData, err = s.usersData(users)
