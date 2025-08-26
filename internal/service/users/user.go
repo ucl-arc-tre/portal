@@ -38,15 +38,9 @@ func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
 		return usersData, types.NewErrServerError(err)
 	}
 
-	users := []types.User{}
-	for _, userId := range userIds {
-		user, err := s.UserById(userId)
-		if err != nil {
-			return usersData, err
-		}
-
-		users = append(users, types.User{Username: user.Username,
-			Model: types.Model{ID: user.ID}})
+	users, err := s.UsersByIds(userIds)
+	if err != nil {
+		return usersData, err
 	}
 
 	usersData, err = s.usersData(users)
@@ -122,6 +116,20 @@ func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {
 
 func (s *Service) UserById(id uuid.UUID) (*types.User, error) {
 	return s.findUser(&types.User{Model: types.Model{ID: id}})
+}
+
+func (s *Service) UsersByIds(ids []uuid.UUID) ([]types.User, error) {
+	users := []types.User{}
+	for _, userId := range ids {
+		user, err := s.UserById(userId)
+		if err != nil {
+			return users, err
+		}
+
+		users = append(users, types.User{Username: user.Username,
+			Model: types.Model{ID: user.ID}})
+	}
+	return users, nil
 }
 
 func (s *Service) UserByUsername(username types.Username) (*types.User, error) {
