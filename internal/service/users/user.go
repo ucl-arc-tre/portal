@@ -40,7 +40,7 @@ func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
 
 	users := []types.User{}
 	for _, userId := range userIds {
-		user, err := s.UserById(string(userId))
+		user, err := s.UserById(userId)
 		if err != nil {
 			return usersData, err
 		}
@@ -120,12 +120,8 @@ func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {
 	return s.entra.IsStaffMember(ctx, user.Username)
 }
 
-func (s *Service) UserById(id string) (*types.User, error) {
-	uid, err := uuid.Parse(id)
-	if err != nil {
-		return nil, types.NewErrInvalidObject("invalid uuid")
-	}
-	return s.findUser(&types.User{Model: types.Model{ID: uid}})
+func (s *Service) UserById(id uuid.UUID) (*types.User, error) {
+	return s.findUser(&types.User{Model: types.Model{ID: id}})
 }
 
 func (s *Service) UserByUsername(username types.Username) (*types.User, error) {

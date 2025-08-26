@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -63,7 +64,12 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 		return
 	}
 
-	user, err := h.users.UserById(userId)
+	uid, err := uuid.Parse(userId)
+	if err != nil {
+		setError(ctx, err, "Invalid uuid")
+		return
+	}
+	user, err := h.users.UserById(uid)
 	if err != nil {
 		setError(ctx, err, "Failed to get person")
 		return

@@ -115,13 +115,22 @@ func HasRole(user types.User, role RoleName) (bool, error) {
 	return hasRole, types.NewErrServerError(err)
 }
 
-func GetUserIdsWithRole(role RoleName) ([]string, error) {
+func GetUserIdsWithRole(role RoleName) ([]uuid.UUID, error) {
 	userIds, err := enforcer.GetUsersForRole(string(role))
 	if err != nil {
 		return nil, err
 	}
 
-	return userIds, types.NewErrServerError(err)
+	ids := []uuid.UUID{}
+	for _, id := range userIds {
+		uid, err := uuid.Parse(id)
+		if err != nil {
+			return nil, types.NewErrServerError(err)
+		}
+		ids = append(ids, uid)
+	}
+
+	return ids, types.NewErrServerError(err)
 }
 
 func makeCasbinModel() model.Model {
