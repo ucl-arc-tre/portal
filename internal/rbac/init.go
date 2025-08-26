@@ -81,31 +81,22 @@ func addTreOpsStaffUserRoleBindings() {
 }
 
 func persistedAdminUsers() []types.User {
-	db := graceful.NewDB()
-	users := []types.User{}
-	for _, username := range config.AdminUsernames() {
-		user := types.User{}
-		result := db.Clauses(clause.OnConflict{DoNothing: true}).
-			Where("username = ?", username).
-			Attrs(types.User{
-				Username: username,
-				Model:    types.Model{CreatedAt: time.Now()},
-			}).
-			FirstOrCreate(&user)
-		if result.RowsAffected > 0 {
-			log.Info().Any("username", username).Msg("Created admin user")
-		} else if result.RowsAffected == 0 {
-			log.Info().Any("username", username).Msg("Found admin user")
-		}
-		users = append(users, user)
-	}
+	users := persisteUsersFromConfig(config.AdminUsernames())
+
 	return users
 }
 
 func persistedTreOpsStaffUsers() []types.User {
+
+	users := persisteUsersFromConfig(config.TreOpsStaffUsernames())
+
+	return users
+}
+
+func persisteUsersFromConfig(usernames []types.Username) []types.User {
 	db := graceful.NewDB()
 	users := []types.User{}
-	for _, username := range config.TreOpsStaffUsernames() {
+	for _, username := range usernames {
 		user := types.User{}
 		result := db.Clauses(clause.OnConflict{DoNothing: true}).
 			Where("username = ?", username).
