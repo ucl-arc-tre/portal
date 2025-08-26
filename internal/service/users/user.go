@@ -21,7 +21,7 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 		return usersData, types.NewErrServerError(result.Error)
 	}
 
-	usersData, err := s.usersDetails(users)
+	usersData, err := s.usersData(users)
 	if err != nil {
 		return usersData, err
 	}
@@ -49,7 +49,7 @@ func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
 			Model: types.Model{ID: user.ID}})
 	}
 
-	usersData, err = s.usersDetails(users)
+	usersData, err = s.usersData(users)
 	if err != nil {
 		return usersData, err
 	}
@@ -57,7 +57,7 @@ func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
 	return usersData, nil
 }
 
-func (s *Service) usersDetails(users []types.User) ([]openapi.UserData, error) {
+func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 	usersData := []openapi.UserData{}
 	// loops through all users given and get training, roles and agreements for each
 
