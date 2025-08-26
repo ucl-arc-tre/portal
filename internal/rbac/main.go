@@ -125,7 +125,7 @@ func GetUserIdsWithRole(role RoleName) ([]uuid.UUID, error) {
 	for _, id := range userIds {
 		uid, err := uuid.Parse(id)
 		if err != nil {
-			return nil, types.NewErrServerError(err)
+			panic(err)
 		}
 		ids = append(ids, uid)
 	}
