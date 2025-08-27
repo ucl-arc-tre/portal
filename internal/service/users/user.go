@@ -21,12 +21,7 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 		return usersData, types.NewErrServerError(result.Error)
 	}
 
-	usersData, err := s.usersData(users)
-	if err != nil {
-		return usersData, err
-	}
-
-	return usersData, nil
+	return s.usersData(users)
 }
 
 func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
@@ -35,7 +30,7 @@ func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
 	// get all approved researcher users from db
 	userIds, err := rbac.GetUserIdsWithRole(rbac.ApprovedResearcher)
 	if err != nil {
-		return usersData, types.NewErrServerError(err)
+		return usersData, err
 	}
 
 	users := []types.User{}

@@ -123,10 +123,7 @@ func GetUserIdsWithRole(role RoleName) ([]uuid.UUID, error) {
 
 	ids := []uuid.UUID{}
 	for _, id := range userIds {
-		uid, err := uuid.Parse(id)
-		if err != nil {
-			panic(err)
-		}
+		uid := uuid.MustParse(id)
 		ids = append(ids, uid)
 	}
 
