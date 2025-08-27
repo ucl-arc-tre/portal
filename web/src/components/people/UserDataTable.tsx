@@ -1,5 +1,12 @@
 import { ConfirmedAgreement, TrainingRecord, UserData } from "@/openapi";
-import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/exports";
+import {
+  Alert,
+  AlertMessage,
+  CheckIcon,
+  convertRFC3339ToDDMMYYYY,
+  getHumanReadableTrainingKind,
+  XIcon,
+} from "../shared/exports";
 import Loading from "../ui/Loading";
 import Button from "../ui/Button";
 
@@ -45,8 +52,7 @@ export default function UserDataTable(Props: Props) {
     setTrainingDialogOpen(true);
   };
 
-  if (!users) return <div className={styles.container}>No users found</div>;
-
+  if (!users) return null;
   if (isLoading) {
     return (
       <div className={styles.container}>
