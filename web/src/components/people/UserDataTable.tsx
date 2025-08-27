@@ -17,14 +17,14 @@ export default function UserDataTable(Props: Props) {
   const { canEdit, users, setUsers, isLoading } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
 
-  const [id, setId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
 
-  const updatePersonUI = (id: string, training: TrainingRecord) => {
-    // get people object and find the person with the right id then update the training
+  const updateTrainingDateCell = (id: string, training: TrainingRecord) => {
+    // get people object and find the person with the right selectedUserId then update the training
     if (!users) return;
 
     const updatedPeople = [...users];
-    const personIndex = updatedPeople.findIndex((person) => person.user.id === id);
+    const personIndex = updatedPeople.findIndex((person) => person.user.id === selectedUserId);
 
     if (personIndex !== -1) {
       const person = updatedPeople[personIndex];
@@ -40,12 +40,12 @@ export default function UserDataTable(Props: Props) {
       setUsers(updatedPeople);
     }
   };
-  const handleEditTrainingClick = (id: string) => {
-    setId(id);
+  const handleEditTrainingClick = (selectedUserId: string) => {
+    setSelectedUserId(selectedUserId);
     setTrainingDialogOpen(true);
   };
 
-  if (!users) return null;
+  if (!users) return <div className={styles.container}>No users found</div>;
 
   if (isLoading) {
     return (
@@ -58,7 +58,11 @@ export default function UserDataTable(Props: Props) {
   return (
     <>
       {trainingDialogOpen && (
-        <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
+        <TrainingForm
+          userId={selectedUserId}
+          setTrainingDialogOpen={setTrainingDialogOpen}
+          updateTrainingDateCell={updateTrainingDateCell}
+        />
       )}
       <p>
         Please note the dates shown are when the agreement/training is <em>valid from</em>

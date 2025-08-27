@@ -16,13 +16,13 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 });
 
 type TrainingFormProps = {
-  id: string;
+  userId: string;
   setTrainingDialogOpen: (name: boolean) => void;
-  updatePersonUI: (id: string, training: TrainingRecord) => void;
+  updateTrainingDateCell: (userId: string, training: TrainingRecord) => void;
 };
 
 export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
-  const { id, setTrainingDialogOpen, updatePersonUI } = TrainingFormProps;
+  const { userId, setTrainingDialogOpen, updateTrainingDateCell } = TrainingFormProps;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
 
@@ -41,14 +41,14 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
     if (!trainingDate) return setErrorMessage("Please enter the date the training was completed.");
     try {
       const response = await postUsersByUserIdTraining({
-        path: { userId: id },
+        path: { userId: userId },
         body: { training_kind: trainingKind, training_date: trainingDate },
       });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
       closeDialog();
 
-      updatePersonUI(id, {
+      updateTrainingDateCell(userId, {
         kind: trainingKind as TrainingKind,
         completed_at: trainingDisplayDate,
         is_valid: response.data?.is_valid || false,
