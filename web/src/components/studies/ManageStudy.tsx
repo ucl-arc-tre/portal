@@ -3,6 +3,7 @@ import { Study, Auth } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
 import StudyAgreement from "./study-steps/StudyAgreement";
+import StudyAssets from "./study-steps/StudyAssets";
 
 type ManageStudyProps = {
   study: Study;
@@ -11,8 +12,9 @@ type ManageStudyProps = {
 
 export default function ManageStudy({ study }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
+  const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
 
-  const studyStepsCompleted = agreementCompleted;
+  const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
   const studySteps: Step[] = [
     {
@@ -23,24 +25,36 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       current: !agreementCompleted,
     },
     {
-      id: "study-asset",
-      title: "Study Asset",
+      id: "study-assets",
+      title: "Study Assets",
       description: "Create and manage at least one study asset",
-      completed: false,
-      current: agreementCompleted, // replace with actual asset management step logic
+      completed: assetManagementCompleted,
+      current: agreementCompleted && !assetManagementCompleted,
     },
   ];
 
   const getCurrentStepComponent = () => {
-    return (
-      <StudyAgreement
-        studyId={study.id}
-        studyTitle={study.title}
-        agreementCompleted={agreementCompleted}
-        setAgreementCompleted={setAgreementCompleted}
-      />
-    );
-    // Todo: insert next step (asset creation)
+    if (!agreementCompleted) {
+      return (
+        <StudyAgreement
+          studyId={study.id}
+          studyTitle={study.title}
+          agreementCompleted={agreementCompleted}
+          setAgreementCompleted={setAgreementCompleted}
+        />
+      );
+    }
+
+    if (!assetManagementCompleted) {
+      return (
+        <StudyAssets
+          studyId={study.id}
+          studyTitle={study.title}
+          assetManagementCompleted={assetManagementCompleted}
+          setAssetManagementCompleted={setAssetManagementCompleted}
+        />
+      );
+    }
   };
 
   return (

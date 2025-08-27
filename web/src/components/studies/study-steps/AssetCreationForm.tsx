@@ -2,10 +2,10 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Button from "../ui/Button";
+import Button from "../../ui/Button";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
-import styles from "./AssetForm.module.css";
+import styles from "./AssetCreationForm.module.css";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -14,29 +14,12 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
-type AssetFormData = {
-  title: string;
-  description: string;
-  classification_impact: string;
-  protection: string;
-  legal_basis: string;
-  format: string;
-  expiry: string;
-  location: string[];
-  has_dspt: boolean;
-  stored_outside_uk_eea: boolean;
-  accessed_by_third_parties: boolean;
-  third_party_agreement: string;
-  status: string;
-};
-
 type AssetFormProps = {
   onSubmit: (data: AssetFormData) => Promise<void>;
-  // setSelectedStudy: (study: Study | null) => void;
   isSubmitting?: boolean;
 };
 
-export default function AssetForm(props: AssetFormProps) {
+export default function AssetCreationForm(props: AssetFormProps) {
   const { onSubmit, isSubmitting = false } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

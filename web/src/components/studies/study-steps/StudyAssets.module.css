@@ -1,4 +1,4 @@
-.study-agreement-container {
+.study-assets-container {
   width: 100%;
   margin: 1rem 0;
   padding: 1.5rem;
@@ -16,8 +16,11 @@
   margin-bottom: 16px;
 }
 
-.agreement-actions {
-  margin: 1rem 0;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+.no-assets-message {
+  color: #6c757d;
+  padding: 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  margin-bottom: 16px;
 }

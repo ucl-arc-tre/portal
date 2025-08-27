@@ -362,6 +362,7 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+
   /logout:
     get:
       description: Log the user out
