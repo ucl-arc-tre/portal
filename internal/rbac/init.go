@@ -82,13 +82,13 @@ func addTreOpsStaffUserRoleBindings() {
 
 func persistedAdminUsers() []types.User {
 	users := persistedUsersFromConfig(config.AdminUsernames())
-
+	removeOutdatedPersistedUsers(config.AdminUsernames(), Admin)
 	return users
 }
 
 func persistedTreOpsStaffUsers() []types.User {
 	users := persistedUsersFromConfig(config.TreOpsStaffUsernames())
-
+	removeOutdatedPersistedUsers(config.TreOpsStaffUsernames(), TreOpsStaff)
 	return users
 }
 
@@ -110,4 +110,34 @@ func persistedUsersFromConfig(usernames []types.Username) []types.User {
 		users = append(users, user)
 	}
 	return users
+}
+
+func removeOutdatedPersistedUsers(usernames []types.Username, role RoleName) {
+	db := graceful.NewDB()
+	users := []types.User{}
+
+	userIdsWithRole, err := GetUserIdsWithRole(role)
+	if err != nil {
+		log.Warn().Err(err).Msg("failed to get users with role")
+		return
+	}
+
+	if len(usernames) > 0 {
+		// if user exists but name not given in config, remove role
+		db.Where("id IN (?)", userIdsWithRole).Find(&users).Not("username IN (?)", usernames).Find(&users)
+		log.Debug().Any("users", users).Msg("users with admin or treops roles who are not in config")
+
+	} else {
+		// if there are any users who have the role but no usernames were given, remove role
+		db.Where("id IN (?)", userIdsWithRole).Find(&users)
+		log.Debug().Any("users", users).Msg("no usernames given, removing all users for role")
+	}
+
+	for _, user := range users {
+		_, err := RemoveRole(user, role)
+		if err != nil {
+			log.Error().Err(err).Any("user", user.Username).Msg("failed to remove role")
+		}
+	}
+
 }
