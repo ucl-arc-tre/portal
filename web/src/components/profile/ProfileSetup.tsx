@@ -44,7 +44,7 @@ export default function ProfileSetup(props: Props) {
     if (profileStepsCompleted) {
       refreshAuth();
     }
-  }, [profileStepsCompleted]);
+  }, [profileStepsCompleted, refreshAuth]);
 
   const profileSetupSteps: Step[] = [
     {
