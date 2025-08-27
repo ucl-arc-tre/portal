@@ -10,7 +10,7 @@ type TrainingCertificateErrorProps = {
   showExtra?: boolean;
 };
 
-const manualApprovalEmailAddress = "ig-training@ucl.ac.uk";
+const manualApprovalEmailAddress = "arc.tre@ucl.ac.uk";
 const manualApprovalEmailBody = encodeURI("Dear UCL Information Governance,\n\n ...");
 const manualApprovalEmailSubject = "Training certificate";
 
