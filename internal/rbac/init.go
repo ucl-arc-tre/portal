@@ -81,19 +81,18 @@ func addTreOpsStaffUserRoleBindings() {
 }
 
 func persistedAdminUsers() []types.User {
-	users := persisteUsersFromConfig(config.AdminUsernames())
+	users := persistedUsersFromConfig(config.AdminUsernames())
 
 	return users
 }
 
 func persistedTreOpsStaffUsers() []types.User {
-
-	users := persisteUsersFromConfig(config.TreOpsStaffUsernames())
+	users := persistedUsersFromConfig(config.TreOpsStaffUsernames())
 
 	return users
 }
 
-func persisteUsersFromConfig(usernames []types.Username) []types.User {
+func persistedUsersFromConfig(usernames []types.Username) []types.User {
 	db := graceful.NewDB()
 	users := []types.User{}
 	for _, username := range usernames {
@@ -106,9 +105,7 @@ func persisteUsersFromConfig(usernames []types.Username) []types.User {
 			}).
 			FirstOrCreate(&user)
 		if result.RowsAffected > 0 {
-			log.Info().Any("username", username).Msg("Created TRE ops staff user")
 		} else if result.RowsAffected == 0 {
-			log.Info().Any("username", username).Msg("Found TRE ops staff user")
 		}
 		users = append(users, user)
 	}
