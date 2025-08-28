@@ -73,25 +73,13 @@ export default function AssetCreationForm(props: AssetFormProps) {
       reset();
     } catch (error) {
       console.error("Error creating asset:", error);
-      setErrorMessage("Failed to create asset. Please try again.");
+      setErrorMessage("Error: " + String((error as Error).message));
     }
   };
 
   return (
     <div className={styles.container}>
       <h2>Create New Asset</h2>
-
-      {errorMessage && (
-        <Alert type="error" className={styles.alert}>
-          <AlertMessage>{errorMessage}</AlertMessage>
-        </Alert>
-      )}
-
-      {successMessage && (
-        <Alert type="success" className={styles.alert}>
-          <AlertMessage>{successMessage}</AlertMessage>
-        </Alert>
-      )}
 
       <form onSubmit={handleSubmit(onFormSubmit)} className={styles.form}>
         <div className={styles.field}>
@@ -411,6 +399,18 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </select>
           {errors.status && <span className={styles["error-text"]}>{errors.status.message}</span>}
         </div>
+
+        {errorMessage && (
+          <Alert type="error" className={styles.alert}>
+            <AlertMessage>{errorMessage}</AlertMessage>
+          </Alert>
+        )}
+
+        {successMessage && (
+          <Alert type="success" className={styles.alert}>
+            <AlertMessage>{successMessage}</AlertMessage>
+          </Alert>
+        )}
 
         <div className={styles.actions}>
           <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>

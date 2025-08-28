@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
+import {
+  Asset,
+  AssetBase,
+  AssetCreateValidationError,
+  getStudiesByStudyIdAssets,
+  postStudiesByStudyIdAssets,
+} from "@/openapi";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -52,28 +58,28 @@ export default function StudyAssets(props: StudyAssetsProps) {
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     console.log("Creating asset:", assetData);
 
-    try {
-      setError(null);
+    setError(null);
 
-      const response = await postStudiesByStudyIdAssets({
-        path: { studyId },
-        body: assetData as AssetBase,
-      });
+    const response = await postStudiesByStudyIdAssets({
+      path: { studyId },
+      body: assetData as AssetBase,
+    });
 
-      if (response.response.status !== 201) {
-        throw new Error("Failed to create study asset");
+    console.log("asset creation response:", response);
+
+    if (response.error) {
+      const errorData = response.error as AssetCreateValidationError;
+      if (errorData?.error_message) {
+        throw new Error(errorData.error_message);
       }
+    }
 
-      // Refresh assets list after successful creation
-      const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-      if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
-        setStudyAssets(updatedAssetsResult.data);
-        setAssetManagementCompleted(true);
-        setShowAssetForm(false);
-      }
-    } catch (err) {
-      setError("Failed to create asset. Please try again.");
-      throw err;
+    // Refresh assets list after successful creation
+    const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
+    if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
+      setStudyAssets(updatedAssetsResult.data);
+      setAssetManagementCompleted(true);
+      setShowAssetForm(false);
     }
   };
 
