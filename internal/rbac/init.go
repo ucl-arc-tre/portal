@@ -1,6 +1,7 @@
 package rbac
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/casbin/casbin/v2"
@@ -118,8 +119,7 @@ func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role Ro
 
 	userIdsWithRole, err := GetUserIdsWithRole(role)
 	if err != nil {
-		log.Warn().Err(err).Msg("failed to get users with role")
-		return
+		panic(fmt.Sprintf("failed to get user ids from role [%v]", err))
 	}
 	if len(usernames) > 0 {
 		// if user exists but name not given in config
@@ -136,7 +136,7 @@ func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role Ro
 	for _, user := range outdatedUsers {
 		_, err := RemoveRole(user, role)
 		if err != nil {
-			log.Error().Err(err).Any("user", user.Username).Msg("failed to remove role")
+			panic(fmt.Sprintf("failed to remove role for user [%v]", err))
 		}
 	}
 
