@@ -15,12 +15,11 @@ import styles from "./StudyAssets.module.css";
 type StudyAssetsProps = {
   studyId: string;
   studyTitle: string;
-  assetManagementCompleted: boolean;
-  setAssetManagementCompleted: (completed: boolean) => void;
+  setAssetManagementCompleted?: (completed: boolean) => void;
 };
 
 export default function StudyAssets(props: StudyAssetsProps) {
-  const { studyId, studyTitle, assetManagementCompleted, setAssetManagementCompleted } = props;
+  const { studyId, studyTitle, setAssetManagementCompleted } = props;
 
   const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +40,9 @@ export default function StudyAssets(props: StudyAssetsProps) {
           setStudyAssets(studyAssetResult.data);
 
           if (studyAssetResult.data.length > 0) {
-            setAssetManagementCompleted(true);
+            if (setAssetManagementCompleted) {
+              setAssetManagementCompleted(true);
+            }
           }
         }
       } catch (err) {
@@ -78,14 +79,14 @@ export default function StudyAssets(props: StudyAssetsProps) {
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
     if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
       setStudyAssets(updatedAssetsResult.data);
-      setAssetManagementCompleted(true);
+      if (setAssetManagementCompleted) {
+        setAssetManagementCompleted(true);
+      }
       setShowAssetForm(false);
     }
   };
 
   if (isLoading) return null;
-
-  if (assetManagementCompleted) return null;
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">

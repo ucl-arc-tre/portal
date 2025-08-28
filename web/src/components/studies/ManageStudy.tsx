@@ -4,6 +4,7 @@ import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
 import StudyAgreement from "./study-steps/StudyAgreement";
 import StudyAssets from "./study-steps/StudyAssets";
+import styles from "./ManageStudy.module.css";
 
 type ManageStudyProps = {
   study: Study;
@@ -50,7 +51,6 @@ export default function ManageStudy({ study }: ManageStudyProps) {
         <StudyAssets
           studyId={study.id}
           studyTitle={study.title}
-          assetManagementCompleted={assetManagementCompleted}
           setAssetManagementCompleted={setAssetManagementCompleted}
         />
       );
@@ -61,7 +61,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     <>
       <StepProgress
         steps={studySteps}
-        isComplete={false}
+        isComplete={studyStepsCompleted}
         completionTitle="Study Setup Complete!"
         completionSubtitle="You have successfully completed all study setup steps."
         completionButtonText="Go to studies"
@@ -72,7 +72,13 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
       {!studyStepsCompleted && <StepArrow />}
 
-      <div>{getCurrentStepComponent()}</div>
+      {getCurrentStepComponent()}
+
+      {studyStepsCompleted && (
+        <div className={styles["completed-section"]}>
+          <StudyAssets studyId={study.id} studyTitle={study.title} />
+        </div>
+      )}
     </>
   );
 }
