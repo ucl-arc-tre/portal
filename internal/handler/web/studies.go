@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -127,7 +128,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 			ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),
 			Protection:             openapi.AssetProtection(asset.Protection),
 			LegalBasis:             asset.LegalBasis,
-			Format:                 asset.Format,
+			Format:                 openapi.AssetFormat(asset.Format),
 			Expiry:                 asset.Expiry,
 			Locations:              asset.LocationStrings(),
 			HasDspt:                asset.HasDspt,
@@ -144,12 +145,24 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	// This function will handle the creation of new assets for a specific study.
-	// For now, we will return a placeholder response.
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Study asset creation is not yet implemented.",
-		"studyId": studyId,
-	})
+	log.Info().Msg("Asset creation post route hit")
+
+	AssetData := openapi.AssetBase{}
+	if err := bindJSONOrSetError(ctx, &AssetData); err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	validationError, err := h.studies.CreateAsset(ctx, user, AssetData, studyId)
+	if err != nil {
+		setError(ctx, err, "Failed to create asset")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
 }
 
 // confirms a study agreement for the study ID and user

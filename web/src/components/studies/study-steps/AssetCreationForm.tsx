@@ -14,22 +14,6 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
-type AssetFormData = {
-  title: string;
-  description: string;
-  classification_impact: string;
-  protection: string;
-  legal_basis: string;
-  format: string;
-  expiry: string;
-  locations: string[];
-  has_dspt: boolean;
-  stored_outside_uk_eea: boolean;
-  accessed_by_third_parties: boolean;
-  third_party_agreement: string;
-  status: string;
-};
-
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
@@ -108,7 +92,8 @@ export default function AssetCreationForm(props: AssetFormProps) {
             type="text"
             {...register("title", {
               required: "Title is required",
-              maxLength: { value: 255, message: "Title must be less than 255 characters" },
+              minLength: { value: 4, message: "Title must be at least 4 characters" },
+              maxLength: { value: 50, message: "Title must be less than 50 characters" },
             })}
             aria-invalid={!!errors.title}
             className={errors.title ? styles.error : ""}
@@ -123,7 +108,8 @@ export default function AssetCreationForm(props: AssetFormProps) {
             rows={4}
             {...register("description", {
               required: "Description is required",
-              maxLength: { value: 1000, message: "Description must be less than 1000 characters" },
+              minLength: { value: 4, message: "Description must be at least 4 characters" },
+              maxLength: { value: 255, message: "Description must be less than 255 characters" },
             })}
             aria-invalid={!!errors.description}
             className={errors.description ? styles.error : ""}

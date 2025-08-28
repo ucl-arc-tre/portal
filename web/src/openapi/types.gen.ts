@@ -138,7 +138,7 @@ export type AssetBase = {
     /**
      * Format of the asset
      */
-    format: string;
+    format: 'Electronic' | 'Paper' | 'Other';
     /**
      * Retention expiry date of the asset
      */
@@ -181,6 +181,13 @@ export type Asset = AssetBase & {
      * Time in RFC3339 format when the asset was last updated
      */
     updated_at: string;
+};
+
+export type AssetCreateValidationError = {
+    /**
+     * Validation error message explaining why asset creation failed
+     */
+    error_message: string;
 };
 
 /**
@@ -806,17 +813,13 @@ export type PostStudiesByStudyIdAssetsData = {
 
 export type PostStudiesByStudyIdAssetsErrors = {
     /**
-     * Invalid request
+     * Validation error
      */
-    400: unknown;
+    400: AssetCreateValidationError;
     /**
      * Forbidden
      */
     403: unknown;
-    /**
-     * Study not found
-     */
-    404: unknown;
     /**
      * Internal server error
      */
@@ -826,6 +829,8 @@ export type PostStudiesByStudyIdAssetsErrors = {
      */
     default: unknown;
 };
+
+export type PostStudiesByStudyIdAssetsError = PostStudiesByStudyIdAssetsErrors[keyof PostStudiesByStudyIdAssetsErrors];
 
 export type PostStudiesByStudyIdAssetsResponses = {
     /**

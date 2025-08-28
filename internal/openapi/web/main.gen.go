@@ -24,6 +24,13 @@ const (
 	AssetClassificationImpactPublic             AssetClassificationImpact = "Public"
 )
 
+// Defines values for AssetFormat.
+const (
+	AssetFormatElectronic AssetFormat = "Electronic"
+	AssetFormatOther      AssetFormat = "Other"
+	AssetFormatPaper      AssetFormat = "Paper"
+)
+
 // Defines values for AssetProtection.
 const (
 	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
@@ -42,6 +49,13 @@ const (
 	AssetBaseClassificationImpactConfidential       AssetBaseClassificationImpact = "Confidential"
 	AssetBaseClassificationImpactHighlyConfidential AssetBaseClassificationImpact = "Highly confidential"
 	AssetBaseClassificationImpactPublic             AssetBaseClassificationImpact = "Public"
+)
+
+// Defines values for AssetBaseFormat.
+const (
+	AssetBaseFormatElectronic AssetBaseFormat = "Electronic"
+	AssetBaseFormatOther      AssetBaseFormat = "Other"
+	AssetBaseFormatPaper      AssetBaseFormat = "Paper"
 )
 
 // Defines values for AssetBaseProtection.
@@ -115,7 +129,7 @@ type Asset struct {
 	Expiry string `json:"expiry"`
 
 	// Format Format of the asset
-	Format string `json:"format"`
+	Format AssetFormat `json:"format"`
 
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
@@ -151,6 +165,9 @@ type Asset struct {
 // AssetClassificationImpact Classification level of the asset
 type AssetClassificationImpact string
 
+// AssetFormat Format of the asset
+type AssetFormat string
+
 // AssetProtection Type of protection applied to the asset
 type AssetProtection string
 
@@ -172,7 +189,7 @@ type AssetBase struct {
 	Expiry string `json:"expiry"`
 
 	// Format Format of the asset
-	Format string `json:"format"`
+	Format AssetBaseFormat `json:"format"`
 
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
@@ -202,11 +219,20 @@ type AssetBase struct {
 // AssetBaseClassificationImpact Classification level of the asset
 type AssetBaseClassificationImpact string
 
+// AssetBaseFormat Format of the asset
+type AssetBaseFormat string
+
 // AssetBaseProtection Type of protection applied to the asset
 type AssetBaseProtection string
 
 // AssetBaseStatus Status of the asset
 type AssetBaseStatus string
+
+// AssetCreateValidationError defines model for AssetCreateValidationError.
+type AssetCreateValidationError struct {
+	// ErrorMessage Validation error message explaining why asset creation failed
+	ErrorMessage string `json:"error_message"`
+}
 
 // Auth defines model for Auth.
 type Auth struct {

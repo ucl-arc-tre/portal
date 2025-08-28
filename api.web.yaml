@@ -353,11 +353,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Asset"
         "400":
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetCreateValidationError"
         "403":
           description: Forbidden
-        "404":
-          description: Study not found
         "500":
           description: Internal server error
         default:
@@ -663,6 +665,10 @@ components:
           description: Legal basis for holding the asset
         format:
           type: string
+          enum:
+            - Electronic
+            - Paper
+            - Other
           description: Format of the asset
         expiry:
           type: string
@@ -706,6 +712,15 @@ components:
               type: string
               description: Time in RFC3339 format when the asset was last updated
       description: A research study asset
+
+    AssetCreateValidationError:
+      type: object
+      required:
+        - error_message
+      properties:
+        error_message:
+          type: string
+          description: Validation error message explaining why asset creation failed
 
     StudyBase:
       type: object
