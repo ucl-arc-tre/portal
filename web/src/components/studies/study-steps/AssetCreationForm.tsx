@@ -14,13 +14,29 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
+type AssetFormData = {
+  title: string;
+  description: string;
+  classification_impact: string;
+  protection: string;
+  legal_basis: string;
+  format: string;
+  expiry: string;
+  locations: string[];
+  has_dspt: boolean;
+  stored_outside_uk_eea: boolean;
+  accessed_by_third_parties: boolean;
+  third_party_agreement: string;
+  status: string;
+};
+
 type AssetFormProps = {
-  onSubmit: (data: AssetFormData) => Promise<void>;
+  handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {
-  const { onSubmit, isSubmitting = false } = props;
+  const { handleAssetSubmit, isSubmitting = false } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -40,7 +56,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       legal_basis: "",
       format: "",
       expiry: "",
-      location: [],
+      locations: [],
       has_dspt: false,
       stored_outside_uk_eea: false,
       accessed_by_third_parties: false,
@@ -59,7 +75,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
-      await onSubmit(data);
+      await handleAssetSubmit(data);
       setSuccessMessage("Asset created successfully!");
       reset();
     } catch (error) {
@@ -254,7 +270,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 <input
                   type="checkbox"
                   value={storage.value}
-                  {...register("location", {
+                  {...register("locations", {
                     required: "At least one location must be selected",
                   })}
                   className={styles.checkbox}
@@ -264,7 +280,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             ))}
           </div>
 
-          {errors.location && <span className={styles["error-text"]}>{errors.location.message}</span>}
+          {errors.locations && <span className={styles["error-text"]}>{errors.locations.message}</span>}
         </div>
 
         <div className={styles.field}>

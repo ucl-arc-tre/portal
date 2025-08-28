@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Asset, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
+import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -55,7 +55,7 @@ export default function StudyAssets(props: StudyAssetsProps) {
 
       const response = await postStudiesByStudyIdAssets({
         path: { studyId },
-        body: assetData,
+        body: assetData as AssetBase,
       });
 
       if (response.response.status !== 201) {
@@ -95,7 +95,7 @@ export default function StudyAssets(props: StudyAssetsProps) {
             No assets found for this study. You need to create at least one asset to continue.
           </p>
 
-          <AssetCreationForm onSubmit={handleAssetSubmit} />
+          <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />
         </div>
       ) : (
         <div>
@@ -114,7 +114,7 @@ export default function StudyAssets(props: StudyAssetsProps) {
             </Button>
           </div>
 
-          {showAssetForm && <AssetCreationForm onSubmit={handleAssetSubmit} />}
+          {showAssetForm && <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />}
         </div>
       )}
     </section>

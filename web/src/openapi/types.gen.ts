@@ -110,11 +110,7 @@ export type UserTrainingUpdate = {
 /**
  * A data asset representing a set of related data entities
  */
-export type Asset = {
-    /**
-     * Unique identifier for the asset
-     */
-    id: string;
+export type AssetBase = {
     /**
      * Title of the asset
      */
@@ -167,6 +163,16 @@ export type Asset = {
      * Status of the asset
      */
     status: 'Active' | 'Awaiting' | 'Destroyed';
+};
+
+/**
+ * A research study asset
+ */
+export type Asset = AssetBase & {
+    /**
+     * Unique identifier for the asset
+     */
+    id: string;
     /**
      * Time in RFC3339 format when the asset was created
      */
@@ -787,7 +793,7 @@ export type GetStudiesByStudyIdAssetsResponses = {
 export type GetStudiesByStudyIdAssetsResponse = GetStudiesByStudyIdAssetsResponses[keyof GetStudiesByStudyIdAssetsResponses];
 
 export type PostStudiesByStudyIdAssetsData = {
-    body: Asset;
+    body: AssetBase;
     path: {
         /**
          * ID of the study

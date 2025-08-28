@@ -344,7 +344,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Asset"
+              $ref: "#/components/schemas/AssetBase"
       responses:
         "201":
           description: Asset created successfully
@@ -616,11 +616,10 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
-    Asset:
+    AssetBase:
       type: object
       description: A data asset representing a set of related data entities
       required:
-        - id
         - title
         - description
         - classification_impact
@@ -634,12 +633,7 @@ components:
         - accessed_by_third_parties
         - third_party_agreement
         - status
-        - created_at
-        - updated_at
       properties:
-        id:
-          type: string
-          description: Unique identifier for the asset
         title:
           type: string
           description: Title of the asset
@@ -692,12 +686,26 @@ components:
             - Awaiting
             - Destroyed
           description: Status of the asset
-        created_at:
-          type: string
-          description: Time in RFC3339 format when the asset was created
-        updated_at:
-          type: string
-          description: Time in RFC3339 format when the asset was last updated
+
+    Asset:
+      allOf:
+        - $ref: "#/components/schemas/AssetBase"
+        - type: object
+          required:
+            - id
+            - created_at
+            - updated_at
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the asset
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the asset was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the asset was last updated
+      description: A research study asset
 
     StudyBase:
       type: object
