@@ -122,15 +122,14 @@ func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role Ro
 		panic(fmt.Sprintf("failed to get user ids from role [%v]", err))
 	}
 	if len(usernames) > 0 {
-		// if user exists but name not given in config
-		db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers).Not("username IN (?)", usernames).Find(&outdatedUsers)
-		log.Debug().Any("outdated users", outdatedUsers).Msg("users with admin or treops roles who are not in config")
-
+		err = db.Where("id IN (?)", userIdsWithRole).Not("username IN (?)", usernames).Find(&outdatedUsers).Error
 	} else {
-		// if there are any users who have the role but no usernames were given
-		db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers)
-		log.Debug().Any("outdated users", outdatedUsers).Msg("no usernames given, all users with role")
+		err = db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers).Error
 	}
+	if err != nil {
+		panic(fmt.Sprintf("failed to get users with roles [%v]", err))
+	}
+	log.Debug().Any("outdatedUsers", outdatedUsers).Any("role", role).Msg("Users who are not in config")
 
 	// remove role bindings for outdated users
 	for _, user := range outdatedUsers {
