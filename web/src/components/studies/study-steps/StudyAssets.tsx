@@ -50,6 +50,8 @@ export default function StudyAssets(props: StudyAssetsProps) {
   }, [studyId, setAssetManagementCompleted]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
+    console.log("Creating asset:", assetData);
+
     try {
       setError(null);
 

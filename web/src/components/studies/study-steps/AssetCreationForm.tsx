@@ -59,7 +59,16 @@ export default function AssetCreationForm(props: AssetFormProps) {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
-      await handleAssetSubmit(data);
+
+      // Transform string boolean values to actual booleans for API
+      const transformedAssetData: AssetFormData = {
+        ...data,
+        has_dspt: data.has_dspt === "true" || data.has_dspt === true,
+        stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
+        accessed_by_third_parties: data.accessed_by_third_parties === "true" || data.accessed_by_third_parties === true,
+      };
+
+      await handleAssetSubmit(transformedAssetData);
       setSuccessMessage("Asset created successfully!");
       reset();
     } catch (error) {
