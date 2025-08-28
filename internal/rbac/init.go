@@ -82,13 +82,13 @@ func addTreOpsStaffUserRoleBindings() {
 
 func persistedAdminUsers() []types.User {
 	users := persistedUsersFromConfig(config.AdminUsernames())
-	removeOutdatedPersistedUsers(config.AdminUsernames(), Admin)
+	removeOutdatedPersistedUserRoleBindings(config.AdminUsernames(), Admin)
 	return users
 }
 
 func persistedTreOpsStaffUsers() []types.User {
 	users := persistedUsersFromConfig(config.TreOpsStaffUsernames())
-	removeOutdatedPersistedUsers(config.TreOpsStaffUsernames(), TreOpsStaff)
+	removeOutdatedPersistedUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
 	return users
 }
 
@@ -112,28 +112,28 @@ func persistedUsersFromConfig(usernames []types.Username) []types.User {
 	return users
 }
 
-func removeOutdatedPersistedUsers(usernames []types.Username, role RoleName) {
+func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role RoleName) {
 	db := graceful.NewDB()
-	users := []types.User{}
+	outdatedUsers := []types.User{}
 
 	userIdsWithRole, err := GetUserIdsWithRole(role)
 	if err != nil {
 		log.Warn().Err(err).Msg("failed to get users with role")
 		return
 	}
-
 	if len(usernames) > 0 {
-		// if user exists but name not given in config, remove role
-		db.Where("id IN (?)", userIdsWithRole).Find(&users).Not("username IN (?)", usernames).Find(&users)
-		log.Debug().Any("users", users).Msg("users with admin or treops roles who are not in config")
+		// if user exists but name not given in config
+		db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers).Not("username IN (?)", usernames).Find(&outdatedUsers)
+		log.Debug().Any("outdated users", outdatedUsers).Msg("users with admin or treops roles who are not in config")
 
 	} else {
-		// if there are any users who have the role but no usernames were given, remove role
-		db.Where("id IN (?)", userIdsWithRole).Find(&users)
-		log.Debug().Any("users", users).Msg("no usernames given, removing all users for role")
+		// if there are any users who have the role but no usernames were given
+		db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers)
+		log.Debug().Any("outdated users", outdatedUsers).Msg("no usernames given, all users with role")
 	}
 
-	for _, user := range users {
+	// remove role bindings for outdated users
+	for _, user := range outdatedUsers {
 		_, err := RemoveRole(user, role)
 		if err != nil {
 			log.Error().Err(err).Any("user", user.Username).Msg("failed to remove role")
