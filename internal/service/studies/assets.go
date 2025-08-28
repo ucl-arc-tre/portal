@@ -2,10 +2,12 @@ package studies
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"slices"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -113,26 +115,77 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	return nil, nil
 }
 
-func (s *Service) CreateAsset(ctx context.Context, user types.User, AssetData openapi.AssetBase, studyID string) (*openapi.AssetCreateValidationError, error) {
-	log.Info().Msg("Creating asset")
+func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID string) (*openapi.AssetCreateValidationError, error) {
+	log.Info().Msg("Starting asset creation")
 
-	validationError, err := s.validateAssetData(AssetData)
+	validationError, err := s.validateAssetData(assetData)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
 
-	// AssetLocation, err := s.createAssetLocation(AssetData)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// Asset, err := s.createAsset(AssetData, AssetLocation)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// if _, err := rbac.AddAssetOwnerRole(owner, Asset.ID); err != nil {
-	// 	return nil, err
-	// }
+	_, err = s.createStudyAsset(user, assetData, studyID)
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
+}
+
+// handles the database transaction for creating a study asset
+func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase, studyID string) (*types.Asset, error) {
+	studyUUID, err := uuid.Parse(studyID)
+	if err != nil {
+		return nil, types.NewErrServerError(fmt.Errorf("invalid study ID: %w", err))
+	}
+
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Create the Asset with proper fields from AssetBase
+	asset := types.Asset{
+		UserID:                 user.ID,
+		StudyID:                studyUUID,
+		Title:                  assetData.Title,
+		Description:            assetData.Description,
+		ClassificationImpact:   string(assetData.ClassificationImpact),
+		Protection:             string(assetData.Protection),
+		LegalBasis:             assetData.LegalBasis,
+		Format:                 string(assetData.Format),
+		Expiry:                 assetData.Expiry,
+		HasDspt:                assetData.HasDspt,
+		StoredOutsideUkEea:     assetData.StoredOutsideUkEea,
+		AccessedByThirdParties: assetData.AccessedByThirdParties,
+		ThirdPartyAgreement:    assetData.ThirdPartyAgreement,
+		Status:                 string(assetData.Status),
+	}
+
+	// Create the asset
+	if err := tx.Create(&asset).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrServerError(fmt.Errorf("failed to create asset: %w", err))
+	}
+
+	// Create AssetLocation records for each location
+	for _, locationStr := range assetData.Locations {
+		assetLocation := types.AssetLocation{
+			AssetID:  asset.ID,
+			Location: locationStr,
+		}
+		if err := tx.Create(&assetLocation).Error; err != nil {
+			tx.Rollback()
+			return nil, types.NewErrServerError(fmt.Errorf("failed to create asset location: %w", err))
+		}
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		return nil, types.NewErrServerError(fmt.Errorf("failed to commit transaction: %w", err))
+	}
+
+	return &asset, nil
 }

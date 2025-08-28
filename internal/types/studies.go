@@ -58,6 +58,7 @@ type StudyAdmin struct {
 
 type Asset struct {
 	ModelAuditable
+	UserID                 uuid.UUID `gorm:"not null;index"`
 	StudyID                uuid.UUID `gorm:"not null;index"`
 	Title                  string    `gorm:"not null"`
 	Description            string    `gorm:"type:text;not null"`
@@ -73,6 +74,7 @@ type Asset struct {
 	Status                 string    `gorm:"not null"`
 
 	// Relationships
+	User      User            `gorm:"foreignKey:UserID"`
 	Study     Study           `gorm:"foreignKey:StudyID"`
 	Locations []AssetLocation `gorm:"foreignKey:AssetID"`
 }

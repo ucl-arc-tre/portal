@@ -120,9 +120,13 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	// prepare the final response
 	var response []openapi.Asset
 	for _, asset := range assets {
+		AssetUserIDStr := asset.UserID.String()
+		AssetStudyIDStr := asset.StudyID.String()
 
 		response = append(response, openapi.Asset{
 			Id:                     asset.ID.String(),
+			UserId:                 &AssetUserIDStr,
+			StudyId:                &AssetStudyIDStr,
 			Title:                  asset.Title,
 			Description:            asset.Description,
 			ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),
@@ -136,8 +140,8 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 			AccessedByThirdParties: asset.AccessedByThirdParties,
 			ThirdPartyAgreement:    asset.ThirdPartyAgreement,
 			Status:                 openapi.AssetStatus(asset.Status),
-			CreatedAt:              asset.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt:              asset.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			CreatedAt:              asset.CreatedAt.Format(config.TimeFormat),
+			UpdatedAt:              asset.UpdatedAt.Format(config.TimeFormat),
 		})
 	}
 
