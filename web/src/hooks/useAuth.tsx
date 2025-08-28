@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getAuth } from "@/openapi";
 import { Auth } from "@/openapi";
 
@@ -24,7 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userData, setUserData] = useState<Auth | null>(null);
 
   const cancelled = useRef(false);
-  const refreshAuth = async () => {
+
+  const refreshAuth = useCallback(async () => {
     try {
       const response = await getAuth();
 
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       if (!cancelled.current) setAuthInProgress(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshAuth();
