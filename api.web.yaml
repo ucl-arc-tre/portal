@@ -705,6 +705,12 @@ components:
             id:
               type: string
               description: Unique identifier for the asset
+            user_id:
+              type: string
+              description: Unique identifier of the user who uploaded the asset
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the asset belongs
             created_at:
               type: string
               description: Time in RFC3339 format when the asset was created

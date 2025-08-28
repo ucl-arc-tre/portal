@@ -152,6 +152,9 @@ type Asset struct {
 	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
+	// StudyId Unique identifier of the study to which the asset belongs
+	StudyId *string `json:"study_id,omitempty"`
+
 	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
 	ThirdPartyAgreement string `json:"third_party_agreement"`
 
@@ -160,6 +163,9 @@ type Asset struct {
 
 	// UpdatedAt Time in RFC3339 format when the asset was last updated
 	UpdatedAt string `json:"updated_at"`
+
+	// UserId Unique identifier of the user who uploaded the asset
+	UserId *string `json:"user_id,omitempty"`
 }
 
 // AssetClassificationImpact Classification level of the asset
