@@ -38,7 +38,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseClassificationImpactHighlyConfidential,
 	}
 	if !slices.Contains(validClassifications, assetData.ClassificationImpact) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "classification_impact must be one of: Public, Confidential, Highly confidential"}, nil
+		return &openapi.AssetCreateValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
 	}
 
 	// Validate locations
@@ -52,10 +52,11 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 	validProtections := []openapi.AssetBaseProtection{
 		openapi.AssetBaseProtectionAnonymisation,
+		openapi.AssetBaseProtectionPseudonymisation,
 		openapi.AssetBaseProtectionIdentifiableLowConfidencePseudonymisation,
 	}
 	if !slices.Contains(validProtections, assetData.Protection) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "protection must be one of: anonymisation, identifiable_low_confidence_pseudonymisation"}, nil
+		return &openapi.AssetCreateValidationError{ErrorMessage: "protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation"}, nil
 	}
 
 	// Validate legal_basis
@@ -73,7 +74,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseFormatOther,
 	}
 	if !slices.Contains(validFormats, assetData.Format) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "format must be one of: Electronic, Paper, Other"}, nil
+		return &openapi.AssetCreateValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
 	}
 
 	// Validate expiry field
@@ -91,7 +92,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseStatusDestroyed,
 	}
 	if !slices.Contains(validStatuses, assetData.Status) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "status must be one of: Active, Awaiting, Destroyed"}, nil
+		return &openapi.AssetCreateValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
 	}
 
 	// Validate third_party_agreement when accessed_by_third_parties is true

@@ -122,7 +122,7 @@ export type AssetBase = {
     /**
      * Classification level of the asset
      */
-    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
+    classification_impact: 'public' | 'confidential' | 'highly_confidential';
     /**
      * Storage locations and touchpoints for the asset
      */
@@ -130,7 +130,7 @@ export type AssetBase = {
     /**
      * Type of protection applied to the asset
      */
-    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    protection: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
     /**
      * Legal basis for holding the asset
      */
@@ -138,7 +138,7 @@ export type AssetBase = {
     /**
      * Format of the asset
      */
-    format: 'Electronic' | 'Paper' | 'Other';
+    format: 'electronic' | 'paper' | 'other';
     /**
      * Retention expiry date of the asset
      */
@@ -162,7 +162,7 @@ export type AssetBase = {
     /**
      * Status of the asset
      */
-    status: 'Active' | 'Awaiting' | 'Destroyed';
+    status: 'active' | 'awaiting' | 'destroyed';
 };
 
 /**

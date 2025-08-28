@@ -645,9 +645,9 @@ components:
         classification_impact:
           type: string
           enum:
-            - Public
-            - Confidential
-            - Highly confidential
+            - public
+            - confidential
+            - highly_confidential
           description: Classification level of the asset
         locations:
           type: array
@@ -658,6 +658,7 @@ components:
           type: string
           enum:
             - anonymisation
+            - pseudonymisation
             - identifiable_low_confidence_pseudonymisation
           description: Type of protection applied to the asset
         legal_basis:
@@ -666,9 +667,9 @@ components:
         format:
           type: string
           enum:
-            - Electronic
-            - Paper
-            - Other
+            - electronic
+            - paper
+            - other
           description: Format of the asset
         expiry:
           type: string
@@ -688,9 +689,9 @@ components:
         status:
           type: string
           enum:
-            - Active
-            - Awaiting
-            - Destroyed
+            - active
+            - awaiting
+            - destroyed
           description: Status of the asset
 
     Asset:

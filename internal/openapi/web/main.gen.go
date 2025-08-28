@@ -19,56 +19,58 @@ const (
 
 // Defines values for AssetClassificationImpact.
 const (
-	AssetClassificationImpactConfidential       AssetClassificationImpact = "Confidential"
-	AssetClassificationImpactHighlyConfidential AssetClassificationImpact = "Highly confidential"
-	AssetClassificationImpactPublic             AssetClassificationImpact = "Public"
+	AssetClassificationImpactConfidential       AssetClassificationImpact = "confidential"
+	AssetClassificationImpactHighlyConfidential AssetClassificationImpact = "highly_confidential"
+	AssetClassificationImpactPublic             AssetClassificationImpact = "public"
 )
 
 // Defines values for AssetFormat.
 const (
-	AssetFormatElectronic AssetFormat = "Electronic"
-	AssetFormatOther      AssetFormat = "Other"
-	AssetFormatPaper      AssetFormat = "Paper"
+	AssetFormatElectronic AssetFormat = "electronic"
+	AssetFormatOther      AssetFormat = "other"
+	AssetFormatPaper      AssetFormat = "paper"
 )
 
 // Defines values for AssetProtection.
 const (
 	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
 	AssetProtectionIdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
+	AssetProtectionPseudonymisation                          AssetProtection = "pseudonymisation"
 )
 
 // Defines values for AssetStatus.
 const (
-	AssetStatusActive    AssetStatus = "Active"
-	AssetStatusAwaiting  AssetStatus = "Awaiting"
-	AssetStatusDestroyed AssetStatus = "Destroyed"
+	AssetStatusActive    AssetStatus = "active"
+	AssetStatusAwaiting  AssetStatus = "awaiting"
+	AssetStatusDestroyed AssetStatus = "destroyed"
 )
 
 // Defines values for AssetBaseClassificationImpact.
 const (
-	AssetBaseClassificationImpactConfidential       AssetBaseClassificationImpact = "Confidential"
-	AssetBaseClassificationImpactHighlyConfidential AssetBaseClassificationImpact = "Highly confidential"
-	AssetBaseClassificationImpactPublic             AssetBaseClassificationImpact = "Public"
+	AssetBaseClassificationImpactConfidential       AssetBaseClassificationImpact = "confidential"
+	AssetBaseClassificationImpactHighlyConfidential AssetBaseClassificationImpact = "highly_confidential"
+	AssetBaseClassificationImpactPublic             AssetBaseClassificationImpact = "public"
 )
 
 // Defines values for AssetBaseFormat.
 const (
-	AssetBaseFormatElectronic AssetBaseFormat = "Electronic"
-	AssetBaseFormatOther      AssetBaseFormat = "Other"
-	AssetBaseFormatPaper      AssetBaseFormat = "Paper"
+	AssetBaseFormatElectronic AssetBaseFormat = "electronic"
+	AssetBaseFormatOther      AssetBaseFormat = "other"
+	AssetBaseFormatPaper      AssetBaseFormat = "paper"
 )
 
 // Defines values for AssetBaseProtection.
 const (
 	AssetBaseProtectionAnonymisation                             AssetBaseProtection = "anonymisation"
 	AssetBaseProtectionIdentifiableLowConfidencePseudonymisation AssetBaseProtection = "identifiable_low_confidence_pseudonymisation"
+	AssetBaseProtectionPseudonymisation                          AssetBaseProtection = "pseudonymisation"
 )
 
 // Defines values for AssetBaseStatus.
 const (
-	AssetBaseStatusActive    AssetBaseStatus = "Active"
-	AssetBaseStatusAwaiting  AssetBaseStatus = "Awaiting"
-	AssetBaseStatusDestroyed AssetBaseStatus = "Destroyed"
+	AssetBaseStatusActive    AssetBaseStatus = "active"
+	AssetBaseStatusAwaiting  AssetBaseStatus = "awaiting"
+	AssetBaseStatusDestroyed AssetBaseStatus = "destroyed"
 )
 
 // Defines values for AuthRoles.

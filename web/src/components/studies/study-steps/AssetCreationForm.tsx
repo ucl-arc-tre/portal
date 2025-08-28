@@ -151,9 +151,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
             className={errors.classification_impact ? styles.error : ""}
           >
             <option value="">Select classification</option>
-            <option value="Public">Public</option>
-            <option value="Confidential">Confidential</option>
-            <option value="Highly confidential">Highly confidential</option>
+            <option value="public">Public</option>
+            <option value="confidential">Confidential</option>
+            <option value="highly_confidential">Highly confidential</option>
           </select>
           {errors.classification_impact && (
             <span className={styles["error-text"]}>{errors.classification_impact.message}</span>
@@ -405,9 +405,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
             className={errors.status ? styles.error : ""}
           >
             <option value="">Select status</option>
-            <option value="Active">Active</option>
-            <option value="Awaiting">Awaiting</option>
-            <option value="Destroyed">Destroyed</option>
+            <option value="active">Active</option>
+            <option value="awaiting">Awaiting</option>
+            <option value="destroyed">Destroyed</option>
           </select>
           {errors.status && <span className={styles["error-text"]}>{errors.status.message}</span>}
         </div>
@@ -415,15 +415,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
         <div className={styles.actions}>
           <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
             {isSubmitting ? "Creating..." : "Create Asset"}
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            // onClick={() => setSelectedStudy(null)}
-            disabled={isSubmitting}
-          >
-            Cancel
           </Button>
         </div>
       </form>
