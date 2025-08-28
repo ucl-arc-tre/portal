@@ -52,18 +52,6 @@ export default function PeoplePage() {
       </Alert>
     );
 
-  if (!users || users.length === 0)
-    return (
-      <Box>
-        <div className={styles["no-users-found"]}>No users found</div>
-        {errorMessage && (
-          <Alert type="error">
-            <AlertMessage>{errorMessage}</AlertMessage>
-          </Alert>
-        )}
-      </Box>
-    );
-
   return (
     <>
       <MetaHead
@@ -91,7 +79,18 @@ export default function PeoplePage() {
         </div>
       )}
       {!isAdmin && <Callout construction />}
-      <UserDataTable canEdit={true} users={users} setUsers={setUsers} isLoading={isLoading} />
+      {!users || users.length === 0 ? (
+        <Box>
+          <div className={styles["no-users-found"]}>No users found</div>
+          {errorMessage && (
+            <Alert type="error">
+              <AlertMessage>{errorMessage}</AlertMessage>
+            </Alert>
+          )}
+        </Box>
+      ) : (
+        <UserDataTable canEdit={true} users={users} setUsers={setUsers} isLoading={isLoading} />
+      )}
     </>
   );
 }
