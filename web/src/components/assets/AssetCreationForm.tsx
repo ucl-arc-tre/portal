@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Button from "../../ui/Button";
+import Button from "../ui/Button";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";

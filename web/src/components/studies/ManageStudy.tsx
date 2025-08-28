@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Study, Auth } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
-import StudyAgreement from "./study-steps/StudyAgreement";
-import StudyAssets from "./study-steps/StudyAssets";
+import StudyAgreement from "./StudyAgreement";
+import Assets from "../assets/Assets";
+
 import styles from "./ManageStudy.module.css";
 
 type ManageStudyProps = {
@@ -48,11 +49,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
     if (!assetManagementCompleted) {
       return (
-        <StudyAssets
-          studyId={study.id}
-          studyTitle={study.title}
-          setAssetManagementCompleted={setAssetManagementCompleted}
-        />
+        <Assets studyId={study.id} studyTitle={study.title} setAssetManagementCompleted={setAssetManagementCompleted} />
       );
     }
   };
@@ -76,7 +73,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
       {studyStepsCompleted && (
         <div className={styles["completed-section"]}>
-          <StudyAssets studyId={study.id} studyTitle={study.title} />
+          <Assets studyId={study.id} studyTitle={study.title} />
         </div>
       )}
     </>

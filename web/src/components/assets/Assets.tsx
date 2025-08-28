@@ -1,59 +1,134 @@
-// import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  Asset,
+  AssetBase,
+  AssetCreateValidationError,
+  getStudiesByStudyIdAssets,
+  postStudiesByStudyIdAssets,
+} from "@/openapi";
 
-// import AssetForm from "./AssetForm";
-// import Button from "@/components/ui/Button";
+import AssetCreationForm from "./AssetCreationForm";
+import Button from "@/components/ui/Button";
+import AssetCard from "./AssetCard";
 
-// import styles from "./Assets.module.css";
+import styles from "./Assets.module.css";
 
-// type AssetFormData = {
-//   title: string;
-//   description: string;
-//   classification_impact: string;
-//   protection: string;
-//   legal_basis: string;
-//   format: string;
-//   expiry: string;
-//   location: string[];
-//   has_dspt: boolean;
-//   stored_outside_uk_eea: boolean;
-//   accessed_by_third_parties: boolean;
-//   status: string;
-// };
+type StudyAssetsProps = {
+  studyId: string;
+  studyTitle: string;
+  setAssetManagementCompleted?: (completed: boolean) => void;
+};
 
-// type AssetsProps = {
-//   studies: Study[];
-// };
+export default function StudyAssets(props: StudyAssetsProps) {
+  const { studyId, studyTitle, setAssetManagementCompleted } = props;
 
-export default function Assets() {
-  // const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
+  const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showAssetForm, setShowAssetForm] = useState(false);
 
-  // const handleAssetSubmit = async (data: AssetFormData) => {
-  //   // TODO: Implement API call to create asset
-  //   console.log("Asset data:", { ...data, studyId: selectedStudy?.id });
+  useEffect(() => {
+    const fetchStudyAssetData = async () => {
+      setIsLoading(true);
 
-  //   // Simulate API call
-  //   await new Promise((resolve) => setTimeout(resolve, 1000));
+      try {
+        setError(null);
 
-  //   // const response = await createAsset({ ...data, studyId: selectedStudy?.id });
-  //   // if (!response.ok) throw new Error('Failed to create asset');
-  // };
+        const studyAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
+        console.log(studyAssetResult);
+
+        if (studyAssetResult.response.status === 200 && studyAssetResult.data) {
+          setStudyAssets(studyAssetResult.data);
+
+          if (studyAssetResult.data.length > 0) {
+            if (setAssetManagementCompleted) {
+              setAssetManagementCompleted(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load study assets:", err);
+        setError("Failed to load study assets. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStudyAssetData();
+  }, [studyId, setAssetManagementCompleted]);
+
+  const handleAssetSubmit = async (assetData: AssetFormData) => {
+    console.log("Creating asset:", assetData);
+
+    setError(null);
+
+    const response = await postStudiesByStudyIdAssets({
+      path: { studyId },
+      body: assetData as AssetBase,
+    });
+
+    console.log("asset creation response:", response);
+
+    if (response.error) {
+      const errorData = response.error as AssetCreateValidationError;
+      if (errorData?.error_message) {
+        throw new Error(errorData.error_message);
+      }
+    }
+
+    // Refresh assets list after successful creation
+    const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
+    if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
+      setStudyAssets(updatedAssetsResult.data);
+      if (setAssetManagementCompleted) {
+        setAssetManagementCompleted(true);
+      }
+      setShowAssetForm(false);
+    }
+  };
+
+  if (isLoading) return null;
 
   return (
-    <>
-      {/* <div className={styles["selected-study-header"]}>
-        <div className={styles["study-breadcrumb"]}>
-          <span>
-            Study: <strong>{selectedStudy?.title}</strong>
-          </span>
+    <section className={styles["study-assets-container"]} data-cy="study-assets">
+      <h2 className="subtitle">Study Assets for study: {studyTitle}</h2>
 
-          <Button variant="tertiary" size="small" onClick={() => setSelectedStudy(null)}>
-            Change Study
-          </Button>
+      {error && (
+        <div className={styles["error-message"]}>
+          <strong>Error:</strong> {error}
         </div>
-      </div>
+      )}
 
-      <AssetForm onSubmit={handleAssetSubmit} setSelectedStudy={setSelectedStudy} /> */}
-      Placeholder
-    </>
+      {studyAssets.length === 0 ? (
+        <div>
+          <p className={styles["no-assets-message"]}>
+            No assets found for this study. You need to create at least one asset to continue.
+          </p>
+
+          <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />
+        </div>
+      ) : (
+        <div>
+          <div className={styles["assets-summary"]}>
+            <span>Assets for this study:</span>
+            <span className={styles["assets-count-badge"]}>{studyAssets.length}</span>
+          </div>
+
+          <div className={styles["asset-actions"]}>
+            <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary">
+              {showAssetForm ? "Cancel" : "Create Another Asset"}
+            </Button>
+          </div>
+
+          {showAssetForm && <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />}
+
+          <div className={styles["assets-grid"]}>
+            {studyAssets.map((asset) => (
+              <AssetCard key={asset.id} asset={asset} />
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
