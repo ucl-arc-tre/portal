@@ -35,6 +35,7 @@ describe(`People page content`, () => {
     cy.loginAsBase();
     cy.mockAuthAsTreOpsStaff();
     cy.visit("/people");
+    cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("not.exist");
     cy.contains("View approved researchers").should("be.visible");
@@ -85,7 +86,7 @@ describe("Invite externals", () => {
     cy.get("[data-cy='show-invite-input']").should("not.exist");
   });
 
-  it("should not be visible to TRE ops staff staff", () => {
+  it("should not be visible to TRE ops staff", () => {
     cy.loginAsBase();
     cy.mockAuthAsTreOpsStaff();
     cy.visit("/people");
@@ -105,10 +106,11 @@ describe("Invite externals", () => {
     cy.get("input[name='email']").should("not.have.value", "hello@example.com");
   });
 
-  it("should be visable to & usable by an approved researcher who is staff", () => {
+  it("should be visable to & usable by an IAO who is staff", () => {
     cy.loginAsBase();
     cy.mockAuthAsBaseInformationAssetOwner();
     cy.visit("/people");
+    cy.waitForAuth();
     cy.mockInviteExternalResearcher("hello@example.com");
 
     cy.get("[data-cy='show-invite-input']").should("be.visible").click();
