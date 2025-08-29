@@ -152,7 +152,6 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	log.Info().Msg("Asset creation post route")
 
 	AssetData := openapi.AssetBase{}
 	if err := bindJSONOrSetError(ctx, &AssetData); err != nil {
