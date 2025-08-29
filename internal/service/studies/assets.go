@@ -102,16 +102,6 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		return &openapi.AssetCreateValidationError{ErrorMessage: "third_party_agreement is required when accessed_by_third_parties is true"}, nil
 	}
 
-	// Check if the Asset title already exists
-	// var count int64
-	// err := s.db.Model(&types.Asset{}).Where("title = ?", assetData.Title).Count(&count).Error
-	// if err != nil {
-	// 	return nil, types.NewErrServerError(fmt.Errorf("failed to check for duplicate asset title: %w", err))
-	// }
-	// if count > 0 {
-	// 	return &openapi.AssetCreateValidationError{ErrorMessage: fmt.Sprintf("an asset with the title [%v] already exists", assetData.Title)}, nil
-	// }
-
 	return nil, nil
 }
 
