@@ -3,6 +3,12 @@
   justify-items: end;
   height: 4rem;
   display: grid;
+  grid-gap: 10px;
+  grid-template-columns: auto auto auto;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
+}
+
+.no-users-found {
+  text-align: center;
 }

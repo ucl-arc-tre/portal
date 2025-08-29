@@ -1,14 +1,3 @@
-.button-container {
-  justify-self: end;
-  justify-items: end;
-  height: 4rem;
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: auto auto auto;
-  margin-bottom: 0.5rem;
-  margin-top: 1rem;
-}
-
 .table {
   width: 100%;
   margin-block: 1rem;

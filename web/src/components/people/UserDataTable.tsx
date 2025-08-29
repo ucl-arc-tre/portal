@@ -1,54 +1,30 @@
-import { ConfirmedAgreement, getUsers, UserData, TrainingRecord } from "@/openapi";
-import { useEffect, useState } from "react";
-import styles from "./AdminView.module.css";
-import Button from "../ui/Button";
-import TrainingForm from "./TrainingForm";
-import ApprovedResearcherImport from "./ApprovedResearcherImport";
-import { CheckIcon, TrainingKindOptions, XIcon } from "../shared/exports";
+import { ConfirmedAgreement, TrainingRecord, UserData } from "@/openapi";
+import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/exports";
 import Loading from "../ui/Loading";
-import ExternalInvite from "./ExternalInvite";
-import { convertRFC3339ToDDMMYYYY } from "../shared/exports";
+import Button from "../ui/Button";
 
-function getHumanReadableTrainingKind(trainingKind: string) {
-  // getting the key from the value
-  const humanReadableTrainingKind = Object.entries(TrainingKindOptions).find(
-    ([, value]) => value === trainingKind
-  )?.[0];
+import styles from "./UserDataTable.module.css";
+import { useState } from "react";
+import TrainingForm from "./TrainingForm";
 
-  return humanReadableTrainingKind;
-}
-
-export default function AdminView() {
-  const [users, setUsers] = useState<Array<UserData> | null>(null);
+type Props = {
+  canEdit: boolean;
+  users: Array<UserData>;
+  setUsers: (users: Array<UserData>) => void;
+  isLoading: boolean;
+};
+export default function UserDataTable(Props: Props) {
+  const { canEdit, users, setUsers, isLoading } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const [id, setId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
 
-  useEffect(() => {
-    const fetchPeople = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getUsers();
-        if (response.response.ok && response.data) {
-          setUsers(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to get people:", error);
-        setUsers(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchPeople();
-  }, []);
-
-  const updatePersonUI = (id: string, training: TrainingRecord) => {
-    // get people object and find the person with the right id then update the training
+  const updateTrainingDateCell = (id: string, training: TrainingRecord) => {
+    // get people object and find the person with the right selectedUserId then update the training
     if (!users) return;
 
     const updatedPeople = [...users];
-    const personIndex = updatedPeople.findIndex((person) => person.user.id === id);
+    const personIndex = updatedPeople.findIndex((person) => person.user.id === selectedUserId);
 
     if (personIndex !== -1) {
       const person = updatedPeople[personIndex];
@@ -64,30 +40,28 @@ export default function AdminView() {
       setUsers(updatedPeople);
     }
   };
-
-  const handleEditTrainingClick = (id: string) => {
-    setId(id);
+  const handleEditTrainingClick = (selectedUserId: string) => {
+    setSelectedUserId(selectedUserId);
     setTrainingDialogOpen(true);
   };
 
   if (!users) return null;
-
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <h2>Your Tasks</h2>
         <Loading message="Loading users..." />
       </div>
     );
   }
+
   return (
     <>
-      <div className={styles["button-container"]}>
-        <ApprovedResearcherImport />
-        <ExternalInvite />
-      </div>
       {trainingDialogOpen && (
-        <TrainingForm id={id} setTrainingDialogOpen={setTrainingDialogOpen} updatePersonUI={updatePersonUI} />
+        <TrainingForm
+          userId={selectedUserId}
+          setTrainingDialogOpen={setTrainingDialogOpen}
+          updateTrainingDateCell={updateTrainingDateCell}
+        />
       )}
       <p>
         Please note the dates shown are when the agreement/training is <em>valid from</em>
@@ -107,7 +81,13 @@ export default function AdminView() {
               <td className={styles.user}>
                 {userData.user.username} <small>{userData.user.id}</small>
               </td>
-              <td className={styles.roles}>{userData.roles.join(", ")}</td>
+              <td className={styles.roles}>
+                {userData.roles.map((role) => (
+                  <span key={role} className="role">
+                    {role}
+                  </span>
+                ))}
+              </td>
               <td className={styles.agreements}>
                 {userData.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                   <div key={agreement.agreement_type} className={styles.agreement}>
@@ -137,14 +117,16 @@ export default function AdminView() {
                     </div>
                   ))}{" "}
                 </div>
-                <Button
-                  variant="tertiary"
-                  size="small"
-                  onClick={() => handleEditTrainingClick(userData.user.id)}
-                  className={styles.edit}
-                >
-                  Edit
-                </Button>
+                {canEdit && (
+                  <Button
+                    variant="tertiary"
+                    size="small"
+                    onClick={() => handleEditTrainingClick(userData.user.id)}
+                    className={styles.edit}
+                  >
+                    Edit
+                  </Button>
+                )}
               </td>
             </tr>
           ))}

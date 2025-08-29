@@ -22,6 +22,7 @@ const (
 	ApprovedStaffResearcher       = RoleName(openapi.AuthRolesApprovedStaffResearcher)       // Member of staff at the institution thats also an approved researcher
 	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
 	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
+	TreOpsStaff                   = RoleName(openapi.AuthRolesTreOpsStaff)                   // Lesser admin role for tre ops staff
 
 	ReadAction  = Action("read")
 	WriteAction = Action("write")
@@ -112,6 +113,21 @@ func Roles(user types.User) ([]RoleName, error) {
 func HasRole(user types.User, role RoleName) (bool, error) {
 	hasRole, err := enforcer.HasRoleForUser(user.ID.String(), string(role))
 	return hasRole, types.NewErrServerError(err)
+}
+
+func GetUserIdsWithRole(role RoleName) ([]uuid.UUID, error) {
+	userIds, err := enforcer.GetUsersForRole(string(role))
+	if err != nil {
+		return nil, err
+	}
+
+	ids := []uuid.UUID{}
+	for _, id := range userIds {
+		uid := uuid.MustParse(id)
+		ids = append(ids, uid)
+	}
+
+	return ids, types.NewErrServerError(err)
 }
 
 func makeCasbinModel() model.Model {
