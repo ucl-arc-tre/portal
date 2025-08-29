@@ -188,6 +188,18 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
         <div className={styles.field}>
           <label htmlFor="legal_basis">What is the legal basis for holding this asset? *</label>
+          <div className={styles["info-text"]}>
+            <p>
+              To learn more about the legal basis requirements refer to{" "}
+              <a
+                href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                UK GDPR guidance
+              </a>
+            </p>
+          </div>
           <input
             id="legal_basis"
             type="text"
