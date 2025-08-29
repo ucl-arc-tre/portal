@@ -133,7 +133,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 
 	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
-		UserID:                 user.ID,
+		CreatorUserID:          user.ID,
 		StudyID:                studyID,
 		Title:                  assetData.Title,
 		Description:            assetData.Description,

@@ -174,9 +174,9 @@ export type Asset = AssetBase & {
      */
     id: string;
     /**
-     * Unique identifier of the user who uploaded the asset
+     * Unique identifier of the user who created the asset
      */
-    user_id?: string;
+    creator_user_id?: string;
     /**
      * Unique identifier of the study to which the asset belongs
      */

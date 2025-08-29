@@ -125,6 +125,9 @@ type Asset struct {
 	// CreatedAt Time in RFC3339 format when the asset was created
 	CreatedAt string `json:"created_at"`
 
+	// CreatorUserId Unique identifier of the user who created the asset
+	CreatorUserId *string `json:"creator_user_id,omitempty"`
+
 	// Description Description of the asset
 	Description string `json:"description"`
 
@@ -166,9 +169,6 @@ type Asset struct {
 
 	// UpdatedAt Time in RFC3339 format when the asset was last updated
 	UpdatedAt string `json:"updated_at"`
-
-	// UserId Unique identifier of the user who uploaded the asset
-	UserId *string `json:"user_id,omitempty"`
 }
 
 // AssetClassificationImpact Classification level of the asset

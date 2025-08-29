@@ -707,9 +707,9 @@ components:
             id:
               type: string
               description: Unique identifier for the asset
-            user_id:
+            creator_user_id:
               type: string
-              description: Unique identifier of the user who uploaded the asset
+              description: Unique identifier of the user who created the asset
             study_id:
               type: string
               description: Unique identifier of the study to which the asset belongs
