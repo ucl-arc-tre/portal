@@ -110,7 +110,7 @@ export default function Assets(props: StudyAssetsProps) {
           You can read more detailed information about assets in our
           <Button href="/glossary" variant="tertiary" size="small" inline>
             Glossary
-          </Button>{" "}
+          </Button>
           and the{" "}
           <a
             href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
