@@ -395,9 +395,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
             className={errors.status ? styles.error : ""}
           >
             <option value="">Select status</option>
-            <option value="active">Active</option>
-            <option value="awaiting">Awaiting</option>
-            <option value="destroyed">Destroyed</option>
+            <option value="active">Active: asset is in environment</option>
+            <option value="awaiting">Awaiting: asset awaiting creation in environment</option>
+            <option value="destroyed">Destroyed: asset has been destroyed in environment</option>
           </select>
           {errors.status && <span className={styles["error-text"]}>{errors.status.message}</span>}
         </div>
