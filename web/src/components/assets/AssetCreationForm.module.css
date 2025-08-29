@@ -145,7 +145,7 @@
 .radio-label {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
   cursor: pointer;
   font-weight: 500 !important;
   padding: 1rem 1.25rem;
@@ -154,7 +154,7 @@
   background-color: #f8f9fa;
   transition: all 0.2s ease;
   min-width: 90px;
-  justify-content: center;
+  text-align: center;
 }
 
 .radio-label:hover {
@@ -169,8 +169,8 @@
 }
 
 .radio {
-  width: auto !important;
-  margin: 0 0.5rem 0 0 !important;
+  appearance: none;
+  display: none;
 }
 
 .ucl-guidance {
