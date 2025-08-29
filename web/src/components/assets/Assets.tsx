@@ -37,7 +37,6 @@ export default function Assets(props: StudyAssetsProps) {
         setError(null);
 
         const studyAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-        console.log(studyAssetResult);
 
         if (studyAssetResult.response.status === 200 && studyAssetResult.data) {
           setStudyAssets(studyAssetResult.data);
@@ -68,8 +67,6 @@ export default function Assets(props: StudyAssetsProps) {
       path: { studyId },
       body: assetData as AssetBase,
     });
-
-    console.log("asset creation response:", response);
 
     if (response.error) {
       const errorData = response.error as AssetCreateValidationError;
