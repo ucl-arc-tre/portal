@@ -151,6 +151,11 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
+	studyUUID, err := uuid.Parse(studyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		return
+	}
 
 	assetData := openapi.AssetBase{}
 	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
@@ -158,7 +163,7 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateAsset(ctx, user, assetData, studyId)
+	validationError, err := h.studies.CreateAsset(ctx, user, assetData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to create asset")
 		return

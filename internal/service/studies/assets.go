@@ -105,7 +105,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	return nil, nil
 }
 
-func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID string) (*openapi.AssetCreateValidationError, error) {
+func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.AssetCreateValidationError, error) {
 	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
 
 	validationError, err := s.validateAssetData(assetData)
@@ -122,12 +122,7 @@ func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData op
 }
 
 // handles the database transaction for creating a study asset
-func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase, studyID string) (*types.Asset, error) {
-	studyUUID, err := uuid.Parse(studyID)
-	if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("invalid study ID: %w", err))
-	}
-
+func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
@@ -139,7 +134,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
 		UserID:                 user.ID,
-		StudyID:                studyUUID,
+		StudyID:                studyID,
 		Title:                  assetData.Title,
 		Description:            assetData.Description,
 		ClassificationImpact:   string(assetData.ClassificationImpact),
