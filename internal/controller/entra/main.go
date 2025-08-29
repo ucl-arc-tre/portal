@@ -184,3 +184,29 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 	return err
 
 }
+
+func (c *Controller) SearchForUser(ctx context.Context, query string) (*UserData, error) {
+	// do search query and check in email, principal name and maybe display name
+
+	// 	requestSearch := "\"displayName:%s\" OR \"principalName:%s\" OR \"mail:%s\""
+	// 	entraQuery := fmt.Sprintf(requestSearch, query, query, query)
+
+	// 	requestParameters := &graphgroups.GroupsRequestBuilderGetQueryParameters{
+	// 	Search: &entraQuery,
+	// }
+
+	configuration := &graphusers.ItemPeopleRequestBuilderGetRequestConfiguration{
+		QueryParameters: &graphusers.ItemPeopleRequestBuilderGetQueryParameters{
+			Search: &query,
+		},
+	}
+
+	data, err := c.client.Me().People().Get(ctx, configuration)
+	if err != nil {
+		return nil, err
+	}
+	log.Debug().Any("data", data).Msg("Retrieved user data from Entra")
+
+	return nil, nil
+
+}

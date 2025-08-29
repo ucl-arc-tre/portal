@@ -16,7 +16,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-func (h *Handler) GetUsers(ctx *gin.Context) {
+func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
+	// for search, check entra then find matches in our db, based on user principal
 	user := middleware.GetUser(ctx)
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
@@ -29,14 +30,26 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 		return
 	}
 
+	query, hasQuery := ctx.Params.Get("find")
+
 	if isAdmin {
 		// retrieve auth + agreements + training info
-		people, err := h.users.AllUsers()
-		if err != nil {
-			setError(ctx, err, "Failed to get people")
-			return
+		if hasQuery {
+			people, err := h.users.SearchEntraForUserAndMatch(ctx, query)
+			if err != nil {
+				setError(ctx, err, "Failed to get people")
+				return
+			}
+			ctx.JSON(http.StatusOK, people)
+
+		} else {
+			people, err := h.users.AllUsers()
+			if err != nil {
+				setError(ctx, err, "Failed to get people")
+				return
+			}
+			ctx.JSON(http.StatusOK, people)
 		}
-		ctx.JSON(http.StatusOK, people)
 
 	} else if isTreOpsStaff {
 		// retrieve auth + agreements + training info

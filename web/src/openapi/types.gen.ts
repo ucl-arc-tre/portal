@@ -523,7 +523,12 @@ export type GetAgreementsByAgreementTypeResponse = GetAgreementsByAgreementTypeR
 export type GetUsersData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * user details to lookup by
+         */
+        find?: string;
+    };
     url: '/users';
 };
 

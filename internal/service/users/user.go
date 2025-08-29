@@ -125,3 +125,21 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	}
 	return user, types.NewErrServerError(result.Error)
 }
+
+func (s *Service) SearchEntraForUserAndMatch(ctx context.Context, query string) (*types.User, error) {
+	// query entra
+	userData, err := s.entra.SearchForUser(ctx, query)
+
+	// if result/s returned, match to user in our db based on pricipal name
+	if err != nil {
+		return nil, err
+	}
+	if userData == nil {
+		return nil, types.NewNotFoundError("user not found")
+	}
+	user, err := s.UserByUsername(types.Username(*userData.Email))
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
