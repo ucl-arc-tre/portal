@@ -3,7 +3,7 @@ package studies
 import (
 	"context"
 	"fmt"
-	"strings"
+	"regexp"
 
 	"slices"
 
@@ -13,27 +13,25 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+var (
+	assetTitlePattern       = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`) // 4-50 chars, starts/ends with alphanumeric, only letters/numbers/spaces/hyphens
+	assetDescriptionPattern = regexp.MustCompile(`^.{4,255}$`)           // 4-255 characters, any content
+	textField500Pattern     = regexp.MustCompile(`^.{1,500}$`)           // 1-500 characters, any content
+	expiryPattern           = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)  // YYYY-MM-DD date format
+)
+
 func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.AssetCreateValidationError, error) {
 	// Validate title
-	if strings.TrimSpace(assetData.Title) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "asset title is required"}, nil
-	}
-	if !titlePattern.MatchString(assetData.Title) {
+	if !assetTitlePattern.MatchString(assetData.Title) {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	// Validate description
-	if strings.TrimSpace(assetData.Description) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "asset description is required"}, nil
-	}
-	if len(strings.TrimSpace(assetData.Description)) < 4 || len(assetData.Description) > 255 {
+	if !assetDescriptionPattern.MatchString(assetData.Description) {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
 	}
 
 	// Validate classification_impact
-	if strings.TrimSpace(string(assetData.ClassificationImpact)) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "classification_impact is required"}, nil
-	}
 	validClassifications := []openapi.AssetBaseClassificationImpact{
 		openapi.AssetBaseClassificationImpactPublic,
 		openapi.AssetBaseClassificationImpactConfidential,
@@ -49,9 +47,6 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate protection field
-	if strings.TrimSpace(string(assetData.Protection)) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "protection is required"}, nil
-	}
 	validProtections := []openapi.AssetBaseProtection{
 		openapi.AssetBaseProtectionAnonymisation,
 		openapi.AssetBaseProtectionPseudonymisation,
@@ -62,14 +57,11 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate legal_basis
-	if strings.TrimSpace(assetData.LegalBasis) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "legal_basis is required"}, nil
+	if !textField500Pattern.MatchString(assetData.LegalBasis) {
+		return &openapi.AssetCreateValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
 	}
 
 	// Validate format field
-	if strings.TrimSpace(string(assetData.Format)) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "format is required"}, nil
-	}
 	validFormats := []openapi.AssetBaseFormat{
 		openapi.AssetBaseFormatElectronic,
 		openapi.AssetBaseFormatPaper,
@@ -80,14 +72,11 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate expiry field
-	if strings.TrimSpace(assetData.Expiry) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date is required"}, nil
+	if !expiryPattern.MatchString(assetData.Expiry) {
+		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
 
 	// Validate status field
-	if strings.TrimSpace(string(assetData.Status)) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "status is required"}, nil
-	}
 	validStatuses := []openapi.AssetBaseStatus{
 		openapi.AssetBaseStatusActive,
 		openapi.AssetBaseStatusAwaiting,
@@ -98,8 +87,8 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate third_party_agreement when accessed_by_third_parties is true
-	if assetData.AccessedByThirdParties && strings.TrimSpace(assetData.ThirdPartyAgreement) == "" {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "third_party_agreement is required when accessed_by_third_parties is true"}, nil
+	if assetData.AccessedByThirdParties && !textField500Pattern.MatchString(assetData.ThirdPartyAgreement) {
+		return &openapi.AssetCreateValidationError{ErrorMessage: "third_party_agreement must be 1-500 characters when accessed_by_third_parties is true"}, nil
 	}
 
 	return nil, nil
