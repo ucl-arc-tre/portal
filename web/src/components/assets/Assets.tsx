@@ -59,7 +59,6 @@ export default function Assets(props: StudyAssetsProps) {
   }, [studyId, setAssetManagementCompleted]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
-
     setError(null);
 
     const response = await postStudiesByStudyIdAssets({
