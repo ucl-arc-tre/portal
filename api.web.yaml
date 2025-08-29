@@ -701,6 +701,8 @@ components:
         - type: object
           required:
             - id
+            - creator_user_id
+            - study_id
             - created_at
             - updated_at
           properties:

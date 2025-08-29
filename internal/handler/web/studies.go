@@ -49,13 +49,10 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 }
 
 func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
-	AssetCreatorUserIDStr := asset.CreatorUserID.String()
-	AssetStudyIDStr := asset.StudyID.String()
-
 	return openapi.Asset{
 		Id:                     asset.ID.String(),
-		CreatorUserId:          &AssetCreatorUserIDStr,
-		StudyId:                &AssetStudyIDStr,
+		CreatorUserId:          asset.CreatorUserID.String(),
+		StudyId:                asset.StudyID.String(),
 		Title:                  asset.Title,
 		Description:            asset.Description,
 		ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),

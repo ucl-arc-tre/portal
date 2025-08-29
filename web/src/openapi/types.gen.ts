@@ -176,11 +176,11 @@ export type Asset = AssetBase & {
     /**
      * Unique identifier of the user who created the asset
      */
-    creator_user_id?: string;
+    creator_user_id: string;
     /**
      * Unique identifier of the study to which the asset belongs
      */
-    study_id?: string;
+    study_id: string;
     /**
      * Time in RFC3339 format when the asset was created
      */

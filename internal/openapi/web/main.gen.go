@@ -126,7 +126,7 @@ type Asset struct {
 	CreatedAt string `json:"created_at"`
 
 	// CreatorUserId Unique identifier of the user who created the asset
-	CreatorUserId *string `json:"creator_user_id,omitempty"`
+	CreatorUserId string `json:"creator_user_id"`
 
 	// Description Description of the asset
 	Description string `json:"description"`
@@ -159,7 +159,7 @@ type Asset struct {
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
 	// StudyId Unique identifier of the study to which the asset belongs
-	StudyId *string `json:"study_id,omitempty"`
+	StudyId string `json:"study_id"`
 
 	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
 	ThirdPartyAgreement string `json:"third_party_agreement"`
