@@ -12,6 +12,8 @@ import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
+import Callout from "../ui/Callout";
+import InfoTooltip from "../ui/InfoTooltip";
 
 type StudyAssetsProps = {
   studyId: string;
@@ -19,7 +21,7 @@ type StudyAssetsProps = {
   setAssetManagementCompleted?: (completed: boolean) => void;
 };
 
-export default function StudyAssets(props: StudyAssetsProps) {
+export default function Assets(props: StudyAssetsProps) {
   const { studyId, studyTitle, setAssetManagementCompleted } = props;
 
   const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
@@ -98,6 +100,32 @@ export default function StudyAssets(props: StudyAssetsProps) {
           <strong>Error:</strong> {error}
         </div>
       )}
+
+      <Callout definition>
+        Assets are information entities. They are owned by a <strong>study</strong>
+        <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
+        <strong>projects</strong>
+        <InfoTooltip text="Projects are owned by a study and can contain assets" />, for more detailed information and
+        an entity relationship diagram, look at our
+        <Button href="/glossary" variant="tertiary" size="small" inline>
+          Glossary
+        </Button>
+      </Callout>
+      <Callout>
+        <p>
+          Use this page to create data assets you would like to associate with your study. Assets can be any kind of
+          data entity you want to associate with your study (e.g. consent forms, physical study materials etc.). The
+          National Archives also have{" "}
+          <a
+            href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            a more thorough guide
+          </a>{" "}
+          on what assets are and how to use them.
+        </p>
+      </Callout>
 
       {studyAssets.length === 0 ? (
         <div>
