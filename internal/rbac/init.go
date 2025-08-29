@@ -1,6 +1,7 @@
 package rbac
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/casbin/casbin/v2"
@@ -82,13 +83,13 @@ func addTreOpsStaffUserRoleBindings() {
 
 func persistedAdminUsers() []types.User {
 	users := persistedUsersFromConfig(config.AdminUsernames())
-
+	removeOutdatedPersistedUserRoleBindings(config.AdminUsernames(), Admin)
 	return users
 }
 
 func persistedTreOpsStaffUsers() []types.User {
 	users := persistedUsersFromConfig(config.TreOpsStaffUsernames())
-
+	removeOutdatedPersistedUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
 	return users
 }
 
@@ -110,4 +111,32 @@ func persistedUsersFromConfig(usernames []types.Username) []types.User {
 		users = append(users, user)
 	}
 	return users
+}
+
+func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role RoleName) {
+	db := graceful.NewDB()
+	outdatedUsers := []types.User{}
+
+	userIdsWithRole, err := GetUserIdsWithRole(role)
+	if err != nil {
+		panic(fmt.Sprintf("failed to get user ids from role [%v]", err))
+	}
+	if len(usernames) > 0 {
+		err = db.Where("id IN (?)", userIdsWithRole).Not("username IN (?)", usernames).Find(&outdatedUsers).Error
+	} else {
+		err = db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers).Error
+	}
+	if err != nil {
+		panic(fmt.Sprintf("failed to get users with roles [%v]", err))
+	}
+	log.Debug().Any("outdatedUsers", outdatedUsers).Any("role", role).Msg("Users who are not in config")
+
+	// remove role bindings for outdated users
+	for _, user := range outdatedUsers {
+		_, err := RemoveRole(user, role)
+		if err != nil {
+			panic(fmt.Sprintf("failed to remove role for user [%v]", err))
+		}
+	}
+
 }
