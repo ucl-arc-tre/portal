@@ -133,7 +133,7 @@ export default function Assets(props: StudyAssetsProps) {
 
           <div className={styles["asset-actions"]}>
             <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary">
-              {showAssetForm ? "Cancel" : "Create Another Asset"}
+              {showAssetForm ? "Cancel" : "Add Asset"}
             </Button>
           </div>
 
