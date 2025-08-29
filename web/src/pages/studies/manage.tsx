@@ -163,12 +163,6 @@ export default function ManageStudyPage() {
       />
       <Title text={`Manage Study: ${study.title}`} />
 
-      <div className={styles["breadcrumb"]}>
-        <Button onClick={() => router.push("/studies")} variant="tertiary" size="small">
-          ← Back to Studies
-        </Button>
-      </div>
-
       <ManageStudy study={study} userData={userData!} />
     </>
   );
