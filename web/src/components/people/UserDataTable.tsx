@@ -1,6 +1,5 @@
 import { ConfirmedAgreement, TrainingRecord, UserData } from "@/openapi";
 import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/exports";
-import Loading from "../ui/Loading";
 import Button from "../ui/Button";
 
 import styles from "./UserDataTable.module.css";
@@ -11,10 +10,9 @@ type Props = {
   canEdit: boolean;
   users: Array<UserData>;
   setUsers: (users: Array<UserData>) => void;
-  isLoading: boolean;
 };
 export default function UserDataTable(Props: Props) {
-  const { canEdit, users, setUsers, isLoading } = Props;
+  const { canEdit, users, setUsers } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
 
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -46,13 +44,6 @@ export default function UserDataTable(Props: Props) {
   };
 
   if (!users) return null;
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <Loading message="Loading users..." />
-      </div>
-    );
-  }
 
   return (
     <>
