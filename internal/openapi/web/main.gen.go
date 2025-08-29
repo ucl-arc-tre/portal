@@ -82,6 +82,7 @@ const (
 	AuthRolesInformationAssetAdministrator AuthRoles = "information-asset-administrator"
 	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
 	AuthRolesStaff                         AuthRoles = "staff"
+	AuthRolesTreOpsStaff                   AuthRoles = "tre-ops-staff"
 )
 
 // Defines values for StudyApprovalStatus.

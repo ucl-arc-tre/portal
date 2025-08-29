@@ -21,7 +21,36 @@ func (s *Service) AllUsers() ([]openapi.UserData, error) {
 		return usersData, types.NewErrServerError(result.Error)
 	}
 
-	// then loop through each and get their agreements & roles
+	return s.usersData(users)
+}
+
+func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
+
+	// get all approved researcher users from db
+	userIds, err := rbac.GetUserIdsWithRole(rbac.ApprovedResearcher)
+	if err != nil {
+		return usersData, err
+	}
+
+	users := []types.User{}
+	err = s.db.Where("id IN (?)", userIds).Find(&users).Error
+	if err != nil {
+		return usersData, types.NewErrServerError(err)
+	}
+
+	usersData, err = s.usersData(users)
+	if err != nil {
+		return usersData, err
+	}
+
+	return usersData, nil
+}
+
+func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
+	usersData := []openapi.UserData{}
+	// loops through all users given and get training, roles and agreements for each
+
 	for _, user := range users {
 		userData := openapi.UserData{
 			User: openapi.User{
@@ -81,12 +110,8 @@ func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {
 	return s.entra.IsStaffMember(ctx, user.Username)
 }
 
-func (s *Service) UserById(id string) (*types.User, error) {
-	uid, err := uuid.Parse(id)
-	if err != nil {
-		return nil, types.NewErrInvalidObject("invalid uuid")
-	}
-	return s.findUser(&types.User{Model: types.Model{ID: uid}})
+func (s *Service) UserById(id uuid.UUID) (*types.User, error) {
+	return s.findUser(&types.User{Model: types.Model{ID: id}})
 }
 
 func (s *Service) UserByUsername(username types.Username) (*types.User, error) {

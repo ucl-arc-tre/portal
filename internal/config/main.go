@@ -92,6 +92,14 @@ func AdminUsernames() []types.Username {
 	return usernames
 }
 
+func TreOpsStaffUsernames() []types.Username {
+	usernames := []types.Username{}
+	for _, username := range k.Strings("tre_ops_staff_usernames") {
+		usernames = append(usernames, types.Username(username))
+	}
+	return usernames
+}
+
 func env(key string) string {
 	if value := os.Getenv(key); value != "" {
 		return value

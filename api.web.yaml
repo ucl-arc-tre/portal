@@ -450,6 +450,7 @@ components:
               - approved-staff-researcher
               - information-asset-owner
               - information-asset-administrator
+              - tre-ops-staff
 
     Profile:
       type: object
