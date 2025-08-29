@@ -49,6 +49,32 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 	}
 }
 
+func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
+	AssetUserIDStr := asset.UserID.String()
+	AssetStudyIDStr := asset.StudyID.String()
+
+	return openapi.Asset{
+		Id:                     asset.ID.String(),
+		UserId:                 &AssetUserIDStr,
+		StudyId:                &AssetStudyIDStr,
+		Title:                  asset.Title,
+		Description:            asset.Description,
+		ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),
+		Protection:             openapi.AssetProtection(asset.Protection),
+		LegalBasis:             asset.LegalBasis,
+		Format:                 openapi.AssetFormat(asset.Format),
+		Expiry:                 asset.Expiry,
+		Locations:              asset.LocationStrings(),
+		HasDspt:                asset.HasDspt,
+		StoredOutsideUkEea:     asset.StoredOutsideUkEea,
+		AccessedByThirdParties: asset.AccessedByThirdParties,
+		ThirdPartyAgreement:    asset.ThirdPartyAgreement,
+		Status:                 openapi.AssetStatus(asset.Status),
+		CreatedAt:              asset.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:              asset.UpdatedAt.Format(config.TimeFormat),
+	}
+}
+
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	studies, err := h.studies.Studies(user)
@@ -117,32 +143,9 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	// prepare the final response
-	var response []openapi.Asset
+	response := []openapi.Asset{}
 	for _, asset := range assets {
-		AssetUserIDStr := asset.UserID.String()
-		AssetStudyIDStr := asset.StudyID.String()
-
-		response = append(response, openapi.Asset{
-			Id:                     asset.ID.String(),
-			UserId:                 &AssetUserIDStr,
-			StudyId:                &AssetStudyIDStr,
-			Title:                  asset.Title,
-			Description:            asset.Description,
-			ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),
-			Protection:             openapi.AssetProtection(asset.Protection),
-			LegalBasis:             asset.LegalBasis,
-			Format:                 openapi.AssetFormat(asset.Format),
-			Expiry:                 asset.Expiry,
-			Locations:              asset.LocationStrings(),
-			HasDspt:                asset.HasDspt,
-			StoredOutsideUkEea:     asset.StoredOutsideUkEea,
-			AccessedByThirdParties: asset.AccessedByThirdParties,
-			ThirdPartyAgreement:    asset.ThirdPartyAgreement,
-			Status:                 openapi.AssetStatus(asset.Status),
-			CreatedAt:              asset.CreatedAt.Format(config.TimeFormat),
-			UpdatedAt:              asset.UpdatedAt.Format(config.TimeFormat),
-		})
+		response = append(response, assetToOpenApiAsset(asset))
 	}
 
 	ctx.JSON(http.StatusOK, response)
