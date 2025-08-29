@@ -11,7 +11,6 @@ import Box from "@/components/ui/Box";
 import { Alert, AlertMessage } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
-import Loading from "@/components/ui/Loading";
 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -53,14 +52,6 @@ export default function PeoplePage() {
       </Alert>
     );
 
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <Loading message="Loading users..." />
-      </div>
-    );
-  }
-
   return (
     <>
       <MetaHead
@@ -98,7 +89,7 @@ export default function PeoplePage() {
           )}
         </Box>
       ) : (
-        <UserDataTable canEdit={true} users={users} setUsers={setUsers} />
+        <UserDataTable canEdit={true} users={users} setUsers={setUsers} isLoading={isLoading} />
       )}
     </>
   );
