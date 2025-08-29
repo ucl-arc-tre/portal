@@ -106,7 +106,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 }
 
 func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID string) (*openapi.AssetCreateValidationError, error) {
-	log.Info().Msg("Starting asset creation")
+	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
 
 	validationError, err := s.validateAssetData(assetData)
 	if err != nil || validationError != nil {
