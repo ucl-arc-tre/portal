@@ -108,7 +108,7 @@ export default function Assets(props: StudyAssetsProps) {
         </div>
 
         <div className={styles["callout-glossary-section"]}>
-          You can read more detailed information about assets in our{" "}
+          You can read more detailed information about assets in our
           <Button href="/glossary" variant="tertiary" size="small" inline>
             Glossary
           </Button>{" "}
