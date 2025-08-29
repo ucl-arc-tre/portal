@@ -1,6 +1,5 @@
 .study-dialog {
-  width: 70dvw;
-  top: 5vh;
+  padding-bottom: 5rem;
 
   h2 {
     text-align: center;
@@ -148,6 +147,7 @@
   .button--continue,
   .button--back {
     margin-inline: 0.4%;
+    margin-bottom: 1rem;
   }
 
   .form-helper--invalid {

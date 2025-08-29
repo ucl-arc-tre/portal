@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
+import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
@@ -17,10 +18,11 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
+  closeModal: () => void;
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {
-  const { handleAssetSubmit, isSubmitting = false } = props;
+  const { handleAssetSubmit, isSubmitting = false, closeModal } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -78,7 +80,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
   };
 
   return (
-    <div className={styles.container}>
+    <Dialog setDialogOpen={closeModal} cy="create-asset-form">
       <h2>Create New Asset</h2>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className={styles.form}>
@@ -418,6 +420,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </Button>
         </div>
       </form>
-    </div>
+    </Dialog>
   );
 }

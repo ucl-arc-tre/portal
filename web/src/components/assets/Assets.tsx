@@ -123,7 +123,7 @@ export default function Assets(props: StudyAssetsProps) {
       </Callout>
 
       {studyAssets.length === 0 ? (
-        <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />
+        <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => {}} />
       ) : (
         <div>
           <div className={styles["assets-summary"]}>
@@ -137,7 +137,9 @@ export default function Assets(props: StudyAssetsProps) {
             </Button>
           </div>
 
-          {showAssetForm && <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />}
+          {showAssetForm && (
+            <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+          )}
 
           <div className={styles["assets-grid"]}>
             {studyAssets.map((asset) => (
