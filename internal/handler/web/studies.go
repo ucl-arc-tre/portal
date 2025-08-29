@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -153,13 +152,13 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
-	AssetData := openapi.AssetBase{}
-	if err := bindJSONOrSetError(ctx, &AssetData); err != nil {
+	assetData := openapi.AssetBase{}
+	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
 		return
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateAsset(ctx, user, AssetData, studyId)
+	validationError, err := h.studies.CreateAsset(ctx, user, assetData, studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to create asset")
 		return
