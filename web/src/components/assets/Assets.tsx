@@ -102,39 +102,33 @@ export default function Assets(props: StudyAssetsProps) {
       )}
 
       <Callout definition>
-        Assets are information entities. They are owned by a <strong>study</strong>
-        <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
-        <strong>projects</strong>
-        <InfoTooltip text="Projects are owned by a study and can contain assets" />, for more detailed information and
-        an entity relationship diagram, look at our
-        <Button href="/glossary" variant="tertiary" size="small" inline>
-          Glossary
-        </Button>
-      </Callout>
-      <Callout>
-        <p>
-          Use this page to create data assets you would like to associate with your study. Assets can be any kind of
-          data entity you want to associate with your study (e.g. consent forms, physical study materials etc.). The
-          National Archives also have{" "}
+        <div className={styles["callout-section"]}>Use this form to create assets linked to your study.</div>
+
+        <div className={styles["callout-info-paragraph"]}>
+          Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
+          are owned by a <strong>study</strong>{" "}
+          <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
+          <strong>projects</strong> <InfoTooltip text="Projects are owned by a study and can contain assets" />.
+        </div>
+
+        <div className={styles["callout-glossary-section"]}>
+          You can read more detailed information about assets in our{" "}
+          <Button href="/glossary" variant="tertiary" size="small" inline>
+            Glossary
+          </Button>{" "}
+          and the{" "}
           <a
             href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
             target="_blank"
             rel="noopener noreferrer"
           >
-            a more thorough guide
-          </a>{" "}
-          on what assets are and how to use them.
-        </p>
+            The National Archives guide on information assets.
+          </a>
+        </div>
       </Callout>
 
       {studyAssets.length === 0 ? (
-        <div>
-          <p className={styles["no-assets-message"]}>
-            No assets found for this study. You need to create at least one asset to continue.
-          </p>
-
-          <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />
-        </div>
+        <AssetCreationForm handleAssetSubmit={handleAssetSubmit} />
       ) : (
         <div>
           <div className={styles["assets-summary"]}>

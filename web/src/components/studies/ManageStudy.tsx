@@ -22,14 +22,14 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     {
       id: "study-agreement",
       title: "Study Agreement",
-      description: "Review and accept the study agreement terms",
+      description: "Review and accept the study agreement terms.",
       completed: agreementCompleted,
       current: !agreementCompleted,
     },
     {
       id: "study-assets",
       title: "Study Assets",
-      description: "Create and manage at least one study asset",
+      description: "Create and manage at least one study asset. You can create more assets at any time.",
       completed: assetManagementCompleted,
       current: agreementCompleted && !assetManagementCompleted,
     },

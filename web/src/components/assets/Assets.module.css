@@ -53,3 +53,15 @@
   min-width: 1.5rem;
   text-align: center;
 }
+
+.callout-section {
+  margin-bottom: 1rem;
+}
+
+.callout-info-paragraph {
+  margin-bottom: 1rem;
+}
+
+.callout-glossary-section {
+  margin-bottom: 1rem;
+}
