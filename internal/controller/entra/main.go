@@ -199,7 +199,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
 		query, query, query, query,
 	)
-	resultLimit := int32(20)
+	resultLimit := int32(20) // limits to 20 results or 20 per page if more than 20 results
 
 	headers := abstractions.NewRequestHeaders()
 
