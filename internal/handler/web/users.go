@@ -3,6 +3,7 @@ package web
 import (
 	"io"
 	"net/http"
+	"regexp"
 	"slices"
 	"time"
 
@@ -31,11 +32,13 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 		return
 	}
 
+	queryRegex := regexp.MustCompile(`^\w[\w.\s0-9@]+\w$`)
+	queryIsValid := queryRegex.MatchString(*params.Find)
 	query := params.Find
 
 	if isAdmin {
 		// retrieve auth + agreements + training info
-		if query != nil {
+		if queryIsValid && query != nil {
 			people, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
 			if err != nil {
 				setError(ctx, err, "Failed to find people in tenant")
@@ -53,7 +56,7 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 		}
 
 	} else if isTreOpsStaff {
-		if query != nil {
+		if queryIsValid && query != nil {
 			users, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
 			if err != nil {
 				setError(ctx, err, "Failed to find people in tenant")
