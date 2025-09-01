@@ -213,7 +213,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 
 	data, err := c.client.Users().Get(ctx, configuration)
 	if err != nil {
-		return nil, err
+		return nil, types.NewErrServerError(err)
 	}
 
 	userMatches := data.GetValue()
