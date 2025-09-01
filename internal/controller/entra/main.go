@@ -192,7 +192,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 	queryRegex := regexp.MustCompile(`^\w[\w.\s0-9@]+\w$`)
 	queryIsValid := queryRegex.MatchString(query)
 	if !queryIsValid {
-		return nil, types.NewErrInvalidObject("invalid query")
+		return nil, types.NewErrInvalidObject(fmt.Sprintf("invalid query [%v]", query))
 	}
 
 	filterQuery := fmt.Sprintf(
