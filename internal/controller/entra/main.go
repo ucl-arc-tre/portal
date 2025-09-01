@@ -199,6 +199,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
 		query, query, query, query,
 	)
+	resultLimit := int32(20)
 
 	headers := abstractions.NewRequestHeaders()
 
@@ -206,6 +207,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		Headers: headers,
 		QueryParameters: &graphusers.UsersRequestBuilderGetQueryParameters{
 			Filter: &filterQuery,
+			Top:    &resultLimit,
 		},
 	}
 
