@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -33,14 +32,13 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 	}
 
 	query := ctx.Query("find")
-	log.Debug().Any("query", query).Msg("Searching for user")
 
 	if isAdmin {
 		// retrieve auth + agreements + training info
 		if query != "" {
 			people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
 			if err != nil {
-				setError(ctx, err, "Failed to get people")
+				setError(ctx, err, "Failed to find people in tenant")
 				return
 			}
 			ctx.JSON(http.StatusOK, people)
@@ -58,7 +56,7 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 		if query != "" {
 			users, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
 			if err != nil {
-				setError(ctx, err, "Failed to get people")
+				setError(ctx, err, "Failed to find people in tenant")
 				return
 			}
 

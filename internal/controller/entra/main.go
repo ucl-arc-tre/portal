@@ -187,7 +187,7 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 }
 
 func (c *Controller) SearchForUser(ctx context.Context, query string) ([]string, error) {
-	// do filter query and check in email, principal name and maybe display name
+	// do filter query and check in email, principal name and display name
 
 	filterQuery := fmt.Sprintf(
 		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
