@@ -3,6 +3,7 @@ package web
 import (
 	"io"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -38,7 +39,6 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 		// retrieve auth + agreements + training info
 		if query != "" {
 			people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
-			log.Debug().Any("people", people).Msg("Searched and Retrieved user data from Entra")
 			if err != nil {
 				setError(ctx, err, "Failed to get people")
 				return
@@ -56,15 +56,24 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 
 	} else if isTreOpsStaff {
 		if query != "" {
-			people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
-			log.Debug().Any("people", people).Msg("Searched and Retrieved user data from Entra")
+			users, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
 			if err != nil {
 				setError(ctx, err, "Failed to get people")
 				return
 			}
+
+			people := []openapi.UserData{}
+
+			for _, userData := range users {
+				// only carry over users with approved researcher role
+				if slices.Contains(userData.Roles, "approved_researcher") {
+					people = append(people, userData)
+				}
+			}
 			ctx.JSON(http.StatusOK, people)
 
-		} else { // retrieve auth + agreements + training info
+		} else {
+			// retrieve auth + agreements + training info
 			people, err := h.users.AllApprovedResearcherUsers()
 			if err != nil {
 				setError(ctx, err, "Failed to get people")
