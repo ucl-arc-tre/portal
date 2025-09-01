@@ -58,20 +58,18 @@ type StudyAdmin struct {
 
 type Asset struct {
 	ModelAuditable
-	CreatorUserID          uuid.UUID `gorm:"not null;index"`
-	StudyID                uuid.UUID `gorm:"not null;index"`
-	Title                  string    `gorm:"not null"`
-	Description            string    `gorm:"type:text;not null"`
-	ClassificationImpact   string    `gorm:"not null"`
-	Protection             string    `gorm:"not null"`
-	LegalBasis             string    `gorm:"not null"`
-	Format                 string    `gorm:"not null"`
-	Expiry                 string    `gorm:"not null"`
-	HasDspt                bool      `gorm:"not null;default:false"`
-	StoredOutsideUkEea     bool      `gorm:"not null;default:false"`
-	AccessedByThirdParties bool      `gorm:"not null;default:false"`
-	ThirdPartyAgreement    string    `gorm:""`
-	Status                 string    `gorm:"not null"`
+	CreatorUserID        uuid.UUID `gorm:"not null;index"`
+	StudyID              uuid.UUID `gorm:"not null;index"`
+	Title                string    `gorm:"not null"`
+	Description          string    `gorm:"type:text;not null"`
+	ClassificationImpact string    `gorm:"not null"`
+	Protection           string    `gorm:"not null"`
+	LegalBasis           string    `gorm:"not null"`
+	Format               string    `gorm:"not null"`
+	Expiry               string    `gorm:"not null"`
+	HasDspt              bool      `gorm:"not null;default:false"`
+	StoredOutsideUkEea   bool      `gorm:"not null;default:false"`
+	Status               string    `gorm:"not null"`
 
 	// Relationships
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`

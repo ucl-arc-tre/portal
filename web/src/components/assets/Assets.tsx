@@ -97,7 +97,9 @@ export default function Assets(props: StudyAssetsProps) {
       )}
 
       <Callout definition>
-        <div className={styles["callout-section"]}>Use this form to create assets linked to your study.</div>
+        <div className={styles["callout-section"]}>
+          Use this section to view and create assets linked to your study.
+        </div>
 
         <div className={styles["callout-info-paragraph"]}>
           Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They

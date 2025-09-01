@@ -86,11 +86,6 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		return &openapi.AssetCreateValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
 	}
 
-	// Validate third_party_agreement when accessed_by_third_parties is true
-	if assetData.AccessedByThirdParties && !textField500Pattern.MatchString(assetData.ThirdPartyAgreement) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "third_party_agreement must be 1-500 characters when accessed_by_third_parties is true"}, nil
-	}
-
 	return nil, nil
 }
 
@@ -122,20 +117,18 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 
 	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
-		CreatorUserID:          user.ID,
-		StudyID:                studyID,
-		Title:                  assetData.Title,
-		Description:            assetData.Description,
-		ClassificationImpact:   string(assetData.ClassificationImpact),
-		Protection:             string(assetData.Protection),
-		LegalBasis:             assetData.LegalBasis,
-		Format:                 string(assetData.Format),
-		Expiry:                 assetData.Expiry,
-		HasDspt:                assetData.HasDspt,
-		StoredOutsideUkEea:     assetData.StoredOutsideUkEea,
-		AccessedByThirdParties: assetData.AccessedByThirdParties,
-		ThirdPartyAgreement:    assetData.ThirdPartyAgreement,
-		Status:                 string(assetData.Status),
+		CreatorUserID:        user.ID,
+		StudyID:              studyID,
+		Title:                assetData.Title,
+		Description:          assetData.Description,
+		ClassificationImpact: string(assetData.ClassificationImpact),
+		Protection:           string(assetData.Protection),
+		LegalBasis:           assetData.LegalBasis,
+		Format:               string(assetData.Format),
+		Expiry:               assetData.Expiry,
+		HasDspt:              assetData.HasDspt,
+		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
+		Status:               string(assetData.Status),
 	}
 
 	// Create the asset

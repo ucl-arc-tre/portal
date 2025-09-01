@@ -45,17 +45,12 @@ export default function AssetCreationForm(props: AssetFormProps) {
       locations: [],
       has_dspt: false,
       stored_outside_uk_eea: false,
-      accessed_by_third_parties: false,
-      third_party_agreement: "",
       status: "",
     },
   });
 
   const protectionValue = watch("protection");
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
-
-  const thirdPartyAccessed = watch("accessed_by_third_parties");
-  const showThirdPartyDropdown = String(thirdPartyAccessed) === "true";
 
   const onFormSubmit = async (data: AssetFormData) => {
     try {
@@ -67,7 +62,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
         ...data,
         has_dspt: data.has_dspt === "true" || data.has_dspt === true,
         stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
-        accessed_by_third_parties: data.accessed_by_third_parties === "true" || data.accessed_by_third_parties === true,
       };
 
       await handleAssetSubmit(transformedAssetData);
@@ -344,55 +338,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </div>
           {errors.stored_outside_uk_eea && (
             <span className={styles["error-text"]}>{errors.stored_outside_uk_eea.message}</span>
-          )}
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="accessed_by_third_parties">
-            Is this asset accessed by or governed by any third parties? *
-          </label>
-          <div className={styles["radio-group"]}>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="true"
-                {...register("accessed_by_third_parties", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              Yes
-            </label>
-
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="false"
-                {...register("accessed_by_third_parties", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              No
-            </label>
-          </div>
-          {errors.accessed_by_third_parties && (
-            <span className={styles["error-text"]}>{errors.accessed_by_third_parties.message}</span>
-          )}
-
-          {showThirdPartyDropdown && (
-            // WIP: will need to potentially fetch third party agreements from the API
-            <div className={styles["third-party-dropdown"]}>
-              <p className={styles["third-party-text"]}>
-                If this asset is governed by an agreement with a third party please link to the item from your submitted
-                third party information at Stage 2.
-              </p>
-              <select {...register("third_party_agreement")} className={styles["third-party-select"]}>
-                <option value="">Select third party agreement</option>
-                <option value="test1">Test1</option>
-                <option value="test2">Test2</option>
-              </select>
-            </div>
           )}
         </div>
 
