@@ -37,9 +37,9 @@ describe("Study Management Workflow", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsEmpty");
 
-    // Wait for agreement timer to expire and accept the agreement
-    cy.get("[data-cy='agreement-agree']").should("not.be.disabled");
-    cy.get("[data-cy='agreement-agree']").click();
+    cy.get('[data-cy="agreement-agree"]').should("be.disabled");
+    const buttonTimeoutSeconds = 120;
+    cy.get('[data-cy="agreement-agree"]').click({ timeout: buttonTimeoutSeconds * 1000 });
 
     cy.wait("@confirmStudyAgreement");
     cy.wait("@getAssetsEmpty");
