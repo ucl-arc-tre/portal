@@ -126,20 +126,24 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	return user, types.NewErrServerError(result.Error)
 }
 
-func (s *Service) SearchEntraForUserAndMatch(ctx context.Context, query string) (*types.User, error) {
+func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string) ([]openapi.UserData, error) {
 	// query entra
-	userData, err := s.entra.SearchForUser(ctx, query)
+	foundEmails, err := s.entra.SearchForUser(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	// then match to users in our db
+	users := []types.User{}
 
-	// if result/s returned, match to user in our db based on pricipal name
+	result := s.db.Where("username IN (?)", foundEmails).Find(&users)
+	if result.Error != nil {
+		return nil, types.NewErrServerError(result.Error)
+	}
+
+	usersData, err := s.usersData(users)
 	if err != nil {
 		return nil, err
 	}
-	if userData == nil {
-		return nil, types.NewNotFoundError("user not found")
-	}
-	user, err := s.UserByUsername(types.Username(*userData.Email))
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+
+	return usersData, nil
 }

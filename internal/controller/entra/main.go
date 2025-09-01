@@ -8,6 +8,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/hashicorp/golang-lru/v2/expirable"
+	abstractions "github.com/microsoft/kiota-abstractions-go"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
@@ -185,28 +186,43 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 
 }
 
-func (c *Controller) SearchForUser(ctx context.Context, query string) (*UserData, error) {
-	// do search query and check in email, principal name and maybe display name
+func (c *Controller) SearchForUser(ctx context.Context, query string) ([]string, error) {
+	// do filter query and check in email, principal name and maybe display name
 
-	// 	requestSearch := "\"displayName:%s\" OR \"principalName:%s\" OR \"mail:%s\""
-	// 	entraQuery := fmt.Sprintf(requestSearch, query, query, query)
+	filterQuery := fmt.Sprintf(
+		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
+		query, query, query, query,
+	)
 
-	// 	requestParameters := &graphgroups.GroupsRequestBuilderGetQueryParameters{
-	// 	Search: &entraQuery,
-	// }
+	headers := abstractions.NewRequestHeaders()
 
-	configuration := &graphusers.ItemPeopleRequestBuilderGetRequestConfiguration{
-		QueryParameters: &graphusers.ItemPeopleRequestBuilderGetQueryParameters{
-			Search: &query,
+	configuration := &graphusers.UsersRequestBuilderGetRequestConfiguration{
+		Headers: headers,
+		QueryParameters: &graphusers.UsersRequestBuilderGetQueryParameters{
+			Filter: &filterQuery,
 		},
 	}
 
-	data, err := c.client.Me().People().Get(ctx, configuration)
+	data, err := c.client.Users().Get(ctx, configuration)
 	if err != nil {
 		return nil, err
 	}
-	log.Debug().Any("data", data).Msg("Retrieved user data from Entra")
 
-	return nil, nil
+	userMatches := data.GetValue()
+	if userMatches == nil {
+		return nil, types.NewNotFoundError("no users matching query found in tenant")
+	} else {
+		data := []string{}
+		for _, user := range userMatches {
+			principalName := ""
+			if user.GetUserPrincipalName() != nil {
+				principalName = *user.GetUserPrincipalName()
+			}
+
+			data = append(data, principalName)
+		}
+		return data, nil
+
+	}
 
 }

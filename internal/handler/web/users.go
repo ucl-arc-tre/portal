@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -30,12 +31,14 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 		return
 	}
 
-	query, hasQuery := ctx.Params.Get("find")
+	query := ctx.Query("find")
+	log.Debug().Any("query", query).Msg("Searching for user")
 
 	if isAdmin {
 		// retrieve auth + agreements + training info
-		if hasQuery {
-			people, err := h.users.SearchEntraForUserAndMatch(ctx, query)
+		if query != "" {
+			people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+			log.Debug().Any("people", people).Msg("Searched and Retrieved user data from Entra")
 			if err != nil {
 				setError(ctx, err, "Failed to get people")
 				return
@@ -52,13 +55,23 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 		}
 
 	} else if isTreOpsStaff {
-		// retrieve auth + agreements + training info
-		people, err := h.users.AllApprovedResearcherUsers()
-		if err != nil {
-			setError(ctx, err, "Failed to get people")
-			return
+		if query != "" {
+			people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+			log.Debug().Any("people", people).Msg("Searched and Retrieved user data from Entra")
+			if err != nil {
+				setError(ctx, err, "Failed to get people")
+				return
+			}
+			ctx.JSON(http.StatusOK, people)
+
+		} else { // retrieve auth + agreements + training info
+			people, err := h.users.AllApprovedResearcherUsers()
+			if err != nil {
+				setError(ctx, err, "Failed to get people")
+				return
+			}
+			ctx.JSON(http.StatusOK, people)
 		}
-		ctx.JSON(http.StatusOK, people)
 
 	} else {
 		ctx.JSON(http.StatusInternalServerError, "Not implemented")
