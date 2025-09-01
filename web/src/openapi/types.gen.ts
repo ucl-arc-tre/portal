@@ -525,7 +525,7 @@ export type GetUsersData = {
     path?: never;
     query?: {
         /**
-         * user details to lookup by
+         * user details to lookup by. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
          */
         find?: string;
     };
