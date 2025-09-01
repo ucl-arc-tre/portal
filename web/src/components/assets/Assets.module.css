@@ -23,10 +23,20 @@
   border-radius: 4px;
   background-color: #f8f9fa;
   margin-bottom: 16px;
+  text-align: center;
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.no-assets-message button {
+  margin-top: 1rem;
 }
 
 .asset-actions {
   margin-top: 1rem;
+  display: flex;
+  justify-content: center;
 }
 
 .assets-grid {

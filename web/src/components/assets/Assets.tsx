@@ -97,9 +97,7 @@ export default function Assets(props: StudyAssetsProps) {
       )}
 
       <Callout definition>
-        <div className={styles["callout-section"]}>
-          Use this section to view and create assets linked to your study.
-        </div>
+        <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
 
         <div className={styles["callout-info-paragraph"]}>
           Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
@@ -125,7 +123,18 @@ export default function Assets(props: StudyAssetsProps) {
       </Callout>
 
       {studyAssets.length === 0 ? (
-        <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => {}} />
+        <div>
+          <div className={styles["no-assets-message"]}>
+            <p>No assets have been created for this study yet.</p>
+            <Button onClick={() => setShowAssetForm(true)} variant="primary">
+              Add First Asset
+            </Button>
+          </div>
+
+          {showAssetForm && (
+            <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+          )}
+        </div>
       ) : (
         <div>
           <div className={styles["assets-summary"]}>
