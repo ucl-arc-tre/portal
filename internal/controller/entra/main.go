@@ -186,9 +186,8 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 
 }
 
-func (c *Controller) SearchForUser(ctx context.Context, query string) ([]string, error) {
-	// do filter query and check in email, principal name and display name
-
+// FindUsernames searches entra for usernames given a query of email, user principal or display name
+func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
 	filterQuery := fmt.Sprintf(
 		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
 		query, query, query, query,
@@ -212,17 +211,13 @@ func (c *Controller) SearchForUser(ctx context.Context, query string) ([]string,
 	if userMatches == nil {
 		return nil, types.NewNotFoundError("no users matching query found in tenant")
 	} else {
-		data := []string{}
-		for _, user := range userMatches {
-			principalName := ""
-			if user.GetUserPrincipalName() != nil {
-				principalName = *user.GetUserPrincipalName()
-			}
-
-			data = append(data, principalName)
-		}
-		return data, nil
-
 	}
+	usernames := []types.Username{}
+	for _, user := range userMatches {
+		if user.GetUserPrincipalName() != nil {
+			usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
+		}
+	}
+	return usernames, nil
 
 }
