@@ -17,7 +17,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
+func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 	// for search, check entra then find matches in our db, based on user principal
 	user := middleware.GetUser(ctx)
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
@@ -31,12 +31,12 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 		return
 	}
 
-	query := ctx.Query("find")
+	query := params.Find
 
 	if isAdmin {
 		// retrieve auth + agreements + training info
-		if query != "" {
-			people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+		if query != nil {
+			people, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
 			if err != nil {
 				setError(ctx, err, "Failed to find people in tenant")
 				return
@@ -53,8 +53,8 @@ func (h *Handler) GetUsers(ctx *gin.Context, _ openapi.GetUsersParams) {
 		}
 
 	} else if isTreOpsStaff {
-		if query != "" {
-			users, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+		if query != nil {
+			users, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
 			if err != nil {
 				setError(ctx, err, "Failed to find people in tenant")
 				return
