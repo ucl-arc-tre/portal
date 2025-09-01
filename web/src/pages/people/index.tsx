@@ -8,9 +8,14 @@ import styles from "./PeoplePage.module.css";
 import { useEffect, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage } from "@/components/shared/exports";
+import { Alert, AlertMessage, Input } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
+import dynamic from "next/dynamic";
+
+export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
+  ssr: false,
+});
 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -72,12 +77,13 @@ export default function PeoplePage() {
         }
       />
 
-      {!isTreOpsStaff && (
-        <div className={styles["button-container"]}>
-          {isAdmin && <ApprovedResearcherImport />}
-          {(isAdmin || isIAO) && <ExternalInvite />}
-        </div>
-      )}
+      <div className={styles["button-container"]}>
+        {(isAdmin || isTreOpsStaff) && (
+          <Input placeholder="search users..." icon={<SearchIcon />} iconPosition="left" disabled />
+        )}
+        {isAdmin && <ApprovedResearcherImport />}
+        {(isAdmin || isIAO) && <ExternalInvite />}
+      </div>
       {!isAdmin && <Callout construction />}
       {!users || users.length === 0 ? (
         <Box>

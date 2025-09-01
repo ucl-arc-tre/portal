@@ -1,6 +1,7 @@
 .button-container {
-  justify-self: end;
-  justify-items: end;
+  justify-self: center;
+  justify-items: space-evenly;
+  align-items: center;
   height: 4rem;
   display: grid;
   grid-gap: 10px;
