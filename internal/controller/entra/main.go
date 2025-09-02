@@ -216,16 +216,15 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		return nil, types.NewErrServerError(err)
 	}
 
+	usernames := []types.Username{}
+
 	userMatches := data.GetValue()
 	if userMatches != nil {
-		usernames := []types.Username{}
 		for _, user := range userMatches {
 			if user.GetUserPrincipalName() != nil {
 				usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
 			}
 		}
-		return usernames, nil
-
 	}
-	return nil, nil
+	return usernames, nil
 }
