@@ -117,7 +117,13 @@ export default function PeoplePage() {
               value={searchTerm}
               aria-label="search users of the portal"
             ></Input>
-            <Button variant="tertiary" icon={<SearchIcon />} onClick={handleUserSearchSubmit} type="submit"></Button>
+            <Button
+              variant="tertiary"
+              icon={<SearchIcon />}
+              onClick={handleUserSearchSubmit}
+              type="submit"
+              aria-label="submit user search query"
+            ></Button>
             {searchErrorMessage && (
               <Alert type="error">
                 <AlertMessage>{errorMessage}</AlertMessage>
