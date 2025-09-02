@@ -123,7 +123,7 @@ export default function PeoplePage() {
       {!users || users.length === 0 ? (
         <Box>
           <div className={styles["no-users-found"]}>
-            {searchTerm ? `No users found for "${searchTerm}. Try another query"` : "No users found"}
+            {searchTerm ? `No users found for "${searchTerm}". Try another query` : "No users found"}
           </div>
           {errorMessage && (
             <Alert type="error">
