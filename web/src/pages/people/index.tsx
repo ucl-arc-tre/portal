@@ -21,27 +21,29 @@ export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [users, setUsers] = useState<Array<UserData> | null>(null);
+  const [originalUsers, setOriginalUsers] = useState<Array<UserData> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
 
-  useEffect(() => {
-    const fetchPeople = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getUsers();
-        if (response.response.ok && response.data) {
-          setUsers(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to get people:", error);
-        setErrorMessage("Failed to get people");
-        setUsers(null);
-      } finally {
-        setIsLoading(false);
+  const fetchPeople = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getUsers();
+      if (response.response.ok && response.data) {
+        setOriginalUsers(response.data);
+        setUsers(response.data);
       }
-    };
+    } catch (error) {
+      console.error("Failed to get people:", error);
+      setErrorMessage("Failed to get people");
+      setUsers(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchPeople();
   }, []);
 
@@ -54,16 +56,23 @@ export default function PeoplePage() {
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
 
   const handleUserSearch = async (query: string) => {
-    const response = await getUsers({ query: { find: query } });
-    if (response.response.ok && response.data) {
-      setUsers(response.data);
+    if (query !== "") {
+      const response = await getUsers({ query: { find: query } });
+      if (response.response.ok && response.data) {
+        setUsers(response.data);
+      } else {
+        setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+      }
     } else {
-      setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+      setUsers(originalUsers);
     }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    if (event.target.value === "") {
+      setUsers(originalUsers);
+    }
   };
   const handleUserSearchSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
