@@ -49,14 +49,12 @@ func migrateAssetTable(db *gorm.DB) {
 	if db.Migrator().HasTable(&types.Asset{}) {
 		log.Debug().Msg("Starting custom Asset table migration")
 
-		// Rename column
+		// Drop columns
 		if db.Migrator().HasColumn(&types.Asset{}, "expiry") {
-			if err := db.Migrator().RenameColumn(&types.Asset{}, "expiry", "expires_at"); err != nil {
-				panic(fmt.Sprintf("Failed to rename expiry column to expires_at: %v", err))
+			if err := db.Migrator().DropColumn(&types.Asset{}, "expiry"); err != nil {
+				panic(fmt.Sprintf("Failed to drop expiry column: %v", err))
 			}
 		}
-
-		// Drop columns
 		if db.Migrator().HasColumn(&types.Asset{}, "accessed_by_third_parties") {
 			if err := db.Migrator().DropColumn(&types.Asset{}, "accessed_by_third_parties"); err != nil {
 				panic(fmt.Sprintf("Failed to drop accessed_by_third_parties column: %v", err))
