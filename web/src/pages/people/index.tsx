@@ -12,6 +12,7 @@ import { Alert, AlertMessage, Input } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
+import Button from "@/components/ui/Button";
 
 export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
   ssr: false,
@@ -22,6 +23,8 @@ export default function PeoplePage() {
   const [users, setUsers] = useState<Array<UserData> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchErrorMessage, setSearchErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchPeople = async () => {
@@ -49,6 +52,23 @@ export default function PeoplePage() {
   const isAdmin = userData?.roles.includes("admin");
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
+
+  const handleUserSearch = async (query: string) => {
+    const response = await getUsers({ query: { find: query } });
+    if (response.response.ok && response.data) {
+      setUsers(response.data);
+    } else {
+      setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+  const handleUserSearchSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handleUserSearch(searchTerm);
+  };
 
   if (!isAdmin && !isTreOpsStaff && !isIAO)
     return (
@@ -79,7 +99,22 @@ export default function PeoplePage() {
 
       <div className={styles["button-container"]}>
         {(isAdmin || isTreOpsStaff) && (
-          <Input placeholder="search users..." icon={<SearchIcon />} iconPosition="left" disabled />
+          <form className={styles["search-container"]}>
+            <Input
+              placeholder="search users..."
+              id={styles.search}
+              name="search"
+              onChange={handleInputChange}
+              value={searchTerm}
+              aria-label="search users of the portal"
+            ></Input>
+            <Button variant="tertiary" icon={<SearchIcon />} onClick={handleUserSearchSubmit} type="submit"></Button>
+            {searchErrorMessage && (
+              <Alert type="error">
+                <AlertMessage>{errorMessage}</AlertMessage>
+              </Alert>
+            )}
+          </form>
         )}
         {isAdmin && <ApprovedResearcherImport />}
         {(isAdmin || isIAO) && <ExternalInvite />}
@@ -87,7 +122,9 @@ export default function PeoplePage() {
       {!isAdmin && <Callout construction />}
       {!users || users.length === 0 ? (
         <Box>
-          <div className={styles["no-users-found"]}>No users found</div>
+          <div className={styles["no-users-found"]}>
+            {searchTerm ? `No users found for "${searchTerm}. Try another query"` : "No users found"}
+          </div>
           {errorMessage && (
             <Alert type="error">
               <AlertMessage>{errorMessage}</AlertMessage>

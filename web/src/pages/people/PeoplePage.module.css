@@ -10,6 +10,38 @@
   margin-top: 1rem;
 }
 
+.search-container {
+  display: flex;
+  vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+  transition: all 0.15s ease;
+
+  &:focus-within {
+    border-bottom: 2px solid #0d68cf;
+
+    svg {
+      stroke: #0d68cf;
+    }
+  }
+
+  button {
+    /* due to submit type */
+    margin-top: unset;
+  }
+
+  svg {
+    stroke: var(--text--secondary);
+  }
+
+  input {
+    border: none;
+
+    &:focus-visible {
+      box-shadow: none !important;
+    }
+  }
+}
+
 .no-users-found {
   text-align: center;
 }
