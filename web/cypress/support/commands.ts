@@ -118,6 +118,12 @@ declare global {
       mockStudiesWithNewStudy(): Chainable<any>;
 
       /**
+       * Mock individual study access for testing
+       * @example cy.mockStudyAccess()
+       */
+      mockStudyAccess(): Chainable<any>;
+
+      /**
        * Mock successful study creation
        * @example cy.mockStudyCreation()
        */
@@ -165,6 +171,60 @@ declare global {
        * @example cy.waitForStudyCreation()
        */
       waitForStudyCreation(): Chainable<any>;
+
+      /**
+       * Mock empty assets list for a study
+       * @example cy.mockStudyAssetsEmpty()
+       */
+      mockStudyAssetsEmpty(): Chainable<any>;
+
+      /**
+       * Mock assets list with sample assets
+       * @example cy.mockStudyAssetsWithSample()
+       */
+      mockStudyAssetsWithSample(): Chainable<any>;
+
+      /**
+       * Mock successful asset creation
+       * @example cy.mockAssetCreation()
+       */
+      mockAssetCreation(): Chainable<any>;
+
+      /**
+       * Wait for the mocked assets request to complete
+       * @example cy.waitForAssets()
+       */
+      waitForAssets(): Chainable<any>;
+
+      /**
+       * Wait for the mocked asset creation request to complete
+       * @example cy.waitForAssetCreation()
+       */
+      waitForAssetCreation(): Chainable<any>;
+
+      /**
+       * Mock study agreement text
+       * @example cy.mockStudyAgreementText()
+       */
+      mockStudyAgreementText(): Chainable<any>;
+
+      /**
+       * Mock empty study agreements for user
+       * @example cy.mockStudyAgreementsEmpty()
+       */
+      mockStudyAgreementsEmpty(): Chainable<any>;
+
+      /**
+       * Mock confirmed study agreements for user
+       * @example cy.mockStudyAgreementsConfirmed()
+       */
+      mockStudyAgreementsConfirmed(): Chainable<any>;
+
+      /**
+       * Mock successful study agreement confirmation
+       * @example cy.mockStudyAgreementConfirmation()
+       */
+      mockStudyAgreementConfirmation(): Chainable<any>;
 
       /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
@@ -375,6 +435,22 @@ Cypress.Commands.add("mockStudiesWithNewStudy", () => {
   }).as("getStudiesWithNew");
 });
 
+Cypress.Commands.add("mockStudyAccess", () => {
+  cy.intercept("GET", "/web/api/v0/studies/123456789", {
+    body: {
+      id: "123456789",
+      title: "My New Test Study",
+      description: null,
+      owner_user_id: "123456789",
+      additional_study_admin_usernames: [],
+      data_controller_organisation: "UCL",
+      approval_status: "Incomplete",
+      created_at: "2024-01-01T10:00:00Z",
+      updated_at: "2024-01-01T10:00:00Z",
+    },
+  }).as("getStudyById");
+});
+
 Cypress.Commands.add("mockStudyCreation", () => {
   cy.intercept("POST", "/web/api/v0/studies", {
     statusCode: 201,
@@ -388,4 +464,57 @@ Cypress.Commands.add("waitForStudies", () => {
 
 Cypress.Commands.add("waitForStudyCreation", () => {
   cy.wait("@createStudy");
+});
+
+// Asset fixture commands
+Cypress.Commands.add("mockStudyAssetsEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets", {
+    fixture: "assets-empty.json",
+  }).as("getAssetsEmpty");
+});
+
+Cypress.Commands.add("mockStudyAssetsWithSample", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets", {
+    fixture: "assets-with-sample.json",
+  }).as("getAssetsWithSample");
+});
+
+Cypress.Commands.add("mockAssetCreation", () => {
+  cy.intercept("POST", "/web/api/v0/studies/*/assets", {
+    statusCode: 201,
+  }).as("createAsset");
+});
+
+// Wait commands for assets
+Cypress.Commands.add("waitForAssets", () => {
+  cy.wait(["@getAssetsEmpty", "@getAssetsWithSample"]);
+});
+
+Cypress.Commands.add("waitForAssetCreation", () => {
+  cy.wait("@createAsset");
+});
+
+// Study agreement fixture commands
+Cypress.Commands.add("mockStudyAgreementText", () => {
+  cy.intercept("GET", "/web/api/v0/agreements/study-owner", {
+    fixture: "study-agreement-text.json",
+  }).as("getStudyAgreementText");
+});
+
+Cypress.Commands.add("mockStudyAgreementsEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/agreements", {
+    fixture: "study-agreements-empty.json",
+  }).as("getStudyAgreementsEmpty");
+});
+
+Cypress.Commands.add("mockStudyAgreementsConfirmed", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/agreements", {
+    fixture: "study-agreements-confirmed.json",
+  }).as("getStudyAgreementsConfirmed");
+});
+
+Cypress.Commands.add("mockStudyAgreementConfirmation", () => {
+  cy.intercept("POST", "/web/api/v0/studies/*/agreements", {
+    statusCode: 200,
+  }).as("confirmStudyAgreement");
 });

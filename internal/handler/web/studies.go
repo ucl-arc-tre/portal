@@ -48,6 +48,27 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 	}
 }
 
+func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
+	return openapi.Asset{
+		Id:                   asset.ID.String(),
+		CreatorUserId:        asset.CreatorUserID.String(),
+		StudyId:              asset.StudyID.String(),
+		Title:                asset.Title,
+		Description:          asset.Description,
+		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
+		Protection:           openapi.AssetProtection(asset.Protection),
+		LegalBasis:           asset.LegalBasis,
+		Format:               openapi.AssetFormat(asset.Format),
+		ExpiresAt:            asset.ExpiresAt.Format(config.TimeFormat),
+		Locations:            asset.LocationStrings(),
+		HasDspt:              asset.HasDspt,
+		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
+		Status:               openapi.AssetStatus(asset.Status),
+		CreatedAt:            asset.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
+	}
+}
+
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	studies, err := h.studies.Studies(user)
@@ -116,40 +137,37 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	// prepare the final response
-	var response []openapi.Asset
+	response := []openapi.Asset{}
 	for _, asset := range assets {
-
-		response = append(response, openapi.Asset{
-			Id:                     asset.ID.String(),
-			Title:                  asset.Title,
-			Description:            asset.Description,
-			ClassificationImpact:   openapi.AssetClassificationImpact(asset.ClassificationImpact),
-			Protection:             openapi.AssetProtection(asset.Protection),
-			LegalBasis:             asset.LegalBasis,
-			Format:                 asset.Format,
-			Expiry:                 asset.Expiry,
-			Locations:              asset.LocationStrings(),
-			HasDspt:                asset.HasDspt,
-			StoredOutsideUkEea:     asset.StoredOutsideUkEea,
-			AccessedByThirdParties: asset.AccessedByThirdParties,
-			ThirdPartyAgreement:    asset.ThirdPartyAgreement,
-			Status:                 openapi.AssetStatus(asset.Status),
-			CreatedAt:              asset.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			UpdatedAt:              asset.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
-		})
+		response = append(response, assetToOpenApiAsset(asset))
 	}
 
 	ctx.JSON(http.StatusOK, response)
 }
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	// This function will handle the creation of new assets for a specific study.
-	// For now, we will return a placeholder response.
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Study asset creation is not yet implemented.",
-		"studyId": studyId,
-	})
+	studyUUID, err := uuid.Parse(studyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		return
+	}
+
+	assetData := openapi.AssetBase{}
+	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	validationError, err := h.studies.CreateAsset(ctx, user, assetData, studyUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to create asset")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
 }
 
 // confirms a study agreement for the study ID and user

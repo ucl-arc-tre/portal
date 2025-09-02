@@ -3,9 +3,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
+import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
-import styles from "./AssetForm.module.css";
+import styles from "./AssetCreationForm.module.css";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
@@ -14,30 +15,14 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
-type AssetFormData = {
-  title: string;
-  description: string;
-  classification_impact: string;
-  protection: string;
-  legal_basis: string;
-  format: string;
-  expiry: string;
-  location: string[];
-  has_dspt: boolean;
-  stored_outside_uk_eea: boolean;
-  accessed_by_third_parties: boolean;
-  third_party_agreement: string;
-  status: string;
-};
-
 type AssetFormProps = {
-  onSubmit: (data: AssetFormData) => Promise<void>;
-  // setSelectedStudy: (study: Study | null) => void;
+  handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
+  closeModal: () => void;
 };
 
-export default function AssetForm(props: AssetFormProps) {
-  const { onSubmit, isSubmitting = false } = props;
+export default function AssetCreationForm(props: AssetFormProps) {
+  const { handleAssetSubmit, isSubmitting = false, closeModal } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -56,12 +41,10 @@ export default function AssetForm(props: AssetFormProps) {
       protection: "",
       legal_basis: "",
       format: "",
-      expiry: "",
-      location: [],
+      expires_at: "",
+      locations: [],
       has_dspt: false,
       stored_outside_uk_eea: false,
-      accessed_by_third_parties: false,
-      third_party_agreement: "",
       status: "",
     },
   });
@@ -69,37 +52,30 @@ export default function AssetForm(props: AssetFormProps) {
   const protectionValue = watch("protection");
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
 
-  const thirdPartyAccessed = watch("accessed_by_third_parties");
-  const showThirdPartyDropdown = String(thirdPartyAccessed) === "true";
-
   const onFormSubmit = async (data: AssetFormData) => {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
-      await onSubmit(data);
+
+      // Transform string boolean values to actual booleans for API
+      const transformedAssetData: AssetFormData = {
+        ...data,
+        has_dspt: data.has_dspt === "true" || data.has_dspt === true,
+        stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
+      };
+
+      await handleAssetSubmit(transformedAssetData);
       setSuccessMessage("Asset created successfully!");
       reset();
     } catch (error) {
       console.error("Error creating asset:", error);
-      setErrorMessage("Failed to create asset. Please try again.");
+      setErrorMessage("Error: " + String((error as Error).message));
     }
   };
 
   return (
-    <div className={styles.container}>
+    <Dialog setDialogOpen={closeModal} cy="create-asset-form">
       <h2>Create New Asset</h2>
-
-      {errorMessage && (
-        <Alert type="error" className={styles.alert}>
-          <AlertMessage>{errorMessage}</AlertMessage>
-        </Alert>
-      )}
-
-      {successMessage && (
-        <Alert type="success" className={styles.alert}>
-          <AlertMessage>{successMessage}</AlertMessage>
-        </Alert>
-      )}
 
       <form onSubmit={handleSubmit(onFormSubmit)} className={styles.form}>
         <div className={styles.field}>
@@ -109,7 +85,8 @@ export default function AssetForm(props: AssetFormProps) {
             type="text"
             {...register("title", {
               required: "Title is required",
-              maxLength: { value: 255, message: "Title must be less than 255 characters" },
+              minLength: { value: 4, message: "Title must be at least 4 characters" },
+              maxLength: { value: 50, message: "Title must be less than 50 characters" },
             })}
             aria-invalid={!!errors.title}
             className={errors.title ? styles.error : ""}
@@ -124,7 +101,8 @@ export default function AssetForm(props: AssetFormProps) {
             rows={4}
             {...register("description", {
               required: "Description is required",
-              maxLength: { value: 1000, message: "Description must be less than 1000 characters" },
+              minLength: { value: 4, message: "Description must be at least 4 characters" },
+              maxLength: { value: 255, message: "Description must be less than 255 characters" },
             })}
             aria-invalid={!!errors.description}
             className={errors.description ? styles.error : ""}
@@ -157,9 +135,9 @@ export default function AssetForm(props: AssetFormProps) {
             className={errors.classification_impact ? styles.error : ""}
           >
             <option value="">Select classification</option>
-            <option value="Public">Public</option>
-            <option value="Confidential">Confidential</option>
-            <option value="Highly confidential">Highly confidential</option>
+            <option value="public">Public</option>
+            <option value="confidential">Confidential</option>
+            <option value="highly_confidential">Highly confidential</option>
           </select>
           {errors.classification_impact && (
             <span className={styles["error-text"]}>{errors.classification_impact.message}</span>
@@ -204,6 +182,18 @@ export default function AssetForm(props: AssetFormProps) {
 
         <div className={styles.field}>
           <label htmlFor="legal_basis">What is the legal basis for holding this asset? *</label>
+          <div className={styles["info-text"]}>
+            <p>
+              To learn more about the legal basis requirements refer to{" "}
+              <a
+                href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                UK GDPR guidance
+              </a>
+            </p>
+          </div>
           <input
             id="legal_basis"
             type="text"
@@ -236,19 +226,19 @@ export default function AssetForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="expiry" className={styles["red-text"]}>
+          <label htmlFor="expires_at" className={styles["red-text"]}>
             What is the asset&apos;s retention expiry date? *
           </label>
           <input
-            id="expiry"
+            id="expires_at"
             type="date"
-            {...register("expiry", {
+            {...register("expires_at", {
               required: "Expiry date is required",
             })}
-            aria-invalid={!!errors.expiry}
-            className={errors.expiry ? styles.error : ""}
+            aria-invalid={!!errors.expires_at}
+            className={errors.expires_at ? styles.error : ""}
           />
-          {errors.expiry && <span className={styles["error-text"]}>{errors.expiry.message}</span>}
+          {errors.expires_at && <span className={styles["error-text"]}>{errors.expires_at.message}</span>}
         </div>
 
         <div className={styles.field}>
@@ -271,7 +261,7 @@ export default function AssetForm(props: AssetFormProps) {
                 <input
                   type="checkbox"
                   value={storage.value}
-                  {...register("location", {
+                  {...register("locations", {
                     required: "At least one location must be selected",
                   })}
                   className={styles.checkbox}
@@ -281,7 +271,7 @@ export default function AssetForm(props: AssetFormProps) {
             ))}
           </div>
 
-          {errors.location && <span className={styles["error-text"]}>{errors.location.message}</span>}
+          {errors.locations && <span className={styles["error-text"]}>{errors.locations.message}</span>}
         </div>
 
         <div className={styles.field}>
@@ -352,55 +342,6 @@ export default function AssetForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="accessed_by_third_parties">
-            Is this asset accessed by or governed by any third parties? *
-          </label>
-          <div className={styles["radio-group"]}>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="true"
-                {...register("accessed_by_third_parties", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              Yes
-            </label>
-
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="false"
-                {...register("accessed_by_third_parties", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              No
-            </label>
-          </div>
-          {errors.accessed_by_third_parties && (
-            <span className={styles["error-text"]}>{errors.accessed_by_third_parties.message}</span>
-          )}
-
-          {showThirdPartyDropdown && (
-            // WIP: will need to potentially fetch third party agreements from the API
-            <div className={styles["third-party-dropdown"]}>
-              <p className={styles["third-party-text"]}>
-                If this asset is governed by an agreement with a third party please link to the item from your submitted
-                third party information at Stage 2.
-              </p>
-              <select {...register("third_party_agreement")} className={styles["third-party-select"]}>
-                <option value="">Select third party agreement</option>
-                <option value="test1">Test1</option>
-                <option value="test2">Test2</option>
-              </select>
-            </div>
-          )}
-        </div>
-
-        <div className={styles.field}>
           <label htmlFor="status">Status *</label>
           <select
             id="status"
@@ -411,28 +352,31 @@ export default function AssetForm(props: AssetFormProps) {
             className={errors.status ? styles.error : ""}
           >
             <option value="">Select status</option>
-            <option value="Active">Active</option>
-            <option value="Awaiting">Awaiting</option>
-            <option value="Destroyed">Destroyed</option>
+            <option value="active">Active: asset is in environment</option>
+            <option value="awaiting">Awaiting: asset awaiting creation in environment</option>
+            <option value="destroyed">Destroyed: asset has been destroyed in environment</option>
           </select>
           {errors.status && <span className={styles["error-text"]}>{errors.status.message}</span>}
         </div>
+
+        {errorMessage && (
+          <Alert type="error" className={styles.alert}>
+            <AlertMessage>{errorMessage}</AlertMessage>
+          </Alert>
+        )}
+
+        {successMessage && (
+          <Alert type="success" className={styles.alert}>
+            <AlertMessage>{successMessage}</AlertMessage>
+          </Alert>
+        )}
 
         <div className={styles.actions}>
           <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
             {isSubmitting ? "Creating..." : "Create Asset"}
           </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            // onClick={() => setSelectedStudy(null)}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
         </div>
       </form>
-    </div>
+    </Dialog>
   );
 }

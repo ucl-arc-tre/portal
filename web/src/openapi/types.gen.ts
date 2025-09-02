@@ -110,11 +110,7 @@ export type UserTrainingUpdate = {
 /**
  * A data asset representing a set of related data entities
  */
-export type Asset = {
-    /**
-     * Unique identifier for the asset
-     */
-    id: string;
+export type AssetBase = {
     /**
      * Title of the asset
      */
@@ -126,7 +122,7 @@ export type Asset = {
     /**
      * Classification level of the asset
      */
-    classification_impact: 'Public' | 'Confidential' | 'Highly confidential';
+    classification_impact: 'public' | 'confidential' | 'highly_confidential';
     /**
      * Storage locations and touchpoints for the asset
      */
@@ -134,7 +130,7 @@ export type Asset = {
     /**
      * Type of protection applied to the asset
      */
-    protection: 'anonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    protection: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
     /**
      * Legal basis for holding the asset
      */
@@ -142,11 +138,11 @@ export type Asset = {
     /**
      * Format of the asset
      */
-    format: string;
+    format: 'electronic' | 'paper' | 'other';
     /**
      * Retention expiry date of the asset
      */
-    expiry: string;
+    expires_at: string;
     /**
      * Whether there is an up to date Data Security & Protection Toolkit in place
      */
@@ -156,17 +152,27 @@ export type Asset = {
      */
     stored_outside_uk_eea: boolean;
     /**
-     * Whether the asset is accessed by or governed by third parties
-     */
-    accessed_by_third_parties: boolean;
-    /**
-     * Third party agreement identifier if asset is governed by third parties
-     */
-    third_party_agreement: string;
-    /**
      * Status of the asset
      */
-    status: 'Active' | 'Awaiting' | 'Destroyed';
+    status: 'active' | 'awaiting' | 'destroyed';
+};
+
+/**
+ * A research study asset
+ */
+export type Asset = AssetBase & {
+    /**
+     * Unique identifier for the asset
+     */
+    id: string;
+    /**
+     * Unique identifier of the user who created the asset
+     */
+    creator_user_id: string;
+    /**
+     * Unique identifier of the study to which the asset belongs
+     */
+    study_id: string;
     /**
      * Time in RFC3339 format when the asset was created
      */
@@ -175,6 +181,13 @@ export type Asset = {
      * Time in RFC3339 format when the asset was last updated
      */
     updated_at: string;
+};
+
+export type AssetCreateValidationError = {
+    /**
+     * Validation error message explaining why asset creation failed
+     */
+    error_message: string;
 };
 
 /**
@@ -792,7 +805,7 @@ export type GetStudiesByStudyIdAssetsResponses = {
 export type GetStudiesByStudyIdAssetsResponse = GetStudiesByStudyIdAssetsResponses[keyof GetStudiesByStudyIdAssetsResponses];
 
 export type PostStudiesByStudyIdAssetsData = {
-    body: Asset;
+    body: AssetBase;
     path: {
         /**
          * ID of the study
@@ -805,17 +818,13 @@ export type PostStudiesByStudyIdAssetsData = {
 
 export type PostStudiesByStudyIdAssetsErrors = {
     /**
-     * Invalid request
+     * Validation error
      */
-    400: unknown;
+    400: AssetCreateValidationError;
     /**
      * Forbidden
      */
     403: unknown;
-    /**
-     * Study not found
-     */
-    404: unknown;
     /**
      * Internal server error
      */
@@ -825,6 +834,8 @@ export type PostStudiesByStudyIdAssetsErrors = {
      */
     default: unknown;
 };
+
+export type PostStudiesByStudyIdAssetsError = PostStudiesByStudyIdAssetsErrors[keyof PostStudiesByStudyIdAssetsErrors];
 
 export type PostStudiesByStudyIdAssetsResponses = {
     /**

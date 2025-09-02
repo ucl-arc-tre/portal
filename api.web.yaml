@@ -351,7 +351,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Asset"
+              $ref: "#/components/schemas/AssetBase"
       responses:
         "201":
           description: Asset created successfully
@@ -360,15 +360,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/Asset"
         "400":
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetCreateValidationError"
         "403":
           description: Forbidden
-        "404":
-          description: Study not found
         "500":
           description: Internal server error
         default:
           description: Unexpected error
+
   /logout:
     get:
       description: Log the user out
@@ -623,11 +626,10 @@ components:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
 
-    Asset:
+    AssetBase:
       type: object
       description: A data asset representing a set of related data entities
       required:
-        - id
         - title
         - description
         - classification_impact
@@ -635,18 +637,13 @@ components:
         - protection
         - legal_basis
         - format
-        - expiry
+        - expires_at
         - has_dspt
         - stored_outside_uk_eea
         - accessed_by_third_parties
         - third_party_agreement
         - status
-        - created_at
-        - updated_at
       properties:
-        id:
-          type: string
-          description: Unique identifier for the asset
         title:
           type: string
           description: Title of the asset
@@ -656,9 +653,9 @@ components:
         classification_impact:
           type: string
           enum:
-            - Public
-            - Confidential
-            - Highly confidential
+            - public
+            - confidential
+            - highly_confidential
           description: Classification level of the asset
         locations:
           type: array
@@ -669,6 +666,7 @@ components:
           type: string
           enum:
             - anonymisation
+            - pseudonymisation
             - identifiable_low_confidence_pseudonymisation
           description: Type of protection applied to the asset
         legal_basis:
@@ -676,8 +674,12 @@ components:
           description: Legal basis for holding the asset
         format:
           type: string
+          enum:
+            - electronic
+            - paper
+            - other
           description: Format of the asset
-        expiry:
+        expires_at:
           type: string
           description: Retention expiry date of the asset
         has_dspt:
@@ -686,25 +688,50 @@ components:
         stored_outside_uk_eea:
           type: boolean
           description: Whether the asset is stored or processed outside UK and EEA
-        accessed_by_third_parties:
-          type: boolean
-          description: Whether the asset is accessed by or governed by third parties
-        third_party_agreement:
-          type: string
-          description: Third party agreement identifier if asset is governed by third parties
         status:
           type: string
           enum:
-            - Active
-            - Awaiting
-            - Destroyed
+            - active
+            - awaiting
+            - destroyed
           description: Status of the asset
-        created_at:
+
+    Asset:
+      allOf:
+        - $ref: "#/components/schemas/AssetBase"
+        - type: object
+          required:
+            - id
+            - creator_user_id
+            - study_id
+            - created_at
+            - updated_at
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the asset
+            creator_user_id:
+              type: string
+              description: Unique identifier of the user who created the asset
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the asset belongs
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the asset was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the asset was last updated
+      description: A research study asset
+
+    AssetCreateValidationError:
+      type: object
+      required:
+        - error_message
+      properties:
+        error_message:
           type: string
-          description: Time in RFC3339 format when the asset was created
-        updated_at:
-          type: string
-          description: Time in RFC3339 format when the asset was last updated
+          description: Validation error message explaining why asset creation failed
 
     StudyBase:
       type: object

@@ -19,22 +19,58 @@ const (
 
 // Defines values for AssetClassificationImpact.
 const (
-	Confidential       AssetClassificationImpact = "Confidential"
-	HighlyConfidential AssetClassificationImpact = "Highly confidential"
-	Public             AssetClassificationImpact = "Public"
+	AssetClassificationImpactConfidential       AssetClassificationImpact = "confidential"
+	AssetClassificationImpactHighlyConfidential AssetClassificationImpact = "highly_confidential"
+	AssetClassificationImpactPublic             AssetClassificationImpact = "public"
+)
+
+// Defines values for AssetFormat.
+const (
+	AssetFormatElectronic AssetFormat = "electronic"
+	AssetFormatOther      AssetFormat = "other"
+	AssetFormatPaper      AssetFormat = "paper"
 )
 
 // Defines values for AssetProtection.
 const (
-	Anonymisation                             AssetProtection = "anonymisation"
-	IdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
+	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
+	AssetProtectionIdentifiableLowConfidencePseudonymisation AssetProtection = "identifiable_low_confidence_pseudonymisation"
+	AssetProtectionPseudonymisation                          AssetProtection = "pseudonymisation"
 )
 
 // Defines values for AssetStatus.
 const (
-	Active    AssetStatus = "Active"
-	Awaiting  AssetStatus = "Awaiting"
-	Destroyed AssetStatus = "Destroyed"
+	AssetStatusActive    AssetStatus = "active"
+	AssetStatusAwaiting  AssetStatus = "awaiting"
+	AssetStatusDestroyed AssetStatus = "destroyed"
+)
+
+// Defines values for AssetBaseClassificationImpact.
+const (
+	AssetBaseClassificationImpactConfidential       AssetBaseClassificationImpact = "confidential"
+	AssetBaseClassificationImpactHighlyConfidential AssetBaseClassificationImpact = "highly_confidential"
+	AssetBaseClassificationImpactPublic             AssetBaseClassificationImpact = "public"
+)
+
+// Defines values for AssetBaseFormat.
+const (
+	AssetBaseFormatElectronic AssetBaseFormat = "electronic"
+	AssetBaseFormatOther      AssetBaseFormat = "other"
+	AssetBaseFormatPaper      AssetBaseFormat = "paper"
+)
+
+// Defines values for AssetBaseProtection.
+const (
+	AssetBaseProtectionAnonymisation                             AssetBaseProtection = "anonymisation"
+	AssetBaseProtectionIdentifiableLowConfidencePseudonymisation AssetBaseProtection = "identifiable_low_confidence_pseudonymisation"
+	AssetBaseProtectionPseudonymisation                          AssetBaseProtection = "pseudonymisation"
+)
+
+// Defines values for AssetBaseStatus.
+const (
+	AssetBaseStatusActive    AssetBaseStatus = "active"
+	AssetBaseStatusAwaiting  AssetBaseStatus = "awaiting"
+	AssetBaseStatusDestroyed AssetBaseStatus = "destroyed"
 )
 
 // Defines values for AuthRoles.
@@ -78,25 +114,25 @@ type AgreementConfirmation struct {
 // AgreementType defines model for AgreementType.
 type AgreementType string
 
-// Asset A data asset representing a set of related data entities
+// Asset defines model for Asset.
 type Asset struct {
-	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
-	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
-
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
 
 	// CreatedAt Time in RFC3339 format when the asset was created
 	CreatedAt string `json:"created_at"`
 
+	// CreatorUserId Unique identifier of the user who created the asset
+	CreatorUserId string `json:"creator_user_id"`
+
 	// Description Description of the asset
 	Description string `json:"description"`
 
-	// Expiry Retention expiry date of the asset
-	Expiry string `json:"expiry"`
+	// ExpiresAt Retention expiry date of the asset
+	ExpiresAt string `json:"expires_at"`
 
 	// Format Format of the asset
-	Format string `json:"format"`
+	Format AssetFormat `json:"format"`
 
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
@@ -119,8 +155,8 @@ type Asset struct {
 	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
 
-	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
-	ThirdPartyAgreement string `json:"third_party_agreement"`
+	// StudyId Unique identifier of the study to which the asset belongs
+	StudyId string `json:"study_id"`
 
 	// Title Title of the asset
 	Title string `json:"title"`
@@ -132,11 +168,68 @@ type Asset struct {
 // AssetClassificationImpact Classification level of the asset
 type AssetClassificationImpact string
 
+// AssetFormat Format of the asset
+type AssetFormat string
+
 // AssetProtection Type of protection applied to the asset
 type AssetProtection string
 
 // AssetStatus Status of the asset
 type AssetStatus string
+
+// AssetBase A data asset representing a set of related data entities
+type AssetBase struct {
+	// ClassificationImpact Classification level of the asset
+	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
+
+	// Description Description of the asset
+	Description string `json:"description"`
+
+	// ExpiresAt Retention expiry date of the asset
+	ExpiresAt string `json:"expires_at"`
+
+	// Format Format of the asset
+	Format AssetBaseFormat `json:"format"`
+
+	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
+	HasDspt bool `json:"has_dspt"`
+
+	// LegalBasis Legal basis for holding the asset
+	LegalBasis string `json:"legal_basis"`
+
+	// Locations Storage locations and touchpoints for the asset
+	Locations []string `json:"locations"`
+
+	// Protection Type of protection applied to the asset
+	Protection AssetBaseProtection `json:"protection"`
+
+	// Status Status of the asset
+	Status AssetBaseStatus `json:"status"`
+
+	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
+	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
+
+	// Title Title of the asset
+	Title string `json:"title"`
+}
+
+// AssetBaseClassificationImpact Classification level of the asset
+type AssetBaseClassificationImpact string
+
+// AssetBaseFormat Format of the asset
+type AssetBaseFormat string
+
+// AssetBaseProtection Type of protection applied to the asset
+type AssetBaseProtection string
+
+// AssetBaseStatus Status of the asset
+type AssetBaseStatus string
+
+// AssetCreateValidationError defines model for AssetCreateValidationError.
+type AssetCreateValidationError struct {
+	// ErrorMessage Validation error message explaining why asset creation failed
+	ErrorMessage string `json:"error_message"`
+}
 
 // Auth defines model for Auth.
 type Auth struct {
@@ -432,7 +525,7 @@ type PostStudiesJSONRequestBody = StudyCreateRequest
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
-type PostStudiesStudyIdAssetsJSONRequestBody = Asset
+type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody

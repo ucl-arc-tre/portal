@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled.current = true;
     };
-  }, []);
+  }, [refreshAuth]);
 
   return <AuthCtx.Provider value={{ authInProgress, isAuthed, userData, refreshAuth }}>{children}</AuthCtx.Provider>;
 }
