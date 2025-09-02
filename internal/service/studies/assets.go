@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	dateFormat              = "2006-01-02"                               // YYYY-MM-DD format for asset expiry dates
 	assetTitlePattern       = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`) // 4-50 chars, starts/ends with alphanumeric, only letters/numbers/spaces/hyphens
 	assetDescriptionPattern = regexp.MustCompile(`^.{4,255}$`)           // 4-255 characters, any content
 	textField500Pattern     = regexp.MustCompile(`^.{1,500}$`)           // 1-500 characters, any content
@@ -73,7 +74,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate expiry field
-	_, err := time.Parse("2006-01-02", assetData.ExpiresAt)
+	_, err := time.Parse(dateFormat, assetData.ExpiresAt)
 	if err != nil {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
@@ -117,8 +118,11 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		}
 	}()
 
-	// Parse the expiry date string
-	expiryDate, _ := time.Parse("2006-01-02", assetData.ExpiresAt)
+	// Parse the expiry date string (already validated in validateAssetData)
+	expiryDate, err := time.Parse(dateFormat, assetData.ExpiresAt)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
+	}
 
 	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
