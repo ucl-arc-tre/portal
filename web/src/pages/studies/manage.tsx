@@ -17,13 +17,13 @@ export default function ManageStudyPage() {
   const { studyId } = router.query;
   const { authInProgress, isAuthed, userData } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
-  const [studyLoading, setStudyLoading] = useState(false);
+  const [studyIsLoading, setStudyIsLoading] = useState(false);
   const [studyError, setStudyError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   const fetchStudy = async (id: string) => {
-    setStudyLoading(true);
+    setStudyIsLoading(true);
     setStudyError(null);
 
     try {
@@ -48,7 +48,7 @@ export default function ManageStudyPage() {
       console.error("Failed to fetch study:", error);
       setStudyError("Failed to load study. Please try again later.");
     } finally {
-      setStudyLoading(false);
+      setStudyIsLoading(false);
     }
   };
 
@@ -101,7 +101,7 @@ export default function ManageStudyPage() {
     );
   }
 
-  if (studyLoading) {
+  if (studyIsLoading) {
     return (
       <>
         <MetaHead
@@ -162,12 +162,6 @@ export default function ManageStudyPage() {
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
       <Title text={`Manage Study: ${study.title}`} />
-
-      <div className={styles["breadcrumb"]}>
-        <Button onClick={() => router.push("/studies")} variant="tertiary" size="small">
-          ← Back to Studies
-        </Button>
-      </div>
 
       <ManageStudy study={study} userData={userData!} />
     </>

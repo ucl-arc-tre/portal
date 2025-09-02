@@ -11,3 +11,8 @@
   color: #666;
   font-size: 1.1rem;
 }
+
+.completed-section {
+  width: 80%;
+  margin-top: 2rem;
+}

@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Study, Auth } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
-import StudyAgreement from "./study-steps/StudyAgreement";
+import StudyAgreement from "./StudyAgreement";
+import Assets from "../assets/Assets";
+
+import styles from "./ManageStudy.module.css";
 
 type ManageStudyProps = {
   study: Study;
@@ -11,43 +14,51 @@ type ManageStudyProps = {
 
 export default function ManageStudy({ study }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
+  const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
 
-  const studyStepsCompleted = agreementCompleted;
+  const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
   const studySteps: Step[] = [
     {
       id: "study-agreement",
       title: "Study Agreement",
-      description: "Review and accept the study agreement terms",
+      description: "Review and accept the study agreement terms.",
       completed: agreementCompleted,
       current: !agreementCompleted,
     },
     {
-      id: "study-asset",
-      title: "Study Asset",
-      description: "Create and manage at least one study asset",
-      completed: false,
-      current: agreementCompleted, // replace with actual asset management step logic
+      id: "study-assets",
+      title: "Study Assets",
+      description: "Create and manage at least one study asset. You can create more assets at any time.",
+      completed: assetManagementCompleted,
+      current: agreementCompleted && !assetManagementCompleted,
     },
   ];
 
   const getCurrentStepComponent = () => {
-    return (
-      <StudyAgreement
-        studyId={study.id}
-        studyTitle={study.title}
-        agreementCompleted={agreementCompleted}
-        setAgreementCompleted={setAgreementCompleted}
-      />
-    );
-    // Todo: insert next step (asset creation)
+    if (!agreementCompleted) {
+      return (
+        <StudyAgreement
+          studyId={study.id}
+          studyTitle={study.title}
+          agreementCompleted={agreementCompleted}
+          setAgreementCompleted={setAgreementCompleted}
+        />
+      );
+    }
+
+    if (!assetManagementCompleted) {
+      return (
+        <Assets studyId={study.id} studyTitle={study.title} setAssetManagementCompleted={setAssetManagementCompleted} />
+      );
+    }
   };
 
   return (
     <>
       <StepProgress
         steps={studySteps}
-        isComplete={false}
+        isComplete={studyStepsCompleted}
         completionTitle="Study Setup Complete!"
         completionSubtitle="You have successfully completed all study setup steps."
         completionButtonText="Go to studies"
@@ -58,7 +69,13 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
       {!studyStepsCompleted && <StepArrow />}
 
-      <div>{getCurrentStepComponent()}</div>
+      {getCurrentStepComponent()}
+
+      {studyStepsCompleted && (
+        <div className={styles["completed-section"]}>
+          <Assets studyId={study.id} studyTitle={study.title} />
+        </div>
+      )}
     </>
   );
 }

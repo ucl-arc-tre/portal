@@ -4,7 +4,6 @@ const pages = [
   { name: "Homepage", path: "/" },
   { name: "Profile page", path: "/profile" },
   { name: "Studies page", path: "/studies" },
-  { name: "Assets page", path: "/assets" },
   { name: "Projects page", path: "/projects" },
   { name: "People page", path: "/people" },
 ];

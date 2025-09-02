@@ -1,0 +1,122 @@
+.asset-card {
+  width: 60%;
+  margin: auto;
+  margin-top: 1rem;
+  background: #ffffff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.asset-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.asset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.asset-title {
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.asset-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .asset-meta {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+.asset-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.asset-classification-public {
+  background: #d4edda;
+  color: #155724;
+}
+
+.asset-classification-confidential {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.asset-classification-highly-confidential {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.asset-protection {
+  background: #e7f3ff;
+  color: #0c5aa6;
+}
+
+.asset-description {
+  color: #495057;
+  line-height: 1.5;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.asset-details {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.asset-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.asset-detail-label {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.asset-detail-value {
+  color: #495057;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+.asset-locations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+.asset-location {
+  background: #f8f9fa;
+  color: #495057;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  font-size: 0.75rem;
+}
