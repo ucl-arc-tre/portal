@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -58,23 +60,23 @@ type StudyAdmin struct {
 
 type Asset struct {
 	ModelAuditable
-	StudyID                uuid.UUID `gorm:"not null;index"`
-	Title                  string    `gorm:"not null"`
-	Description            string    `gorm:"type:text;not null"`
-	ClassificationImpact   string    `gorm:"not null"`
-	Protection             string    `gorm:"not null"`
-	LegalBasis             string    `gorm:"not null"`
-	Format                 string    `gorm:"not null"`
-	Expiry                 string    `gorm:"not null"`
-	HasDspt                bool      `gorm:"not null;default:false"`
-	StoredOutsideUkEea     bool      `gorm:"not null;default:false"`
-	AccessedByThirdParties bool      `gorm:"not null;default:false"`
-	ThirdPartyAgreement    string    `gorm:""`
-	Status                 string    `gorm:"not null"`
+	CreatorUserID        uuid.UUID `gorm:"not null;index"`
+	StudyID              uuid.UUID `gorm:"not null;index"`
+	Title                string    `gorm:"not null"`
+	Description          string    `gorm:"type:text;not null"`
+	ClassificationImpact string    `gorm:"not null"`
+	Protection           string    `gorm:"not null"`
+	LegalBasis           string    `gorm:"not null"`
+	Format               string    `gorm:"not null"`
+	ExpiresAt            time.Time `gorm:"not null"`
+	HasDspt              bool      `gorm:"not null;default:false"`
+	StoredOutsideUkEea   bool      `gorm:"not null;default:false"`
+	Status               string    `gorm:"not null"`
 
 	// Relationships
-	Study     Study           `gorm:"foreignKey:StudyID"`
-	Locations []AssetLocation `gorm:"foreignKey:AssetID"`
+	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
+	Study       Study           `gorm:"foreignKey:StudyID"`
+	Locations   []AssetLocation `gorm:"foreignKey:AssetID"`
 }
 
 func (a Asset) LocationStrings() []string {
