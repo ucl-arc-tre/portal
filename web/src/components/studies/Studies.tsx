@@ -35,8 +35,6 @@ export default function Studies(props: Props) {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    console.log("Submitting study data:", data);
-
     try {
       // Convert form data to StudyCreateRequest API format
       const studyData: StudyCreateRequest = {
