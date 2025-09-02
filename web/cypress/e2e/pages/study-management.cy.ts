@@ -134,7 +134,7 @@ describe("Study Assets Management", () => {
     cy.get("select[name='protection']").select("anonymisation");
     cy.get("input[name='legal_basis']").type("test123");
     cy.get("select[name='format']").select("electronic");
-    cy.get("input[name='expiry']").type("2025-12-31");
+    cy.get("input[name='expires_at']").type("2025-12-31");
 
     // Select at least one location
     cy.get("input[type='checkbox'][value='arc_tre']").check();

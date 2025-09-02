@@ -142,7 +142,7 @@ export type AssetBase = {
     /**
      * Retention expiry date of the asset
      */
-    expiry: string;
+    expires_at: string;
     /**
      * Whether there is an up to date Data Security & Protection Toolkit in place
      */
@@ -151,14 +151,6 @@ export type AssetBase = {
      * Whether the asset is stored or processed outside UK and EEA
      */
     stored_outside_uk_eea: boolean;
-    /**
-     * Whether the asset is accessed by or governed by third parties
-     */
-    accessed_by_third_parties: boolean;
-    /**
-     * Third party agreement identifier if asset is governed by third parties
-     */
-    third_party_agreement: string;
     /**
      * Status of the asset
      */

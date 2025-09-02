@@ -41,7 +41,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       protection: "",
       legal_basis: "",
       format: "",
-      expiry: "",
+      expires_at: "",
       locations: [],
       has_dspt: false,
       stored_outside_uk_eea: false,
@@ -226,19 +226,19 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="expiry" className={styles["red-text"]}>
+          <label htmlFor="expires_at" className={styles["red-text"]}>
             What is the asset&apos;s retention expiry date? *
           </label>
           <input
-            id="expiry"
+            id="expires_at"
             type="date"
-            {...register("expiry", {
+            {...register("expires_at", {
               required: "Expiry date is required",
             })}
-            aria-invalid={!!errors.expiry}
-            className={errors.expiry ? styles.error : ""}
+            aria-invalid={!!errors.expires_at}
+            className={errors.expires_at ? styles.error : ""}
           />
-          {errors.expiry && <span className={styles["error-text"]}>{errors.expiry.message}</span>}
+          {errors.expires_at && <span className={styles["error-text"]}>{errors.expires_at.message}</span>}
         </div>
 
         <div className={styles.field}>

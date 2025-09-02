@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"time"
 
 	"slices"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -17,7 +19,6 @@ var (
 	assetTitlePattern       = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`) // 4-50 chars, starts/ends with alphanumeric, only letters/numbers/spaces/hyphens
 	assetDescriptionPattern = regexp.MustCompile(`^.{4,255}$`)           // 4-255 characters, any content
 	textField500Pattern     = regexp.MustCompile(`^.{1,500}$`)           // 1-500 characters, any content
-	expiryPattern           = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)  // YYYY-MM-DD date format
 )
 
 func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.AssetCreateValidationError, error) {
@@ -72,7 +73,8 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate expiry field
-	if !expiryPattern.MatchString(assetData.Expiry) {
+	_, err := time.Parse("2006-01-02", assetData.ExpiresAt)
+	if err != nil {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
 
@@ -115,6 +117,9 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		}
 	}()
 
+	// Parse the expiry date string
+	expiryDate, _ := time.Parse("2006-01-02", assetData.ExpiresAt)
+
 	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
 		CreatorUserID:        user.ID,
@@ -125,7 +130,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		Protection:           string(assetData.Protection),
 		LegalBasis:           assetData.LegalBasis,
 		Format:               string(assetData.Format),
-		Expiry:               assetData.Expiry,
+		ExpiresAt:            expiryDate,
 		HasDspt:              assetData.HasDspt,
 		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
 		Status:               string(assetData.Status),

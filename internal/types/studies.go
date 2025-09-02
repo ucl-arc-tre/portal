@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -66,7 +68,7 @@ type Asset struct {
 	Protection           string    `gorm:"not null"`
 	LegalBasis           string    `gorm:"not null"`
 	Format               string    `gorm:"not null"`
-	Expiry               string    `gorm:"not null"`
+	ExpiresAt            time.Time `gorm:"not null"`
 	HasDspt              bool      `gorm:"not null;default:false"`
 	StoredOutsideUkEea   bool      `gorm:"not null;default:false"`
 	Status               string    `gorm:"not null"`

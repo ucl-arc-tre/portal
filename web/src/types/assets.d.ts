@@ -5,7 +5,7 @@ type AssetFormData = {
   protection: string;
   legal_basis: string;
   format: string;
-  expiry: string;
+  expires_at: string;
   locations: string[];
   has_dspt: boolean | string; // Can be string from form, converted to boolean
   stored_outside_uk_eea: boolean | string; // Can be string from form, converted to boolean

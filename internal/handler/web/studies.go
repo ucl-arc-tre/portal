@@ -59,7 +59,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Protection:           openapi.AssetProtection(asset.Protection),
 		LegalBasis:           asset.LegalBasis,
 		Format:               openapi.AssetFormat(asset.Format),
-		Expiry:               asset.Expiry,
+		ExpiresAt:            asset.ExpiresAt.Format(config.TimeFormat),
 		Locations:            asset.LocationStrings(),
 		HasDspt:              asset.HasDspt,
 		StoredOutsideUkEea:   asset.StoredOutsideUkEea,

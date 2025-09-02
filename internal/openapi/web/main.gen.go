@@ -116,9 +116,6 @@ type AgreementType string
 
 // Asset defines model for Asset.
 type Asset struct {
-	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
-	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
-
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
 
@@ -131,8 +128,8 @@ type Asset struct {
 	// Description Description of the asset
 	Description string `json:"description"`
 
-	// Expiry Retention expiry date of the asset
-	Expiry string `json:"expiry"`
+	// ExpiresAt Retention expiry date of the asset
+	ExpiresAt string `json:"expires_at"`
 
 	// Format Format of the asset
 	Format AssetFormat `json:"format"`
@@ -161,9 +158,6 @@ type Asset struct {
 	// StudyId Unique identifier of the study to which the asset belongs
 	StudyId string `json:"study_id"`
 
-	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
-	ThirdPartyAgreement string `json:"third_party_agreement"`
-
 	// Title Title of the asset
 	Title string `json:"title"`
 
@@ -185,17 +179,14 @@ type AssetStatus string
 
 // AssetBase A data asset representing a set of related data entities
 type AssetBase struct {
-	// AccessedByThirdParties Whether the asset is accessed by or governed by third parties
-	AccessedByThirdParties bool `json:"accessed_by_third_parties"`
-
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
 
 	// Description Description of the asset
 	Description string `json:"description"`
 
-	// Expiry Retention expiry date of the asset
-	Expiry string `json:"expiry"`
+	// ExpiresAt Retention expiry date of the asset
+	ExpiresAt string `json:"expires_at"`
 
 	// Format Format of the asset
 	Format AssetBaseFormat `json:"format"`
@@ -217,9 +208,6 @@ type AssetBase struct {
 
 	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
-
-	// ThirdPartyAgreement Third party agreement identifier if asset is governed by third parties
-	ThirdPartyAgreement string `json:"third_party_agreement"`
 
 	// Title Title of the asset
 	Title string `json:"title"`
