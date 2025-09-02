@@ -11,7 +11,16 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   {
-    ignores: ["out/**", "node_modules/**", ".next/**", "dist/**", "cypress/**", "cypress.config.ts", "src/openapi/**"],
+    ignores: [
+      "out/**",
+      "node_modules/**",
+      ".next/**",
+      "dist/**",
+      "cypress/**",
+      "cypress.config.ts",
+      "src/openapi/**",
+      "next-env.d.ts",
+    ],
   },
   ...compat.config({
     extends: ["next/core-web-vitals", "next/typescript"],
