@@ -61,8 +61,13 @@ export default function PeoplePage() {
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
+      if (query === "") {
+        setUsers(originalUsers);
+        setSearchErrorMessage("");
+        return;
+      }
       setSearchErrorMessage("invalid query; note that there's a minimum of 3 characters required to perform search");
-      setUsers(originalUsers);
+
       return;
     }
 
