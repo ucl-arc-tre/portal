@@ -67,6 +67,13 @@ export default function PeoplePage() {
       return;
     }
 
+    const regex = `^\w[\w.\s0-9@]+\w$`;
+    const isValid = new RegExp(regex).test(query);
+    if (!isValid) {
+      setSearchErrorMessage("invalid query");
+      return;
+    }
+
     const response = await getUsers({ query: { find: query } });
 
     if (!response.response.ok || !response.data) {
