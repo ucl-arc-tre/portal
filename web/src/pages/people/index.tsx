@@ -5,10 +5,10 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, Input } from "@/components/shared/exports";
+import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
@@ -54,25 +54,28 @@ export default function PeoplePage() {
   const isAdmin = userData?.roles.includes("admin");
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
+  const canSearch = isTreOpsStaff || isAdmin;
 
   const handleUserSearch = async (query: string) => {
-    if (query !== "") {
-      const response = await getUsers({ query: { find: query } });
-      if (response.response.ok && response.data) {
-        setUsers(response.data);
-      } else {
-        setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
-      }
+    if (query.length < 3) {
+      setSearchErrorMessage("minimum 3 characters required to perform search");
     } else {
-      setUsers(originalUsers);
+      if (query === "") {
+        setUsers(originalUsers);
+      } else {
+        const response = await getUsers({ query: { find: query } });
+        if (response.response.ok && response.data) {
+          setUsers(response.data);
+          setSearchErrorMessage("");
+        } else {
+          setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+        }
+      }
     }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-    if (event.target.value === "") {
-      setUsers(originalUsers);
-    }
   };
   const handleUserSearchSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -105,35 +108,42 @@ export default function PeoplePage() {
                 : "You do not have permission to view this page"
         }
       />
-
+      {canSearch && (
+        <HelperText>
+          <small>Search by display name, user principal or email</small>
+        </HelperText>
+      )}
       <div className={styles["button-container"]}>
-        {(isAdmin || isTreOpsStaff) && (
-          <form className={styles["search-container"]}>
-            <Input
-              placeholder="search users..."
-              id={styles.search}
-              name="search"
-              onChange={handleInputChange}
-              value={searchTerm}
-              aria-label="search users of the portal"
-            ></Input>
-            <Button
-              variant="tertiary"
-              icon={<SearchIcon />}
-              onClick={handleUserSearchSubmit}
-              type="submit"
-              aria-label="submit user search query"
-            ></Button>
-            {searchErrorMessage && (
-              <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
-              </Alert>
-            )}
-          </form>
+        {canSearch && (
+          <div className={styles["search-wrapper"]}>
+            <form className={styles["search-container"]}>
+              <Input
+                placeholder="search users..."
+                id={styles.search}
+                name="search"
+                onChange={handleInputChange}
+                value={searchTerm}
+                aria-label="search users of the portal"
+              ></Input>
+              <Button
+                variant="tertiary"
+                icon={<SearchIcon />}
+                onClick={handleUserSearchSubmit}
+                type="submit"
+                aria-label="submit user search query"
+              ></Button>
+            </form>
+          </div>
         )}
         {isAdmin && <ApprovedResearcherImport />}
         {(isAdmin || isIAO) && <ExternalInvite />}
       </div>
+
+      {searchErrorMessage !== "" && (
+        <Alert type="error">
+          <AlertMessage>{searchErrorMessage}</AlertMessage>
+        </Alert>
+      )}
       {!isAdmin && <Callout construction />}
       {!users || users.length === 0 ? (
         <Box>
