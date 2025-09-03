@@ -57,15 +57,16 @@ export default function PeoplePage() {
   const canSearch = isTreOpsStaff || isAdmin;
 
   const handleUserSearch = async (query: string) => {
+    if (query === "") {
+      setUsers(originalUsers);
+      setSearchErrorMessage("");
+      return;
+    }
+
     const regex = /^\w[\w.\s0-9@]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
-      if (query === "") {
-        setUsers(originalUsers);
-        setSearchErrorMessage("");
-        return;
-      }
       setSearchErrorMessage("invalid query; note that there's a minimum of 3 characters required to perform search");
 
       return;
