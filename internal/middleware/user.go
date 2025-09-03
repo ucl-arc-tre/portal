@@ -51,7 +51,7 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	if hasBaseRole, err := rbac.HasRole(user, rbac.Base); err != nil && !hasBaseRole {
+	if hasBaseRole, err := rbac.HasRole(user, rbac.Base); err == nil && !hasBaseRole {
 		_, _ = rbac.AddRole(user, rbac.Base)
 	}
 	if err := u.setDynamicRoles(ctx, user); err != nil {
