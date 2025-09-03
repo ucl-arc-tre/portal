@@ -59,7 +59,6 @@ export default function PeoplePage() {
   const handleUserSearch = async (query: string) => {
     const regex = /^\w[\w.\s0-9@]+\w$/;
     const isValid = new RegExp(regex).test(query);
-    console.log(query, isValid);
 
     if (!isValid) {
       setSearchErrorMessage("invalid query; note that there's a minimum of 3 characters required to perform search");
