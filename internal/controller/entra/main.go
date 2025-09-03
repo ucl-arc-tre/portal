@@ -138,6 +138,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 
 	if user != nil {
 		log.Debug().Any("user", user).Msg("User already exists in entra")
+		// todo: send custom email invite
 		return nil
 	}
 

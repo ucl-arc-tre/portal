@@ -13,6 +13,12 @@ entra:
   invite_redirect_url: <CHANGE_ME> # where you want to send the user when they accept the invite, eg. http://localhost:8000/profile
   primary_domain: <CHANGE_ME> # eg. arctretest.onmicrosoft.com
   invited_user_group_id: <CHANGE_ME> # found in the Azure portal, eg Invited Users group
+
+  # Mail app details, linked to staging on UCL tenant
+  # these are different for dev/staging to the details above but will be the same on prod
+  mail_tenant_id: <CHANGE_ME>
+  mail_client_id: <CHANGE_ME>
+  mail_client_secret: <CHANGE_ME>
 tre:
   users:
     username: password # pragma: allowlist secret
