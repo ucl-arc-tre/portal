@@ -23,7 +23,7 @@ const (
 )
 
 var (
-	employeeTypeStaffPattern = regexp.MustCompile(`(?i)staff(?:[,]|$)`)
+	employeeTypeStaffPattern = regexp.MustCompile(`(?i)(?:^|\s|,)staff(?:,|$)`)
 )
 
 var controller *Controller
