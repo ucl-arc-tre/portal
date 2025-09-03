@@ -76,10 +76,11 @@ func (h *Handler) getUsersTreOps(ctx *gin.Context, query *string) {
 
 		for _, userData := range users {
 			// only carry over users with approved researcher role
-			if slices.Contains(userData.Roles, "approved_researcher") {
+			if slices.Contains(userData.Roles, "approved-researcher") {
 				people = append(people, userData)
 			}
 		}
+
 		ctx.JSON(http.StatusOK, people)
 
 	} else {
