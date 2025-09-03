@@ -56,23 +56,28 @@ export default function PeoplePage() {
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const canSearch = isTreOpsStaff || isAdmin;
 
-  const handleUserSearch = async (query: string) => {
-    if (query.length < 3) {
-      setSearchErrorMessage("minimum 3 characters required to perform search");
-    } else {
-      if (query === "") {
-        setUsers(originalUsers);
-      } else {
-        const response = await getUsers({ query: { find: query } });
-        if (response.response.ok && response.data) {
-          setUsers(response.data);
-          setSearchErrorMessage("");
-        } else {
-          setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
-        }
-      }
-    }
-  };
+ const handleUserSearch = async (query: string) => {
+  if (query.length < 3) {
+    setSearchErrorMessage("minimum 3 characters required to perform search");
+    return;
+  }
+
+  if (query === "") {
+    setUsers(originalUsers);
+    return;
+  }
+
+  const response = await getUsers({ query: { find: query } });
+
+  if (!response.response.ok || !response.data) {
+    setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+    return;
+  }
+
+  setUsers(response.data);
+  setSearchErrorMessage("");
+};
+
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
