@@ -24,6 +24,9 @@ export default function ApprovedResearcherImport() {
     try {
       const response = await postUsersApprovedResearchersImportCsv({
         body: files[0],
+        bodySerializer: (b) => {
+          return b; // noop serialisation for blob
+        },
       });
       if (response.error) {
         console.error(response.error);
