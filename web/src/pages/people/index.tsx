@@ -5,7 +5,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
@@ -115,25 +115,23 @@ export default function PeoplePage() {
       )}
       <div className={styles["button-container"]}>
         {canSearch && (
-          <div className={styles["search-wrapper"]}>
-            <form className={styles["search-container"]}>
-              <Input
-                placeholder="search users..."
-                id={styles.search}
-                name="search"
-                onChange={handleInputChange}
-                value={searchTerm}
-                aria-label="search users of the portal"
-              ></Input>
-              <Button
-                variant="tertiary"
-                icon={<SearchIcon />}
-                onClick={handleUserSearchSubmit}
-                type="submit"
-                aria-label="submit user search query"
-              ></Button>
-            </form>
-          </div>
+          <form className={styles["search-container"]} data-cy="search-users">
+            <Input
+              placeholder="search users..."
+              id={styles.search}
+              name="search"
+              onChange={handleInputChange}
+              value={searchTerm}
+              aria-label="search users of the portal"
+            ></Input>
+            <Button
+              variant="tertiary"
+              icon={<SearchIcon />}
+              onClick={handleUserSearchSubmit}
+              type="submit"
+              aria-label="submit user search query"
+            ></Button>
+          </form>
         )}
         {isAdmin && <ApprovedResearcherImport />}
         {(isAdmin || isIAO) && <ExternalInvite />}

@@ -9,11 +9,6 @@
   margin-block: 0.8rem;
 }
 
-.search-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
 .search-container {
   display: flex;
   vertical-align: middle;
