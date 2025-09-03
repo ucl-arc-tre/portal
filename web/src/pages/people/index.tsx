@@ -5,7 +5,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
@@ -26,6 +26,7 @@ export default function PeoplePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const fetchPeople = async () => {
     setIsLoading(true);
@@ -60,6 +61,7 @@ export default function PeoplePage() {
     if (query === "") {
       setUsers(originalUsers);
       setSearchErrorMessage("");
+      setSearchTerm("");
       return;
     }
 
@@ -78,13 +80,14 @@ export default function PeoplePage() {
       setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
       return;
     }
-
+    setSearchTerm(query);
     setUsers(response.data);
     setSearchErrorMessage("");
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    const inputValue = event.target.value;
+    searchRef.current!.value = inputValue;
   };
 
   if (!isAdmin && !isTreOpsStaff && !isIAO)
@@ -126,7 +129,7 @@ export default function PeoplePage() {
               id={styles.search}
               name="search"
               onChange={handleInputChange}
-              value={searchTerm}
+              ref={searchRef}
               aria-label="search users of the portal"
             ></Input>
             <Button
@@ -134,7 +137,7 @@ export default function PeoplePage() {
               icon={<SearchIcon />}
               onClick={(e) => {
                 e.preventDefault();
-                handleUserSearch(searchTerm);
+                handleUserSearch(searchRef.current!.value);
               }}
               type="submit"
               aria-label="submit user search query"
@@ -167,7 +170,10 @@ export default function PeoplePage() {
           )}
         </Box>
       ) : (
-        <UserDataTable canEdit={true} users={users} setUsers={setUsers} isLoading={isLoading} />
+        <>
+          {canSearch && searchTerm.length > 0 && <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>}
+          <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+        </>
       )}
     </>
   );
