@@ -76,7 +76,7 @@ func (h *Handler) getUsersTreOps(ctx *gin.Context, query *string) {
 
 		for _, userData := range users {
 			// only carry over users with approved researcher role
-			if slices.Contains(userData.Roles, "approved-researcher") {
+			if slices.Contains(userData.Roles, string(rbac.ApprovedResearcher)) {
 				people = append(people, userData)
 			}
 		}
