@@ -3,6 +3,7 @@ package entra
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -19,6 +20,10 @@ import (
 
 const (
 	cacheTTL = 12 * time.Hour
+)
+
+var (
+	employeeTypeStaffPattern = regexp.MustCompile(`(?i)(?:^|\s|,)staff(?:,|$)`)
 )
 
 var controller *Controller
@@ -123,9 +128,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 		return false, types.NewNotFoundError("employee type unset")
 	}
 
-	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
-
-	return isStaff, nil
+	return employeeTypeIsStaff(*userData.EmployeeType), nil
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
@@ -182,5 +185,8 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 
 	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
 	return err
+}
 
+func employeeTypeIsStaff(employeeType string) bool {
+	return employeeTypeStaffPattern.MatchString(employeeType)
 }
