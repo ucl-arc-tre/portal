@@ -56,35 +56,30 @@ export default function PeoplePage() {
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const canSearch = isTreOpsStaff || isAdmin;
 
- const handleUserSearch = async (query: string) => {
-  if (query.length < 3) {
-    setSearchErrorMessage("minimum 3 characters required to perform search");
-    return;
-  }
+  const handleUserSearch = async (query: string) => {
+    if (query.length < 3) {
+      setSearchErrorMessage("minimum 3 characters required to perform search");
+      return;
+    }
 
-  if (query === "") {
-    setUsers(originalUsers);
-    return;
-  }
+    if (query === "") {
+      setUsers(originalUsers);
+      return;
+    }
 
-  const response = await getUsers({ query: { find: query } });
+    const response = await getUsers({ query: { find: query } });
 
-  if (!response.response.ok || !response.data) {
-    setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
-    return;
-  }
+    if (!response.response.ok || !response.data) {
+      setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+      return;
+    }
 
-  setUsers(response.data);
-  setSearchErrorMessage("");
-};
-
+    setUsers(response.data);
+    setSearchErrorMessage("");
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-  };
-  const handleUserSearchSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    handleUserSearch(searchTerm);
   };
 
   if (!isAdmin && !isTreOpsStaff && !isIAO)
@@ -132,7 +127,7 @@ export default function PeoplePage() {
             <Button
               variant="tertiary"
               icon={<SearchIcon />}
-              onClick={handleUserSearchSubmit}
+              onClick={() => handleUserSearch(searchTerm)}
               type="submit"
               aria-label="submit user search query"
             ></Button>
