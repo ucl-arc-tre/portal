@@ -150,6 +150,7 @@ export default function PeoplePage() {
         </Alert>
       )}
       {!isAdmin && <Callout construction />}
+      {searchTerm.length > 2 && <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>}
       {!users || users.length === 0 ? (
         <Box>
           <div className={styles["no-users-found"]}>
