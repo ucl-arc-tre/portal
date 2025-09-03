@@ -125,7 +125,10 @@ export default function PeoplePage() {
             <Button
               variant="tertiary"
               icon={<SearchIcon />}
-              onClick={() => handleUserSearch(searchTerm)}
+              onClick={(e) => {
+                e.preventDefault();
+                handleUserSearch(searchTerm);
+              }}
               type="submit"
               aria-label="submit user search query"
             ></Button>
