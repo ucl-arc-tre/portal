@@ -499,7 +499,7 @@ type UserTrainingUpdate struct {
 
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
-	// Find user details to lookup by. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
 	Find *string `form:"find,omitempty" json:"find,omitempty"`
 }
 

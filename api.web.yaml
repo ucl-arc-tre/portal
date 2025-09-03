@@ -148,7 +148,7 @@ paths:
         - in: query
           name: find
           required: false
-          description: user details to lookup by. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+          description: user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
           schema:
             type: string
       responses:
