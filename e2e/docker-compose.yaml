@@ -23,6 +23,8 @@ services:
     build:
       context: ..
       target: web-frontend-release
+      args:
+        NEXT_PUBLIC_AGREEMENT_TIMER: 1
     environment:
       PORT: "8080"
       IS_TESTING: true
@@ -46,7 +48,7 @@ services:
       POSTGRES_DB: dev
 
   cypress:
-    image: cypress/included:14.3.0
+    image: cypress/included:15.0.0
     depends_on:
       - nginx
     working_dir: /repo/web
