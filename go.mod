@@ -3,8 +3,8 @@ module github.com/ucl-arc-tre/portal
 go 1.24.0
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.10.1
-	github.com/casbin/casbin/v2 v2.111.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.11.0
+	github.com/casbin/casbin/v2 v2.121.0
 	github.com/casbin/gorm-adapter/v3 v3.36.0
 	github.com/gin-contrib/secure v1.1.2
 	github.com/gin-gonic/gin v1.10.1
@@ -15,19 +15,19 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/microsoft/kiota-abstractions-go v1.9.3
-	github.com/microsoftgraph/msgraph-sdk-go v1.81.0
+	github.com/microsoftgraph/msgraph-sdk-go v1.84.0
 	github.com/oapi-codegen/runtime v1.1.2
 	github.com/rs/zerolog v1.34.0
-	github.com/stretchr/testify v1.10.0
-	golang.org/x/text v0.27.0
+	github.com/stretchr/testify v1.11.1
+	golang.org/x/text v0.28.0
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gorm v1.30.1
+	gorm.io/gorm v1.30.2
 )
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.1 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.1 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.2 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.2 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
@@ -50,7 +50,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
