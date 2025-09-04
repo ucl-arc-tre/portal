@@ -31,6 +31,7 @@ var controller *Controller
 
 type Controller struct {
 	client        *graph.GraphServiceClient
+	mailClient    *graph.GraphServiceClient
 	userDataCache *expirable.LRU[types.Username, UserData]
 }
 
@@ -56,8 +57,25 @@ func New() *Controller {
 	if err != nil {
 		panic(fmt.Errorf("failed to create msgraph client [%v]", err))
 	}
+
+	mailCredentials := config.EntraMailCredentials()
+	mailAzCredentials, err := azidentity.NewClientSecretCredential(
+		mailCredentials.TenantID,
+		mailCredentials.ClientID,
+		mailCredentials.ClientSecret,
+		nil,
+	)
+	if err != nil {
+		panic(fmt.Errorf("failed to create msgraph mail client credentials [%v]", err))
+	}
+	mailClient, err := graph.NewGraphServiceClientWithCredentials(mailAzCredentials, scopes)
+	if err != nil {
+		panic(fmt.Errorf("failed to create msgraph mail client [%v]", err))
+	}
+
 	controller = &Controller{
 		client:        graphClient,
+		mailClient:    mailClient,
 		userDataCache: expirable.NewLRU[types.Username, UserData](1000, nil, cacheTTL),
 	}
 	return controller
@@ -150,9 +168,9 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 
 		message := ""
 		if sponsor.ChosenName != "" {
-			message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
+			message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
 		} else {
-			message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
+			message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
 		}
 		messageInfo := graphmodels.NewInvitedUserMessageInfo()
 
