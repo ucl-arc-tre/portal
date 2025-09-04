@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { Input, Alert, AlertMessage, Label } from "../shared/exports";
+import { Input, Alert, AlertMessage, Label, HelperText } from "../shared/exports";
 import styles from "./CreateStudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 import dynamic from "next/dynamic";
 
 const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Textarea), {
-  ssr: false,
-});
-const HelperText = dynamic(() => import("uikit-react-public").then((mod) => mod.Field.HelperText), {
   ssr: false,
 });
 

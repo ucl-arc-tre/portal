@@ -3,11 +3,13 @@ package entra
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/hashicorp/golang-lru/v2/expirable"
+	abstractions "github.com/microsoft/kiota-abstractions-go"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
@@ -19,6 +21,10 @@ import (
 
 const (
 	cacheTTL = 12 * time.Hour
+)
+
+var (
+	employeeTypeStaffPattern = regexp.MustCompile(`(?i)(?:^|\s|,)staff(?:,|$)`)
 )
 
 var controller *Controller
@@ -123,9 +129,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 		return false, types.NewNotFoundError("employee type unset")
 	}
 
-	isStaff := strings.ToLower(*userData.EmployeeType) == "staff"
-
-	return isStaff, nil
+	return employeeTypeIsStaff(*userData.EmployeeType), nil
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
@@ -183,5 +187,50 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 
 	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
 	return err
+}
 
+func employeeTypeIsStaff(employeeType string) bool {
+	return employeeTypeStaffPattern.MatchString(employeeType)
+}
+
+// FindUsernames searches entra for usernames given a query of email, user principal or display name
+func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
+	queryRegex := regexp.MustCompile(`^\w[\w.\s0-9@]+\w$`)
+	queryIsValid := queryRegex.MatchString(query)
+	if !queryIsValid {
+		return nil, types.NewErrInvalidObject(fmt.Sprintf("invalid query [%v]", query))
+	}
+
+	filterQuery := fmt.Sprintf(
+		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
+		query, query, query, query,
+	)
+	resultLimit := int32(20) // limits to 20 results or 20 per page if more than 20 results
+
+	headers := abstractions.NewRequestHeaders()
+
+	configuration := &graphusers.UsersRequestBuilderGetRequestConfiguration{
+		Headers: headers,
+		QueryParameters: &graphusers.UsersRequestBuilderGetQueryParameters{
+			Filter: &filterQuery,
+			Top:    &resultLimit,
+		},
+	}
+
+	data, err := c.client.Users().Get(ctx, configuration)
+	if err != nil {
+		return nil, types.NewErrServerError(err)
+	}
+
+	usernames := []types.Username{}
+
+	userMatches := data.GetValue()
+	if userMatches != nil {
+		for _, user := range userMatches {
+			if user.GetUserPrincipalName() != nil {
+				usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
+			}
+		}
+	}
+	return usernames, nil
 }

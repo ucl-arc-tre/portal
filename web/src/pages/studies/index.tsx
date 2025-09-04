@@ -60,6 +60,18 @@ export default function StudiesPage() {
         </Button>
       </Callout>
 
+      <Callout
+        construction
+        text="Please be aware this site is under development and features may change. This means any data you create may be lost. "
+      >
+        <span>
+          If you require a more stable record of your study, you can fill out the{" "}
+          <a href="https://liveuclac.sharepoint.com/sites/ISD.IGAdvisoryService/Lists/Start%20a%20service%20request/NewForm.aspx">
+            IG form{" "}
+          </a>
+        </span>
+      </Callout>
+
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
