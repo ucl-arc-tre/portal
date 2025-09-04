@@ -637,6 +637,7 @@ components:
         - protection
         - legal_basis
         - format
+        - requires_contract
         - expires_at
         - has_dspt
         - stored_outside_uk_eea
@@ -682,6 +683,9 @@ components:
         expires_at:
           type: string
           description: Retention expiry date of the asset
+        requires_contract:
+          type: boolean
+          description: Whether a contract is required for the asset
         has_dspt:
           type: boolean
           description: Whether there is an up to date Data Security & Protection Toolkit in place

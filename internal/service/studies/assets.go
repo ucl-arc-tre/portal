@@ -136,6 +136,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		Format:               string(assetData.Format),
 		ExpiresAt:            expiryDate,
 		HasDspt:              assetData.HasDspt,
+		RequiresContract:     assetData.RequiresContract,
 		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
 		Status:               string(assetData.Status),
 	}
