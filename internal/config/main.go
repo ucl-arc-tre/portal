@@ -71,8 +71,8 @@ func S3BucketName() string {
 	return k.String("s3.bucket")
 }
 
-func S3Host() string {
-	return k.String("s3.host")
+func S3DevHost() string {
+	return k.String("s3.dev.host")
 }
 
 // TREUserAccounts are the username:password pairs used to access the TRE API

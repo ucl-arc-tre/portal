@@ -2,6 +2,7 @@ package types
 
 import "io"
 
-type S3UploadObject struct {
-	Content io.ReadCloser
+type S3Object struct {
+	Content  io.ReadCloser
+	NumBytes *int64
 }

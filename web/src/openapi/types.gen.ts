@@ -981,6 +981,41 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadRespon
 
 export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses];
 
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData = {
+    body?: never;
+    path: {
+        studyId: string;
+        assetId: string;
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/download';
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses = {
+    /**
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponse = GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses];
+
 export type ClientOptions = {
     baseUrl: `${string}://${string}/web/api/v0` | (string & {});
 };

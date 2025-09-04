@@ -42,8 +42,21 @@ func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 func parseUUIDOrSetError(ctx *gin.Context, id string) (uuid.UUID, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expeced uuid")
 		return [16]byte{}, err
 	}
 	return uuid, nil
+}
+
+func parseUUIDsOrSetError(ctx *gin.Context, ids ...string) ([]uuid.UUID, error) {
+	uuids := []uuid.UUID{}
+	for _, id := range ids {
+		uuid, err := uuid.Parse(id)
+		if err != nil {
+			setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expeced uuid")
+			return uuids, err
+		}
+		uuids = append(uuids, uuid)
+	}
+	return uuids, nil
 }

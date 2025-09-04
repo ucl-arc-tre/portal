@@ -65,7 +65,8 @@ jobs:
           db:
             dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC
           s3:
-            host: s3:8333
+            dev:
+              host: s3:8333
             bucket: bucket-name
             access_key_id: s3
             secret_access_key: s3

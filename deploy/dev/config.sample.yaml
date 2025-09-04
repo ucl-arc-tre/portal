@@ -6,7 +6,9 @@ tre_ops_staff_usernames:
 db:
   dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
 s3:
-  host: s3:8333 # Host:port of the s3 service. If unset will use standard ASW S3 host
+  dev:
+    host: s3:8333 # Host:port of the s3 service
+
   bucket: bucket-name
   region: eu-west-2
 

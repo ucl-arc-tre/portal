@@ -58,20 +58,35 @@ func New() *Controller {
 	return &controller
 }
 
-func (c *Controller) StoreObject(ctx context.Context, id uuid.UUID, obj types.S3UploadObject) error {
-	bucketName := aws.String(config.S3BucketName())
-	key := aws.String(id.String())
-	log.Debug().Any("id", id).Msg("Uploading")
+func (c *Controller) StoreObject(ctx context.Context, id uuid.UUID, obj types.S3Object) error {
+	log.Debug().Any("id", id).Msg("Uploading S3 object")
 	_, err := c.uploader.Upload(ctx, &awsS3.PutObjectInput{
-		Bucket: bucketName,
-		Key:    key,
+		Bucket: aws.String(config.S3BucketName()),
+		Key:    aws.String(id.String()),
 		Body:   obj.Content,
 	})
 	return err
 }
 
+func (c *Controller) GetObject(ctx context.Context, id uuid.UUID) (types.S3Object, error) {
+	log.Debug().Any("id", id).Msg("Downloading S3 object")
+	output, err := c.client.GetObject(ctx, &awsS3.GetObjectInput{
+		Bucket: aws.String(config.S3BucketName()),
+		Key:    aws.String(id.String()),
+	})
+	if err != nil {
+		return types.S3Object{}, err
+	}
+	object := types.S3Object{
+		Content:  output.Body,
+		NumBytes: output.ContentLength,
+	}
+	return object, nil
+}
+
 func makeResolver() awsS3.EndpointResolverV2 {
-	if config.IsDevDeploy() || config.IsTesting() {
+	if config.S3DevHost() != "" {
+		log.Warn().Msg("S3DevHost is set - using dev resolver for s3")
 		return DevResolver{}
 	}
 	return awsS3.NewDefaultEndpointResolverV2()
@@ -84,7 +99,7 @@ func (r DevResolver) ResolveEndpoint(ctx context.Context, params awsS3.EndpointP
 ) {
 	uri := url.URL{
 		Scheme: "http",
-		Host:   config.S3Host(),
+		Host:   config.S3DevHost(),
 		Path:   config.S3BucketName(),
 	}
 	return awsEndpoints.Endpoint{URI: uri}, nil

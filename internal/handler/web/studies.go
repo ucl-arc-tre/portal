@@ -224,26 +224,39 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 }
 
 func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
 	if err != nil {
 		return
 	}
-	assetUUID, err := parseUUIDOrSetError(ctx, assetId)
-	if err != nil {
-		return
-	}
-	contractUUID, err := parseUUIDOrSetError(ctx, contractId)
-	if err != nil {
-		return
-	}
-
-	err = h.studies.StoreContract(ctx, studyUUID, assetUUID, contractUUID, types.S3UploadObject{
+	err = h.studies.StoreContract(ctx, uuids[0], uuids[1], uuids[2], types.S3Object{
 		Content: ctx.Request.Body,
 	})
 	if err != nil {
 		setError(ctx, err, "Failed store contract")
 		return
 	}
-
 	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+	if err != nil {
+		return
+	}
+	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1], uuids[2])
+	if err != nil {
+		setError(ctx, err, "Failed get contract")
+		return
+	} else if object.NumBytes == nil {
+		setError(ctx, types.NewErrServerError("contract object missing content length"), "Failed get contract")
+		return
+	}
+	ctx.DataFromReader(
+		http.StatusOK,
+		*object.NumBytes,
+		"application/octet-stream",
+		object.Content, map[string]string{
+			"Content-Disposition": "attachment; filename=contract.txt", // todo set filename
+		},
+	)
 }

@@ -471,6 +471,40 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download:
+    get:
+      description: Get a contract object e.g. PDF
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: assetId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: contractId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   schemas:
     Auth:
