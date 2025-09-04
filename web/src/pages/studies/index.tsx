@@ -60,6 +60,11 @@ export default function StudiesPage() {
         </Button>
       </Callout>
 
+      <Callout
+        construction
+        text="Please be aware this site is under development and features may change. This means any data you create may be lost."
+      />
+
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
