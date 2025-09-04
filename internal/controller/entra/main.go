@@ -35,14 +35,7 @@ type Controller struct {
 	userDataCache *expirable.LRU[types.Username, UserData]
 }
 
-// Create or get a new entra controller using client credentials
-func New() *Controller {
-	if controller != nil {
-		return controller
-	}
-	log.Info().Float64("cacheTTL seconds", cacheTTL.Seconds()).Msg("Creating entra controller")
-	credentials := config.EntraCredentials()
-	// See: https://learn.microsoft.com/en-us/graph/sdks/choose-authentication-providers?tabs=go#client-credentials-provider
+func createGraphClient(credentials config.EntraCredentialBundle) *graph.GraphServiceClient {
 	azCredentials, err := azidentity.NewClientSecretCredential(
 		credentials.TenantID,
 		credentials.ClientID,
@@ -50,28 +43,26 @@ func New() *Controller {
 		nil,
 	)
 	if err != nil {
-		panic(fmt.Errorf("failed to create msgraph client credentials [%v]", err))
+		log.Error().Err(err).Msg("Failed to create msgraph client credentials")
 	}
 	scopes := []string{"https://graph.microsoft.com/.default"}
 	graphClient, err := graph.NewGraphServiceClientWithCredentials(azCredentials, scopes)
 	if err != nil {
-		panic(fmt.Errorf("failed to create msgraph client [%v]", err))
+		log.Error().Err(err).Msg("Failed to create msgraph client")
 	}
+	return graphClient
+}
 
-	mailCredentials := config.EntraMailCredentials()
-	mailAzCredentials, err := azidentity.NewClientSecretCredential(
-		mailCredentials.TenantID,
-		mailCredentials.ClientID,
-		mailCredentials.ClientSecret,
-		nil,
-	)
-	if err != nil {
-		panic(fmt.Errorf("failed to create msgraph mail client credentials [%v]", err))
+// Create or get a new entra controller using client credentials
+func New() *Controller {
+	if controller != nil {
+		return controller
 	}
-	mailClient, err := graph.NewGraphServiceClientWithCredentials(mailAzCredentials, scopes)
-	if err != nil {
-		panic(fmt.Errorf("failed to create msgraph mail client [%v]", err))
-	}
+	log.Info().Float64("cacheTTL seconds", cacheTTL.Seconds()).Msg("Creating entra controller")
+	// See: https://learn.microsoft.com/en-us/graph/sdks/choose-authentication-providers?tabs=go#client-credentials-provider
+
+	graphClient := createGraphClient(config.EntraCredentials())
+	mailClient := createGraphClient(config.EntraMailCredentials())
 
 	controller = &Controller{
 		client:        graphClient,
