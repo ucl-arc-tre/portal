@@ -62,8 +62,15 @@ export default function StudiesPage() {
 
       <Callout
         construction
-        text="Please be aware this site is under development and features may change. This means any data you create may be lost."
-      />
+        text="Please be aware this site is under development and features may change. This means any data you create may be lost. "
+      >
+        <span>
+          If you require a more stable record of your study, you can fill out the{" "}
+          <a href="https://ucl-arc.slack.com/archives/C08KNUP9MQX/p1756973881044109?thread_ts=1756973525.068159&cid=C08KNUP9MQX">
+            IG form{" "}
+          </a>
+        </span>
+      </Callout>
 
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
