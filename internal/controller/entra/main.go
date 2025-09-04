@@ -136,41 +136,51 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 
 	// check if user exists in entra, if yes, don't send invite
 	user, err := c.userData(ctx, types.Username(email))
-	if err != nil && !strings.Contains(err.Error(), "does not exist") {
+	if err != nil && strings.Contains(err.Error(), "does not exist") {
 		// we only want to return the error if it's not because the user doesn't exist, otherwise we can't invite them
+
+		requestBody := graphmodels.NewInvitation()
+		invitedUserEmailAddress := email
+		inviteRedirectUrl := config.EntraInviteRedirectURL()
+		sendInvitationMessage := true
+
+		requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
+		requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
+		requestBody.SetSendInvitationMessage(&sendInvitationMessage)
+
+		message := ""
+		if sponsor.ChosenName != "" {
+			message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
+		} else {
+			message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
+		}
+		messageInfo := graphmodels.NewInvitedUserMessageInfo()
+
+		messageInfo.SetCustomizedMessageBody(&message)
+		requestBody.SetInvitedUserMessageInfo(messageInfo)
+
+		_, err = c.client.Invitations().Post(ctx, requestBody, nil)
+		if err != nil {
+			log.Debug().Err(err).Msg("Failed to invite user to entra")
+			return types.NewErrServerError(err)
+		}
+		return nil
+	} else if err != nil && !strings.Contains(err.Error(), "does not exist") {
+		// catch the other errors
 		return err
 	}
 
 	if user != nil {
 		log.Debug().Any("user", user).Msg("User already exists in entra")
 		// todo: send custom email invite
+		err := c.CustomInviteNotification(ctx, email, sponsor)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 
-	requestBody := graphmodels.NewInvitation()
-	invitedUserEmailAddress := email
-	inviteRedirectUrl := config.EntraInviteRedirectURL()
-	sendInvitationMessage := true
-
-	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
-	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
-	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
-
-	message := ""
-	if sponsor.ChosenName != "" {
-		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
-	} else {
-		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
-	}
-	messageInfo := graphmodels.NewInvitedUserMessageInfo()
-
-	messageInfo.SetCustomizedMessageBody(&message)
-	requestBody.SetInvitedUserMessageInfo(messageInfo)
-
-	_, err = c.client.Invitations().Post(ctx, requestBody, nil)
-	if err != nil {
-		return types.NewErrServerError(err)
-	}
 	return nil
 }
 
