@@ -152,7 +152,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
 
-	// check if user exists in entra, if yes, don't send invite
+	// check if user exists in entra, if not, send an invite; if yes, custom notification
 	user, err := c.userData(ctx, types.Username(email))
 	if err != nil && strings.Contains(err.Error(), "does not exist") {
 		// we only want to return the error if it's not because the user doesn't exist, otherwise we can't invite them
@@ -179,12 +179,18 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 
 		_, err = c.client.Invitations().Post(ctx, requestBody, nil)
 		if err != nil {
+			if strings.Contains(err.Error(), "already exists") {
+				err = c.CustomInviteNotification(ctx, email, sponsor)
+				if err != nil {
+					return err
+				}
+				return err
+			}
 			log.Debug().Err(err).Msg("Failed to invite user to entra")
 			return types.NewErrServerError(err)
 		}
 		return nil
-	}
-	if err != nil && !strings.Contains(err.Error(), "does not exist") {
+	} else if err != nil {
 		// catch the other errors
 		return err
 	}
