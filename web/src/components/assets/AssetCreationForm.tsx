@@ -278,7 +278,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
         <div className={styles.field}>
           <label htmlFor="requires_contract">Does this asset require a contract? *</label>
-          <p>Answering yes will require you to add a contract document at a later step</p>
+          <p>Answering yes will require you to add a contract document in a later step</p>
           <div className={styles["radio-group"]}>
             <label className={styles["radio-label"]}>
               <input
