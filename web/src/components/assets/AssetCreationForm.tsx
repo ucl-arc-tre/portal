@@ -43,6 +43,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       format: "",
       expires_at: "",
       locations: [],
+      requires_contract: false,
       has_dspt: false,
       stored_outside_uk_eea: false,
       status: "",
@@ -60,6 +61,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {
         ...data,
+        requires_contract: data.requires_contract === "true" || data.requires_contract === true,
         has_dspt: data.has_dspt === "true" || data.has_dspt === true,
         stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
       };
@@ -272,6 +274,37 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </div>
 
           {errors.locations && <span className={styles["error-text"]}>{errors.locations.message}</span>}
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="requires_contract">Does this asset require a contract? *</label>
+          <p>Answering yes will require you to add a contract document in a later step</p>
+          <div className={styles["radio-group"]}>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="true"
+                {...register("requires_contract", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              Yes
+            </label>
+
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="false"
+                {...register("requires_contract", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              No
+            </label>
+          </div>
+          {errors.requires_contract && <span className={styles["error-text"]}>{errors.requires_contract.message}</span>}
         </div>
 
         <div className={styles.field}>

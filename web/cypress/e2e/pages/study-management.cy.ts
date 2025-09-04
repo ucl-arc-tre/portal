@@ -140,6 +140,7 @@ describe("Study Assets Management", () => {
     cy.get("input[type='checkbox'][value='arc_tre']").check();
 
     // Fill in boolean fields
+    cy.get("input[name='requires_contract'][value='true']").check({ force: true });
     cy.get("input[name='has_dspt'][value='false']").check({ force: true });
     cy.get("input[name='stored_outside_uk_eea'][value='false']").check({ force: true });
 
