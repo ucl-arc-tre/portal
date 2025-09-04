@@ -183,14 +183,14 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 			return types.NewErrServerError(err)
 		}
 		return nil
-	} else if err != nil && !strings.Contains(err.Error(), "does not exist") {
+	}
+	if err != nil && !strings.Contains(err.Error(), "does not exist") {
 		// catch the other errors
 		return err
 	}
 
 	if user != nil {
 		log.Debug().Any("user", user).Msg("User already exists in entra")
-		// todo: send custom email invite
 		err := c.CustomInviteNotification(ctx, email, sponsor)
 		if err != nil {
 			return err
@@ -254,11 +254,9 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 	usernames := []types.Username{}
 
 	userMatches := data.GetValue()
-	if userMatches != nil {
-		for _, user := range userMatches {
-			if user.GetUserPrincipalName() != nil {
-				usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
-			}
+	for _, user := range userMatches {
+		if user.GetUserPrincipalName() != nil {
+			usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
 		}
 	}
 	return usernames, nil
