@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -86,9 +85,8 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -125,9 +123,8 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -146,9 +143,8 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -172,11 +168,8 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 // confirms a study agreement for the study ID and user
 func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -185,12 +178,12 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 		return
 	}
 
-	agreementId, err := uuid.Parse(confirmation.AgreementId)
+	agreementId, err := parseUUIDOrSetError(ctx, confirmation.AgreementId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid agreement ID")
 		return
 	}
 
+	user := middleware.GetUser(ctx)
 	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
 		setError(ctx, err, "Failed to confirm study agreement")
 		return
@@ -213,14 +206,12 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 }
 
 func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
+	user := middleware.GetUser(ctx)
 	signatures, err := h.studies.GetStudyAgreementSignatures(user, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to get study agreements")
@@ -230,4 +221,29 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, openapi.UserAgreements{
 		ConfirmedAgreements: signatures,
 	})
+}
+
+func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(ctx *gin.Context, studyId string, assetId string, contractId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	assetUUID, err := parseUUIDOrSetError(ctx, assetId)
+	if err != nil {
+		return
+	}
+	contractUUID, err := parseUUIDOrSetError(ctx, contractId)
+	if err != nil {
+		return
+	}
+
+	err = h.studies.StoreContract(ctx, studyUUID, assetUUID, contractUUID, types.S3UploadObject{
+		Content: ctx.Request.Body,
+	})
+	if err != nil {
+		setError(ctx, err, "Failed store contract")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }

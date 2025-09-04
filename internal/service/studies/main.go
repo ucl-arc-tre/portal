@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
+	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -24,12 +25,14 @@ var (
 type Service struct {
 	db    *gorm.DB
 	entra *entra.Controller
+	s3    *s3.Controller
 	users *users.Service
 }
 
 func New() *Service {
 	return &Service{
 		db:    graceful.NewDB(),
+		s3:    s3.New(),
 		entra: entra.New(),
 		users: users.New(),
 	}

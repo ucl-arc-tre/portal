@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -36,4 +37,13 @@ func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid JSON object")
 	}
 	return err
+}
+
+func parseUUIDOrSetError(ctx *gin.Context, id string) (uuid.UUID, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
+		return [16]byte{}, err
+	}
+	return uuid, nil
 }
