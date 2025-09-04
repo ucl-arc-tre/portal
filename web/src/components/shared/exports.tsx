@@ -28,6 +28,10 @@ export const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) =
   ssr: false,
 });
 
+export const HelperText = dynamic(() => import("uikit-react-public").then((mod) => mod.Field.HelperText), {
+  ssr: false,
+});
+
 export const TrainingKindOptions = {
   //  is there a better way of doing this? Won't let me use type as a value
   nhsd: "training_kind_nhsd",

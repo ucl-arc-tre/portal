@@ -125,3 +125,20 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	}
 	return user, types.NewErrServerError(result.Error)
 }
+
+func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string) ([]openapi.UserData, error) {
+	// query entra
+	usernames, err := s.entra.FindUsernames(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	// then match to users in our db
+	users := []types.User{}
+
+	result := s.db.Where("username IN (?)", usernames).Find(&users)
+	if result.Error != nil {
+		return nil, types.NewErrServerError(result.Error)
+	}
+
+	return s.usersData(users)
+}

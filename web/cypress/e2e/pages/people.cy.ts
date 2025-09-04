@@ -27,6 +27,7 @@ describe(`People page content`, () => {
     cy.visit("/people");
 
     cy.contains("You do not have permission to view this page").should("not.exist");
+    cy.get("[data-cy='search-users']").should("be.visible");
     cy.get("table").contains("User").should("be.visible");
     cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
   });
@@ -38,6 +39,7 @@ describe(`People page content`, () => {
     cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("not.exist");
+    cy.get("[data-cy='search-users']").should("be.visible");
     cy.contains("View approved researchers").should("be.visible");
 
     // should only show approved researchers...best way to test this? Or not bother here?

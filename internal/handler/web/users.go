@@ -3,6 +3,7 @@ package web
 import (
 	"io"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
-func (h *Handler) GetUsers(ctx *gin.Context) {
+func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
+	// for search, check entra then find matches in our db, based on user principal
 	user := middleware.GetUser(ctx)
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
@@ -29,26 +31,65 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 		return
 	}
 
+	query := params.Find
+
+	// retrieve auth + agreements + training info for set of users
 	if isAdmin {
-		// retrieve auth + agreements + training info
+		h.getUsersAdmin(ctx, query)
+
+	} else if isTreOpsStaff {
+		h.getUsersTreOps(ctx, query)
+
+	} else {
+		ctx.JSON(http.StatusInternalServerError, "Not implemented")
+	}
+}
+
+func (h *Handler) getUsersAdmin(ctx *gin.Context, query *string) {
+	if query != nil {
+		people, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
+		if err != nil {
+			setError(ctx, err, "Failed to find people in tenant")
+			return
+		}
+		ctx.JSON(http.StatusOK, people)
+
+	} else {
 		people, err := h.users.AllUsers()
 		if err != nil {
 			setError(ctx, err, "Failed to get people")
 			return
 		}
 		ctx.JSON(http.StatusOK, people)
+	}
+}
 
-	} else if isTreOpsStaff {
-		// retrieve auth + agreements + training info
+func (h *Handler) getUsersTreOps(ctx *gin.Context, query *string) {
+	if query != nil {
+		users, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
+		if err != nil {
+			setError(ctx, err, "Failed to find people in tenant")
+			return
+		}
+
+		people := []openapi.UserData{}
+
+		for _, userData := range users {
+			// only carry over users with approved researcher role
+			if slices.Contains(userData.Roles, string(rbac.ApprovedResearcher)) {
+				people = append(people, userData)
+			}
+		}
+
+		ctx.JSON(http.StatusOK, people)
+
+	} else {
 		people, err := h.users.AllApprovedResearcherUsers()
 		if err != nil {
 			setError(ctx, err, "Failed to get people")
 			return
 		}
 		ctx.JSON(http.StatusOK, people)
-
-	} else {
-		ctx.JSON(http.StatusInternalServerError, "Not implemented")
 	}
 }
 
