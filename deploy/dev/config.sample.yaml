@@ -16,7 +16,6 @@ entra:
 
   # Mail app details, linked to staging on UCL tenant
   # these are different for dev/staging to the details above but will be the same on prod
-  mail_primary_domain: <CHANGE_ME> # eg. ucl.ac.uk
   mail_tenant_id: <CHANGE_ME>
   mail_client_id: <CHANGE_ME>
   mail_client_secret: <CHANGE_ME>
