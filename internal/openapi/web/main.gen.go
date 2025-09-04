@@ -497,6 +497,12 @@ type UserTrainingUpdate struct {
 	TrainingKind TrainingKind `json:"training_kind"`
 }
 
+// GetUsersParams defines parameters for GetUsers.
+type GetUsersParams struct {
+	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+	Find *string `form:"find,omitempty" json:"find,omitempty"`
+}
+
 // PostUsersInviteJSONBody defines parameters for PostUsersInvite.
 type PostUsersInviteJSONBody struct {
 	// Email Email address of the person to be invited
@@ -579,7 +585,7 @@ type ServerInterface interface {
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
 	// (GET /users)
-	GetUsers(c *gin.Context)
+	GetUsers(c *gin.Context, params GetUsersParams)
 
 	// (POST /users/approved-researchers/import/csv)
 	PostUsersApprovedResearchersImportCsv(c *gin.Context)
@@ -877,6 +883,19 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUsersParams
+
+	// ------------- Optional query parameter "find" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "find", c.Request.URL.Query(), &params.Find)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter find: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -884,7 +903,7 @@ func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetUsers(c)
+	siw.Handler.GetUsers(c, params)
 }
 
 // PostUsersApprovedResearchersImportCsv operation middleware
