@@ -13,7 +13,7 @@ export default function Callout(CalloutProps: CalloutProps) {
       className={`${styles.callout} ${construction ? styles.construction : ""} ${definition ? styles.definition : ""}`}
     >
       {text && <p>{text}</p>}
-      {construction && <p>This page is being built, check back soon for updates!</p>}
+      {construction && !text && <p>This page is being built, check back soon for updates!</p>}
       {children}
     </div>
   );
