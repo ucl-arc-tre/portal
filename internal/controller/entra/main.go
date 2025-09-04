@@ -31,7 +31,26 @@ var controller *Controller
 
 type Controller struct {
 	client        *graph.GraphServiceClient
+	mailClient    *graph.GraphServiceClient
 	userDataCache *expirable.LRU[types.Username, UserData]
+}
+
+func createGraphClient(credentials config.EntraCredentialBundle) *graph.GraphServiceClient {
+	azCredentials, err := azidentity.NewClientSecretCredential(
+		credentials.TenantID,
+		credentials.ClientID,
+		credentials.ClientSecret,
+		nil,
+	)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create msgraph client credentials")
+	}
+	scopes := []string{"https://graph.microsoft.com/.default"}
+	graphClient, err := graph.NewGraphServiceClientWithCredentials(azCredentials, scopes)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to create msgraph client")
+	}
+	return graphClient
 }
 
 // Create or get a new entra controller using client credentials
@@ -40,24 +59,14 @@ func New() *Controller {
 		return controller
 	}
 	log.Info().Float64("cacheTTL seconds", cacheTTL.Seconds()).Msg("Creating entra controller")
-	credentials := config.EntraCredentials()
 	// See: https://learn.microsoft.com/en-us/graph/sdks/choose-authentication-providers?tabs=go#client-credentials-provider
-	azCredentials, err := azidentity.NewClientSecretCredential(
-		credentials.TenantID,
-		credentials.ClientID,
-		credentials.ClientSecret,
-		nil,
-	)
-	if err != nil {
-		panic(fmt.Errorf("failed to create msgraph client credentials [%v]", err))
-	}
-	scopes := []string{"https://graph.microsoft.com/.default"}
-	graphClient, err := graph.NewGraphServiceClientWithCredentials(azCredentials, scopes)
-	if err != nil {
-		panic(fmt.Errorf("failed to create msgraph client [%v]", err))
-	}
+
+	graphClient := createGraphClient(config.EntraCredentials())
+	mailClient := createGraphClient(config.EntraMailCredentials())
+
 	controller = &Controller{
 		client:        graphClient,
+		mailClient:    mailClient,
 		userDataCache: expirable.NewLRU[types.Username, UserData](1000, nil, cacheTTL),
 	}
 	return controller
@@ -134,41 +143,59 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
 
-	// check if user exists in entra, if yes, don't send invite
+	// check if user exists in entra, if not, send an invite; if yes, custom notification
 	user, err := c.userData(ctx, types.Username(email))
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "does not exist") {
+		// we only want to return the error if it's not because the user doesn't exist, otherwise we can't invite them
+
+		requestBody := graphmodels.NewInvitation()
+		invitedUserEmailAddress := email
+		inviteRedirectUrl := config.EntraInviteRedirectURL()
+		sendInvitationMessage := true
+
+		requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
+		requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
+		requestBody.SetSendInvitationMessage(&sendInvitationMessage)
+
+		message := ""
+		if sponsor.ChosenName != "" {
+			message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
+		} else {
+			message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
+		}
+		messageInfo := graphmodels.NewInvitedUserMessageInfo()
+
+		messageInfo.SetCustomizedMessageBody(&message)
+		requestBody.SetInvitedUserMessageInfo(messageInfo)
+
+		_, err = c.client.Invitations().Post(ctx, requestBody, nil)
+		if err != nil {
+			if strings.Contains(err.Error(), "already exists") {
+				err = c.CustomInviteNotification(ctx, email, sponsor)
+				if err != nil {
+					return err
+				}
+				return err
+			}
+			log.Debug().Err(err).Msg("Failed to invite user to entra")
+			return types.NewErrServerError(err)
+		}
+		return nil
+	} else if err != nil {
+		// catch the other errors
 		return err
 	}
 
 	if user != nil {
 		log.Debug().Any("user", user).Msg("User already exists in entra")
+		err := c.CustomInviteNotification(ctx, email, sponsor)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 
-	requestBody := graphmodels.NewInvitation()
-	invitedUserEmailAddress := email
-	inviteRedirectUrl := config.EntraInviteRedirectURL()
-	sendInvitationMessage := true
-
-	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
-	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
-	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
-
-	message := ""
-	if sponsor.ChosenName != "" {
-		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.ChosenName)
-	} else {
-		message = "You have been invited to join the UCL ARC Portal by " + string(sponsor.Username)
-	}
-	messageInfo := graphmodels.NewInvitedUserMessageInfo()
-
-	messageInfo.SetCustomizedMessageBody(&message)
-	requestBody.SetInvitedUserMessageInfo(messageInfo)
-
-	_, err = c.client.Invitations().Post(ctx, requestBody, nil)
-	if err != nil {
-		return types.NewErrServerError(err)
-	}
 	return nil
 }
 
@@ -224,11 +251,9 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 	usernames := []types.Username{}
 
 	userMatches := data.GetValue()
-	if userMatches != nil {
-		for _, user := range userMatches {
-			if user.GetUserPrincipalName() != nil {
-				usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
-			}
+	for _, user := range userMatches {
+		if user.GetUserPrincipalName() != nil {
+			usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
 		}
 	}
 	return usernames, nil

@@ -68,6 +68,10 @@ jobs:
             tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
             client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}
             client_secret: ${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}
+
+            mail_tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
+            mail_client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}
+            mail_client_secret: ${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}
           tre:
             users:
               username: password

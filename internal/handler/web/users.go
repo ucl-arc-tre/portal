@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -180,7 +181,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
+	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil && !strings.Contains(err.Error(), "does not exist") {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}
