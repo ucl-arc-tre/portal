@@ -171,6 +171,7 @@ export default function PeoplePage() {
         </Box>
       ) : (
         <>
+          <br></br>
           {canSearch && searchTerm.length > 0 && <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>}
           <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
         </>
