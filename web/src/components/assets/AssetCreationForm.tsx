@@ -199,6 +199,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           <input
             id="legal_basis"
             type="text"
+            placeholder="Legal basis"
             {...register("legal_basis", {
               required: "Legal basis is required",
               maxLength: { value: 255, message: "This must be less than 255 characters" },
