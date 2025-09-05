@@ -1,4 +1,6 @@
 import { Asset } from "@/openapi";
+import Button from "@/components/ui/Button";
+import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 
 type AssetCardProps = {
@@ -28,6 +30,8 @@ const formatDate = (dateString: string) => {
 };
 
 export default function AssetCard({ asset }: AssetCardProps) {
+  const router = useRouter();
+
   const getClassificationClass = (classification: string) => {
     switch (classification) {
       case "public":
@@ -82,6 +86,12 @@ export default function AssetCard({ asset }: AssetCardProps) {
             <span className={styles["asset-detail-value"]}>{formatDate(asset.updated_at)}</span>
           </div>
         )}
+      </div>
+
+      <div className={styles["asset-actions"]}>
+        <Button onClick={() => router.push(`/assets/manage?assetId=${asset.id}`)} size="small">
+          Manage Asset
+        </Button>
       </div>
     </div>
   );
