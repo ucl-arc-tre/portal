@@ -21,7 +21,7 @@
 }
 
 .dialog-content {
-  max-width: calc(100vw - 16rem);
+  max-width: calc(100vw - 10rem);
   max-height: calc(100vh - 10rem);
   padding: 2rem;
   padding-top: 1.5rem;
