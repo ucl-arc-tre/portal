@@ -1,24 +1,38 @@
 .dialog {
   position: fixed;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -35%);
-  max-width: calc(100vw - 4rem);
-  max-height: calc(100vh - 8rem);
-  padding: 2rem;
-  padding-top: 1.5rem;
-  padding-bottom: 2rem;
-  border: 2px solid #191919;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  top: 5vw;
+  display: flex;
+  width: 100%;
   z-index: 1000;
-  overflow-y: auto;
-  margin: 0;
+
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
 
   .close-button {
     top: 0;
   }
+
+  h2 {
+    text-align: center;
+  }
+}
+
+.dialog-content {
+  max-width: calc(100vw - 16rem);
+  max-height: calc(100vh - 10rem);
+  padding: 2rem;
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+  border: 1.5px solid #191919;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+
+  margin: 0;
 }
 
 .blanket {

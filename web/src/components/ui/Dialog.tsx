@@ -24,21 +24,23 @@ export default function Dialog(DialogProps: DialogProps) {
     setDialogOpen(false);
   };
 
-  const combinedClassName = `${styles.dialog}${className ? ` ${className}` : ""}`;
+  const combinedClassName = `${styles["dialog-content"]}${className ? ` ${className}` : ""}`;
 
   return (
     <>
-      <dialog open ref={dialogRef} className={combinedClassName} data-cy={cy}>
-        <Button
-          type="button"
-          variant="tertiary"
-          size="small"
-          icon={<XIcon />}
-          onClick={closeDialog}
-          className={styles["close-button"]}
-          cy="close-dialog"
-        ></Button>
-        {children}
+      <dialog open ref={dialogRef} data-cy={cy} className={styles.dialog}>
+        <div className={combinedClassName}>
+          <Button
+            type="button"
+            variant="tertiary"
+            size="small"
+            icon={<XIcon />}
+            onClick={closeDialog}
+            className={styles["close-button"]}
+            cy="close-dialog"
+          ></Button>
+          {children}
+        </div>
       </dialog>
       <Blanket onClick={closeDialog} className={styles.blanket} />
     </>
