@@ -66,7 +66,6 @@ export default function PeoplePage() {
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
-      console.log(query, query.length);
       if (query.length < 3) {
         setSearchErrorMessage("Not enough characters; there's a minimum of 3 characters required to perform search");
       } else {
