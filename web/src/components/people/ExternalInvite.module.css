@@ -1,5 +1,6 @@
 .dialog {
-  width: clamp(40vw, 60vw, 80vw);
+  margin-top: 15vw;
+  width: 60vw;
 }
 
 .dialog-content {
