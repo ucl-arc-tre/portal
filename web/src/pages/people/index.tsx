@@ -44,9 +44,6 @@ export default function PeoplePage() {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    fetchPeople();
-  }, []);
 
   if (authInProgress) return null;
 
@@ -65,12 +62,15 @@ export default function PeoplePage() {
       return;
     }
 
-    const regex = /^\w[\w.\s0-9@]+\w$/;
+    const regex = /^\w[\w.\s0-9@-]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
-      setSearchErrorMessage("invalid query; note that there's a minimum of 3 characters required to perform search");
-
+      if (query.length < 3) {
+        setSearchErrorMessage("Not enough characters; there's a minimum of 3 characters required to perform search");
+      } else {
+        setSearchErrorMessage("Invalid query, only alphanumeric characters, @ and - are allowed");
+      }
       return;
     }
 
@@ -116,13 +116,12 @@ export default function PeoplePage() {
                 : "You do not have permission to view this page"
         }
       />
-      {canSearch && (
-        <HelperText>
-          <small>Search by display name, user principal or email</small>
-        </HelperText>
-      )}
       <div className={styles["button-container"]}>
-        {canSearch && (
+        {isAdmin && <ApprovedResearcherImport />}
+        {(isAdmin || isIAO) && <ExternalInvite />}
+      </div>
+      {canSearch && (
+        <div className={styles["search-wrapper"]}>
           <form className={styles["search-container"]} data-cy="search-users">
             <Input
               placeholder="search users..."
@@ -143,10 +142,11 @@ export default function PeoplePage() {
               aria-label="submit user search query"
             ></Button>
           </form>
-        )}
-        {isAdmin && <ApprovedResearcherImport />}
-        {(isAdmin || isIAO) && <ExternalInvite />}
-      </div>
+          <HelperText>
+            <small>Search by display name, user principal or email</small>
+          </HelperText>
+        </div>
+      )}
 
       {searchErrorMessage !== "" && (
         <Alert type="error">
@@ -172,8 +172,12 @@ export default function PeoplePage() {
       ) : (
         <>
           <br></br>
-          {canSearch && searchTerm.length > 0 && <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>}
-          <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+          {canSearch && searchTerm.length > 0 && (
+            <>
+              <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>
+              <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+            </>
+          )}
         </>
       )}
     </>
