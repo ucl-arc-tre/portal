@@ -44,9 +44,6 @@ export default function PeoplePage() {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    fetchPeople();
-  }, []);
 
   if (authInProgress) return null;
 
