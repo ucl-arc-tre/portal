@@ -149,6 +149,9 @@ type Asset struct {
 	// Protection Type of protection applied to the asset
 	Protection AssetProtection `json:"protection"`
 
+	// RequiresContract Whether a contract is required for the asset
+	RequiresContract bool `json:"requires_contract"`
+
 	// Status Status of the asset
 	Status AssetStatus `json:"status"`
 
@@ -202,6 +205,9 @@ type AssetBase struct {
 
 	// Protection Type of protection applied to the asset
 	Protection AssetBaseProtection `json:"protection"`
+
+	// RequiresContract Whether a contract is required for the asset
+	RequiresContract bool `json:"requires_contract"`
 
 	// Status Status of the asset
 	Status AssetBaseStatus `json:"status"`

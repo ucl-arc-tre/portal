@@ -144,6 +144,10 @@ export type AssetBase = {
      */
     expires_at: string;
     /**
+     * Whether a contract is required for the asset
+     */
+    requires_contract: boolean;
+    /**
      * Whether there is an up to date Data Security & Protection Toolkit in place
      */
     has_dspt: boolean;
