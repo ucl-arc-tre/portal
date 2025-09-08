@@ -5,7 +5,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
@@ -21,29 +21,11 @@ export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [users, setUsers] = useState<Array<UserData> | null>(null);
-  const [originalUsers, setOriginalUsers] = useState<Array<UserData> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
-
-  const fetchPeople = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getUsers();
-      if (response.response.ok && response.data) {
-        setOriginalUsers(response.data);
-        setUsers(response.data);
-      }
-    } catch (error) {
-      console.error("Failed to get people:", error);
-      setErrorMessage("Failed to get people");
-      setUsers(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (authInProgress) return null;
 
@@ -55,8 +37,8 @@ export default function PeoplePage() {
   const canSearch = isTreOpsStaff || isAdmin;
 
   const handleUserSearch = async (query: string) => {
+    setIsLoading(true);
     if (query === "") {
-      setUsers(originalUsers);
       setSearchErrorMessage("");
       setSearchTerm("");
       return;
@@ -77,12 +59,13 @@ export default function PeoplePage() {
     const response = await getUsers({ query: { find: query } });
 
     if (!response.response.ok || !response.data) {
-      setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+      setErrorMessage("Oops, something went wrong when trying to complete your search. Refresh and try again");
       return;
     }
     setSearchTerm(query);
     setUsers(response.data);
     setSearchErrorMessage("");
+    setIsLoading(false);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
