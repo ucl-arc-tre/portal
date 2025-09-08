@@ -122,6 +122,7 @@ export default function PeoplePage() {
                 handleUserSearch(searchRef.current!.value);
               }}
               type="submit"
+              data-cy="submit-user-search"
               aria-label="submit user search query"
             ></Button>
           </form>
