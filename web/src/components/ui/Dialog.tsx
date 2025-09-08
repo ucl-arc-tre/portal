@@ -37,15 +37,19 @@ export default function Dialog(DialogProps: DialogProps) {
     <>
       <dialog open ref={dialogRef} data-cy={cy} className={styles.dialog} onClick={handleNonContentClick}>
         <div className={combinedClassName} ref={contentRef}>
-          <Button
-            type="button"
-            variant="tertiary"
-            size="small"
-            icon={<XIcon />}
-            onClick={closeDialog}
-            className={styles["close-button"]}
-            cy="close-dialog"
-          ></Button>
+          <div className={styles["close-button"]}>
+            <Button
+              type="button"
+              variant="tertiary"
+              size="small"
+              icon={<XIcon />}
+              onClick={closeDialog}
+              cy="close-dialog"
+            >
+              {" "}
+              <small>Close</small>
+            </Button>
+          </div>
           {children}
         </div>
       </dialog>

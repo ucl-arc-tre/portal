@@ -13,6 +13,10 @@
 
   .close-button {
     top: 0;
+    position: sticky;
+    width: 100%;
+    background-color: var(--background);
+    padding-top: 1.5rem;
   }
 
   h2 {
@@ -23,8 +27,7 @@
 .dialog-content {
   max-width: calc(100vw - 10rem);
   max-height: calc(100vh - 10rem);
-  padding: 2rem;
-  padding-top: 1.5rem;
+  padding-inline: 2rem;
   padding-bottom: 2rem;
   border: 1.5px solid #191919;
   border-radius: 12px;
