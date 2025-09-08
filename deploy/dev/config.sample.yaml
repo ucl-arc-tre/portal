@@ -19,7 +19,7 @@ entra:
   mail_tenant_id: <CHANGE_ME>
   mail_client_id: <CHANGE_ME>
   mail_client_secret: <CHANGE_ME>
-  mail_user_principal: <CHANGE_ME> # found in entra by searching for the mailbox
+  mail_user_principal: <CHANGE_ME> # eg. rp2@ucl.ac.uk, found in entra by searching for the mailbox
 
 tre:
   users:
