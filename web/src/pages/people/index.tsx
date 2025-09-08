@@ -137,32 +137,27 @@ export default function PeoplePage() {
         </Alert>
       )}
       {!isAdmin && <Callout construction />}
-      {!users || users.length === 0 ? (
-        <Box>
-          <div className={styles["no-users-found"]}>
-            {searchTerm.length > 2
-              ? `No users found for "${searchTerm}". Try another query`
-              : searchTerm.length > 0
-                ? "No users found, try another query"
-                : "No users found"}
-          </div>
-          {errorMessage && (
-            <Alert type="error">
-              <AlertMessage>{errorMessage}</AlertMessage>
-            </Alert>
-          )}
-        </Box>
-      ) : (
-        <>
-          <br></br>
-          {canSearch && searchTerm.length > 0 && (
-            <>
-              <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>
-              <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
-            </>
-          )}
-        </>
-      )}
+      {canSearch &&
+        searchTerm.length > 0 &&
+        (!users || users.length === 0 ? (
+          <Box>
+            <div className={styles["no-users-found"]}>
+              {searchTerm.length > 2
+                ? `No users found for "${searchTerm}". Try another query`
+                : "No users found, try another query"}
+            </div>
+            {errorMessage && (
+              <Alert type="error">
+                <AlertMessage>{errorMessage}</AlertMessage>
+              </Alert>
+            )}
+          </Box>
+        ) : (
+          <>
+            <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>
+            <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+          </>
+        ))}
     </>
   );
 }
