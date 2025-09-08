@@ -171,7 +171,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 		_, err = c.client.Invitations().Post(ctx, requestBody, nil)
 		if err != nil {
 			if strings.Contains(err.Error(), "already exists") {
-				err = c.CustomInviteNotification(ctx, email, sponsor)
+				err = c.SendCustomInviteNotification(ctx, email, sponsor)
 				if err != nil {
 					return err
 				}
@@ -188,7 +188,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 
 	if user != nil {
 		log.Debug().Any("user", user).Msg("User already exists in entra")
-		err := c.CustomInviteNotification(ctx, email, sponsor)
+		err := c.SendCustomInviteNotification(ctx, email, sponsor)
 		if err != nil {
 			return err
 		}
