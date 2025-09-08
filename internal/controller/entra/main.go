@@ -143,61 +143,59 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 }
 
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
-
-	// check if user exists in entra, if not, send an invite; if yes, custom notification
 	user, err := c.userData(ctx, types.Username(email))
-	if err != nil && errors.Is(err, types.ErrNotFound) {
-		// we only want to return the error if it's not because the user doesn't exist, otherwise we can't invite them
-
-		requestBody := graphmodels.NewInvitation()
-		invitedUserEmailAddress := email
-		inviteRedirectUrl := config.EntraInviteRedirectURL()
-		sendInvitationMessage := true
-
-		requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
-		requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
-		requestBody.SetSendInvitationMessage(&sendInvitationMessage)
-
-		message := ""
-		if sponsor.ChosenName != "" {
-			message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
-		} else {
-			message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
-		}
-		messageInfo := graphmodels.NewInvitedUserMessageInfo()
-
-		messageInfo.SetCustomizedMessageBody(&message)
-		requestBody.SetInvitedUserMessageInfo(messageInfo)
-
-		_, err = c.client.Invitations().Post(ctx, requestBody, nil)
-		if err != nil {
-			if strings.Contains(err.Error(), "already exists") {
-				log.Debug().Msg("this is how we get here")
-				err = c.SendCustomInviteNotification(ctx, email, sponsor)
-				if err != nil {
-					return err
-				}
-				return err
-			}
-			log.Debug().Err(err).Msg("Failed to invite user to entra")
-			return types.NewErrServerError(err)
-		}
-		return nil
-	} else if err != nil {
-		// catch the other errors
+	if err == nil {
+		log.Debug().Any("user", user).Msg("User already exists in entra")
+		return c.sendInviteExistingEntraUser(ctx, email, sponsor)
+	} else if errors.Is(err, types.ErrNotFound) {
+		return c.sendInviteNewEntraUser(ctx, email, sponsor)
+	} else {
 		return err
 	}
+}
 
-	if user != nil {
-		log.Debug().Any("user", user).Msg("User already exists in entra")
-		err := c.SendCustomInviteNotification(ctx, email, sponsor)
-		if err != nil {
+func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+	err := c.SendCustomInviteNotification(ctx, email, sponsor)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+	requestBody := graphmodels.NewInvitation()
+	invitedUserEmailAddress := email
+	inviteRedirectUrl := config.EntraInviteRedirectURL()
+	sendInvitationMessage := true
+
+	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
+	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
+	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
+
+	message := ""
+	if sponsor.ChosenName != "" {
+		message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
+	} else {
+		message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
+	}
+	messageInfo := graphmodels.NewInvitedUserMessageInfo()
+
+	messageInfo.SetCustomizedMessageBody(&message)
+	requestBody.SetInvitedUserMessageInfo(messageInfo)
+
+	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
+	if err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			log.Debug().Msg("this is how we get here")
+			err = c.SendCustomInviteNotification(ctx, email, sponsor)
+			if err != nil {
+				return err
+			}
 			return err
 		}
-
-		return nil
+		log.Debug().Err(err).Msg("Failed to invite user to entra")
+		return types.NewErrServerError(err)
 	}
-
 	return nil
 }
 
