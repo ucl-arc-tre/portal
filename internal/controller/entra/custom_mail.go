@@ -26,7 +26,7 @@ func (c *Controller) CustomInviteNotification(ctx context.Context, email string,
 	} else {
 		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
 	}
-	content = content + "<br><br>You can sign into the portal at <a href='https://portal.ucl.ac.uk'>https://portal.ucl.ac.uk</a> <br><br> This is an automated message, but this mailbox is monitored so you can contact us if you need help."
+	content = content + "<br><br>You can sign into the portal at <a href='https://portal.arc.ucl.ac.uk'>https://portal.arc.ucl.ac.uk</a> <br><br> This is an automated message, but this mailbox is monitored so you can contact us if you need assistance."
 
 	body.SetContent(&content)
 	message.SetBody(body)
