@@ -35,7 +35,7 @@ type Controller struct {
 	userDataCache *expirable.LRU[types.Username, UserData]
 }
 
-func createGraphClient(credentials config.EntraCredentialBundle) *graph.GraphServiceClient {
+func newGraphClient(credentials config.EntraCredentialBundle) *graph.GraphServiceClient {
 	azCredentials, err := azidentity.NewClientSecretCredential(
 		credentials.TenantID,
 		credentials.ClientID,
@@ -61,8 +61,8 @@ func New() *Controller {
 	log.Info().Float64("cacheTTL seconds", cacheTTL.Seconds()).Msg("Creating entra controller")
 	// See: https://learn.microsoft.com/en-us/graph/sdks/choose-authentication-providers?tabs=go#client-credentials-provider
 
-	graphClient := createGraphClient(config.EntraCredentials())
-	mailClient := createGraphClient(config.EntraMailCredentials())
+	graphClient := newGraphClient(config.EntraCredentials())
+	mailClient := newGraphClient(config.EntraMailCredentials())
 
 	controller = &Controller{
 		client:        graphClient,
