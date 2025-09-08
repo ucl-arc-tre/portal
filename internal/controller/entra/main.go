@@ -2,6 +2,7 @@ package entra
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -145,7 +146,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 
 	// check if user exists in entra, if not, send an invite; if yes, custom notification
 	user, err := c.userData(ctx, types.Username(email))
-	if err != nil && strings.Contains(err.Error(), "does not exist") {
+	if err != nil && errors.Is(err, types.ErrNotFound) {
 		// we only want to return the error if it's not because the user doesn't exist, otherwise we can't invite them
 
 		requestBody := graphmodels.NewInvitation()
@@ -171,6 +172,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 		_, err = c.client.Invitations().Post(ctx, requestBody, nil)
 		if err != nil {
 			if strings.Contains(err.Error(), "already exists") {
+				log.Debug().Msg("this is how we get here")
 				err = c.SendCustomInviteNotification(ctx, email, sponsor)
 				if err != nil {
 					return err
