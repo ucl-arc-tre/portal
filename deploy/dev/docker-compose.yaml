@@ -16,13 +16,14 @@ services:
   s3:
     # https://github.com/seaweedfs/seaweedfs
     image: chrislusf/seaweedfs
-    command: ["server", "-s3"]
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
     ports:
       - 23646:23646 # Admin UI
     environment:
-      REGION: eu-west-2
       AWS_ACCESS_KEY_ID: s3
       AWS_SECRET_ACCESS_KEY: s3 # pragma: allowlist secret
+    volumes:
+      - ./s3/entrypoint.sh:/entrypoint.sh:ro
 
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.2

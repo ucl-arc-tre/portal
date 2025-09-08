@@ -10,14 +10,16 @@ services:
       - ./config.yaml:/etc/portal/config.yaml:ro
     depends_on:
       - postgres
+      - s3
 
   s3:
     image: chrislusf/seaweedfs
-    command: ["server", "-s3"]
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
     environment:
-      REGION: eu-west-2
       AWS_ACCESS_KEY_ID: s3
       AWS_SECRET_ACCESS_KEY: s3 # pragma: allowlist secret
+    volumes:
+      - ./../deploy/dev/s3/entrypoint.sh:/entrypoint.sh:ro
 
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.2

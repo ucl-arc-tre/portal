@@ -2,15 +2,12 @@ package s3
 
 import (
 	"context"
-	"fmt"
-	"net/url"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	awsCredentials "github.com/aws/aws-sdk-go-v2/credentials"
 	awsS3Manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	awsS3 "github.com/aws/aws-sdk-go-v2/service/s3"
-	awsEndpoints "github.com/aws/smithy-go/endpoints"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
@@ -42,10 +39,12 @@ func New() *Controller {
 				SecretAccessKey: credentials.SecretAccessKey,
 			},
 		}),
+
 		awsConfig.WithRegion(config.S3Region()),
 	)
 	if err != nil {
-		panic(fmt.Errorf("unable to load AWS SDK config, %v", err))
+		log.Err(err).Msg("Failed to load AWS config. Returning a nil controller")
+		return nil
 	}
 	client := awsS3.NewFromConfig(
 		config,
@@ -65,7 +64,7 @@ func (c *Controller) StoreObject(ctx context.Context, id uuid.UUID, obj types.S3
 		Key:    aws.String(id.String()),
 		Body:   obj.Content,
 	})
-	return err
+	return types.NewErrServerError(err)
 }
 
 func (c *Controller) GetObject(ctx context.Context, id uuid.UUID) (types.S3Object, error) {
@@ -75,7 +74,7 @@ func (c *Controller) GetObject(ctx context.Context, id uuid.UUID) (types.S3Objec
 		Key:    aws.String(id.String()),
 	})
 	if err != nil {
-		return types.S3Object{}, err
+		return types.S3Object{}, types.NewErrServerError(err)
 	}
 	object := types.S3Object{
 		Content:  output.Body,
@@ -85,22 +84,13 @@ func (c *Controller) GetObject(ctx context.Context, id uuid.UUID) (types.S3Objec
 }
 
 func makeResolver() awsS3.EndpointResolverV2 {
-	if config.S3DevHost() != "" {
+	s3DevHostIsSet := config.S3DevHost() != ""
+	if s3DevHostIsSet && (!config.IsDevDeploy() && !config.IsTesting()) {
+		panic("S3DevHost must be unset unless is dev or test")
+	}
+	if s3DevHostIsSet {
 		log.Warn().Msg("S3DevHost is set - using dev resolver for s3")
 		return DevResolver{}
 	}
 	return awsS3.NewDefaultEndpointResolverV2()
-}
-
-type DevResolver struct{}
-
-func (r DevResolver) ResolveEndpoint(ctx context.Context, params awsS3.EndpointParameters) (
-	awsEndpoints.Endpoint, error,
-) {
-	uri := url.URL{
-		Scheme: "http",
-		Host:   config.S3DevHost(),
-		Path:   config.S3BucketName(),
-	}
-	return awsEndpoints.Endpoint{URI: uri}, nil
 }
