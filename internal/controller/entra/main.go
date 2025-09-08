@@ -44,12 +44,14 @@ func newGraphClient(credentials config.EntraCredentialBundle) *graph.GraphServic
 		nil,
 	)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create msgraph client credentials")
+		log.Err(err).Msg("Failed to create msgraph client credentials")
+		return nil
 	}
 	scopes := []string{"https://graph.microsoft.com/.default"}
 	graphClient, err := graph.NewGraphServiceClientWithCredentials(azCredentials, scopes)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to create msgraph client")
+		log.Err(err).Msg("Failed to create msgraph client")
+		return nil
 	}
 	return graphClient
 }
