@@ -14,8 +14,7 @@ entra:
   primary_domain: <CHANGE_ME> # eg. arctretest.onmicrosoft.com
   invited_user_group_id: <CHANGE_ME> # found in the Azure portal, eg Invited Users group
 
-  # Mail app details, linked to staging on UCL tenant
-  # these are different for dev/staging to the details above but will be the same on prod
+  # Mail app details, these may be the same as the above but don't have to be (eg in the case of different tenants)
   mail_tenant_id: <CHANGE_ME>
   mail_client_id: <CHANGE_ME>
   mail_client_secret: <CHANGE_ME>
