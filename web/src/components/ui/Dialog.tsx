@@ -18,18 +18,25 @@ type DialogProps = {
 export default function Dialog(DialogProps: DialogProps) {
   const { setDialogOpen, children, className, cy } = DialogProps;
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const closeDialog = () => {
     dialogRef.current?.close();
     setDialogOpen(false);
   };
 
+  const handleNonContentClick = (event: React.MouseEvent<HTMLDialogElement, MouseEvent>) => {
+    if (contentRef.current && !contentRef.current.contains(event.target as Node)) {
+      closeDialog();
+    }
+  };
+
   const combinedClassName = `${styles["dialog-content"]}${className ? ` ${className}` : ""}`;
 
   return (
     <>
-      <dialog open ref={dialogRef} data-cy={cy} className={styles.dialog}>
-        <div className={combinedClassName}>
+      <dialog open ref={dialogRef} data-cy={cy} className={styles.dialog} onClick={handleNonContentClick}>
+        <div className={combinedClassName} ref={contentRef}>
           <Button
             type="button"
             variant="tertiary"
