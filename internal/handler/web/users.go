@@ -30,15 +30,14 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 		setError(ctx, err, "Failed to get roles for user")
 		return
 	}
-
 	query := params.Find
 
 	// retrieve auth + agreements + training info for set of users
 	if isAdmin {
-		h.getUsersAdmin(ctx, query)
+		h.getUsersAdmin(ctx, &query)
 
 	} else if isTreOpsStaff {
-		h.getUsersTreOps(ctx, query)
+		h.getUsersTreOps(ctx, &query)
 
 	} else {
 		ctx.JSON(http.StatusInternalServerError, "Not implemented")
@@ -46,22 +45,13 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 }
 
 func (h *Handler) getUsersAdmin(ctx *gin.Context, query *string) {
-	if query != nil {
-		people, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
-		if err != nil {
-			setError(ctx, err, "Failed to find people in tenant")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
-
-	} else {
-		people, err := h.users.AllUsers()
-		if err != nil {
-			setError(ctx, err, "Failed to get people")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
+	people, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
+	if err != nil {
+		setError(ctx, err, "Failed to find people in tenant")
+		return
 	}
+	ctx.JSON(http.StatusOK, people)
+
 }
 
 func (h *Handler) getUsersTreOps(ctx *gin.Context, query *string) {
@@ -83,13 +73,6 @@ func (h *Handler) getUsersTreOps(ctx *gin.Context, query *string) {
 
 		ctx.JSON(http.StatusOK, people)
 
-	} else {
-		people, err := h.users.AllApprovedResearcherUsers()
-		if err != nil {
-			setError(ctx, err, "Failed to get people")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
 	}
 }
 
