@@ -141,6 +141,7 @@ export default function PeoplePage() {
       {!isAdmin && <Callout construction />}
       {canSearch &&
         searchTerm.length > 0 &&
+        !searchErrorMessage &&
         (!users || users.length === 0 ? (
           <Box>
             <div className={styles["no-users-found"]}>
@@ -155,8 +156,7 @@ export default function PeoplePage() {
             )}
           </Box>
         ) : (
-          !errorMessage &&
-          !searchErrorMessage && (
+          !errorMessage && (
             <>
               <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
               <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
