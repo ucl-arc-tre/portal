@@ -113,8 +113,10 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 		},
 	}
 	data, err := c.client.Users().ByUserId(string(username)).Get(ctx, configuration)
-	if err != nil {
-		return nil, err
+	if err != nil && strings.Contains(err.Error(), "does not exist") {
+		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
+	} else if err != nil {
+		return nil, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
 	}
 	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType(), Id: data.GetId()}
 	_ = c.userDataCache.Add(username, userData)
@@ -129,10 +131,8 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 	}
 
 	userData, err := c.userData(ctx, types.Username(username))
-	if err != nil && strings.Contains(err.Error(), "does not exist") {
-		return false, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
-	} else if err != nil {
-		return false, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
+	if err != nil {
+		return false, err
 	}
 
 	log.Debug().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
