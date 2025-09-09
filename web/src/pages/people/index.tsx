@@ -60,6 +60,7 @@ export default function PeoplePage() {
 
     if (!response.response.ok || !response.data) {
       setErrorMessage("Oops, something went wrong when trying to complete your search. Refresh and try again");
+      setIsLoading(false);
       return;
     }
     setSearchTerm(query);
@@ -154,10 +155,13 @@ export default function PeoplePage() {
             )}
           </Box>
         ) : (
-          <>
-            <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
-            <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
-          </>
+          !errorMessage &&
+          !searchErrorMessage && (
+            <>
+              <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
+              <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+            </>
+          )
         ))}
     </>
   );
