@@ -1,5 +1,9 @@
 .study-dialog {
   padding-bottom: 5rem;
+
+  div[role="alert"] {
+    max-width: 70vw;
+  }
 }
 
 .error-alert {
