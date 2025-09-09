@@ -34,7 +34,8 @@
   }
 
   .fieldset {
-    border: 1px solid var(--text--secondary);
+    border: 1px solid var(--grey-border--light);
+    border-radius: 3px;
     padding: 1rem;
     margin-block-end: 1.5rem;
     display: grid;
