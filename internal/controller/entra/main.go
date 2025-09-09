@@ -188,7 +188,8 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
 		if strings.Contains(err.Error(), "already exists") {
-			log.Debug().Msg("this is how we get here")
+			// bit of a mystery how this ends up being triggered, will investigate on other deployments
+			log.Warn().Any("email", email).Msg("user supposedly didn't exist but invitation thinks otherwise")
 			err = c.SendCustomInviteNotification(ctx, email, sponsor)
 			if err != nil {
 				return err
