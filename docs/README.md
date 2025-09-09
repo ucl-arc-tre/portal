@@ -8,6 +8,7 @@ This project is a full-stack web application built with:
 - **Nginx** as a reverse proxy in dev
 - **PostgreSQL** as the database
 - **Cypress** for end-to-end (E2E) testing
+- **S3** for object storage
 
 ---
 
@@ -45,6 +46,14 @@ All environments are dockerised for a self-contained service that builds all ver
   - `/api` → Go backend API
   - `/oauth2` → OAuth2Proxy
 - Accessible at: [http://localhost:8000](http://localhost:8000)
+- S3 provided by [seaweedfs](https://github.com/seaweedfs/seaweedfs)
+
+#### Helpful commands
+
+- `make help`: Shows all the commands
+- `make dev-psql`: Opens a psql interactive terminal into the dev postgres database
+- `make dev-s3`: Runs a seaweedfs admin UI on http://localhost:23646 (username and password are `admin`)
+- `make dev-destroy`: Downs the docker compose stack
 
 ### 🔐 Release
 
@@ -52,6 +61,7 @@ All environments are dockerised for a self-contained service that builds all ver
 - React frontend is built into static files (see [`Dockerfile`](../Dockerfile) in the `web-frontend-builder` section)
 - Go backend and frontend servers are compiled into standalone binaries
 - Static frontend is served by the `web-frontend` Go binary (see `cmd/web-frontend`)
+- S3 is provided by AWS S3
 
 ### 🧪 E2E Testing (`make test-e2e-release`)
 
