@@ -9,8 +9,11 @@ weed server \
   -volume.max=1 \
   -master.raftHashicorp &
 
+until echo "" | weed shell | grep -v "error"; do
+  echo "waiting for weed startup..." && sleep 1
+done
+
 # Bucket must be created non-lazily
-sleep 1
 echo "s3.bucket.create -name bucket-name" | weed shell
 
 sleep infinity
