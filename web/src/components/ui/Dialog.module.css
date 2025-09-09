@@ -17,6 +17,7 @@
     width: 100%;
     background-color: var(--background);
     padding-top: 1.5rem;
+    z-index: 1001;
   }
 
   h2 {
