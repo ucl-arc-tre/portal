@@ -4,8 +4,8 @@
 weed server \
   -s3 \
   -master.volumeSizeLimitMB=100 \
-  -master.volumePreallocate=false \
-  -master.raftHashicorp &
+  -master.electionTimeout=1s \
+  -master.volumePreallocate=false &
 
 until echo "" | weed shell | grep -v "error"; do
   echo "waiting for weed startup..." && sleep 1
