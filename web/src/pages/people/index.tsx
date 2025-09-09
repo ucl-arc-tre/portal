@@ -155,7 +155,7 @@ export default function PeoplePage() {
           </Box>
         ) : (
           <>
-            <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>
+            <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
             <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
           </>
         ))}

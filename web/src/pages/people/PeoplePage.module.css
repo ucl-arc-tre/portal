@@ -53,3 +53,7 @@
 .no-users-found {
   text-align: center;
 }
+
+.results-heading {
+  margin-block: 0.8rem;
+}
