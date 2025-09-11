@@ -82,11 +82,13 @@ export default function UserDataTable(Props: Props) {
                 {userData.user.username} <small>{userData.user.id}</small>
               </td>
               <td className={styles.roles}>
-                {userData.roles.map((role) => (
-                  <span key={role} className="role">
-                    {role}
-                  </span>
-                ))}
+                {userData.roles
+                  .filter((role) => !role.includes("study"))
+                  .map((role) => (
+                    <span key={role} className="role">
+                      {role}
+                    </span>
+                  ))}
               </td>
               <td className={styles.agreements}>
                 {userData.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
