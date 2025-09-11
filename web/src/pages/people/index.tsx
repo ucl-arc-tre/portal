@@ -5,7 +5,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
@@ -21,32 +21,11 @@ export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) 
 export default function PeoplePage() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [users, setUsers] = useState<Array<UserData> | null>(null);
-  const [originalUsers, setOriginalUsers] = useState<Array<UserData> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
-
-  const fetchPeople = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getUsers();
-      if (response.response.ok && response.data) {
-        setOriginalUsers(response.data);
-        setUsers(response.data);
-      }
-    } catch (error) {
-      console.error("Failed to get people:", error);
-      setErrorMessage("Failed to get people");
-      setUsers(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchPeople();
-  }, []);
 
   if (authInProgress) return null;
 
@@ -58,31 +37,36 @@ export default function PeoplePage() {
   const canSearch = isTreOpsStaff || isAdmin;
 
   const handleUserSearch = async (query: string) => {
+    setIsLoading(true);
     if (query === "") {
-      setUsers(originalUsers);
       setSearchErrorMessage("");
       setSearchTerm("");
       return;
     }
 
-    const regex = /^\w[\w.\s0-9@]+\w$/;
+    const regex = /^\w[\w.\s0-9@-]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
-      setSearchErrorMessage("invalid query; note that there's a minimum of 3 characters required to perform search");
-
+      if (query.length < 3) {
+        setSearchErrorMessage("Not enough characters; there's a minimum of 3 characters required to perform search");
+      } else {
+        setSearchErrorMessage("Invalid query, only alphanumeric characters, @ and - are allowed");
+      }
       return;
     }
 
     const response = await getUsers({ query: { find: query } });
 
     if (!response.response.ok || !response.data) {
-      setSearchErrorMessage("Oops, something went wrong with your search. Refresh and try again");
+      setErrorMessage("Oops, something went wrong when trying to complete your search. Refresh and try again");
+      setIsLoading(false);
       return;
     }
     setSearchTerm(query);
     setUsers(response.data);
     setSearchErrorMessage("");
+    setIsLoading(false);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,13 +100,12 @@ export default function PeoplePage() {
                 : "You do not have permission to view this page"
         }
       />
-      {canSearch && (
-        <HelperText>
-          <small>Search by display name, user principal or email</small>
-        </HelperText>
-      )}
       <div className={styles["button-container"]}>
-        {canSearch && (
+        {isAdmin && <ApprovedResearcherImport />}
+        {(isAdmin || isIAO) && <ExternalInvite />}
+      </div>
+      {canSearch && (
+        <div className={styles["search-wrapper"]}>
           <form className={styles["search-container"]} data-cy="search-users">
             <Input
               placeholder="search users..."
@@ -140,13 +123,15 @@ export default function PeoplePage() {
                 handleUserSearch(searchRef.current!.value);
               }}
               type="submit"
+              data-cy="submit-user-search"
               aria-label="submit user search query"
             ></Button>
           </form>
-        )}
-        {isAdmin && <ApprovedResearcherImport />}
-        {(isAdmin || isIAO) && <ExternalInvite />}
-      </div>
+          <HelperText>
+            <small>Search by display name, user principal or email</small>
+          </HelperText>
+        </div>
+      )}
 
       {searchErrorMessage !== "" && (
         <Alert type="error">
@@ -154,28 +139,30 @@ export default function PeoplePage() {
         </Alert>
       )}
       {!isAdmin && <Callout construction />}
-      {!users || users.length === 0 ? (
-        <Box>
-          <div className={styles["no-users-found"]}>
-            {searchTerm.length > 2
-              ? `No users found for "${searchTerm}". Try another query`
-              : searchTerm.length > 0
-                ? "No users found, try another query"
-                : "No users found"}
-          </div>
-          {errorMessage && (
-            <Alert type="error">
-              <AlertMessage>{errorMessage}</AlertMessage>
-            </Alert>
-          )}
-        </Box>
-      ) : (
-        <>
-          <br></br>
-          {canSearch && searchTerm.length > 0 && <HelperText>Results for &ldquo;{searchTerm}&rdquo;</HelperText>}
-          <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
-        </>
-      )}
+      {canSearch &&
+        searchTerm.length > 0 &&
+        !searchErrorMessage &&
+        (!users || users.length === 0 ? (
+          <Box>
+            <div className={styles["no-users-found"]}>
+              {searchTerm.length > 2
+                ? `No users found for "${searchTerm}". Try another query`
+                : "No users found, try another query"}
+            </div>
+            {errorMessage && (
+              <Alert type="error">
+                <AlertMessage>{errorMessage}</AlertMessage>
+              </Alert>
+            )}
+          </Box>
+        ) : (
+          !errorMessage && (
+            <>
+              <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
+              <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+            </>
+          )
+        ))}
     </>
   );
 }

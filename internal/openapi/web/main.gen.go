@@ -506,7 +506,7 @@ type UserTrainingUpdate struct {
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
-	Find *string `form:"find,omitempty" json:"find,omitempty"`
+	Find string `form:"find" json:"find"`
 }
 
 // PostUsersInviteJSONBody defines parameters for PostUsersInvite.
@@ -894,9 +894,16 @@ func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUsersParams
 
-	// ------------- Optional query parameter "find" -------------
+	// ------------- Required query parameter "find" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "find", c.Request.URL.Query(), &params.Find)
+	if paramValue := c.Query("find"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument find is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "find", c.Request.URL.Query(), &params.Find)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter find: %w", err), http.StatusBadRequest)
 		return
