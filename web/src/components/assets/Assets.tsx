@@ -88,7 +88,7 @@ export default function Assets(props: StudyAssetsProps) {
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
-      <h2 className="subtitle">Study Assets for study: {studyTitle}</h2>
+      <h2 className="subtitle">Assets for Study: {studyTitle}</h2>
 
       {error && (
         <div className={styles["error-message"]}>

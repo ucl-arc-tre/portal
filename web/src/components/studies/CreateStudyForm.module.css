@@ -1,8 +1,8 @@
 .study-dialog {
   padding-bottom: 5rem;
 
-  h2 {
-    text-align: center;
+  div[role="alert"] {
+    max-width: 70vw;
   }
 }
 
@@ -34,7 +34,8 @@
   }
 
   .fieldset {
-    border: 1px solid var(--text--secondary);
+    border: 1px solid var(--grey-border--light);
+    border-radius: 3px;
     padding: 1rem;
     margin-block-end: 1.5rem;
     display: grid;
