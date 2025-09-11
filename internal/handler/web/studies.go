@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -87,9 +86,8 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -126,9 +124,8 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 }
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -147,9 +144,8 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -173,11 +169,8 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 
 // confirms a study agreement for the study ID and user
 func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
@@ -186,12 +179,12 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 		return
 	}
 
-	agreementId, err := uuid.Parse(confirmation.AgreementId)
+	agreementId, err := parseUUIDOrSetError(ctx, confirmation.AgreementId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid agreement ID")
 		return
 	}
 
+	user := middleware.GetUser(ctx)
 	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
 		setError(ctx, err, "Failed to confirm study agreement")
 		return
@@ -214,14 +207,12 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 }
 
 func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
-	user := middleware.GetUser(ctx)
-
-	studyUUID, err := uuid.Parse(studyId)
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID format")
 		return
 	}
 
+	user := middleware.GetUser(ctx)
 	signatures, err := h.studies.GetStudyAgreementSignatures(user, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to get study agreements")
@@ -231,4 +222,42 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, openapi.UserAgreements{
 		ConfirmedAgreements: signatures,
 	})
+}
+
+func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(ctx *gin.Context, studyId string, assetId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+	if err != nil {
+		return
+	}
+	err = h.studies.StoreContract(ctx, uuids[0], uuids[1], uuids[2], types.S3Object{
+		Content: ctx.Request.Body,
+	})
+	if err != nil {
+		setError(ctx, err, "Failed store contract")
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+	if err != nil {
+		return
+	}
+	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1], uuids[2])
+	if err != nil {
+		setError(ctx, err, "Failed get contract")
+		return
+	} else if object.NumBytes == nil {
+		setError(ctx, types.NewErrServerError("contract object missing content length"), "Failed get contract")
+		return
+	}
+	ctx.DataFromReader(
+		http.StatusOK,
+		*object.NumBytes,
+		"application/octet-stream",
+		object.Content, map[string]string{
+			"Content-Disposition": "attachment; filename=contract.txt", // todo set filename
+		},
+	)
 }

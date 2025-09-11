@@ -5,3 +5,8 @@ type EntraCredentialBundle struct {
 	ClientID     string
 	ClientSecret string
 }
+
+type S3CredentialBundle struct {
+	AccessKeyId     string
+	SecretAccessKey string
+}
