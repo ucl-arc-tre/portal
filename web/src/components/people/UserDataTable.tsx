@@ -83,7 +83,7 @@ export default function UserDataTable(Props: Props) {
               </td>
               <td className={styles.roles}>
                 {userData.roles
-                  .filter((role) => !role.includes("study"))
+                  .filter((role) => !role.includes("study") && !role.includes("base"))
                   .map((role) => (
                     <span key={role} className="role">
                       {role}
