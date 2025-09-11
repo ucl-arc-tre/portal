@@ -107,8 +107,7 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='next']").click();
     cy.get("input[name='involvesCag']").check();
 
-    // GH thinks it isn't visible because it's using weird dimensions
-    cy.get("input[name='cagReference']").should("exist");
+    cy.get("input[name='cagReference']").should("be.visible");
   });
 
   it("should show IRAS ID when HRA is checked", () => {

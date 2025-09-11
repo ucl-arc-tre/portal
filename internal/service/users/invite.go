@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -12,8 +13,8 @@ import (
 
 func (s *Service) InviteUser(ctx context.Context, email string, sponsor types.Sponsor) error {
 
-	if err := s.entra.SendInvite(ctx, email, sponsor); err != nil {
-		return types.NewErrServerError(err)
+	if err := s.entra.SendInvite(ctx, email, sponsor); err != nil && !errors.Is(err, types.ErrNotFound) {
+		return err
 	}
 
 	if err := s.entra.AddtoInvitedUserGroup(ctx, email); err != nil {
@@ -22,7 +23,7 @@ func (s *Service) InviteUser(ctx context.Context, email string, sponsor types.Sp
 			return nil
 		}
 
-		return types.NewErrServerError(err)
+		return err
 
 	}
 	return nil

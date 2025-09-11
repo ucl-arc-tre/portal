@@ -23,6 +23,13 @@ entra:
   invite_redirect_url: <CHANGE_ME> # where you want to send the user when they accept the invite, eg. http://localhost:8000/profile
   primary_domain: <CHANGE_ME> # eg. arctretest.onmicrosoft.com
   invited_user_group_id: <CHANGE_ME> # found in the Azure portal, eg Invited Users group
+
+  # Mail app details, these may be the same as the above but don't have to be (eg in the case of different tenants)
+  mail_tenant_id: <CHANGE_ME>
+  mail_client_id: <CHANGE_ME>
+  mail_client_secret: <CHANGE_ME>
+  mail_user_principal: <CHANGE_ME> # eg. rp2@ucl.ac.uk, found in entra by searching for the mailbox
+
 tre:
   users: # Map of usernames to passwords for HTTP basic auth
     username: password # pragma: allowlist secret

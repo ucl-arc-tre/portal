@@ -11,5 +11,7 @@ module.exports = defineConfig({
     experimentalModifyObstructiveThirdPartyCode: true,
     chromeWebSecurity: false, // Necessary for cross-origin logins like AAD
     defaultCommandTimeout: 10000,
+    viewportWidth: 1280,
+    viewportHeight: 720,
   },
 });

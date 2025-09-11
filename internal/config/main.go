@@ -88,6 +88,18 @@ func EntraCredentials() EntraCredentialBundle {
 	}
 }
 
+func EntraMailCredentials() EntraCredentialBundle {
+	return EntraCredentialBundle{
+		TenantID:     k.String("entra.mail_tenant_id"),
+		ClientID:     k.String("entra.mail_client_id"),
+		ClientSecret: k.String("entra.mail_client_secret"),
+	}
+}
+
+func EntraMailUserPrincipal() string {
+	return k.String("entra.mail_user_principal")
+}
+
 func EntraInviteRedirectURL() string {
 	return k.String("entra.invite_redirect_url")
 }
