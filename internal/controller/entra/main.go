@@ -93,9 +93,7 @@ func userIdForExternal(username types.Username) (string, error) {
 
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
-	var err error
 	userId := ""
-
 	if usernameIsExternal(username) {
 		externalUserId, err := userIdForExternal(username)
 		if err != nil {
