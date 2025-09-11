@@ -5,6 +5,16 @@ tre_ops_staff_usernames:
   - bob@example.com
 db:
   dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
+s3:
+  dev: # Required S3 config in dev
+    host: s3:8333 # Host:port of the s3 service
+
+  bucket: bucket-name # Must exist in staging/prod and will be created in dev. In dev it must match the value in s3/entrypoint.sh
+  region: eu-west-2 # AWS region the bucket exists in
+
+  # Access keys for user with S3:GetObject and S3:PutObject on the bucket
+  access_key_id: s3
+  secret_access_key: s3 # pragma: allowlist secret
 entra:
   # EntraID app registration with User.Read.All & User.Invite.All application permissions
   tenant_id: <CHANGE_ME>
@@ -14,5 +24,5 @@ entra:
   primary_domain: <CHANGE_ME> # eg. arctretest.onmicrosoft.com
   invited_user_group_id: <CHANGE_ME> # found in the Azure portal, eg Invited Users group
 tre:
-  users:
+  users: # Map of usernames to passwords for HTTP basic auth
     username: password # pragma: allowlist secret
