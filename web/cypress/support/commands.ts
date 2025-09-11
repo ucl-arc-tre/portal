@@ -6,6 +6,8 @@ const botAdminUsername = Cypress.env("botAdminUsername") as string;
 const botAdminPassword = Cypress.env("botAdminPassword") as string;
 export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
+const botStaffUsername = Cypress.env("botStaffUsername") as string;
+const botStaffPassword = Cypress.env("botStaffPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -22,6 +24,12 @@ declare global {
        * @example cy.loginAsBase()
        */
       loginAsBase(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as as as staff user
+       * @example cy.loginAsStaff()
+       */
+      loginAsStaff(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Repeatedly polls the given endpoint until it answers with a status
@@ -292,6 +300,23 @@ Cypress.Commands.add("loginAsBase", () => {
 
     log.snapshot("before");
     login(botBaseUsername, botBasePassword);
+    log.snapshot("after");
+    log.end();
+
+    cy.waitForApi(); // poll until the backend API is available
+  });
+});
+
+Cypress.Commands.add("loginAsStaff", () => {
+  cy.session(`login-staff`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID staff user Login",
+      message: [`🔐 Authenticating staff user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botStaffUsername, botStaffPassword);
     log.snapshot("after");
     log.end();
 
