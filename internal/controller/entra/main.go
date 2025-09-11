@@ -190,11 +190,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 		if strings.Contains(err.Error(), "already exists") {
 			// bit of a mystery how this ends up being triggered, will investigate on other deployments
 			log.Warn().Any("email", email).Msg("user supposedly didn't exist but invitation thinks otherwise")
-			err = c.SendCustomInviteNotification(ctx, email, sponsor)
-			if err != nil {
-				return err
-			}
-			return err
+			return c.sendInviteExistingEntraUser(ctx, email, sponsor)
 		}
 		log.Debug().Err(err).Msg("Failed to invite user to entra")
 		return types.NewErrServerError(err)
