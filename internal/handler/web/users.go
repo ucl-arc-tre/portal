@@ -1,7 +1,6 @@
 package web
 
 import (
-	"errors"
 	"io"
 	"net/http"
 	"slices"
@@ -162,7 +161,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil && !errors.Is(err, types.ErrNotFound) {
+	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}

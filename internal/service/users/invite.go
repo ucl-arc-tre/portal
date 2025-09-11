@@ -2,7 +2,6 @@ package users
 
 import (
 	"context"
-	"errors"
 	"strings"
 	"time"
 
@@ -13,7 +12,7 @@ import (
 
 func (s *Service) InviteUser(ctx context.Context, email string, sponsor types.Sponsor) error {
 
-	if err := s.entra.SendInvite(ctx, email, sponsor); err != nil && !errors.Is(err, types.ErrNotFound) {
+	if err := s.entra.SendInvite(ctx, email, sponsor); err != nil {
 		return err
 	}
 

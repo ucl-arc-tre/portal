@@ -75,33 +75,33 @@ func New() *Controller {
 	return controller
 }
 
-func entraUsernameForExternalEmail(email string) (string, error) {
+func userIdForExternal(username types.Username) (string, error) {
 	if config.EntraTenantPrimaryDomain() == "" {
 		return "", types.NewErrServerError("Entra tenant primary domain is not set")
 	}
 
-	parts := strings.Split(email, "@")
+	parts := strings.Split(string(username), "@")
 	if len(parts) != 2 {
-		return email, types.NewErrInvalidObject("invalid email")
+		return "", types.NewErrInvalidObject("invalid email")
 	}
 
 	domain := parts[1]
 
-	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
-	return newEmail, nil
+	userId := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
+	return userId, nil
 }
 
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
-
-	if !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain()) {
-
-		extFormatEmail, err := entraUsernameForExternalEmail(string(username))
+	userId := ""
+	if usernameIsExternal(username) {
+		externalUserId, err := userIdForExternal(username)
 		if err != nil {
-
 			return nil, err
 		}
-		username = types.Username(extFormatEmail)
+		userId = externalUserId
+	} else {
+		userId = string(username)
 	}
 
 	if userData, exists := c.userDataCache.Get(username); exists {
@@ -112,7 +112,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 			Select: []string{"mail", "employeeType", "id"},
 		},
 	}
-	data, err := c.client.Users().ByUserId(string(username)).Get(ctx, configuration)
+	data, err := c.client.Users().ByUserId(userId).Get(ctx, configuration)
 	if err != nil && strings.Contains(err.Error(), "does not exist") {
 		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
 	} else if err != nil {
@@ -157,6 +157,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 }
 
 func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+	log.Debug().Str("email", email).Msg("Inviting existing entra user to portal")
 	err := c.SendCustomInviteNotification(ctx, email, sponsor)
 	if err != nil {
 		return err
@@ -165,6 +166,8 @@ func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email stri
 }
 
 func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+	log.Debug().Str("email", email).Msg("Inviting new entra user to portal")
+
 	requestBody := graphmodels.NewInvitation()
 	invitedUserEmailAddress := email
 	inviteRedirectUrl := config.EntraInviteRedirectURL()
@@ -199,9 +202,11 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 }
 
 func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) error {
+	log.Debug().Str("email", email).Msg("Adding invited user to invited user group")
 
 	user, err := c.userData(ctx, types.Username(email))
 	if err != nil {
+		log.Err(err).Str("email", email).Msg("Failed to get user data to get user id")
 		return err
 	}
 
@@ -256,4 +261,8 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		}
 	}
 	return usernames, nil
+}
+
+func usernameIsExternal(username types.Username) bool {
+	return !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain())
 }
