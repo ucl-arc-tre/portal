@@ -14,7 +14,6 @@ import (
 	"gorm.io/gorm"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -181,26 +180,7 @@ func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
 }
 
 // retrieves a specific asset within a study
-// verifies that the user has access to the study via RBAC
 func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
-	// check if user has access to the study
-	if isAdmin, err := rbac.HasRole(user, rbac.Admin); err != nil {
-		return types.Asset{}, err
-	} else if !isAdmin {
-		// Non-admin users need study owner access
-		studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
-		if err != nil {
-			return types.Asset{}, err
-		}
-
-		hasAccess := slices.Contains(studyIds, studyID)
-
-		if !hasAccess {
-			return types.Asset{}, types.NewForbiddenError("Access denied to study")
-		}
-	}
-
-	// If authorized, get the asset
 	var asset types.Asset
 	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {

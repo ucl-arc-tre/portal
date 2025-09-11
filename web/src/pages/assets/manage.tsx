@@ -30,12 +30,42 @@ export default function ManageAssetPage() {
       const studyResponse = await getStudiesByStudyId({
         path: { studyId: studyIdParam },
       });
-      if (studyResponse.data) setStudy(studyResponse.data);
+
+      if (studyResponse.response.ok && studyResponse.data) {
+        setStudy(studyResponse.data);
+      } else {
+        if (studyResponse.response.status === 404) {
+          setError("Study not found or you don't have access to it.");
+          return;
+        } else if (studyResponse.response.status === 403) {
+          setError("You don't have permission to access this study.");
+          return;
+        } else if (studyResponse.response.status === 406) {
+          setError("The study ID is not valid. Please check and try again.");
+          return;
+        } else {
+          setError("Failed to load study. Please try again later.");
+          return;
+        }
+      }
 
       const assetResponse = await getStudiesByStudyIdAssetsByAssetId({
         path: { studyId: studyIdParam, assetId: assetIdParam },
       });
-      if (assetResponse.data) setAsset(assetResponse.data);
+
+      if (assetResponse.response.ok && assetResponse.data) {
+        setAsset(assetResponse.data);
+      } else {
+        if (assetResponse.response.status === 404) {
+          setError("Asset not found or you don't have access to it.");
+        } else if (assetResponse.response.status === 403) {
+          setError("You don't have permission to access this asset.");
+        } else if (assetResponse.response.status === 406) {
+          setError("The asset ID is not valid. Please check and try again.");
+        } else {
+          setError("Failed to load asset. Please try again later.");
+        }
+      }
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError("Failed to load asset details");

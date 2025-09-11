@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"slices"
+
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -71,10 +74,36 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
-	studies, err := h.studies.Studies(user)
+
+	var studies []types.Study
+
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
-		setError(ctx, err, "Failed to get studies")
+		setError(ctx, err, "Failed to check user roles")
 		return
+	}
+
+	if isAdmin {
+		// Admins can see all studies
+		studies, err = h.studies.AllStudies()
+		if err != nil {
+			setError(ctx, err, "Failed to get studies")
+			return
+		}
+	} else {
+		// Non-admin users can only see studies they own
+		var studyIds []uuid.UUID
+		studyIds, err = rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+		if err != nil {
+			setError(ctx, err, "Failed to get user's study access")
+			return
+		}
+
+		studies, err = h.studies.StudiesById(studyIds...)
+		if err != nil {
+			setError(ctx, err, "Failed to get studies")
+			return
+		}
 	}
 
 	response := []openapi.Study{}
@@ -179,6 +208,30 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 	}
 
 	user := middleware.GetUser(ctx)
+
+	// Check if user has access to the study
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	if !isAdmin {
+		// Non-admin users need study owner access
+		studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+		if err != nil {
+			setError(ctx, err, "Failed to get user's study access")
+			return
+		}
+
+		hasAccess := slices.Contains(studyIds, studyUUID)
+
+		if !hasAccess {
+			setError(ctx, types.NewForbiddenError("Access denied to study"), "Access denied")
+			return
+		}
+	}
+
 	asset, err := h.studies.StudyAssetById(user, studyUUID, assetUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve asset")
