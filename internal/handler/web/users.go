@@ -31,7 +31,6 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 		setError(ctx, err, "Failed to get roles for user")
 		return
 	}
-
 	query := params.Find
 
 	// retrieve auth + agreements + training info for set of users
@@ -46,52 +45,34 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 	}
 }
 
-func (h *Handler) getUsersAdmin(ctx *gin.Context, query *string) {
-	if query != nil {
-		people, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
-		if err != nil {
-			setError(ctx, err, "Failed to find people in tenant")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
-
-	} else {
-		people, err := h.users.AllUsers()
-		if err != nil {
-			setError(ctx, err, "Failed to get people")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
+func (h *Handler) getUsersAdmin(ctx *gin.Context, query string) {
+	people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+	if err != nil {
+		setError(ctx, err, "Failed to find people in tenant")
+		return
 	}
+	ctx.JSON(http.StatusOK, people)
+
 }
 
-func (h *Handler) getUsersTreOps(ctx *gin.Context, query *string) {
-	if query != nil {
-		users, err := h.users.SearchEntraForUsersAndMatch(ctx, *query)
-		if err != nil {
-			setError(ctx, err, "Failed to find people in tenant")
-			return
-		}
-
-		people := []openapi.UserData{}
-
-		for _, userData := range users {
-			// only carry over users with approved researcher role
-			if slices.Contains(userData.Roles, string(rbac.ApprovedResearcher)) {
-				people = append(people, userData)
-			}
-		}
-
-		ctx.JSON(http.StatusOK, people)
-
-	} else {
-		people, err := h.users.AllApprovedResearcherUsers()
-		if err != nil {
-			setError(ctx, err, "Failed to get people")
-			return
-		}
-		ctx.JSON(http.StatusOK, people)
+func (h *Handler) getUsersTreOps(ctx *gin.Context, query string) {
+	users, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+	if err != nil {
+		setError(ctx, err, "Failed to find people in tenant")
+		return
 	}
+
+	people := []openapi.UserData{}
+
+	for _, userData := range users {
+		// only carry over users with approved researcher role
+		if slices.Contains(userData.Roles, string(rbac.ApprovedResearcher)) {
+			people = append(people, userData)
+		}
+	}
+
+	ctx.JSON(http.StatusOK, people)
+
 }
 
 func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {

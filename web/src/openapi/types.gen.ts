@@ -540,11 +540,11 @@ export type GetAgreementsByAgreementTypeResponse = GetAgreementsByAgreementTypeR
 export type GetUsersData = {
     body?: never;
     path?: never;
-    query?: {
+    query: {
         /**
          * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
          */
-        find?: string;
+        find: string;
     };
     url: '/users';
 };
@@ -949,6 +949,76 @@ export type PostStudiesByStudyIdAgreementsResponses = {
      */
     200: unknown;
 };
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadData = {
+    body: Blob | File;
+    path: {
+        studyId: string;
+        assetId: string;
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload';
+};
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses];
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData = {
+    body?: never;
+    path: {
+        studyId: string;
+        assetId: string;
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/download';
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses = {
+    /**
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponse = GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses];
 
 export type ClientOptions = {
     baseUrl: `${string}://${string}/web/api/v0` | (string & {});

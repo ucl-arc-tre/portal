@@ -506,7 +506,7 @@ type UserTrainingUpdate struct {
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
-	Find *string `form:"find,omitempty" json:"find,omitempty"`
+	Find string `form:"find" json:"find"`
 }
 
 // PostUsersInviteJSONBody defines parameters for PostUsersInvite.
@@ -589,6 +589,12 @@ type ServerInterface interface {
 
 	// (POST /studies/{studyId}/assets)
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
+
+	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
+	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
+
+	// (POST /studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload)
+	PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c *gin.Context, studyId string, assetId string, contractId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -886,6 +892,90 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
 }
 
+// GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractId" -------------
+	var contractId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
+}
+
+// PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractId" -------------
+	var contractId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c, studyId, assetId, contractId)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -894,9 +984,16 @@ func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUsersParams
 
-	// ------------- Optional query parameter "find" -------------
+	// ------------- Required query parameter "find" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "find", c.Request.URL.Query(), &params.Find)
+	if paramValue := c.Query("find"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument find is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "find", c.Request.URL.Query(), &params.Find)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter find: %w", err), http.StatusBadRequest)
 		return
@@ -1005,6 +1102,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
+	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
+	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

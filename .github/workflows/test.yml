@@ -64,6 +64,12 @@ jobs:
             - portal-e2e-admin@arctretest.onmicrosoft.com
           db:
             dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC
+          s3:
+            dev:
+              host: s3:8333
+            bucket: bucket-name
+            access_key_id: s3
+            secret_access_key: s3
           entra:
             tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
             client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}

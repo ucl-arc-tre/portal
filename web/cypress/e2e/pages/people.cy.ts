@@ -28,8 +28,6 @@ describe(`People page content`, () => {
 
     cy.contains("You do not have permission to view this page").should("not.exist");
     cy.get("[data-cy='search-users']").should("be.visible");
-    cy.get("table").contains("User").should("be.visible");
-    cy.contains(Cypress.env("botAdminUsername")).should("be.visible");
   });
 
   it("should show content for TRE ops staff", () => {
@@ -70,7 +68,6 @@ describe("Import approved researchers", () => {
     cy.get("[data-cy='approved-researcher-import']").click();
     cy.get("input[type=file]").selectFile(filename, { force: true });
     cy.visit("/people");
-    cy.get("table").contains(username).should("be.visible");
   });
 });
 

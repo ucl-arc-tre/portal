@@ -56,6 +56,25 @@ func DBDataSourceName() string {
 	return k.String("db.dsn")
 }
 
+func S3Credentials() S3CredentialBundle {
+	return S3CredentialBundle{
+		AccessKeyId:     k.String("s3.access_key_id"),
+		SecretAccessKey: k.String("s3.secret_access_key"),
+	}
+}
+
+func S3Region() string {
+	return k.String("s3.region")
+}
+
+func S3BucketName() string {
+	return k.String("s3.bucket")
+}
+
+func S3DevHost() string {
+	return k.String("s3.dev.host")
+}
+
 // TREUserAccounts are the username:password pairs used to access the TRE API
 func TREUserAccounts() map[string]string {
 	return k.StringMap("tre.users")
