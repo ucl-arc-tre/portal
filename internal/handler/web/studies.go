@@ -167,6 +167,27 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	ctx.Status(http.StatusCreated)
 }
 
+func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	assetUUID, err := parseUUIDOrSetError(ctx, assetId)
+	if err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	asset, err := h.studies.StudyAssetById(user, studyUUID, assetUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve asset")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
+}
+
 // confirms a study agreement for the study ID and user
 func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)

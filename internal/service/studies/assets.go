@@ -2,6 +2,7 @@ package studies
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"time"
@@ -10,8 +11,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -165,4 +168,43 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	}
 
 	return &asset, nil
+}
+
+// retrieves all assets for a study
+func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
+	assets := []types.Asset{}
+	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return assets, types.NewNotFoundError(err)
+	}
+	return assets, types.NewErrServerError(err)
+}
+
+// retrieves a specific asset within a study
+// verifies that the user has access to the study via RBAC
+func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
+	// check if user has access to the study
+	if isAdmin, err := rbac.HasRole(user, rbac.Admin); err != nil {
+		return types.Asset{}, err
+	} else if !isAdmin {
+		// Non-admin users need study owner access
+		studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+		if err != nil {
+			return types.Asset{}, err
+		}
+
+		hasAccess := slices.Contains(studyIds, studyID)
+
+		if !hasAccess {
+			return types.Asset{}, types.NewForbiddenError("Access denied to study")
+		}
+	}
+
+	// If authorized, get the asset
+	var asset types.Asset
+	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return asset, types.NewNotFoundError(err)
+	}
+	return asset, types.NewErrServerError(err)
 }

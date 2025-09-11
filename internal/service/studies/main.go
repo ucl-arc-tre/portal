@@ -158,17 +158,6 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	return studies, types.NewErrServerError(err)
 }
 
-// StudyAssetsWithOwner retrieves all assets for a study,
-// ensures that the user owns the study (this might be refactored later to allow shared access)
-func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
-	assets := []types.Asset{}
-	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return assets, types.NewNotFoundError(err)
-	}
-	return assets, types.NewErrServerError(err)
-}
-
 // handles the database transaction for creating a study and its admins
 func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
 	// Start a transaction

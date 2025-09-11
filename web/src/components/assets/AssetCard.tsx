@@ -5,6 +5,8 @@ import styles from "./AssetCard.module.css";
 
 type AssetCardProps = {
   asset: Asset;
+  studyId: string;
+  studyTitle: string;
 };
 
 const formatClassification = (classification: string) => {
@@ -29,7 +31,7 @@ const formatDate = (dateString: string) => {
   }
 };
 
-export default function AssetCard({ asset }: AssetCardProps) {
+export default function AssetCard({ studyId, studyTitle, asset }: AssetCardProps) {
   const router = useRouter();
 
   const getClassificationClass = (classification: string) => {
@@ -89,7 +91,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
       </div>
 
       <div className={styles["asset-actions"]}>
-        <Button onClick={() => router.push(`/assets/manage?assetId=${asset.id}`)} size="small">
+        <Button onClick={() => router.push(`/studies/${studyId}/assets/${asset.id}/manage`)} size="small">
           Manage Asset
         </Button>
       </div>

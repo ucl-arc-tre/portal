@@ -9,6 +9,7 @@ var (
 	ErrInvalidObject = errors.New("invalid object")
 	ErrServerError   = errors.New("server error")
 	ErrNotFound      = errors.New("not found")
+	ErrForbidden     = errors.New("forbidden")
 )
 
 func NewErrInvalidObject(err any) error {
@@ -21,6 +22,10 @@ func NewErrServerError(err any) error {
 
 func NewNotFoundError(err any) error {
 	return newErrorWithType(err, ErrNotFound)
+}
+
+func NewForbiddenError(err any) error {
+	return newErrorWithType(err, ErrForbidden)
 }
 
 func newErrorWithType(err any, errorType error) error {
