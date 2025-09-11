@@ -75,33 +75,35 @@ func New() *Controller {
 	return controller
 }
 
-func entraUsernameForExternalEmail(email string) (string, error) {
+func userIdForExternal(username types.Username) (string, error) {
 	if config.EntraTenantPrimaryDomain() == "" {
 		return "", types.NewErrServerError("Entra tenant primary domain is not set")
 	}
 
-	parts := strings.Split(email, "@")
+	parts := strings.Split(string(username), "@")
 	if len(parts) != 2 {
-		return email, types.NewErrInvalidObject("invalid email")
+		return "", types.NewErrInvalidObject("invalid email")
 	}
 
 	domain := parts[1]
 
-	newEmail := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
-	return newEmail, nil
+	userId := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
+	return userId, nil
 }
 
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
+	var err error
+	userId := ""
 
-	if !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain()) {
-
-		extFormatEmail, err := entraUsernameForExternalEmail(string(username))
+	if usernameIsExternal(username) {
+		externalUserId, err := userIdForExternal(username)
 		if err != nil {
-
 			return nil, err
 		}
-		username = types.Username(extFormatEmail)
+		userId = externalUserId
+	} else {
+		userId = string(username)
 	}
 
 	if userData, exists := c.userDataCache.Get(username); exists {
@@ -112,7 +114,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 			Select: []string{"mail", "employeeType", "id"},
 		},
 	}
-	data, err := c.client.Users().ByUserId(string(username)).Get(ctx, configuration)
+	data, err := c.client.Users().ByUserId(userId).Get(ctx, configuration)
 	if err != nil && strings.Contains(err.Error(), "does not exist") {
 		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
 	} else if err != nil {
@@ -256,4 +258,8 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		}
 	}
 	return usernames, nil
+}
+
+func usernameIsExternal(username types.Username) bool {
+	return !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain())
 }
