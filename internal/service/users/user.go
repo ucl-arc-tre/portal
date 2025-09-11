@@ -11,42 +11,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (s *Service) AllUsers() ([]openapi.UserData, error) {
-	usersData := []openapi.UserData{}
-
-	// get all users from db
-	users := []types.User{}
-	result := s.db.Find(&users)
-	if result.Error != nil {
-		return usersData, types.NewErrServerError(result.Error)
-	}
-
-	return s.usersData(users)
-}
-
-func (s *Service) AllApprovedResearcherUsers() ([]openapi.UserData, error) {
-	usersData := []openapi.UserData{}
-
-	// get all approved researcher users from db
-	userIds, err := rbac.GetUserIdsWithRole(rbac.ApprovedResearcher)
-	if err != nil {
-		return usersData, err
-	}
-
-	users := []types.User{}
-	err = s.db.Where("id IN (?)", userIds).Find(&users).Error
-	if err != nil {
-		return usersData, types.NewErrServerError(err)
-	}
-
-	usersData, err = s.usersData(users)
-	if err != nil {
-		return usersData, err
-	}
-
-	return usersData, nil
-}
-
 func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 	usersData := []openapi.UserData{}
 	// loops through all users given and get training, roles and agreements for each

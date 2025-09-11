@@ -110,8 +110,8 @@ export const getAgreementsByAgreementType = <ThrowOnError extends boolean = fals
 /**
  * Get all the users a user has access to view
  */
-export const getUsers = <ThrowOnError extends boolean = false>(options?: Options<GetUsersData, ThrowOnError>) => {
-    return (options?.client ?? _heyApiClient).get<GetUsersResponses, GetUsersErrors, ThrowOnError>({
+export const getUsers = <ThrowOnError extends boolean = false>(options: Options<GetUsersData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).get<GetUsersResponses, GetUsersErrors, ThrowOnError>({
         url: '/users',
         ...options
     });

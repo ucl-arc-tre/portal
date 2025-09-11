@@ -540,11 +540,11 @@ export type GetAgreementsByAgreementTypeResponse = GetAgreementsByAgreementTypeR
 export type GetUsersData = {
     body?: never;
     path?: never;
-    query?: {
+    query: {
         /**
          * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
          */
-        find?: string;
+        find: string;
     };
     url: '/users';
 };
