@@ -27,25 +27,15 @@ export default function ManageAssetPage() {
     setError(null);
 
     try {
-      // Fetch study details
       const studyResponse = await getStudiesByStudyId({
         path: { studyId: studyIdParam },
       });
+      if (studyResponse.data) setStudy(studyResponse.data);
 
-      if (studyResponse.data) {
-        setStudy(studyResponse.data);
-      }
-
-      // Fetch specific asset using new endpoint
       const assetResponse = await getStudiesByStudyIdAssetsByAssetId({
         path: { studyId: studyIdParam, assetId: assetIdParam },
       });
-
-      console.log(assetResponse);
-
-      if (assetResponse.data) {
-        setAsset(assetResponse.data);
-      }
+      if (assetResponse.data) setAsset(assetResponse.data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError("Failed to load asset details");
@@ -71,6 +61,7 @@ export default function ManageAssetPage() {
           title="Manage Asset | ARC Services Portal"
           description="Manage your asset in the ARC Services Portal"
         />
+
         <div className={styles["not-approved-section"]}>
           <h2>To manage assets, please first set up your profile by completing the approved researcher process.</h2>
           <div className={styles["profile-completion-action"]}>
@@ -112,17 +103,17 @@ export default function ManageAssetPage() {
       <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
       <div className={styles.container}>
         <div className={styles.breadcrumb}>
-          <Button onClick={() => router.push("/studies")} size="small">
+          <Button onClick={() => router.push("/studies")} size="small" variant="tertiary">
             Studies
           </Button>
           <span> / </span>
-          <Button onClick={() => router.push(`/studies/manage?studyId=${studyId}`)} size="small">
+          <Button onClick={() => router.push(`/studies/manage?studyId=${studyId}`)} size="small" variant="tertiary" s>
             {study.title}
           </Button>
           <span> / Assets / {asset.title}</span>
         </div>
 
-        <Title text={`Manage Asset: ${asset.title}`} description={`Part of study: ${study.title}`} />
+        <Title text={`Manage Asset: ${asset.title}`} />
 
         <div className={styles.assetInfo}>
           <div className={styles.section}>
@@ -162,12 +153,6 @@ export default function ManageAssetPage() {
               {/* TODO: Add contract upload/download UI */}
             </div>
           )}
-
-          <div className={styles.actions}>
-            <Button onClick={() => router.back()} variant="secondary">
-              Back to Study
-            </Button>
-          </div>
         </div>
       </div>
     </>

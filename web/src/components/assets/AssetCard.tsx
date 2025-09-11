@@ -91,7 +91,7 @@ export default function AssetCard({ studyId, studyTitle, asset }: AssetCardProps
       </div>
 
       <div className={styles["asset-actions"]}>
-        <Button onClick={() => router.push(`/studies/${studyId}/assets/${asset.id}/manage`)} size="small">
+        <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
           Manage Asset
         </Button>
       </div>
