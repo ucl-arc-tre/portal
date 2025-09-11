@@ -215,7 +215,7 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) er
 	requestBody.SetOdataId(&odataId)
 
 	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
-	return err
+	return types.NewErrServerError(err)
 }
 
 func employeeTypeIsStaff(employeeType string) bool {
