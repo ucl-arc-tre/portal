@@ -13,6 +13,7 @@
   flex-direction: column;
   gap: 1.5rem;
   margin-top: 1rem;
+  padding-inline: 4%;
 }
 
 .field {

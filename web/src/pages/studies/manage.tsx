@@ -161,7 +161,7 @@ export default function ManageStudyPage() {
         title={`Manage ${study.title} | ARC Services Portal`}
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
-      <Title text={`Manage Study: ${study.title}`} />
+      <Title text={`Manage Study: ${study.title}`} centered />
 
       <ManageStudy study={study} userData={userData!} />
     </>
