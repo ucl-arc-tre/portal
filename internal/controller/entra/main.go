@@ -157,6 +157,7 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 }
 
 func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+	log.Debug().Str("email", email).Msg("Inviting existing entra user to portal")
 	err := c.SendCustomInviteNotification(ctx, email, sponsor)
 	if err != nil {
 		return err
@@ -165,6 +166,8 @@ func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email stri
 }
 
 func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+	log.Debug().Str("email", email).Msg("Inviting new entra user to portal")
+
 	requestBody := graphmodels.NewInvitation()
 	invitedUserEmailAddress := email
 	inviteRedirectUrl := config.EntraInviteRedirectURL()
@@ -199,9 +202,11 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 }
 
 func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) error {
+	log.Debug().Str("email", email).Msg("Adding invited user to invited user group")
 
 	user, err := c.userData(ctx, types.Username(email))
 	if err != nil {
+		log.Err(err).Str("email", email).Msg("Failed to get user data to get user id")
 		return err
 	}
 
