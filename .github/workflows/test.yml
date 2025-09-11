@@ -86,7 +86,9 @@ jobs:
             "botAdminUsername": "portal-e2e-admin@arctretest.onmicrosoft.com",
             "botAdminPassword": "${{ secrets.CYPRESS_BOT_ADMIN_PASSWORD }}",
             "botBaseUsername": "portal-e2e-base@arctretest.onmicrosoft.com",
-            "botBasePassword": "${{ secrets.CYPRESS_BOT_BASE_PASSWORD }}"
+            "botBasePassword": "${{ secrets.CYPRESS_BOT_BASE_PASSWORD }}",
+            "botStaffUsername": "portal-e2e-staff@arctretest.onmicrosoft.com",
+            "botStaffPassword": "${{ secrets.CYPRESS_BOT_STAFF_PASSWORD }}"
           }
           EOF
 
