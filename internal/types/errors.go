@@ -24,10 +24,6 @@ func NewNotFoundError(err any) error {
 	return newErrorWithType(err, ErrNotFound)
 }
 
-func NewForbiddenError(err any) error {
-	return newErrorWithType(err, ErrForbidden)
-}
-
 func newErrorWithType(err any, errorType error) error {
 	if err == nil {
 		return nil

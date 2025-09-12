@@ -140,7 +140,8 @@ export default function ManageAssetPage() {
           <Button onClick={() => router.push(`/studies/manage?studyId=${studyId}`)} size="small" variant="tertiary" s>
             {study.title}
           </Button>
-          <span> / Assets / {asset.title}</span>
+          <span> / </span>
+          <span>{asset.title}</span>
         </div>
 
         <Title text={`Manage Asset: ${asset.title}`} />
