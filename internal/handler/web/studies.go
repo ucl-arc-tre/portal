@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"slices"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -208,29 +206,6 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 	}
 
 	user := middleware.GetUser(ctx)
-
-	// Check if user has access to the study
-	isAdmin, err := rbac.HasRole(user, rbac.Admin)
-	if err != nil {
-		setError(ctx, err, "Failed to check user roles")
-		return
-	}
-
-	if !isAdmin {
-		// Non-admin users need study owner access
-		studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
-		if err != nil {
-			setError(ctx, err, "Failed to get user's study access")
-			return
-		}
-
-		hasAccess := slices.Contains(studyIds, studyUUID)
-
-		if !hasAccess {
-			setError(ctx, types.NewForbiddenError("Access denied to study"), "Access denied")
-			return
-		}
-	}
 
 	asset, err := h.studies.StudyAssetById(user, studyUUID, assetUUID)
 	if err != nil {
