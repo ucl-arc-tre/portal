@@ -8,6 +8,7 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
+import ContractManagement from "@/components/assets/ContractManagement";
 
 import styles from "./ManageAsset.module.css";
 
@@ -146,7 +147,7 @@ export default function ManageAssetPage() {
 
         <Title text={`Manage Asset: ${asset.title}`} />
 
-        <div className={styles.assetInfo}>
+        <div className={styles["asset-info"]}>
           <div className={styles.section}>
             <h3>Asset Details</h3>
             <div className={styles.field}>
@@ -177,13 +178,7 @@ export default function ManageAssetPage() {
             )}
           </div>
 
-          {asset.requires_contract && (
-            <div className={styles.section}>
-              <h3>Contract Management</h3>
-              <p>This asset requires a contract. Contract upload/download functionality will be implemented here.</p>
-              {/* TODO: Add contract upload/download UI */}
-            </div>
-          )}
+          {asset.requires_contract && <ContractManagement studyId={studyId as string} assetId={assetId as string} />}
         </div>
       </div>
     </>
