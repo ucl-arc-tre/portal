@@ -2,6 +2,7 @@ package studies
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"time"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -165,4 +167,24 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	}
 
 	return &asset, nil
+}
+
+// retrieves all assets for a study
+func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
+	assets := []types.Asset{}
+	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return assets, types.NewNotFoundError(err)
+	}
+	return assets, types.NewErrServerError(err)
+}
+
+// retrieves a specific asset within a study
+func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
+	var asset types.Asset
+	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return asset, types.NewNotFoundError(err)
+	}
+	return asset, types.NewErrServerError(err)
 }

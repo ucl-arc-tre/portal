@@ -590,6 +590,9 @@ type ServerInterface interface {
 	// (POST /studies/{studyId}/assets)
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
+	// (GET /studies/{studyId}/assets/{assetId})
+	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId string, assetId string)
+
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
 
@@ -892,6 +895,39 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
 }
 
+// GetStudiesStudyIdAssetsAssetId operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAssetsAssetId(c, studyId, assetId)
+}
+
 // GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context) {
 
@@ -1102,6 +1138,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
+	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)

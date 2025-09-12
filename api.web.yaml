@@ -372,6 +372,37 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/{studyId}/assets/{assetId}:
+    get:
+      description: Get details of a specific asset within a study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+        - in: path
+          name: assetId
+          required: true
+          description: ID of the asset
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
+        "403":
+          description: Forbidden - no access to study or asset
+        "404":
+          description: Study or asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /logout:
     get:
       description: Log the user out
