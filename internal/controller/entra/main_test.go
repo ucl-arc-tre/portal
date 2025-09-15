@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func TestEntraUsernameForExternalEmail(t *testing.T) {
@@ -14,12 +15,15 @@ func TestEntraUsernameForExternalEmail(t *testing.T) {
 
 	testTenantDomain := config.EntraTenantPrimaryDomain()
 
-	email := "hello@example.com"
-	expectedEmail := "hello_example.com#EXT#@" + testTenantDomain
+	username := types.Username("hello@example.com")
+	assert.True(t, usernameIsExternal(username))
+	assert.False(t, usernameIsExternal(types.Username("hello@testTenant.com")))
 
-	extFormatEmail, err := entraUsernameForExternalEmail(email)
+	expectedUserId := "hello_example.com#EXT#@" + testTenantDomain
+
+	extFormatUserId, err := userIdForExternal(username)
 	assert.NoError(t, err, "EntraUsernameForExternalEmail returned an error")
-	assert.Equal(t, expectedEmail, extFormatEmail)
+	assert.Equal(t, expectedUserId, extFormatUserId)
 }
 
 func TestEmployeeTypeStaffRegex(t *testing.T) {
