@@ -51,7 +51,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
     setError(null);
 
     try {
-      const generatedContractId = uuidv4();
+      const generatedContractId = uuidv4(); // refactor this to generate the UUID on the backend
 
       const response = await postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload({
         path: {
