@@ -850,6 +850,47 @@ export type PostStudiesByStudyIdAssetsResponses = {
 
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
+export type GetStudiesByStudyIdAssetsByAssetIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+        /**
+         * ID of the asset
+         */
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}';
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdErrors = {
+    /**
+     * Forbidden - no access to study or asset
+     */
+    403: unknown;
+    /**
+     * Study or asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdResponses = {
+    200: Asset;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdResponse = GetStudiesByStudyIdAssetsByAssetIdResponses[keyof GetStudiesByStudyIdAssetsByAssetIdResponses];
+
 export type GetLogoutData = {
     body?: never;
     path?: never;
