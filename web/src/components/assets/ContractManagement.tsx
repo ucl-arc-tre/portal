@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import Button from "@/components/ui/Button";
 import { postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload } from "@/openapi";
-import { v4 as uuidv4 } from "uuid";
 import styles from "./ContractManagement.module.css";
 
 interface ContractManagementProps {
@@ -51,13 +50,11 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
     setError(null);
 
     try {
-      const generatedContractId = uuidv4(); // refactor this to generate the UUID on the backend
-
       const response = await postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload({
         path: {
           studyId,
           assetId,
-          contractId: generatedContractId,
+          contractId: "abc123", // Temporary placeholder until contract creation is implemented
         },
         body: uploadFile,
       });
