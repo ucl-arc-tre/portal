@@ -10,9 +10,13 @@ export default function StudyStatusBadge({ status, isAdmin }: BadgeProps) {
   function getStatusDescription(status: string | undefined): string {
     switch (status) {
       case "Incomplete":
-        return "Click 'manage study' to complete your study setup.";
+        if (isAdmin) {
+          return "The study owner has yet to agree to the study agreement.";
+        } else return "Click 'manage study' to complete your study setup.";
       case "Pending":
-        return "Study is under review and awaiting approval from administrators.";
+        if (isAdmin) {
+          return "Study is ready for review - you may update this status as needed.";
+        } else return "Study is under review and awaiting approval from administrators.";
       case "Approved":
         return "Study has been approved and is ready for use.";
       case "Rejected":
@@ -21,7 +25,6 @@ export default function StudyStatusBadge({ status, isAdmin }: BadgeProps) {
         return "Status information not available.";
     }
   }
-  // todo: admin defs
 
   return (
     <span className={`${styles["status-badge"]} ${styles[`status-${status?.toLowerCase()}`]}`}>

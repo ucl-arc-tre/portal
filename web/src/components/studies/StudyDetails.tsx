@@ -1,7 +1,8 @@
 import { Study } from "@/openapi";
 import Box from "../ui/Box";
 import { formatDate } from "../shared/exports";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import StudyStatusBadge from "../ui/StudyStatusBadge";
 
 type StudyDetailsProps = {
   study: Study;
@@ -23,6 +24,10 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
 
     setRiskScore(score);
   };
+
+  useEffect(() => {
+    calculateRiskScore();
+  });
   return (
     <>
       <Box>
@@ -32,7 +37,9 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           <dt>Risk Score</dt>
           <dd>{riskScore}</dd>
           <dt>Status</dt>
-          <dd>{study.approval_status}</dd>
+          <dd>
+            <StudyStatusBadge status={study.approval_status} isAdmin={true} />
+          </dd>
         </dl>
         <h2>{study.description}</h2>
         <div>
