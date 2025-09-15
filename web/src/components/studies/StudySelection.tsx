@@ -7,6 +7,7 @@ import styles from "./StudySelection.module.css";
 
 type StudySelectionProps = {
   studies: Study[];
+  isAdmin: boolean;
 };
 
 function getStatusDescription(status: string | undefined): string {
@@ -25,12 +26,12 @@ function getStatusDescription(status: string | undefined): string {
 }
 
 export default function StudySelection(props: StudySelectionProps) {
-  const { studies } = props;
+  const { studies, isAdmin } = props;
   const router = useRouter();
 
   return (
     <div className={styles["study-selection"]}>
-      <h2 className={styles["studies-heading"]}>Your Studies</h2>
+      {!isAdmin && <h2 className={styles["studies-heading"]}>Your Studies</h2>}
 
       <div className={styles["studies-list"]}>
         {studies.map((study) => (
@@ -51,7 +52,7 @@ export default function StudySelection(props: StudySelectionProps) {
 
             <div className={styles["study-actions"]}>
               <Button onClick={() => router.push(`/studies/manage?studyId=${study.id}`)} size="small">
-                Manage Study
+                {isAdmin ? "View Study" : "Manage Study"}
               </Button>
             </div>
           </div>

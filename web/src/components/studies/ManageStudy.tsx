@@ -6,15 +6,17 @@ import StudyAgreement from "./StudyAgreement";
 import Assets from "../assets/Assets";
 
 import styles from "./ManageStudy.module.css";
+import StudyDetails from "./StudyDetails";
 
 type ManageStudyProps = {
   study: Study;
   userData: Auth;
 };
 
-export default function ManageStudy({ study }: ManageStudyProps) {
+export default function ManageStudy({ study, userData }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
+  const isAdmin = userData?.roles.includes("admin");
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
@@ -35,6 +37,9 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     },
   ];
 
+  if (isAdmin) {
+    return <StudyDetails study={study} />;
+  }
   const getCurrentStepComponent = () => {
     if (!agreementCompleted) {
       return (
