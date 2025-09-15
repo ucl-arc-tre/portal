@@ -46,6 +46,20 @@ export function convertRFC3339ToDDMMYYYY(dateString: string) {
   return `${day}/${month}/${year}`;
 }
 
+export const formatDate = (dateString: string) => {
+  try {
+    return new Date(dateString).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return dateString;
+  }
+};
+
 export function getHumanReadableTrainingKind(trainingKind: string) {
   // getting the key from the value
   const humanReadableTrainingKind = Object.entries(TrainingKindOptions).find(

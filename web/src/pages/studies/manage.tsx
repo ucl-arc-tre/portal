@@ -21,6 +21,7 @@ export default function ManageStudyPage() {
   const [studyError, setStudyError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
 
   const fetchStudy = async (id: string) => {
     setStudyIsLoading(true);
@@ -60,7 +61,7 @@ export default function ManageStudyPage() {
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
 
-  if (!isApprovedResearcher) {
+  if (!isApprovedResearcher && !isAdmin) {
     return (
       <>
         <MetaHead
@@ -161,7 +162,7 @@ export default function ManageStudyPage() {
         title={`Manage ${study.title} | ARC Services Portal`}
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
-      <Title text={`Manage Study: ${study.title}`} centered />
+      <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
       <ManageStudy study={study} userData={userData!} />
     </>
