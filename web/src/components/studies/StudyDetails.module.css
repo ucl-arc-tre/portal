@@ -1,0 +1,59 @@
+.pre-description {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-weight: 500;
+
+  dd {
+    display: inline-block;
+  }
+}
+
+.ownership {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+
+  dd {
+    font-weight: 600;
+
+    span {
+      font-weight: 400;
+    }
+  }
+}
+
+.additional-info {
+  margin-bottom: 1rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: fit-content;
+}
+
+.badge-no-risk-associated {
+  background-color: #ddeef0;
+  color: #283d3d;
+  border: 1px solid #73bbc9;
+}
+
+.badge-risk-associated {
+  background-color: #f2eee2;
+  color: #55331c;
+  border: 1px solid #a17f4c;
+}
+
+.grouping {
+  display: flex;
+  gap: 0.5rem;
+  margin-block: 0.8rem;
+}
