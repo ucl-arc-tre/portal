@@ -1,5 +1,5 @@
 import { Asset } from "@/openapi";
-import Button from "@/components/ui/Button";
+// import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 
