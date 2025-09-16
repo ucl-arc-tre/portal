@@ -1,6 +1,6 @@
 import { postStudiesByStudyId, Study } from "@/openapi";
 import Box from "../ui/Box";
-import { formatDate } from "../shared/exports";
+import { formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
@@ -13,6 +13,8 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   //   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const handleUpdateStudyStatus = async (status: string) => {
     const studyId = study.id;
@@ -26,6 +28,19 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       console.log(response);
     } else if (status === "Rejected") {
       // todo: add feedback bits
+    }
+  };
+
+  const toggleShowFeedbackForm = () => {
+    // for smooth collapse
+    if (showFeedbackForm) {
+      setIsCollapsing(true);
+      setTimeout(() => {
+        setShowFeedbackForm(false);
+        setIsCollapsing(false);
+      }, 1900);
+    } else {
+      setShowFeedbackForm(true);
     }
   };
 
@@ -172,10 +187,29 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
         <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
           Approve Study
         </Button>
-        <Button variant="secondary" className={styles["reject-button"]}>
+        <Button variant="secondary" className={styles["reject-button"]} onClick={() => setShowFeedbackForm(true)}>
           Request Changes
         </Button>
       </div>
+      {showFeedbackForm && (
+        <Box>
+          <div className={styles["feedback-container"]}>
+            <form
+              className={`${styles["feedback-form"]} ${
+                isCollapsing
+                  ? styles["form-collapsing"]
+                  : showFeedbackForm
+                    ? styles["form-visible"]
+                    : styles["form-hidden"]
+              }`}
+            >
+              <label htmlFor="feedback">Outline what the changes are required to attain approval</label>
+              <Textarea name="feedback" id="feedback" cols={30} rows={10} />
+              <Button onClick={toggleShowFeedbackForm}>Submit</Button>
+            </form>
+          </div>
+        </Box>
+      )}
     </>
   );
 }
