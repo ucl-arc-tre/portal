@@ -57,3 +57,17 @@
   gap: 0.5rem;
   margin-block: 0.8rem;
 }
+
+.approve-button {
+  background-color: var(--green-100) !important;
+  border-color: var(--green-100) !important;
+}
+
+.reject-button {
+  color: #a50909 !important;
+  border-color: #a50909 !important;
+
+  &:hover {
+    font-weight: 600;
+  }
+}

@@ -207,3 +207,16 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 
 	return &study, nil
 }
+
+func (s *Service) UpdateStudyStatus(id uuid.UUID, status openapi.StudyApprovalStatus) error {
+	study := types.Study{}
+	if err := s.db.Where("id = ?", id).First(&study).Error; err != nil {
+		return types.NewErrServerError(err)
+	}
+	study.ApprovalStatus = string(status)
+	if err := s.db.Save(&study).Error; err != nil {
+		return types.NewErrServerError(err)
+	}
+
+	return nil
+}

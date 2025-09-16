@@ -309,6 +309,32 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    post:
+      description: Update study status
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyApprovalStatus"
+      responses:
+        "201":
+          description: Study status updated successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   # Study Asset Management
   /studies/{studyId}/assets:
@@ -946,14 +972,17 @@ components:
               type: string
               description: Time in RFC3339 format when the study was last updated
             approval_status:
-              type: string
-              enum:
-                - Incomplete
-                - Pending
-                - Approved
-                - Rejected
-              description: Current approval status of the study
+              $ref: "#/components/schemas/StudyApprovalStatus"
       description: A research study
+
+    StudyApprovalStatus:
+      type: string
+      enum:
+        - Incomplete
+        - Pending
+        - Approved
+        - Rejected
+      description: Current approval status of the study
 
     StudyCreateValidationError:
       type: object

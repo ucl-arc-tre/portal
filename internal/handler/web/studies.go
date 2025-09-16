@@ -310,3 +310,23 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 		},
 	)
 }
+
+func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
+	var status openapi.StudyApprovalStatus // why doesn't this work as status := openapi.StudyApprovalStatus
+
+	if err := bindJSONOrSetError(ctx, &status); err != nil {
+		return
+	}
+
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	err = h.studies.UpdateStudyStatus(studyUUID, status)
+
+	if err != nil {
+		setError(ctx, err, "Failed to update study status")
+	}
+
+	ctx.Status(http.StatusOK)
+}

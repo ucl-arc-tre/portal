@@ -1,4 +1,4 @@
-import { Study } from "@/openapi";
+import { postStudiesByStudyId, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -11,9 +11,21 @@ type StudyDetailsProps = {
 };
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
-  //   const getUserFromId = (id: string) => {
-  //     // todo
-  //   };
+  // const getUserFromId = (id: string) => {
+  //   // todo
+  // };
+
+  const handleUpdateStudyStatus = async (status: string) => {
+    const studyId = study.id;
+
+    if (status === "Approved") {
+      // set as approved
+      const response = await postStudiesByStudyId({ path: { studyId }, body: "Approved" });
+      console.log(response);
+    } else if (status === "Rejected") {
+      // todo: add feedback bits
+    }
+  };
   const calculateRiskScore = () => {
     // todo: how to determine if they have data?
     let score = 0;
@@ -145,7 +157,14 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           </dl>
         </div>
       </Box>
-      <Button>Update Status</Button>
+      <div>
+        <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+          Approve Study
+        </Button>
+        <Button variant="secondary" className={styles["reject-button"]}>
+          Request Changes
+        </Button>
+      </div>
     </>
   );
 }

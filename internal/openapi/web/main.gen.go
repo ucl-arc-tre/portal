@@ -527,6 +527,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyCreateRequest
 
+// PostStudiesStudyIdJSONRequestBody defines body for PostStudiesStudyId for application/json ContentType.
+type PostStudiesStudyIdJSONRequestBody = StudyApprovalStatus
+
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
@@ -577,6 +580,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
+
+	// (POST /studies/{studyId})
+	PostStudiesStudyId(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/agreements)
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
@@ -797,6 +803,30 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
 	}
 
 	siw.Handler.GetStudiesStudyId(c, studyId)
+}
+
+// PostStudiesStudyId operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyId(c, studyId)
 }
 
 // GetStudiesStudyIdAgreements operation middleware
@@ -1134,6 +1164,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
+	router.POST(options.BaseURL+"/studies/:studyId", wrapper.PostStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
