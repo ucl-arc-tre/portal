@@ -364,6 +364,9 @@ type Study struct {
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
 
+	// OwnerUsername Username of the user who owns the study
+	OwnerUsername *string `json:"owner_username,omitempty"`
+
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`
 
@@ -444,6 +447,9 @@ type StudyBase struct {
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
+
+	// OwnerUsername Username of the user who owns the study
+	OwnerUsername *string `json:"owner_username,omitempty"`
 
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`

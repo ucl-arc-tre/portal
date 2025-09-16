@@ -11,11 +11,8 @@ type StudyDetailsProps = {
 };
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
-  const [feedback, setFeedback] = useState("");
+  //   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
-  // const getUserFromId = (id: string) => {
-  //   // todo
-  // };
 
   const handleUpdateStudyStatus = async (status: string) => {
     const studyId = study.id;
@@ -61,7 +58,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
         <div>
           <dl className={styles.ownership}>
             <dd>
-              Owner: <span>{study.owner_user_id}</span>
+              Owner: <span>{study.owner_username}</span>
             </dd>
             <dd>
               Admins:

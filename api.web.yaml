@@ -946,6 +946,9 @@ components:
         owner_user_id:
           type: string
           description: ID of the user who owns the study
+        owner_username:
+          type: string
+          description: Username of the user who owns the study
 
     StudyCreateRequest:
       allOf:

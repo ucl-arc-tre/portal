@@ -294,6 +294,10 @@ export type StudyBase = {
      * ID of the user who owns the study
      */
     owner_user_id?: string;
+    /**
+     * Username of the user who owns the study
+     */
+    owner_username?: string;
 };
 
 /**

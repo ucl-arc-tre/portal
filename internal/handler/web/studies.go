@@ -16,11 +16,13 @@ import (
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
+	ownerUsernameStr := string(study.OwnerUsername)
 	return openapi.Study{
 		Id:                               study.ID.String(),
 		Title:                            study.Title,
 		Description:                      study.Description,
 		OwnerUserId:                      &ownerUserIDStr,
+		OwnerUsername:                    &ownerUsernameStr,
 		ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
 		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 		DataControllerOrganisation:       study.DataControllerOrganisation,

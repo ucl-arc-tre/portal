@@ -10,6 +10,7 @@ import (
 type Study struct {
 	ModelAuditable
 	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
+	OwnerUsername                    Username  `gorm:"type:varchar(255)"`
 	Title                            string    `gorm:"not null"`
 	Description                      *string   `gorm:"type:text"`
 	DataControllerOrganisation       string    `gorm:"not null"`
@@ -33,6 +34,7 @@ type Study struct {
 	InvolvesIndirectDataCollection   *bool     `gorm:""`
 	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
 	ApprovalStatus                   string    `gorm:"not null"`
+	Feedback                         *string   `gorm:"type:text"`
 
 	// Relationships
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`

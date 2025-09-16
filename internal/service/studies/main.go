@@ -156,6 +156,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 
 	study := types.Study{
 		OwnerUserID:                owner.ID,
+		OwnerUsername:              owner.Username,
 		Title:                      studyData.Title,
 		DataControllerOrganisation: studyData.DataControllerOrganisation,
 		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
