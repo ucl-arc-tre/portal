@@ -11,6 +11,8 @@ type StudyDetailsProps = {
 };
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [approvalStatus, setApprovalStatus] = useState("");
   // const getUserFromId = (id: string) => {
   //   // todo
   // };
@@ -21,34 +23,39 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
     if (status === "Approved") {
       // set as approved
       const response = await postStudiesByStudyId({ path: { studyId }, body: "Approved" });
+      if (response.response.ok) {
+        setApprovalStatus("Approved");
+      }
       console.log(response);
     } else if (status === "Rejected") {
       // todo: add feedback bits
     }
   };
-  const calculateRiskScore = () => {
-    // todo: how to determine if they have data?
-    let score = 0;
-
-    if (study.involves_data_processing_outside_eea) score += 10;
-    if (study.requires_dbs) score += 5;
-    if (study.requires_dspt) score += 5;
-    if (study.involves_third_party && !study.involves_mnca) score += 5;
-    if (study.involves_nhs_england || study.involves_cag) score += 5;
-
-    setRiskScore(score);
-  };
 
   useEffect(() => {
+    const calculateRiskScore = () => {
+      // todo: how to determine if they have data?
+      let score = 0;
+
+      if (study.involves_data_processing_outside_eea) score += 10;
+      if (study.requires_dbs) score += 5;
+      if (study.requires_dspt) score += 5;
+      if (study.involves_third_party && !study.involves_mnca) score += 5;
+      if (study.involves_nhs_england || study.involves_cag) score += 5;
+
+      setRiskScore(score);
+    };
+
     calculateRiskScore();
-  });
+    setApprovalStatus(study.approval_status);
+  }, [study]);
   return (
     <>
       <Box>
         <div className={styles["pre-description"]}>
           <span>Last updated: {formatDate(study.updated_at)}</span>
           <span>Risk Score: {riskScore}</span>
-          <StudyStatusBadge status={study.approval_status} isAdmin={true} />
+          <StudyStatusBadge status={approvalStatus} isAdmin={true} />
         </div>
         <h2>{study.description}</h2>
         <div>
