@@ -50,22 +50,29 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
     <>
       <Box>
         <div className={styles["pre-description"]}>
-          <span>Last updated: {formatDate(study.updated_at)}</span>
-          <span>Risk Score: {riskScore}</span>
+          <span>
+            Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
+          </span>
+          <span>
+            Risk Score: <span className={styles["risk-score"]}>{riskScore}</span>
+          </span>
           <StudyStatusBadge status={approvalStatus} isAdmin={true} />
         </div>
         <h2>{study.description}</h2>
         <div>
           <dl className={styles.ownership}>
             <dd>
-              Owner: <span>{study.owner_username}</span>
+              Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
             </dd>
             <dd>
               Admins:
-              <span>{study.additional_study_admin_usernames}</span>
+              {study.additional_study_admin_usernames.length > 0 && (
+                <span className={styles["grey-value"]}>{study.additional_study_admin_usernames}</span>
+              )}
             </dd>
             <dd>
-              Data Controller: <span>{study.data_controller_organisation.toUpperCase()}</span>
+              Data Controller:{" "}
+              <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
             </dd>
           </dl>
           <h3>Additional Information</h3>

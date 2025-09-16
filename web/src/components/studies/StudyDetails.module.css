@@ -3,17 +3,29 @@
   flex-direction: row;
   justify-content: space-between;
   font-weight: 500;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
 
   dd {
     display: inline-block;
   }
 }
 
+.grey-value {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 400;
+}
+
 .ownership {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1.2rem;
+  flex-wrap: wrap;
 
   dd {
     font-weight: 600;
@@ -61,13 +73,17 @@
 .approve-button {
   background-color: var(--green-100) !important;
   border-color: var(--green-100) !important;
+  margin-inline: 0.4rem;
 }
 
 .reject-button {
   color: #a50909 !important;
-  border-color: #a50909 !important;
+  border: 2px solid #a50909 !important;
+  margin-inline: 0.4rem;
+  transition: all 0.3s ease;
 
   &:hover {
-    font-weight: 600;
+    background-color: #a50909 !important;
+    color: #fff !important;
   }
 }
