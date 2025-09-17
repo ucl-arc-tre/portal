@@ -81,14 +81,6 @@ func (s *Service) StoreContract(
 		return types.NewErrServerError(fmt.Errorf("failed to commit contract transaction: %w", err))
 	}
 
-	// remove later
-	log.Debug().
-		Str("filename", contractMetadata.Filename).
-		Str("organisation_signatory", contractMetadata.OrganisationSignatory).
-		Str("third_party", contractMetadata.ThirdPartyName).
-		Str("status", contractMetadata.Status).
-		Msg("Contract stored successfully")
-
 	return nil
 }
 
