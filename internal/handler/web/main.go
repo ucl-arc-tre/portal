@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -31,7 +32,11 @@ func New() *Handler {
 
 func (h *Handler) GetLogout(ctx *gin.Context) {
 
-	logoutUrl := "/oauth2/sign_out?rd=https://login.microsoftonline.com/" + config.EntraCredentials().TenantID + "/oauth2/v2.0/logout?post_logout_redirect_uri=" + config.EntraInviteRedirectURL()
-
-	ctx.Redirect(http.StatusFound, logoutUrl)
+	redirectQuery := url.QueryEscape(
+		"https://login.microsoftonline.com/" +
+			config.EntraCredentials().TenantID +
+			"/oauth2/v2.0/logout?post_logout_redirect_uri=" +
+			config.EntraInviteRedirectURL(),
+	)
+	ctx.Redirect(http.StatusFound, "/oauth2/sign_out?rd="+redirectQuery)
 }
