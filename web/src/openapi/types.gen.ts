@@ -991,18 +991,34 @@ export type PostStudiesByStudyIdAgreementsResponses = {
     200: unknown;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadData = {
-    body: Blob | File;
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
+    body: {
+        /**
+         * PDF contract file
+         */
+        file: Blob | File;
+        /**
+         * Name of the UCL signatory
+         */
+        ucl_signatory: string;
+        /**
+         * Name of the third party organization
+         */
+        third_party_name: string;
+        /**
+         * Contract status
+         */
+        status: 'proposed' | 'active' | 'expired';
+    };
     path: {
         studyId: string;
         assetId: string;
-        contractId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload';
+    url: '/studies/{studyId}/assets/{assetId}/contracts/upload';
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadErrors = {
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
     /**
      * Forbidden
      */
@@ -1017,14 +1033,14 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadErrors
     default: unknown;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses = {
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses];
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData = {
     body?: never;

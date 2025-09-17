@@ -466,7 +466,7 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload:
+  /studies/{studyId}/assets/{assetId}/contracts/upload:
     post:
       description: Upload a contract object e.g. PDF
       parameters:
@@ -480,18 +480,32 @@ paths:
           required: true
           schema:
             type: string
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
       requestBody:
         required: true
         content:
-          application/octet-stream:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF contract file
+                ucl_signatory:
+                  type: string
+                  description: Name of the UCL signatory
+                third_party_name:
+                  type: string
+                  description: Name of the third party organization
+                status:
+                  type: string
+                  enum: [proposed, active, expired]
+                  description: Contract status
+              required:
+                - file
+                - ucl_signatory
+                - third_party_name
+                - status
       responses:
         "204":
           description: OK

@@ -1,12 +1,19 @@
 import { useState, useRef } from "react";
+import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
-import { postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload } from "@/openapi";
+import { postStudiesByStudyIdAssetsByAssetIdContractsUpload } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 
-interface ContractManagementProps {
+type ContractManagementProps = {
   studyId: string;
   assetId: string;
-}
+};
+
+type ContractFormData = {
+  uclSignatory: string;
+  thirdPartyName: string;
+  status: "proposed" | "active" | "expired";
+};
 
 export default function ContractManagement({ studyId, assetId }: ContractManagementProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -14,6 +21,17 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
   const [error, setError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<ContractFormData>({
+    defaultValues: {
+      status: "proposed",
+    },
+  });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,7 +58,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
     setUploadFile(file);
   };
 
-  const handleFileUpload = async () => {
+  const onSubmit = async (formData: ContractFormData) => {
     if (!uploadFile) {
       setError("Please select a PDF file before uploading.");
       return;
@@ -50,13 +68,17 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
     setError(null);
 
     try {
-      const response = await postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload({
+      const response = await postStudiesByStudyIdAssetsByAssetIdContractsUpload({
         path: {
           studyId,
           assetId,
-          contractId: "abc123", // Temporary placeholder until contract creation is implemented
         },
-        body: uploadFile,
+        body: {
+          file: uploadFile,
+          ucl_signatory: formData.uclSignatory,
+          third_party_name: formData.thirdPartyName,
+          status: formData.status,
+        },
       });
 
       if (!response.response.ok) {
@@ -65,6 +87,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
 
       setUploadSuccess(true);
       setUploadFile(null);
+      reset(); // Reset form
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -92,43 +115,87 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
         Upload a PDF contract document for this asset. Only PDF files up to 10MB are accepted.
       </p>
 
-      <div className={styles["upload-section"]}>
-        <div className={styles["file-input"]}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={handleFileSelect}
-            className={styles["hidden-input"]}
-            id="contract-file-input"
-          />
-          <label htmlFor="contract-file-input" className={styles["file-label"]}>
-            <div className={styles["upload-icon"]}>📄</div>
-            <span>Choose PDF file or drag and drop</span>
-          </label>
-        </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles["upload-section"]}>
+          <div className={styles["file-input"]}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handleFileSelect}
+              className={styles["hidden-input"]}
+              id="contract-file-input"
+            />
+            <label htmlFor="contract-file-input" className={styles["file-label"]}>
+              <div className={styles["upload-icon"]}>📄</div>
+              <span>Choose PDF file or drag and drop</span>
+            </label>
+          </div>
 
-        {uploadFile && (
-          <div className={styles["selected-file"]}>
-            <div className={styles["file-info"]}>
-              <span className={styles["file-name"]}>{uploadFile.name}</span>
+          {uploadFile && (
+            <div className={styles["selected-file"]}>
+              <div className={styles["file-info"]}>
+                <span className={styles["file-name"]}>{uploadFile.name}</span>
+              </div>
+              <Button onClick={clearFile} size="small" variant="tertiary">
+                Remove
+              </Button>
             </div>
-            <Button onClick={clearFile} size="small" variant="tertiary">
-              Remove
+          )}
+
+          {error && <div className={styles.error}>{error}</div>}
+
+          {uploadSuccess && <div className={styles.success}>Contract uploaded successfully!</div>}
+
+          <div className={styles["form-section"]}>
+            <h4>Contract Details</h4>
+
+            <div className={styles["form-group"]}>
+              <label htmlFor="uclSignatory">UCL Signatory</label>
+              <input
+                id="uclSignatory"
+                type="text"
+                {...register("uclSignatory", { required: "UCL Signatory is required" })}
+                className={styles["form-input"]}
+                placeholder="Enter UCL signatory name"
+              />
+              {errors.uclSignatory && <span className={styles["form-error"]}>{errors.uclSignatory.message}</span>}
+            </div>
+
+            <div className={styles["form-group"]}>
+              <label htmlFor="thirdPartyName">Third Party Name</label>
+              <input
+                id="thirdPartyName"
+                type="text"
+                {...register("thirdPartyName", { required: "Third Party Name is required" })}
+                className={styles["form-input"]}
+                placeholder="Enter third party organization name"
+              />
+              {errors.thirdPartyName && <span className={styles["form-error"]}>{errors.thirdPartyName.message}</span>}
+            </div>
+
+            <div className={styles["form-group"]}>
+              <label htmlFor="status">Contract Status</label>
+              <select
+                id="status"
+                {...register("status", { required: "Status is required" })}
+                className={styles["form-select"]}
+              >
+                <option value="proposed">Proposed</option>
+                <option value="active">Active</option>
+                <option value="expired">Expired</option>
+              </select>
+              {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
+            </div>
+          </div>
+
+          <div className={styles.actions}>
+            <Button type="submit" disabled={uploading} size="large">
+              {uploading ? "Uploading..." : "Upload Contract"}
             </Button>
           </div>
-        )}
-
-        {error && <div className={styles.error}>{error}</div>}
-
-        {uploadSuccess && <div className={styles.success}>Contract uploaded successfully!</div>}
-
-        <div className={styles.actions}>
-          <Button onClick={handleFileUpload} disabled={uploading} size="large">
-            {uploading ? "Uploading..." : "Upload Contract"}
-          </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -273,18 +274,61 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	})
 }
 
-func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
 	if err != nil {
 		return
 	}
-	err = h.studies.StoreContract(ctx, uuids[0], uuids[1], uuids[2], types.S3Object{
-		Content: ctx.Request.Body,
-	})
+
+	contractUUID := uuid.New()
+
+	// Parse multipart form
+	err = ctx.Request.ParseMultipartForm(10 << 20) // 10 MB max
 	if err != nil {
-		setError(ctx, err, "Failed store contract")
+		setError(ctx, types.NewErrServerError(err), "Failed to parse multipart form")
 		return
 	}
+
+	// Get the uploaded file
+	file, header, err := ctx.Request.FormFile("file")
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Failed to get uploaded file")
+		return
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Error().Err(err).Msg("Failed to close uploaded file")
+		}
+	}()
+
+	user := middleware.GetUser(ctx)
+
+	formData := types.Contract{
+		StudyID:        uuids[0],
+		AssetID:        uuids[1],
+		ContractID:     contractUUID,
+		Filename:       header.Filename,
+		UploadedBy:     user.ID,
+		UCLSignatory:   ctx.Request.FormValue("ucl_signatory"),
+		ThirdPartyName: ctx.Request.FormValue("third_party_name"),
+		Status:         ctx.Request.FormValue("status"),
+	}
+
+	err = h.studies.ValidateContractMetadata(user, formData)
+	if err != nil {
+		setError(ctx, err, "Invalid contract data")
+		return
+	}
+
+	pdfContractObj := types.S3Object{
+		Content: file,
+	}
+	err = h.studies.StoreContract(ctx, pdfContractObj, formData)
+	if err != nil {
+		setError(ctx, err, "Failed to store contract")
+		return
+	}
+
 	ctx.Status(http.StatusNoContent)
 }
 

@@ -78,6 +78,7 @@ type Asset struct {
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
 	Study       Study           `gorm:"foreignKey:StudyID"`
 	Locations   []AssetLocation `gorm:"foreignKey:AssetID"`
+	Contracts   []Contract      `gorm:"foreignKey:AssetID"`
 }
 
 func (a Asset) LocationStrings() []string {
@@ -95,4 +96,22 @@ type AssetLocation struct {
 
 	// Relationships
 	Asset Asset `gorm:"foreignKey:AssetID"`
+}
+
+// Contract represents a PDF contract document associated with an asset
+type Contract struct {
+	ModelAuditable
+	StudyID        uuid.UUID `gorm:"not null;index"`
+	AssetID        uuid.UUID `gorm:"not null;index"`
+	ContractID     uuid.UUID `gorm:"type:uuid;not null;unique;index"` // Used as S3 key
+	Filename       string    `gorm:"not null"`
+	UploadedBy     uuid.UUID `gorm:"type:uuid;not null"`
+	UCLSignatory   string    `gorm:"column:ucl_signatory"`
+	ThirdPartyName string    `gorm:"column:third_party_name"`
+	Status         string    `gorm:"column:status"` // proposed, active, expired
+
+	// Relationships
+	Study Study `gorm:"foreignKey:StudyID"`
+	Asset Asset `gorm:"foreignKey:AssetID"`
+	User  User  `gorm:"foreignKey:UploadedBy"`
 }
