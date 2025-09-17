@@ -309,6 +309,8 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+
+  /studies/{studyId}/status:
     post:
       description: Update study status
       parameters:

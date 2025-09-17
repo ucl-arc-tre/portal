@@ -214,8 +214,7 @@ func (s *Service) UpdateStudyStatus(id uuid.UUID, status openapi.StudyApprovalSt
 	if err := s.db.Where("id = ?", id).First(&study).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
-	study.ApprovalStatus = string(status)
-	if err := s.db.Save(&study).Error; err != nil {
+	if err := s.db.Model(&study).Update("approval_status", status).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
 

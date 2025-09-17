@@ -1,4 +1,4 @@
-import { postStudiesByStudyId, Study } from "@/openapi";
+import { postStudiesByStudyIdStatus, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
 
     if (status === "Approved") {
       // set as approved
-      const response = await postStudiesByStudyId({ path: { studyId }, body: "Approved" });
+      const response = await postStudiesByStudyIdStatus({ path: { studyId }, body: "Approved" });
       if (response.response.ok) {
         setApprovalStatus("Approved");
       }

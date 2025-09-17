@@ -777,7 +777,7 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
-export type PostStudiesByStudyIdData = {
+export type PostStudiesByStudyIdStatusData = {
     body: StudyApprovalStatus;
     path: {
         /**
@@ -786,10 +786,10 @@ export type PostStudiesByStudyIdData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}';
+    url: '/studies/{studyId}/status';
 };
 
-export type PostStudiesByStudyIdErrors = {
+export type PostStudiesByStudyIdStatusErrors = {
     /**
      * Forbidden
      */
@@ -808,7 +808,7 @@ export type PostStudiesByStudyIdErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdResponses = {
+export type PostStudiesByStudyIdStatusResponses = {
     /**
      * Study status updated successfully
      */

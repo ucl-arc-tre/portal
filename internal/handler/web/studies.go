@@ -313,7 +313,7 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	)
 }
 
-func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
 	var status openapi.StudyApprovalStatus // why doesn't this work as status := openapi.StudyApprovalStatus
 
 	if err := bindJSONOrSetError(ctx, &status); err != nil {
@@ -328,6 +328,7 @@ func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
 
 	if err != nil {
 		setError(ctx, err, "Failed to update study status")
+		return
 	}
 
 	ctx.Status(http.StatusOK)
