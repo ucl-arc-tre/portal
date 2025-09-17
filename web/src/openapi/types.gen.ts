@@ -815,6 +815,44 @@ export type PostStudiesByStudyIdStatusResponses = {
     201: unknown;
 };
 
+export type PostStudiesByStudyIdFeedbackData = {
+    body: string;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/feedback';
+};
+
+export type PostStudiesByStudyIdFeedbackErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdFeedbackResponses = {
+    /**
+     * Study feedback updated successfully
+     */
+    201: unknown;
+};
+
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
     path: {
