@@ -5,4 +5,13 @@
 
 .task-wrapper {
   display: grid;
+  justify-content: center;
+}
+
+.studies-wrapper h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-align: center;
 }

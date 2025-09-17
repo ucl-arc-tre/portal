@@ -2,8 +2,41 @@ import styles from "./index.module.css";
 import MetaHead from "@/components/meta/Head";
 import UserTasks from "@/components/index/UserTasks";
 import Title from "@/components/ui/Title";
+import StudySelection from "@/components/studies/StudySelection";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { getStudies, Study } from "@/openapi";
+import Loading from "@/components/ui/Loading";
+import Box from "@/components/ui/Box";
 
 export default function Index() {
+  const { userData } = useAuth();
+
+  const [tasksCompleted, setTasksCompleted] = useState(false);
+  const [studies, setStudies] = useState<Study[]>([]);
+  const [studiesLoading, setStudiesLoading] = useState(true);
+
+  const isAdmin = userData!.roles.includes("admin");
+
+  const fetchStudies = async () => {
+    setStudiesLoading(true);
+    try {
+      const response = await getStudies();
+
+      const pendingStudies = response.data?.filter((s) => s.approval_status === "Pending");
+      setStudies(pendingStudies || []);
+    } catch (error) {
+      console.error("Failed to fetch studies:", error);
+      setStudies([]);
+    } finally {
+      setStudiesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) fetchStudies();
+  }, [isAdmin]);
+
   return (
     <>
       <MetaHead title="ARC Services Portal | UCL" description="ARC Services Portal homepage" />
@@ -17,7 +50,19 @@ export default function Index() {
       </div>
 
       <div className={styles["task-wrapper"]}>
-        <UserTasks />
+        {!tasksCompleted && <UserTasks setTasksCompleted={setTasksCompleted} />}
+        {tasksCompleted && studiesLoading ? (
+          <Loading message="Loading studies..." />
+        ) : (
+          tasksCompleted && (
+            <Box>
+              <div className={styles["studies-wrapper"]}>
+                <h2>Studies to Approve</h2>
+                <StudySelection isAdmin={isAdmin} studies={studies} />
+              </div>
+            </Box>
+          )
+        )}
       </div>
     </>
   );

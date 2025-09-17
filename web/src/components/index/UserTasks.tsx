@@ -6,7 +6,7 @@ import { getProfile } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 
-export default function UserTasks() {
+export default function UserTasks({ setTasksCompleted }: { setTasksCompleted: (completed: boolean) => void }) {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +33,12 @@ export default function UserTasks() {
       fetchProfile();
     }
   }, [isAuthed]);
+
+  useEffect(() => {
+    if (isAuthed && userData && userData.roles.includes("approved-researcher")) {
+      setTasksCompleted(true);
+    }
+  }, [isAuthed, userData, setTasksCompleted]);
 
   if (authInProgress) return null;
 
