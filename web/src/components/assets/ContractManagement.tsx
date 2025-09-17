@@ -13,9 +13,10 @@ type ContractManagementProps = {
 };
 
 type ContractFormData = {
-  uclSignatory: string;
+  organisationSignatory: string;
   thirdPartyName: string;
   status: "proposed" | "active" | "expired";
+  expiryDate: string;
 };
 
 export default function ContractManagement({ studyId, assetId }: ContractManagementProps) {
@@ -79,9 +80,10 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
         },
         body: {
           file: uploadFile,
-          ucl_signatory: formData.uclSignatory,
+          organisation_signatory: formData.organisationSignatory,
           third_party_name: formData.thirdPartyName,
           status: formData.status,
+          expiry_date: formData.expiryDate,
         },
       });
 
@@ -114,7 +116,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
 
   const handleDownload = async () => {
     // For testing, using a hardcoded contract ID
-    const testContractId = "c61770c2-65c3-416d-bcd8-0f709bd95e8a";
+    const testContractId = "3ba8cb22-48ad-4157-84e3-70555794ac1f";
 
     setDownloading(true);
     setError(null);
@@ -193,23 +195,33 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
             <h4>Contract Details</h4>
 
             <div className={styles["form-group"]}>
-              <label htmlFor="uclSignatory">UCL Signatory</label>
+              <label htmlFor="organisationSignatory">Organisation Signatory *</label>
               <input
-                id="uclSignatory"
+                id="organisationSignatory"
                 type="text"
-                {...register("uclSignatory", { required: "UCL Signatory is required" })}
+                {...register("organisationSignatory", {
+                  required: "Organisation Signatory is required",
+                  minLength: { value: 2, message: "Organisation Signatory must be at least 2 characters" },
+                  maxLength: { value: 100, message: "Organisation Signatory must be less than 100 characters" },
+                })}
                 className={styles["form-input"]}
-                placeholder="Enter UCL signatory name"
+                placeholder="Enter organisation signatory name"
               />
-              {errors.uclSignatory && <span className={styles["form-error"]}>{errors.uclSignatory.message}</span>}
+              {errors.organisationSignatory && (
+                <span className={styles["form-error"]}>{errors.organisationSignatory.message}</span>
+              )}
             </div>
 
             <div className={styles["form-group"]}>
-              <label htmlFor="thirdPartyName">Third Party Name</label>
+              <label htmlFor="thirdPartyName">Third Party Name *</label>
               <input
                 id="thirdPartyName"
                 type="text"
-                {...register("thirdPartyName", { required: "Third Party Name is required" })}
+                {...register("thirdPartyName", {
+                  required: "Third Party Name is required",
+                  minLength: { value: 2, message: "Third Party Name must be at least 2 characters" },
+                  maxLength: { value: 100, message: "Third Party Name must be less than 100 characters" },
+                })}
                 className={styles["form-input"]}
                 placeholder="Enter third party organization name"
               />
@@ -217,10 +229,12 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
             </div>
 
             <div className={styles["form-group"]}>
-              <label htmlFor="status">Contract Status</label>
+              <label htmlFor="status">Contract Status *</label>
               <select
                 id="status"
-                {...register("status", { required: "Status is required" })}
+                {...register("status", {
+                  required: "Status is required",
+                })}
                 className={styles["form-select"]}
               >
                 <option value="proposed">Proposed</option>
@@ -228,6 +242,19 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
                 <option value="expired">Expired</option>
               </select>
               {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
+            </div>
+
+            <div className={styles["form-group"]}>
+              <label htmlFor="expiryDate">Expiry Date *</label>
+              <input
+                id="expiryDate"
+                type="date"
+                {...register("expiryDate", {
+                  required: "Expiry date is required",
+                })}
+                className={styles["form-input"]}
+              />
+              {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
             </div>
           </div>
 

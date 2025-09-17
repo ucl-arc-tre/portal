@@ -4,27 +4,46 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(user types.User, formData types.Contract) error {
-	if strings.TrimSpace(formData.UCLSignatory) == "" {
-		return types.NewErrServerError("UCL signatory is required")
+func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPartyName string, status string, expiryDateStr string) *openapi.ContractUploadValidationError {
+	if !validation.ContractNamePattern.MatchString(strings.TrimSpace(organisationSignatory)) {
+		return &openapi.ContractUploadValidationError{
+			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
+		}
 	}
 
-	if strings.TrimSpace(formData.ThirdPartyName) == "" {
-		return types.NewErrServerError("third party name is required")
+	if !validation.ContractNamePattern.MatchString(strings.TrimSpace(thirdPartyName)) {
+		return &openapi.ContractUploadValidationError{
+			ErrorMessage: "Third party name must be between 2 and 100 characters",
+		}
 	}
 
-	if strings.TrimSpace(formData.Status) == "" {
-		return types.NewErrServerError("contract status is required")
+	if status != "proposed" && status != "active" && status != "expired" {
+		return &openapi.ContractUploadValidationError{
+			ErrorMessage: "Status must be proposed, active, or expired",
+		}
 	}
 
-	if formData.Status != "proposed" && formData.Status != "active" && formData.Status != "expired" {
-		return types.NewErrServerError("status must be proposed, active, or expired")
+	if strings.TrimSpace(expiryDateStr) == "" {
+		return &openapi.ContractUploadValidationError{
+			ErrorMessage: "Expiry date is required",
+		}
+	}
+
+	// Parse expiry date
+	_, err := time.Parse(validation.DateFormat, expiryDateStr)
+	if err != nil {
+		return &openapi.ContractUploadValidationError{
+			ErrorMessage: "Invalid expiry date format",
+		}
 	}
 
 	return nil
@@ -36,7 +55,6 @@ func (s *Service) StoreContract(
 	contractMetadata types.Contract,
 ) error {
 	log.Debug().Any("contractId", contractMetadata.ContractID).Msg("Storing contract")
-	log.Debug().Any("pdf obj", pdfContractObj).Msg("pdf obj")
 
 	// Start a database transaction
 	tx := s.db.Begin()
@@ -63,9 +81,10 @@ func (s *Service) StoreContract(
 		return types.NewErrServerError(fmt.Errorf("failed to commit contract transaction: %w", err))
 	}
 
+	// remove later
 	log.Debug().
 		Str("filename", contractMetadata.Filename).
-		Str("ucl_signatory", contractMetadata.UCLSignatory).
+		Str("organisation_signatory", contractMetadata.OrganisationSignatory).
 		Str("third_party", contractMetadata.ThirdPartyName).
 		Str("status", contractMetadata.Status).
 		Msg("Contract stored successfully")

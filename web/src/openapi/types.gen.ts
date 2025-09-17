@@ -330,6 +330,13 @@ export type StudyCreateValidationError = {
     error_message: string;
 };
 
+export type ContractUploadValidationError = {
+    /**
+     * Validation error message explaining why contract upload failed
+     */
+    error_message: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -998,9 +1005,9 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
          */
         file: Blob | File;
         /**
-         * Name of the UCL signatory
+         * Name of the organisation signatory
          */
-        ucl_signatory: string;
+        organisation_signatory: string;
         /**
          * Name of the third party organization
          */
@@ -1009,6 +1016,10 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
          * Contract status
          */
         status: 'proposed' | 'active' | 'expired';
+        /**
+         * Contract expiry date
+         */
+        expiry_date: string;
     };
     path: {
         studyId: string;
@@ -1019,6 +1030,10 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
 };
 
 export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
+    /**
+     * Validation error
+     */
+    400: ContractUploadValidationError;
     /**
      * Forbidden
      */
@@ -1032,6 +1047,8 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
      */
     default: unknown;
 };
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadError = PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors];
 
 export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses = {
     /**

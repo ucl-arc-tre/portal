@@ -1,6 +1,7 @@
 package types
 
 import (
+	"mime/multipart"
 	"time"
 
 	"github.com/google/uuid"
@@ -101,17 +102,27 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	StudyID        uuid.UUID `gorm:"not null;index"`
-	AssetID        uuid.UUID `gorm:"not null;index"`
-	ContractID     uuid.UUID `gorm:"type:uuid;not null;unique;index"` // Used as S3 key
-	Filename       string    `gorm:"not null"`
-	UploadedBy     uuid.UUID `gorm:"type:uuid;not null"`
-	UCLSignatory   string    `gorm:"column:ucl_signatory"`
-	ThirdPartyName string    `gorm:"column:third_party_name"`
-	Status         string    `gorm:"column:status"` // proposed, active, expired
+	StudyID               uuid.UUID `gorm:"not null;index"`
+	AssetID               uuid.UUID `gorm:"not null;index"`
+	ContractID            uuid.UUID `gorm:"type:uuid;not null;unique;index"` // Used as S3 key
+	Filename              string    `gorm:"not null"`
+	UploadedBy            uuid.UUID `gorm:"type:uuid;not null"`
+	OrganisationSignatory string
+	ThirdPartyName        string
+	Status                string // proposed, active, expired
+	ExpiryDate            time.Time
 
 	// Relationships
 	Study Study `gorm:"foreignKey:StudyID"`
 	Asset Asset `gorm:"foreignKey:AssetID"`
 	User  User  `gorm:"foreignKey:UploadedBy"`
+}
+
+// used for parsing multipart form data when uploading a contract (before it is stored)
+type ContractFormData struct {
+	OrganisationSignatory string                `form:"organisation_signatory"`
+	ThirdPartyName        string                `form:"third_party_name"`
+	Status                string                `form:"status"`
+	ExpiryDate            string                `form:"expiry_date"`
+	File                  *multipart.FileHeader `form:"file"`
 }

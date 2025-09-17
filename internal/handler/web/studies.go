@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -280,19 +281,30 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	contractUUID := uuid.New()
-
-	// Parse multipart form
-	err = ctx.Request.ParseMultipartForm(10 << 20) // 10 MB max
-	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Failed to parse multipart form")
+	var formData types.ContractFormData
+	if err := ctx.ShouldBind(&formData); err != nil {
+		setError(ctx, types.NewErrServerError(err), "Invalid form data")
 		return
 	}
 
-	// Get the uploaded file
-	file, header, err := ctx.Request.FormFile("file")
+	validationError := h.studies.ValidateContractMetadata(formData.OrganisationSignatory, formData.ThirdPartyName, formData.Status, formData.ExpiryDate)
+	if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	expiryDate, err := time.Parse("2006-01-02", formData.ExpiryDate)
 	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Failed to get uploaded file")
+		setError(ctx, types.NewErrServerError(err), "Invalid expiry date format")
+		return
+	}
+
+	contractUUID := uuid.New()
+	user := middleware.GetUser(ctx)
+
+	file, err := formData.File.Open()
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
 		return
 	}
 	defer func() {
@@ -301,29 +313,22 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		}
 	}()
 
-	user := middleware.GetUser(ctx)
-
-	formData := types.Contract{
-		StudyID:        uuids[0],
-		AssetID:        uuids[1],
-		ContractID:     contractUUID,
-		Filename:       header.Filename,
-		UploadedBy:     user.ID,
-		UCLSignatory:   ctx.Request.FormValue("ucl_signatory"),
-		ThirdPartyName: ctx.Request.FormValue("third_party_name"),
-		Status:         ctx.Request.FormValue("status"),
-	}
-
-	err = h.studies.ValidateContractMetadata(user, formData)
-	if err != nil {
-		setError(ctx, err, "Invalid contract data")
-		return
+	contractData := types.Contract{
+		StudyID:               uuids[0],
+		AssetID:               uuids[1],
+		ContractID:            contractUUID,
+		Filename:              formData.File.Filename,
+		UploadedBy:            user.ID,
+		OrganisationSignatory: formData.OrganisationSignatory,
+		ThirdPartyName:        formData.ThirdPartyName,
+		Status:                formData.Status,
+		ExpiryDate:            expiryDate,
 	}
 
 	pdfContractObj := types.S3Object{
 		Content: file,
 	}
-	err = h.studies.StoreContract(ctx, pdfContractObj, formData)
+	err = h.studies.StoreContract(ctx, pdfContractObj, contractData)
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
 		return

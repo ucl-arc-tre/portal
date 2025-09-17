@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 
 	"slices"
@@ -15,23 +14,17 @@ import (
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
-)
-
-var (
-	dateFormat              = "2006-01-02"                               // YYYY-MM-DD format for asset expiry dates
-	assetTitlePattern       = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`) // 4-50 chars, starts/ends with alphanumeric, only letters/numbers/spaces/hyphens
-	assetDescriptionPattern = regexp.MustCompile(`^.{4,255}$`)           // 4-255 characters, any content
-	textField500Pattern     = regexp.MustCompile(`^.{1,500}$`)           // 1-500 characters, any content
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.AssetCreateValidationError, error) {
 	// Validate title
-	if !assetTitlePattern.MatchString(assetData.Title) {
+	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	// Validate description
-	if !assetDescriptionPattern.MatchString(assetData.Description) {
+	if !validation.AssetDescriptionPattern.MatchString(assetData.Description) {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
 	}
 
@@ -61,7 +54,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate legal_basis
-	if !textField500Pattern.MatchString(assetData.LegalBasis) {
+	if !validation.TextField500Pattern.MatchString(assetData.LegalBasis) {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
 	}
 
@@ -76,7 +69,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 	}
 
 	// Validate expiry field
-	_, err := time.Parse(dateFormat, assetData.ExpiresAt)
+	_, err := time.Parse(validation.DateFormat, assetData.ExpiresAt)
 	if err != nil {
 		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
@@ -121,7 +114,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	}()
 
 	// Parse the expiry date string (already validated in validateAssetData)
-	expiryDate, err := time.Parse(dateFormat, assetData.ExpiresAt)
+	expiryDate, err := time.Parse(validation.DateFormat, assetData.ExpiresAt)
 	if err != nil {
 		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
 	}

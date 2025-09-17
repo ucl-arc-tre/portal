@@ -262,6 +262,12 @@ type ConfirmedAgreement struct {
 	ConfirmedAt string `json:"confirmed_at"`
 }
 
+// ContractUploadValidationError defines model for ContractUploadValidationError.
+type ContractUploadValidationError struct {
+	// ErrorMessage Validation error message explaining why contract upload failed
+	ErrorMessage string `json:"error_message"`
+}
+
 // Profile defines model for Profile.
 type Profile struct {
 	ChosenName string `json:"chosen_name"`
@@ -513,17 +519,20 @@ type UserTrainingUpdate struct {
 
 // PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartBody defines parameters for PostStudiesStudyIdAssetsAssetIdContractsUpload.
 type PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartBody struct {
+	// ExpiryDate Contract expiry date
+	ExpiryDate openapi_types.Date `json:"expiry_date"`
+
 	// File PDF contract file
 	File openapi_types.File `json:"file"`
+
+	// OrganisationSignatory Name of the organisation signatory
+	OrganisationSignatory string `json:"organisation_signatory"`
 
 	// Status Contract status
 	Status PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartBodyStatus `json:"status"`
 
 	// ThirdPartyName Name of the third party organization
 	ThirdPartyName string `json:"third_party_name"`
-
-	// UclSignatory Name of the UCL signatory
-	UclSignatory string `json:"ucl_signatory"`
 }
 
 // PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartBodyStatus defines parameters for PostStudiesStudyIdAssetsAssetIdContractsUpload.

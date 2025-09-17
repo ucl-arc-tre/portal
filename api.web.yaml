@@ -491,9 +491,9 @@ paths:
                   type: string
                   format: binary
                   description: PDF contract file
-                ucl_signatory:
+                organisation_signatory:
                   type: string
-                  description: Name of the UCL signatory
+                  description: Name of the organisation signatory
                 third_party_name:
                   type: string
                   description: Name of the third party organization
@@ -501,14 +501,25 @@ paths:
                   type: string
                   enum: [proposed, active, expired]
                   description: Contract status
+                expiry_date:
+                  type: string
+                  format: date
+                  description: Contract expiry date
               required:
                 - file
-                - ucl_signatory
+                - organisation_signatory
                 - third_party_name
                 - status
+                - expiry_date
       responses:
         "204":
           description: OK
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractUploadValidationError"
         "403":
           description: Forbidden
         "500":
@@ -977,3 +988,11 @@ components:
         error_message:
           type: string
           description: Validation error message explaining why study creation failed
+    ContractUploadValidationError:
+      type: object
+      required:
+        - error_message
+      properties:
+        error_message:
+          type: string
+          description: Validation error message explaining why contract upload failed
