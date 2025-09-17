@@ -72,6 +72,19 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 	}
 }
 
+func contractToOpenApiContract(contract types.Contract) openapi.Contract {
+	return openapi.Contract{
+		Id:                    contract.ContractID.String(),
+		Filename:              contract.Filename,
+		OrganisationSignatory: contract.OrganisationSignatory,
+		ThirdPartyName:        contract.ThirdPartyName,
+		Status:                openapi.ContractStatus(contract.Status),
+		ExpiryDate:            contract.ExpiryDate.Format(config.TimeFormat),
+		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
+	}
+}
+
 func (h *Handler) GetStudies(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
@@ -335,6 +348,27 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	}
 
 	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	if err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+
+	contracts, err := h.studies.AssetContracts(user, uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve contracts")
+		return
+	}
+
+	apiContracts := []openapi.Contract{}
+	for _, contract := range contracts {
+		apiContracts = append(apiContracts, contractToOpenApiContract(contract))
+	}
+	ctx.JSON(http.StatusOK, apiContracts)
 }
 
 func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {

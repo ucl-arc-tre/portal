@@ -26,6 +26,24 @@
   line-height: 1.5;
 }
 
+.error {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.loading {
+  margin-bottom: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

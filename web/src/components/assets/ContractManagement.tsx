@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
+import { getStudiesByStudyIdAssetsByAssetIdContracts, Contract } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 
 type ContractManagementProps = {
@@ -9,44 +10,41 @@ type ContractManagementProps = {
   assetId: string;
 };
 
-type Contract = {
-  id: string;
-  filename: string;
-  organisationSignatory: string;
-  thirdPartyName: string;
-  status: "proposed" | "active" | "expired";
-  expiryDate: string;
-  uploadedAt: string;
-};
-
 export default function ContractManagement({ studyId, assetId }: ContractManagementProps) {
-  const [contracts, setContracts] = useState<Contract[]>([
-    // Mock data for testing - replace with actual API call
-    {
-      id: "1",
-      filename: "Data_Processing_Agreement.pdf",
-      organisationSignatory: "Dr. Jane Smith",
-      thirdPartyName: "Research Partners Ltd",
-      status: "active",
-      expiryDate: "2024-12-31",
-      uploadedAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      filename: "Collaboration_Contract.pdf",
-      organisationSignatory: "Prof. John Doe",
-      thirdPartyName: "University Hospital",
-      status: "proposed",
-      expiryDate: "2025-06-30",
-      uploadedAt: "2024-02-20",
-    },
-  ]);
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
+  const fetchContracts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+        path: { studyId, assetId },
+      });
+
+      if (response.response.ok && response.data) {
+        setContracts(response.data);
+      } else {
+        throw new Error(`Failed to fetch contracts: ${response.response.status} ${response.response.statusText}`);
+      }
+    } catch (err) {
+      console.error("Failed to load contracts:", err);
+      setError("Failed to load contracts. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [studyId, assetId]);
+
+  useEffect(() => {
+    fetchContracts();
+  }, [fetchContracts]);
+
   const handleUploadSuccess = () => {
-    // TODO: Refresh contracts list from API
-    // For now, just close the modal
     setShowUploadModal(false);
+    fetchContracts();
   };
 
   return (
@@ -62,7 +60,15 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
         Manage contract documents for this asset. Upload PDF contracts and track their status.
       </p>
 
-      {contracts.length === 0 ? (
+      {error && (
+        <div className={styles.error}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className={styles.loading}>Loading contracts...</div>
+      ) : contracts.length === 0 ? (
         <div className={styles["empty-state"]}>
           <h4>No contracts uploaded</h4>
           <p>Upload your first contract document to get started.</p>

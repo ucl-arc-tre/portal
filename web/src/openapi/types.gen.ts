@@ -330,6 +330,54 @@ export type StudyCreateValidationError = {
     error_message: string;
 };
 
+export type ContractBase = {
+    /**
+     * Name of the organisation signatory
+     */
+    organisation_signatory: string;
+    /**
+     * Name of the third party organization
+     */
+    third_party_name: string;
+    /**
+     * Current status of the contract
+     */
+    status: 'proposed' | 'active' | 'expired';
+    /**
+     * Contract expiry date
+     */
+    expiry_date: string;
+};
+
+export type ContractUploadObject = ContractBase & {
+    /**
+     * The contract file to upload (e.g., PDF)
+     */
+    file: Blob | File;
+};
+
+/**
+ * A contract associated with a study asset
+ */
+export type Contract = ContractBase & {
+    /**
+     * Unique identifier for the contract
+     */
+    id: string;
+    /**
+     * Original filename of the uploaded contract
+     */
+    filename: string;
+    /**
+     * Time in RFC3339 format when the contract was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the contract was last updated
+     */
+    updated_at: string;
+};
+
 export type ContractUploadValidationError = {
     /**
      * Validation error message explaining why contract upload failed
@@ -998,29 +1046,46 @@ export type PostStudiesByStudyIdAgreementsResponses = {
     200: unknown;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
-    body: {
-        /**
-         * PDF contract file
-         */
-        file: Blob | File;
-        /**
-         * Name of the organisation signatory
-         */
-        organisation_signatory: string;
-        /**
-         * Name of the third party organization
-         */
-        third_party_name: string;
-        /**
-         * Contract status
-         */
-        status: 'proposed' | 'active' | 'expired';
-        /**
-         * Contract expiry date
-         */
-        expiry_date: string;
+export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
+    body?: never;
+    path: {
+        studyId: string;
+        assetId: string;
     };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts';
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsResponses = {
+    /**
+     * List of contracts for the asset
+     */
+    200: Array<Contract>;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsResponse = GetStudiesByStudyIdAssetsByAssetIdContractsResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsResponses];
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
+    body: ContractUploadObject;
     path: {
         studyId: string;
         assetId: string;

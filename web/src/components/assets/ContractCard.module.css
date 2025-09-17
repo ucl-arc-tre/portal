@@ -37,7 +37,7 @@
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -76,7 +76,7 @@
 }
 
 .label {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-text-secondary);
   font-weight: 500;
   min-width: 0;
@@ -84,7 +84,7 @@
 }
 
 .value {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-text);
   word-break: break-word;
   flex: 1;
@@ -92,7 +92,7 @@
 
 .error {
   color: var(--color-error);
-  font-size: 0.75rem;
+  font-size: 1rem;
   padding: 0.5rem;
   background-color: var(--color-error-light);
   border: 1px solid var(--color-error);

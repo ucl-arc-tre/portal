@@ -466,6 +466,38 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/{studyId}/assets/{assetId}/contracts:
+    get:
+      description: Get all contracts for a specific asset
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: assetId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of contracts for the asset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contract"
+        "403":
+          description: Forbidden
+        "404":
+          description: Asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /studies/{studyId}/assets/{assetId}/contracts/upload:
     post:
       description: Upload a contract object e.g. PDF
@@ -485,32 +517,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: PDF contract file
-                organisation_signatory:
-                  type: string
-                  description: Name of the organisation signatory
-                third_party_name:
-                  type: string
-                  description: Name of the third party organization
-                status:
-                  type: string
-                  enum: [proposed, active, expired]
-                  description: Contract status
-                expiry_date:
-                  type: string
-                  format: date
-                  description: Contract expiry date
-              required:
-                - file
-                - organisation_signatory
-                - third_party_name
-                - status
-                - expiry_date
+              $ref: "#/components/schemas/ContractUploadObject"
       responses:
         "204":
           description: OK
@@ -988,6 +995,66 @@ components:
         error_message:
           type: string
           description: Validation error message explaining why study creation failed
+
+    ContractBase:
+      type: object
+      required:
+        - organisation_signatory
+        - third_party_name
+        - status
+        - expiry_date
+      properties:
+        organisation_signatory:
+          type: string
+          description: Name of the organisation signatory
+        third_party_name:
+          type: string
+          description: Name of the third party organization
+        status:
+          type: string
+          enum: [proposed, active, expired]
+          description: Current status of the contract
+        expiry_date:
+          type: string
+          description: Contract expiry date
+
+    ContractUploadObject:
+      allOf:
+        - $ref: "#/components/schemas/ContractBase"
+        - type: object
+          required:
+            - file
+          properties:
+            file:
+              type: string
+              format: binary
+              description: The contract file to upload (e.g., PDF)
+
+    Contract:
+      allOf:
+        - $ref: "#/components/schemas/ContractBase"
+        - type: object
+          required:
+            - id
+            - filename
+            - created_at
+            - updated_at
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the contract
+            filename:
+              type: string
+              description: Original filename of the uploaded contract
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the contract was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the contract was last updated
+
+      description: A contract associated with a study asset
+
     ContractUploadValidationError:
       type: object
       required:

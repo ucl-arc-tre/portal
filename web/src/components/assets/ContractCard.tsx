@@ -1,17 +1,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
-import { getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload } from "@/openapi";
+import { Contract, getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload } from "@/openapi";
 import styles from "./ContractCard.module.css";
-
-type Contract = {
-  id: string;
-  filename: string;
-  organisationSignatory: string;
-  thirdPartyName: string;
-  status: "proposed" | "active" | "expired";
-  expiryDate: string;
-  uploadedAt: string;
-};
 
 type ContractCardProps = {
   contract: Contract;
@@ -87,23 +77,23 @@ export default function ContractCard({ contract, studyId, assetId }: ContractCar
 
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
-          <span className={styles.label}>Organisation Signatory:</span>
-          <span className={styles.value}>{contract.organisationSignatory}</span>
+          <span className={styles.label}>Organisation Signatory: </span>
+          <span className={styles.value}>{contract.organisation_signatory}</span>
         </div>
 
         <div className={styles["detail-item"]}>
-          <span className={styles.label}>Third Party:</span>
-          <span className={styles.value}>{contract.thirdPartyName}</span>
+          <span className={styles.label}>Third Party: </span>
+          <span className={styles.value}>{contract.third_party_name}</span>
         </div>
 
         <div className={styles["detail-item"]}>
-          <span className={styles.label}>Expiry Date:</span>
-          <span className={styles.value}>{formatDate(contract.expiryDate)}</span>
+          <span className={styles.label}>Expiry Date: </span>
+          <span className={styles.value}>{formatDate(contract.expiry_date)}</span>
         </div>
 
         <div className={styles["detail-item"]}>
-          <span className={styles.label}>Uploaded:</span>
-          <span className={styles.value}>{formatDate(contract.uploadedAt)}</span>
+          <span className={styles.label}>Uploaded: </span>
+          <span className={styles.value}>{formatDate(contract.created_at)}</span>
         </div>
       </div>
 
