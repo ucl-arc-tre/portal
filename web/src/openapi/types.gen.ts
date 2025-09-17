@@ -329,6 +329,14 @@ export type Study = StudyBase & {
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
+export type StudyReview = {
+    status: StudyApprovalStatus;
+    /**
+     * Feedback for the study
+     */
+    feedback?: string;
+};
+
 export type StudyCreateValidationError = {
     /**
      * Validation error message explaining why study creation failed
@@ -777,8 +785,8 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
-export type PostStudiesByStudyIdStatusData = {
-    body: StudyApprovalStatus;
+export type PostStudiesByStudyIdReviewData = {
+    body: StudyReview;
     path: {
         /**
          * ID of the study
@@ -786,10 +794,10 @@ export type PostStudiesByStudyIdStatusData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/status';
+    url: '/studies/{studyId}/review';
 };
 
-export type PostStudiesByStudyIdStatusErrors = {
+export type PostStudiesByStudyIdReviewErrors = {
     /**
      * Forbidden
      */
@@ -808,47 +816,9 @@ export type PostStudiesByStudyIdStatusErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdStatusResponses = {
+export type PostStudiesByStudyIdReviewResponses = {
     /**
-     * Study status updated successfully
-     */
-    201: unknown;
-};
-
-export type PostStudiesByStudyIdFeedbackData = {
-    body: string;
-    path: {
-        /**
-         * ID of the study
-         */
-        studyId: string;
-    };
-    query?: never;
-    url: '/studies/{studyId}/feedback';
-};
-
-export type PostStudiesByStudyIdFeedbackErrors = {
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Study not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PostStudiesByStudyIdFeedbackResponses = {
-    /**
-     * Study feedback updated successfully
+     * Study review submitted successfully
      */
     201: unknown;
 };

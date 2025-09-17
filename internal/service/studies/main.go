@@ -222,10 +222,5 @@ func (s *Service) UpdateStudyFeedback(id uuid.UUID, feedback *string) error {
 	if err := s.db.Model(&study).Where("id = ?", id).Update("feedback", feedback).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
-
-	if err := s.UpdateStudyStatus(id, openapi.Rejected); err != nil {
-		return err
-	}
-
 	return nil
 }

@@ -313,9 +313,13 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	)
 }
 
-func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
+	feedback := ""
 	var status openapi.StudyApprovalStatus // why doesn't this work as status := openapi.StudyApprovalStatus
 
+	if err := bindJSONOrSetError(ctx, &feedback); err != nil {
+		return
+	}
 	if err := bindJSONOrSetError(ctx, &status); err != nil {
 		return
 	}
@@ -324,31 +328,16 @@ func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
 	if err != nil {
 		return
 	}
-	err = h.studies.UpdateStudyStatus(studyUUID, status)
-
-	if err != nil {
-		setError(ctx, err, "Failed to update study status")
-		return
-	}
-
-	ctx.Status(http.StatusOK)
-}
-
-func (h *Handler) PostStudiesStudyIdFeedback(ctx *gin.Context, studyId string) {
-	feedback := ""
-
-	if err := bindJSONOrSetError(ctx, &feedback); err != nil {
-		return
-	}
-
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
+	// unless we want these in one func?
 	err = h.studies.UpdateStudyFeedback(studyUUID, &feedback)
-
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
+		return
+	}
+
+	err = h.studies.UpdateStudyStatus(studyUUID, status)
+	if err != nil {
+		setError(ctx, err, "Failed to update study status")
 		return
 	}
 
