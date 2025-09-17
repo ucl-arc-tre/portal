@@ -140,7 +140,7 @@ func (s *Service) AllStudies() ([]types.Study, error) {
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("id IN (?)", ids).Find(&studies).Error
 	return studies, types.NewErrServerError(err)
 }
 
