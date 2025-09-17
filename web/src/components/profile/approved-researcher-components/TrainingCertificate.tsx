@@ -157,7 +157,7 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
         <p>
           All members of UCL who manage highly confidential research information must undertake annual training on
           handling sensitive information. Anyone with an &apos;.ac.uk&apos; or NHS email address can self-register for{" "}
-          <a href="https://www.e-lfh.org.uk/programmes/data-security-awareness/">
+          <a href="https://portal.e-lfh.org.uk/Component/Details/544095">
             NHS Digital Data Security Awareness Level 1 course
           </a>{" "}
           provided by e-Learning for Health. When asked, you can register your role as a &quot;Further Education and
