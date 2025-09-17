@@ -33,6 +33,7 @@ func TestValidRegex(t *testing.T) {
 	validTexts := []string{
 		"This is to certify that Bob Smith completed the programme Data Security Awareness",
 		"This is to certify that Alice Taylor-Smith completed the course Data Security Awareness",
+		"This is to certify that Alice Jones GMC: 7562896 completed the course Data Security Awareness On 10 September 2025",
 	}
 	for _, text := range validTexts {
 		assert.True(t, isValidRegex.MatchString(text))
