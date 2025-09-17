@@ -1,7 +1,10 @@
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
-import { postStudiesByStudyIdAssetsByAssetIdContractsUpload } from "@/openapi";
+import {
+  postStudiesByStudyIdAssetsByAssetIdContractsUpload,
+  getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload,
+} from "@/openapi";
 import styles from "./ContractManagement.module.css";
 
 type ContractManagementProps = {
@@ -20,6 +23,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -108,6 +112,44 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
     }
   };
 
+  const handleDownload = async () => {
+    // For testing, using a hardcoded contract ID
+    const testContractId = "c61770c2-65c3-416d-bcd8-0f709bd95e8a";
+
+    setDownloading(true);
+    setError(null);
+
+    try {
+      const response = await getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload({
+        path: {
+          studyId,
+          assetId,
+          contractId: testContractId,
+        },
+      });
+
+      if (!response.response.ok || !response.data) {
+        throw new Error(`Download failed: ${response.response.status} ${response.response.statusText}`);
+      }
+
+      // Create download link using the response data
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "contract.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed:", error);
+      setError("Failed to download contract. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <h3>Contract Management</h3>
@@ -192,6 +234,9 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
           <div className={styles.actions}>
             <Button type="submit" disabled={uploading} size="large">
               {uploading ? "Uploading..." : "Upload Contract"}
+            </Button>
+            <Button type="button" onClick={handleDownload} disabled={downloading} size="large" variant="secondary">
+              {downloading ? "Downloading..." : "Test Download"}
             </Button>
           </div>
         </div>
