@@ -210,10 +210,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 
 func (s *Service) UpdateStudyStatus(id uuid.UUID, status openapi.StudyApprovalStatus) error {
 	study := types.Study{}
-	if err := s.db.Where("id = ?", id).First(&study).Error; err != nil {
-		return types.NewErrServerError(err)
-	}
-	if err := s.db.Model(&study).Update("approval_status", status).Error; err != nil {
+	if err := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
 
