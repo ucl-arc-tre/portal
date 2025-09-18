@@ -104,16 +104,19 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
               <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
             </dd>
           </dl>
-          <Alert type={"warning"} className={styles["feedback-alert"]}>
-            <AlertMessage>
-              <h4>This study has been rejected and the following feedback has been provided:</h4>
-              <p>{study.feedback}</p>
-            </AlertMessage>
-            <hr></hr>
-            <small>
-              <em>Please adjust as appropriate and request another review.</em>
-            </small>
-          </Alert>
+
+          {study.feedback && (
+            <Alert type={"warning"} className={styles["feedback-alert"]}>
+              <AlertMessage>
+                <h4>This study has been rejected and the following feedback has been provided:</h4>
+                <p>{study.feedback}</p>
+              </AlertMessage>
+              <hr></hr>
+              <small>
+                <em>Please adjust as appropriate and request another review.</em>
+              </small>
+            </Alert>
+          )}
 
           <h3>Additional Information</h3>
           <p className={styles["additional-info"]}>

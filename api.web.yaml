@@ -966,7 +966,6 @@ components:
             - created_at
             - updated_at
             - approval_status
-            - feedback
           properties:
             id:
               type: string

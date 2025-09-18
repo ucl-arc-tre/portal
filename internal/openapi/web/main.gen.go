@@ -312,7 +312,7 @@ type Study struct {
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
-	Feedback    string  `json:"feedback"`
+	Feedback    *string `json:"feedback,omitempty"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
