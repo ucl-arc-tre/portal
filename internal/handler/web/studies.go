@@ -314,13 +314,8 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 }
 
 func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
-	feedback := ""
-	var status openapi.StudyApprovalStatus // why doesn't this work as status := openapi.StudyApprovalStatus
-
-	if err := bindJSONOrSetError(ctx, &feedback); err != nil {
-		return
-	}
-	if err := bindJSONOrSetError(ctx, &status); err != nil {
+	review := openapi.StudyReview{}
+	if err := bindJSONOrSetError(ctx, &review); err != nil {
 		return
 	}
 
@@ -329,13 +324,13 @@ func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
 		return
 	}
 	// unless we want these in one func?
-	err = h.studies.UpdateStudyFeedback(studyUUID, &feedback)
+	err = h.studies.UpdateStudyFeedback(studyUUID, review.Feedback)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return
 	}
 
-	err = h.studies.UpdateStudyStatus(studyUUID, status)
+	err = h.studies.UpdateStudyStatus(studyUUID, review.Status)
 	if err != nil {
 		setError(ctx, err, "Failed to update study status")
 		return
