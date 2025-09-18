@@ -65,7 +65,6 @@ export default function Index() {
         {tasksCompleted && isAdmin && studiesLoading ? (
           <Loading message="Loading studies..." />
         ) : (
-          tasksCompleted &&
           isAdmin && (
             <Box>
               <div className={styles["studies-wrapper"]}>

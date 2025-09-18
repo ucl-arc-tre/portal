@@ -46,6 +46,14 @@ describe(`Homepage Tests`, () => {
 
       cy.contains("You have completed all your tasks").should("be.visible");
     });
+
+    it("shows studies for admin", () => {
+      cy.loginAsAdmin();
+
+      cy.visit("/");
+
+      cy.contains("Studies to Approve").should("be.visible");
+    });
   });
 
   describe("log out", () => {
