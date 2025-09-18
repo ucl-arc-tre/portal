@@ -79,7 +79,6 @@ type Asset struct {
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
 	Study       Study           `gorm:"foreignKey:StudyID"`
 	Locations   []AssetLocation `gorm:"foreignKey:AssetID"`
-	Contracts   []Contract      `gorm:"foreignKey:AssetID"`
 }
 
 func (a Asset) LocationStrings() []string {
