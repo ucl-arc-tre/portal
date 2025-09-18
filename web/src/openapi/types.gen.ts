@@ -322,6 +322,7 @@ export type Study = StudyBase & {
      */
     updated_at: string;
     approval_status: StudyApprovalStatus;
+    feedback: string;
 };
 
 /**

@@ -45,6 +45,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
 		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
 		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
+		Feedback:                         *study.Feedback,
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 	}

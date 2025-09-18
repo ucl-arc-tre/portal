@@ -966,6 +966,7 @@ components:
             - created_at
             - updated_at
             - approval_status
+            - feedback
           properties:
             id:
               type: string
@@ -978,6 +979,8 @@ components:
               description: Time in RFC3339 format when the study was last updated
             approval_status:
               $ref: "#/components/schemas/StudyApprovalStatus"
+            feedback:
+              type: string
       description: A research study
 
     StudyApprovalStatus:
