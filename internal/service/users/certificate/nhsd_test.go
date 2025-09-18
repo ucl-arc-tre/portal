@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 func TestValidNHSDCertificateParse(t *testing.T) {
@@ -16,7 +17,7 @@ func TestValidNHSDCertificateParse(t *testing.T) {
 	assert.NotNil(t, certificate)
 	assert.True(t, certificate.IsValid)
 	assert.Equal(t, "Tom Young", certificate.Name)
-	expectedExpiry, err := time.Parse("2006-01-02", "2024-10-23")
+	expectedExpiry, err := time.Parse(validation.DateFormat, "2024-10-23")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExpiry, certificate.IssuedAt)
 }
