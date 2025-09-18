@@ -12,6 +12,7 @@ import Loading from "@/components/ui/Loading";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
+import StudySelection from "@/components/studies/StudySelection";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -19,6 +20,7 @@ export default function StudiesPage() {
   const [studiesLoading, setStudiesLoading] = useState(true);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
 
   const fetchStudies = async () => {
     setStudiesLoading(true);
@@ -34,9 +36,9 @@ export default function StudiesPage() {
   };
 
   useEffect(() => {
-    if (!isApprovedResearcher) return;
+    if (!isApprovedResearcher && !isAdmin) return;
     fetchStudies();
-  }, [isApprovedResearcher]);
+  }, [isApprovedResearcher, isAdmin]);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -72,7 +74,9 @@ export default function StudiesPage() {
         </span>
       </Callout>
 
-      {!isApprovedResearcher && (
+      {isAdmin && <StudySelection studies={studies} isAdmin={true} />}
+
+      {!isAdmin && !isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
             To create and manage your studies, please first set up your profile by completing the approved researcher
@@ -85,9 +89,9 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
+      {!isAdmin && isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
 
-      {isApprovedResearcher && !studiesLoading && (
+      {!isAdmin && isApprovedResearcher && !studiesLoading && (
         <Studies userData={userData!} studies={studies} fetchStudies={fetchStudies} />
       )}
     </>

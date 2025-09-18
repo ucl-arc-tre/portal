@@ -16,11 +16,13 @@ import (
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
+	ownerUsernameStr := string(study.Owner.Username)
 	return openapi.Study{
 		Id:                               study.ID.String(),
 		Title:                            study.Title,
 		Description:                      study.Description,
 		OwnerUserId:                      &ownerUserIDStr,
+		OwnerUsername:                    &ownerUsernameStr,
 		ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
 		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 		DataControllerOrganisation:       study.DataControllerOrganisation,
@@ -310,3 +312,45 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 		},
 	)
 }
+
+func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
+	var status openapi.StudyApprovalStatus // why doesn't this work as status := openapi.StudyApprovalStatus
+
+	if err := bindJSONOrSetError(ctx, &status); err != nil {
+		return
+	}
+
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	err = h.studies.UpdateStudyStatus(studyUUID, status)
+
+	if err != nil {
+		setError(ctx, err, "Failed to update study status")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+// func (h *Handler) PostStudiesStudyIdFeedback(ctx *gin.Context, studyId string) {
+// 	feedback := string
+
+// 	if err := bindJSONOrSetError(ctx, &feedback); err != nil {
+// 		return
+// 	}
+
+// 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+// 	if err != nil {
+// 		return
+// 	}
+// 	err = h.studies.UpdateStudyStatus(studyUUID, status)
+
+// 	if err != nil {
+// 		setError(ctx, err, "Failed to update study status")
+// 		return
+// 	}
+
+// 	ctx.Status(http.StatusOK)
+// }

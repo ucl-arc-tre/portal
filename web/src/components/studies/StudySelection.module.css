@@ -47,7 +47,7 @@
   right: 1.2rem;
 }
 
-.status-badge {
+/* .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -88,7 +88,7 @@
   background-color: #fee2e2;
   color: #dc2626;
   border: 1px solid #f87171;
-}
+} */
 
 .study-card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);

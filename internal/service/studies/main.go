@@ -133,14 +133,14 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 // gets all studies (for admin access)
 func (s *Service) AllStudies() ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
 	return studies, types.NewErrServerError(err)
 }
 
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Where("id IN (?)", ids).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("id IN (?)", ids).Find(&studies).Error
 	return studies, types.NewErrServerError(err)
 }
 
@@ -206,4 +206,25 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	}
 
 	return &study, nil
+}
+
+func (s *Service) UpdateStudyStatus(id uuid.UUID, status openapi.StudyApprovalStatus) error {
+	study := types.Study{}
+	if err := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Error; err != nil {
+		return types.NewErrServerError(err)
+	}
+
+	return nil
+}
+
+func (s *Service) UpdateStudyFeedback(id uuid.UUID, feedback *string) error {
+	study := types.Study{}
+	if err := s.db.Where("id = ?", id).First(&study).Error; err != nil {
+		return types.NewErrServerError(err)
+	}
+	if err := s.db.Model(&study).Update("feedback", feedback).Error; err != nil {
+		return types.NewErrServerError(err)
+	}
+
+	return nil
 }
