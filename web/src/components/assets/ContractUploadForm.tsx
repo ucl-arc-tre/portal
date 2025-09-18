@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
-import { postStudiesByStudyIdAssetsByAssetIdContractsUpload, ValidationError } from "@/openapi";
+import { postStudiesByStudyIdAssetsByAssetIdContractsUpload, ValidationError, ContractUploadObject } from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
 
 type ContractFormData = {
@@ -79,18 +79,20 @@ export default function ContractUploadModal({
     setError(null);
 
     try {
+      const contractUploadData: ContractUploadObject = {
+        file: uploadFile,
+        organisation_signatory: formData.organisationSignatory,
+        third_party_name: formData.thirdPartyName,
+        status: formData.status,
+        expiry_date: formData.expiryDate,
+      };
+
       const response = await postStudiesByStudyIdAssetsByAssetIdContractsUpload({
         path: {
           studyId,
           assetId,
         },
-        body: {
-          file: uploadFile,
-          organisation_signatory: formData.organisationSignatory,
-          third_party_name: formData.thirdPartyName,
-          status: formData.status,
-          expiry_date: formData.expiryDate,
-        },
+        body: contractUploadData,
       });
 
       if (response.error) {
