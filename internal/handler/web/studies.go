@@ -14,6 +14,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
@@ -294,19 +295,28 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	var formData openapi.ContractUploadObject
-	if err := ctx.ShouldBind(&formData); err != nil {
-		setError(ctx, types.NewErrServerError(err), "Invalid form data")
+	// Extract form fields
+	organisationSignatory := ctx.PostForm("organisation_signatory")
+	thirdPartyName := ctx.PostForm("third_party_name")
+	status := ctx.PostForm("status")
+	expiryDateStr := ctx.PostForm("expiry_date")
+
+	// Get the uploaded file
+	fileHeader, err := ctx.FormFile("file")
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Failed to get uploaded file")
 		return
 	}
 
-	// validationError := h.studies.ValidateContractMetadata(formData.OrganisationSignatory, formData.ThirdPartyName, string(formData.Status), formData.ExpiryDate)
-	// if validationError != nil {
-	// 	ctx.JSON(http.StatusBadRequest, *validationError)
-	// 	return
-	// }
+	// Validate form data
+	validationError := h.studies.ValidateContractMetadata(organisationSignatory, thirdPartyName, status, expiryDateStr)
+	if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
 
-	expiryDate, err := time.Parse("2006-01-02", formData.ExpiryDate)
+	// Parse expiry date
+	expiryDate, err := time.Parse(validation.DateFormat, expiryDateStr)
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Invalid expiry date format")
 		return
@@ -314,7 +324,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 
 	user := middleware.GetUser(ctx)
 
-	file, err := formData.File.Reader()
+	// Open the uploaded file
+	file, err := fileHeader.Open()
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
 		return
@@ -328,11 +339,11 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	contractData := types.Contract{
 		StudyID:               uuids[0],
 		AssetID:               uuids[1],
-		Filename:              formData.File.Filename(),
+		Filename:              fileHeader.Filename,
 		UploadedBy:            user.ID,
-		OrganisationSignatory: formData.OrganisationSignatory,
-		ThirdPartyName:        formData.ThirdPartyName,
-		Status:                string(formData.Status),
+		OrganisationSignatory: organisationSignatory,
+		ThirdPartyName:        thirdPartyName,
+		Status:                status,
 		ExpiryDate:            expiryDate,
 	}
 
