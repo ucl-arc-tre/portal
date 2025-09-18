@@ -36,6 +36,10 @@
   }
 }
 
+.feedback-alert {
+  margin-block: 1rem;
+}
+
 .additional-info {
   margin-bottom: 1rem;
 }

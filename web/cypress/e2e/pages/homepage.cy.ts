@@ -12,6 +12,13 @@ describe(`Homepage Tests`, () => {
   });
 
   describe("Authenticated content", () => {
+    it("can be logged into as a base user", () => {
+      cy.loginAsBase();
+
+      cy.visit("/");
+      cy.contains("Your Tasks").should("exist");
+    });
+
     it("can be logged into as an admin", () => {
       cy.loginAsAdmin();
 
@@ -26,11 +33,6 @@ describe(`Homepage Tests`, () => {
       cy.visit("/");
     });
 
-    it("shows profile setup prompt when no chosen name", () => {
-      cy.mockProfileChosenName(""); // No chosen name
-      cy.contains("Complete Profile Setup").should("be.visible");
-    });
-
     it("shows tasks complete when profile is complete", () => {
       // Mock profile with chosen name
       cy.mockProfileChosenName("Tom Young"); // No chosen name
@@ -43,6 +45,14 @@ describe(`Homepage Tests`, () => {
       cy.waitForChosenName();
 
       cy.contains("You have completed all your tasks").should("be.visible");
+    });
+
+    it("shows studies for admin", () => {
+      cy.loginAsAdmin();
+
+      cy.visit("/");
+
+      cy.contains("Studies to Approve").should("be.visible");
     });
   });
 

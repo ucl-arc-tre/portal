@@ -45,6 +45,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
 		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
 		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
+		Feedback:                         study.Feedback,
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 	}
@@ -313,10 +314,9 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	)
 }
 
-func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
-	var status openapi.StudyApprovalStatus // why doesn't this work as status := openapi.StudyApprovalStatus
-
-	if err := bindJSONOrSetError(ctx, &status); err != nil {
+func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
+	review := openapi.StudyReview{}
+	if err := bindJSONOrSetError(ctx, &review); err != nil {
 		return
 	}
 
@@ -324,8 +324,14 @@ func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
 	if err != nil {
 		return
 	}
-	err = h.studies.UpdateStudyStatus(studyUUID, status)
+	// unless we want these in one func?
+	err = h.studies.UpdateStudyFeedback(studyUUID, review.Feedback)
+	if err != nil {
+		setError(ctx, err, "Failed to update study feedback")
+		return
+	}
 
+	err = h.studies.UpdateStudyStatus(studyUUID, review.Status)
 	if err != nil {
 		setError(ctx, err, "Failed to update study status")
 		return
@@ -333,24 +339,3 @@ func (h *Handler) PostStudiesStudyIdStatus(ctx *gin.Context, studyId string) {
 
 	ctx.Status(http.StatusOK)
 }
-
-// func (h *Handler) PostStudiesStudyIdFeedback(ctx *gin.Context, studyId string) {
-// 	feedback := string
-
-// 	if err := bindJSONOrSetError(ctx, &feedback); err != nil {
-// 		return
-// 	}
-
-// 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-// 	if err != nil {
-// 		return
-// 	}
-// 	err = h.studies.UpdateStudyStatus(studyUUID, status)
-
-// 	if err != nil {
-// 		setError(ctx, err, "Failed to update study status")
-// 		return
-// 	}
-
-// 	ctx.Status(http.StatusOK)
-// }
