@@ -23,7 +23,7 @@ describe(`Homepage Tests`, () => {
       cy.loginAsAdmin();
 
       cy.visit("/");
-      cy.contains("Studies to Approve").should("exist");
+      cy.contains("Your Tasks").should("exist");
     });
   });
 
