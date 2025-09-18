@@ -3,7 +3,6 @@ package studies
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,13 +13,13 @@ import (
 )
 
 func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPartyName string, status string, expiryDateStr string) *openapi.ContractUploadValidationError {
-	if !validation.ContractNamePattern.MatchString(strings.TrimSpace(organisationSignatory)) {
+	if !validation.ContractNamePattern.MatchString(organisationSignatory) {
 		return &openapi.ContractUploadValidationError{
 			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
 		}
 	}
 
-	if !validation.ContractNamePattern.MatchString(strings.TrimSpace(thirdPartyName)) {
+	if !validation.ContractNamePattern.MatchString(thirdPartyName) {
 		return &openapi.ContractUploadValidationError{
 			ErrorMessage: "Third party name must be between 2 and 100 characters",
 		}
@@ -32,7 +31,7 @@ func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPa
 		}
 	}
 
-	if strings.TrimSpace(expiryDateStr) == "" {
+	if expiryDateStr == "" {
 		return &openapi.ContractUploadValidationError{
 			ErrorMessage: "Expiry date is required",
 		}
