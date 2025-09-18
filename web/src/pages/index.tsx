@@ -59,6 +59,7 @@ export default function Index() {
               <div className={styles["studies-wrapper"]}>
                 <h2>Studies to Approve</h2>
                 <StudySelection isAdmin={isAdmin} studies={studies} />
+                {studies.length === 0 && <p>You&apos;re all caught up! No studies to approve</p>}
               </div>
             </Box>
           )
