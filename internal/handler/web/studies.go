@@ -294,17 +294,17 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	var formData types.ContractFormData
+	var formData openapi.ContractUploadObject
 	if err := ctx.ShouldBind(&formData); err != nil {
 		setError(ctx, types.NewErrServerError(err), "Invalid form data")
 		return
 	}
 
-	validationError := h.studies.ValidateContractMetadata(formData.OrganisationSignatory, formData.ThirdPartyName, formData.Status, formData.ExpiryDate)
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
+	// validationError := h.studies.ValidateContractMetadata(formData.OrganisationSignatory, formData.ThirdPartyName, string(formData.Status), formData.ExpiryDate)
+	// if validationError != nil {
+	// 	ctx.JSON(http.StatusBadRequest, *validationError)
+	// 	return
+	// }
 
 	expiryDate, err := time.Parse("2006-01-02", formData.ExpiryDate)
 	if err != nil {
@@ -314,7 +314,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 
 	user := middleware.GetUser(ctx)
 
-	file, err := formData.File.Open()
+	file, err := formData.File.Reader()
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
 		return
@@ -328,11 +328,11 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	contractData := types.Contract{
 		StudyID:               uuids[0],
 		AssetID:               uuids[1],
-		Filename:              formData.File.Filename,
+		Filename:              formData.File.Filename(),
 		UploadedBy:            user.ID,
 		OrganisationSignatory: formData.OrganisationSignatory,
 		ThirdPartyName:        formData.ThirdPartyName,
-		Status:                formData.Status,
+		Status:                string(formData.Status),
 		ExpiryDate:            expiryDate,
 	}
 

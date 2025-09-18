@@ -13,17 +13,17 @@ import (
 )
 
 func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPartyName string, status string, expiryDateStr string) *openapi.ValidationError {
-	if !validation.ContractNamePattern.MatchString(organisationSignatory) {
-		return &openapi.ValidationError{
-			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
-		}
-	}
+	// if !validation.ContractNamePattern.MatchString(organisationSignatory) {
+	// 	return &openapi.ValidationError{
+	// 		ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
+	// 	}
+	// }
 
-	if !validation.ContractNamePattern.MatchString(thirdPartyName) {
-		return &openapi.ValidationError{
-			ErrorMessage: "Third party name must be between 2 and 100 characters",
-		}
-	}
+	// if !validation.ContractNamePattern.MatchString(thirdPartyName) {
+	// 	return &openapi.ValidationError{
+	// 		ErrorMessage: "Third party name must be between 2 and 100 characters",
+	// 	}
+	// }
 
 	if status != "proposed" && status != "active" && status != "expired" {
 		return &openapi.ValidationError{

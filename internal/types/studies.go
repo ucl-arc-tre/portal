@@ -1,7 +1,6 @@
 package types
 
 import (
-	"mime/multipart"
 	"time"
 
 	"github.com/google/uuid"
@@ -114,13 +113,4 @@ type Contract struct {
 	Study Study `gorm:"foreignKey:StudyID"`
 	Asset Asset `gorm:"foreignKey:AssetID"`
 	User  User  `gorm:"foreignKey:UploadedBy"`
-}
-
-// used for parsing multipart form data when uploading a contract (before it is stored)
-type ContractFormData struct {
-	OrganisationSignatory string                `form:"organisation_signatory"`
-	ThirdPartyName        string                `form:"third_party_name"`
-	Status                string                `form:"status"`
-	ExpiryDate            string                `form:"expiry_date"`
-	File                  *multipart.FileHeader `form:"file"`
 }
