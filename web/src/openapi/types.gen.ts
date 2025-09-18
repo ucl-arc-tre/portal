@@ -187,13 +187,6 @@ export type Asset = AssetBase & {
     updated_at: string;
 };
 
-export type AssetCreateValidationError = {
-    /**
-     * Validation error message explaining why asset creation failed
-     */
-    error_message: string;
-};
-
 /**
  * Base study properties
  */
@@ -323,9 +316,9 @@ export type Study = StudyBase & {
     approval_status: 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 };
 
-export type StudyCreateValidationError = {
+export type ValidationError = {
     /**
-     * Validation error message explaining why study creation failed
+     * Validation error message explaining why the request failed
      */
     error_message: string;
 };
@@ -376,13 +369,6 @@ export type Contract = ContractBase & {
      * Time in RFC3339 format when the contract was last updated
      */
     updated_at: string;
-};
-
-export type ContractUploadValidationError = {
-    /**
-     * Validation error message explaining why contract upload failed
-     */
-    error_message: string;
 };
 
 export type GetAuthData = {
@@ -761,7 +747,7 @@ export type PostStudiesErrors = {
     /**
      * Validation error
      */
-    400: StudyCreateValidationError;
+    400: ValidationError;
     /**
      * Forbidden
      */
@@ -879,7 +865,7 @@ export type PostStudiesByStudyIdAssetsErrors = {
     /**
      * Validation error
      */
-    400: AssetCreateValidationError;
+    400: ValidationError;
     /**
      * Forbidden
      */
@@ -1098,7 +1084,7 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
     /**
      * Validation error
      */
-    400: ContractUploadValidationError;
+    400: ValidationError;
     /**
      * Forbidden
      */

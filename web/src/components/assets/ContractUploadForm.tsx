@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
-import { postStudiesByStudyIdAssetsByAssetIdContractsUpload, ContractUploadValidationError } from "@/openapi";
+import { postStudiesByStudyIdAssetsByAssetIdContractsUpload, ValidationError } from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
 
 type ContractFormData = {
@@ -94,7 +94,7 @@ export default function ContractUploadModal({
       });
 
       if (response.error) {
-        const errorData = response.error as ContractUploadValidationError;
+        const errorData = response.error as ValidationError;
         if (errorData?.error_message) {
           throw new Error(errorData.error_message);
         }

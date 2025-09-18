@@ -253,12 +253,6 @@ type AssetBaseProtection string
 // AssetBaseStatus Status of the asset
 type AssetBaseStatus string
 
-// AssetCreateValidationError defines model for AssetCreateValidationError.
-type AssetCreateValidationError struct {
-	// ErrorMessage Validation error message explaining why asset creation failed
-	ErrorMessage string `json:"error_message"`
-}
-
 // Auth defines model for Auth.
 type Auth struct {
 	Roles    []AuthRoles `json:"roles"`
@@ -344,12 +338,6 @@ type ContractUploadObject struct {
 
 // ContractUploadObjectStatus Current status of the contract
 type ContractUploadObjectStatus string
-
-// ContractUploadValidationError defines model for ContractUploadValidationError.
-type ContractUploadValidationError struct {
-	// ErrorMessage Validation error message explaining why contract upload failed
-	ErrorMessage string `json:"error_message"`
-}
 
 // Profile defines model for Profile.
 type Profile struct {
@@ -555,12 +543,6 @@ type StudyBase struct {
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase
 
-// StudyCreateValidationError defines model for StudyCreateValidationError.
-type StudyCreateValidationError struct {
-	// ErrorMessage Validation error message explaining why study creation failed
-	ErrorMessage string `json:"error_message"`
-}
-
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -598,6 +580,12 @@ type UserTrainingUpdate struct {
 	// TrainingDate Time in RFC3339 format at which the the certificate was issued
 	TrainingDate string       `json:"training_date"`
 	TrainingKind TrainingKind `json:"training_kind"`
+}
+
+// ValidationError defines model for ValidationError.
+type ValidationError struct {
+	// ErrorMessage Validation error message explaining why the request failed
+	ErrorMessage string `json:"error_message"`
 }
 
 // GetUsersParams defines parameters for GetUsers.

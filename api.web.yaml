@@ -275,7 +275,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StudyCreateValidationError"
+                $ref: "#/components/schemas/ValidationError"
         "406":
           description: Invalid request
         "403":
@@ -364,7 +364,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AssetCreateValidationError"
+                $ref: "#/components/schemas/ValidationError"
         "403":
           description: Forbidden
         "500":
@@ -526,7 +526,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ContractUploadValidationError"
+                $ref: "#/components/schemas/ValidationError"
         "403":
           description: Forbidden
         "500":
@@ -861,15 +861,6 @@ components:
               description: Time in RFC3339 format when the asset was last updated
       description: A research study asset
 
-    AssetCreateValidationError:
-      type: object
-      required:
-        - error_message
-      properties:
-        error_message:
-          type: string
-          description: Validation error message explaining why asset creation failed
-
     StudyBase:
       type: object
       description: Base study properties
@@ -987,14 +978,14 @@ components:
               description: Current approval status of the study
       description: A research study
 
-    StudyCreateValidationError:
+    ValidationError:
       type: object
       required:
         - error_message
       properties:
         error_message:
           type: string
-          description: Validation error message explaining why study creation failed
+          description: Validation error message explaining why the request failed
 
     ContractBase:
       type: object
@@ -1054,12 +1045,3 @@ components:
               description: Time in RFC3339 format when the contract was last updated
 
       description: A contract associated with a study asset
-
-    ContractUploadValidationError:
-      type: object
-      required:
-        - error_message
-      properties:
-        error_message:
-          type: string
-          description: Validation error message explaining why contract upload failed

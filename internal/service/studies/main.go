@@ -38,7 +38,7 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
@@ -54,7 +54,7 @@ func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCre
 	if errorMessage == "" {
 		return nil, nil
 	}
-	return &openapi.StudyCreateValidationError{ErrorMessage: errorMessage}, nil
+	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
 }
 
 func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]types.User, error) {
@@ -70,22 +70,22 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]typ
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
-		return &openapi.StudyCreateValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
+		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
-		return &openapi.StudyCreateValidationError{ErrorMessage: "data_controller_organisation is required"}, nil
+		return &openapi.ValidationError{ErrorMessage: "data_controller_organisation is required"}, nil
 	}
 
 	if studyData.Description != nil && len(*studyData.Description) > 255 {
-		return &openapi.StudyCreateValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
+		return &openapi.ValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
 	}
 
 	if studyData.IsDataProtectionOfficeRegistered != nil {
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
-			return &openapi.StudyCreateValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
+			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
 	}
 
@@ -96,7 +96,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 		return nil, types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
 	}
 	if count > 0 {
-		return &openapi.StudyCreateValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
+		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
 	validationError, err := s.validateAdmins(ctx, studyData)
@@ -109,7 +109,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.StudyCreateValidationError, error) {
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
 	validationError, err := s.validateStudyData(ctx, owner, studyData)
 	if err != nil || validationError != nil {
 		return validationError, err

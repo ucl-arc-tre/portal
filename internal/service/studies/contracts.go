@@ -12,27 +12,27 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPartyName string, status string, expiryDateStr string) *openapi.ContractUploadValidationError {
+func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPartyName string, status string, expiryDateStr string) *openapi.ValidationError {
 	if !validation.ContractNamePattern.MatchString(organisationSignatory) {
-		return &openapi.ContractUploadValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
 		}
 	}
 
 	if !validation.ContractNamePattern.MatchString(thirdPartyName) {
-		return &openapi.ContractUploadValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Third party name must be between 2 and 100 characters",
 		}
 	}
 
 	if status != "proposed" && status != "active" && status != "expired" {
-		return &openapi.ContractUploadValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Status must be proposed, active, or expired",
 		}
 	}
 
 	if expiryDateStr == "" {
-		return &openapi.ContractUploadValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Expiry date is required",
 		}
 	}
@@ -40,7 +40,7 @@ func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPa
 	// Parse expiry date
 	_, err := time.Parse(validation.DateFormat, expiryDateStr)
 	if err != nil {
-		return &openapi.ContractUploadValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Invalid expiry date format",
 		}
 	}

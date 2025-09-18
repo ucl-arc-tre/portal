@@ -17,15 +17,15 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.AssetCreateValidationError, error) {
+func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.ValidationError, error) {
 	// Validate title
 	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
+		return &openapi.ValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	// Validate description
 	if !validation.AssetDescriptionPattern.MatchString(assetData.Description) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
+		return &openapi.ValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
 	}
 
 	// Validate classification_impact
@@ -35,12 +35,12 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseClassificationImpactHighlyConfidential,
 	}
 	if !slices.Contains(validClassifications, assetData.ClassificationImpact) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
+		return &openapi.ValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
 	}
 
 	// Validate locations
 	if len(assetData.Locations) == 0 {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "at least one location must be specified"}, nil
+		return &openapi.ValidationError{ErrorMessage: "at least one location must be specified"}, nil
 	}
 
 	// Validate protection field
@@ -50,12 +50,12 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseProtectionIdentifiableLowConfidencePseudonymisation,
 	}
 	if !slices.Contains(validProtections, assetData.Protection) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation"}, nil
+		return &openapi.ValidationError{ErrorMessage: "protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation"}, nil
 	}
 
 	// Validate legal_basis
 	if !validation.TextField500Pattern.MatchString(assetData.LegalBasis) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
+		return &openapi.ValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
 	}
 
 	// Validate format field
@@ -65,13 +65,13 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseFormatOther,
 	}
 	if !slices.Contains(validFormats, assetData.Format) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
+		return &openapi.ValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
 	}
 
 	// Validate expiry field
 	_, err := time.Parse(validation.DateFormat, assetData.ExpiresAt)
 	if err != nil {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
+		return &openapi.ValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
 
 	// Validate status field
@@ -81,13 +81,13 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseStatusDestroyed,
 	}
 	if !slices.Contains(validStatuses, assetData.Status) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
+		return &openapi.ValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
 	}
 
 	return nil, nil
 }
 
-func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.AssetCreateValidationError, error) {
+func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
 	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
 
 	validationError, err := s.validateAssetData(assetData)
