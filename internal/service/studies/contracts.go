@@ -53,7 +53,7 @@ func (s *Service) StoreContract(
 	pdfContractObj types.S3Object,
 	contractMetadata types.Contract,
 ) error {
-	log.Debug().Any("contractId", contractMetadata.ContractID).Msg("Storing contract")
+	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
 
 	// Start a database transaction
 	tx := s.db.Begin()
@@ -63,14 +63,16 @@ func (s *Service) StoreContract(
 		}
 	}()
 
-	// Store the contract metadata in the database
+	// Store the contract metadata in the database first to generate an ID
 	if err := tx.Create(&contractMetadata).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrServerError(fmt.Errorf("failed to save contract metadata: %w", err))
 	}
 
-	// Store the PDF file in S3
-	if err := s.s3.StoreObject(ctx, contractMetadata.ContractID, pdfContractObj); err != nil {
+	log.Debug().Any("contractId", contractMetadata.ID).Msg("Contract metadata saved, proceeding with S3 storage")
+
+	// Store the PDF file in S3 using the generated primary key ID from the database
+	if err := s.s3.StoreObject(ctx, contractMetadata.ID, pdfContractObj); err != nil {
 		tx.Rollback()
 		return types.NewErrServerError(fmt.Errorf("failed to store contract file: %w", err))
 	}

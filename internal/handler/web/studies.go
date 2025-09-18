@@ -74,7 +74,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	return openapi.Contract{
-		Id:                    contract.ContractID.String(),
+		Id:                    contract.ID.String(),
 		Filename:              contract.Filename,
 		OrganisationSignatory: contract.OrganisationSignatory,
 		ThirdPartyName:        contract.ThirdPartyName,
@@ -312,7 +312,6 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	contractUUID := uuid.New()
 	user := middleware.GetUser(ctx)
 
 	file, err := formData.File.Open()
@@ -329,7 +328,6 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	contractData := types.Contract{
 		StudyID:               uuids[0],
 		AssetID:               uuids[1],
-		ContractID:            contractUUID,
 		Filename:              formData.File.Filename,
 		UploadedBy:            user.ID,
 		OrganisationSignatory: formData.OrganisationSignatory,
