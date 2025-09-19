@@ -295,12 +295,6 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	// Extract form fields
-	organisationSignatory := ctx.PostForm("organisation_signatory")
-	thirdPartyName := ctx.PostForm("third_party_name")
-	status := ctx.PostForm("status")
-	expiryDateStr := ctx.PostForm("expiry_date")
-
 	// Get the uploaded file
 	fileHeader, err := ctx.FormFile("file")
 	if err != nil {
@@ -308,15 +302,22 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	// Validate form data
-	validationError := h.studies.ValidateContractMetadata(organisationSignatory, thirdPartyName, status, expiryDateStr)
+	// Create contract metadata for validation
+	contractMetadata := openapi.ContractUploadObject{
+		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
+		ThirdPartyName:        ctx.PostForm("third_party_name"),
+		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
+		ExpiryDate:            ctx.PostForm("expiry_date"),
+	}
+
+	validationError := h.studies.ValidateContractMetadata(contractMetadata)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
 	// Parse expiry date
-	expiryDate, err := time.Parse(validation.DateFormat, expiryDateStr)
+	expiryDate, err := time.Parse(validation.DateFormat, contractMetadata.ExpiryDate)
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Invalid expiry date format")
 		return
@@ -336,13 +337,14 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		}
 	}()
 
+	// Create the final contract record for storage
 	contractData := types.Contract{
 		AssetID:               uuids[1],
 		Filename:              fileHeader.Filename,
 		CreatorUserID:         user.ID,
-		OrganisationSignatory: organisationSignatory,
-		ThirdPartyName:        thirdPartyName,
-		Status:                status,
+		OrganisationSignatory: contractMetadata.OrganisationSignatory,
+		ThirdPartyName:        contractMetadata.ThirdPartyName,
+		Status:                string(contractMetadata.Status),
 		ExpiryDate:            expiryDate,
 	}
 
