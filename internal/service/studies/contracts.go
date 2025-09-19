@@ -25,7 +25,9 @@ func (s *Service) ValidateContractMetadata(organisationSignatory string, thirdPa
 		}
 	}
 
-	if status != "proposed" && status != "active" && status != "expired" {
+	if status != string(openapi.ContractStatusProposed) &&
+		status != string(openapi.ContractStatusActive) &&
+		status != string(openapi.ContractStatusExpired) {
 		return &openapi.ValidationError{
 			ErrorMessage: "Status must be proposed, active, or expired",
 		}
