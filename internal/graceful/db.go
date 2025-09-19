@@ -28,6 +28,7 @@ func InitDB() {
 		&types.StudyAgreementSignature{},
 		&types.Asset{},
 		&types.AssetLocation{},
+		&types.Contract{},
 		&types.UserSponsorship{},
 	}
 	db := NewDB()

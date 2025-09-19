@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Asset,
-  AssetBase,
-  AssetCreateValidationError,
-  getStudiesByStudyIdAssets,
-  postStudiesByStudyIdAssets,
-} from "@/openapi";
+import { Asset, AssetBase, ValidationError, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -67,7 +61,7 @@ export default function Assets(props: StudyAssetsProps) {
     });
 
     if (response.error) {
-      const errorData = response.error as AssetCreateValidationError;
+      const errorData = response.error as ValidationError;
       if (errorData?.error_message) {
         throw new Error(errorData.error_message);
       }

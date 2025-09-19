@@ -2,24 +2,90 @@ package studies
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
+
+func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject) *openapi.ValidationError {
+	if !validation.ContractNamePattern.MatchString(contractData.OrganisationSignatory) {
+		return &openapi.ValidationError{
+			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
+		}
+	}
+
+	if !validation.ContractNamePattern.MatchString(contractData.ThirdPartyName) {
+		return &openapi.ValidationError{
+			ErrorMessage: "Third party name must be between 2 and 100 characters",
+		}
+	}
+
+	if string(contractData.Status) != string(openapi.ContractStatusProposed) &&
+		string(contractData.Status) != string(openapi.ContractStatusActive) &&
+		string(contractData.Status) != string(openapi.ContractStatusExpired) {
+		return &openapi.ValidationError{
+			ErrorMessage: "Status must be proposed, active, or expired",
+		}
+	}
+
+	if contractData.ExpiryDate == "" {
+		return &openapi.ValidationError{
+			ErrorMessage: "Expiry date is required",
+		}
+	}
+
+	// Parse expiry date
+	_, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
+	if err != nil {
+		return &openapi.ValidationError{
+			ErrorMessage: "Invalid expiry date format",
+		}
+	}
+
+	return nil
+}
 
 func (s *Service) StoreContract(
 	ctx context.Context,
-	studyId uuid.UUID,
-	assetId uuid.UUID,
-	contractId uuid.UUID,
-	obj types.S3Object,
+	pdfContractObj types.S3Object,
+	contractMetadata types.Contract,
 ) error {
-	log.Debug().Any("contractId", contractId).Msg("Storing contract")
+	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
 
-	err := s.s3.StoreObject(ctx, contractId, obj)
-	// todo: save metadata inc. filename
-	return err
+	// Start a database transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Store the contract metadata in the database first to generate an ID
+	if err := tx.Create(&contractMetadata).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrServerError(fmt.Errorf("failed to save contract metadata: %w", err))
+	}
+
+	log.Debug().Any("contractId", contractMetadata.ID).Msg("Contract metadata saved, proceeding with S3 storage")
+
+	// Store the PDF file in S3 using the generated primary key ID from the database
+	if err := s.s3.StoreObject(ctx, contractMetadata.ID, pdfContractObj); err != nil {
+		tx.Rollback()
+		return types.NewErrServerError(fmt.Errorf("failed to store contract file: %w", err))
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrServerError(fmt.Errorf("failed to commit contract transaction: %w", err))
+	}
+
+	return nil
 }
 
 func (s *Service) GetContract(ctx context.Context,

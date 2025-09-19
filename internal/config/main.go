@@ -20,7 +20,8 @@ const (
 	configPath = "/etc/portal/config.yaml"
 
 	TimeFormat     = time.RFC3339
-	MaxUploadBytes = 1e7 // 10 MB
+	DateFormat     = "2006-01-02" // YYYY-MM-DD format for dates
+	MaxUploadBytes = 1e7          // 10 MB
 
 	TrainingValidityYears = 1
 	TrainingValidity      = TrainingValidityYears * 365 * 24 * time.Hour
