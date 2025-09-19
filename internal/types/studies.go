@@ -103,7 +103,7 @@ type Contract struct {
 	StudyID               uuid.UUID `gorm:"not null;index"`
 	AssetID               uuid.UUID `gorm:"not null;index"`
 	Filename              string    `gorm:"not null"`
-	UploadedBy            uuid.UUID `gorm:"type:uuid;not null"`
+	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
 	OrganisationSignatory string
 	ThirdPartyName        string
 	Status                string // proposed, active, expired
@@ -112,5 +112,5 @@ type Contract struct {
 	// Relationships
 	Study Study `gorm:"foreignKey:StudyID"`
 	Asset Asset `gorm:"foreignKey:AssetID"`
-	User  User  `gorm:"foreignKey:UploadedBy"`
+	User  User  `gorm:"foreignKey:CreatorUserID"`
 }

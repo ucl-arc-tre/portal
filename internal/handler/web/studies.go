@@ -340,7 +340,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		StudyID:               uuids[0],
 		AssetID:               uuids[1],
 		Filename:              fileHeader.Filename,
-		UploadedBy:            user.ID,
+		CreatorUserID:         user.ID,
 		OrganisationSignatory: organisationSignatory,
 		ThirdPartyName:        thirdPartyName,
 		Status:                status,
