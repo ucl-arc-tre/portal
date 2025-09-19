@@ -183,9 +183,9 @@ func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uui
 }
 
 // retrieves all contracts for a specific asset within a study
-func (s *Service) AssetContracts(user types.User, studyID uuid.UUID, assetID uuid.UUID) ([]types.Contract, error) {
+func (s *Service) AssetContracts(user types.User, assetID uuid.UUID) ([]types.Contract, error) {
 	var contracts []types.Contract
-	err := s.db.Where("study_id = ? AND asset_id = ?", studyID, assetID).
+	err := s.db.Where("asset_id = ?", assetID).
 		Order("created_at DESC").
 		Find(&contracts).Error
 

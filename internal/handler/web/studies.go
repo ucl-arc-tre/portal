@@ -337,7 +337,6 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	}()
 
 	contractData := types.Contract{
-		StudyID:               uuids[0],
 		AssetID:               uuids[1],
 		Filename:              fileHeader.Filename,
 		CreatorUserID:         user.ID,
@@ -367,7 +366,7 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 
 	user := middleware.GetUser(ctx)
 
-	contracts, err := h.studies.AssetContracts(user, uuids[0], uuids[1])
+	contracts, err := h.studies.AssetContracts(user, uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve contracts")
 		return

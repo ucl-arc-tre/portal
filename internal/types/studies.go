@@ -100,7 +100,6 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	StudyID               uuid.UUID `gorm:"not null;index"`
 	AssetID               uuid.UUID `gorm:"not null;index"`
 	Filename              string    `gorm:"not null"`
 	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
@@ -110,7 +109,6 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Study Study `gorm:"foreignKey:StudyID"`
 	Asset Asset `gorm:"foreignKey:AssetID"`
 	User  User  `gorm:"foreignKey:CreatorUserID"`
 }
