@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/types"
-	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 // Import a CSV file containing usernames, agreement confirmation, nhsd training completed at dates
@@ -46,7 +46,7 @@ func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResear
 		} else if len(raw) != 3 {
 			return records, fmt.Errorf("failed to parse csv line: %v", raw)
 		}
-		nhsdTrainingCompletedAt, err := time.Parse(validation.DateFormat, raw[2])
+		nhsdTrainingCompletedAt, err := time.Parse(config.DateFormat, raw[2])
 		if err != nil {
 			return records, err
 		}

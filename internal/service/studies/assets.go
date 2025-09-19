@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 
+	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -69,7 +70,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 	}
 
 	// Validate expiry field
-	_, err := time.Parse(validation.DateFormat, assetData.ExpiresAt)
+	_, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
 	if err != nil {
 		return &openapi.ValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
@@ -114,7 +115,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	}()
 
 	// Parse the expiry date string (already validated in validateAssetData)
-	expiryDate, err := time.Parse(validation.DateFormat, assetData.ExpiresAt)
+	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
 	if err != nil {
 		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
 	}

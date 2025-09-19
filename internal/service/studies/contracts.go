@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -40,7 +41,7 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 	}
 
 	// Parse expiry date
-	_, err := time.Parse(validation.DateFormat, contractData.ExpiryDate)
+	_, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
 	if err != nil {
 		return &openapi.ValidationError{
 			ErrorMessage: "Invalid expiry date format",

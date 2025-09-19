@@ -14,7 +14,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
-	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
@@ -317,7 +316,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	}
 
 	// Parse expiry date
-	expiryDate, err := time.Parse(validation.DateFormat, contractMetadata.ExpiryDate)
+	expiryDate, err := time.Parse(config.DateFormat, contractMetadata.ExpiryDate)
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Invalid expiry date format")
 		return
