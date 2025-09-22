@@ -211,14 +211,17 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           </dl>
         </div>
       </Box>
-      <div>
-        <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
-          Approve Study
-        </Button>
-        <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
-          {showFeedbackForm ? "Cancel" : "Request Changes"}
-        </Button>
-      </div>
+
+      {study.approval_status === "Pending" && (
+        <div>
+          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+            Approve Study
+          </Button>
+          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
+            {showFeedbackForm ? "Cancel" : "Request Changes"}
+          </Button>
+        </div>
+      )}
       {showFeedbackForm && (
         <Box>
           <div className={styles["feedback-container"]}>
