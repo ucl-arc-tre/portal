@@ -61,7 +61,7 @@ export default function ManageStudyPage() {
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
 
-  if (!isApprovedResearcher && !isAdmin) {
+  if (!isApprovedResearcher) {
     return (
       <>
         <MetaHead

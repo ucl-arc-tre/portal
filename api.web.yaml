@@ -310,9 +310,9 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/status:
+  /studies/{studyId}/review:
     post:
-      description: Update study status
+      description: Update study status + opportunity to update feedback
       parameters:
         - in: path
           name: studyId
@@ -325,10 +325,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StudyApprovalStatus"
+              $ref: "#/components/schemas/StudyReview"
       responses:
         "201":
-          description: Study status updated successfully
+          description: Study review submitted successfully
         "403":
           description: Forbidden
         "404":
@@ -978,6 +978,8 @@ components:
               description: Time in RFC3339 format when the study was last updated
             approval_status:
               $ref: "#/components/schemas/StudyApprovalStatus"
+            feedback:
+              type: string
       description: A research study
 
     StudyApprovalStatus:
@@ -988,6 +990,17 @@ components:
         - Approved
         - Rejected
       description: Current approval status of the study
+
+    StudyReview:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: "#/components/schemas/StudyApprovalStatus"
+        feedback:
+          type: string
+          description: Feedback for the study
 
     StudyCreateValidationError:
       type: object

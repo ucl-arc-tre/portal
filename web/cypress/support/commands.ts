@@ -57,10 +57,22 @@ declare global {
       mockAuthAsBaseUser(): Chainable<any>;
 
       /**
+       * Mock auth response to return base and admin roles
+       * @example cy.mockAuthAsBaseAdmin()
+       */
+      mockAuthAsAdminBase(): Chainable<any>;
+
+      /**
        * Mock auth response to return base and approved researcher roles
        * @example cy.mockAuthAsBaseApprovedResearcher()
        */
       mockAuthAsBaseApprovedResearcher(): Chainable<any>;
+
+      /**
+       * Mock auth response to return admin and approved researcher roles
+       * @example cy.mockAuthAsAdminApprovedResearcher()
+       */
+      mockAuthAsAdminApprovedResearcher(): Chainable<any>;
 
       /**
        * Mock auth response to return base and approved researcher roles with staff status
@@ -344,6 +356,18 @@ Cypress.Commands.add("mockAuthAsBaseUser", () => {
 Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-base-approved-researcher.json",
+  }).as("getAuth");
+});
+
+Cypress.Commands.add("mockAuthAsAdminBase", () => {
+  cy.intercept("GET", "/web/api/v0/auth", {
+    fixture: "auth-admin-base.json",
+  }).as("getAuth");
+});
+
+Cypress.Commands.add("mockAuthAsAdminApprovedResearcher", () => {
+  cy.intercept("GET", "/web/api/v0/auth", {
+    fixture: "auth-admin-approved-researcher.json",
   }).as("getAuth");
 });
 

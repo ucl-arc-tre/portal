@@ -312,6 +312,7 @@ type Study struct {
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
+	Feedback    *string `json:"feedback,omitempty"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
@@ -470,6 +471,15 @@ type StudyCreateValidationError struct {
 	ErrorMessage string `json:"error_message"`
 }
 
+// StudyReview defines model for StudyReview.
+type StudyReview struct {
+	// Feedback Feedback for the study
+	Feedback *string `json:"feedback,omitempty"`
+
+	// Status Current approval status of the study
+	Status StudyApprovalStatus `json:"status"`
+}
+
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -539,8 +549,8 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
-// PostStudiesStudyIdStatusJSONRequestBody defines body for PostStudiesStudyIdStatus for application/json ContentType.
-type PostStudiesStudyIdStatusJSONRequestBody = StudyApprovalStatus
+// PostStudiesStudyIdReviewJSONRequestBody defines body for PostStudiesStudyIdReview for application/json ContentType.
+type PostStudiesStudyIdReviewJSONRequestBody = StudyReview
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -608,8 +618,8 @@ type ServerInterface interface {
 	// (POST /studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload)
 	PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c *gin.Context, studyId string, assetId string, contractId string)
 
-	// (POST /studies/{studyId}/status)
-	PostStudiesStudyIdStatus(c *gin.Context, studyId string)
+	// (POST /studies/{studyId}/review)
+	PostStudiesStudyIdReview(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -1024,8 +1034,8 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsContr
 	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c, studyId, assetId, contractId)
 }
 
-// PostStudiesStudyIdStatus operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdStatus(c *gin.Context) {
+// PostStudiesStudyIdReview operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdReview(c *gin.Context) {
 
 	var err error
 
@@ -1045,7 +1055,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdStatus(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdStatus(c, studyId)
+	siw.Handler.PostStudiesStudyIdReview(c, studyId)
 }
 
 // GetUsers operation middleware
@@ -1177,7 +1187,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload)
-	router.POST(options.BaseURL+"/studies/:studyId/status", wrapper.PostStudiesStudyIdStatus)
+	router.POST(options.BaseURL+"/studies/:studyId/review", wrapper.PostStudiesStudyIdReview)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

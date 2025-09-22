@@ -322,12 +322,21 @@ export type Study = StudyBase & {
      */
     updated_at: string;
     approval_status: StudyApprovalStatus;
+    feedback?: string;
 };
 
 /**
  * Current approval status of the study
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+
+export type StudyReview = {
+    status: StudyApprovalStatus;
+    /**
+     * Feedback for the study
+     */
+    feedback?: string;
+};
 
 export type StudyCreateValidationError = {
     /**
@@ -777,8 +786,8 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
-export type PostStudiesByStudyIdStatusData = {
-    body: StudyApprovalStatus;
+export type PostStudiesByStudyIdReviewData = {
+    body: StudyReview;
     path: {
         /**
          * ID of the study
@@ -786,10 +795,10 @@ export type PostStudiesByStudyIdStatusData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/status';
+    url: '/studies/{studyId}/review';
 };
 
-export type PostStudiesByStudyIdStatusErrors = {
+export type PostStudiesByStudyIdReviewErrors = {
     /**
      * Forbidden
      */
@@ -808,9 +817,9 @@ export type PostStudiesByStudyIdStatusErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdStatusResponses = {
+export type PostStudiesByStudyIdReviewResponses = {
     /**
-     * Study status updated successfully
+     * Study review submitted successfully
      */
     201: unknown;
 };

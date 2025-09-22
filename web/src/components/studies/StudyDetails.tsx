@@ -1,6 +1,6 @@
-import { postStudiesByStudyIdStatus, Study } from "@/openapi";
+import { postStudiesByStudyIdReview, Study } from "@/openapi";
 import Box from "../ui/Box";
-import { formatDate, Textarea } from "../shared/exports";
+import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
@@ -11,7 +11,7 @@ type StudyDetailsProps = {
 };
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
-  //   const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
@@ -21,13 +21,18 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
 
     if (status === "Approved") {
       // set as approved
-      const response = await postStudiesByStudyIdStatus({ path: { studyId }, body: "Approved" });
+      const response = await postStudiesByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
       if (response.response.ok) {
         setApprovalStatus("Approved");
       }
       console.log(response);
     } else if (status === "Rejected") {
       // todo: add feedback bits
+      const response = await postStudiesByStudyIdReview({
+        path: { studyId },
+        body: { status: "Rejected", feedback: feedback },
+      });
+      console.log(response);
     }
   };
 
@@ -42,6 +47,15 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
     } else {
       setShowFeedbackForm(true);
     }
+  };
+
+  const handleFeedbackSubmit = () => {
+    handleUpdateStudyStatus("Rejected");
+    toggleShowFeedbackForm();
+  };
+
+  const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFeedback(event.target.value);
   };
 
   useEffect(() => {
@@ -90,6 +104,20 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
               <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
             </dd>
           </dl>
+
+          {study.feedback && (
+            <Alert type={"warning"} className={styles["feedback-alert"]}>
+              <AlertMessage>
+                <h4>This study has been rejected and the following feedback has been provided:</h4>
+                <p>{study.feedback}</p>
+              </AlertMessage>
+              <hr></hr>
+              <small>
+                <em>Please adjust as appropriate and request another review.</em>
+              </small>
+            </Alert>
+          )}
+
           <h3>Additional Information</h3>
           <p className={styles["additional-info"]}>
             <em>
@@ -183,14 +211,17 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           </dl>
         </div>
       </Box>
-      <div>
-        <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
-          Approve Study
-        </Button>
-        <Button variant="secondary" className={styles["reject-button"]} onClick={() => setShowFeedbackForm(true)}>
-          Request Changes
-        </Button>
-      </div>
+
+      {study.approval_status === "Pending" && (
+        <div>
+          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+            Approve Study
+          </Button>
+          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
+            {showFeedbackForm ? "Cancel" : "Request Changes"}
+          </Button>
+        </div>
+      )}
       {showFeedbackForm && (
         <Box>
           <div className={styles["feedback-container"]}>
@@ -204,8 +235,17 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
               }`}
             >
               <label htmlFor="feedback">Outline what the changes are required to attain approval</label>
-              <Textarea name="feedback" id="feedback" cols={30} rows={10} />
-              <Button onClick={toggleShowFeedbackForm}>Submit</Button>
+              <Textarea
+                name="feedback"
+                id="feedback"
+                cols={30}
+                rows={10}
+                onChange={handleFeedbackChange}
+                value={feedback}
+              />
+              <Button onClick={handleFeedbackSubmit} type="button">
+                Submit
+              </Button>
             </form>
           </div>
         </Box>
