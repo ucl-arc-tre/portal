@@ -10,7 +10,6 @@ import (
 type Study struct {
 	ModelAuditable
 	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
-	OwnerUsername                    Username  `gorm:"type:varchar(255)"`
 	Title                            string    `gorm:"not null"`
 	Description                      *string   `gorm:"type:text"`
 	DataControllerOrganisation       string    `gorm:"not null"`
