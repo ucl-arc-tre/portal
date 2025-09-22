@@ -100,7 +100,6 @@ func (s *Service) GetContract(ctx context.Context,
 ) (types.S3Object, error) {
 	log.Debug().Any("contractId", contractId).Msg("Getting contract")
 
-	// todo: add metadata from database
 	metadata := s3.ObjectMetadata{
 		Id:   contractId,
 		Kind: s3.ContractKind,
