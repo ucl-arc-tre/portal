@@ -188,7 +188,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("shows completion state when all steps done", () => {
     // Mock auth as approved researcher (complete profile)
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
@@ -215,7 +215,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("should show low urgency when training has 2 months left", () => {
     // Mock auth as approved researcher (complete profile)
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
@@ -232,7 +232,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("should show medium urgency when training has 1 month left", () => {
     // Mock auth as approved researcher (complete profile)
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
@@ -249,7 +249,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
   it("should show high urgency when training has less than 1 month left", () => {
     // Mock auth as approved researcher (complete profile)
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed

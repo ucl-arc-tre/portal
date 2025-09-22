@@ -36,7 +36,7 @@ describe(`Homepage Tests`, () => {
       cy.mockProfileChosenName("Tom Young"); // No chosen name
 
       // Mock auth as approved researcher (complete profile)
-      cy.mockAuthAsBaseApprovedResearcher();
+      cy.mockAuthAsBaseStaffApprovedResearcher();
 
       cy.visit("/");
       cy.waitForAuth();
