@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -75,7 +76,11 @@ func (s *Service) StoreContract(
 	log.Debug().Any("contractId", contractMetadata.ID).Msg("Contract metadata saved, proceeding with S3 storage")
 
 	// Store the PDF file in S3 using the generated primary key ID from the database
-	if err := s.s3.StoreObject(ctx, contractMetadata.ID, pdfContractObj); err != nil {
+	metadata := s3.ObjectMetadata{
+		Id:   contractMetadata.ID,
+		Kind: s3.ContractKind,
+	}
+	if err := s.s3.StoreObject(ctx, metadata, pdfContractObj); err != nil {
 		tx.Rollback()
 		return types.NewErrServerError(fmt.Errorf("failed to store contract file: %w", err))
 	}
@@ -96,5 +101,9 @@ func (s *Service) GetContract(ctx context.Context,
 	log.Debug().Any("contractId", contractId).Msg("Getting contract")
 
 	// todo: add metadata from database
-	return s.s3.GetObject(ctx, contractId)
+	metadata := s3.ObjectMetadata{
+		Id:   contractId,
+		Kind: s3.ContractKind,
+	}
+	return s.s3.GetObject(ctx, metadata)
 }
