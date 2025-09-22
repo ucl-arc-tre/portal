@@ -76,6 +76,8 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
     calculateRiskScore();
     setApprovalStatus(study.approval_status);
   }, [study]);
+
+  const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
       <Box>
@@ -154,7 +156,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             {study.involves_nhs_england && (
               <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
                 NHS England involvement
-                <InfoTooltip text="increases risk score by 5" />
+                <InfoTooltip text={standardRiskScoreStatement} />
               </dd>
             )}
             {study.involves_mnca && (
@@ -163,7 +165,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             {study.requires_dspt && (
               <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
                 requires DSPT
-                <InfoTooltip text="increases risk score by 5" />
+                <InfoTooltip text={standardRiskScoreStatement} />
               </dd>
             )}
             {!study.is_nhs_associated &&
@@ -180,7 +182,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             {study.requires_dbs && (
               <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
                 requires DBS
-                <InfoTooltip text="increases risk score by 5" />
+                <InfoTooltip text={standardRiskScoreStatement} />
               </dd>
             )}
             {study.is_data_protection_office_registered && (
@@ -222,16 +224,16 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
         </div>
       </Box>
 
-      {study.approval_status === "Pending" && (
-        <div>
-          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
-            Approve Study
-          </Button>
-          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
-            {showFeedbackForm ? "Cancel" : "Request Changes"}
-          </Button>
-        </div>
-      )}
+      {/* {study.approval_status === "Pending" && ( */}
+      <div>
+        <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+          Approve Study
+        </Button>
+        <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
+          {showFeedbackForm ? "Cancel" : "Request Changes"}
+        </Button>
+      </div>
+      {/* )} */}
       {showFeedbackForm && (
         <Box>
           <div className={styles["feedback-container"]}>
