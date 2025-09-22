@@ -1007,7 +1007,8 @@ components:
           description: Current status of the contract
         expiry_date:
           type: string
-          description: Contract expiry date
+          description: Contract expiry date in YYYY-MM-DD format
+          example: "2025-12-31"
 
     ContractUploadObject:
       allOf:

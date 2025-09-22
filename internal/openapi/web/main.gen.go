@@ -275,7 +275,7 @@ type Contract struct {
 	// CreatedAt Time in RFC3339 format when the contract was created
 	CreatedAt string `json:"created_at"`
 
-	// ExpiryDate Contract expiry date
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
 	// Filename Original filename of the uploaded contract
@@ -302,7 +302,7 @@ type ContractStatus string
 
 // ContractBase defines model for ContractBase.
 type ContractBase struct {
-	// ExpiryDate Contract expiry date
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
 	// OrganisationSignatory Name of the organisation signatory
@@ -320,7 +320,7 @@ type ContractBaseStatus string
 
 // ContractUploadObject defines model for ContractUploadObject.
 type ContractUploadObject struct {
-	// ExpiryDate Contract expiry date
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
 	// File The contract file to upload (e.g., PDF)

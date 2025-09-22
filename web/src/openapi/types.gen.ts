@@ -337,7 +337,7 @@ export type ContractBase = {
      */
     status: 'proposed' | 'active' | 'expired';
     /**
-     * Contract expiry date
+     * Contract expiry date in YYYY-MM-DD format
      */
     expiry_date: string;
 };
