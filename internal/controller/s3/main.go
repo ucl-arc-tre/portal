@@ -8,7 +8,6 @@ import (
 	awsCredentials "github.com/aws/aws-sdk-go-v2/credentials"
 	awsS3Manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	awsS3 "github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -57,21 +56,21 @@ func New() *Controller {
 	return &controller
 }
 
-func (c *Controller) StoreObject(ctx context.Context, id uuid.UUID, obj types.S3Object) error {
-	log.Debug().Any("id", id).Msg("Uploading S3 object")
+func (c *Controller) StoreObject(ctx context.Context, metadata ObjectMetadata, obj types.S3Object) error {
+	log.Debug().Any("metadata", metadata).Msg("Uploading S3 object")
 	_, err := c.uploader.Upload(ctx, &awsS3.PutObjectInput{
 		Bucket: aws.String(config.S3BucketName()),
-		Key:    aws.String(id.String()),
+		Key:    aws.String(metadata.Key()),
 		Body:   obj.Content,
 	})
 	return types.NewErrServerError(err)
 }
 
-func (c *Controller) GetObject(ctx context.Context, id uuid.UUID) (types.S3Object, error) {
-	log.Debug().Any("id", id).Msg("Downloading S3 object")
+func (c *Controller) GetObject(ctx context.Context, metadata ObjectMetadata) (types.S3Object, error) {
+	log.Debug().Any("metadata", metadata).Msg("Downloading S3 object")
 	output, err := c.client.GetObject(ctx, &awsS3.GetObjectInput{
 		Bucket: aws.String(config.S3BucketName()),
-		Key:    aws.String(id.String()),
+		Key:    aws.String(metadata.Key()),
 	})
 	if err != nil {
 		return types.S3Object{}, types.NewErrServerError(err)

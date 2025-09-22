@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -17,7 +18,11 @@ func (s *Service) StoreContract(
 ) error {
 	log.Debug().Any("contractId", contractId).Msg("Storing contract")
 
-	err := s.s3.StoreObject(ctx, contractId, obj)
+	metadata := s3.ObjectMetadata{
+		Id:   contractId,
+		Kind: s3.ContractKind,
+	}
+	err := s.s3.StoreObject(ctx, metadata, obj)
 	// todo: save metadata inc. filename
 	return err
 }
@@ -30,5 +35,9 @@ func (s *Service) GetContract(ctx context.Context,
 	log.Debug().Any("contractId", contractId).Msg("Getting contract")
 
 	// todo: add metadata from database
-	return s.s3.GetObject(ctx, contractId)
+	metadata := s3.ObjectMetadata{
+		Id:   contractId,
+		Kind: s3.ContractKind,
+	}
+	return s.s3.GetObject(ctx, metadata)
 }
