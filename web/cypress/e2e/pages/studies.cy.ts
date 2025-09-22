@@ -37,7 +37,7 @@ describe("Approved researcher can create studies", () => {
   });
 
   it("owner set to user & can't be edited", () => {
-    cy.fixture("auth-base-approved-researcher.json").then((data) => {
+    cy.fixture("auth-base-staff-approved-researcher.json").then((data) => {
       const username = data.username;
 
       cy.contains("Create Your First Study").should("be.visible").click();
