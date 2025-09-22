@@ -44,7 +44,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       setTimeout(() => {
         setShowFeedbackForm(false);
         setIsCollapsing(false);
-      }, 1900);
+      }, 1400);
     } else {
       setShowFeedbackForm(true);
     }

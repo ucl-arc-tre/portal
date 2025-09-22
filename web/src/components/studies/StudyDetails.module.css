@@ -122,10 +122,12 @@
   }
 
   &.form-collapsing {
-    animation: slide-up-fade 1.4s ease 0s 1.5 normal forwards;
-    transition:
-      opacity 1.4s,
-      transform 1s 1.2s;
+    * {
+      animation: slide-up-fade 1.3s ease 0s 1 normal forwards;
+      transition:
+        opacity 1s,
+        transform 0.8s 1s;
+    }
   }
 
   &.form-visible {
