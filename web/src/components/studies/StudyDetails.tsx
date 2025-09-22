@@ -1,4 +1,4 @@
-import { postStudiesByStudyIdReview, Study } from "@/openapi";
+import { postStudiesAdminByStudyIdReview, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -22,14 +22,14 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
 
     if (status === "Approved") {
       // set as approved
-      const response = await postStudiesByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
+      const response = await postStudiesAdminByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
       if (response.response.ok) {
         setApprovalStatus("Approved");
       }
       console.log(response);
     } else if (status === "Rejected") {
       // todo: add feedback bits
-      const response = await postStudiesByStudyIdReview({
+      const response = await postStudiesAdminByStudyIdReview({
         path: { studyId },
         body: { status: "Rejected", feedback: feedback },
       });

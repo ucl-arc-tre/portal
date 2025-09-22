@@ -310,7 +310,7 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/review:
+  /studies/admin/{studyId}/review:
     post:
       description: Update study status + opportunity to update feedback
       parameters:

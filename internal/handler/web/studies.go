@@ -314,7 +314,7 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	)
 }
 
-func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{}
 	if err := bindJSONOrSetError(ctx, &review); err != nil {
 		return

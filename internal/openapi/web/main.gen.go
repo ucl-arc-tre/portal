@@ -543,14 +543,14 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyCreateRequest
 
+// PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
+type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
+
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
-
-// PostStudiesStudyIdReviewJSONRequestBody defines body for PostStudiesStudyIdReview for application/json ContentType.
-type PostStudiesStudyIdReviewJSONRequestBody = StudyReview
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -594,6 +594,9 @@ type ServerInterface interface {
 	// (POST /studies)
 	PostStudies(c *gin.Context)
 
+	// (POST /studies/admin/{studyId}/review)
+	PostStudiesAdminStudyIdReview(c *gin.Context, studyId string)
+
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
 
@@ -617,9 +620,6 @@ type ServerInterface interface {
 
 	// (POST /studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload)
 	PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c *gin.Context, studyId string, assetId string, contractId string)
-
-	// (POST /studies/{studyId}/review)
-	PostStudiesStudyIdReview(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -795,6 +795,30 @@ func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
 	}
 
 	siw.Handler.PostStudies(c)
+}
+
+// PostStudiesAdminStudyIdReview operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdReview(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdReview(c, studyId)
 }
 
 // GetStudiesStudyId operation middleware
@@ -1034,30 +1058,6 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsContr
 	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c, studyId, assetId, contractId)
 }
 
-// PostStudiesStudyIdReview operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdReview(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "studyId" -------------
-	var studyId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostStudiesStudyIdReview(c, studyId)
-}
-
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -1179,6 +1179,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
@@ -1187,7 +1188,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload)
-	router.POST(options.BaseURL+"/studies/:studyId/review", wrapper.PostStudiesStudyIdReview)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

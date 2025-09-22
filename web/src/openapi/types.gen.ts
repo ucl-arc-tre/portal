@@ -786,7 +786,7 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
-export type PostStudiesByStudyIdReviewData = {
+export type PostStudiesAdminByStudyIdReviewData = {
     body: StudyReview;
     path: {
         /**
@@ -795,10 +795,10 @@ export type PostStudiesByStudyIdReviewData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/review';
+    url: '/studies/admin/{studyId}/review';
 };
 
-export type PostStudiesByStudyIdReviewErrors = {
+export type PostStudiesAdminByStudyIdReviewErrors = {
     /**
      * Forbidden
      */
@@ -817,7 +817,7 @@ export type PostStudiesByStudyIdReviewErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdReviewResponses = {
+export type PostStudiesAdminByStudyIdReviewResponses = {
     /**
      * Study review submitted successfully
      */
