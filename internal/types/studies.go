@@ -109,6 +109,6 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Asset Asset `gorm:"foreignKey:AssetID"`
-	User  User  `gorm:"foreignKey:CreatorUserID"`
+	Asset       Asset `gorm:"foreignKey:AssetID"`
+	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
 }
