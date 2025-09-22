@@ -347,10 +347,10 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		ExpiryDate:            expiryDate,
 	}
 
-	pdfContractObj := types.S3Object{
+	contractObj := types.S3Object{
 		Content: file,
 	}
-	err = h.studies.StoreContract(ctx, pdfContractObj, contractData)
+	err = h.studies.StoreContract(ctx, contractObj, contractData)
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
 		return
