@@ -66,6 +66,12 @@
   background-color: #f2eee2;
   color: #55331c;
   border: 1px solid #a17f4c;
+
+  span {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+  }
 }
 
 .grouping {

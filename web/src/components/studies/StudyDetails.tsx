@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
+import InfoTooltip from "../ui/InfoTooltip";
 
 type StudyDetailsProps = {
   study: Study;
@@ -119,21 +120,15 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           )}
 
           <h3>Additional Information</h3>
-          <p className={styles["additional-info"]}>
-            <em>
-              These details have all been marked as &ldquo;true&rdquo; in the form. Some can{" "}
-              <span className={`${styles.badge} ${styles["badge-risk-associated"]}`}>contribute</span> to the risk
-              score, whilst others do{" "}
-              <span className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>not</span>.
-            </em>
-          </p>
           <dl className={styles.grouping}>
             <h4>Sponsorships & Approvals</h4>
             {study.involves_ucl_sponsorship && (
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>UCL Sponsorship</dd>
             )}
             {study.involves_cag && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>CAG approval</dd>
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                CAG approval <InfoTooltip text="increases risk score by 5" />
+              </dd>
             )}
             {study.involves_ethics_approval && (
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>Ethics approval</dd>
@@ -157,13 +152,19 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is NHS associated</dd>
             )}
             {study.involves_nhs_england && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>NHS England involvement</dd>
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                NHS England involvement
+                <InfoTooltip text="increases risk score by 5" />
+              </dd>
             )}
             {study.involves_mnca && (
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>involves MNCA</dd>
             )}
             {study.requires_dspt && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>requires DSPT</dd>
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                requires DSPT
+                <InfoTooltip text="increases risk score by 5" />
+              </dd>
             )}
             {!study.is_nhs_associated &&
               !study.involves_nhs_england &&
@@ -177,13 +178,19 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           <dl className={styles.grouping}>
             <h4>Data</h4>
             {study.requires_dbs && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>requires DBS</dd>
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                requires DBS
+                <InfoTooltip text="increases risk score by 5" />
+              </dd>
             )}
             {study.is_data_protection_office_registered && (
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is registered with DPO</dd>
             )}
             {study.involves_third_party && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>third party</dd>
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                third party
+                <InfoTooltip text="increases risk score by 5 if no mNCA" />
+              </dd>
             )}
             {study.involves_external_users && (
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>external users</dd>
@@ -195,7 +202,10 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
               <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>indirect data collection</dd>
             )}
             {study.involves_data_processing_outside_eea && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>data processing outside EEA</dd>
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                data processing outside EEA
+                <InfoTooltip text="increases risk score by 10" />
+              </dd>
             )}
             {!study.requires_dbs &&
               !study.is_data_protection_office_registered &&
