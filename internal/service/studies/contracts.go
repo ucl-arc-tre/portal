@@ -3,6 +3,7 @@ package studies
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,7 +15,13 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject) *openapi.ValidationError {
+func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
+	if !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
+		return &openapi.ValidationError{
+			ErrorMessage: "Only PDF files are allowed",
+		}
+	}
+
 	if !validation.ContractNamePattern.MatchString(contractData.OrganisationSignatory) {
 		return &openapi.ValidationError{
 			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",

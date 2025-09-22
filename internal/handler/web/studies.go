@@ -309,7 +309,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		ExpiryDate:            ctx.PostForm("expiry_date"),
 	}
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata)
+	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
