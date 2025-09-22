@@ -122,30 +122,26 @@
   }
 
   &.form-collapsing {
-    section {
-      animation: slide-up-fade 1.8s ease 0s 1 normal forwards;
-      transition:
-        opacity 1.6s,
-        transform 1s 1.5s;
-    }
+    animation: slide-up-fade 1.4s ease 0s 1.5 normal forwards;
+    transition:
+      opacity 1.4s,
+      transform 1s 1.2s;
   }
 
   &.form-visible {
     max-height: 100vh;
 
-    section {
-      animation: fade-slide-down 1.8s ease 0s 1 normal forwards;
-      transition:
-        opacity 1.6s,
-        transform 1s 1.5s;
-    }
+    animation: fade-slide-down 1.4s ease 0s 1 normal forwards;
+    transition:
+      opacity 1.4s,
+      transform 1s 1.2s;
   }
 }
 
 @keyframes fade-slide-down {
   0% {
     opacity: 0;
-    transform: translateY(-200px);
+    transform: translateY(-80px);
   }
 
   100% {
@@ -162,6 +158,6 @@
 
   100% {
     opacity: 0;
-    transform: translateY(-200px);
+    transform: translateY(-80px);
   }
 }
