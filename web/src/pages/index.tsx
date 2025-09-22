@@ -61,10 +61,11 @@ export default function Index() {
       </div>
 
       <div className={styles["task-wrapper"]}>
-        {!tasksCompleted && <UserTasks setTasksCompleted={setTasksCompleted} />}
+        {(!tasksCompleted || !isAdmin) && <UserTasks setTasksCompleted={setTasksCompleted} />}
         {tasksCompleted && isAdmin && studiesLoading ? (
           <Loading message="Loading studies..." />
         ) : (
+          tasksCompleted &&
           isAdmin && (
             <Box>
               <div className={styles["studies-wrapper"]}>

@@ -1,0 +1,4 @@
+{
+  "username": "cypress-admin-base@example.com",
+  "roles": ["base", "admin"]
+}
