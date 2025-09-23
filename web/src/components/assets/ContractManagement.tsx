@@ -1,134 +1,109 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
-import { postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload } from "@/openapi";
+import ContractUploadForm from "./ContractUploadForm";
+import ContractCard from "./ContractCard";
+import { getStudiesByStudyIdAssetsByAssetIdContracts, Contract, Study, Asset } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 
-interface ContractManagementProps {
-  studyId: string;
-  assetId: string;
-}
+type ContractManagementProps = {
+  study: Study;
+  asset: Asset;
+};
 
-export default function ContractManagement({ studyId, assetId }: ContractManagementProps) {
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
+export default function ContractManagement({ study, asset }: ContractManagementProps) {
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    setError(null);
-    setUploadSuccess(false);
-
-    if (!file) {
-      setUploadFile(null);
-      return;
-    }
-
-    if (file.type !== "application/pdf") {
-      setError("File format must be PDF.");
-      setUploadFile(null);
-      return;
-    }
-
-    if (file.size > 1e7) {
-      setError("File size must be less than 10MB.");
-      setUploadFile(null);
-      return;
-    }
-
-    setUploadFile(file);
-  };
-
-  const handleFileUpload = async () => {
-    if (!uploadFile) {
-      setError("Please select a PDF file before uploading.");
-      return;
-    }
-
-    setUploading(true);
+  const fetchContracts = useCallback(async () => {
+    setIsLoading(true);
     setError(null);
 
     try {
-      const response = await postStudiesByStudyIdAssetsByAssetIdContractsByContractIdUpload({
-        path: {
-          studyId,
-          assetId,
-          contractId: "abc123", // Temporary placeholder until contract creation is implemented
-        },
-        body: uploadFile,
+      const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+        path: { studyId: study.id, assetId: asset.id },
       });
 
-      if (!response.response.ok) {
-        throw new Error(`Upload failed: ${response.response.status} ${response.response.statusText}`);
+      if (response.response.ok && response.data) {
+        setContracts(response.data);
+      } else {
+        throw new Error(`Failed to fetch contracts: ${response.response.status} ${response.response.statusText}`);
       }
-
-      setUploadSuccess(true);
-      setUploadFile(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Upload failed:", error);
-      setError("Failed to upload contract. Please try again.");
+    } catch (err) {
+      console.error("Failed to load contracts:", err);
+      setError("Failed to load contracts. Please try again later.");
     } finally {
-      setUploading(false);
+      setIsLoading(false);
     }
-  };
+  }, [study.id, asset.id]);
 
-  const clearFile = () => {
-    setUploadFile(null);
-    setError(null);
-    setUploadSuccess(false);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  useEffect(() => {
+    fetchContracts();
+  }, [fetchContracts]);
+
+  const handleUploadSuccess = () => {
+    setShowUploadModal(false);
+    fetchContracts();
   };
 
   return (
     <div className={styles.container}>
-      <h3>Contract Management</h3>
+      <div className={styles.header}>
+        <h3>Contract Management</h3>
+        <Button onClick={() => setShowUploadModal(true)} variant="primary">
+          Add Contract
+        </Button>
+      </div>
+
       <p className={styles.description}>
-        Upload a PDF contract document for this asset. Only PDF files up to 10MB are accepted.
+        Manage contract documents for this asset. Upload PDF contracts and track their status.
       </p>
 
-      <div className={styles["upload-section"]}>
-        <div className={styles["file-input"]}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={handleFileSelect}
-            className={styles["hidden-input"]}
-            id="contract-file-input"
-          />
-          <label htmlFor="contract-file-input" className={styles["file-label"]}>
-            <div className={styles["upload-icon"]}>📄</div>
-            <span>Choose PDF file or drag and drop</span>
-          </label>
-        </div>
-
-        {uploadFile && (
-          <div className={styles["selected-file"]}>
-            <div className={styles["file-info"]}>
-              <span className={styles["file-name"]}>{uploadFile.name}</span>
+      {contracts.length === 0 &&
+        (asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
+          <div className={styles["contract-requirement-notice"]}>
+            <div>
+              Based on your responses while making your Study and Asset, uploading a contract is required. This is
+              because you said:
+              <ul>
+                {asset.requires_contract && <li>This asset requires a contract.</li>}
+                {study.involves_external_users && <li>Your study involves external users.</li>}
+                {study.involves_third_party && <li>Your study involves third parties.</li>}
+              </ul>
+              <p>Please ensure you upload a valid contract document to comply with our policies.</p>
             </div>
-            <Button onClick={clearFile} size="small" variant="tertiary">
-              Remove
-            </Button>
           </div>
         )}
 
-        {error && <div className={styles.error}>{error}</div>}
-
-        {uploadSuccess && <div className={styles.success}>Contract uploaded successfully!</div>}
-
-        <div className={styles.actions}>
-          <Button onClick={handleFileUpload} disabled={uploading} size="large">
-            {uploading ? "Uploading..." : "Upload Contract"}
-          </Button>
+      {error && (
+        <div className={styles.error}>
+          <strong>Error:</strong> {error}
         </div>
-      </div>
+      )}
+
+      {isLoading ? (
+        <div className={styles.loading}>Loading contracts...</div>
+      ) : contracts.length === 0 ? (
+        <div className={styles["empty-state"]}>
+          <h4>No contracts uploaded</h4>
+          <p>Upload your first contract document to get started.</p>
+        </div>
+      ) : (
+        <div className={styles["contracts-list"]}>
+          {contracts.map((contract) => (
+            <ContractCard key={contract.id} contract={contract} studyId={study.id} assetId={asset.id} />
+          ))}
+        </div>
+      )}
+
+      <ContractUploadForm
+        study={study}
+        asset={asset}
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </div>
   );
 }

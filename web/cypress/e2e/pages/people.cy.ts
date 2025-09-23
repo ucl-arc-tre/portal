@@ -15,7 +15,7 @@ describe(`People page content`, () => {
 
   it("should not show content for base approved researcher", () => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
     cy.visit("/people");
     cy.waitForAuth();
 

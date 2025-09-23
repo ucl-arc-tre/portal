@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for AgreementType.
@@ -83,6 +84,27 @@ const (
 	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
 	AuthRolesStaff                         AuthRoles = "staff"
 	AuthRolesTreOpsStaff                   AuthRoles = "tre-ops-staff"
+)
+
+// Defines values for ContractStatus.
+const (
+	ContractStatusActive   ContractStatus = "active"
+	ContractStatusExpired  ContractStatus = "expired"
+	ContractStatusProposed ContractStatus = "proposed"
+)
+
+// Defines values for ContractBaseStatus.
+const (
+	ContractBaseStatusActive   ContractBaseStatus = "active"
+	ContractBaseStatusExpired  ContractBaseStatus = "expired"
+	ContractBaseStatusProposed ContractBaseStatus = "proposed"
+)
+
+// Defines values for ContractUploadObjectStatus.
+const (
+	Active   ContractUploadObjectStatus = "active"
+	Expired  ContractUploadObjectStatus = "expired"
+	Proposed ContractUploadObjectStatus = "proposed"
 )
 
 // Defines values for StudyApprovalStatus.
@@ -231,12 +253,6 @@ type AssetBaseProtection string
 // AssetBaseStatus Status of the asset
 type AssetBaseStatus string
 
-// AssetCreateValidationError defines model for AssetCreateValidationError.
-type AssetCreateValidationError struct {
-	// ErrorMessage Validation error message explaining why asset creation failed
-	ErrorMessage string `json:"error_message"`
-}
-
 // Auth defines model for Auth.
 type Auth struct {
 	Roles    []AuthRoles `json:"roles"`
@@ -253,6 +269,84 @@ type ConfirmedAgreement struct {
 	// ConfirmedAt Time in RFC3339 format at which the agreement was confirmed
 	ConfirmedAt string `json:"confirmed_at"`
 }
+
+// Contract defines model for Contract.
+type Contract struct {
+	// CreatedAt Time in RFC3339 format when the contract was created
+	CreatedAt string `json:"created_at"`
+
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
+	ExpiryDate string `json:"expiry_date"`
+
+	// Filename Original filename of the uploaded contract
+	Filename string `json:"filename"`
+
+	// Id Unique identifier for the contract
+	Id string `json:"id"`
+
+	// OrganisationSignatory Name of the organisation signatory
+	OrganisationSignatory string `json:"organisation_signatory"`
+
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
+
+	// Status Current status of the contract
+	Status ContractStatus `json:"status"`
+
+	// ThirdPartyName Name of the third party organization
+	ThirdPartyName string `json:"third_party_name"`
+
+	// UpdatedAt Time in RFC3339 format when the contract was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
+// ContractStatus Current status of the contract
+type ContractStatus string
+
+// ContractBase defines model for ContractBase.
+type ContractBase struct {
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
+	ExpiryDate string `json:"expiry_date"`
+
+	// OrganisationSignatory Name of the organisation signatory
+	OrganisationSignatory string `json:"organisation_signatory"`
+
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
+
+	// Status Current status of the contract
+	Status ContractBaseStatus `json:"status"`
+
+	// ThirdPartyName Name of the third party organization
+	ThirdPartyName string `json:"third_party_name"`
+}
+
+// ContractBaseStatus Current status of the contract
+type ContractBaseStatus string
+
+// ContractUploadObject defines model for ContractUploadObject.
+type ContractUploadObject struct {
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
+	ExpiryDate string `json:"expiry_date"`
+
+	// File The contract file to upload (e.g., PDF)
+	File openapi_types.File `json:"file"`
+
+	// OrganisationSignatory Name of the organisation signatory
+	OrganisationSignatory string `json:"organisation_signatory"`
+
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
+
+	// Status Current status of the contract
+	Status ContractUploadObjectStatus `json:"status"`
+
+	// ThirdPartyName Name of the third party organization
+	ThirdPartyName string `json:"third_party_name"`
+}
+
+// ContractUploadObjectStatus Current status of the contract
+type ContractUploadObjectStatus string
 
 // Profile defines model for Profile.
 type Profile struct {
@@ -458,12 +552,6 @@ type StudyBase struct {
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase
 
-// StudyCreateValidationError defines model for StudyCreateValidationError.
-type StudyCreateValidationError struct {
-	// ErrorMessage Validation error message explaining why study creation failed
-	ErrorMessage string `json:"error_message"`
-}
-
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -503,6 +591,12 @@ type UserTrainingUpdate struct {
 	TrainingKind TrainingKind `json:"training_kind"`
 }
 
+// ValidationError defines model for ValidationError.
+type ValidationError struct {
+	// ErrorMessage Validation error message explaining why the request failed
+	ErrorMessage string `json:"error_message"`
+}
+
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
@@ -532,6 +626,9 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
+
+// PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdAssetsAssetIdContractsUpload for multipart/form-data ContentType.
+type PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody = ContractUploadObject
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -593,11 +690,14 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/assets/{assetId})
 	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId string, assetId string)
 
+	// (GET /studies/{studyId}/assets/{assetId}/contracts)
+	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId string, assetId string)
+
+	// (POST /studies/{studyId}/assets/{assetId}/contracts/upload)
+	PostStudiesStudyIdAssetsAssetIdContractsUpload(c *gin.Context, studyId string, assetId string)
+
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
-
-	// (POST /studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload)
-	PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c *gin.Context, studyId string, assetId string, contractId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -928,6 +1028,72 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	siw.Handler.GetStudiesStudyIdAssetsAssetId(c, studyId, assetId)
 }
 
+// GetStudiesStudyIdAssetsAssetIdContracts operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAssetsAssetIdContracts(c, studyId, assetId)
+}
+
+// PostStudiesStudyIdAssetsAssetIdContractsUpload operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsUpload(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsUpload(c, studyId, assetId)
+}
+
 // GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context) {
 
@@ -968,48 +1134,6 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 	}
 
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
-}
-
-// PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "studyId" -------------
-	var studyId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Path parameter "assetId" -------------
-	var assetId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Path parameter "contractId" -------------
-	var contractId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(c, studyId, assetId, contractId)
 }
 
 // GetUsers operation middleware
@@ -1139,8 +1263,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
+	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
+	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
-	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

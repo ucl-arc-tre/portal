@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 
 	"slices"
@@ -13,26 +12,21 @@ import (
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 
+	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-var (
-	dateFormat              = "2006-01-02"                               // YYYY-MM-DD format for asset expiry dates
-	assetTitlePattern       = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`) // 4-50 chars, starts/ends with alphanumeric, only letters/numbers/spaces/hyphens
-	assetDescriptionPattern = regexp.MustCompile(`^.{4,255}$`)           // 4-255 characters, any content
-	textField500Pattern     = regexp.MustCompile(`^.{1,500}$`)           // 1-500 characters, any content
-)
-
-func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.AssetCreateValidationError, error) {
+func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.ValidationError, error) {
 	// Validate title
-	if !assetTitlePattern.MatchString(assetData.Title) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
+	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
+		return &openapi.ValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
 	// Validate description
-	if !assetDescriptionPattern.MatchString(assetData.Description) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
+	if !validation.AssetDescriptionPattern.MatchString(assetData.Description) {
+		return &openapi.ValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
 	}
 
 	// Validate classification_impact
@@ -42,12 +36,12 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseClassificationImpactHighlyConfidential,
 	}
 	if !slices.Contains(validClassifications, assetData.ClassificationImpact) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
+		return &openapi.ValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
 	}
 
 	// Validate locations
 	if len(assetData.Locations) == 0 {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "at least one location must be specified"}, nil
+		return &openapi.ValidationError{ErrorMessage: "at least one location must be specified"}, nil
 	}
 
 	// Validate protection field
@@ -57,12 +51,12 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseProtectionIdentifiableLowConfidencePseudonymisation,
 	}
 	if !slices.Contains(validProtections, assetData.Protection) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation"}, nil
+		return &openapi.ValidationError{ErrorMessage: "protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation"}, nil
 	}
 
 	// Validate legal_basis
-	if !textField500Pattern.MatchString(assetData.LegalBasis) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
+	if !validation.TextField500Pattern.MatchString(assetData.LegalBasis) {
+		return &openapi.ValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
 	}
 
 	// Validate format field
@@ -72,13 +66,13 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseFormatOther,
 	}
 	if !slices.Contains(validFormats, assetData.Format) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
+		return &openapi.ValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
 	}
 
 	// Validate expiry field
-	_, err := time.Parse(dateFormat, assetData.ExpiresAt)
+	_, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
 	if err != nil {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
+		return &openapi.ValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
 	}
 
 	// Validate status field
@@ -88,13 +82,13 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Asset
 		openapi.AssetBaseStatusDestroyed,
 	}
 	if !slices.Contains(validStatuses, assetData.Status) {
-		return &openapi.AssetCreateValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
+		return &openapi.ValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
 	}
 
 	return nil, nil
 }
 
-func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.AssetCreateValidationError, error) {
+func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
 	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
 
 	validationError, err := s.validateAssetData(assetData)
@@ -121,7 +115,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	}()
 
 	// Parse the expiry date string (already validated in validateAssetData)
-	expiryDate, err := time.Parse(dateFormat, assetData.ExpiresAt)
+	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
 	if err != nil {
 		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
 	}
@@ -187,4 +181,18 @@ func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uui
 		return asset, types.NewNotFoundError(err)
 	}
 	return asset, types.NewErrServerError(err)
+}
+
+// retrieves all contracts for a specific asset within a study
+func (s *Service) AssetContracts(user types.User, assetID uuid.UUID) ([]types.Contract, error) {
+	var contracts []types.Contract
+	err := s.db.Where("asset_id = ?", assetID).
+		Order("created_at DESC").
+		Find(&contracts).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return contracts, nil
+	}
+
+	return contracts, types.NewErrServerError(err)
 }
