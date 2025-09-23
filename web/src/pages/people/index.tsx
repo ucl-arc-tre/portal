@@ -66,6 +66,7 @@ export default function PeoplePage() {
     setSearchTerm(query);
     setUsers(response.data);
     setSearchErrorMessage("");
+    setErrorMessage("");
     setIsLoading(false);
   };
 
@@ -138,6 +139,11 @@ export default function PeoplePage() {
           <AlertMessage>{searchErrorMessage}</AlertMessage>
         </Alert>
       )}
+      {errorMessage && (
+        <Alert type="error">
+          <AlertMessage>{errorMessage}</AlertMessage>
+        </Alert>
+      )}
       {!isAdmin && <Callout construction />}
       {canSearch &&
         searchTerm.length > 0 &&
@@ -149,19 +155,12 @@ export default function PeoplePage() {
                 ? `No users found for "${searchTerm}". Try another query`
                 : "No users found, try another query"}
             </div>
-            {errorMessage && (
-              <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
-              </Alert>
-            )}
           </Box>
         ) : (
-          !errorMessage && (
-            <>
-              <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
-              <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
-            </>
-          )
+          <>
+            <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
+            <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+          </>
         ))}
     </>
   );
