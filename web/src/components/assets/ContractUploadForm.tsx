@@ -219,7 +219,7 @@ export default function ContractUploadModal({
                 maxLength: { value: 100, message: "Third Party Name must be less than 100 characters" },
               })}
               className={styles["form-input"]}
-              placeholder="Enter third party organization name"
+              placeholder="Enter the other party in the contract (e.g. an organisation or a person)"
             />
             {errors.thirdPartyName && <span className={styles["form-error"]}>{errors.thirdPartyName.message}</span>}
           </div>
