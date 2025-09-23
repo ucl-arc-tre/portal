@@ -62,7 +62,7 @@ export default function ContractManagement({ study, asset }: ContractManagementP
 
       {(asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
         <div className={styles["contract-requirement-notice"]}>
-          <p>
+          <div>
             Based on your responses while making your Study and Asset, uploading a contract is required. This is because
             you said:
             <ul>
@@ -73,7 +73,7 @@ export default function ContractManagement({ study, asset }: ContractManagementP
             {contracts.length === 0 && (
               <p>Please ensure you upload a valid contract document to comply with our policies.</p>
             )}
-          </p>
+          </div>
         </div>
       )}
 

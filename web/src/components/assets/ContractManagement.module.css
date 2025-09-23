@@ -86,7 +86,7 @@
   border-left: 4px solid #f39c12;
 }
 
-.contract-requirement-notice p {
+.contract-requirement-notice div {
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.5;
