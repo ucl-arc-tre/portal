@@ -70,7 +70,9 @@ export default function ContractManagement({ study, asset }: ContractManagementP
               {study.involves_external_users && <li>Your study involves external users.</li>}
               {study.involves_third_party && <li>Your study involves third parties.</li>}
             </ul>
-            Please ensure you upload a valid contract document to comply with our policies.
+            {contracts.length === 0 && (
+              <p>Please ensure you upload a valid contract document to comply with our policies.</p>
+            )}
           </p>
         </div>
       )}
