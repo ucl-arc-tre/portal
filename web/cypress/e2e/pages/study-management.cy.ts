@@ -6,7 +6,7 @@ beforeEach(() => {
 describe("Study Management Workflow", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
     cy.mockStudyAgreementText();
@@ -70,7 +70,7 @@ describe("Study Management Workflow", () => {
 describe("Study Assets Management", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
     cy.mockStudyAgreementText();

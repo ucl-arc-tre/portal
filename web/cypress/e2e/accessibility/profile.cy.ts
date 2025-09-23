@@ -57,7 +57,7 @@ describe("Accessibility - Profile Page", () => {
   describe("Base user - complete profile scenario", () => {
     beforeEach(() => {
       // Mock auth as approved researcher (complete profile)
-      cy.mockAuthAsBaseApprovedResearcher();
+      cy.mockAuthAsBaseStaffApprovedResearcher();
     });
 
     it("should have no accessibility violations when profile is complete", () => {

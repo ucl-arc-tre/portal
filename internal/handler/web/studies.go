@@ -3,9 +3,11 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -70,6 +72,20 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Status:               openapi.AssetStatus(asset.Status),
 		CreatedAt:            asset.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
+	}
+}
+
+func contractToOpenApiContract(contract types.Contract) openapi.Contract {
+	return openapi.Contract{
+		Id:                    contract.ID.String(),
+		Filename:              contract.Filename,
+		OrganisationSignatory: contract.OrganisationSignatory,
+		ThirdPartyName:        contract.ThirdPartyName,
+		Status:                openapi.ContractStatus(contract.Status),
+		StartDate:             contract.StartDate.Format(config.DateFormat),
+		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
+		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
 	}
 }
 
@@ -276,19 +292,105 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	})
 }
 
-func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsContractIdUpload(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
 	if err != nil {
 		return
 	}
-	err = h.studies.StoreContract(ctx, uuids[0], uuids[1], uuids[2], types.S3Object{
-		Content: ctx.Request.Body,
-	})
+
+	// Get the uploaded file
+	fileHeader, err := ctx.FormFile("file")
 	if err != nil {
-		setError(ctx, err, "Failed store contract")
+		setError(ctx, types.NewErrServerError(err), "Failed to get uploaded file")
 		return
 	}
+
+	// Create contract metadata for validation
+	contractMetadata := openapi.ContractUploadObject{
+		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
+		ThirdPartyName:        ctx.PostForm("third_party_name"),
+		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
+		StartDate:             ctx.PostForm("start_date"),
+		ExpiryDate:            ctx.PostForm("expiry_date"),
+	}
+
+	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
+	if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	// Parse start date
+	startDate, err := time.Parse(config.DateFormat, contractMetadata.StartDate)
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Invalid start date format")
+		return
+	}
+
+	// Parse expiry date
+	expiryDate, err := time.Parse(config.DateFormat, contractMetadata.ExpiryDate)
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Invalid expiry date format")
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+
+	// Open the uploaded file
+	file, err := fileHeader.Open()
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
+		return
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Error().Err(err).Msg("Failed to close uploaded file")
+		}
+	}()
+
+	// Create the final contract record for storage
+	contractData := types.Contract{
+		AssetID:               uuids[1],
+		Filename:              fileHeader.Filename,
+		CreatorUserID:         user.ID,
+		OrganisationSignatory: contractMetadata.OrganisationSignatory,
+		ThirdPartyName:        contractMetadata.ThirdPartyName,
+		Status:                string(contractMetadata.Status),
+		StartDate:             startDate,
+		ExpiryDate:            expiryDate,
+	}
+
+	contractObj := types.S3Object{
+		Content: file,
+	}
+	err = h.studies.StoreContract(ctx, contractObj, contractData)
+	if err != nil {
+		setError(ctx, err, "Failed to store contract")
+		return
+	}
+
 	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	if err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+
+	contracts, err := h.studies.AssetContracts(user, uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve contracts")
+		return
+	}
+
+	apiContracts := []openapi.Contract{}
+	for _, contract := range contracts {
+		apiContracts = append(apiContracts, contractToOpenApiContract(contract))
+	}
+	ctx.JSON(http.StatusOK, apiContracts)
 }
 
 func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {

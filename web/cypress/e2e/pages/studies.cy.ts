@@ -15,7 +15,7 @@ describe(`Studies page content`, () => {
 
   it("should show content for base approved researcher", () => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
     cy.visit("/studies");
     cy.waitForAuth();
 
@@ -26,7 +26,7 @@ describe(`Studies page content`, () => {
 describe("Approved researcher can create studies", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
     cy.visit("/studies");
     cy.waitForAuth();
   });
@@ -37,7 +37,7 @@ describe("Approved researcher can create studies", () => {
   });
 
   it("owner set to user & can't be edited", () => {
-    cy.fixture("auth-base-approved-researcher.json").then((data) => {
+    cy.fixture("auth-base-staff-approved-researcher.json").then((data) => {
       const username = data.username;
 
       cy.contains("Create Your First Study").should("be.visible").click();
@@ -71,7 +71,7 @@ describe("Approved researcher can create studies", () => {
 describe("Checking conditionally rendered fields", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
     cy.visit("/studies");
     cy.waitForAuth();
     cy.contains("Create Your First Study").click();
@@ -134,7 +134,7 @@ describe("Study creation end-to-end", () => {
   });
 
   it("should successfully create a study and see it in the list", () => {
-    cy.mockAuthAsBaseApprovedResearcher();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
 
     // Mock initial empty studies list
     cy.mockStudiesEmpty();

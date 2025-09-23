@@ -64,9 +64,9 @@ declare global {
 
       /**
        * Mock auth response to return base and approved researcher roles
-       * @example cy.mockAuthAsBaseApprovedResearcher()
+       * @example cy.mockAuthAsBaseStaffApprovedResearcher()
        */
-      mockAuthAsBaseApprovedResearcher(): Chainable<any>;
+      mockAuthAsBaseStaffApprovedResearcher(): Chainable<any>;
 
       /**
        * Mock auth response to return admin and approved researcher roles
@@ -76,7 +76,7 @@ declare global {
 
       /**
        * Mock auth response to return base and approved researcher roles with staff status
-       * @example cy.mockAuthAsBaseApprovedResearcher()
+       * @example cy.mockAuthAsBaseNonStaffApprovedResearcher()
        */
       mockAuthAsBaseNonStaffApprovedResearcher(): Chainable<any>;
 
@@ -142,6 +142,12 @@ declare global {
        * @example cy.mockStudyAccess()
        */
       mockStudyAccess(): Chainable<any>;
+
+      /**
+       * Mock individual asset access for testing
+       * @example cy.mockAssetAccess()
+       */
+      mockAssetAccess(): Chainable<any>;
 
       /**
        * Mock successful study creation
@@ -245,6 +251,30 @@ declare global {
        * @example cy.mockStudyAgreementConfirmation()
        */
       mockStudyAgreementConfirmation(): Chainable<any>;
+
+      /**
+       * Mock empty contracts list for an asset
+       * @example cy.mockContractsEmpty()
+       */
+      mockContractsEmpty(): Chainable<any>;
+
+      /**
+       * Mock contracts list with sample contracts
+       * @example cy.mockContractsWithSample()
+       */
+      mockContractsWithSample(): Chainable<any>;
+
+      /**
+       * Mock successful contract upload
+       * @example cy.mockContractUpload()
+       */
+      mockContractUpload(): Chainable<any>;
+
+      /**
+       * Mock contract download
+       * @example cy.mockContractDownload()
+       */
+      mockContractDownload(): Chainable<any>;
 
       /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
@@ -353,9 +383,9 @@ Cypress.Commands.add("mockAuthAsBaseUser", () => {
   }).as("getAuth");
 });
 
-Cypress.Commands.add("mockAuthAsBaseApprovedResearcher", () => {
+Cypress.Commands.add("mockAuthAsBaseStaffApprovedResearcher", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
-    fixture: "auth-base-approved-researcher.json",
+    fixture: "auth-base-staff-approved-researcher.json",
   }).as("getAuth");
 });
 
@@ -500,6 +530,30 @@ Cypress.Commands.add("mockStudyAccess", () => {
   }).as("getStudyById");
 });
 
+Cypress.Commands.add("mockAssetAccess", () => {
+  cy.intercept("GET", "/web/api/v0/studies/123456789/assets/asset-123", {
+    body: {
+      id: "asset-123",
+      creator_user_id: "user-123",
+      study_id: "123456789",
+      title: "Sample Asset Title 1",
+      description: "Sample Asset Description 1",
+      classification_impact: "confidential",
+      protection: "pseudonymisation",
+      legal_basis: "test123",
+      format: "electronic",
+      expires_at: "2025-12-31",
+      locations: ["ucl_rcs", "ucl_data_safe_haven"],
+      requires_contract: true,
+      has_dspt: true,
+      stored_outside_uk_eea: false,
+      status: "active",
+      created_at: "2024-01-01T10:00:00Z",
+      updated_at: "2024-01-01T10:00:00Z",
+    },
+  }).as("getAssetById");
+});
+
 Cypress.Commands.add("mockStudyCreation", () => {
   cy.intercept("POST", "/web/api/v0/studies", {
     statusCode: 201,
@@ -566,4 +620,28 @@ Cypress.Commands.add("mockStudyAgreementConfirmation", () => {
   cy.intercept("POST", "/web/api/v0/studies/*/agreements", {
     statusCode: 200,
   }).as("confirmStudyAgreement");
+});
+
+Cypress.Commands.add("mockContractsEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+    fixture: "contracts-empty.json",
+  }).as("getContractsEmpty");
+});
+
+Cypress.Commands.add("mockContractsWithSample", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+    fixture: "contracts-with-sample.json",
+  }).as("getContractsWithSample");
+});
+
+Cypress.Commands.add("mockContractUpload", () => {
+  cy.intercept("POST", "/web/api/v0/studies/*/assets/*/contracts/upload", {
+    statusCode: 204,
+  }).as("uploadContract");
+});
+
+Cypress.Commands.add("mockContractDownload", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts/*/download", {
+    fixture: "valid_nhsd_certificate.pdf", // mocking with an available sample PDF for now, can add a sample contract PDF later
+  }).as("downloadContract");
 });

@@ -1,0 +1,145 @@
+.card {
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.file-info {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.filename {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+  flex-shrink: 0;
+}
+
+.status-active {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-proposed {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-expired {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-default {
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.value {
+  font-size: 1rem;
+  color: var(--color-text);
+  word-break: break-word;
+  flex: 1;
+}
+
+.error {
+  color: var(--color-error);
+  font-size: 1rem;
+  padding: 0.5rem;
+  background-color: var(--color-error-light);
+  border: 1px solid var(--color-error);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.value {
+  text-align: left;
+}
+
+.actions {
+  display: flex;
+  justify-content: stretch;
+  gap: 0.5rem;
+}
+
+.actions button {
+  flex: 1;
+}
+
+@media (width >= 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .detail-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .value {
+    text-align: right;
+  }
+
+  .actions {
+    justify-content: flex-end;
+  }
+
+  .actions button {
+    flex: none;
+  }
+}

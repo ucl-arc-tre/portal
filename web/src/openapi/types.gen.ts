@@ -187,13 +187,6 @@ export type Asset = AssetBase & {
     updated_at: string;
 };
 
-export type AssetCreateValidationError = {
-    /**
-     * Validation error message explaining why asset creation failed
-     */
-    error_message: string;
-};
-
 /**
  * Base study properties
  */
@@ -338,11 +331,63 @@ export type StudyReview = {
     feedback?: string;
 };
 
-export type StudyCreateValidationError = {
+export type ValidationError = {
     /**
-     * Validation error message explaining why study creation failed
+     * Validation error message explaining why the request failed
      */
     error_message: string;
+};
+
+export type ContractBase = {
+    /**
+     * Name of the organisation signatory
+     */
+    organisation_signatory: string;
+    /**
+     * Name of the third party organization
+     */
+    third_party_name: string;
+    /**
+     * Current status of the contract
+     */
+    status: 'proposed' | 'active' | 'expired';
+    /**
+     * Contract start date in YYYY-MM-DD format
+     */
+    start_date: string;
+    /**
+     * Contract expiry date in YYYY-MM-DD format
+     */
+    expiry_date: string;
+};
+
+export type ContractUploadObject = ContractBase & {
+    /**
+     * The contract file to upload (e.g., PDF)
+     */
+    file: Blob | File;
+};
+
+/**
+ * A contract associated with a study asset
+ */
+export type Contract = ContractBase & {
+    /**
+     * Unique identifier for the contract
+     */
+    id: string;
+    /**
+     * Original filename of the uploaded contract
+     */
+    filename: string;
+    /**
+     * Time in RFC3339 format when the contract was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the contract was last updated
+     */
+    updated_at: string;
 };
 
 export type GetAuthData = {
@@ -721,7 +766,7 @@ export type PostStudiesErrors = {
     /**
      * Validation error
      */
-    400: StudyCreateValidationError;
+    400: ValidationError;
     /**
      * Forbidden
      */
@@ -877,7 +922,7 @@ export type PostStudiesByStudyIdAssetsErrors = {
     /**
      * Validation error
      */
-    400: AssetCreateValidationError;
+    400: ValidationError;
     /**
      * Forbidden
      */
@@ -1044,18 +1089,59 @@ export type PostStudiesByStudyIdAgreementsResponses = {
     200: unknown;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadData = {
-    body: Blob | File;
+export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
+    body?: never;
     path: {
         studyId: string;
         assetId: string;
-        contractId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/upload';
+    url: '/studies/{studyId}/assets/{assetId}/contracts';
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadErrors = {
+export type GetStudiesByStudyIdAssetsByAssetIdContractsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsResponses = {
+    /**
+     * List of contracts for the asset
+     */
+    200: Array<Contract>;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsResponse = GetStudiesByStudyIdAssetsByAssetIdContractsResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsResponses];
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
+    body: ContractUploadObject;
+    path: {
+        studyId: string;
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts/upload';
+};
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
     /**
      * Forbidden
      */
@@ -1070,14 +1156,16 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadErrors
     default: unknown;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses = {
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadError = PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors];
+
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsByContractIdUploadResponses];
+export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData = {
     body?: never;

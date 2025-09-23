@@ -1,6 +1,6 @@
 import { Asset } from "@/openapi";
-// import Button from "@/components/ui/Button";
-// import { useRouter } from "next/router";
+import Button from "@/components/ui/Button";
+import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 import { formatDate } from "../shared/exports";
 
@@ -19,7 +19,7 @@ const formatProtection = (protection: string) => {
 };
 
 export default function AssetCard({ studyId, studyTitle, asset }: AssetCardProps) {
-  // const router = useRouter();
+  const router = useRouter();
 
   const getClassificationClass = (classification: string) => {
     switch (classification) {
@@ -77,11 +77,11 @@ export default function AssetCard({ studyId, studyTitle, asset }: AssetCardProps
         )}
       </div>
 
-      {/* <div className={styles["asset-actions"]}>
+      <div className={styles["asset-actions"]}>
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
           Manage Asset
         </Button>
-      </div> */}
+      </div>
     </div>
   );
 }

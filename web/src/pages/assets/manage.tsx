@@ -178,7 +178,7 @@ export default function ManageAssetPage() {
             )}
           </div>
 
-          {asset.requires_contract && <ContractManagement studyId={studyId as string} assetId={assetId as string} />}
+          <ContractManagement study={study} asset={asset} />
         </div>
       </div>
     </>
