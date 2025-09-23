@@ -324,6 +324,12 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 	if err != nil {
 		return
 	}
+
+	// if status is approved then set feedback to nothing
+	if review.Status == "Approved" {
+		review.Feedback = nil
+	}
+
 	// unless we want these in one func?
 	err = h.studies.UpdateStudyFeedback(studyUUID, review.Feedback)
 	if err != nil {
