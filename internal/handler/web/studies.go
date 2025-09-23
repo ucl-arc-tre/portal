@@ -331,16 +331,9 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		review.Feedback = &emptyReviewString
 	}
 
-	// unless we want these in one func?
-	err = h.studies.UpdateStudyFeedback(studyUUID, review.Feedback)
+	err = h.studies.UpdateStudyReview(studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
-		return
-	}
-
-	err = h.studies.UpdateStudyStatus(studyUUID, review.Status)
-	if err != nil {
-		setError(ctx, err, "Failed to update study status")
 		return
 	}
 

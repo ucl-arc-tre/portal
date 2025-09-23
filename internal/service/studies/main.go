@@ -208,18 +208,11 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	return &study, nil
 }
 
-func (s *Service) UpdateStudyStatus(id uuid.UUID, status openapi.StudyApprovalStatus) error {
+func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
 	study := types.Study{}
-	if err := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Error; err != nil {
-		return types.NewErrServerError(err)
-	}
-
-	return nil
-}
-
-func (s *Service) UpdateStudyFeedback(id uuid.UUID, feedback *string) error {
-	study := types.Study{}
-	if err := s.db.Model(&study).Where("id = ?", id).Update("feedback", feedback).Error; err != nil {
+	feedback := review.Feedback
+	status := review.Status
+	if err := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
 	return nil
