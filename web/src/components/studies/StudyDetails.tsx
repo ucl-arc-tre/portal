@@ -26,14 +26,14 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       if (response.response.ok) {
         setApprovalStatus("Approved");
       }
-      console.log(response);
     } else if (status === "Rejected") {
-      // todo: add feedback bits
       const response = await postStudiesAdminByStudyIdReview({
         path: { studyId },
         body: { status: "Rejected", feedback: feedback },
       });
-      console.log(response);
+      if (response.response.ok) {
+        setApprovalStatus("Rejected");
+      }
     }
   };
 
