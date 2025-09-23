@@ -9,6 +9,7 @@ type ContractFormData = {
   organisationSignatory: string;
   thirdPartyName: string;
   status: "proposed" | "active" | "expired";
+  startDate: string;
   expiryDate: string;
 };
 
@@ -84,6 +85,7 @@ export default function ContractUploadModal({
         organisation_signatory: formData.organisationSignatory,
         third_party_name: formData.thirdPartyName,
         status: formData.status,
+        start_date: formData.startDate,
         expiry_date: formData.expiryDate,
       };
 
@@ -238,6 +240,19 @@ export default function ContractUploadModal({
               <option value="expired">Expired</option>
             </select>
             {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
+          </div>
+
+          <div className={styles["form-group"]}>
+            <label htmlFor="startDate">Start Date *</label>
+            <input
+              id="startDate"
+              type="date"
+              {...register("startDate", {
+                required: "Start date is required",
+              })}
+              className={styles["form-input"]}
+            />
+            {errors.startDate && <span className={styles["form-error"]}>{errors.startDate.message}</span>}
           </div>
 
           <div className={styles["form-group"]}>

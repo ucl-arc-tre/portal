@@ -79,7 +79,8 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		OrganisationSignatory: contract.OrganisationSignatory,
 		ThirdPartyName:        contract.ThirdPartyName,
 		Status:                openapi.ContractStatus(contract.Status),
-		ExpiryDate:            contract.ExpiryDate.Format(config.TimeFormat),
+		StartDate:             contract.StartDate.Format(config.DateFormat),
+		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
 		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
 	}
@@ -306,12 +307,20 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
 		ThirdPartyName:        ctx.PostForm("third_party_name"),
 		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
+		StartDate:             ctx.PostForm("start_date"),
 		ExpiryDate:            ctx.PostForm("expiry_date"),
 	}
 
 	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	// Parse start date
+	startDate, err := time.Parse(config.DateFormat, contractMetadata.StartDate)
+	if err != nil {
+		setError(ctx, types.NewErrServerError(err), "Invalid start date format")
 		return
 	}
 
@@ -344,6 +353,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
+		StartDate:             startDate,
 		ExpiryDate:            expiryDate,
 	}
 

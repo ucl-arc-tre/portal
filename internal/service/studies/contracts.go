@@ -42,6 +42,20 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
+	if contractData.StartDate == "" {
+		return &openapi.ValidationError{
+			ErrorMessage: "Start date is required",
+		}
+	}
+
+	// Parse start date
+	startDate, err := time.Parse(config.DateFormat, contractData.StartDate)
+	if err != nil {
+		return &openapi.ValidationError{
+			ErrorMessage: "Invalid start date format",
+		}
+	}
+
 	if contractData.ExpiryDate == "" {
 		return &openapi.ValidationError{
 			ErrorMessage: "Expiry date is required",
@@ -49,10 +63,17 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 	}
 
 	// Parse expiry date
-	_, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
+	expiryDate, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
 	if err != nil {
 		return &openapi.ValidationError{
 			ErrorMessage: "Invalid expiry date format",
+		}
+	}
+
+	// Validate that start date is before expiry date
+	if !startDate.Before(expiryDate) {
+		return &openapi.ValidationError{
+			ErrorMessage: "Start date must be before expiry date",
 		}
 	}
 

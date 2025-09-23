@@ -106,6 +106,7 @@ type Contract struct {
 	OrganisationSignatory string
 	ThirdPartyName        string
 	Status                string // proposed, active, expired
+	StartDate             time.Time
 	ExpiryDate            time.Time
 
 	// Relationships

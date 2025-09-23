@@ -64,6 +64,7 @@ describe("Contract Management", () => {
     cy.get("input[name='organisationSignatory']").type("Test Organization");
     cy.get("input[name='thirdPartyName']").type("Test Third Party");
     cy.get("select[name='status']").select("proposed");
+    cy.get("input[name='startDate']").type("2024-01-01");
     cy.get("input[name='expiryDate']").type("2025-12-31");
 
     // Simulate a pdf upload

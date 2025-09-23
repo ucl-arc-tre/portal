@@ -287,6 +287,9 @@ type Contract struct {
 	// OrganisationSignatory Name of the organisation signatory
 	OrganisationSignatory string `json:"organisation_signatory"`
 
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
+
 	// Status Current status of the contract
 	Status ContractStatus `json:"status"`
 
@@ -308,6 +311,9 @@ type ContractBase struct {
 	// OrganisationSignatory Name of the organisation signatory
 	OrganisationSignatory string `json:"organisation_signatory"`
 
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
+
 	// Status Current status of the contract
 	Status ContractBaseStatus `json:"status"`
 
@@ -328,6 +334,9 @@ type ContractUploadObject struct {
 
 	// OrganisationSignatory Name of the organisation signatory
 	OrganisationSignatory string `json:"organisation_signatory"`
+
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
 
 	// Status Current status of the contract
 	Status ContractUploadObjectStatus `json:"status"`

@@ -993,6 +993,7 @@ components:
         - organisation_signatory
         - third_party_name
         - status
+        - start_date
         - expiry_date
       properties:
         organisation_signatory:
@@ -1005,6 +1006,10 @@ components:
           type: string
           enum: [proposed, active, expired]
           description: Current status of the contract
+        start_date:
+          type: string
+          description: Contract start date in YYYY-MM-DD format
+          example: "2024-01-01"
         expiry_date:
           type: string
           description: Contract expiry date in YYYY-MM-DD format
