@@ -60,22 +60,21 @@ export default function ContractManagement({ study, asset }: ContractManagementP
         Manage contract documents for this asset. Upload PDF contracts and track their status.
       </p>
 
-      {(asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
-        <div className={styles["contract-requirement-notice"]}>
-          <div>
-            Based on your responses while making your Study and Asset, uploading a contract is required. This is because
-            you said:
-            <ul>
-              {asset.requires_contract && <li>This asset requires a contract.</li>}
-              {study.involves_external_users && <li>Your study involves external users.</li>}
-              {study.involves_third_party && <li>Your study involves third parties.</li>}
-            </ul>
-            {contracts.length === 0 && (
+      {contracts.length === 0 &&
+        (asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
+          <div className={styles["contract-requirement-notice"]}>
+            <div>
+              Based on your responses while making your Study and Asset, uploading a contract is required. This is
+              because you said:
+              <ul>
+                {asset.requires_contract && <li>This asset requires a contract.</li>}
+                {study.involves_external_users && <li>Your study involves external users.</li>}
+                {study.involves_third_party && <li>Your study involves third parties.</li>}
+              </ul>
               <p>Please ensure you upload a valid contract document to comply with our policies.</p>
-            )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {error && (
         <div className={styles.error}>
