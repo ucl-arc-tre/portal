@@ -34,6 +34,8 @@ export default function ContractUploadModal({
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const organisationName = process.env.NEXT_PUBLIC_ORGANISATION_NAME;
+
   const {
     register,
     handleSubmit,
@@ -193,7 +195,7 @@ export default function ContractUploadModal({
           <h4>Contract Details</h4>
 
           <div className={styles["form-group"]}>
-            <label htmlFor="organisationSignatory">Organisation Signatory *</label>
+            <label htmlFor="organisationSignatory">{organisationName} Signatory *</label>
             <input
               id="organisationSignatory"
               type="text"
