@@ -69,10 +69,10 @@ export default function ContractCard({ contract, studyId, assetId }: ContractCar
       <div className={styles.header}>
         <div className={styles["file-info"]}>
           <h4 className={styles.filename}>{contract.filename}</h4>
-          <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
-            {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
-          </span>
         </div>
+        <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
+          {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
+        </span>
       </div>
 
       <div className={styles.details}>

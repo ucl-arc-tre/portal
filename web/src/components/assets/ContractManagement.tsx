@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdAssetsByAssetIdContracts, Contract } from "@/openapi";
+import { getStudiesByStudyIdAssetsByAssetIdContracts, Contract, Study, Asset } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 
 type ContractManagementProps = {
-  studyId: string;
-  assetId: string;
+  study: Study;
+  asset: Asset;
 };
 
-export default function ContractManagement({ studyId, assetId }: ContractManagementProps) {
+export default function ContractManagement({ study, asset }: ContractManagementProps) {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
 
     try {
       const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
-        path: { studyId, assetId },
+        path: { studyId: study.id, assetId: asset.id },
       });
 
       if (response.response.ok && response.data) {
@@ -36,7 +36,7 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
     } finally {
       setIsLoading(false);
     }
-  }, [studyId, assetId]);
+  }, [study.id, asset.id]);
 
   useEffect(() => {
     fetchContracts();
@@ -60,6 +60,21 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
         Manage contract documents for this asset. Upload PDF contracts and track their status.
       </p>
 
+      {(asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
+        <div className={styles["contract-requirement-notice"]}>
+          <p>
+            Based on your responses while making your Study and Asset, uploading a contract is required. This is because
+            you said:
+            <ul>
+              {asset.requires_contract && <li>This asset requires a contract.</li>}
+              {study.involves_external_users && <li>Your study involves external users.</li>}
+              {study.involves_third_party && <li>Your study involves third parties.</li>}
+            </ul>
+            Please ensure you upload a valid contract document to comply with our policies.
+          </p>
+        </div>
+      )}
+
       {error && (
         <div className={styles.error}>
           <strong>Error:</strong> {error}
@@ -74,16 +89,16 @@ export default function ContractManagement({ studyId, assetId }: ContractManagem
           <p>Upload your first contract document to get started.</p>
         </div>
       ) : (
-        <div className={styles["contracts-grid"]}>
+        <div className={styles["contracts-list"]}>
           {contracts.map((contract) => (
-            <ContractCard key={contract.id} contract={contract} studyId={studyId} assetId={assetId} />
+            <ContractCard key={contract.id} contract={contract} studyId={study.id} assetId={asset.id} />
           ))}
         </div>
       )}
 
       <ContractUploadForm
-        studyId={studyId}
-        assetId={assetId}
+        study={study}
+        asset={asset}
         isOpen={showUploadModal}
         onClose={() => setShowUploadModal(false)}
         onSuccess={handleUploadSuccess}

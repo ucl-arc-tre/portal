@@ -2,7 +2,13 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
-import { postStudiesByStudyIdAssetsByAssetIdContractsUpload, ValidationError, ContractUploadObject } from "@/openapi";
+import {
+  postStudiesByStudyIdAssetsByAssetIdContractsUpload,
+  ValidationError,
+  ContractUploadObject,
+  Study,
+  Asset,
+} from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
 
 type ContractFormData = {
@@ -14,20 +20,14 @@ type ContractFormData = {
 };
 
 type ContractUploadModalProps = {
-  studyId: string;
-  assetId: string;
+  study: Study;
+  asset: Asset;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export default function ContractUploadModal({
-  studyId,
-  assetId,
-  isOpen,
-  onClose,
-  onSuccess,
-}: ContractUploadModalProps) {
+export default function ContractUploadModal({ study, asset, isOpen, onClose, onSuccess }: ContractUploadModalProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,8 +93,8 @@ export default function ContractUploadModal({
 
       const response = await postStudiesByStudyIdAssetsByAssetIdContractsUpload({
         path: {
-          studyId,
-          assetId,
+          studyId: study.id,
+          assetId: asset.id,
         },
         body: contractUploadData,
       });
