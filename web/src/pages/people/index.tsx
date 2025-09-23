@@ -8,7 +8,7 @@ import styles from "./PeoplePage.module.css";
 import { useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
+import { Alert, AlertMessage, HelperText } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
@@ -75,6 +75,12 @@ export default function PeoplePage() {
     searchRef.current!.value = inputValue;
   };
 
+  const clearSearchTerm = () => {
+    if (searchRef.current) {
+      searchRef.current.value = "";
+    }
+  };
+
   if (!isAdmin && !isTreOpsStaff && !isIAO)
     return (
       <Alert type="warning">
@@ -108,25 +114,41 @@ export default function PeoplePage() {
       {canSearch && (
         <div className={styles["search-wrapper"]}>
           <form className={styles["search-container"]} data-cy="search-users">
-            <Input
+            <input
               placeholder="search users..."
               id={styles.search}
               name="search"
               onChange={handleInputChange}
               ref={searchRef}
               aria-label="search users of the portal"
-            ></Input>
+            ></input>
             <Button
               variant="tertiary"
               icon={<SearchIcon />}
               onClick={(e) => {
                 e.preventDefault();
+
                 handleUserSearch(searchRef.current!.value);
               }}
               type="submit"
               data-cy="submit-user-search"
               aria-label="submit user search query"
             ></Button>
+            {searchTerm.length > 0 && (
+              <Button
+                variant="tertiary"
+                onClick={() => {
+                  handleUserSearch("");
+                  clearSearchTerm();
+                }}
+                className={styles["clear-search"]}
+                type="reset"
+                data-cy="clear-user-search"
+                aria-label="clear user search query"
+              >
+                <small>Clear</small>
+              </Button>
+            )}
           </form>
           <HelperText>
             <small>Search by display name, user principal or email</small>
