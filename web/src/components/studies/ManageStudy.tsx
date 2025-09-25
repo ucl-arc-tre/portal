@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { Study, Auth } from "@/openapi";
+import { Study } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
 import Assets from "../assets/Assets";
 
 import styles from "./ManageStudy.module.css";
-import StudyDetails from "./StudyDetails";
 
 type ManageStudyProps = {
   study: Study;
-  userData: Auth;
 };
 
-export default function ManageStudy({ study, userData }: ManageStudyProps) {
+export default function ManageStudy({ study }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
-  const isAdmin = userData?.roles.includes("admin");
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
@@ -37,9 +34,6 @@ export default function ManageStudy({ study, userData }: ManageStudyProps) {
     },
   ];
 
-  if (isAdmin) {
-    return <StudyDetails study={study} />;
-  }
   const getCurrentStepComponent = () => {
     if (!agreementCompleted) {
       return (

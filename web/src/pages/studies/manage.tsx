@@ -11,6 +11,7 @@ import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 
 import styles from "./ManageStudyPage.module.css";
+import StudyDetails from "@/components/studies/StudyDetails";
 
 export default function ManageStudyPage() {
   const router = useRouter();
@@ -164,7 +165,7 @@ export default function ManageStudyPage() {
       />
       <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
-      <ManageStudy study={study} userData={userData!} />
+      {isAdmin ? <StudyDetails study={study} /> : <ManageStudy study={study} />}
     </>
   );
 }
