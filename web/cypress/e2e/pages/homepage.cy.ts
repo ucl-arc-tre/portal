@@ -52,7 +52,7 @@ describe(`Homepage Tests`, () => {
       cy.contains("You have completed all your tasks").should("be.visible");
     });
 
-    it("shows studies for AR admin", () => {
+    it("shows studies for admin Approved Researcher", () => {
       cy.loginAsAdmin();
       cy.mockProfileChosenName("Tom Young");
       cy.mockAuthAsAdminApprovedResearcher();
