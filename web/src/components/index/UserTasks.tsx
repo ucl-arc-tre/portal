@@ -6,10 +6,13 @@ import { getProfile } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 
-export default function UserTasks({ setTasksCompleted }: { setTasksCompleted: (completed: boolean) => void }) {
+export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isAdmin = userData?.roles.includes("admin");
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,12 +36,6 @@ export default function UserTasks({ setTasksCompleted }: { setTasksCompleted: (c
       fetchProfile();
     }
   }, [isAuthed]);
-
-  useEffect(() => {
-    if (isAuthed && userData && userData.roles.includes("approved-researcher")) {
-      setTasksCompleted(true);
-    }
-  }, [isAuthed, userData, setTasksCompleted]);
 
   if (authInProgress) return null;
 
@@ -67,7 +64,7 @@ export default function UserTasks({ setTasksCompleted }: { setTasksCompleted: (c
             Complete Profile Setup
           </Button>
         </div>
-      ) : !userData.roles.includes("approved-researcher") ? (
+      ) : !isApprovedResearcher ? (
         <div className={styles["researcher-prompt"]}>
           <p>Complete your profile setup to become an approved researcher.</p>
           <Button href="/profile" variant="secondary">
@@ -76,7 +73,16 @@ export default function UserTasks({ setTasksCompleted }: { setTasksCompleted: (c
         </div>
       ) : (
         <div className={styles["completed-tasks"]}>
-          <p>You have completed all your tasks.</p>
+          {isAdmin ? (
+            <>
+              <p>There may be studies to approve, check out the Studies page.</p>
+              <Button href="/studies" size="large">
+                View Studies
+              </Button>
+            </>
+          ) : (
+            <p>You have completed all your tasks.</p>
+          )}
         </div>
       )}
     </div>
