@@ -52,7 +52,7 @@ describe(`Homepage Tests`, () => {
       cy.contains("You have completed all your tasks").should("be.visible");
     });
 
-    it("shows studies for admin Approved Researcher", () => {
+    it("points to studies page for admin Approved Researcher", () => {
       cy.loginAsAdmin();
       cy.mockProfileChosenName("Tom Young");
       cy.mockAuthAsAdminApprovedResearcher();
@@ -61,7 +61,7 @@ describe(`Homepage Tests`, () => {
       cy.waitForAuth();
       cy.waitForChosenName();
 
-      cy.contains("Studies to Approve").should("be.visible");
+      cy.contains("View Studies").should("be.visible");
     });
   });
 
