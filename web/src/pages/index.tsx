@@ -38,12 +38,6 @@ export default function Index() {
     if (isAdmin) fetchStudies();
   }, [isAdmin]);
 
-  useEffect(() => {
-    if (isAuthed && userData && userData.roles.includes("approved-researcher")) {
-      setTasksCompleted(true);
-    }
-  }, [isAuthed, userData, setTasksCompleted]);
-
   if (authInProgress) return null;
 
   if (!isAuthed || !userData) return <LoginFallback />;
