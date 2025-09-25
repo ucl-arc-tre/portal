@@ -1,0 +1,267 @@
+import { postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import Box from "../ui/Box";
+import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
+import { useEffect, useState } from "react";
+import StudyStatusBadge from "../ui/StudyStatusBadge";
+import styles from "./StudyDetails.module.css";
+import Button from "../ui/Button";
+import InfoTooltip from "../ui/InfoTooltip";
+
+type StudyDetailsProps = {
+  study: Study;
+};
+export default function StudyDetails({ study }: StudyDetailsProps) {
+  const [riskScore, setRiskScore] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [approvalStatus, setApprovalStatus] = useState("");
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [isCollapsing, setIsCollapsing] = useState(false);
+
+  const handleUpdateStudyStatus = async (status: string) => {
+    const studyId = study.id;
+
+    if (status === "Approved") {
+      // set as approved
+      const response = await postStudiesAdminByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
+      if (response.response.ok) {
+        setApprovalStatus("Approved");
+      }
+    } else if (status === "Rejected") {
+      const response = await postStudiesAdminByStudyIdReview({
+        path: { studyId },
+        body: { status: "Rejected", feedback: feedback },
+      });
+      if (response.response.ok) {
+        setApprovalStatus("Rejected");
+      }
+    }
+  };
+
+  const toggleShowFeedbackForm = () => {
+    // for smooth collapse
+    if (showFeedbackForm) {
+      setIsCollapsing(true);
+      setTimeout(() => {
+        setShowFeedbackForm(false);
+        setIsCollapsing(false);
+      }, 1400);
+    } else {
+      setShowFeedbackForm(true);
+    }
+  };
+
+  const handleFeedbackSubmit = () => {
+    handleUpdateStudyStatus("Rejected");
+    toggleShowFeedbackForm();
+  };
+
+  const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFeedback(event.target.value);
+  };
+
+  useEffect(() => {
+    const calculateRiskScore = () => {
+      // todo: how to determine if they have data?
+      let score = 0;
+
+      if (study.involves_data_processing_outside_eea) score += 10;
+      if (study.requires_dbs) score += 5;
+      if (study.requires_dspt) score += 5;
+      if (study.involves_third_party && !study.involves_mnca) score += 5;
+      if (study.involves_nhs_england || study.involves_cag) score += 5;
+
+      setRiskScore(score);
+    };
+
+    calculateRiskScore();
+    setApprovalStatus(study.approval_status);
+  }, [study]);
+
+  const standardRiskScoreStatement = "increases risk score by 5";
+  return (
+    <>
+      <Box>
+        <div className={styles["pre-description"]}>
+          <span>
+            Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
+          </span>
+          <span>
+            Risk Score: <span className={styles["risk-score"]}>{riskScore}</span>
+          </span>
+          <StudyStatusBadge status={approvalStatus} isAdmin={true} />
+        </div>
+        <h2>{study.description}</h2>
+        <div>
+          <dl className={styles.ownership}>
+            <dd>
+              Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
+            </dd>
+            <dd>
+              Admins:
+              {study.additional_study_admin_usernames.length > 0 && (
+                <span className={styles["grey-value"]}>{study.additional_study_admin_usernames}</span>
+              )}
+            </dd>
+            <dd>
+              Data Controller:{" "}
+              <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
+            </dd>
+          </dl>
+
+          {study.feedback && (
+            <Alert type={"warning"} className={styles["feedback-alert"]}>
+              <AlertMessage>
+                <h4>This study has been rejected and the following feedback has been provided:</h4>
+                <p>{study.feedback}</p>
+              </AlertMessage>
+              <hr></hr>
+              <small>
+                <em>Please adjust as appropriate and request another review.</em>
+              </small>
+            </Alert>
+          )}
+
+          <h3>Additional Information</h3>
+          <dl className={styles.grouping}>
+            <h4>Sponsorships & Approvals</h4>
+            {study.involves_ucl_sponsorship && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>UCL Sponsorship</dd>
+            )}
+            {study.involves_cag && (
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                CAG approval <InfoTooltip text="increases risk score by 5" />
+              </dd>
+            )}
+            {study.involves_ethics_approval && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>Ethics approval</dd>
+            )}
+            {study.involves_hra_approval && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>HRA approval</dd>
+            )}
+            {!study.involves_ucl_sponsorship &&
+              !study.involves_cag &&
+              !study.involves_ethics_approval &&
+              !study.involves_hra_approval && (
+                <dd>
+                  {" "}
+                  <em>No sponsorship or approval information given</em>
+                </dd>
+              )}
+          </dl>
+          <dl className={styles.grouping}>
+            <h4>NHS</h4>
+            {study.is_nhs_associated && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is NHS associated</dd>
+            )}
+            {study.involves_nhs_england && (
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                NHS England involvement
+                <InfoTooltip text={standardRiskScoreStatement} />
+              </dd>
+            )}
+            {study.involves_mnca && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>involves MNCA</dd>
+            )}
+            {study.requires_dspt && (
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                requires DSPT
+                <InfoTooltip text={standardRiskScoreStatement} />
+              </dd>
+            )}
+            {!study.is_nhs_associated &&
+              !study.involves_nhs_england &&
+              !study.involves_mnca &&
+              !study.requires_dspt && (
+                <dd>
+                  <em> No NHS information given</em>
+                </dd>
+              )}
+          </dl>
+          <dl className={styles.grouping}>
+            <h4>Data</h4>
+            {study.requires_dbs && (
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                requires DBS
+                <InfoTooltip text={standardRiskScoreStatement} />
+              </dd>
+            )}
+            {study.is_data_protection_office_registered && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is registered with DPO</dd>
+            )}
+            {study.involves_third_party && (
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                third party
+                <InfoTooltip text="increases risk score by 5 if no mNCA" />
+              </dd>
+            )}
+            {study.involves_external_users && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>external users</dd>
+            )}
+            {study.involves_participant_consent && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>participant consent</dd>
+            )}
+            {study.involves_indirect_data_collection && (
+              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>indirect data collection</dd>
+            )}
+            {study.involves_data_processing_outside_eea && (
+              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+                data processing outside EEA
+                <InfoTooltip text="increases risk score by 10" />
+              </dd>
+            )}
+            {!study.requires_dbs &&
+              !study.is_data_protection_office_registered &&
+              !study.involves_third_party &&
+              !study.involves_external_users &&
+              !study.involves_participant_consent &&
+              !study.involves_indirect_data_collection &&
+              !study.involves_data_processing_outside_eea && (
+                <dd>
+                  <em>No data information given</em>
+                </dd>
+              )}
+          </dl>
+        </div>
+      </Box>
+
+      {study.approval_status === "Pending" && (
+        <div>
+          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+            Approve Study
+          </Button>
+          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
+            {showFeedbackForm ? "Cancel" : "Request Changes"}
+          </Button>
+        </div>
+      )}
+      {showFeedbackForm && (
+        <Box>
+          <div className={styles["feedback-container"]}>
+            <form
+              className={`${styles["feedback-form"]} ${
+                isCollapsing
+                  ? styles["form-collapsing"]
+                  : showFeedbackForm
+                    ? styles["form-visible"]
+                    : styles["form-hidden"]
+              }`}
+            >
+              <label htmlFor="feedback">Outline what the changes are required to attain approval</label>
+              <Textarea
+                name="feedback"
+                id="feedback"
+                cols={30}
+                rows={10}
+                onChange={handleFeedbackChange}
+                value={feedback}
+              />
+              <Button onClick={handleFeedbackSubmit} type="button">
+                Submit
+              </Button>
+            </form>
+          </div>
+        </Box>
+      )}
+    </>
+  );
+}

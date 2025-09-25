@@ -225,7 +225,7 @@ func employeeTypeIsStaff(employeeType string) bool {
 
 // FindUsernames searches entra for usernames given a query of email, user principal or display name
 func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
-	queryRegex := regexp.MustCompile(`^\w[\w.\s0-9@]+\w$`)
+	queryRegex := regexp.MustCompile(`^\w[\w.\s0-9@-]+\w$`)
 	queryIsValid := queryRegex.MatchString(query)
 	if !queryIsValid {
 		return nil, types.NewErrInvalidObject(fmt.Sprintf("invalid query [%v]", query))

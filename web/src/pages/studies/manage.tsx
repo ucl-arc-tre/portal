@@ -11,6 +11,7 @@ import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 
 import styles from "./ManageStudyPage.module.css";
+import StudyDetails from "@/components/studies/StudyDetails";
 
 export default function ManageStudyPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ManageStudyPage() {
   const [studyError, setStudyError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
 
   const fetchStudy = async (id: string) => {
     setStudyIsLoading(true);
@@ -161,9 +163,9 @@ export default function ManageStudyPage() {
         title={`Manage ${study.title} | ARC Services Portal`}
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
-      <Title text={`Manage Study: ${study.title}`} centered />
+      <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
-      <ManageStudy study={study} userData={userData!} />
+      {isAdmin ? <StudyDetails study={study} /> : <ManageStudy study={study} />}
     </>
   );
 }

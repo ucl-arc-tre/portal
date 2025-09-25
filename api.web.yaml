@@ -310,6 +310,34 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/admin/{studyId}/review:
+    post:
+      description: Update study status + opportunity to update feedback
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyReview"
+      responses:
+        "201":
+          description: Study review submitted successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -943,6 +971,9 @@ components:
         owner_user_id:
           type: string
           description: ID of the user who owns the study
+        owner_username:
+          type: string
+          description: Username of the user who owns the study
 
     StudyCreateRequest:
       allOf:
@@ -969,14 +1000,30 @@ components:
               type: string
               description: Time in RFC3339 format when the study was last updated
             approval_status:
+              $ref: "#/components/schemas/StudyApprovalStatus"
+            feedback:
               type: string
-              enum:
-                - Incomplete
-                - Pending
-                - Approved
-                - Rejected
-              description: Current approval status of the study
       description: A research study
+
+    StudyApprovalStatus:
+      type: string
+      enum:
+        - Incomplete
+        - Pending
+        - Approved
+        - Rejected
+      description: Current approval status of the study
+
+    StudyReview:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: "#/components/schemas/StudyApprovalStatus"
+        feedback:
+          type: string
+          description: Feedback for the study
 
     ValidationError:
       type: object

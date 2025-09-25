@@ -18,11 +18,13 @@ import (
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
+	ownerUsernameStr := string(study.Owner.Username)
 	return openapi.Study{
 		Id:                               study.ID.String(),
 		Title:                            study.Title,
 		Description:                      study.Description,
 		OwnerUserId:                      &ownerUserIDStr,
+		OwnerUsername:                    &ownerUsernameStr,
 		ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
 		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 		DataControllerOrganisation:       study.DataControllerOrganisation,
@@ -45,6 +47,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
 		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
 		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
+		Feedback:                         study.Feedback,
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 	}
@@ -411,4 +414,30 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 			"Content-Disposition": "attachment; filename=contract.txt", // todo set filename
 		},
 	)
+}
+
+func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
+	review := openapi.StudyReview{}
+	if err := bindJSONOrSetError(ctx, &review); err != nil {
+		return
+	}
+
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	// if status is approved then set feedback to nothing
+	if review.Status == openapi.Approved {
+		emptyReviewString := ""
+		review.Feedback = &emptyReviewString
+	}
+
+	err = h.studies.UpdateStudyReview(studyUUID, review)
+	if err != nil {
+		setError(ctx, err, "Failed to update study feedback")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
