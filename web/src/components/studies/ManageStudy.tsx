@@ -8,6 +8,7 @@ import Assets from "../assets/Assets";
 import styles from "./ManageStudy.module.css";
 import StudyDetails from "./StudyDetails";
 import { useAuth } from "@/hooks/useAuth";
+import StudyForm from "./StudyForm";
 
 type ManageStudyProps = {
   study: Study;
@@ -16,6 +17,8 @@ type ManageStudyProps = {
 export default function ManageStudy({ study }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
+  const [studyFormOpen, setStudyFormOpen] = useState(false);
+
   const { userData } = useAuth();
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
@@ -60,7 +63,10 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
   return (
     <>
-      <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} />
+      {studyFormOpen && userData && (
+        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} isUpdate={true} />
+      )}
+      <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} setStudyFormOpen={setStudyFormOpen} />
 
       <StepProgress
         steps={studySteps}

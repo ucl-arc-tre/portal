@@ -11,8 +11,10 @@ type StudyDetailsProps = {
   study: Study;
   isAdmin: boolean;
   isStudyOwner: boolean;
+  setStudyFormOpen?: (name: boolean) => void;
 };
-export default function StudyDetails({ study, isAdmin, isStudyOwner }: StudyDetailsProps) {
+export default function StudyDetails(props: StudyDetailsProps) {
+  const { study, isAdmin, isStudyOwner, setStudyFormOpen } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
@@ -82,12 +84,15 @@ export default function StudyDetails({ study, isAdmin, isStudyOwner }: StudyDeta
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
-      {isStudyOwner && (
+      {isStudyOwner && setStudyFormOpen && (
         <div className={styles["study-actions"]}>
-          <Button variant="secondary">Edit Study</Button>
+          <Button variant="secondary" onClick={() => setStudyFormOpen(true)}>
+            {study.feedback ? "Respond to Feedback" : "Edit Study"}
+          </Button>
           <Button>Mark Ready for Review</Button>
         </div>
       )}
+
       <Box>
         <div className={styles["pre-description"]}>
           <span>
