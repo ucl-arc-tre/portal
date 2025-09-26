@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
-import styles from "./CreateStudyForm.module.css";
+import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 
 export type StudyFormData = {
@@ -35,24 +35,22 @@ export type StudyFormData = {
   requiresDspt: boolean;
 };
 
-type CreateStudyProps = {
+type StudyProps = {
   username: string;
-  setCreateStudyFormOpen: (name: boolean) => void;
+  setStudyFormOpen: (name: boolean) => void;
   handleStudySubmit: (data: StudyFormData) => Promise<void>;
   submitError: string | null;
   isSubmitting: boolean;
   setSubmitError: (error: string | null) => void;
 };
 
-// what is this?
-// A brief comment for context might be good here
+// data protection office id
 const UclDpoId = "Z6364106";
 
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
-export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
-  const { username, setCreateStudyFormOpen, handleStudySubmit, submitError, isSubmitting, setSubmitError } =
-    CreateStudyProps;
+export default function StudyForm(StudyProps: StudyProps) {
+  const { username, setStudyFormOpen, handleStudySubmit, submitError, isSubmitting, setSubmitError } = StudyProps;
   const {
     register,
     handleSubmit,
@@ -120,7 +118,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
   const handleCloseForm = () => {
     setSubmitError(null);
-    setCreateStudyFormOpen(false);
+    setStudyFormOpen(false);
   };
 
   const getFieldsetClass = (step: number) =>

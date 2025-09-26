@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { postStudies, Study, StudyCreateRequest, Auth, ValidationError } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
-import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
+import StudyForm, { StudyFormData } from "./StudyForm";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 
@@ -15,7 +15,7 @@ type Props = {
 
 export default function Studies(props: Props) {
   const { userData, studies, fetchStudies } = props;
-  const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
+  const [StudyFormOpen, setStudyFormOpen] = useState(false);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function Studies(props: Props) {
       setShowUclStaffModal(true);
       return;
     }
-    setCreateStudyFormOpen(true);
+    setStudyFormOpen(true);
   };
 
   const handleStudySubmit = async (data: StudyFormData) => {
@@ -79,7 +79,7 @@ export default function Studies(props: Props) {
       });
 
       if (response.data) {
-        setCreateStudyFormOpen(false);
+        setStudyFormOpen(false);
         fetchStudies();
         return;
       }
@@ -103,10 +103,10 @@ export default function Studies(props: Props) {
 
   return (
     <>
-      {createStudyFormOpen && (
-        <CreateStudyForm
+      {StudyFormOpen && (
+        <StudyForm
           username={userData.username}
-          setCreateStudyFormOpen={setCreateStudyFormOpen}
+          setStudyFormOpen={setStudyFormOpen}
           handleStudySubmit={handleStudySubmit}
           submitError={submitError}
           isSubmitting={isSubmitting}
