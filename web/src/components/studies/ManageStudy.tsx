@@ -6,6 +6,8 @@ import StudyAgreement from "./StudyAgreement";
 import Assets from "../assets/Assets";
 
 import styles from "./ManageStudy.module.css";
+import StudyDetails from "./StudyDetails";
+import { useAuth } from "@/hooks/useAuth";
 
 type ManageStudyProps = {
   study: Study;
@@ -14,6 +16,9 @@ type ManageStudyProps = {
 export default function ManageStudy({ study }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
+  const { userData } = useAuth();
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
@@ -55,13 +60,15 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
   return (
     <>
+      <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} />
+
       <StepProgress
         steps={studySteps}
         isComplete={studyStepsCompleted}
         completionTitle="Study Setup Complete!"
         completionSubtitle="You have successfully completed all study setup steps."
-        completionButtonText="Go to studies"
-        completionButtonHref="/studies"
+        // completionButtonText="Go to studies"
+        // completionButtonHref="/studies"
         introText="Complete the following steps to set up your study."
         ariaLabel="Study setup progress"
       />

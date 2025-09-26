@@ -9,8 +9,10 @@ import InfoTooltip from "../ui/InfoTooltip";
 
 type StudyDetailsProps = {
   study: Study;
+  isAdmin: boolean;
+  isStudyOwner: boolean;
 };
-export default function StudyDetails({ study }: StudyDetailsProps) {
+export default function StudyDetails({ study, isAdmin, isStudyOwner }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
@@ -80,6 +82,12 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
+      {isStudyOwner && (
+        <div className={styles["study-actions"]}>
+          <Button variant="secondary">Edit Study</Button>
+          <Button>Mark Ready for Review</Button>
+        </div>
+      )}
       <Box>
         <div className={styles["pre-description"]}>
           <span>
@@ -223,8 +231,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           </dl>
         </div>
       </Box>
-
-      {study.approval_status === "Pending" && (
+      {study.approval_status === "Pending" && isAdmin && (
         <div>
           <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
             Approve Study
