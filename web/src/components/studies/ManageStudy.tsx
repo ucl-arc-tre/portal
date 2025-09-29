@@ -66,9 +66,9 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       {studyFormOpen && userData && (
         <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} isUpdate={true} />
       )}
-      <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} setStudyFormOpen={setStudyFormOpen} />
 
       <StepProgress
+        // todo: turn into an expandable section
         steps={studySteps}
         isComplete={studyStepsCompleted}
         completionTitle="Study Setup Complete!"
@@ -82,6 +82,8 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       {!studyStepsCompleted && <StepArrow />}
 
       {getCurrentStepComponent()}
+
+      <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} setStudyFormOpen={setStudyFormOpen} />
 
       {studyStepsCompleted && (
         <div className={styles["completed-section"]}>

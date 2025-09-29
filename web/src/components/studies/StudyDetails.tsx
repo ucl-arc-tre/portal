@@ -1,4 +1,4 @@
-import { postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import { postStudiesAdminByStudyIdReview, postStudiesByStudyIdReview, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -37,6 +37,14 @@ export default function StudyDetails(props: StudyDetailsProps) {
       });
       if (response.response.ok) {
         setApprovalStatus("Rejected");
+      }
+    } else if (status === "Pending") {
+      const response = await postStudiesByStudyIdReview({
+        path: { studyId },
+        body: { status: "Pending" },
+      });
+      if (response.response.ok) {
+        setApprovalStatus("Pending");
       }
     }
   };
@@ -89,7 +97,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <Button variant="secondary" onClick={() => setStudyFormOpen(true)}>
             {study.feedback ? "Respond to Feedback" : "Edit Study"}
           </Button>
-          <Button>Mark Ready for Review</Button>
+          <Button onClick={() => handleUpdateStudyStatus("Pending")}>Mark Ready for Review</Button>
         </div>
       )}
 

@@ -441,3 +441,40 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 
 	ctx.Status(http.StatusOK)
 }
+func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
+	review := openapi.StudyReview{}
+	if err := bindJSONOrSetError(ctx, &review); err != nil {
+		return
+	}
+
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	err = h.studies.UpdateStudyReview(studyUUID, review)
+	if err != nil {
+		setError(ctx, err, "Failed to update study feedback")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
+	// todo
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	log.Debug().Msgf("Updating study [%v]", studyUUID)
+
+	// err = h.studies.UpdateStudy(studyUUID, )
+	// if err != nil {
+	// 	setError(ctx, err, "Failed to update study status")
+	// 	return
+	// }
+
+	ctx.Status(http.StatusOK)
+}

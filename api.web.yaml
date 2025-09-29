@@ -309,10 +309,64 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    post:
+      description: Update a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyUpdateRequest"
+      responses:
+        "200":
+          description: Study updated successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /studies/admin/{studyId}/review:
     post:
       description: Update study status + opportunity to update feedback
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyReview"
+      responses:
+        "201":
+          description: Study review submitted successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /studies/{studyId}/review:
+    post:
+      description: Update study status to pending
       parameters:
         - in: path
           name: studyId
@@ -979,6 +1033,14 @@ components:
       allOf:
         - $ref: "#/components/schemas/StudyBase"
       description: Request payload for creating a new study
+
+    StudyUpdateRequest:
+      allOf:
+        - $ref: "#/components/schemas/StudyBase"
+          properties:
+            id:
+              type: string
+      description: Request payload for updating a given study
 
     Study:
       allOf:

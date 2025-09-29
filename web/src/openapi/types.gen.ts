@@ -299,6 +299,11 @@ export type StudyBase = {
 export type StudyCreateRequest = StudyBase;
 
 /**
+ * Request payload for updating a given study
+ */
+export type StudyUpdateRequest = StudyBase;
+
+/**
  * A research study
  */
 export type Study = StudyBase & {
@@ -831,6 +836,44 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
+export type PostStudiesByStudyIdData = {
+    body: StudyUpdateRequest;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}';
+};
+
+export type PostStudiesByStudyIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdResponses = {
+    /**
+     * Study updated successfully
+     */
+    200: unknown;
+};
+
 export type PostStudiesAdminByStudyIdReviewData = {
     body: StudyReview;
     path: {
@@ -863,6 +906,44 @@ export type PostStudiesAdminByStudyIdReviewErrors = {
 };
 
 export type PostStudiesAdminByStudyIdReviewResponses = {
+    /**
+     * Study review submitted successfully
+     */
+    201: unknown;
+};
+
+export type PostStudiesByStudyIdReviewData = {
+    body: StudyReview;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/review';
+};
+
+export type PostStudiesByStudyIdReviewErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdReviewResponses = {
     /**
      * Study review submitted successfully
      */

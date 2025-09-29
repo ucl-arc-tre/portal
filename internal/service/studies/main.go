@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -144,23 +145,8 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	return studies, types.NewErrServerError(err)
 }
 
-// handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
-	// Start a transaction
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	study := types.Study{
-		OwnerUserID:                owner.ID,
-		Title:                      studyData.Title,
-		DataControllerOrganisation: studyData.DataControllerOrganisation,
-		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
-	}
-
+// given a study and data from a request, line up the values
+func setStudyFromStudyData(study *types.Study, studyData openapi.StudyCreateRequest) {
 	study.Description = studyData.Description
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
@@ -181,6 +167,27 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	study.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
 	study.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
 	study.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
+
+}
+
+// handles the database transaction for creating a study and its admins
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	study := types.Study{
+		OwnerUserID:                owner.ID,
+		Title:                      studyData.Title,
+		DataControllerOrganisation: studyData.DataControllerOrganisation,
+		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+	}
+
+	setStudyFromStudyData(&study, studyData)
 
 	// Create the study
 	if err := tx.Create(&study).Error; err != nil {
@@ -212,7 +219,20 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	study := types.Study{}
 	feedback := review.Feedback
 	status := review.Status
+
+	log.Debug().Any("study", study).Msg("Updating study review")
 	if err := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback).Error; err != nil {
+		return types.NewErrServerError(err)
+	}
+	return nil
+}
+
+func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyUpdateRequest) error {
+	study := types.Study{}
+
+	setStudyFromStudyData(&study, studyData)
+
+	if err := s.db.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
 	return nil

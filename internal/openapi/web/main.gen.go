@@ -568,6 +568,9 @@ type StudyReview struct {
 	Status StudyApprovalStatus `json:"status"`
 }
 
+// StudyUpdateRequest Base study properties
+type StudyUpdateRequest = StudyBase
+
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -640,6 +643,9 @@ type PostStudiesJSONRequestBody = StudyCreateRequest
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
+// PostStudiesStudyIdJSONRequestBody defines body for PostStudiesStudyId for application/json ContentType.
+type PostStudiesStudyIdJSONRequestBody = StudyUpdateRequest
+
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
@@ -648,6 +654,9 @@ type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
 // PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdAssetsAssetIdContractsUpload for multipart/form-data ContentType.
 type PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody = ContractUploadObject
+
+// PostStudiesStudyIdReviewJSONRequestBody defines body for PostStudiesStudyIdReview for application/json ContentType.
+type PostStudiesStudyIdReviewJSONRequestBody = StudyReview
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -697,6 +706,9 @@ type ServerInterface interface {
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
 
+	// (POST /studies/{studyId})
+	PostStudiesStudyId(c *gin.Context, studyId string)
+
 	// (GET /studies/{studyId}/agreements)
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
 
@@ -720,6 +732,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
+
+	// (POST /studies/{studyId}/review)
+	PostStudiesStudyIdReview(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -943,6 +958,30 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
 	}
 
 	siw.Handler.GetStudiesStudyId(c, studyId)
+}
+
+// PostStudiesStudyId operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyId(c, studyId)
 }
 
 // GetStudiesStudyIdAgreements operation middleware
@@ -1182,6 +1221,30 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
 }
 
+// PostStudiesStudyIdReview operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdReview(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdReview(c, studyId)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -1305,6 +1368,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
+	router.POST(options.BaseURL+"/studies/:studyId", wrapper.PostStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
@@ -1313,6 +1377,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
+	router.POST(options.BaseURL+"/studies/:studyId/review", wrapper.PostStudiesStudyIdReview)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

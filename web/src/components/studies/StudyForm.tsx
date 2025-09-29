@@ -184,8 +184,16 @@ export default function StudyForm(StudyProps: StudyProps) {
       setIsSubmitting(false);
     }
   };
+
+  const handleStudySubmitUpdate = async (data: StudyFormData) => {
+    // todo
+  };
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    if (!isUpdate) await handleStudySubmitCreate(data);
+    if (!isUpdate) {
+      await handleStudySubmitCreate(data);
+    } else {
+      await handleStudySubmitUpdate(data);
+    }
   };
 
   const handleCloseForm = () => {
