@@ -30,7 +30,7 @@ func (s *Service) LatestStudyOwner() (*types.Agreement, error) {
 }
 
 func (s *Service) AgreementTypeById(id uuid.UUID) (*types.AgreementType, error) {
-	agreement := types.Agreement{Model: types.Model{ID: id}}
+	agreement := types.Agreement{}
 	result := s.db.Select("type").Where("id = ?", id).Find(&agreement)
 	if result.Error != nil {
 		return nil, types.NewErrServerError(result.Error)

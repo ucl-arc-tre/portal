@@ -18,7 +18,7 @@ func (s *Service) ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&confirmation)
 	if result.Error != nil {
-		return types.NewErrServerError(result.Error)
+		return types.NewErrFromGorm(result.Error)
 	}
 	return s.updateApprovedResearcherStatus(user)
 }
@@ -33,6 +33,10 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 		Joins("left join agreements on agreements.id = user_agreement_confirmations.agreement_id").
 		Where(types.UserAgreementConfirmation{UserID: user.ID}).
 		Scan(&data)
+	if result.Error != nil {
+		return []openapi.ConfirmedAgreement{}, types.NewErrFromGorm(result.Error)
+	}
+
 	agreements := []openapi.ConfirmedAgreement{}
 	for _, item := range data {
 		agreements = append(agreements, openapi.ConfirmedAgreement{
@@ -40,7 +44,7 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 			ConfirmedAt:   item.CreatedAt.Format(config.TimeFormat),
 		})
 	}
-	return agreements, types.NewErrServerError(result.Error)
+	return agreements, nil
 }
 
 func (s *Service) hasAgreedToApprovedResarcherAgreement(user types.User) (bool, error) {

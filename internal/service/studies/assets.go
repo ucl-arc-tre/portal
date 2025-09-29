@@ -2,7 +2,6 @@ package studies
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -97,11 +95,7 @@ func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData op
 	}
 
 	_, err = s.createStudyAsset(user, assetData, studyID)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, nil
+	return nil, err
 }
 
 // handles the database transaction for creating a study asset
@@ -140,7 +134,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 	// Create the asset
 	if err := tx.Create(&asset).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrServerError(fmt.Errorf("failed to create asset: %w", err))
+		return nil, types.NewErrFromGorm(err, "failed to create asset")
 	}
 
 	// Create AssetLocation records for each location
@@ -151,13 +145,13 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		}
 		if err := tx.Create(&assetLocation).Error; err != nil {
 			tx.Rollback()
-			return nil, types.NewErrServerError(fmt.Errorf("failed to create asset location: %w", err))
+			return nil, types.NewErrFromGorm(err, "failed to create asset location")
 		}
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to commit transaction: %w", err))
+		return nil, types.NewErrFromGorm(err, "failed to commit transaction")
 	}
 
 	return &asset, nil
@@ -167,32 +161,21 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
 	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return assets, types.NewNotFoundError(err)
-	}
-	return assets, types.NewErrServerError(err)
+	return assets, types.NewErrFromGorm(err, "failed to get study assets")
 }
 
 // retrieves a specific asset within a study
 func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
-	var asset types.Asset
+	asset := types.Asset{}
 	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return asset, types.NewNotFoundError(err)
-	}
-	return asset, types.NewErrServerError(err)
+	return asset, types.NewErrFromGorm(err, "failed to get study asset by id")
 }
 
 // retrieves all contracts for a specific asset within a study
 func (s *Service) AssetContracts(user types.User, assetID uuid.UUID) ([]types.Contract, error) {
-	var contracts []types.Contract
+	contracts := []types.Contract{}
 	err := s.db.Where("asset_id = ?", assetID).
 		Order("created_at DESC").
 		Find(&contracts).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return contracts, nil
-	}
-
-	return contracts, types.NewErrServerError(err)
+	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
 }

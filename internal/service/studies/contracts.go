@@ -2,7 +2,6 @@ package studies
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -98,7 +97,7 @@ func (s *Service) StoreContract(
 	// Store the contract metadata in the database first to generate an ID
 	if err := tx.Create(&contractMetadata).Error; err != nil {
 		tx.Rollback()
-		return types.NewErrServerError(fmt.Errorf("failed to save contract metadata: %w", err))
+		return types.NewErrFromGorm(err, "failed to save contract metadata")
 	}
 
 	log.Debug().Any("contractId", contractMetadata.ID).Msg("Contract metadata saved, proceeding with S3 storage")
@@ -110,12 +109,12 @@ func (s *Service) StoreContract(
 	}
 	if err := s.s3.StoreObject(ctx, metadata, pdfContractObj); err != nil {
 		tx.Rollback()
-		return types.NewErrServerError(fmt.Errorf("failed to store contract file: %w", err))
+		return err
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return types.NewErrServerError(fmt.Errorf("failed to commit contract transaction: %w", err))
+		return types.NewErrFromGorm(err, "failed to commit contract transaction")
 	}
 
 	return nil

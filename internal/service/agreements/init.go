@@ -2,6 +2,7 @@ package agreements
 
 import (
 	_ "embed"
+	"fmt"
 	"time"
 
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -33,6 +34,6 @@ func initAgreement(db *gorm.DB, agreementMarkdown string, agreementType types.Ag
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&types.Agreement{})
 	if result.Error != nil {
-		panic(result.Error)
+		panic(fmt.Sprintf("failed to initalise agreement: %v", result.Error))
 	}
 }
