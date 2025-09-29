@@ -30,7 +30,7 @@ The portal is comprised of a NextJS frontend that uses a web api to interact wit
 
 ### Logical View
 
-![Architecture](./media/architecture_2.drawio.png)
+![Architecture](./media/architecture_logical.png)
 
 ## Physical View
 
