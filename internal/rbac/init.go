@@ -102,7 +102,7 @@ func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role Ro
 	db := graceful.NewDB()
 	outdatedUsers := []types.User{}
 
-	userIdsWithRole, err := GetUserIdsWithRole(role)
+	userIdsWithRole, err := userIdsWithRole(role)
 	if err != nil {
 		panic(fmt.Sprintf("failed to get user ids from role [%v]", err))
 	}
