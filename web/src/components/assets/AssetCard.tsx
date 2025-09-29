@@ -2,6 +2,7 @@ import { Asset } from "@/openapi";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
+import { formatDate } from "../shared/exports";
 
 type AssetCardProps = {
   asset: Asset;
@@ -15,20 +16,6 @@ const formatClassification = (classification: string) => {
 
 const formatProtection = (protection: string) => {
   return protection.replace(/_/g, " ");
-};
-
-const formatDate = (dateString: string) => {
-  try {
-    return new Date(dateString).toLocaleDateString("en-GB", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return dateString;
-  }
 };
 
 export default function AssetCard({ studyId, studyTitle, asset }: AssetCardProps) {

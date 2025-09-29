@@ -138,7 +138,7 @@ export default function ProfileSetup(props: Props) {
 
       {/* profile complete & show option to upload another cert */}
       {profileStepsCompleted && (
-        <div className={`${styles["reupload-option"]} ${isCollapsing ? styles.collapsing : ""}`}>
+        <div className={styles["reupload-option"]}>
           <p>
             Your current training certificate is within date, but you may update your certification at any time by
             uploading a new document.

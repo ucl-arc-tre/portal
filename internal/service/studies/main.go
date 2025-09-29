@@ -95,7 +95,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
 	if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
+		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
 	if count > 0 {
 		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
@@ -135,14 +135,14 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 // gets all studies (for admin access)
 func (s *Service) AllStudies() ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Where("id IN (?)", ids).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("id IN (?)", ids).Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 
@@ -208,4 +208,12 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	}
 
 	return &study, nil
+}
+
+func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
+	study := types.Study{}
+	feedback := review.Feedback
+	status := review.Status
+	result := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback)
+	return types.NewErrFromGorm(result.Error, "failed to update study review")
 }
