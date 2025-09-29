@@ -285,6 +285,24 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/pending:
+    get:
+      description: Get all studies pending approval
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Study"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /studies/{studyId}:
     get:
       description: Get details of a specific study

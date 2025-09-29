@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
-import { getProfile } from "@/openapi";
+import { getProfile, getStudiesPending } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 
@@ -10,6 +10,7 @@ export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasPendingStudies, setHasPendingStudies] = useState(false);
 
   const isAdmin = userData?.roles.includes("admin");
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
@@ -36,6 +37,22 @@ export default function UserTasks() {
       fetchProfile();
     }
   }, [isAuthed]);
+
+  useEffect(() => {
+    const fetchPendingStudies = async () => {
+      try {
+        const response = await getStudiesPending();
+        if (response.response.ok) {
+          if (response.data && response.data.length > 0) {
+            setHasPendingStudies(true);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to get pending studies:", error);
+      }
+    };
+    if (isAdmin) fetchPendingStudies();
+  }, [isAdmin]);
 
   if (authInProgress) return null;
 
@@ -75,10 +92,16 @@ export default function UserTasks() {
         <div className={styles["completed-tasks"]}>
           {isAdmin ? (
             <>
-              <p>There may be studies to approve, check out the Studies page.</p>
-              <Button href="/studies" size="large">
-                View Studies
-              </Button>
+              {hasPendingStudies ? (
+                <>
+                  <p>There are studies to approve, check out the Studies page.</p>
+                  <Button href="/studies" size="large">
+                    View Studies
+                  </Button>
+                </>
+              ) : (
+                <p>You&apos;re all caught up! There are no studies to approve.</p>
+              )}
             </>
           ) : (
             <p>You have completed all your tasks.</p>

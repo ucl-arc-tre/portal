@@ -703,6 +703,9 @@ type ServerInterface interface {
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId string)
 
+	// (GET /studies/pending)
+	GetStudiesPending(c *gin.Context)
+
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
 
@@ -934,6 +937,19 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdReview(c *gin.Context)
 	}
 
 	siw.Handler.PostStudiesAdminStudyIdReview(c, studyId)
+}
+
+// GetStudiesPending operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesPending(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesPending(c)
 }
 
 // GetStudiesStudyId operation middleware
@@ -1367,6 +1383,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
+	router.GET(options.BaseURL+"/studies/pending", wrapper.GetStudiesPending)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.POST(options.BaseURL+"/studies/:studyId", wrapper.PostStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)

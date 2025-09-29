@@ -416,6 +416,40 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	)
 }
 
+func (h *Handler) GetStudiesPending(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+
+	var studies []types.Study
+
+	// or is this already handled by the rbac?
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	if isAdmin || isTreOpsStaff {
+		studies, err = h.studies.PendingStudies()
+		if err != nil {
+			setError(ctx, err, "Failed to get studies")
+			return
+		}
+	}
+
+	response := []openapi.Study{}
+	for _, study := range studies {
+		response = append(response, studyToOpenApiStudy(study))
+	}
+
+	ctx.JSON(http.StatusOK, response)
+
+}
+
 func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{}
 	if err := bindJSONOrSetError(ctx, &review); err != nil {

@@ -138,6 +138,12 @@ func (s *Service) AllStudies() ([]types.Study, error) {
 	return studies, types.NewErrServerError(err)
 }
 
+func (s *Service) PendingStudies() ([]types.Study, error) {
+	studies := []types.Study{}
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", string(openapi.Pending)).Find(&studies).Error
+	return studies, types.NewErrServerError(err)
+}
+
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}

@@ -799,6 +799,34 @@ export type PostStudiesResponses = {
     201: unknown;
 };
 
+export type GetStudiesPendingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/studies/pending';
+};
+
+export type GetStudiesPendingErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesPendingResponses = {
+    200: Array<Study>;
+};
+
+export type GetStudiesPendingResponse = GetStudiesPendingResponses[keyof GetStudiesPendingResponses];
+
 export type GetStudiesByStudyIdData = {
     body?: never;
     path: {
