@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Study, Auth } from "@/openapi";
+import { Study } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
@@ -9,7 +9,6 @@ import styles from "./ManageStudy.module.css";
 
 type ManageStudyProps = {
   study: Study;
-  userData: Auth;
 };
 
 export default function ManageStudy({ study }: ManageStudyProps) {

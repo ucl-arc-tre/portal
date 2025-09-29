@@ -287,6 +287,10 @@ export type StudyBase = {
      * ID of the user who owns the study
      */
     owner_user_id?: string;
+    /**
+     * Username of the user who owns the study
+     */
+    owner_username?: string;
 };
 
 /**
@@ -310,10 +314,21 @@ export type Study = StudyBase & {
      * Time in RFC3339 format when the study was last updated
      */
     updated_at: string;
+    approval_status: StudyApprovalStatus;
+    feedback?: string;
+};
+
+/**
+ * Current approval status of the study
+ */
+export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+
+export type StudyReview = {
+    status: StudyApprovalStatus;
     /**
-     * Current approval status of the study
+     * Feedback for the study
      */
-    approval_status: 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+    feedback?: string;
 };
 
 export type ValidationError = {
@@ -815,6 +830,44 @@ export type GetStudiesByStudyIdResponses = {
 };
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
+
+export type PostStudiesAdminByStudyIdReviewData = {
+    body: StudyReview;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/review';
+};
+
+export type PostStudiesAdminByStudyIdReviewErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesAdminByStudyIdReviewResponses = {
+    /**
+     * Study review submitted successfully
+     */
+    201: unknown;
+};
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;

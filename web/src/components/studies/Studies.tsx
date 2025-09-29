@@ -148,7 +148,7 @@ export default function Studies(props: Props) {
             </Button>
           </div>
 
-          <StudySelection studies={studies} />
+          <StudySelection studies={studies} isAdmin={false} />
         </>
       )}
     </>

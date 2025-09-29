@@ -406,6 +406,7 @@ type Study struct {
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
+	Feedback    *string `json:"feedback,omitempty"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
@@ -457,6 +458,9 @@ type Study struct {
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
+
+	// OwnerUsername Username of the user who owns the study
+	OwnerUsername *string `json:"owner_username,omitempty"`
 
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`
@@ -539,6 +543,9 @@ type StudyBase struct {
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
 
+	// OwnerUsername Username of the user who owns the study
+	OwnerUsername *string `json:"owner_username,omitempty"`
+
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`
 
@@ -551,6 +558,15 @@ type StudyBase struct {
 
 // StudyCreateRequest Base study properties
 type StudyCreateRequest = StudyBase
+
+// StudyReview defines model for StudyReview.
+type StudyReview struct {
+	// Feedback Feedback for the study
+	Feedback *string `json:"feedback,omitempty"`
+
+	// Status Current approval status of the study
+	Status StudyApprovalStatus `json:"status"`
+}
 
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
@@ -621,6 +637,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyCreateRequest
 
+// PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
+type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
+
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
@@ -671,6 +690,9 @@ type ServerInterface interface {
 
 	// (POST /studies)
 	PostStudies(c *gin.Context)
+
+	// (POST /studies/admin/{studyId}/review)
+	PostStudiesAdminStudyIdReview(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
@@ -873,6 +895,30 @@ func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
 	}
 
 	siw.Handler.PostStudies(c)
+}
+
+// PostStudiesAdminStudyIdReview operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdReview(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdReview(c, studyId)
 }
 
 // GetStudiesStudyId operation middleware
@@ -1257,6 +1303,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)

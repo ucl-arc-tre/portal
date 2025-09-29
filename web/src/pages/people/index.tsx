@@ -8,7 +8,7 @@ import styles from "./PeoplePage.module.css";
 import { useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, HelperText, Input } from "@/components/shared/exports";
+import { Alert, AlertMessage, HelperText } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
@@ -66,12 +66,19 @@ export default function PeoplePage() {
     setSearchTerm(query);
     setUsers(response.data);
     setSearchErrorMessage("");
+    setErrorMessage("");
     setIsLoading(false);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     searchRef.current!.value = inputValue;
+  };
+
+  const clearSearchTerm = () => {
+    if (searchRef.current) {
+      searchRef.current.value = "";
+    }
   };
 
   if (!isAdmin && !isTreOpsStaff && !isIAO)
@@ -107,25 +114,41 @@ export default function PeoplePage() {
       {canSearch && (
         <div className={styles["search-wrapper"]}>
           <form className={styles["search-container"]} data-cy="search-users">
-            <Input
+            <input
               placeholder="search users..."
               id={styles.search}
               name="search"
               onChange={handleInputChange}
               ref={searchRef}
               aria-label="search users of the portal"
-            ></Input>
+            ></input>
             <Button
               variant="tertiary"
               icon={<SearchIcon />}
               onClick={(e) => {
                 e.preventDefault();
+
                 handleUserSearch(searchRef.current!.value);
               }}
               type="submit"
               data-cy="submit-user-search"
               aria-label="submit user search query"
             ></Button>
+            {searchTerm.length > 0 && (
+              <Button
+                variant="tertiary"
+                onClick={() => {
+                  handleUserSearch("");
+                  clearSearchTerm();
+                }}
+                className={styles["clear-search"]}
+                type="reset"
+                data-cy="clear-user-search"
+                aria-label="clear user search query"
+              >
+                <small>Clear</small>
+              </Button>
+            )}
           </form>
           <HelperText>
             <small>Search by display name, user principal or email</small>
@@ -136,6 +159,11 @@ export default function PeoplePage() {
       {searchErrorMessage !== "" && (
         <Alert type="error">
           <AlertMessage>{searchErrorMessage}</AlertMessage>
+        </Alert>
+      )}
+      {errorMessage && (
+        <Alert type="error">
+          <AlertMessage>{errorMessage}</AlertMessage>
         </Alert>
       )}
       {!isAdmin && <Callout construction />}
@@ -149,19 +177,12 @@ export default function PeoplePage() {
                 ? `No users found for "${searchTerm}". Try another query`
                 : "No users found, try another query"}
             </div>
-            {errorMessage && (
-              <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
-              </Alert>
-            )}
           </Box>
         ) : (
-          !errorMessage && (
-            <>
-              <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
-              <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
-            </>
-          )
+          <>
+            <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
+            <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+          </>
         ))}
     </>
   );

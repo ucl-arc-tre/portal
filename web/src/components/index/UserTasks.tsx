@@ -11,6 +11,9 @@ export default function UserTasks() {
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
+  const isAdmin = userData?.roles.includes("admin");
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+
   useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true);
@@ -61,7 +64,7 @@ export default function UserTasks() {
             Complete Profile Setup
           </Button>
         </div>
-      ) : !userData.roles.includes("approved-researcher") ? (
+      ) : !isApprovedResearcher ? (
         <div className={styles["researcher-prompt"]}>
           <p>Complete your profile setup to become an approved researcher.</p>
           <Button href="/profile" variant="secondary">
@@ -70,7 +73,16 @@ export default function UserTasks() {
         </div>
       ) : (
         <div className={styles["completed-tasks"]}>
-          <p>You have completed all your tasks.</p>
+          {isAdmin ? (
+            <>
+              <p>There may be studies to approve, check out the Studies page.</p>
+              <Button href="/studies" size="large">
+                View Studies
+              </Button>
+            </>
+          ) : (
+            <p>You have completed all your tasks.</p>
+          )}
         </div>
       )}
     </div>

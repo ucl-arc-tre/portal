@@ -32,6 +32,10 @@ export const HelperText = dynamic(() => import("uikit-react-public").then((mod) 
   ssr: false,
 });
 
+export const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Textarea), {
+  ssr: false,
+});
+
 export const TrainingKindOptions = {
   //  is there a better way of doing this? Won't let me use type as a value
   nhsd: "training_kind_nhsd",
@@ -45,6 +49,20 @@ export function convertRFC3339ToDDMMYYYY(dateString: string) {
 
   return `${day}/${month}/${year}`;
 }
+
+export const formatDate = (dateString: string) => {
+  try {
+    return new Date(dateString).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return dateString;
+  }
+};
 
 export function getHumanReadableTrainingKind(trainingKind: string) {
   // getting the key from the value
