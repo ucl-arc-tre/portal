@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
+import { Input, Label, HelperText, Textarea } from "../shared/exports";
 import styles from "./CreateStudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 
@@ -58,6 +58,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     handleSubmit,
     control,
     setValue,
+    trigger,
     formState: { errors, isValid },
   } = useForm<StudyFormData>({
     mode: "onChange",
@@ -71,9 +72,36 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
-  const nextStep = () => setCurrentStep(currentStep + 1);
-  const prevStep = () => setCurrentStep(currentStep - 1);
+  const [stepValidationError, setStepValidationError] = useState<string | null>(null);
   const totalSteps = 3;
+
+  const nextStep = async () => {
+    setStepValidationError(null);
+
+    if (currentStep === 1) {
+      const titleValid = await trigger("title");
+      const controllerValid = await trigger("dataControllerOrganisation");
+
+      // Validate admin fields if they exist
+      const adminValidResults = await Promise.all(
+        fields.map((_, index) => trigger(`additionalStudyAdminUsernames.${index}.value` as const))
+      );
+
+      if (!titleValid || !controllerValid || !adminValidResults.every((valid) => valid)) {
+        setStepValidationError("Please fix the validation errors before proceeding.");
+        return;
+      }
+    }
+
+    // Step 2 is all optional fields
+    // Step 3's conditional fields will be validated on final submit
+    setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    setStepValidationError(null);
+    setCurrentStep(currentStep - 1);
+  };
 
   const { fields, append, remove } = useFieldArray<StudyFormData, "additionalStudyAdminUsernames", "id">({
     control,
@@ -148,6 +176,8 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </div>
         )}
 
+        {stepValidationError && <div className={styles["error-alert"]}>{stepValidationError}</div>}
+
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>
           <legend>Study Details</legend>
@@ -170,11 +200,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               Study title must be 4-50 characters, start and end with a letter/number, only letters, numbers, spaces,
               and hyphens allowed
             </HelperText>
-            {errors.title && (
-              <Alert type="error">
-                <AlertMessage>{errors.title.message}</AlertMessage>
-              </Alert>
-            )}
+            {errors.title && <span className={styles["error-text"]}>{errors.title.message}</span>}
           </Label>
 
           <Label htmlFor="description">
@@ -237,11 +263,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                             <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
                             <span className={styles["domain-suffix"]}>{domainName}</span>
                           </div>
-                          {fieldState.error && (
-                            <Alert type="error">
-                              <AlertMessage>{fieldState.error.message}</AlertMessage>
-                            </Alert>
-                          )}
+                          {fieldState.error && <span className={styles["error-text"]}>{fieldState.error.message}</span>}
                         </div>
                       )}
                     />
@@ -275,9 +297,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             />
             <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
             {errors.dataControllerOrganisation && (
-              <Alert type="error">
-                <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
-              </Alert>
+              <span className={styles["error-text"]}>{errors.dataControllerOrganisation.message}</span>
             )}
           </Label>
         </fieldset>
@@ -461,13 +481,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 />
               </div>
               {(errors.dataProtectionPrefix || errors.dataProtectionDate || errors.dataProtectionId) && (
-                <Alert type="error">
-                  <AlertMessage>
-                    {errors.dataProtectionPrefix?.message ||
-                      errors.dataProtectionDate?.message ||
-                      errors.dataProtectionId?.message}
-                  </AlertMessage>
-                </Alert>
+                <span className={styles["error-text"]}>
+                  {errors.dataProtectionPrefix?.message ||
+                    errors.dataProtectionDate?.message ||
+                    errors.dataProtectionId?.message}
+                </span>
               )}
             </Label>
           )}
@@ -511,21 +529,21 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         )}
 
         {currentStep < totalSteps && (
-          <Button type="button" size="small" onClick={nextStep} className={styles["button--continue"]} cy="next">
+          <Button
+            type="button"
+            size="small"
+            onClick={() => nextStep()}
+            className={styles["button--continue"]}
+            cy="next"
+          >
             Next &rarr;
           </Button>
         )}
 
         {currentStep === totalSteps && (
-          <>
-            {!isValid && (
-              <HelperText className={styles["form-helper--invalid"]}>Please fill out all required fields</HelperText>
-            )}
-
-            <Button type="submit" disabled={!isValid || isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Request"}
-            </Button>
-          </>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Request"}
+          </Button>
         )}
       </form>
     </Dialog>
