@@ -16,12 +16,14 @@ import (
 func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewEnforcer()
+
 	addBasePolicies(enforcer)
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
-	addAdminUserRoleBindings()
 	addTreOpsStaffPolicy(enforcer)
-	addTreOpsStaffUserRoleBindings()
+
+	addUserRoleBindings(config.AdminUsernames(), Admin)
+	addUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
 }
 
 func addBasePolicies(enforcer *casbin.Enforcer) {
@@ -69,31 +71,14 @@ func addPolicy(enforcer *casbin.Enforcer, policy Policy) (bool, error) {
 	return enforcer.AddPolicy(string(policy.RoleName), policy.Resource, string(policy.Action))
 }
 
-func addAdminUserRoleBindings() {
-	for _, user := range persistedAdminUsers() {
-		_ = must(AddRole(user, Admin))
+func addUserRoleBindings(usernames []types.Username, role RoleName) {
+	removeOutdatedPersistedUserRoleBindings(usernames, role)
+	for _, user := range persistedUsers(usernames) {
+		_ = must(AddRole(user, role))
 	}
 }
 
-func addTreOpsStaffUserRoleBindings() {
-	for _, user := range persistedTreOpsStaffUsers() {
-		_ = must(AddRole(user, TreOpsStaff))
-	}
-}
-
-func persistedAdminUsers() []types.User {
-	users := persistedUsersFromConfig(config.AdminUsernames())
-	removeOutdatedPersistedUserRoleBindings(config.AdminUsernames(), Admin)
-	return users
-}
-
-func persistedTreOpsStaffUsers() []types.User {
-	users := persistedUsersFromConfig(config.TreOpsStaffUsernames())
-	removeOutdatedPersistedUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
-	return users
-}
-
-func persistedUsersFromConfig(usernames []types.Username) []types.User {
+func persistedUsers(usernames []types.Username) []types.User {
 	db := graceful.NewDB()
 	users := []types.User{}
 	for _, username := range usernames {
