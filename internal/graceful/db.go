@@ -41,6 +41,7 @@ func InitDB() {
 			panic(err)
 		}
 	}
+	log.Debug().Msg("Initalised database")
 }
 
 // run the custom migration for the Asset table schema changes
