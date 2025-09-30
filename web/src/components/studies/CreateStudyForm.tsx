@@ -525,7 +525,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </Label>
         </fieldset>
 
-        {stepValidationError && <div className={styles["error-alert"]}>{stepValidationError}</div>}
+        {stepValidationError && (
+          <Alert type="error">
+            <AlertMessage>{stepValidationError}</AlertMessage>
+          </Alert>
+        )}
 
         {currentStep > 1 && (
           <Button
