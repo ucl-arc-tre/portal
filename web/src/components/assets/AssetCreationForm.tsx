@@ -186,9 +186,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
               className={errors.tier ? styles.error : ""}
             >
               <option value="">Select security tier</option>
-              <option value={2}>Tier 2 (Highly Confidential)</option>
-              <option value={3}>Tier 3 (Highly Confidential)</option>
-              <option value={4}>Tier 4 (Highly Confidential)</option>
+              <option value={2}>Tier 2</option>
+              <option value={3}>Tier 3</option>
+              <option value={4}>Tier 4</option>
             </select>
             {errors.tier && <span className={styles["error-text"]}>{errors.tier.message}</span>}
           </div>
