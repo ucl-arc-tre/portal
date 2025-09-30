@@ -37,6 +37,11 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 		return &openapi.ValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
 	}
 
+	// Validate tier
+	if assetData.Tier < 0 || assetData.Tier > 4 {
+		return &openapi.ValidationError{ErrorMessage: "tier must be between 0 and 4"}, nil
+	}
+
 	// Validate locations
 	if len(assetData.Locations) == 0 {
 		return &openapi.ValidationError{ErrorMessage: "at least one location must be specified"}, nil
@@ -121,6 +126,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		Title:                assetData.Title,
 		Description:          assetData.Description,
 		ClassificationImpact: string(assetData.ClassificationImpact),
+		Tier:                 assetData.Tier,
 		Protection:           string(assetData.Protection),
 		LegalBasis:           assetData.LegalBasis,
 		Format:               string(assetData.Format),

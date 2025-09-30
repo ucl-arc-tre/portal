@@ -66,6 +66,7 @@ type Asset struct {
 	Title                string    `gorm:"not null"`
 	Description          string    `gorm:"type:text;not null"`
 	ClassificationImpact string    `gorm:"not null"`
+	Tier                 int       `gorm:"not null;default:0"`
 	Protection           string    `gorm:"not null"`
 	LegalBasis           string    `gorm:"not null"`
 	Format               string    `gorm:"not null"`

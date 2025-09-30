@@ -2,6 +2,7 @@ type AssetFormData = {
   title: string;
   description: string;
   classification_impact: string;
+  tier: number | string; // Can be string from form, converted to number
   protection: string;
   legal_basis: string;
   format: string;

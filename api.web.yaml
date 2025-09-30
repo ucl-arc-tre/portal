@@ -794,6 +794,7 @@ components:
         - title
         - description
         - classification_impact
+        - tier
         - locations
         - protection
         - legal_basis
@@ -819,6 +820,11 @@ components:
             - confidential
             - highly_confidential
           description: Classification level of the asset
+        tier:
+          type: integer
+          minimum: 0
+          maximum: 4
+          description: Security tier level for the asset (0=public, 1=confidential, 2-4=highly confidential)
         locations:
           type: array
           items:
