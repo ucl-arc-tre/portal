@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { Input, Label, HelperText, Textarea } from "../shared/exports";
+import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
 import styles from "./CreateStudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 
@@ -176,8 +176,6 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </div>
         )}
 
-        {stepValidationError && <div className={styles["error-alert"]}>{stepValidationError}</div>}
-
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>
           <legend>Study Details</legend>
@@ -200,7 +198,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               Study title must be 4-50 characters, start and end with a letter/number, only letters, numbers, spaces,
               and hyphens allowed
             </HelperText>
-            {errors.title && <span className={styles["error-text"]}>{errors.title.message}</span>}
+            {errors.title && (
+              <Alert type="error">
+                <AlertMessage>{errors.title.message}</AlertMessage>
+              </Alert>
+            )}
           </Label>
 
           <Label htmlFor="description">
@@ -263,7 +265,11 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                             <Input {...field} type="text" id={`admin-${index}`} placeholder="Valid UCL username" />
                             <span className={styles["domain-suffix"]}>{domainName}</span>
                           </div>
-                          {fieldState.error && <span className={styles["error-text"]}>{fieldState.error.message}</span>}
+                          {fieldState.error && (
+                            <Alert type="error">
+                              <AlertMessage>{fieldState.error.message}</AlertMessage>
+                            </Alert>
+                          )}
                         </div>
                       )}
                     />
@@ -297,7 +303,9 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             />
             <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
             {errors.dataControllerOrganisation && (
-              <span className={styles["error-text"]}>{errors.dataControllerOrganisation.message}</span>
+              <Alert type="error">
+                <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
+              </Alert>
             )}
           </Label>
         </fieldset>
@@ -481,11 +489,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 />
               </div>
               {(errors.dataProtectionPrefix || errors.dataProtectionDate || errors.dataProtectionId) && (
-                <span className={styles["error-text"]}>
-                  {errors.dataProtectionPrefix?.message ||
-                    errors.dataProtectionDate?.message ||
-                    errors.dataProtectionId?.message}
-                </span>
+                <Alert type="error">
+                  <AlertMessage>
+                    {errors.dataProtectionPrefix?.message ||
+                      errors.dataProtectionDate?.message ||
+                      errors.dataProtectionId?.message}
+                  </AlertMessage>
+                </Alert>
               )}
             </Label>
           )}
@@ -515,6 +525,8 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
           </Label>
         </fieldset>
 
+        {stepValidationError && <div className={styles["error-alert"]}>{stepValidationError}</div>}
+
         {currentStep > 1 && (
           <Button
             type="button"
@@ -542,7 +554,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
         {currentStep === totalSteps && (
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit Request"}
+            {isSubmitting ? "Creating study..." : "Create Study"}
           </Button>
         )}
       </form>
