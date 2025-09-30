@@ -1,0 +1,67 @@
+import { useEffect, useState } from "react";
+import { Study, getStudiesPending, getStudies } from "@/openapi";
+import StudySelection from "../studies/StudySelection";
+import Button from "../ui/Button";
+import styles from "./StudiesAdmin.module.css";
+
+export default function StudiesAdmin() {
+  const [tab, setTab] = useState("pending");
+  const [studies, setStudies] = useState<Study[]>([]);
+
+  const fetchPendingStudies = async () => {
+    try {
+      const response = await getStudiesPending();
+      if (response.response.ok) {
+        setStudies(response.data || []);
+      }
+    } catch (error) {
+      console.error("Failed to get pending studies:", error);
+    }
+  };
+  useEffect(() => {
+    fetchPendingStudies();
+  }, []);
+
+  const handleAllStudiesClick = async () => {
+    setTab("all");
+    const response = await getStudies();
+    if (!response.response.ok) {
+      console.error("Failed to get pending studies:", response.error);
+    } else {
+      setStudies(response.data || []);
+    }
+  };
+
+  const handlePendingStudiesClick = async () => {
+    setTab("pending");
+    fetchPendingStudies();
+  };
+
+  return (
+    <>
+      {tab === "pending" && <h2>Studies to Review</h2>}
+      {tab === "all" && <h2>All Studies</h2>}
+
+      <div className={styles["study-tabs"]}>
+        <Button
+          onClick={handlePendingStudiesClick}
+          variant="secondary"
+          className={`${styles.tab} ${styles["pending-studies-tab"]} ${tab === "pending" ? styles.active : ""}`}
+        >
+          Pending Studies
+        </Button>
+        <Button
+          onClick={handleAllStudiesClick}
+          variant="secondary"
+          className={`${styles.tab} ${styles["all-studies-tab"]} ${tab === "all" ? styles.active : ""}`}
+        >
+          All Studies
+        </Button>
+      </div>
+
+      {tab === "all" && <div>search bar</div>}
+
+      <StudySelection studies={studies} isAdmin={true} />
+    </>
+  );
+}

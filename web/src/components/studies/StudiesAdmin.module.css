@@ -1,0 +1,41 @@
+.study-tabs {
+  display: flex;
+  justify-content: space-around;
+  width: 60%;
+  margin-block: 0.8rem;
+}
+
+.tab {
+  border: none !important;
+  transition: all 0.3s ease;
+
+  &.active {
+    font-weight: 600 !important;
+  }
+}
+
+.pending-studies-tab {
+  color: #1e40af;
+  border-bottom: 2px solid #60a5fa !important;
+
+  &.active {
+    background-color: #dbeafe;
+  }
+
+  &:hover {
+    color: #60a5fa;
+  }
+}
+
+.all-studies-tab {
+  color: var(--green-300);
+  border-bottom: 2px solid var(--green-100) !important;
+
+  &.active {
+    background-color: #ddeee0;
+  }
+
+  &:hover {
+    color: var(--green-100);
+  }
+}

@@ -13,6 +13,7 @@ import Loading from "@/components/ui/Loading";
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
 import StudySelection from "@/components/studies/StudySelection";
+import StudiesAdmin from "@/components/studies/StudiesAdmin";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -74,7 +75,7 @@ export default function StudiesPage() {
         </span>
       </Callout>
 
-      {isAdmin && <StudySelection studies={studies} isAdmin={true} />}
+      {isAdmin && <StudiesAdmin />}
 
       {!isAdmin && !isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
