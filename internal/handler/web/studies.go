@@ -61,6 +61,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Title:                asset.Title,
 		Description:          asset.Description,
 		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
+		Tier:                 asset.Tier,
 		Protection:           openapi.AssetProtection(asset.Protection),
 		LegalBasis:           asset.LegalBasis,
 		Format:               openapi.AssetFormat(asset.Format),

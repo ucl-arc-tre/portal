@@ -38,6 +38,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       title: "",
       description: "",
       classification_impact: "",
+      tier: "",
       protection: "",
       legal_basis: "",
       format: "",
@@ -51,16 +52,30 @@ export default function AssetCreationForm(props: AssetFormProps) {
   });
 
   const protectionValue = watch("protection");
+  const classificationValue = watch("classification_impact");
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
+  const showTierSelection = classificationValue === "highly_confidential";
 
   const onFormSubmit = async (data: AssetFormData) => {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
 
+      // Set tier based on classification_impact
+      let tier: number;
+      if (data.classification_impact === "public") {
+        tier = 0;
+      } else if (data.classification_impact === "confidential") {
+        tier = 1;
+      } else {
+        // For highly_confidential, convert the user-selected tier to number (2, 3, or 4)
+        tier = typeof data.tier === "string" ? parseInt(data.tier, 10) : data.tier;
+      }
+
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {
         ...data,
+        tier,
         requires_contract: data.requires_contract === "true" || data.requires_contract === true,
         has_dspt: data.has_dspt === "true" || data.has_dspt === true,
         stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
@@ -145,6 +160,39 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <span className={styles["error-text"]}>{errors.classification_impact.message}</span>
           )}
         </div>
+
+        {showTierSelection && (
+          <div className={styles.field}>
+            <label htmlFor="tier">Security Tier *</label>
+            <div className={styles["info-text"]}>
+              <p>
+                Please select the appropriate security tier based on{" "}
+                <a
+                  href="https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#3-related-policies-and-documents"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  UCL ARC Data Classification and Environment Tiering Policy
+                </a>
+                .
+              </p>
+            </div>
+            <select
+              id="tier"
+              {...register("tier", {
+                required: showTierSelection ? "Security tier is required for highly confidential assets" : false,
+              })}
+              aria-invalid={!!errors.tier}
+              className={errors.tier ? styles.error : ""}
+            >
+              <option value="">Select security tier</option>
+              <option value={2}>Tier 2 (Highly Confidential)</option>
+              <option value={3}>Tier 3 (Highly Confidential)</option>
+              <option value={4}>Tier 4 (Highly Confidential)</option>
+            </select>
+            {errors.tier && <span className={styles["error-text"]}>{errors.tier.message}</span>}
+          </div>
+        )}
 
         <div className={styles.field}>
           <label htmlFor="protection">What protection is applied to this asset in the form described here? *</label>
