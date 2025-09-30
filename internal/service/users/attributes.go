@@ -16,7 +16,7 @@ var (
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 	attrs := types.UserAttributes{}
 	result := s.db.Find(&attrs, "user_id = ?", user.ID)
-	return attrs, types.NewErrServerError(result.Error)
+	return attrs, types.NewErrFromGorm(result.Error)
 }
 
 func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
@@ -33,13 +33,13 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	if chosenName == "" { // assign does not clear the value
 		log.Debug().Any("user", user.Username).Msg("Clearing the chosen name user attribute")
 		result := s.db.Model(&attrs).Where(&attrs).Update("chosen_name", "")
-		return types.NewErrServerError(result.Error)
+		return types.NewErrFromGorm(result.Error)
 	}
-	return types.NewErrServerError(result.Error)
+	return types.NewErrFromGorm(result.Error)
 }
 
 func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {
 	attrs := types.UserAttributes{}
 	result := s.db.Select("chosen_name").Limit(1).Where("user_id = ?", user.ID).Find(&attrs)
-	return attrs.ChosenName, types.NewErrServerError(result.Error)
+	return attrs.ChosenName, types.NewErrFromGorm(result.Error)
 }

@@ -59,12 +59,12 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 		}).
 		FirstOrCreate(&user)
 	if result.Error != nil {
-		return user, types.NewErrServerError(result.Error)
+		return user, types.NewErrFromGorm(result.Error)
 	}
 	userWasCreated := result.RowsAffected > 0
 	if userWasCreated {
 		if _, err := rbac.AddRole(user, rbac.Base); err != nil {
-			return user, fmt.Errorf("failed assign user base role: %v", err)
+			return user, types.NewErrServerError(fmt.Errorf("failed assign user base role: %v", err))
 		}
 	}
 	return user, nil
@@ -87,7 +87,7 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	if result.RowsAffected == 0 {
 		return nil, types.NewNotFoundError("user not found")
 	}
-	return user, types.NewErrServerError(result.Error)
+	return user, types.NewErrFromGorm(result.Error)
 }
 
 func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string) ([]openapi.UserData, error) {
@@ -101,7 +101,7 @@ func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string)
 
 	result := s.db.Where("username IN (?)", usernames).Find(&users)
 	if result.Error != nil {
-		return nil, types.NewErrServerError(result.Error)
+		return nil, types.NewErrFromGorm(result.Error)
 	}
 
 	return s.usersData(users)

@@ -74,7 +74,7 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 	if result.RowsAffected == 0 {
 		return false, nil
 	} else if result.Error != nil {
-		return false, types.NewErrServerError(result.Error)
+		return false, types.NewErrFromGorm(result.Error)
 	}
 	return NHSDTrainingIsValid(record.CompletedAt), nil
 }
@@ -90,7 +90,7 @@ func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Tim
 		CompletedAt: completedAt,
 	}).FirstOrCreate(&record)
 	if result.Error != nil {
-		return types.NewErrServerError(result.Error)
+		return types.NewErrFromGorm(result.Error)
 	}
 	return s.updateApprovedResearcherStatus(user)
 }
@@ -102,7 +102,7 @@ func (s *Service) TrainingRecords(user types.User) ([]openapi.TrainingRecord, er
 	records := []types.UserTrainingRecord{}
 	err := s.db.Order("completed_at desc").Where("user_id = ?", user.ID).Find(&records).Error
 	if err != nil {
-		return trainingRecords, types.NewErrServerError(err)
+		return trainingRecords, types.NewErrFromGorm(err)
 	}
 
 	for _, record := range records {
@@ -131,7 +131,7 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 	if result.RowsAffected == 0 {
 		return nil, types.NewNotFoundError("")
 	} else if result.Error != nil {
-		return nil, types.NewErrServerError(result.Error)
+		return nil, types.NewErrFromGorm(result.Error)
 	}
 	expiresAt := record.CompletedAt.Add(config.TrainingValidity)
 	return &expiresAt, nil
