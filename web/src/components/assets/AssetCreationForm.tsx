@@ -168,7 +168,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
               <p>
                 Please select the appropriate security tier based on{" "}
                 <a
-                  href="https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#3-related-policies-and-documents"
+                  href="https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#5environment-tier-definition"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
