@@ -38,10 +38,5 @@ func (s *Service) CreateUserSponsorship(userId uuid.UUID, sponsorId uuid.UUID) (
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&userSponsorship)
 
-	if result.Error != nil {
-		return types.UserSponsorship{}, types.NewErrServerError(result.Error)
-	}
-
-	return userSponsorship, nil
-
+	return userSponsorship, types.NewErrFromGorm(result.Error, "failed to create user sponsorship")
 }

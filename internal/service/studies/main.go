@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -63,7 +64,8 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]typ
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		user, err := s.users.PersistedUser(types.Username(studyAdminUsername))
 		if err != nil {
-			return admins, types.NewErrServerError(fmt.Errorf("failed to create/find study admin '%s': %w", studyAdminUsername, err))
+			log.Err(err).Any("username", studyAdminUsername).Msg("Failed to get persisted user. Cannot create study admin")
+			return admins, err
 		}
 		admins = append(admins, user)
 	}
@@ -93,7 +95,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
 	if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to check for duplicate study title: %w", err))
+		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
 	if count > 0 {
 		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
@@ -134,14 +136,14 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 func (s *Service) AllStudies() ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
-	return studies, types.NewErrServerError(err)
+	return studies, types.NewErrFromGorm(err)
 }
 
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("id IN (?)", ids).Find(&studies).Error
-	return studies, types.NewErrServerError(err)
+	return studies, types.NewErrFromGorm(err)
 }
 
 // handles the database transaction for creating a study and its admins
@@ -185,7 +187,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	// Create the study
 	if err := tx.Create(&study).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrServerError(err)
+		return nil, types.NewErrFromGorm(err)
 	}
 
 	// Create StudyAdmin records for each study admin user
@@ -196,13 +198,13 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 		}
 		if err := tx.Create(&studyAdmin).Error; err != nil {
 			tx.Rollback()
-			return nil, types.NewErrServerError(fmt.Errorf("failed to create study admin: %w", err))
+			return nil, types.NewErrFromGorm(err, "failed to create study admin")
 		}
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to commit transaction: %w", err))
+		return nil, types.NewErrFromGorm(err, "failed to commit create study transaction")
 	}
 
 	return &study, nil
@@ -212,8 +214,6 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	study := types.Study{}
 	feedback := review.Feedback
 	status := review.Status
-	if err := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback).Error; err != nil {
-		return types.NewErrServerError(err)
-	}
-	return nil
+	result := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback)
+	return types.NewErrFromGorm(result.Error, "failed to update study review")
 }

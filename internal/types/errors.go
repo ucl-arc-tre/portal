@@ -3,6 +3,8 @@ package types
 import (
 	"errors"
 	"fmt"
+
+	"gorm.io/gorm"
 )
 
 var (
@@ -21,6 +23,15 @@ func NewErrServerError(err any) error {
 
 func NewNotFoundError(err any) error {
 	return newErrorWithType(err, ErrNotFound)
+}
+
+func NewErrFromGorm(err error, messages ...string) error {
+	if err == nil {
+		return nil
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		return NewNotFoundError(fmt.Errorf("%v %v", err, messages))
+	}
+	return NewErrServerError(fmt.Errorf("%v %v", err, messages))
 }
 
 func newErrorWithType(err any, errorType error) error {
