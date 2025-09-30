@@ -1,3 +1,11 @@
+.study-actions {
+  margin-block: 1rem;
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+  justify-content: center;
+}
+
 .pre-description {
   display: flex;
   flex-direction: row;
