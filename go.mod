@@ -1,6 +1,6 @@
 module github.com/ucl-arc-tre/portal
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.12.0
@@ -25,6 +25,7 @@ require (
 	github.com/oapi-codegen/runtime v1.1.2
 	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.11.1
+	github.com/ucl-arc-tre/x v0.1.0
 	golang.org/x/text v0.29.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.0
