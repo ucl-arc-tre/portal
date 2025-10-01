@@ -1,13 +1,16 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
   postStudiesByStudyIdAssetsByAssetIdContractsUpload,
+  putStudiesByStudyIdAssetsByAssetIdContractsByContractId,
   ValidationError,
   ContractUploadObject,
+  ContractUpdate,
   Study,
   Asset,
+  Contract,
 } from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
 
@@ -25,9 +28,17 @@ type ContractUploadModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  editingContract?: Contract | null;
 };
 
-export default function ContractUploadModal({ study, asset, isOpen, onClose, onSuccess }: ContractUploadModalProps) {
+export default function ContractUploadModal({
+  study,
+  asset,
+  isOpen,
+  onClose,
+  onSuccess,
+  editingContract,
+}: ContractUploadModalProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +57,28 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
       status: "proposed",
     },
   });
+
+  useEffect(() => {
+    // populate form with existing data when editing
+    if (editingContract) {
+      reset({
+        organisationSignatory: editingContract.organisation_signatory,
+        thirdPartyName: editingContract.third_party_name,
+        status: editingContract.status,
+        startDate: editingContract.start_date,
+        expiryDate: editingContract.expiry_date,
+      });
+    } else {
+      // reset to defaults when not editing
+      reset({
+        status: "proposed",
+        organisationSignatory: "",
+        thirdPartyName: "",
+        startDate: "",
+        expiryDate: "",
+      });
+    }
+  }, [editingContract, reset]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -73,7 +106,8 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
   };
 
   const onSubmit = async (formData: ContractFormData) => {
-    if (!uploadFile) {
+    // For upload mode, file is required
+    if (!editingContract && !uploadFile) {
       setError("Please select a PDF file before uploading.");
       return;
     }
@@ -81,23 +115,46 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
     setUploading(true);
     setError(null);
 
-    try {
-      const contractUploadData: ContractUploadObject = {
-        file: uploadFile,
-        organisation_signatory: formData.organisationSignatory,
-        third_party_name: formData.thirdPartyName,
-        status: formData.status,
-        start_date: formData.startDate,
-        expiry_date: formData.expiryDate,
-      };
+    const contractData: ContractUpdate | ContractUploadObject = {
+      organisation_signatory: formData.organisationSignatory,
+      third_party_name: formData.thirdPartyName,
+      status: formData.status,
+      start_date: formData.startDate,
+      expiry_date: formData.expiryDate,
+    };
 
-      const response = await postStudiesByStudyIdAssetsByAssetIdContractsUpload({
-        path: {
-          studyId: study.id,
-          assetId: asset.id,
-        },
-        body: contractUploadData,
-      });
+    let response;
+    try {
+      if (editingContract) {
+        // Update existing contract
+        const contractUpdateData: ContractUpdate = {
+          ...contractData,
+          file: uploadFile || undefined,
+        };
+
+        response = await putStudiesByStudyIdAssetsByAssetIdContractsByContractId({
+          path: {
+            studyId: study.id,
+            assetId: asset.id,
+            contractId: editingContract.id,
+          },
+          body: contractUpdateData,
+        });
+      } else {
+        // Upload new contract
+        const contractUploadData: ContractUploadObject = {
+          ...contractData,
+          file: uploadFile!,
+        };
+
+        response = await postStudiesByStudyIdAssetsByAssetIdContractsUpload({
+          path: {
+            studyId: study.id,
+            assetId: asset.id,
+          },
+          body: contractUploadData,
+        });
+      }
 
       if (response.error) {
         const errorData = response.error as ValidationError;
@@ -107,7 +164,7 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
       }
 
       if (!response.response.ok) {
-        throw new Error(`Upload failed: ${response.response.status} ${response.response.statusText}`);
+        throw new Error(`Update failed: ${response.response.status} ${response.response.statusText}`);
       }
 
       setUploadSuccess(true);
@@ -122,7 +179,7 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
         setUploadSuccess(false);
       }, 1500);
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error(editingContract ? "Update failed:" : "Upload failed:", error);
       setError("Error: " + String((error as Error).message));
     } finally {
       setUploading(false);
@@ -153,9 +210,11 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
 
   return (
     <Dialog setDialogOpen={handleClose}>
-      <h2>Upload Contract</h2>
+      <h2>{editingContract ? "Edit Contract" : "Upload Contract"}</h2>
       <p className={styles.description}>
-        Upload a PDF contract document for this asset. Only PDF files up to 10MB are accepted.
+        {editingContract
+          ? "Edit the contract details below. You can optionally upload a new PDF file to replace the existing one."
+          : "Upload a PDF contract document for this asset. Only PDF files up to 10MB are accepted."}
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
@@ -171,7 +230,7 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
             />
             <label htmlFor="contract-file-input" className={styles["file-label"]}>
               <div className={styles["upload-icon"]}>📄</div>
-              <span>Choose PDF file or drag and drop</span>
+              <span>{editingContract ? "Choose new PDF file (optional)" : "Choose PDF file or drag and drop"}</span>
             </label>
           </div>
 
@@ -186,9 +245,22 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
             </div>
           )}
 
+          {/* Show current file when editing */}
+          {editingContract && !uploadFile && (
+            <div className={styles["current-file"]}>
+              <div className={styles["file-info"]}>
+                <span className={styles["file-name"]}>Current file: {editingContract.filename}</span>
+              </div>
+            </div>
+          )}
+
           {error && <div className={styles.error}>{error}</div>}
 
-          {uploadSuccess && <div className={styles.success}>Contract uploaded successfully!</div>}
+          {uploadSuccess && (
+            <div className={styles.success}>
+              {editingContract ? "Contract updated successfully!" : "Contract uploaded successfully!"}
+            </div>
+          )}
         </div>
 
         <div className={styles["form-section"]}>
@@ -273,7 +345,13 @@ export default function ContractUploadModal({ study, asset, isOpen, onClose, onS
 
         <div className={styles.actions}>
           <Button type="submit" disabled={uploading} size="large">
-            {uploading ? "Uploading..." : "Upload Contract"}
+            {uploading
+              ? editingContract
+                ? "Updating..."
+                : "Uploading..."
+              : editingContract
+                ? "Update Contract"
+                : "Upload Contract"}
           </Button>
           <Button type="button" onClick={handleClose} variant="secondary" size="large">
             Cancel
