@@ -25,6 +25,8 @@ const (
 
 	TrainingValidityYears = 1
 	TrainingValidity      = TrainingValidityYears * 365 * 24 * time.Hour
+
+	ServerShutdownGraceDuration = 10 * time.Second
 )
 
 var k = koanf.New(".")
