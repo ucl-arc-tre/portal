@@ -14,23 +14,23 @@
     "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
   },
   "dependencies": {
-    "next": "15.5.2",
+    "next": "15.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-hook-form": "^7.62.0",
+    "react-hook-form": "^7.63.0",
     "react-markdown": "^10.1.0",
     "uikit-react-public": "^0.11.24"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@hey-api/openapi-ts": "^0.82.3",
+    "@hey-api/openapi-ts": "^0.84.4",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cypress": "^15.0.0",
+    "cypress": "^15.3.0",
     "cypress-axe": "^1.7.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.2",
+    "eslint-config-next": "15.5.4",
     "prettier": "^3.6.2",
     "typescript": "^5"
   }
