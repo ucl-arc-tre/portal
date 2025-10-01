@@ -3,7 +3,6 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -15,6 +14,16 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
+
+func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
+	return openapi.ContractUploadObject{
+		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
+		ThirdPartyName:        ctx.PostForm("third_party_name"),
+		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
+		StartDate:             ctx.PostForm("start_date"),
+		ExpiryDate:            ctx.PostForm("expiry_date"),
+	}
+}
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
@@ -306,32 +315,11 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	// Create contract metadata for validation
-	contractMetadata := openapi.ContractUploadObject{
-		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
-		ThirdPartyName:        ctx.PostForm("third_party_name"),
-		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
-		StartDate:             ctx.PostForm("start_date"),
-		ExpiryDate:            ctx.PostForm("expiry_date"),
-	}
+	contractMetadata := extractContractFormData(ctx)
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
+	startDate, expiryDate, validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-
-	// Parse start date
-	startDate, err := time.Parse(config.DateFormat, contractMetadata.StartDate)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid start date format")
-		return
-	}
-
-	// Parse expiry date
-	expiryDate, err := time.Parse(config.DateFormat, contractMetadata.ExpiryDate)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid expiry date format")
 		return
 	}
 
@@ -386,30 +374,11 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 		filename = fileHeader.Filename
 	}
 
-	contractMetadata := openapi.ContractUploadObject{
-		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
-		ThirdPartyName:        ctx.PostForm("third_party_name"),
-		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
-		StartDate:             ctx.PostForm("start_date"),
-		ExpiryDate:            ctx.PostForm("expiry_date"),
-	}
+	contractMetadata := extractContractFormData(ctx)
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
+	startDate, expiryDate, validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-
-	// Parse dates
-	startDate, err := time.Parse(config.DateFormat, contractMetadata.StartDate)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid start date format")
-		return
-	}
-
-	expiryDate, err := time.Parse(config.DateFormat, contractMetadata.ExpiryDate)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid expiry date format")
 		return
 	}
 
