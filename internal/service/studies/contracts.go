@@ -2,6 +2,7 @@ package studies
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -81,10 +82,17 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 
 func (s *Service) StoreContract(
 	ctx context.Context,
+	studyID uuid.UUID,
 	pdfContractObj types.S3Object,
 	contractMetadata types.Contract,
 ) error {
 	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
+
+	if assetExists, err := s.assetExists(studyID, contractMetadata.AssetID); err != nil {
+		return err
+	} else if !assetExists {
+		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
+	}
 
 	// Start a database transaction
 	tx := s.db.Begin()
@@ -121,14 +129,20 @@ func (s *Service) StoreContract(
 }
 
 func (s *Service) GetContract(ctx context.Context,
-	studyId uuid.UUID,
-	assetId uuid.UUID,
-	contractId uuid.UUID,
+	studyID uuid.UUID,
+	assetID uuid.UUID,
+	contractID uuid.UUID,
 ) (types.S3Object, error) {
-	log.Debug().Any("contractId", contractId).Msg("Getting contract")
+	log.Debug().Any("contractID", contractID).Msg("Getting contract")
+
+	if exists, err := s.contractExists(studyID, assetID, contractID); err != nil {
+		return types.S3Object{}, err
+	} else if !exists {
+		return types.S3Object{}, types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
+	}
 
 	metadata := s3.ObjectMetadata{
-		Id:   contractId,
+		Id:   contractID,
 		Kind: s3.ContractKind,
 	}
 	return s.s3.GetObject(ctx, metadata)
