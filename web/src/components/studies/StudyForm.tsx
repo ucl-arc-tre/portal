@@ -4,7 +4,7 @@ import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
-import { postStudies, StudyCreateRequest, ValidationError } from "@/openapi";
+import { getStudiesByStudyId, postStudies, StudyCreateRequest, ValidationError } from "@/openapi";
 
 export type StudyFormData = {
   title: string;
@@ -40,7 +40,7 @@ type StudyProps = {
   username: string;
   setStudyFormOpen: (name: boolean) => void;
   fetchStudies?: () => void;
-  isUpdate?: boolean;
+  studyId?: string;
 };
 
 // data protection office id
@@ -50,7 +50,7 @@ const UclDpoId = "Z6364106";
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
 export default function StudyForm(StudyProps: StudyProps) {
-  const { username, setStudyFormOpen, fetchStudies, isUpdate } = StudyProps;
+  const { username, setStudyFormOpen, fetchStudies, studyId } = StudyProps;
   const {
     register,
     handleSubmit,
@@ -113,6 +113,20 @@ export default function StudyForm(StudyProps: StudyProps) {
       setValue("dataProtectionPrefix", "");
     }
   }, [controllerValue, setValue]);
+
+  // if update get the study to populate the fields
+  useEffect(() => {
+    const fetchStudy = async () => {
+      const response = await getStudiesByStudyId({
+        path: { studyId: studyId || "" },
+      });
+
+      console.log(response);
+    };
+    if (studyId) {
+      fetchStudy();
+    }
+  }, [studyId]);
 
   // move this to study form & have it determine if it's an update if an id is given for the study
   const handleStudySubmitCreate = async (data: StudyFormData) => {
@@ -189,7 +203,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     // todo
   };
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    if (!isUpdate) {
+    if (!studyId) {
       await handleStudySubmitCreate(data);
     } else {
       await handleStudySubmitUpdate(data);
@@ -205,7 +219,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
   return (
     <Dialog setDialogOpen={handleCloseForm} className={styles["study-dialog"]} cy="create-study-form">
-      <h2>Create Study</h2>
+      <h2>{studyId ? "Update Study" : "Create Study"}</h2>
       <div className={styles["step-progress"]}>
         <div
           className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""} ${isValid ? styles.valid : ""}`}

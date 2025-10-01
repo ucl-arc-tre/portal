@@ -12,7 +12,6 @@ import Loading from "@/components/ui/Loading";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
-import StudySelection from "@/components/studies/StudySelection";
 import StudiesAdmin from "@/components/studies/StudiesAdmin";
 
 export default function StudiesPage() {
