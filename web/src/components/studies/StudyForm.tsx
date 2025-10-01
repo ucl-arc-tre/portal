@@ -56,6 +56,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     handleSubmit,
     control,
     setValue,
+    trigger,
     formState: { errors, isValid },
   } = useForm<StudyFormData>({
     mode: "onChange",
@@ -71,9 +72,36 @@ export default function StudyForm(StudyProps: StudyProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
-  const nextStep = () => setCurrentStep(currentStep + 1);
-  const prevStep = () => setCurrentStep(currentStep - 1);
+  const [stepValidationError, setStepValidationError] = useState<string | null>(null);
   const totalSteps = 3;
+
+  const nextStep = async () => {
+    setStepValidationError(null);
+
+    if (currentStep === 1) {
+      const titleValid = await trigger("title");
+      const controllerValid = await trigger("dataControllerOrganisation");
+
+      // Validate admin fields if they exist
+      const adminValidResults = await Promise.all(
+        fields.map((_, index) => trigger(`additionalStudyAdminUsernames.${index}.value` as const))
+      );
+
+      if (!titleValid || !controllerValid || !adminValidResults.every((valid) => valid)) {
+        setStepValidationError("Please fix the validation errors before proceeding.");
+        return;
+      }
+    }
+
+    // Step 2 is all optional fields
+    // Step 3's conditional fields will be validated on final submit
+    setCurrentStep(currentStep + 1);
+  };
+
+  const prevStep = () => {
+    setStepValidationError(null);
+    setCurrentStep(currentStep - 1);
+  };
 
   const { fields, append, remove } = useFieldArray<StudyFormData, "additionalStudyAdminUsernames", "id">({
     control,
@@ -589,6 +617,12 @@ export default function StudyForm(StudyProps: StudyProps) {
           </Label>
         </fieldset>
 
+        {stepValidationError && (
+          <Alert type="error">
+            <AlertMessage>{stepValidationError}</AlertMessage>
+          </Alert>
+        )}
+
         {currentStep > 1 && (
           <Button
             type="button"
@@ -603,21 +637,21 @@ export default function StudyForm(StudyProps: StudyProps) {
         )}
 
         {currentStep < totalSteps && (
-          <Button type="button" size="small" onClick={nextStep} className={styles["button--continue"]} cy="next">
+          <Button
+            type="button"
+            size="small"
+            onClick={() => nextStep()}
+            className={styles["button--continue"]}
+            cy="next"
+          >
             Next &rarr;
           </Button>
         )}
 
         {currentStep === totalSteps && (
-          <>
-            {!isValid && (
-              <HelperText className={styles["form-helper--invalid"]}>Please fill out all required fields</HelperText>
-            )}
-
-            <Button type="submit" disabled={!isValid || isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Request"}
-            </Button>
-          </>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Creating study..." : "Create Study"}
+          </Button>
         )}
       </form>
     </Dialog>

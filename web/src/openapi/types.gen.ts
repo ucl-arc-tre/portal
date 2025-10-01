@@ -124,6 +124,10 @@ export type AssetBase = {
      */
     classification_impact: 'public' | 'confidential' | 'highly_confidential';
     /**
+     * Security tier level for the asset (0=public, 1=confidential, 2-4=highly confidential)
+     */
+    tier: number;
+    /**
      * Storage locations and touchpoints for the asset
      */
     locations: Array<string>;

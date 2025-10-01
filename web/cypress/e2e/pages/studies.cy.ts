@@ -50,18 +50,14 @@ describe("Approved researcher can create studies", () => {
   it("can't submit without filling in required fields", () => {
     cy.contains("Create Your First Study").should("be.visible").click();
 
-    // click through form
+    // Try to click next without filling required fields - should show validation error
     cy.get("[data-cy='next']").click();
-    cy.get("[data-cy='next']").click();
-    cy.get("button[type='submit']").should("be.disabled");
+    cy.contains("Please fix the validation errors before proceeding.").should("be.visible");
 
-    // go back to start of form and fill in the fields
-    cy.get("[data-cy='back']").click();
-    cy.get("[data-cy='back']").click();
+    // Fill in required fields
     cy.get("input[name='title']").type("Test Study");
     cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
-    // go to the end and submit
     cy.get("[data-cy='next']").click();
     cy.get("[data-cy='next']").click();
     cy.get("button[type='submit']").should("not.be.disabled");
@@ -81,6 +77,8 @@ describe("Checking conditionally rendered fields", () => {
   });
 
   it("sets DPO id to UCL's if UCL selected", () => {
+    // Fill required fields first
+    cy.get("input[name='title']").type("Test Study");
     cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
     cy.get("[data-cy='next']").click();
@@ -93,6 +91,8 @@ describe("Checking conditionally rendered fields", () => {
   });
 
   it("allows DPO id to be set if not UCL", () => {
+    // Fill required fields first
+    cy.get("input[name='title']").type("Test Study");
     cy.get("input[name='dataControllerOrganisation']").type("Other Organization");
 
     cy.get("[data-cy='next']").click();
@@ -104,6 +104,10 @@ describe("Checking conditionally rendered fields", () => {
   });
 
   it("should show CAG ref when checked", () => {
+    // Fill required fields first
+    cy.get("input[name='title']").type("Test Study");
+    cy.get("input[name='dataControllerOrganisation']").type("UCL");
+
     cy.get("[data-cy='next']").click();
     cy.get("input[name='involvesCag']").check();
 
@@ -111,6 +115,10 @@ describe("Checking conditionally rendered fields", () => {
   });
 
   it("should show IRAS ID when HRA is checked", () => {
+    // Fill required fields first
+    cy.get("input[name='title']").type("Test Study");
+    cy.get("input[name='dataControllerOrganisation']").type("UCL");
+
     cy.get("[data-cy='next']").click();
     cy.get("input[name='involvesHraApproval']").check();
 
@@ -118,6 +126,10 @@ describe("Checking conditionally rendered fields", () => {
   });
 
   it("should show NHS questions when checked", () => {
+    // Fill required fields first
+    cy.get("input[name='title']").type("Test Study");
+    cy.get("input[name='dataControllerOrganisation']").type("UCL");
+
     cy.get("[data-cy='next']").click();
     cy.get("input[name='isNhsAssociated']").check();
 

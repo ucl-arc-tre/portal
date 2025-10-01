@@ -58,12 +58,6 @@
   border-color: #dc3545 !important;
 }
 
-.error-text {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
 .checkbox-label {
   display: flex;
   align-items: center;

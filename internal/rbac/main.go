@@ -115,7 +115,7 @@ func HasRole(user types.User, role RoleName) (bool, error) {
 	return hasRole, types.NewErrServerError(err)
 }
 
-func GetUserIdsWithRole(role RoleName) ([]uuid.UUID, error) {
+func userIdsWithRole(role RoleName) ([]uuid.UUID, error) {
 	userIds, err := enforcer.GetUsersForRole(string(role))
 	if err != nil {
 		return nil, err

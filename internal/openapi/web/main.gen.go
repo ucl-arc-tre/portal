@@ -183,6 +183,9 @@ type Asset struct {
 	// StudyId Unique identifier of the study to which the asset belongs
 	StudyId string `json:"study_id"`
 
+	// Tier Security tier level for the asset (0=public, 1=confidential, 2-4=highly confidential)
+	Tier int `json:"tier"`
+
 	// Title Title of the asset
 	Title string `json:"title"`
 
@@ -236,6 +239,9 @@ type AssetBase struct {
 
 	// StoredOutsideUkEea Whether the asset is stored or processed outside UK and EEA
 	StoredOutsideUkEea bool `json:"stored_outside_uk_eea"`
+
+	// Tier Security tier level for the asset (0=public, 1=confidential, 2-4=highly confidential)
+	Tier int `json:"tier"`
 
 	// Title Title of the asset
 	Title string `json:"title"`

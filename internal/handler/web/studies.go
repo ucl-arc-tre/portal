@@ -61,6 +61,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Title:                asset.Title,
 		Description:          asset.Description,
 		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
+		Tier:                 asset.Tier,
 		Protection:           openapi.AssetProtection(asset.Protection),
 		LegalBasis:           asset.LegalBasis,
 		Format:               openapi.AssetFormat(asset.Format),
@@ -301,7 +302,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	// Get the uploaded file
 	fileHeader, err := ctx.FormFile("file")
 	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Failed to get uploaded file")
+		setError(ctx, types.NewErrInvalidObject(err), "Failed to get uploaded file")
 		return
 	}
 
@@ -323,14 +324,14 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	// Parse start date
 	startDate, err := time.Parse(config.DateFormat, contractMetadata.StartDate)
 	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Invalid start date format")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid start date format")
 		return
 	}
 
 	// Parse expiry date
 	expiryDate, err := time.Parse(config.DateFormat, contractMetadata.ExpiryDate)
 	if err != nil {
-		setError(ctx, types.NewErrServerError(err), "Invalid expiry date format")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid expiry date format")
 		return
 	}
 

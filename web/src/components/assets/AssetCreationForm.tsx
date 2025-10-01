@@ -38,6 +38,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       title: "",
       description: "",
       classification_impact: "",
+      tier: "",
       protection: "",
       legal_basis: "",
       format: "",
@@ -51,16 +52,30 @@ export default function AssetCreationForm(props: AssetFormProps) {
   });
 
   const protectionValue = watch("protection");
+  const classificationValue = watch("classification_impact");
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
+  const showTierSelection = classificationValue === "highly_confidential";
 
   const onFormSubmit = async (data: AssetFormData) => {
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
 
+      // Set tier based on classification_impact
+      let tier: number;
+      if (data.classification_impact === "public") {
+        tier = 0;
+      } else if (data.classification_impact === "confidential") {
+        tier = 1;
+      } else {
+        // For highly_confidential, convert the user-selected tier to number (2, 3, or 4)
+        tier = typeof data.tier === "string" ? parseInt(data.tier, 10) : data.tier;
+      }
+
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {
         ...data,
+        tier,
         requires_contract: data.requires_contract === "true" || data.requires_contract === true,
         has_dspt: data.has_dspt === "true" || data.has_dspt === true,
         stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
@@ -93,7 +108,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             aria-invalid={!!errors.title}
             className={errors.title ? styles.error : ""}
           />
-          {errors.title && <span className={styles["error-text"]}>{errors.title.message}</span>}
+          {errors.title && (
+            <Alert type="error">
+              <AlertMessage>{errors.title.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -109,7 +128,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             aria-invalid={!!errors.description}
             className={errors.description ? styles.error : ""}
           />
-          {errors.description && <span className={styles["error-text"]}>{errors.description.message}</span>}
+          {errors.description && (
+            <Alert type="error">
+              <AlertMessage>{errors.description.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -142,9 +165,48 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <option value="highly_confidential">Highly confidential</option>
           </select>
           {errors.classification_impact && (
-            <span className={styles["error-text"]}>{errors.classification_impact.message}</span>
+            <Alert type="error">
+              <AlertMessage>{errors.classification_impact.message}</AlertMessage>
+            </Alert>
           )}
         </div>
+
+        {showTierSelection && (
+          <div className={styles.field}>
+            <label htmlFor="tier">Security Tier *</label>
+            <div className={styles["info-text"]}>
+              <p>
+                Please select the appropriate security tier based on{" "}
+                <a
+                  href="https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#5environment-tier-definition"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  UCL ARC Data Classification and Environment Tiering Policy
+                </a>
+                .
+              </p>
+            </div>
+            <select
+              id="tier"
+              {...register("tier", {
+                required: showTierSelection ? "Security tier is required for highly confidential assets" : false,
+              })}
+              aria-invalid={!!errors.tier}
+              className={errors.tier ? styles.error : ""}
+            >
+              <option value="">Select security tier</option>
+              <option value={2}>Tier 2</option>
+              <option value={3}>Tier 3</option>
+              <option value={4}>Tier 4</option>
+            </select>
+            {errors.tier && (
+              <Alert type="error">
+                <AlertMessage>{errors.tier.message}</AlertMessage>
+              </Alert>
+            )}
+          </div>
+        )}
 
         <div className={styles.field}>
           <label htmlFor="protection">What protection is applied to this asset in the form described here? *</label>
@@ -163,7 +225,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
               Identifiable or low confidence of pseudonymisation
             </option>
           </select>
-          {errors.protection && <span className={styles["error-text"]}>{errors.protection.message}</span>}
+          {errors.protection && (
+            <Alert type="error">
+              <AlertMessage>{errors.protection.message}</AlertMessage>
+            </Alert>
+          )}
 
           {showUCLGuidanceText && (
             <div className={styles["ucl-guidance"]}>
@@ -207,7 +273,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             aria-invalid={!!errors.legal_basis}
             className={errors.legal_basis ? styles.error : ""}
           />
-          {errors.legal_basis && <span className={styles["error-text"]}>{errors.legal_basis.message}</span>}
+          {errors.legal_basis && (
+            <Alert type="error">
+              <AlertMessage>{errors.legal_basis.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -225,7 +295,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <option value="paper">Paper</option>
             <option value="other">Other</option>
           </select>
-          {errors.format && <span className={styles["error-text"]}>{errors.format.message}</span>}
+          {errors.format && (
+            <Alert type="error">
+              <AlertMessage>{errors.format.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -241,7 +315,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             aria-invalid={!!errors.expires_at}
             className={errors.expires_at ? styles.error : ""}
           />
-          {errors.expires_at && <span className={styles["error-text"]}>{errors.expires_at.message}</span>}
+          {errors.expires_at && (
+            <Alert type="error">
+              <AlertMessage>{errors.expires_at.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -274,7 +352,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             ))}
           </div>
 
-          {errors.locations && <span className={styles["error-text"]}>{errors.locations.message}</span>}
+          {errors.locations && (
+            <Alert type="error">
+              <AlertMessage>{errors.locations.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -305,7 +387,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
               No
             </label>
           </div>
-          {errors.requires_contract && <span className={styles["error-text"]}>{errors.requires_contract.message}</span>}
+          {errors.requires_contract && (
+            <Alert type="error">
+              <AlertMessage>{errors.requires_contract.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -338,7 +424,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
               No
             </label>
           </div>
-          {errors.has_dspt && <span className={styles["error-text"]}>{errors.has_dspt.message}</span>}
+          {errors.has_dspt && (
+            <Alert type="error">
+              <AlertMessage>{errors.has_dspt.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -371,7 +461,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
             </label>
           </div>
           {errors.stored_outside_uk_eea && (
-            <span className={styles["error-text"]}>{errors.stored_outside_uk_eea.message}</span>
+            <Alert type="error">
+              <AlertMessage>{errors.stored_outside_uk_eea.message}</AlertMessage>
+            </Alert>
           )}
         </div>
 
@@ -390,7 +482,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <option value="awaiting">Awaiting: asset awaiting creation in environment</option>
             <option value="destroyed">Destroyed: asset has been destroyed in environment</option>
           </select>
-          {errors.status && <span className={styles["error-text"]}>{errors.status.message}</span>}
+          {errors.status && (
+            <Alert type="error">
+              <AlertMessage>{errors.status.message}</AlertMessage>
+            </Alert>
+          )}
         </div>
 
         {errorMessage && (

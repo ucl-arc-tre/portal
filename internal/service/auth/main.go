@@ -19,7 +19,7 @@ func New() *Service {
 func (s *Service) AuthInfo(ctx context.Context, user types.User) (*openapi.Auth, error) {
 	roles, err := rbac.Roles(user)
 	if err != nil {
-		log.Error().Err(err).Any("user", user.Username).Msg("Failed to get user roles")
+		log.Err(err).Any("user", user.Username).Msg("Failed to get user roles")
 		return nil, err
 	}
 
