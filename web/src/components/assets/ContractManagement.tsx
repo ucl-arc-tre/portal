@@ -15,6 +15,7 @@ export default function ContractManagement({ study, asset }: ContractManagementP
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [editingContract, setEditingContract] = useState<Contract | null>(null);
 
   const fetchContracts = useCallback(async () => {
     setIsLoading(true);
@@ -44,7 +45,13 @@ export default function ContractManagement({ study, asset }: ContractManagementP
 
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
+    setEditingContract(null);
     fetchContracts();
+  };
+
+  const handleEditContract = (contract: Contract) => {
+    setEditingContract(contract);
+    setShowUploadModal(true);
   };
 
   return (
@@ -92,7 +99,13 @@ export default function ContractManagement({ study, asset }: ContractManagementP
       ) : (
         <div className={styles["contracts-list"]}>
           {contracts.map((contract) => (
-            <ContractCard key={contract.id} contract={contract} studyId={study.id} assetId={asset.id} />
+            <ContractCard
+              key={contract.id}
+              contract={contract}
+              studyId={study.id}
+              assetId={asset.id}
+              onEdit={() => handleEditContract(contract)}
+            />
           ))}
         </div>
       )}
@@ -101,8 +114,12 @@ export default function ContractManagement({ study, asset }: ContractManagementP
         study={study}
         asset={asset}
         isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
+        onClose={() => {
+          setShowUploadModal(false);
+          setEditingContract(null);
+        }}
         onSuccess={handleUploadSuccess}
+        editingContract={editingContract}
       />
     </div>
   );

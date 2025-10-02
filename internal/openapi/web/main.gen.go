@@ -100,11 +100,18 @@ const (
 	ContractBaseStatusProposed ContractBaseStatus = "proposed"
 )
 
+// Defines values for ContractUpdateStatus.
+const (
+	ContractUpdateStatusActive   ContractUpdateStatus = "active"
+	ContractUpdateStatusExpired  ContractUpdateStatus = "expired"
+	ContractUpdateStatusProposed ContractUpdateStatus = "proposed"
+)
+
 // Defines values for ContractUploadObjectStatus.
 const (
-	Active   ContractUploadObjectStatus = "active"
-	Expired  ContractUploadObjectStatus = "expired"
-	Proposed ContractUploadObjectStatus = "proposed"
+	ContractUploadObjectStatusActive   ContractUploadObjectStatus = "active"
+	ContractUploadObjectStatusExpired  ContractUploadObjectStatus = "expired"
+	ContractUploadObjectStatusProposed ContractUploadObjectStatus = "proposed"
 )
 
 // Defines values for StudyApprovalStatus.
@@ -329,6 +336,30 @@ type ContractBase struct {
 
 // ContractBaseStatus Current status of the contract
 type ContractBaseStatus string
+
+// ContractUpdate defines model for ContractUpdate.
+type ContractUpdate struct {
+	// ExpiryDate Contract expiry date in YYYY-MM-DD format
+	ExpiryDate string `json:"expiry_date"`
+
+	// File Optional new contract file to replace the existing one
+	File *openapi_types.File `json:"file,omitempty"`
+
+	// OrganisationSignatory Name of the organisation signatory
+	OrganisationSignatory string `json:"organisation_signatory"`
+
+	// StartDate Contract start date in YYYY-MM-DD format
+	StartDate string `json:"start_date"`
+
+	// Status Current status of the contract
+	Status ContractUpdateStatus `json:"status"`
+
+	// ThirdPartyName Name of the third party organization
+	ThirdPartyName string `json:"third_party_name"`
+}
+
+// ContractUpdateStatus Current status of the contract
+type ContractUpdateStatus string
 
 // ContractUploadObject defines model for ContractUploadObject.
 type ContractUploadObject struct {
@@ -655,6 +686,9 @@ type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 // PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdAssetsAssetIdContractsUpload for multipart/form-data ContentType.
 type PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody = ContractUploadObject
 
+// PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody defines body for PutStudiesStudyIdAssetsAssetIdContractsContractId for multipart/form-data ContentType.
+type PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody = ContractUpdate
+
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
 
@@ -723,6 +757,9 @@ type ServerInterface interface {
 
 	// (POST /studies/{studyId}/assets/{assetId}/contracts/upload)
 	PostStudiesStudyIdAssetsAssetIdContractsUpload(c *gin.Context, studyId string, assetId string)
+
+	// (PUT /studies/{studyId}/assets/{assetId}/contracts/{contractId})
+	PutStudiesStudyIdAssetsAssetIdContractsContractId(c *gin.Context, studyId string, assetId string, contractId string)
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
@@ -1146,6 +1183,48 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsUploa
 	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsUpload(c, studyId, assetId)
 }
 
+// PutStudiesStudyIdAssetsAssetIdContractsContractId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetIdContractsContractId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractId" -------------
+	var contractId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutStudiesStudyIdAssetsAssetIdContractsContractId(c, studyId, assetId, contractId)
+}
+
 // GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context) {
 
@@ -1318,6 +1397,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
+	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId", wrapper.PutStudiesStudyIdAssetsAssetIdContractsContractId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
