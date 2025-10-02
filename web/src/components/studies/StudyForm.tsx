@@ -236,10 +236,12 @@ export default function StudyForm(StudyProps: StudyProps) {
           body: studyData,
         });
       }
-
-      if (response.data && fetchStudies) {
+      console.log(response);
+      if (response.data) {
         setStudyFormOpen(false);
-        fetchStudies();
+        if (fetchStudies) {
+          fetchStudies();
+        }
         return;
       }
 
