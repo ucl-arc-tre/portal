@@ -221,7 +221,7 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateAsset(ctx, user, assetData, studyUUID)
+	validationError, err := h.studies.CreateAsset(user, assetData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to create asset")
 		return
@@ -234,19 +234,12 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
 	if err != nil {
 		return
 	}
 
-	assetUUID, err := parseUUIDOrSetError(ctx, assetId)
-	if err != nil {
-		return
-	}
-
-	user := middleware.GetUser(ctx)
-
-	asset, err := h.studies.StudyAssetById(user, studyUUID, assetUUID)
+	asset, err := h.studies.StudyAssetById(uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve asset")
 		return
@@ -333,9 +326,6 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	startDate := mustParseDate(contractMetadata.StartDate)
-	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
-
 	user := middleware.GetUser(ctx)
 
 	// Open the uploaded file
@@ -358,14 +348,14 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
-		StartDate:             startDate,
-		ExpiryDate:            expiryDate,
+		StartDate:             mustParseDate(contractMetadata.StartDate),
+		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 	}
 
 	contractObj := types.S3Object{
 		Content: file,
 	}
-	err = h.studies.StoreContract(ctx, contractObj, contractData)
+	err = h.studies.StoreContract(ctx, uuids[0], contractObj, contractData)
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
 		return
@@ -395,9 +385,6 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 		return
 	}
 
-	startDate := mustParseDate(contractMetadata.StartDate)
-	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
-
 	// Handle file processing if a new file is provided
 	var contractObj *types.S3Object
 	if fileHeader != nil {
@@ -418,15 +405,17 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 	}
 
 	contractUpdateData := types.Contract{
+		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[2]}},
+		AssetID:               uuids[1],
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
-		StartDate:             startDate,
-		ExpiryDate:            expiryDate,
+		StartDate:             mustParseDate(contractMetadata.StartDate),
+		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 		Filename:              filename,
 	}
 
-	err = h.studies.UpdateContract(ctx, uuids[1], uuids[2], contractUpdateData, contractObj)
+	err = h.studies.UpdateContract(ctx, uuids[0], uuids[2], contractUpdateData, contractObj)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
@@ -441,9 +430,7 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 		return
 	}
 
-	user := middleware.GetUser(ctx)
-
-	contracts, err := h.studies.AssetContracts(user, uuids[1])
+	contracts, err := h.studies.AssetContracts(uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve contracts")
 		return
