@@ -150,12 +150,18 @@ func (s *Service) GetContract(ctx context.Context,
 
 func (s *Service) UpdateContract(
 	ctx context.Context,
-	assetId uuid.UUID,
-	contractId uuid.UUID,
+	studyID uuid.UUID,
+	contractID uuid.UUID,
 	contractMetadata types.Contract,
 	pdfContractObj *types.S3Object,
 ) error {
-	log.Debug().Any("contractId", contractId).Msg("Updating contract")
+	log.Debug().Any("contractId", contractID).Msg("Updating contract")
+
+	if exists, err := s.contractExists(studyID, contractMetadata.AssetID, contractID); err != nil {
+		return err
+	} else if !exists {
+		return types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
+	}
 
 	// Start a database transaction
 	tx := s.db.Begin()
@@ -168,7 +174,7 @@ func (s *Service) UpdateContract(
 	// If a new file is provided, update the filename and replace the file in S3
 	if pdfContractObj != nil {
 		metadata := s3.ObjectMetadata{
-			Id:   contractId,
+			Id:   contractID,
 			Kind: s3.ContractKind,
 		}
 		if err := s.s3.StoreObject(ctx, metadata, *pdfContractObj); err != nil {
@@ -179,7 +185,7 @@ func (s *Service) UpdateContract(
 
 	// Update the database record
 	result := tx.Model(&types.Contract{}).
-		Where("id = ? AND asset_id = ?", contractId, assetId).
+		Where("id = ? AND asset_id = ?", contractID, contractMetadata.AssetID).
 		Updates(contractMetadata)
 
 	if result.Error != nil {

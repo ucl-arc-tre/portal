@@ -326,9 +326,6 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	startDate := mustParseDate(contractMetadata.StartDate)
-	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
-
 	user := middleware.GetUser(ctx)
 
 	// Open the uploaded file
@@ -351,8 +348,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
-		StartDate:             startDate,
-		ExpiryDate:            expiryDate,
+		StartDate:             mustParseDate(contractMetadata.StartDate),
+		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 	}
 
 	contractObj := types.S3Object{
@@ -388,9 +385,6 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 		return
 	}
 
-	startDate := mustParseDate(contractMetadata.StartDate)
-	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
-
 	// Handle file processing if a new file is provided
 	var contractObj *types.S3Object
 	if fileHeader != nil {
@@ -411,15 +405,17 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 	}
 
 	contractUpdateData := types.Contract{
+		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[2]}},
+		AssetID:               uuids[1],
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
-		StartDate:             startDate,
-		ExpiryDate:            expiryDate,
+		StartDate:             mustParseDate(contractMetadata.StartDate),
+		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 		Filename:              filename,
 	}
 
-	err = h.studies.UpdateContract(ctx, uuids[1], uuids[2], contractUpdateData, contractObj)
+	err = h.studies.UpdateContract(ctx, uuids[0], uuids[2], contractUpdateData, contractObj)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
