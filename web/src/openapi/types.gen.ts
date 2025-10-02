@@ -372,6 +372,13 @@ export type ContractUploadObject = ContractBase & {
     file: Blob | File;
 };
 
+export type ContractUpdate = ContractBase & {
+    /**
+     * Optional new contract file to replace the existing one
+     */
+    file?: Blob | File;
+};
+
 /**
  * A contract associated with a study asset
  */
@@ -1274,6 +1281,51 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses = {
 };
 
 export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses];
+
+export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData = {
+    body: ContractUpdate;
+    path: {
+        studyId: string;
+        assetId: string;
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}';
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Contract not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdError = PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors[keyof PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors];
+
+export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses = {
+    /**
+     * Contract updated successfully
+     */
+    200: Contract;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponse = PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses[keyof PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData = {
     body?: never;

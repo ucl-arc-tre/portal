@@ -277,6 +277,12 @@ declare global {
       mockContractDownload(): Chainable<any>;
 
       /**
+       * Mock contract edit
+       * @example cy.mockContractEdit()
+       */
+      mockContractEdit(): Chainable<any>;
+
+      /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
        * @param selector - Optional selector to check specific element (defaults to entire page)
        * @example cy.checkAccessibility()
@@ -644,4 +650,10 @@ Cypress.Commands.add("mockContractDownload", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts/*/download", {
     fixture: "valid_nhsd_certificate.pdf", // mocking with an available sample PDF for now, can add a sample contract PDF later
   }).as("downloadContract");
+});
+
+Cypress.Commands.add("mockContractEdit", () => {
+  cy.intercept("PUT", "/web/api/v0/studies/*/assets/*/contracts/*", {
+    statusCode: 204,
+  }).as("editContract");
 });

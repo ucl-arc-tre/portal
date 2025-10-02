@@ -7,9 +7,10 @@ type ContractCardProps = {
   contract: Contract;
   studyId: string;
   assetId: string;
+  onEdit: () => void;
 };
 
-export default function ContractCard({ contract, studyId, assetId }: ContractCardProps) {
+export default function ContractCard({ contract, studyId, assetId, onEdit }: ContractCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -102,6 +103,10 @@ export default function ContractCard({ contract, studyId, assetId }: ContractCar
       <div className={styles.actions}>
         <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
           {downloading ? "Downloading..." : "Download PDF"}
+        </Button>
+
+        <Button onClick={onEdit} size="small">
+          Edit
         </Button>
       </div>
     </div>
