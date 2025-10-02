@@ -117,4 +117,68 @@ describe("Contract Management", () => {
     // Verify download request was made
     cy.wait("@downloadContract");
   });
+
+  it("should prepopulate form fields when editing a contract", () => {
+    cy.mockContractsWithSample();
+
+    cy.visit("/studies/manage?studyId=123456789");
+    cy.waitForAuth();
+    cy.wait("@getStudyById");
+    cy.wait("@getStudyAgreementText");
+    cy.wait("@getStudyAgreementsConfirmed");
+    cy.wait("@getAssetsWithSample");
+
+    cy.contains("Sample Asset Title 1").should("be.visible");
+    cy.contains("Manage Asset").click();
+
+    cy.wait("@getAssetById");
+    cy.wait("@getContractsWithSample");
+
+    cy.contains("Edit").first().click();
+
+    // Verify form is prepopulated with existing values
+    cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organization");
+    cy.get("input[name='thirdPartyName']").should("have.value", "Sample Third Party");
+    cy.get("select[name='status']").should("have.value", "active");
+    cy.get("input[name='startDate']").should("have.value", "2024-01-01");
+    cy.get("input[name='expiryDate']").should("have.value", "2025-12-31");
+
+    // Verify the dialog title shows we're editing
+    cy.contains("Edit Contract").should("be.visible");
+    cy.contains("Current file: sample-contract.pdf").should("be.visible");
+    cy.contains("Choose new PDF file (optional)").should("be.visible");
+  });
+
+  it("should successfully submit edited contract data", () => {
+    cy.mockContractEdit();
+    cy.mockContractsWithSample();
+
+    cy.visit("/studies/manage?studyId=123456789");
+    cy.waitForAuth();
+    cy.wait("@getStudyById");
+    cy.wait("@getStudyAgreementText");
+    cy.wait("@getStudyAgreementsConfirmed");
+    cy.wait("@getAssetsWithSample");
+
+    cy.contains("Sample Asset Title 1").should("be.visible");
+    cy.contains("Manage Asset").click();
+
+    cy.wait("@getAssetById");
+    cy.wait("@getContractsWithSample");
+
+    cy.contains("Edit").first().click();
+
+    // Modify a form field
+    cy.get("select[name='status']").select("expired");
+
+    // Submit the form
+    cy.contains("Update Contract").click();
+
+    cy.wait("@editContract");
+    cy.wait("@getContractsWithSample");
+
+    // Verify the mock contract is displayed
+    cy.contains("sample-contract.pdf").should("be.visible");
+    cy.contains("Sample Organization").should("be.visible");
+  });
 });

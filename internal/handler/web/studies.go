@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,24 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
+
+func mustParseDate(dateStr string) time.Time {
+	parsedDate, err := time.Parse(config.DateFormat, dateStr)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse date %q: %v", dateStr, err))
+	}
+	return parsedDate
+}
+
+func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
+	return openapi.ContractUploadObject{
+		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
+		ThirdPartyName:        ctx.PostForm("third_party_name"),
+		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
+		StartDate:             ctx.PostForm("start_date"),
+		ExpiryDate:            ctx.PostForm("expiry_date"),
+	}
+}
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
@@ -299,14 +318,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	// Create contract metadata for validation
-	contractMetadata := openapi.ContractUploadObject{
-		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
-		ThirdPartyName:        ctx.PostForm("third_party_name"),
-		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
-		StartDate:             ctx.PostForm("start_date"),
-		ExpiryDate:            ctx.PostForm("expiry_date"),
-	}
+	contractMetadata := extractContractFormData(ctx)
 
 	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
 	if validationError != nil {
@@ -314,19 +326,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	// Parse start date
-	startDate, err := time.Parse(config.DateFormat, contractMetadata.StartDate)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid start date format")
-		return
-	}
-
-	// Parse expiry date
-	expiryDate, err := time.Parse(config.DateFormat, contractMetadata.ExpiryDate)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid expiry date format")
-		return
-	}
+	startDate := mustParseDate(contractMetadata.StartDate)
+	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
 
 	user := middleware.GetUser(ctx)
 
@@ -360,6 +361,67 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	err = h.studies.StoreContract(ctx, uuids[0], contractObj, contractData)
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Context, studyId string, assetId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+	if err != nil {
+		return
+	}
+
+	// Get optional uploaded file (don't error if no file provided)
+	fileHeader, _ := ctx.FormFile("file")
+	filename := ""
+	if fileHeader != nil {
+		filename = fileHeader.Filename
+	}
+
+	contractMetadata := extractContractFormData(ctx)
+
+	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
+	if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	startDate := mustParseDate(contractMetadata.StartDate)
+	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
+
+	// Handle file processing if a new file is provided
+	var contractObj *types.S3Object
+	if fileHeader != nil {
+		file, err := fileHeader.Open()
+		if err != nil {
+			setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
+			return
+		}
+		defer func() {
+			if err := file.Close(); err != nil {
+				log.Error().Err(err).Msg("Failed to close uploaded file")
+			}
+		}()
+
+		contractObj = &types.S3Object{
+			Content: file,
+		}
+	}
+
+	contractUpdateData := types.Contract{
+		OrganisationSignatory: contractMetadata.OrganisationSignatory,
+		ThirdPartyName:        contractMetadata.ThirdPartyName,
+		Status:                string(contractMetadata.Status),
+		StartDate:             startDate,
+		ExpiryDate:            expiryDate,
+		Filename:              filename,
+	}
+
+	err = h.studies.UpdateContract(ctx, uuids[1], uuids[2], contractUpdateData, contractObj)
+	if err != nil {
+		setError(ctx, err, "Failed to update contract")
 		return
 	}
 

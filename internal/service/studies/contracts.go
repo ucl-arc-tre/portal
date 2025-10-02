@@ -16,7 +16,8 @@ import (
 )
 
 func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
-	if !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
+	// Only validate file extension if a filename is provided (for an updated contract, file is optional)
+	if filename != "" && !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
 		return &openapi.ValidationError{
 			ErrorMessage: "Only PDF files are allowed",
 		}
@@ -48,7 +49,7 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
-	// Parse start date
+	// Validate start date format
 	startDate, err := time.Parse(config.DateFormat, contractData.StartDate)
 	if err != nil {
 		return &openapi.ValidationError{
@@ -62,7 +63,7 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
-	// Parse expiry date
+	// Validate expiry date format
 	expiryDate, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
 	if err != nil {
 		return &openapi.ValidationError{
@@ -70,7 +71,6 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
-	// Validate that start date is before expiry date
 	if !startDate.Before(expiryDate) {
 		return &openapi.ValidationError{
 			ErrorMessage: "Start date must be before expiry date",
@@ -146,4 +146,50 @@ func (s *Service) GetContract(ctx context.Context,
 		Kind: s3.ContractKind,
 	}
 	return s.s3.GetObject(ctx, metadata)
+}
+
+func (s *Service) UpdateContract(
+	ctx context.Context,
+	assetId uuid.UUID,
+	contractId uuid.UUID,
+	contractMetadata types.Contract,
+	pdfContractObj *types.S3Object,
+) error {
+	log.Debug().Any("contractId", contractId).Msg("Updating contract")
+
+	// Start a database transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// If a new file is provided, update the filename and replace the file in S3
+	if pdfContractObj != nil {
+		metadata := s3.ObjectMetadata{
+			Id:   contractId,
+			Kind: s3.ContractKind,
+		}
+		if err := s.s3.StoreObject(ctx, metadata, *pdfContractObj); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// Update the database record
+	result := tx.Model(&types.Contract{}).
+		Where("id = ? AND asset_id = ?", contractId, assetId).
+		Updates(contractMetadata)
+
+	if result.Error != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(result.Error, "failed to update contract")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit contract update transaction")
+	}
+
+	return nil
 }
