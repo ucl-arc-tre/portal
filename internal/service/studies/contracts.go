@@ -14,22 +14,22 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject, filename string) (time.Time, time.Time, *openapi.ValidationError) {
+func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
 	// Only validate file extension if a filename is provided (for an updated contract, file is optional)
 	if filename != "" && !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Only PDF files are allowed",
 		}
 	}
 
 	if !validation.ContractNamePattern.MatchString(contractData.OrganisationSignatory) {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
 		}
 	}
 
 	if !validation.ContractNamePattern.MatchString(contractData.ThirdPartyName) {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Third party name must be between 2 and 100 characters",
 		}
 	}
@@ -37,47 +37,50 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 	if openapi.ContractStatus(contractData.Status) != openapi.ContractStatusProposed &&
 		openapi.ContractStatus(contractData.Status) != openapi.ContractStatusActive &&
 		openapi.ContractStatus(contractData.Status) != openapi.ContractStatusExpired {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Status must be proposed, active, or expired",
 		}
 	}
 
 	if contractData.StartDate == "" {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Start date is required",
 		}
 	}
 
-	// Parse start date
-	startDate, err := time.Parse(config.DateFormat, contractData.StartDate)
+	// Validate start date format
+	_, err := time.Parse(config.DateFormat, contractData.StartDate)
 	if err != nil {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Invalid start date format",
 		}
 	}
 
 	if contractData.ExpiryDate == "" {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Expiry date is required",
 		}
 	}
 
-	// Parse expiry date
-	expiryDate, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
+	// Validate expiry date format
+	_, err = time.Parse(config.DateFormat, contractData.ExpiryDate)
 	if err != nil {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Invalid expiry date format",
 		}
 	}
 
-	// Validate that start date is before expiry date
+	// Parse both dates to validate that start date is before expiry date
+	startDate, _ := time.Parse(config.DateFormat, contractData.StartDate)
+	expiryDate, _ := time.Parse(config.DateFormat, contractData.ExpiryDate)
+
 	if !startDate.Before(expiryDate) {
-		return time.Time{}, time.Time{}, &openapi.ValidationError{
+		return &openapi.ValidationError{
 			ErrorMessage: "Start date must be before expiry date",
 		}
 	}
 
-	return startDate, expiryDate, nil
+	return nil
 }
 
 func (s *Service) StoreContract(

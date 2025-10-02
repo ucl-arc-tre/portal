@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -14,6 +16,14 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
+
+func mustParseTime(dateStr string) time.Time {
+	parsedTime, err := time.Parse(config.DateFormat, dateStr)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse date %q: %v", dateStr, err))
+	}
+	return parsedTime
+}
 
 func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 	return openapi.ContractUploadObject{
@@ -317,11 +327,14 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 
 	contractMetadata := extractContractFormData(ctx)
 
-	startDate, expiryDate, validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
+	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
+
+	startDate := mustParseTime(contractMetadata.StartDate)
+	expiryDate := mustParseTime(contractMetadata.ExpiryDate)
 
 	user := middleware.GetUser(ctx)
 
@@ -376,11 +389,14 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 
 	contractMetadata := extractContractFormData(ctx)
 
-	startDate, expiryDate, validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
+	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
+
+	startDate := mustParseTime(contractMetadata.StartDate)
+	expiryDate := mustParseTime(contractMetadata.ExpiryDate)
 
 	// Handle file processing if a new file is provided
 	var contractObj *types.S3Object
