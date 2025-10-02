@@ -298,14 +298,9 @@ export type StudyBase = {
 };
 
 /**
- * Request payload for creating a new study
+ * Request payload for creating a new study or updating an existing one
  */
-export type StudyCreateRequest = StudyBase;
-
-/**
- * Request payload for updating a given study
- */
-export type StudyUpdateRequest = StudyBase;
+export type StudyRequest = StudyBase;
 
 /**
  * A research study
@@ -765,7 +760,7 @@ export type GetStudiesResponses = {
 export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
 
 export type PostStudiesData = {
-    body: StudyCreateRequest;
+    body: StudyRequest;
     path?: never;
     query?: never;
     url: '/studies';
@@ -869,7 +864,7 @@ export type GetStudiesByStudyIdResponses = {
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
 export type PostStudiesByStudyIdData = {
-    body: StudyUpdateRequest;
+    body: StudyRequest;
     path: {
         /**
          * ID of the study

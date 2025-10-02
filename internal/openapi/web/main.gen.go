@@ -562,8 +562,8 @@ type StudyBase struct {
 	Title string `json:"title"`
 }
 
-// StudyCreateRequest Base study properties
-type StudyCreateRequest = StudyBase
+// StudyRequest Base study properties
+type StudyRequest = StudyBase
 
 // StudyReview defines model for StudyReview.
 type StudyReview struct {
@@ -573,9 +573,6 @@ type StudyReview struct {
 	// Status Current approval status of the study
 	Status StudyApprovalStatus `json:"status"`
 }
-
-// StudyUpdateRequest Base study properties
-type StudyUpdateRequest = StudyBase
 
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
@@ -644,13 +641,13 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
-type PostStudiesJSONRequestBody = StudyCreateRequest
+type PostStudiesJSONRequestBody = StudyRequest
 
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
 // PostStudiesStudyIdJSONRequestBody defines body for PostStudiesStudyId for application/json ContentType.
-type PostStudiesStudyIdJSONRequestBody = StudyUpdateRequest
+type PostStudiesStudyIdJSONRequestBody = StudyRequest
 
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation

@@ -64,7 +64,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
   return (
     <>
       {studyFormOpen && userData && (
-        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} isUpdate={true} />
+        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} editingStudy={study} />
       )}
 
       <StepProgress
@@ -83,12 +83,13 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
       {getCurrentStepComponent()}
 
-      <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} setStudyFormOpen={setStudyFormOpen} />
-
       {studyStepsCompleted && (
-        <div className={styles["completed-section"]}>
-          <Assets studyId={study.id} studyTitle={study.title} />
-        </div>
+        <>
+          <StudyDetails study={study} isAdmin={false} isStudyOwner={isStudyOwner} setStudyFormOpen={setStudyFormOpen} />
+          <div className={styles["completed-section"]}>
+            <Assets studyId={study.id} studyTitle={study.title} />
+          </div>
+        </>
       )}
     </>
   );

@@ -152,7 +152,7 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
-	studyData := openapi.StudyCreateRequest{}
+	studyData := openapi.StudyRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}

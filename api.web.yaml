@@ -266,7 +266,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StudyCreateRequest"
+              $ref: "#/components/schemas/StudyRequest"
       responses:
         "201":
           description: Study created successfully
@@ -341,7 +341,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StudyUpdateRequest"
+              $ref: "#/components/schemas/StudyRequest"
       responses:
         "200":
           description: Study updated successfully
@@ -1053,18 +1053,10 @@ components:
           type: string
           description: Username of the user who owns the study
 
-    StudyCreateRequest:
+    StudyRequest:
       allOf:
         - $ref: "#/components/schemas/StudyBase"
-      description: Request payload for creating a new study
-
-    StudyUpdateRequest:
-      allOf:
-        - $ref: "#/components/schemas/StudyBase"
-          properties:
-            id:
-              type: string
-      description: Request payload for updating a given study
+      description: Request payload for creating a new study or updating an existing one
 
     Study:
       allOf:

@@ -19,23 +19,23 @@
   border-bottom: 2px solid #60a5fa !important;
 
   &.active {
-    background-color: #dbeafe;
+    background-color: #dbeafe !important;
   }
 
   &:hover {
-    color: #60a5fa;
+    color: #60a5fa !important;
   }
 }
 
 .all-studies-tab {
-  color: var(--green-300);
+  color: var(--green-300) !important;
   border-bottom: 2px solid var(--green-100) !important;
 
   &.active {
-    background-color: #ddeee0;
+    background-color: #ddeee0 !important;
   }
 
   &:hover {
-    color: var(--green-100);
+    color: var(--green-100) !important;
   }
 }

@@ -39,7 +39,7 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
@@ -58,7 +58,7 @@ func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCre
 	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
 }
 
-func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]types.User, error) {
+func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.User, error) {
 	admins := []types.User{}
 
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
@@ -72,7 +72,7 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]typ
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
@@ -111,7 +111,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
 	validationError, err := s.validateStudyData(ctx, owner, studyData)
 	if err != nil || validationError != nil {
 		return validationError, err
@@ -153,7 +153,7 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 }
 
 // given a study and data from a request, line up the values
-func setStudyFromStudyData(study *types.Study, studyData openapi.StudyCreateRequest) {
+func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 	study.Description = studyData.Description
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
@@ -178,7 +178,7 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyCreateRequ
 }
 
 // handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) (*types.Study, error) {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
@@ -231,7 +231,7 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	return types.NewErrFromGorm(result.Error, "failed to update study review")
 }
 
-func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyUpdateRequest) error {
+func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
 	study := types.Study{}
 
 	setStudyFromStudyData(&study, studyData)
