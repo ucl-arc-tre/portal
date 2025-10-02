@@ -1,6 +1,6 @@
 import { postStudiesAdminByStudyIdReview, postStudiesByStudyIdReview, Study } from "@/openapi";
 import Box from "../ui/Box";
-import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
+import { Alert, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
@@ -131,10 +131,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
           {study.feedback && (
             <Alert type={"warning"} className={styles["feedback-alert"]}>
-              <AlertMessage>
-                <h4>This study has been rejected and the following feedback has been provided:</h4>
-                <p>{study.feedback}</p>
-              </AlertMessage>
+              <h4>This study has been rejected and the following feedback has been provided:</h4>
+              <p>{study.feedback}</p>
               <hr></hr>
               <small>
                 <em>Please adjust as appropriate and request another review.</em>
