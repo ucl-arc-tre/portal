@@ -142,7 +142,7 @@ export type AssetBase = {
     /**
      * Legal basis for holding the asset
      */
-    legal_basis: string;
+    legal_basis: 'consent' | 'contract' | 'legal_obligation' | 'vital_interests' | 'public_task' | 'legitimate_interests';
     /**
      * Format of the asset
      */

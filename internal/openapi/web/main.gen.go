@@ -32,6 +32,16 @@ const (
 	AssetFormatPaper      AssetFormat = "paper"
 )
 
+// Defines values for AssetLegalBasis.
+const (
+	AssetLegalBasisConsent             AssetLegalBasis = "consent"
+	AssetLegalBasisContract            AssetLegalBasis = "contract"
+	AssetLegalBasisLegalObligation     AssetLegalBasis = "legal_obligation"
+	AssetLegalBasisLegitimateInterests AssetLegalBasis = "legitimate_interests"
+	AssetLegalBasisPublicTask          AssetLegalBasis = "public_task"
+	AssetLegalBasisVitalInterests      AssetLegalBasis = "vital_interests"
+)
+
 // Defines values for AssetProtection.
 const (
 	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
@@ -58,6 +68,16 @@ const (
 	AssetBaseFormatElectronic AssetBaseFormat = "electronic"
 	AssetBaseFormatOther      AssetBaseFormat = "other"
 	AssetBaseFormatPaper      AssetBaseFormat = "paper"
+)
+
+// Defines values for AssetBaseLegalBasis.
+const (
+	AssetBaseLegalBasisConsent             AssetBaseLegalBasis = "consent"
+	AssetBaseLegalBasisContract            AssetBaseLegalBasis = "contract"
+	AssetBaseLegalBasisLegalObligation     AssetBaseLegalBasis = "legal_obligation"
+	AssetBaseLegalBasisLegitimateInterests AssetBaseLegalBasis = "legitimate_interests"
+	AssetBaseLegalBasisPublicTask          AssetBaseLegalBasis = "public_task"
+	AssetBaseLegalBasisVitalInterests      AssetBaseLegalBasis = "vital_interests"
 )
 
 // Defines values for AssetBaseProtection.
@@ -170,7 +190,7 @@ type Asset struct {
 	Id string `json:"id"`
 
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis string `json:"legal_basis"`
+	LegalBasis AssetLegalBasis `json:"legal_basis"`
 
 	// Locations Storage locations and touchpoints for the asset
 	Locations []string `json:"locations"`
@@ -206,6 +226,9 @@ type AssetClassificationImpact string
 // AssetFormat Format of the asset
 type AssetFormat string
 
+// AssetLegalBasis Legal basis for holding the asset
+type AssetLegalBasis string
+
 // AssetProtection Type of protection applied to the asset
 type AssetProtection string
 
@@ -230,7 +253,7 @@ type AssetBase struct {
 	HasDspt bool `json:"has_dspt"`
 
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis string `json:"legal_basis"`
+	LegalBasis AssetBaseLegalBasis `json:"legal_basis"`
 
 	// Locations Storage locations and touchpoints for the asset
 	Locations []string `json:"locations"`
@@ -259,6 +282,9 @@ type AssetBaseClassificationImpact string
 
 // AssetBaseFormat Format of the asset
 type AssetBaseFormat string
+
+// AssetBaseLegalBasis Legal basis for holding the asset
+type AssetBaseLegalBasis string
 
 // AssetBaseProtection Type of protection applied to the asset
 type AssetBaseProtection string

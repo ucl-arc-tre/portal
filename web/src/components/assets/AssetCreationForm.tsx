@@ -252,7 +252,8 @@ export default function AssetCreationForm(props: AssetFormProps) {
           <label htmlFor="legal_basis">What is the legal basis for holding this asset? *</label>
           <div className={styles["info-text"]}>
             <p>
-              To learn more about the legal basis requirements refer to{" "}
+              Select the most relevant legal basis from the six options available. To learn more about the legal basis
+              requirements refer to{" "}
               <a
                 href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/"
                 target="_blank"
@@ -262,17 +263,40 @@ export default function AssetCreationForm(props: AssetFormProps) {
               </a>
             </p>
           </div>
-          <input
+          <select
             id="legal_basis"
-            type="text"
-            placeholder="Legal basis"
             {...register("legal_basis", {
               required: "Legal basis is required",
-              maxLength: { value: 255, message: "This must be less than 255 characters" },
             })}
             aria-invalid={!!errors.legal_basis}
             className={errors.legal_basis ? styles.error : ""}
-          />
+          >
+            <option value="">Select legal basis</option>
+            <option value="consent">
+              Consent: the individual has given clear consent for you to process their personal data for a specific
+              purpose
+            </option>
+            <option value="contract">
+              Contract: the processing is necessary for a contract you have with the individual, or because they have
+              asked you to take specific steps before entering into a contract
+            </option>
+            <option value="legal_obligation">
+              Legal obligation: the processing is necessary for you to comply with the law (not including contractual
+              obligations)
+            </option>
+            <option value="vital_interests">
+              Vital interests: the processing is necessary to protect someone&apos;s life
+            </option>
+            <option value="public_task">
+              Public task: the processing is necessary for you to perform a task in the public interest or for your
+              official functions, and the task or function has a clear basis in law
+            </option>
+            <option value="legitimate_interests">
+              Legitimate interests: the processing is necessary for your legitimate interests or the legitimate
+              interests of a third party, unless there is a good reason to protect the individual&apos;s personal data
+              which overrides those legitimate interests
+            </option>
+          </select>
           {errors.legal_basis && (
             <Alert type="error">
               <AlertMessage>{errors.legal_basis.message}</AlertMessage>
