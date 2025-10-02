@@ -7,7 +7,6 @@ import { formatDate } from "../shared/exports";
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  studyTitle: string;
 };
 
 const formatClassification = (classification: string) => {
@@ -18,7 +17,7 @@ const formatProtection = (protection: string) => {
   return protection.replace(/_/g, " ");
 };
 
-export default function AssetCard({ studyId, studyTitle, asset }: AssetCardProps) {
+export default function AssetCard({ studyId, asset }: AssetCardProps) {
   const router = useRouter();
 
   const getClassificationClass = (classification: string) => {
