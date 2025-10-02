@@ -49,7 +49,7 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 	}
 
 	// Validate start date format
-	_, err := time.Parse(config.DateFormat, contractData.StartDate)
+	startDate, err := time.Parse(config.DateFormat, contractData.StartDate)
 	if err != nil {
 		return &openapi.ValidationError{
 			ErrorMessage: "Invalid start date format",
@@ -63,16 +63,12 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 	}
 
 	// Validate expiry date format
-	_, err = time.Parse(config.DateFormat, contractData.ExpiryDate)
+	expiryDate, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
 	if err != nil {
 		return &openapi.ValidationError{
 			ErrorMessage: "Invalid expiry date format",
 		}
 	}
-
-	// Parse both dates to validate that start date is before expiry date
-	startDate, _ := time.Parse(config.DateFormat, contractData.StartDate)
-	expiryDate, _ := time.Parse(config.DateFormat, contractData.ExpiryDate)
 
 	if !startDate.Before(expiryDate) {
 		return &openapi.ValidationError{

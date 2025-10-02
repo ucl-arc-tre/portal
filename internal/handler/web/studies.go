@@ -17,7 +17,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func mustParseTime(dateStr string) time.Time {
+func mustParseDate(dateStr string) time.Time {
 	parsedTime, err := time.Parse(config.DateFormat, dateStr)
 	if err != nil {
 		panic(fmt.Sprintf("failed to parse date %q: %v", dateStr, err))
@@ -333,8 +333,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
-	startDate := mustParseTime(contractMetadata.StartDate)
-	expiryDate := mustParseTime(contractMetadata.ExpiryDate)
+	startDate := mustParseDate(contractMetadata.StartDate)
+	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
 
 	user := middleware.GetUser(ctx)
 
@@ -395,8 +395,8 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 		return
 	}
 
-	startDate := mustParseTime(contractMetadata.StartDate)
-	expiryDate := mustParseTime(contractMetadata.ExpiryDate)
+	startDate := mustParseDate(contractMetadata.StartDate)
+	expiryDate := mustParseDate(contractMetadata.ExpiryDate)
 
 	// Handle file processing if a new file is provided
 	var contractObj *types.S3Object
