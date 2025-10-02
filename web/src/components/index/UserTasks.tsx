@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
-import { getProfile, getStudiesPending } from "@/openapi";
+import { getProfile, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 
@@ -41,7 +41,7 @@ export default function UserTasks() {
   useEffect(() => {
     const fetchPendingStudies = async () => {
       try {
-        const response = await getStudiesPending();
+        const response = await getStudies({ query: { status: "Pending" } });
         if (response.response.ok) {
           if (response.data && response.data.length > 0) {
             setHasPendingStudies(true);

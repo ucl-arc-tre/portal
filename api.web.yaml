@@ -245,6 +245,13 @@ paths:
   /studies:
     get:
       description: Get all studies accessible to the current user
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+          required: false
+          description: get studies by status
       responses:
         "200":
           content:
@@ -278,24 +285,6 @@ paths:
                 $ref: "#/components/schemas/ValidationError"
         "406":
           description: Invalid request
-        "403":
-          description: Forbidden
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
-  /studies/pending:
-    get:
-      description: Get all studies pending approval
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Study"
         "403":
           description: Forbidden
         "500":
@@ -382,7 +371,7 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/review:
+  /studies/{studyId}/pending:
     post:
       description: Update study status to pending
       parameters:
@@ -392,12 +381,6 @@ paths:
           description: ID of the study
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/StudyReview"
       responses:
         "201":
           description: Study review submitted successfully

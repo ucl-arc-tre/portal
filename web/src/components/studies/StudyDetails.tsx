@@ -1,4 +1,4 @@
-import { postStudiesAdminByStudyIdReview, postStudiesByStudyIdReview, Study } from "@/openapi";
+import { postStudiesAdminByStudyIdReview, postStudiesByStudyIdPending, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -39,9 +39,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
         setApprovalStatus("Rejected");
       }
     } else if (status === "Pending") {
-      const response = await postStudiesByStudyIdReview({
+      const response = await postStudiesByStudyIdPending({
         path: { studyId },
-        body: { status: "Pending" },
       });
       if (response.response.ok) {
         setApprovalStatus("Pending");

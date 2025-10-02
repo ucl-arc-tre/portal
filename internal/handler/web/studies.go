@@ -109,10 +109,27 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	}
 }
 
-func (h *Handler) GetStudies(ctx *gin.Context) {
+func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) {
 	user := middleware.GetUser(ctx)
 
 	var studies []types.Study
+
+	status := params.Status
+	isPending := string(openapi.Pending)
+
+	if status == &isPending {
+
+		studies, err := h.studies.PendingStudies()
+		if err != nil {
+			setError(ctx, err, "Failed to get studies")
+			return
+		}
+		response := []openapi.Study{}
+		for _, study := range studies {
+			response = append(response, studyToOpenApiStudy(study))
+		}
+		ctx.JSON(http.StatusOK, response)
+	}
 
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
@@ -466,25 +483,6 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	)
 }
 
-func (h *Handler) GetStudiesPending(ctx *gin.Context) {
-
-	var studies []types.Study
-
-	studies, err := h.studies.PendingStudies()
-	if err != nil {
-		setError(ctx, err, "Failed to get studies")
-		return
-	}
-
-	response := []openapi.Study{}
-	for _, study := range studies {
-		response = append(response, studyToOpenApiStudy(study))
-	}
-
-	ctx.JSON(http.StatusOK, response)
-
-}
-
 func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{}
 	if err := bindJSONOrSetError(ctx, &review); err != nil {
@@ -510,7 +508,7 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 
 	ctx.Status(http.StatusOK)
 }
-func (h *Handler) PostStudiesStudyIdReview(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{}
 	if err := bindJSONOrSetError(ctx, &review); err != nil {
 		return
@@ -536,14 +534,18 @@ func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
 	if err != nil {
 		return
 	}
+	studyData := openapi.StudyRequest{}
+	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
+		return
+	}
 
 	log.Debug().Msgf("Updating study [%v]", studyUUID)
 
-	// err = h.studies.UpdateStudy(studyUUID, )
-	// if err != nil {
-	// 	setError(ctx, err, "Failed to update study status")
-	// 	return
-	// }
+	err = h.studies.UpdateStudy(studyUUID, studyData)
+	if err != nil {
+		setError(ctx, err, "Failed to update study status")
+		return
+	}
 
 	ctx.Status(http.StatusOK)
 }

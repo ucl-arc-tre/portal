@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Study, getStudiesPending, getStudies } from "@/openapi";
+import { Study, getStudies } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
 import Button from "../ui/Button";
 import styles from "./StudiesAdmin.module.css";
@@ -10,7 +10,7 @@ export default function StudiesAdmin() {
 
   const fetchPendingStudies = async () => {
     try {
-      const response = await getStudiesPending();
+      const response = await getStudies({ query: { status: "Pending" } });
       if (response.response.ok) {
         setStudies(response.data || []);
       }

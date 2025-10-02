@@ -745,7 +745,12 @@ export type PostUsersInviteResponses = {
 export type GetStudiesData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * get studies by status
+         */
+        status?: string;
+    };
     url: '/studies';
 };
 
@@ -808,34 +813,6 @@ export type PostStudiesResponses = {
      */
     201: unknown;
 };
-
-export type GetStudiesPendingData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/studies/pending';
-};
-
-export type GetStudiesPendingErrors = {
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type GetStudiesPendingResponses = {
-    200: Array<Study>;
-};
-
-export type GetStudiesPendingResponse = GetStudiesPendingResponses[keyof GetStudiesPendingResponses];
 
 export type GetStudiesByStudyIdData = {
     body?: never;
@@ -950,8 +927,8 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
     201: unknown;
 };
 
-export type PostStudiesByStudyIdReviewData = {
-    body: StudyReview;
+export type PostStudiesByStudyIdPendingData = {
+    body?: never;
     path: {
         /**
          * ID of the study
@@ -959,10 +936,10 @@ export type PostStudiesByStudyIdReviewData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/review';
+    url: '/studies/{studyId}/pending';
 };
 
-export type PostStudiesByStudyIdReviewErrors = {
+export type PostStudiesByStudyIdPendingErrors = {
     /**
      * Forbidden
      */
@@ -981,7 +958,7 @@ export type PostStudiesByStudyIdReviewErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdReviewResponses = {
+export type PostStudiesByStudyIdPendingResponses = {
     /**
      * Study review submitted successfully
      */

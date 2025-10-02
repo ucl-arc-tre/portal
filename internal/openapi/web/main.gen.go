@@ -676,6 +676,12 @@ type ValidationError struct {
 	ErrorMessage string `json:"error_message"`
 }
 
+// GetStudiesParams defines parameters for GetStudies.
+type GetStudiesParams struct {
+	// Status get studies by status
+	Status *string `form:"status,omitempty" json:"status,omitempty"`
+}
+
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
@@ -718,9 +724,6 @@ type PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody = Contra
 // PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody defines body for PutStudiesStudyIdAssetsAssetIdContractsContractId for multipart/form-data ContentType.
 type PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody = ContractUpdate
 
-// PostStudiesStudyIdReviewJSONRequestBody defines body for PostStudiesStudyIdReview for application/json ContentType.
-type PostStudiesStudyIdReviewJSONRequestBody = StudyReview
-
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
 
@@ -758,16 +761,13 @@ type ServerInterface interface {
 	PostProfileTraining(c *gin.Context)
 
 	// (GET /studies)
-	GetStudies(c *gin.Context)
+	GetStudies(c *gin.Context, params GetStudiesParams)
 
 	// (POST /studies)
 	PostStudies(c *gin.Context)
 
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId string)
-
-	// (GET /studies/pending)
-	GetStudiesPending(c *gin.Context)
 
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
@@ -802,8 +802,8 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
 
-	// (POST /studies/{studyId}/review)
-	PostStudiesStudyIdReview(c *gin.Context, studyId string)
+	// (POST /studies/{studyId}/pending)
+	PostStudiesStudyIdPending(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -958,6 +958,19 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 // GetStudies operation middleware
 func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStudiesParams
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "status", c.Request.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -965,7 +978,7 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetStudies(c)
+	siw.Handler.GetStudies(c, params)
 }
 
 // PostStudies operation middleware
@@ -1003,19 +1016,6 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdReview(c *gin.Context)
 	}
 
 	siw.Handler.PostStudiesAdminStudyIdReview(c, studyId)
-}
-
-// GetStudiesPending operation middleware
-func (siw *ServerInterfaceWrapper) GetStudiesPending(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetStudiesPending(c)
 }
 
 // GetStudiesStudyId operation middleware
@@ -1345,8 +1345,8 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
 }
 
-// PostStudiesStudyIdReview operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdReview(c *gin.Context) {
+// PostStudiesStudyIdPending operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdPending(c *gin.Context) {
 
 	var err error
 
@@ -1366,7 +1366,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdReview(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdReview(c, studyId)
+	siw.Handler.PostStudiesStudyIdPending(c, studyId)
 }
 
 // GetUsers operation middleware
@@ -1491,7 +1491,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
-	router.GET(options.BaseURL+"/studies/pending", wrapper.GetStudiesPending)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.POST(options.BaseURL+"/studies/:studyId", wrapper.PostStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
@@ -1503,7 +1502,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
 	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId", wrapper.PutStudiesStudyIdAssetsAssetIdContractsContractId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
-	router.POST(options.BaseURL+"/studies/:studyId/review", wrapper.PostStudiesStudyIdReview)
+	router.POST(options.BaseURL+"/studies/:studyId/pending", wrapper.PostStudiesStudyIdPending)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
