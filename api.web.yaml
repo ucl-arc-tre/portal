@@ -893,7 +893,7 @@ components:
             - vital_interests
             - public_task
             - legitimate_interests
-          description: Legal basis for holding the asset under Article 6 of UK GDPR
+          description: Legal basis for holding the asset
         format:
           type: string
           enum:

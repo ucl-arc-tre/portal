@@ -140,7 +140,7 @@ export type AssetBase = {
      */
     protection: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
     /**
-     * Legal basis for holding the asset under Article 6 of UK GDPR
+     * Legal basis for holding the asset
      */
     legal_basis: 'consent' | 'contract' | 'legal_obligation' | 'vital_interests' | 'public_task' | 'legitimate_interests';
     /**

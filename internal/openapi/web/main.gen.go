@@ -189,7 +189,7 @@ type Asset struct {
 	// Id Unique identifier for the asset
 	Id string `json:"id"`
 
-	// LegalBasis Legal basis for holding the asset under Article 6 of UK GDPR
+	// LegalBasis Legal basis for holding the asset
 	LegalBasis AssetLegalBasis `json:"legal_basis"`
 
 	// Locations Storage locations and touchpoints for the asset
@@ -226,7 +226,7 @@ type AssetClassificationImpact string
 // AssetFormat Format of the asset
 type AssetFormat string
 
-// AssetLegalBasis Legal basis for holding the asset under Article 6 of UK GDPR
+// AssetLegalBasis Legal basis for holding the asset
 type AssetLegalBasis string
 
 // AssetProtection Type of protection applied to the asset
@@ -252,7 +252,7 @@ type AssetBase struct {
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
 
-	// LegalBasis Legal basis for holding the asset under Article 6 of UK GDPR
+	// LegalBasis Legal basis for holding the asset
 	LegalBasis AssetBaseLegalBasis `json:"legal_basis"`
 
 	// Locations Storage locations and touchpoints for the asset
@@ -283,7 +283,7 @@ type AssetBaseClassificationImpact string
 // AssetBaseFormat Format of the asset
 type AssetBaseFormat string
 
-// AssetBaseLegalBasis Legal basis for holding the asset under Article 6 of UK GDPR
+// AssetBaseLegalBasis Legal basis for holding the asset
 type AssetBaseLegalBasis string
 
 // AssetBaseProtection Type of protection applied to the asset
