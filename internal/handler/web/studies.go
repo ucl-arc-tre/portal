@@ -82,7 +82,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
 		Tier:                 asset.Tier,
 		Protection:           openapi.AssetProtection(asset.Protection),
-		LegalBasis:           asset.LegalBasis,
+		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
 		Format:               openapi.AssetFormat(asset.Format),
 		ExpiresAt:            asset.ExpiresAt.Format(config.TimeFormat),
 		Locations:            asset.LocationStrings(),

@@ -58,8 +58,16 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 	}
 
 	// Validate legal_basis
-	if !validation.TextField500Pattern.MatchString(assetData.LegalBasis) {
-		return &openapi.ValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
+	validLegalBases := []openapi.AssetBaseLegalBasis{
+		openapi.AssetBaseLegalBasisConsent,
+		openapi.AssetBaseLegalBasisContract,
+		openapi.AssetBaseLegalBasisLegalObligation,
+		openapi.AssetBaseLegalBasisVitalInterests,
+		openapi.AssetBaseLegalBasisPublicTask,
+		openapi.AssetBaseLegalBasisLegitimateInterests,
+	}
+	if !slices.Contains(validLegalBases, assetData.LegalBasis) {
+		return &openapi.ValidationError{ErrorMessage: "legal_basis must be one of: consent, contract, legal_obligation, vital_interests, public_task, legitimate_interests"}, nil
 	}
 
 	// Validate format field
@@ -128,7 +136,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		ClassificationImpact: string(assetData.ClassificationImpact),
 		Tier:                 assetData.Tier,
 		Protection:           string(assetData.Protection),
-		LegalBasis:           assetData.LegalBasis,
+		LegalBasis:           string(assetData.LegalBasis),
 		Format:               string(assetData.Format),
 		ExpiresAt:            expiryDate,
 		HasDspt:              assetData.HasDspt,
