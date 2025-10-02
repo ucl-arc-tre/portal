@@ -546,7 +546,7 @@ Cypress.Commands.add("mockAssetAccess", () => {
       description: "Sample Asset Description 1",
       classification_impact: "confidential",
       protection: "pseudonymisation",
-      legal_basis: "test123",
+      legal_basis: "consent",
       format: "electronic",
       expires_at: "2025-12-31",
       locations: ["ucl_rcs", "ucl_data_safe_haven"],

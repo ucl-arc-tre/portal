@@ -958,6 +958,13 @@ components:
           description: Type of protection applied to the asset
         legal_basis:
           type: string
+          enum:
+            - consent
+            - contract
+            - legal_obligation
+            - vital_interests
+            - public_task
+            - legitimate_interests
           description: Legal basis for holding the asset
         format:
           type: string

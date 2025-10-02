@@ -132,7 +132,7 @@ describe("Study Assets Management", () => {
     cy.get("textarea[name='description']").type("Test Asset Description");
     cy.get("select[name='classification_impact']").select("public");
     cy.get("select[name='protection']").select("anonymisation");
-    cy.get("input[name='legal_basis']").type("test123");
+    cy.get("select[name='legal_basis']").select("consent");
     cy.get("select[name='format']").select("electronic");
     cy.get("input[name='expires_at']").type("2025-12-31");
 

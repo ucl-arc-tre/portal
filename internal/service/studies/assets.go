@@ -1,7 +1,6 @@
 package studies
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -58,8 +57,16 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 	}
 
 	// Validate legal_basis
-	if !validation.TextField500Pattern.MatchString(assetData.LegalBasis) {
-		return &openapi.ValidationError{ErrorMessage: "legal_basis must be 1-500 characters"}, nil
+	validLegalBases := []openapi.AssetBaseLegalBasis{
+		openapi.AssetBaseLegalBasisConsent,
+		openapi.AssetBaseLegalBasisContract,
+		openapi.AssetBaseLegalBasisLegalObligation,
+		openapi.AssetBaseLegalBasisVitalInterests,
+		openapi.AssetBaseLegalBasisPublicTask,
+		openapi.AssetBaseLegalBasisLegitimateInterests,
+	}
+	if !slices.Contains(validLegalBases, assetData.LegalBasis) {
+		return &openapi.ValidationError{ErrorMessage: "legal_basis must be one of: consent, contract, legal_obligation, vital_interests, public_task, legitimate_interests"}, nil
 	}
 
 	// Validate format field
@@ -91,7 +98,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 	return nil, nil
 }
 
-func (s *Service) CreateAsset(ctx context.Context, user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
 	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
 
 	validationError, err := s.validateAssetData(assetData)
@@ -128,7 +135,7 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 		ClassificationImpact: string(assetData.ClassificationImpact),
 		Tier:                 assetData.Tier,
 		Protection:           string(assetData.Protection),
-		LegalBasis:           assetData.LegalBasis,
+		LegalBasis:           string(assetData.LegalBasis),
 		Format:               string(assetData.Format),
 		ExpiresAt:            expiryDate,
 		HasDspt:              assetData.HasDspt,
@@ -171,17 +178,37 @@ func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
 }
 
 // retrieves a specific asset within a study
-func (s *Service) StudyAssetById(user types.User, studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
+func (s *Service) StudyAssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
 	asset := types.Asset{}
 	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
 	return asset, types.NewErrFromGorm(err, "failed to get study asset by id")
 }
 
 // retrieves all contracts for a specific asset within a study
-func (s *Service) AssetContracts(user types.User, assetID uuid.UUID) ([]types.Contract, error) {
+func (s *Service) AssetContracts(studyID uuid.UUID, assetID uuid.UUID) ([]types.Contract, error) {
 	contracts := []types.Contract{}
-	err := s.db.Where("asset_id = ?", assetID).
+	err := s.db.Joins("left join assets on contracts.asset_id = assets.id").
+		Where("assets.study_id = ? AND contracts.asset_id = ?", studyID, assetID).
 		Order("created_at DESC").
 		Find(&contracts).Error
 	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
+}
+
+func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Model(&types.Asset{}).
+		Select("count(*) > 0").
+		Where("study_id = ? AND id = ?", studyID, assetID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
+}
+
+func (s *Service) contractExists(studyID uuid.UUID, assetID uuid.UUID, contractID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Joins("left join assets on contracts.asset_id = assets.id").
+		Model(&types.Contract{}).
+		Select("count(*) > 0").
+		Where("assets.study_id = ? AND contracts.asset_id = ? AND contracts.id = ?", studyID, assetID, contractID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
 }
