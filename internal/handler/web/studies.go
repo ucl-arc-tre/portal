@@ -18,11 +18,11 @@ import (
 )
 
 func mustParseDate(dateStr string) time.Time {
-	parsedTime, err := time.Parse(config.DateFormat, dateStr)
+	parsedDate, err := time.Parse(config.DateFormat, dateStr)
 	if err != nil {
 		panic(fmt.Sprintf("failed to parse date %q: %v", dateStr, err))
 	}
-	return parsedTime
+	return parsedDate
 }
 
 func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
