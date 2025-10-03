@@ -6,22 +6,52 @@
   margin: 1.5rem 0;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 .title {
-  margin: 0 0 1rem 0;
+  margin: 0;
   font-size: 1rem;
   font-weight: 600;
   color: var(--foreground);
 }
 
+.username-change-link {
+  background: none;
+  border: none;
+  color: #0070e8;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.username-change-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.username-change-link:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 .content {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 2rem;
 }
 
 .row {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -52,7 +82,7 @@
 
 .roles {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.1rem;
   flex-wrap: wrap;
   align-items: center;
 }

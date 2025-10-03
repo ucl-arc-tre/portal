@@ -1,3 +1,5 @@
+import { useState } from "react";
+import ChosenNameChangeModal from "./ChosenNameChangeModal";
 import styles from "./ProfileSummaryCard.module.css";
 
 type ProfileSummaryCardProps = {
@@ -7,9 +9,15 @@ type ProfileSummaryCardProps = {
 };
 
 export default function ProfileSummaryCard({ chosenName, username, roles }: ProfileSummaryCardProps) {
+  const [showChosenNameChangeModal, setShowChosenNameChangeModal] = useState(false);
   return (
     <div className={styles["profile-summary-container"]}>
-      <h3 className={styles.title}>Profile Information</h3>
+      <div className={styles.header}>
+        <h3 className={styles.title}>Profile Information</h3>
+        <button className={styles["username-change-link"]} onClick={() => setShowChosenNameChangeModal(true)}>
+          request chosen name change
+        </button>
+      </div>
       <div className={styles.content}>
         <div className={styles.row}>
           <div className={styles.field}>
@@ -41,6 +49,12 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
           </div>
         </div>
       </div>
+
+      <ChosenNameChangeModal
+        isOpen={showChosenNameChangeModal}
+        onClose={() => setShowChosenNameChangeModal(false)}
+        currentChosenName={chosenName}
+      />
     </div>
   );
 }
