@@ -11,7 +11,6 @@ export default function StudiesAdmin() {
   const fetchPendingStudies = async () => {
     try {
       const response = await getStudies({ query: { status: "Pending" } });
-      console.log("useffect response", response);
       if (response.response.ok && response.data) {
         setStudies(response.data);
       }
@@ -20,10 +19,8 @@ export default function StudiesAdmin() {
     }
   };
   useEffect(() => {
-    if (studies.length === 0) {
-      fetchPendingStudies();
-    }
-  });
+    fetchPendingStudies();
+  }, []);
 
   const handleAllStudiesClick = async () => {
     setTab("all");
