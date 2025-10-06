@@ -122,6 +122,7 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 	}
 
 	if isAdmin {
+		// admins can see all pending studies
 		if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
 
 			studies, err := h.studies.PendingStudies()
@@ -137,9 +138,9 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 			}
 			ctx.JSON(http.StatusOK, response)
 			return
-		} else {
 
-			// Admins can see all studies
+		} else {
+			// Admins can see all studies normally
 			studies, err = h.studies.AllStudies()
 			if err != nil {
 				setError(ctx, err, "Failed to get studies")

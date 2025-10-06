@@ -31,7 +31,7 @@ export default function StudiesAdmin() {
     setIsLoading(true);
     const response = await getStudies();
     if (!response.response.ok) {
-      console.error("Failed to get pending studies:", response.error);
+      console.error("Failed to get studies:", response.error);
     } else {
       setStudies(response.data || []);
       setIsLoading(false);
