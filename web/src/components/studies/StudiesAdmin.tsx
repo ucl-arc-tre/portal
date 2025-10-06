@@ -3,16 +3,20 @@ import { Study, getStudies } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
 import Button from "../ui/Button";
 import styles from "./StudiesAdmin.module.css";
+import Loading from "../ui/Loading";
 
 export default function StudiesAdmin() {
   const [tab, setTab] = useState("pending");
   const [studies, setStudies] = useState<Study[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchPendingStudies = async () => {
+    setIsLoading(true);
     try {
       const response = await getStudies({ query: { status: "Pending" } });
       if (response.response.ok && response.data) {
         setStudies(response.data);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Failed to get pending studies:", error);
@@ -24,11 +28,13 @@ export default function StudiesAdmin() {
 
   const handleAllStudiesClick = async () => {
     setTab("all");
+    setIsLoading(true);
     const response = await getStudies();
     if (!response.response.ok) {
       console.error("Failed to get pending studies:", response.error);
     } else {
       setStudies(response.data || []);
+      setIsLoading(false);
     }
   };
 
@@ -60,6 +66,8 @@ export default function StudiesAdmin() {
       </div>
 
       {tab === "all" && <div>search bar</div>}
+
+      {isLoading && <Loading message="Loading studies..." />}
 
       <StudySelection studies={studies} isAdmin={true} />
     </>
