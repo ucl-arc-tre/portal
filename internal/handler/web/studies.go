@@ -36,6 +36,7 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 }
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
+	log.Debug().Msg("Converting study to openapi study")
 	ownerUserIDStr := study.OwnerUserID.String()
 	ownerUsernameStr := string(study.Owner.Username)
 	return openapi.Study{
@@ -114,23 +115,6 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 
 	var studies []types.Study
 
-	status := params.Status
-	isPending := string(openapi.Pending)
-
-	if status == &isPending {
-
-		studies, err := h.studies.PendingStudies()
-		if err != nil {
-			setError(ctx, err, "Failed to get studies")
-			return
-		}
-		response := []openapi.Study{}
-		for _, study := range studies {
-			response = append(response, studyToOpenApiStudy(study))
-		}
-		ctx.JSON(http.StatusOK, response)
-	}
-
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
@@ -138,12 +122,31 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 	}
 
 	if isAdmin {
-		// Admins can see all studies
-		studies, err = h.studies.AllStudies()
-		if err != nil {
-			setError(ctx, err, "Failed to get studies")
+		if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
+
+			studies, err := h.studies.PendingStudies()
+			if err != nil {
+				setError(ctx, err, "Failed to get studies")
+				return
+			}
+
+			response := []openapi.Study{}
+
+			for _, study := range studies {
+				response = append(response, studyToOpenApiStudy(study))
+			}
+			ctx.JSON(http.StatusOK, response)
 			return
+		} else {
+
+			// Admins can see all studies
+			studies, err = h.studies.AllStudies()
+			if err != nil {
+				setError(ctx, err, "Failed to get studies")
+				return
+			}
 		}
+
 	} else {
 		// Non-admin users can only see studies they own
 		var studyIds []uuid.UUID
@@ -509,9 +512,8 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 	ctx.Status(http.StatusOK)
 }
 func (h *Handler) PostStudiesStudyIdPending(ctx *gin.Context, studyId string) {
-	review := openapi.StudyReview{}
-	if err := bindJSONOrSetError(ctx, &review); err != nil {
-		return
+	review := openapi.StudyReview{
+		Status: openapi.Pending,
 	}
 
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)

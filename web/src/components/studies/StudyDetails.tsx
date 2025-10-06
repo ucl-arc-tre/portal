@@ -110,7 +110,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           </span>
           <StudyStatusBadge status={approvalStatus} isAdmin={true} />
         </div>
-        <h2>{study.description}</h2>
+        <h3 className={styles.description}>{study.description}</h3>
         <div>
           <dl className={styles.ownership}>
             <dd>

@@ -11,16 +11,19 @@ export default function StudiesAdmin() {
   const fetchPendingStudies = async () => {
     try {
       const response = await getStudies({ query: { status: "Pending" } });
-      if (response.response.ok) {
-        setStudies(response.data || []);
+      console.log("useffect response", response);
+      if (response.response.ok && response.data) {
+        setStudies(response.data);
       }
     } catch (error) {
       console.error("Failed to get pending studies:", error);
     }
   };
   useEffect(() => {
-    fetchPendingStudies();
-  }, []);
+    if (studies.length === 0) {
+      fetchPendingStudies();
+    }
+  });
 
   const handleAllStudiesClick = async () => {
     setTab("all");
