@@ -25,7 +25,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
     const studyId = study.id;
 
     if (status === "Approved") {
-      // set as approved
       const response = await postStudiesAdminByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
       if (response.response.ok) {
         setApprovalStatus("Approved");

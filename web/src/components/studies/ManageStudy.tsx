@@ -68,7 +68,6 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       )}
 
       <StepProgress
-        // todo: turn into an expandable section
         steps={studySteps}
         isComplete={studyStepsCompleted}
         completionTitle="Study Setup Complete!"
