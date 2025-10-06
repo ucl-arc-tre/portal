@@ -73,8 +73,8 @@ export default function ManageStudy({ study }: ManageStudyProps) {
         isComplete={studyStepsCompleted}
         completionTitle="Study Setup Complete!"
         completionSubtitle="You have successfully completed all study setup steps."
-        // completionButtonText="Go to studies"
-        // completionButtonHref="/studies"
+        completionButtonText="Go to studies"
+        completionButtonHref="/studies"
         introText="Complete the following steps to set up your study."
         ariaLabel="Study setup progress"
       />

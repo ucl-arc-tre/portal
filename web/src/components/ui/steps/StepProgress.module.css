@@ -1,7 +1,7 @@
 .step-progress-container {
   width: 80%;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
 }
@@ -15,6 +15,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-top: 1rem;
 }
 
 .step {
@@ -148,10 +149,25 @@
   background-color: var(--green-200);
 }
 
+.completion-container[open] > summary {
+  list-style-type: "▽";
+}
+
 .completion-header {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
   border-bottom: 1px solid #e5e7eb;
+  list-style-type: "▷";
+
+  &::marker {
+    display: inline-block;
+    color: #6b7280;
+    font-size: 1.2em;
+  }
+
+  h3 {
+    display: inline-block;
+    margin-inline: 0.5rem;
+  }
 }
 
 .completion-title {
