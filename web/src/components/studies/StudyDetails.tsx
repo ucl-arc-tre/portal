@@ -240,6 +240,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
           </dl>
         </div>
       </Box>
+
+      {/* Admin actions */}
       {study.approval_status === "Pending" && isAdmin && (
         <div>
           <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
