@@ -749,7 +749,7 @@ export type GetStudiesData = {
         /**
          * get studies by status
          */
-        status?: string;
+        status?: StudyApprovalStatus;
     };
     url: '/studies';
 };

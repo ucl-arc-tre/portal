@@ -249,7 +249,7 @@ paths:
         - in: query
           name: status
           schema:
-            type: string
+            $ref: "#/components/schemas/StudyApprovalStatus"
           required: false
           description: get studies by status
       responses:

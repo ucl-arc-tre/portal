@@ -679,7 +679,7 @@ type ValidationError struct {
 // GetStudiesParams defines parameters for GetStudies.
 type GetStudiesParams struct {
 	// Status get studies by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
+	Status *StudyApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
