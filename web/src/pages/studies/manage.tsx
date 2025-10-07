@@ -12,6 +12,7 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageStudyPage.module.css";
 import StudyDetails from "@/components/studies/StudyDetails";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function ManageStudyPage() {
   const router = useRouter();
@@ -163,6 +164,7 @@ export default function ManageStudyPage() {
         title={`Manage ${study.title} | ARC Services Portal`}
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
+      <Breadcrumbs studyId={study.id} studyTitle={study.title} />
       <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
       {isAdmin ? <StudyDetails study={study} /> : <ManageStudy study={study} />}

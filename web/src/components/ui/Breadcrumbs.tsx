@@ -8,11 +8,10 @@ type BreadcrumbProps = {
   studyTitle?: string;
   assetId?: string;
   assetTitle?: string;
-  contractName?: string;
 };
 
 export default function Breadcrumbs(props: BreadcrumbProps) {
-  const { studyId, studyTitle, assetId, assetTitle, contractName } = props;
+  const { studyId, studyTitle, assetId, assetTitle } = props;
   const router = useRouter();
 
   return (
@@ -35,22 +34,7 @@ export default function Breadcrumbs(props: BreadcrumbProps) {
               </Button>
               <span> / </span>
 
-              {contractName ? (
-                <>
-                  <Button
-                    onClick={() => router.push(`/studies/manage?studyId=${studyId}&assetId=${assetId}`)}
-                    size="small"
-                    variant="tertiary"
-                    s
-                  >
-                    {assetTitle}
-                  </Button>
-                  <span> / </span>
-                  <span className={styles.current}>{contractName}</span>
-                </>
-              ) : (
-                <span className={styles.current}>{assetTitle}</span>
-              )}
+              <span className={styles.current}>{assetTitle}</span>
             </>
           ) : (
             <span className={styles.current}>{studyTitle}</span>
