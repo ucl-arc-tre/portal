@@ -3,7 +3,6 @@ import styles from "./Breadcrumbs.module.css";
 import Button from "./Button";
 
 type BreadcrumbProps = {
-  children?: React.ReactNode;
   studyId?: string;
   studyTitle?: string;
   assetId?: string;
@@ -33,7 +32,6 @@ export default function Breadcrumbs(props: BreadcrumbProps) {
                 {studyTitle}
               </Button>
               <span> / </span>
-
               <span className={styles.current}>{assetTitle}</span>
             </>
           ) : (
