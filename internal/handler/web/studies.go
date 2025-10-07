@@ -36,7 +36,6 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 }
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
-	log.Debug().Msg("Converting study to openapi study")
 	ownerUserIDStr := study.OwnerUserID.String()
 	ownerUsernameStr := string(study.Owner.Username)
 	return openapi.Study{
@@ -125,19 +124,11 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 		// admins can see all pending studies
 		if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
 
-			studies, err := h.studies.PendingStudies()
+			studies, err = h.studies.PendingStudies()
 			if err != nil {
 				setError(ctx, err, "Failed to get studies")
 				return
 			}
-
-			response := []openapi.Study{}
-
-			for _, study := range studies {
-				response = append(response, studyToOpenApiStudy(study))
-			}
-			ctx.JSON(http.StatusOK, response)
-			return
 
 		} else {
 			// Admins can see all studies normally
@@ -532,7 +523,6 @@ func (h *Handler) PostStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
-	// todo
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
 		return
@@ -541,8 +531,6 @@ func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
-
-	log.Debug().Msgf("Updating study [%v]", studyUUID)
 
 	err = h.studies.UpdateStudy(studyUUID, studyData)
 	if err != nil {

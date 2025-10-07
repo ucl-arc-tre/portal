@@ -240,6 +240,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 	if err := s.db.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
 		return types.NewErrServerError(err)
 	}
+	log.Debug().Msgf("Updated study: %v", study.ID)
 	return nil
 
 }

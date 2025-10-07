@@ -236,7 +236,6 @@ export default function StudyForm(StudyProps: StudyProps) {
           body: studyData,
         });
       }
-      console.log(response);
       if (response.data) {
         setStudyFormOpen(false);
         if (fetchStudies) {

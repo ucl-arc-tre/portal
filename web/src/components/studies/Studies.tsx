@@ -15,7 +15,7 @@ type Props = {
 
 export default function Studies(props: Props) {
   const { userData, studies, fetchStudies } = props;
-  const [StudyFormOpen, setStudyFormOpen] = useState(false);
+  const [studyFormOpen, setStudyFormOpen] = useState(false);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
 
   const handleCreateStudyClick = () => {
@@ -28,7 +28,7 @@ export default function Studies(props: Props) {
 
   return (
     <>
-      {StudyFormOpen && (
+      {studyFormOpen && (
         <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudies={fetchStudies} />
       )}
 
