@@ -1,0 +1,31 @@
+.breadcrumbs {
+  margin-bottom: 1rem;
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 1rem;
+  flex-wrap: wrap;
+
+  > * {
+    margin: 0.25rem 0;
+    padding: 0.25rem 0;
+  }
+
+  span {
+    color: #666;
+    font-size: 1rem;
+  }
+
+  span:last-child {
+    margin-left: 0.15rem;
+    margin-right: 0.5rem;
+  }
+
+  button {
+    padding: 0rem;
+    margin: 0.25rem 0;
+  }
+}
