@@ -1,7 +1,9 @@
 package entra
 
 import (
+	"bytes"
 	"context"
+	"html/template"
 
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
@@ -20,9 +22,27 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 	contentType := graphmodels.HTML_BODYTYPE
 	body.SetContentType(&contentType)
 
-	body.SetContent(&content) // set the content from the args
+	t, err := template.ParseFiles("internal/controller/entra/base_mail_template.html")
+	if err != nil {
+		return err
+	}
+
+	wr := new(bytes.Buffer)
+	err = t.Execute(wr, struct {
+		Content string
+	}{
+		Content: content,
+	})
+	if err != nil {
+		return err
+	}
+	htmlContent := wr.String()
+
+	body.SetContent(&htmlContent) // set the content from the args
+	// todo: get the img to work
 	message.SetBody(body)
 
+	// set up the recipients
 	recipients := []graphmodels.Recipientable{}
 	for _, email := range emails {
 		recipient := graphmodels.NewRecipient()
@@ -33,11 +53,6 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 	}
 	message.SetToRecipients(recipients)
 
-	// toRecipients := []graphmodels.Recipientable{
-	// 	recipient,
-	// }
-	// message.SetToRecipients(toRecipients)
-
 	requestBody.SetMessage(message)
 	saveToSentItems := true
 	requestBody.SetSaveToSentItems(&saveToSentItems)
@@ -45,7 +60,7 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 	userID := config.EntraMailUserPrincipal()
 
 	// use the mail client to send via the mailbox
-	err := c.mailClient.Users().ByUserId(userID).SendMail().Post(ctx, requestBody, nil)
+	err = c.mailClient.Users().ByUserId(userID).SendMail().Post(ctx, requestBody, nil)
 	if err != nil {
 		return types.NewErrServerError(err)
 	}
