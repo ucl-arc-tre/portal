@@ -133,7 +133,6 @@ export default function ManageAssetPage() {
   return (
     <>
       <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
-      {/* <div className={styles.container}> */}
       <Breadcrumbs studyId={study.id} studyTitle={study.title} assetId={asset.id} assetTitle={asset.title} />
 
       <Title text={`Manage Asset: ${asset.title}`} />
@@ -171,7 +170,6 @@ export default function ManageAssetPage() {
 
         <ContractManagement study={study} asset={asset} />
       </div>
-      {/* </div> */}
     </>
   );
 }
