@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import ContractManagement from "@/components/assets/ContractManagement";
 
 import styles from "./ManageAsset.module.css";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -132,54 +133,42 @@ export default function ManageAssetPage() {
   return (
     <>
       <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
-      <div className={styles.container}>
-        <div className={styles.breadcrumb}>
-          <Button onClick={() => router.push("/studies")} size="small" variant="tertiary">
-            Studies
-          </Button>
-          <span> / </span>
-          <Button onClick={() => router.push(`/studies/manage?studyId=${studyId}`)} size="small" variant="tertiary" s>
-            {study.title}
-          </Button>
-          <span> / </span>
-          <span>{asset.title}</span>
-        </div>
+      <Breadcrumbs studyId={study.id} studyTitle={study.title} assetId={asset.id} assetTitle={asset.title} />
 
-        <Title text={`Manage Asset: ${asset.title}`} />
+      <Title text={`Manage Asset: ${asset.title}`} />
 
-        <div className={styles["asset-info"]}>
-          <div className={styles.section}>
-            <h3>Asset Details</h3>
-            <div className={styles.field}>
-              <label>Title:</label>
-              <span>{asset.title}</span>
-            </div>
-            <div className={styles.field}>
-              <label>Description:</label>
-              <span>{asset.description}</span>
-            </div>
-            <div className={styles.field}>
-              <label>Classification:</label>
-              <span>{asset.classification_impact}</span>
-            </div>
-            <div className={styles.field}>
-              <label>Protection:</label>
-              <span>{asset.protection}</span>
-            </div>
-            <div className={styles.field}>
-              <label>Status:</label>
-              <span className={styles.status}>{asset.status}</span>
-            </div>
-            {asset.requires_contract && (
-              <div className={styles.field}>
-                <label>Contract Required:</label>
-                <span>Yes</span>
-              </div>
-            )}
+      <div className={styles["asset-info"]}>
+        <div className={styles.section}>
+          <h3>Asset Details</h3>
+          <div className={styles.field}>
+            <label>Title:</label>
+            <span>{asset.title}</span>
           </div>
-
-          <ContractManagement study={study} asset={asset} />
+          <div className={styles.field}>
+            <label>Description:</label>
+            <span>{asset.description}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Classification:</label>
+            <span>{asset.classification_impact}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Protection:</label>
+            <span>{asset.protection}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Status:</label>
+            <span className={styles.status}>{asset.status}</span>
+          </div>
+          {asset.requires_contract && (
+            <div className={styles.field}>
+              <label>Contract Required:</label>
+              <span>Yes</span>
+            </div>
+          )}
         </div>
+
+        <ContractManagement study={study} asset={asset} />
       </div>
     </>
   );

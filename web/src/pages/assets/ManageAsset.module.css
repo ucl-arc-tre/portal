@@ -4,36 +4,6 @@
   padding: 1rem;
 }
 
-.breadcrumb {
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #666;
-  font-size: 1rem;
-  flex-wrap: wrap;
-}
-
-.breadcrumb > * {
-  margin: 0.25rem 0;
-  padding: 0.25rem 0;
-}
-
-.breadcrumb span {
-  color: #666;
-  font-size: 1rem;
-}
-
-.breadcrumb span:last-child {
-  margin-left: 0rem;
-  margin-right: 0.5rem;
-}
-
-.breadcrumb button {
-  padding: 0rem;
-  margin: 0.25rem 0;
-}
-
 .asset-info {
   margin-top: 2rem;
   display: flex;
@@ -109,11 +79,7 @@
   margin-top: 2rem;
 }
 
-@media (width >= 768px) {
-  .container {
-    padding: 2rem;
-  }
-
+@media (width >=768px) {
   .field {
     grid-template-columns: 150px 1fr;
     gap: 1rem;
