@@ -84,6 +84,7 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, email string, review openapi.StudyReview) error {
 	// email to notify IAO + IAA when study has been reviewed
+	// todo: set up usage of this
 
 	content := ""
 	subject := ""
