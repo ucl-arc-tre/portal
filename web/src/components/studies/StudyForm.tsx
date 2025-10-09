@@ -4,7 +4,7 @@ import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
-import { postStudies, postStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
+import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
 
 export type StudyFormData = {
   title: string;
@@ -231,7 +231,7 @@ export default function StudyForm(StudyProps: StudyProps) {
           body: studyData,
         });
       } else {
-        response = await postStudiesByStudyId({
+        response = await putStudiesByStudyId({
           path: { studyId },
           body: studyData,
         });

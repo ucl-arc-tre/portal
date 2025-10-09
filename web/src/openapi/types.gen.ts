@@ -851,7 +851,7 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
-export type PostStudiesByStudyIdData = {
+export type PutStudiesByStudyIdData = {
     body: StudyRequest;
     path: {
         /**
@@ -863,7 +863,7 @@ export type PostStudiesByStudyIdData = {
     url: '/studies/{studyId}';
 };
 
-export type PostStudiesByStudyIdErrors = {
+export type PutStudiesByStudyIdErrors = {
     /**
      * Forbidden
      */
@@ -882,7 +882,7 @@ export type PostStudiesByStudyIdErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdResponses = {
+export type PutStudiesByStudyIdResponses = {
     /**
      * Study updated successfully
      */
@@ -927,7 +927,7 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
     201: unknown;
 };
 
-export type PostStudiesByStudyIdPendingData = {
+export type PatchStudiesByStudyIdPendingData = {
     body?: never;
     path: {
         /**
@@ -939,7 +939,7 @@ export type PostStudiesByStudyIdPendingData = {
     url: '/studies/{studyId}/pending';
 };
 
-export type PostStudiesByStudyIdPendingErrors = {
+export type PatchStudiesByStudyIdPendingErrors = {
     /**
      * Forbidden
      */
@@ -958,7 +958,7 @@ export type PostStudiesByStudyIdPendingErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdPendingResponses = {
+export type PatchStudiesByStudyIdPendingResponses = {
     /**
      * Study review submitted successfully
      */

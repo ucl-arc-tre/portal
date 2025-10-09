@@ -503,7 +503,7 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 
 	ctx.Status(http.StatusOK)
 }
-func (h *Handler) PostStudiesStudyIdPending(ctx *gin.Context, studyId string) {
+func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{
 		Status: openapi.Pending,
 	}
@@ -522,7 +522,7 @@ func (h *Handler) PostStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) PostStudiesStudyId(ctx *gin.Context, studyId string) {
+func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
 		return

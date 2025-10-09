@@ -316,7 +316,7 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-    post:
+    put:
       description: Update a specific study
       parameters:
         - in: path
@@ -372,7 +372,7 @@ paths:
           description: Unexpected error
 
   /studies/{studyId}/pending:
-    post:
+    patch:
       description: Update study status to pending
       parameters:
         - in: path

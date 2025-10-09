@@ -709,8 +709,8 @@ type PostStudiesJSONRequestBody = StudyRequest
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
-// PostStudiesStudyIdJSONRequestBody defines body for PostStudiesStudyId for application/json ContentType.
-type PostStudiesStudyIdJSONRequestBody = StudyRequest
+// PutStudiesStudyIdJSONRequestBody defines body for PutStudiesStudyId for application/json ContentType.
+type PutStudiesStudyIdJSONRequestBody = StudyRequest
 
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
@@ -772,8 +772,8 @@ type ServerInterface interface {
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
 
-	// (POST /studies/{studyId})
-	PostStudiesStudyId(c *gin.Context, studyId string)
+	// (PUT /studies/{studyId})
+	PutStudiesStudyId(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/agreements)
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
@@ -802,8 +802,8 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
 
-	// (POST /studies/{studyId}/pending)
-	PostStudiesStudyIdPending(c *gin.Context, studyId string)
+	// (PATCH /studies/{studyId}/pending)
+	PatchStudiesStudyIdPending(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -1042,8 +1042,8 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
 	siw.Handler.GetStudiesStudyId(c, studyId)
 }
 
-// PostStudiesStudyId operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyId(c *gin.Context) {
+// PutStudiesStudyId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyId(c *gin.Context) {
 
 	var err error
 
@@ -1063,7 +1063,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostStudiesStudyId(c, studyId)
+	siw.Handler.PutStudiesStudyId(c, studyId)
 }
 
 // GetStudiesStudyIdAgreements operation middleware
@@ -1345,8 +1345,8 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
 }
 
-// PostStudiesStudyIdPending operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdPending(c *gin.Context) {
+// PatchStudiesStudyIdPending operation middleware
+func (siw *ServerInterfaceWrapper) PatchStudiesStudyIdPending(c *gin.Context) {
 
 	var err error
 
@@ -1366,7 +1366,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdPending(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdPending(c, studyId)
+	siw.Handler.PatchStudiesStudyIdPending(c, studyId)
 }
 
 // GetUsers operation middleware
@@ -1492,7 +1492,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
-	router.POST(options.BaseURL+"/studies/:studyId", wrapper.PostStudiesStudyId)
+	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
@@ -1502,7 +1502,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
 	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId", wrapper.PutStudiesStudyIdAssetsAssetIdContractsContractId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
-	router.POST(options.BaseURL+"/studies/:studyId/pending", wrapper.PostStudiesStudyIdPending)
+	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
