@@ -109,6 +109,46 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	}
 }
 
+func (h *Handler) getStudiesAdmin(ctx *gin.Context, params openapi.GetStudiesParams) []types.Study {
+	if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
+		// admins can see all pending studies
+		studies, err := h.studies.PendingStudies()
+		if err != nil {
+			setError(ctx, err, "Failed to get studies")
+			return nil
+		}
+		return studies
+
+	} else {
+		// Admins can see all studies normally
+		studies, err := h.studies.AllStudies()
+		if err != nil {
+			setError(ctx, err, "Failed to get studies")
+			return nil
+		}
+		return studies
+	}
+
+}
+
+func (h *Handler) getStudiesStudyOwner(ctx *gin.Context, user types.User) []types.Study {
+	// Non-admin users can only see studies they own
+	var studyIds []uuid.UUID
+	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+	if err != nil {
+		setError(ctx, err, "Failed to get user's study access")
+		return nil
+	}
+
+	studies, err := h.studies.StudiesById(studyIds...)
+	if err != nil {
+		setError(ctx, err, "Failed to get studies")
+		return nil
+	}
+
+	return studies
+}
+
 func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) {
 	user := middleware.GetUser(ctx)
 
@@ -121,38 +161,12 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 	}
 
 	if isAdmin {
-		// admins can see all pending studies
-		if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
 
-			studies, err = h.studies.PendingStudies()
-			if err != nil {
-				setError(ctx, err, "Failed to get studies")
-				return
-			}
-
-		} else {
-			// Admins can see all studies normally
-			studies, err = h.studies.AllStudies()
-			if err != nil {
-				setError(ctx, err, "Failed to get studies")
-				return
-			}
-		}
+		studies = h.getStudiesAdmin(ctx, params)
 
 	} else {
-		// Non-admin users can only see studies they own
-		var studyIds []uuid.UUID
-		studyIds, err = rbac.StudyIDsWithRole(user, rbac.StudyOwner)
-		if err != nil {
-			setError(ctx, err, "Failed to get user's study access")
-			return
-		}
 
-		studies, err = h.studies.StudiesById(studyIds...)
-		if err != nil {
-			setError(ctx, err, "Failed to get studies")
-			return
-		}
+		studies = h.getStudiesStudyOwner(ctx, user)
 	}
 
 	response := []openapi.Study{}
