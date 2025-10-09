@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
-import { Asset, AssetBase, ValidationError, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Asset,
+  AssetBase,
+  ValidationError,
+  getStudiesByStudyIdAssets,
+  getStudiesByStudyIdAssetsByAssetIdContracts,
+  postStudiesByStudyIdAssets,
+} from "@/openapi";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -23,6 +30,28 @@ export default function Assets(props: InformationAssetsProps) {
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
 
+  const checkAssetManagementCompleted = useCallback(
+    async (assets: Asset[]) => {
+      // for each asset, check if it requires a contract and if it does, that there is one
+
+      const checkContractsForAsset = async (assetId: string) => {
+        const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+          path: { studyId: studyId, assetId: assetId },
+        });
+        if (!response.response.ok) {
+          console.error("Failed to get contracts for asset:", response.error);
+        } else if (response.response.ok && response.data) {
+          return response.data.length > 0;
+        }
+      };
+
+      const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
+      const requiredContractChecks = assetsRequiringContracts.map((asset) => checkContractsForAsset(asset.id));
+      const results = await Promise.all(requiredContractChecks);
+      return results.every((hasContract) => hasContract);
+    },
+    [studyId]
+  );
   useEffect(() => {
     const fetchInformationAssetData = async () => {
       setIsLoading(true);
@@ -36,7 +65,10 @@ export default function Assets(props: InformationAssetsProps) {
           setInformationAssets(informationAssetResult.data);
 
           if (informationAssetResult.data.length > 0) {
-            if (setAssetManagementCompleted) {
+            const assets = informationAssetResult.data;
+            const assetsComplete = await checkAssetManagementCompleted(assets);
+
+            if (setAssetManagementCompleted && assetsComplete) {
               setAssetManagementCompleted(true);
             }
           }
@@ -50,7 +82,7 @@ export default function Assets(props: InformationAssetsProps) {
     };
 
     fetchInformationAssetData();
-  }, [studyId, setAssetManagementCompleted]);
+  }, [studyId, setAssetManagementCompleted, checkAssetManagementCompleted]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);
@@ -71,7 +103,10 @@ export default function Assets(props: InformationAssetsProps) {
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
     if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
       setInformationAssets(updatedAssetsResult.data);
-      if (setAssetManagementCompleted) {
+      const assets = updatedAssetsResult.data;
+      const assetsComplete = await checkAssetManagementCompleted(assets);
+
+      if (setAssetManagementCompleted && assetsComplete) {
         setAssetManagementCompleted(true);
       }
       setShowAssetForm(false);
