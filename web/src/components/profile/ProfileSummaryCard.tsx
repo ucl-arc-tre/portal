@@ -18,6 +18,7 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
           request chosen name change
         </button>
       </div>
+
       <div className={styles.content}>
         <div className={styles.row}>
           <div className={styles.field}>

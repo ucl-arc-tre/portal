@@ -93,3 +93,19 @@ func (h *Handler) PostProfileTraining(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, result)
 }
+
+func (h *Handler) PostProfileChosenNameChangeRequest(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	request := openapi.ChosenNameChangeRequest{}
+
+	if err := bindJSONOrSetError(ctx, &request); err != nil {
+		return
+	}
+
+	if err := h.users.CreateChosenNameChangeRequest(ctx, user, types.ChosenName(request.NewChosenName), request.Reason); err != nil {
+		setError(ctx, err, "Failed to create chosen name change request")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

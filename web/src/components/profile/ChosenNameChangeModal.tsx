@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import dynamic from "next/dynamic";
 import Dialog from "@/components/ui/Dialog";
 import Button from "@/components/ui/Button";
+import { postProfileChosenNameChangeRequest } from "@/openapi";
 import styles from "./ChosenNameChangeModal.module.css";
 
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
@@ -39,15 +40,17 @@ export default function ChosenNameChangeModal({ isOpen, onClose, currentChosenNa
     setIsSubmitting(true);
     setErrorMessage(null);
     try {
-      // TODO: Implement API call to send chosen name change request
-      console.log("Chosen name change request:", {
-        currentChosenName,
-        newChosenName: data.newChosenName,
-        reason: data.reason,
+      const response = await postProfileChosenNameChangeRequest({
+        body: {
+          new_chosen_name: data.newChosenName,
+          reason: data.reason || undefined,
+        },
       });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // do we need more robust backend validation and error handling here?
+      if (!response.response.ok) {
+        throw new Error("Failed to submit chosen name change request");
+      }
 
       setIsSubmitted(true);
       reset();

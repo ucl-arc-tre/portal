@@ -301,6 +301,12 @@ type Auth struct {
 // AuthRoles defines model for Auth.Roles.
 type AuthRoles string
 
+// ChosenNameChangeRequest defines model for ChosenNameChangeRequest.
+type ChosenNameChangeRequest struct {
+	NewChosenName string  `json:"new_chosen_name"`
+	Reason        *string `json:"reason,omitempty"`
+}
+
 // ConfirmedAgreement defines model for ConfirmedAgreement.
 type ConfirmedAgreement struct {
 	AgreementType AgreementType `json:"agreement_type"`
@@ -694,6 +700,9 @@ type PostProfileJSONRequestBody = ProfileUpdate
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 
+// PostProfileChosenNameChangeRequestJSONRequestBody defines body for PostProfileChosenNameChangeRequest for application/json ContentType.
+type PostProfileChosenNameChangeRequestJSONRequestBody = ChosenNameChangeRequest
+
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
@@ -744,6 +753,9 @@ type ServerInterface interface {
 
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
+
+	// (POST /profile/chosen-name-change-request)
+	PostProfileChosenNameChangeRequest(c *gin.Context)
 
 	// (GET /profile/training)
 	GetProfileTraining(c *gin.Context)
@@ -912,6 +924,19 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfileAgreements(c)
+}
+
+// PostProfileChosenNameChangeRequest operation middleware
+func (siw *ServerInterfaceWrapper) PostProfileChosenNameChangeRequest(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProfileChosenNameChangeRequest(c)
 }
 
 // GetProfileTraining operation middleware
@@ -1410,6 +1435,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.POST(options.BaseURL+"/profile/chosen-name-change-request", wrapper.PostProfileChosenNameChangeRequest)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
