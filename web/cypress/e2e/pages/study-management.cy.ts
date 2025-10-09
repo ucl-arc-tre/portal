@@ -14,7 +14,7 @@ describe("Study Management Workflow", () => {
 
   it("should display study agreement form when agreement not confirmed", () => {
     cy.mockStudyAgreementsEmpty();
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -29,7 +29,7 @@ describe("Study Management Workflow", () => {
   it("should complete agreement workflow and show asset creation", () => {
     cy.mockStudyAgreementsEmpty();
     cy.mockStudyAgreementConfirmation();
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -51,7 +51,7 @@ describe("Study Management Workflow", () => {
 
   it("should show assets section when agreement already confirmed", () => {
     cy.mockStudyAgreementsConfirmed();
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -78,7 +78,7 @@ describe("Study Assets Management", () => {
   });
 
   it("should display asset creation button when no assets exist", () => {
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -93,7 +93,7 @@ describe("Study Assets Management", () => {
   });
 
   it("should display existing assets and allow creating additional ones", () => {
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -114,7 +114,7 @@ describe("Study Assets Management", () => {
   });
 
   it("should successfully create a new asset", () => {
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
     cy.mockAssetCreation();
 
     cy.visit("/studies/manage?studyId=123456789");
@@ -153,7 +153,7 @@ describe("Study Assets Management", () => {
 
     cy.visit("/studies/manage?studyId=123456789");
 
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
     cy.wait("@getAssetsWithSample");
     cy.contains("Sample Asset Title 1").should("be.visible");
   });

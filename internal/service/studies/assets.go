@@ -106,12 +106,12 @@ func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, stud
 		return validationError, err
 	}
 
-	_, err = s.createStudyAsset(user, assetData, studyID)
+	_, err = s.createInformationAsset(user, assetData, studyID)
 	return nil, err
 }
 
 // handles the database transaction for creating a study asset
-func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
+func (s *Service) createInformationAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
@@ -171,14 +171,14 @@ func (s *Service) createStudyAsset(user types.User, assetData openapi.AssetBase,
 }
 
 // retrieves all assets for a study
-func (s *Service) StudyAssets(studyID uuid.UUID) ([]types.Asset, error) {
+func (s *Service) InformationAssets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
 	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
 	return assets, types.NewErrFromGorm(err, "failed to get study assets")
 }
 
 // retrieves a specific asset within a study
-func (s *Service) StudyAssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
+func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
 	asset := types.Asset{}
 	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
 	return asset, types.NewErrFromGorm(err, "failed to get study asset by id")
