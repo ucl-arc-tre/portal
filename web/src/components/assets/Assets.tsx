@@ -52,6 +52,7 @@ export default function Assets(props: InformationAssetsProps) {
     },
     [studyId]
   );
+
   useEffect(() => {
     const fetchInformationAssetData = async () => {
       setIsLoading(true);
@@ -183,7 +184,12 @@ export default function Assets(props: InformationAssetsProps) {
 
           <div className={styles["assets-grid"]}>
             {informationAssets.map((asset) => (
-              <AssetCard key={asset.id} studyId={studyId} asset={asset} />
+              <AssetCard
+                key={asset.id}
+                studyId={studyId}
+                asset={asset}
+                checkCompleted={checkAssetManagementCompleted}
+              />
             ))}
           </div>
         </div>
