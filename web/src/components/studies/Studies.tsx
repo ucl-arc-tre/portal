@@ -19,6 +19,41 @@ export default function Studies(props: Props) {
   const [studiesLoading, setStudiesLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
 
+  const [tab, setTab] = useState("pending");
+  const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
+
+  const isAdmin = userData.roles.includes("admin");
+
+  useEffect(() => {
+    const fetchPendingStudies = async () => {
+      setStudiesLoading(true);
+      try {
+        const response = await getStudies({ query: { status: "Pending" } });
+        if (response.response.ok && response.data) {
+          setPendingStudies(response.data);
+          setStudiesLoading(false);
+        }
+      } catch (error) {
+        console.error("Failed to get pending studies:", error);
+      }
+    };
+    if (isAdmin) {
+      fetchPendingStudies();
+    }
+  }, [isAdmin]);
+
+  const handleAllStudiesClick = async () => {
+    setTab("all");
+
+    if (!studies.length) {
+      fetchStudies();
+    }
+  };
+
+  const handlePendingStudiesClick = async () => {
+    setTab("pending");
+  };
+
   const fetchStudies = async () => {
     setStudiesLoading(true);
     try {
@@ -44,6 +79,38 @@ export default function Studies(props: Props) {
     setStudyFormOpen(true);
   };
 
+  if (isAdmin) {
+    return (
+      <>
+        {tab === "pending" && <h2>Studies to Review</h2>}
+        {tab === "all" && <h2>All Studies</h2>}
+
+        <div className={styles["study-tabs"]}>
+          <Button
+            onClick={handlePendingStudiesClick}
+            variant="secondary"
+            className={`${styles.tab} ${styles["pending-studies-tab"]} ${tab === "pending" ? styles.active : ""}`}
+          >
+            Pending Studies
+          </Button>
+          <Button
+            onClick={handleAllStudiesClick}
+            variant="secondary"
+            className={`${styles.tab} ${styles["all-studies-tab"]} ${tab === "all" ? styles.active : ""}`}
+          >
+            All Studies
+          </Button>
+        </div>
+
+        {tab === "all" && <div>search bar</div>}
+
+        {studiesLoading && <Loading message="Loading studies..." />}
+
+        <StudySelection studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+      </>
+    );
+  }
+
   return (
     <>
       {studyFormOpen && (
@@ -63,6 +130,7 @@ export default function Studies(props: Props) {
         </Dialog>
       )}
       {studiesLoading && <Loading message="Loading studies..." />}
+
       {!userData.roles.includes("approved-staff-researcher") && studies.length === 0 ? (
         <div className={styles["no-studies-message"]}>
           <h2>You haven&apos;t been added to any studies yet</h2>

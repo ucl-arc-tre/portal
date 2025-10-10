@@ -9,7 +9,6 @@ import LoginFallback from "@/components/ui/LoginFallback";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
-import StudiesAdmin from "@/components/studies/StudiesAdmin";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -64,11 +63,7 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {isApprovedResearcher && isAdmin ? (
-        <StudiesAdmin />
-      ) : (
-        isApprovedResearcher && !isAdmin && <Studies userData={userData!} />
-      )}
+      {isApprovedResearcher && <Studies userData={userData!} />}
     </>
   );
 }
