@@ -1,11 +1,12 @@
 import { postStudiesAdminByStudyIdReview, patchStudiesByStudyIdPending, Study } from "@/openapi";
 import Box from "../ui/Box";
-import { Alert, formatDate, Textarea } from "../shared/exports";
+import { Alert, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
 import InfoTooltip from "../ui/InfoTooltip";
+import AdminFeedbackSection from "./AdminFeedbackSection";
 
 type StudyDetailsProps = {
   study: Study;
@@ -18,8 +19,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const handleUpdateStudyStatus = async (status: string) => {
     const studyId = study.id;
@@ -47,28 +46,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
     }
   };
 
-  const toggleShowFeedbackForm = () => {
-    // for smooth collapse
-    if (showFeedbackForm) {
-      setIsCollapsing(true);
-      setTimeout(() => {
-        setShowFeedbackForm(false);
-        setIsCollapsing(false);
-      }, 1400);
-    } else {
-      setShowFeedbackForm(true);
-    }
-  };
-
-  const handleFeedbackSubmit = () => {
-    handleUpdateStudyStatus("Rejected");
-    toggleShowFeedbackForm();
-  };
-
-  const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFeedback(event.target.value);
-  };
-
   useEffect(() => {
     const calculateRiskScore = () => {
       // todo: how to determine if they have data?
@@ -85,6 +62,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
     calculateRiskScore();
     setApprovalStatus(study.approval_status);
+    if (study.feedback) setFeedback(study.feedback);
   }, [study]);
 
   const standardRiskScoreStatement = "increases risk score by 5";
@@ -127,10 +105,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
             </dd>
           </dl>
 
-          {study.feedback && (
+          {feedback && (
             <Alert type={"warning"} className={styles["feedback-alert"]}>
               <h4>This study has been rejected and the following feedback has been provided:</h4>
-              <p>{study.feedback}</p>
+              <p>{feedback}</p>
               <hr></hr>
               <small>
                 <em>Please adjust as appropriate and request another review.</em>
@@ -242,43 +220,14 @@ export default function StudyDetails(props: StudyDetailsProps) {
       </Box>
 
       {/* Admin actions */}
-      {study.approval_status === "Pending" && isAdmin && (
-        <div>
-          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
-            Approve Study
-          </Button>
-          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
-            {showFeedbackForm ? "Cancel" : "Request Changes"}
-          </Button>
-        </div>
-      )}
-      {showFeedbackForm && (
-        <Box>
-          <div className={styles["feedback-container"]}>
-            <form
-              className={`${styles["feedback-form"]} ${
-                isCollapsing
-                  ? styles["form-collapsing"]
-                  : showFeedbackForm
-                    ? styles["form-visible"]
-                    : styles["form-hidden"]
-              }`}
-            >
-              <label htmlFor="feedback">Outline what the changes are required to attain approval</label>
-              <Textarea
-                name="feedback"
-                id="feedback"
-                cols={30}
-                rows={10}
-                onChange={handleFeedbackChange}
-                value={feedback}
-              />
-              <Button onClick={handleFeedbackSubmit} type="button">
-                Submit
-              </Button>
-            </form>
-          </div>
-        </Box>
+
+      {isAdmin && (
+        <AdminFeedbackSection
+          status={study.approval_status}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          handleUpdateStudyStatus={handleUpdateStudyStatus}
+        />
       )}
     </>
   );
