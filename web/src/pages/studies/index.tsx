@@ -51,8 +51,6 @@ export default function StudiesPage() {
         </span>
       </Callout>
 
-      {isAdmin && <StudiesAdmin />}
-
       {!isAdmin && !isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
@@ -66,7 +64,11 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {!isAdmin && isApprovedResearcher && <Studies userData={userData!} />}
+      {isApprovedResearcher && isAdmin ? (
+        <StudiesAdmin />
+      ) : (
+        isApprovedResearcher && !isAdmin && <Studies userData={userData!} />
+      )}
     </>
   );
 }
