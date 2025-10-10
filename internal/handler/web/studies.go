@@ -108,7 +108,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	}
 }
 
-func (h *Handler) studiesAdmin(ctx *gin.Context, params openapi.GetStudiesParams) ([]types.Study, error) {
+func (h *Handler) studiesAdmin(params openapi.GetStudiesParams) ([]types.Study, error) {
 	if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
 		// admins can see all pending studies
 		return h.studies.PendingStudies()
@@ -120,7 +120,7 @@ func (h *Handler) studiesAdmin(ctx *gin.Context, params openapi.GetStudiesParams
 
 }
 
-func (h *Handler) studiesStudyOwner(ctx *gin.Context, user types.User) ([]types.Study, error) {
+func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
 	// Non-admin users can only see studies they own
 
 	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
@@ -149,7 +149,7 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 
 	if isAdmin {
 
-		studies, err = h.studiesAdmin(ctx, params)
+		studies, err = h.studiesAdmin(params)
 		if err != nil {
 			setError(ctx, err, "Failed to get studies for admin")
 			return
@@ -157,7 +157,7 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 
 	} else {
 
-		studies, err = h.studiesStudyOwner(ctx, user)
+		studies, err = h.studiesStudyOwner(user)
 		if err != nil {
 			setError(ctx, err, "Failed to get studies for study owner")
 			return
