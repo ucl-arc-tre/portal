@@ -12,6 +12,7 @@ import StudyForm from "./StudyForm";
 
 type ManageStudyProps = {
   study: Study;
+  // fetchStudy: (id: string) => Promise<void>;
 };
 
 export default function ManageStudy({ study }: ManageStudyProps) {
@@ -94,18 +95,18 @@ export default function ManageStudy({ study }: ManageStudyProps) {
         setStudyFormOpen={setStudyFormOpen}
       />
 
-      <StepProgress
-        steps={studySteps}
-        isComplete={studyStepsCompleted}
-        completionTitle="Study Setup Complete!"
-        completionSubtitle="You have successfully completed all study setup steps."
-        completionButtonText="Go to studies"
-        completionButtonHref="/studies"
-        introText="Complete the following steps to set up your study."
-        ariaLabel="Study setup progress"
-      />
+      {!studyStepsCompleted && (
+        <>
+          <StepProgress
+            steps={studySteps}
+            isComplete={studyStepsCompleted}
+            introText="Complete the following steps to set up your study."
+            ariaLabel="Study setup progress"
+          />
 
-      {!studyStepsCompleted && <StepArrow />}
+          <StepArrow />
+        </>
+      )}
 
       {getCurrentStepComponent()}
 
