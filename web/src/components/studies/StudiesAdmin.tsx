@@ -7,40 +7,44 @@ import Loading from "../ui/Loading";
 
 export default function StudiesAdmin() {
   const [tab, setTab] = useState("pending");
-  const [studies, setStudies] = useState<Study[]>([]);
+  const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
+  const [allStudies, setAllStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchPendingStudies = async () => {
-    setIsLoading(true);
-    try {
-      const response = await getStudies({ query: { status: "Pending" } });
-      if (response.response.ok && response.data) {
-        setStudies(response.data);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Failed to get pending studies:", error);
-    }
-  };
   useEffect(() => {
+    const fetchPendingStudies = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getStudies({ query: { status: "Pending" } });
+        if (response.response.ok && response.data) {
+          setPendingStudies(response.data);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Failed to get pending studies:", error);
+      }
+    };
+
     fetchPendingStudies();
   }, []);
 
   const handleAllStudiesClick = async () => {
     setTab("all");
-    setIsLoading(true);
-    const response = await getStudies();
-    if (!response.response.ok) {
-      console.error("Failed to get studies:", response.error);
-    } else {
-      setStudies(response.data || []);
-      setIsLoading(false);
+
+    if (!allStudies.length) {
+      setIsLoading(true);
+      const response = await getStudies();
+      if (!response.response.ok) {
+        console.error("Failed to get studies:", response.error);
+      } else {
+        setAllStudies(response.data || []);
+        setIsLoading(false);
+      }
     }
   };
 
   const handlePendingStudiesClick = async () => {
     setTab("pending");
-    fetchPendingStudies();
   };
 
   return (
@@ -69,7 +73,7 @@ export default function StudiesAdmin() {
 
       {isLoading && <Loading message="Loading studies..." />}
 
-      <StudySelection studies={studies} isAdmin={true} />
+      <StudySelection studies={tab === "pending" ? pendingStudies : allStudies} isAdmin={true} />
     </>
   );
 }
