@@ -67,7 +67,7 @@ describe("Study Management Workflow", () => {
   });
 });
 
-describe("Study Assets Management", () => {
+describe("Information Assets Management", () => {
   beforeEach(() => {
     cy.loginAsBase();
     cy.mockAuthAsBaseStaffApprovedResearcher();

@@ -36,7 +36,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     },
     {
       id: "study-assets",
-      title: "Study Assets",
+      title: "Information Assets",
       description: "Create and manage at least one study asset. You can create more assets at any time.",
       completed: assetManagementCompleted,
       current: agreementCompleted && !assetManagementCompleted,
@@ -57,11 +57,13 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
     if (!assetManagementCompleted) {
       return (
-        <Assets
-          studyId={currentStudy.id}
-          studyTitle={currentStudy.title}
-          setAssetManagementCompleted={setAssetManagementCompleted}
-        />
+        <>
+          <Assets
+            studyId={currentStudy.id}
+            studyTitle={currentStudy.title}
+            setAssetManagementCompleted={setAssetManagementCompleted}
+          />
+        </>
       );
     }
   };
@@ -84,6 +86,13 @@ export default function ManageStudy({ study }: ManageStudyProps) {
           fetchStudies={getStudy}
         />
       )}
+      <StudyDetails
+        studyStepsCompleted={studyStepsCompleted}
+        study={currentStudy}
+        isAdmin={false}
+        isStudyOwner={isStudyOwner}
+        setStudyFormOpen={setStudyFormOpen}
+      />
 
       <StepProgress
         steps={studySteps}
@@ -102,12 +111,6 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
       {studyStepsCompleted && (
         <>
-          <StudyDetails
-            study={currentStudy}
-            isAdmin={false}
-            isStudyOwner={isStudyOwner}
-            setStudyFormOpen={setStudyFormOpen}
-          />
           <div className={styles["completed-section"]}>
             <Assets studyId={currentStudy.id} studyTitle={currentStudy.title} />
           </div>

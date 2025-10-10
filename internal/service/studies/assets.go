@@ -174,7 +174,7 @@ func (s *Service) createInformationAsset(user types.User, assetData openapi.Asse
 func (s *Service) InformationAssets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
 	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
-	return assets, types.NewErrFromGorm(err, "failed to get study assets")
+	return assets, types.NewErrFromGorm(err, "failed to get Information Assets")
 }
 
 // retrieves a specific asset within a study

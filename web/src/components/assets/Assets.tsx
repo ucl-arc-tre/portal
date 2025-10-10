@@ -75,8 +75,8 @@ export default function Assets(props: InformationAssetsProps) {
           }
         }
       } catch (err) {
-        console.error("Failed to load study assets:", err);
-        setError("Failed to load study assets. Please try again later.");
+        console.error("Failed to load Information Assets:", err);
+        setError("Failed to load Information Assets. Please try again later.");
       } finally {
         setIsLoading(false);
       }
