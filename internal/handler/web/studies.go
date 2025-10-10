@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
@@ -112,34 +111,26 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 func (h *Handler) studiesAdmin(ctx *gin.Context, params openapi.GetStudiesParams) ([]types.Study, error) {
 	if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
 		// admins can see all pending studies
-		studies, err := h.studies.PendingStudies()
-		if err != nil {
-			return nil, types.NewErrFromGorm(err)
-		}
-		return studies, nil
+		return h.studies.PendingStudies()
 
 	} else {
 		// Admins can see all studies normally
-		studies, err := h.studies.AllStudies()
-		if err != nil {
-			return nil, types.NewErrFromGorm(err)
-		}
-		return studies, nil
+		return h.studies.AllStudies()
 	}
 
 }
 
 func (h *Handler) studiesStudyOwner(ctx *gin.Context, user types.User) ([]types.Study, error) {
 	// Non-admin users can only see studies they own
-	var studyIds []uuid.UUID
+
 	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
 	if err != nil {
-		return nil, types.NewErrFromGorm(err)
+		return []types.Study{}, err
 	}
 
 	studies, err := h.studies.StudiesById(studyIds...)
 	if err != nil {
-		return nil, types.NewErrFromGorm(err)
+		return []types.Study{}, err
 	}
 
 	return studies, nil
