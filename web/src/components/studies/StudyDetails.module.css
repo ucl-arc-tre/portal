@@ -62,11 +62,12 @@
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   align-items: center;
+  align-content: center;
   gap: 0.25rem;
   max-width: fit-content;
 }
@@ -86,6 +87,10 @@
     font-weight: 400;
     text-transform: none;
     letter-spacing: normal;
+
+    svg {
+      height: 12px !important;
+    }
   }
 }
 

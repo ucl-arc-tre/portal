@@ -13,9 +13,10 @@ type StudyDetailsProps = {
   isAdmin: boolean;
   isStudyOwner: boolean;
   setStudyFormOpen?: (name: boolean) => void;
+  studyStepsCompleted?: boolean;
 };
 export default function StudyDetails(props: StudyDetailsProps) {
-  const { study, isAdmin, isStudyOwner, setStudyFormOpen } = props;
+  const { study, isAdmin, isStudyOwner, setStudyFormOpen, studyStepsCompleted } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
@@ -70,10 +71,15 @@ export default function StudyDetails(props: StudyDetailsProps) {
     <>
       {isStudyOwner && setStudyFormOpen && (
         <div className={styles["study-actions"]}>
-          <Button variant="secondary" onClick={() => setStudyFormOpen(true)}>
+          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)}>
             {study.feedback ? "Respond to Feedback" : "Edit Study"}
           </Button>
-          <Button onClick={() => handleUpdateStudyStatus("Pending")}>Mark Ready for Review</Button>
+
+          {studyStepsCompleted && (
+            <Button onClick={() => handleUpdateStudyStatus("Pending")} size="small">
+              Mark Ready for Review
+            </Button>
+          )}
         </div>
       )}
 
@@ -117,6 +123,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           )}
 
           <h3>Additional Information</h3>
+          <hr />
           <dl className={styles.grouping}>
             <h4>Sponsorships & Approvals</h4>
             {study.involves_ucl_sponsorship && (
@@ -124,7 +131,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
             )}
             {study.involves_cag && (
               <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                CAG approval <InfoTooltip text="increases risk score by 5" />
+                CAG approval
+                <InfoTooltip text="increases risk score by 5" />
               </dd>
             )}
             {study.involves_ethics_approval && (
