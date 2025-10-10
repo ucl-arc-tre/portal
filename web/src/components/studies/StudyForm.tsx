@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
-import styles from "./CreateStudyForm.module.css";
+import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
+import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
 
 export type StudyFormData = {
   title: string;
@@ -11,7 +12,7 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  cagReference: number;
+  cagReference: string;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
   dataProtectionId: number;
@@ -35,41 +36,77 @@ export type StudyFormData = {
   requiresDspt: boolean;
 };
 
-type CreateStudyProps = {
+type StudyProps = {
   username: string;
-  setCreateStudyFormOpen: (name: boolean) => void;
-  handleStudySubmit: (data: StudyFormData) => Promise<void>;
-  submitError: string | null;
-  isSubmitting: boolean;
-  setSubmitError: (error: string | null) => void;
+  setStudyFormOpen: (name: boolean) => void;
+  fetchStudies?: () => void;
+  editingStudy?: Study | null;
 };
 
-// what is this?
-// A brief comment for context might be good here
+const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
+  const studyData: StudyRequest = {
+    title: data.title,
+    description: data.description ? data.description : undefined,
+    data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
+    additional_study_admin_usernames: data.additionalStudyAdminUsernames
+      .map((admin) => admin.value.trim())
+      .map((username) => `${username}${domainName}`),
+    involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
+    involves_cag: data.involvesCag ? data.involvesCag : undefined,
+    cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
+    involves_ethics_approval: data.involvesEthicsApproval ? data.involvesEthicsApproval : undefined,
+    involves_hra_approval: data.involvesHraApproval ? data.involvesHraApproval : undefined,
+    iras_id: data.irasId ? data.irasId : undefined,
+    is_nhs_associated: data.isNhsAssociated ? data.isNhsAssociated : undefined,
+    involves_nhs_england: data.involvesNhsEngland ? data.involvesNhsEngland : undefined,
+    nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+    involves_mnca: data.involvesMnca ? data.involvesMnca : undefined,
+    requires_dspt: data.requiresDspt ? data.requiresDspt : undefined,
+    requires_dbs: data.requiresDbs ? data.requiresDbs : undefined,
+    is_data_protection_office_registered: data.isDataProtectionOfficeRegistered
+      ? data.isDataProtectionOfficeRegistered
+      : undefined,
+    data_protection_number:
+      data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
+        : undefined,
+    involves_third_party: data.involvesThirdParty ? data.involvesThirdParty : undefined,
+    involves_external_users: data.involvesExternalUsers ? data.involvesExternalUsers : undefined,
+    involves_participant_consent: data.involvesParticipantConsent ? data.involvesParticipantConsent : undefined,
+    involves_indirect_data_collection: data.involvesIndirectDataCollection
+      ? data.involvesIndirectDataCollection
+      : undefined,
+    involves_data_processing_outside_eea: data.involvesDataProcessingOutsideEea
+      ? data.involvesDataProcessingOutsideEea
+      : undefined,
+  };
+
+  return studyData;
+};
+
+// data protection office id
 const UclDpoId = "Z6364106";
 
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME;
+// this should match the domain that is used for the entra ID users in the portal
+const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
-export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
-  const { username, setCreateStudyFormOpen, handleStudySubmit, submitError, isSubmitting, setSubmitError } =
-    CreateStudyProps;
+export default function StudyForm(StudyProps: StudyProps) {
+  const { username, setStudyFormOpen, fetchStudies, editingStudy } = StudyProps;
   const {
     register,
     handleSubmit,
     control,
     setValue,
     trigger,
+    reset,
     formState: { errors, isValid },
   } = useForm<StudyFormData>({
     mode: "onChange",
     criteriaMode: "all",
-    defaultValues: {
-      title: "",
-      dataControllerOrganisation: "",
-      owner: username,
-      additionalStudyAdminUsernames: [],
-    },
+    defaultValues: { title: "", dataControllerOrganisation: "", owner: username, additionalStudyAdminUsernames: [] },
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [stepValidationError, setStepValidationError] = useState<string | null>(null);
@@ -142,20 +179,105 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     }
   }, [controllerValue, setValue]);
 
+  // if update get the study to populate the fields
+  useEffect(() => {
+    if (editingStudy) {
+      const study = editingStudy;
+      reset({
+        title: study.title,
+        description: study.description,
+        owner: study.owner_username!,
+        additionalStudyAdminUsernames: study.additional_study_admin_usernames.map((username) => ({
+          value: username.split("@")[0],
+        })),
+        dataControllerOrganisation: study.data_controller_organisation,
+        cagReference: study.cag_reference,
+        dataProtectionPrefix: study.data_protection_number?.split("/")[0],
+        dataProtectionDate: study.data_protection_number?.split("/")[1],
+        dataProtectionId: Number(study.data_protection_number?.split("/")[2]),
+        dataProtectionNumber: study.data_protection_number,
+        nhsEnglandReference: Number(study.nhs_england_reference),
+        irasId: study.iras_id,
+        involvesUclSponsorship: study.involves_ucl_sponsorship,
+        involvesCag: study.involves_cag,
+        involvesEthicsApproval: study.involves_ethics_approval,
+        involvesHraApproval: study.involves_hra_approval,
+        requiresDbs: study.requires_dbs,
+        isDataProtectionOfficeRegistered: study.is_data_protection_office_registered,
+        involvesThirdParty: study.involves_third_party,
+        involvesExternalUsers: study.involves_external_users,
+        involvesParticipantConsent: study.involves_participant_consent,
+        involvesIndirectDataCollection: study.involves_indirect_data_collection,
+        involvesDataProcessingOutsideEea: study.involves_data_processing_outside_eea,
+        isNhsAssociated: study.is_nhs_associated,
+        involvesNhsEngland: study.involves_nhs_england,
+        involvesMnca: study.involves_mnca,
+        requiresDspt: study.requires_dspt,
+      });
+    }
+  }, [editingStudy, username, reset]);
+
+  const handleStudySubmit = async (data: StudyFormData, studyId?: string) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Convert form data to API format
+      const studyData = convertStudyFormDataToApiRequest(data);
+
+      let response;
+      if (!studyId) {
+        response = await postStudies({
+          body: studyData,
+        });
+      } else {
+        response = await putStudiesByStudyId({
+          path: { studyId },
+          body: studyData,
+        });
+      }
+      if (response.data) {
+        setStudyFormOpen(false);
+        if (fetchStudies) {
+          fetchStudies();
+        }
+        return;
+      }
+
+      if (response.error) {
+        const errorData = response.error as ValidationError;
+        if (errorData?.error_message) {
+          setSubmitError(errorData.error_message);
+          return;
+        }
+      }
+
+      setSubmitError("An unknown error occurred.");
+    } catch (error) {
+      console.error(`Failed to ${studyId ? "update" : "create"} study:`, error);
+      setSubmitError(`Failed to ${studyId ? "update" : "create"} study Please try again.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    await handleStudySubmit(data);
+    if (!editingStudy) {
+      await handleStudySubmit(data);
+    } else {
+      await handleStudySubmit(data, editingStudy.id);
+    }
   };
 
   const handleCloseForm = () => {
     setSubmitError(null);
-    setCreateStudyFormOpen(false);
+    setStudyFormOpen(false);
   };
 
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
   return (
     <Dialog setDialogOpen={handleCloseForm} className={styles["study-dialog"]} cy="create-study-form">
-      <h2>Create Study</h2>
+      <h2>{editingStudy ? "Update Study" : "Create Study"}</h2>
       <div className={styles["step-progress"]}>
         <div
           className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""} ${isValid ? styles.valid : ""}`}
@@ -558,7 +680,8 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
         {currentStep === totalSteps && (
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating study..." : "Create Study"}
+            {editingStudy && isSubmitting ? "Updating study..." : editingStudy && "Update Study"}
+            {!editingStudy && isSubmitting ? "Creating study..." : !editingStudy && "Create Study"}
           </Button>
         )}
       </form>

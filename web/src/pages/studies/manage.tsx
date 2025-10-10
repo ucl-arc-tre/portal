@@ -167,7 +167,7 @@ export default function ManageStudyPage() {
       <Breadcrumbs studyId={study.id} studyTitle={study.title} />
       <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
-      {isAdmin ? <StudyDetails study={study} /> : <ManageStudy study={study} />}
+      {isAdmin ? <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} /> : <ManageStudy study={study} />}
     </>
   );
 }
