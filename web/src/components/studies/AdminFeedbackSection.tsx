@@ -39,7 +39,6 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
   return (
     <>
       {(status === "Pending" || status === "Rejected") && (
-        //TODO: check why feedback not showing up after edit since abstraction
         <div>
           <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
             Approve Study
