@@ -47,7 +47,6 @@ export default function ChosenNameChangeModal({ isOpen, onClose, currentChosenNa
         },
       });
 
-      // do we need more robust backend validation and error handling here?
       if (!response.response.ok) {
         throw new Error("Failed to submit chosen name change request");
       }
