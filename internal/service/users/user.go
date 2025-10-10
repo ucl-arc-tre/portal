@@ -22,6 +22,14 @@ func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 				Username: string(user.Username),
 			},
 		}
+
+		attributes, err := s.Attributes(user)
+		if err != nil {
+			return usersData, fmt.Errorf("failed to get attributes for user: %w", err)
+		}
+		chosenNameStr := string(attributes.ChosenName)
+		userData.ChosenName = &chosenNameStr
+
 		agreements, err := s.ConfirmedAgreements(user)
 		if err != nil {
 			return usersData, fmt.Errorf("failed to get agreements for user: %w", err)

@@ -75,6 +75,8 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
             name="chosenName"
             value={inputNameValue}
             placeholder="e.g. Alice Smith"
+            minLength={3}
+            maxLength={100}
             onChange={(e) => {
               setInputNameValue(e.target.value);
               if (errorMessage) setErrorMessage(null);

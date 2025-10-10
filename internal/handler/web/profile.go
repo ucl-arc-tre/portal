@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -92,4 +93,58 @@ func (h *Handler) PostProfileTraining(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, result)
+}
+
+func (h *Handler) PostProfileChosenNameChangeRequest(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	request := openapi.ChosenNameChangeRequest{}
+
+	if err := bindJSONOrSetError(ctx, &request); err != nil {
+		return
+	}
+
+	if err := h.users.CreateChosenNameChangeRequest(ctx, user, types.ChosenName(request.NewChosenName), request.Reason); err != nil {
+		setError(ctx, err, "Failed to create chosen name change request")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) PutProfile(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+	if !isAdmin {
+		setError(ctx, types.NewErrServerError(err), "Unauthorized")
+		return
+	}
+
+	requestBody := openapi.PutProfileJSONRequestBody{}
+
+	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
+		return
+	}
+
+	userID, err := uuid.Parse(requestBody.UserId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid user ID")
+		return
+	}
+
+	targetUser, err := h.users.UserById(userID)
+	if err != nil {
+		setError(ctx, err, "Failed to find user")
+		return
+	}
+
+	if err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
+		setError(ctx, err, "Failed to update chosen name")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
