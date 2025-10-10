@@ -50,13 +50,12 @@ func (s *Service) CreateChosenNameChangeRequest(ctx context.Context, user types.
 		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", newChosenName))
 	}
 
-	// Get current chosen name
+	// get the users current chosen name
 	currentAttributes, err := s.Attributes(user)
 	if err != nil {
 		return err
 	}
 
-	// Send email notification to ARC TRE team
 	recipientEmail := "arc.tre@ucl.ac.uk"
 	reasonStr := ""
 	if reason != nil {
@@ -74,15 +73,6 @@ func (s *Service) CreateChosenNameChangeRequest(ctx context.Context, user types.
 		log.Error().Err(err).Msg("Failed to send chosen name change request notification")
 		return err
 	}
-
-	log.Info().
-		Str("username", string(user.Username)).
-		Str("current_chosen_name", string(currentAttributes.ChosenName)).
-		Str("new_chosen_name", string(newChosenName)).
-		Str("reason", reasonStr).
-		Msg("Chosen name change request submitted successfully")
-
-	// TODO: Store the request in database?
 
 	return nil
 }

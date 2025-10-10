@@ -664,6 +664,7 @@ type UserAgreements struct {
 // UserData defines model for UserData.
 type UserData struct {
 	Agreements     UserAgreements  `json:"agreements"`
+	ChosenName     *string         `json:"chosen_name,omitempty"`
 	Roles          []string        `json:"roles"`
 	TrainingRecord ProfileTraining `json:"training_record"`
 	User           User            `json:"user"`
@@ -682,6 +683,14 @@ type ValidationError struct {
 	ErrorMessage string `json:"error_message"`
 }
 
+// PutProfileJSONBody defines parameters for PutProfile.
+type PutProfileJSONBody struct {
+	ChosenName string `json:"chosen_name"`
+
+	// UserId ID of the user to update
+	UserId string `json:"user_id"`
+}
+
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
@@ -696,6 +705,9 @@ type PostUsersInviteJSONBody struct {
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
+
+// PutProfileJSONRequestBody defines body for PutProfile for application/json ContentType.
+type PutProfileJSONRequestBody PutProfileJSONBody
 
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
@@ -747,6 +759,9 @@ type ServerInterface interface {
 
 	// (POST /profile)
 	PostProfile(c *gin.Context)
+
+	// (PUT /profile)
+	PutProfile(c *gin.Context)
 
 	// (GET /profile/agreements)
 	GetProfileAgreements(c *gin.Context)
@@ -898,6 +913,19 @@ func (siw *ServerInterfaceWrapper) PostProfile(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfile(c)
+}
+
+// PutProfile operation middleware
+func (siw *ServerInterfaceWrapper) PutProfile(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutProfile(c)
 }
 
 // GetProfileAgreements operation middleware
@@ -1433,6 +1461,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
+	router.PUT(options.BaseURL+"/profile", wrapper.PutProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.POST(options.BaseURL+"/profile/chosen-name-change-request", wrapper.PostProfileChosenNameChangeRequest)

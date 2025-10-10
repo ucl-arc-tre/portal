@@ -35,6 +35,7 @@ paths:
         default:
           description: Unexpected error
     post:
+      description: Update own profile chosen name
       requestBody:
         required: true
         content:
@@ -48,6 +49,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Profile"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    put:
+      description: Update another user's chosen name (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - chosen_name
+              properties:
+                user_id:
+                  type: string
+                  description: ID of the user to update
+                chosen_name:
+                  type: string
+      responses:
+        "200":
+          description: Successfully updated chosen name
+        "400":
+          description: Invalid request
+        "403":
+          description: Forbidden
+        "404":
+          description: User not found
         "500":
           description: Internal server error
         default:
@@ -853,6 +884,8 @@ components:
           $ref: "#/components/schemas/UserAgreements"
         training_record:
           $ref: "#/components/schemas/ProfileTraining"
+        chosen_name:
+          type: string
 
     UserTrainingUpdate:
       type: object

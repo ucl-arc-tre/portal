@@ -109,3 +109,30 @@ func (h *Handler) PostProfileChosenNameChangeRequest(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) PutProfile(ctx *gin.Context) {
+	requestBody := openapi.PutProfileJSONRequestBody{}
+
+	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
+		return
+	}
+
+	userID, err := uuid.Parse(requestBody.UserId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid user ID")
+		return
+	}
+
+	targetUser, err := h.users.UserById(userID)
+	if err != nil {
+		setError(ctx, err, "Failed to find user")
+		return
+	}
+
+	if err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
+		setError(ctx, err, "Failed to update chosen name")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

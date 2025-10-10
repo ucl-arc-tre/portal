@@ -106,6 +106,7 @@ export type UserData = {
     roles: Array<string>;
     agreements: UserAgreements;
     training_record: ProfileTraining;
+    chosen_name?: string;
 };
 
 export type UserTrainingUpdate = {
@@ -484,6 +485,49 @@ export type PostProfileResponses = {
 };
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
+
+export type PutProfileData = {
+    body: {
+        /**
+         * ID of the user to update
+         */
+        user_id: string;
+        chosen_name: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/profile';
+};
+
+export type PutProfileErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutProfileResponses = {
+    /**
+     * Successfully updated chosen name
+     */
+    200: unknown;
+};
 
 export type GetProfileAgreementsData = {
     body?: never;
