@@ -72,7 +72,7 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.Use
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
+func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
@@ -112,7 +112,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 }
 
 func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
-	validationError, err := s.validateStudyData(ctx, owner, studyData)
+	validationError, err := s.ValidateStudyData(ctx, studyData)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
@@ -155,6 +155,10 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 
 // given a study and data from a request, line up the values
 func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
+	log.Debug().Msg("setting study data")
+	if studyData.Title != "" {
+		study.Title = studyData.Title
+	}
 	study.Description = studyData.Description
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
@@ -233,10 +237,16 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 }
 
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
-	study := types.Study{}
+	studies, err := s.StudiesById(id)
+	if err != nil {
+		return err
+	} else if len(studies) == 0 {
+		return types.NewNotFoundError("study not found")
+	}
+	study := studies[0]
 
 	setStudyFromStudyData(&study, studyData)
-
 	result := s.db.Model(&study).Where("id = ?", id).Updates(&study)
+
 	return types.NewErrFromGorm(result.Error)
 }
