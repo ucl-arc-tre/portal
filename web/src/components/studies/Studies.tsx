@@ -1,22 +1,40 @@
-import { useState } from "react";
-import { Study, Auth } from "@/openapi";
+import { useEffect, useState } from "react";
+import { Study, Auth, getStudies } from "@/openapi";
 import StudySelection from "../studies/StudySelection";
 import StudyForm from "./StudyForm";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 
 import styles from "./Studies.module.css";
+import Loading from "../ui/Loading";
 
 type Props = {
   userData: Auth;
-  studies: Study[];
-  fetchStudies: () => void;
 };
 
 export default function Studies(props: Props) {
-  const { userData, studies, fetchStudies } = props;
+  const { userData } = props;
   const [studyFormOpen, setStudyFormOpen] = useState(false);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
+  const [studiesLoading, setStudiesLoading] = useState(true);
+  const [studies, setStudies] = useState<Study[]>([]);
+
+  const fetchStudies = async () => {
+    setStudiesLoading(true);
+    try {
+      const response = await getStudies();
+      setStudies(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch studies:", error);
+      setStudies([]);
+    } finally {
+      setStudiesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudies();
+  }, []);
 
   const handleCreateStudyClick = () => {
     if (!userData.roles.includes("approved-staff-researcher")) {
@@ -44,7 +62,7 @@ export default function Studies(props: Props) {
           </div>
         </Dialog>
       )}
-
+      {studiesLoading && <Loading message="Loading studies..." />}
       {!userData.roles.includes("approved-staff-researcher") && studies.length === 0 ? (
         <div className={styles["no-studies-message"]}>
           <h2>You haven&apos;t been added to any studies yet</h2>
