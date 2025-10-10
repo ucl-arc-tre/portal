@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -111,6 +112,17 @@ func (h *Handler) PostProfileChosenNameChangeRequest(ctx *gin.Context) {
 }
 
 func (h *Handler) PutProfile(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+	if !isAdmin {
+		setError(ctx, types.NewErrServerError(err), "Unauthorized")
+		return
+	}
+
 	requestBody := openapi.PutProfileJSONRequestBody{}
 
 	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
