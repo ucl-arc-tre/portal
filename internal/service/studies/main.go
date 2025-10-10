@@ -155,10 +155,10 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 
 // given a study and data from a request, line up the values
 func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
-	log.Debug().Msg("setting study data")
 	if studyData.Title != "" {
 		study.Title = studyData.Title
 	}
+	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.Description = studyData.Description
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
