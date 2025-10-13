@@ -334,6 +334,12 @@ paths:
       responses:
         "200":
           description: Study updated successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
         "403":
           description: Forbidden
         "404":

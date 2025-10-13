@@ -865,6 +865,10 @@ export type PutStudiesByStudyIdData = {
 
 export type PutStudiesByStudyIdErrors = {
     /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
      * Forbidden
      */
     403: unknown;
@@ -881,6 +885,8 @@ export type PutStudiesByStudyIdErrors = {
      */
     default: unknown;
 };
+
+export type PutStudiesByStudyIdError = PutStudiesByStudyIdErrors[keyof PutStudiesByStudyIdErrors];
 
 export type PutStudiesByStudyIdResponses = {
     /**
