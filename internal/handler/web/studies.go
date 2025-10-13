@@ -113,6 +113,8 @@ func (h *Handler) studiesAdmin(params openapi.GetStudiesParams) ([]types.Study, 
 		// admins can see all pending studies
 		return h.studies.PendingStudies()
 
+	} else if params.Status != nil {
+		return []types.Study{}, types.NewErrInvalidObject("Invalid query param")
 	} else {
 		// Admins can see all studies normally
 		return h.studies.AllStudies()
@@ -541,8 +543,11 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 	validationError, err := h.studies.ValidateStudyData(ctx, studyData)
-	if err != nil || validationError != nil {
+	if err != nil {
 		setError(ctx, err, "Failed to validate study data")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 	err = h.studies.UpdateStudy(studyUUID, studyData)
