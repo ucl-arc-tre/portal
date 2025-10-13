@@ -39,7 +39,7 @@ export type StudyFormData = {
 type StudyProps = {
   username: string;
   setStudyFormOpen: (name: boolean) => void;
-  fetchStudies?: () => void;
+  fetchStudyData?: () => void;
   editingStudy?: Study | null;
 };
 
@@ -91,7 +91,7 @@ const UclDpoId = "Z6364106";
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
 export default function StudyForm(StudyProps: StudyProps) {
-  const { username, setStudyFormOpen, fetchStudies, editingStudy } = StudyProps;
+  const { username, setStudyFormOpen, fetchStudyData, editingStudy } = StudyProps;
   const {
     register,
     handleSubmit,
@@ -238,8 +238,8 @@ export default function StudyForm(StudyProps: StudyProps) {
       }
       if (response.data) {
         setStudyFormOpen(false);
-        if (fetchStudies) {
-          fetchStudies();
+        if (fetchStudyData) {
+          fetchStudyData();
         }
         return;
       }

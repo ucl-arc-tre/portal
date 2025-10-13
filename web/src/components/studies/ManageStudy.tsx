@@ -84,7 +84,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
           username={userData.username}
           setStudyFormOpen={setStudyFormOpen}
           editingStudy={currentStudy}
-          fetchStudies={getStudy}
+          fetchStudyData={getStudy}
         />
       )}
       <StudyDetails
