@@ -62,7 +62,7 @@ export default function ChosenNameChangeModal({ isOpen, onClose, currentChosenNa
             href={`mailto:${emailAddress}?subject=${encodedEmailSubject}&body=${encodedEmailBody}`}
             variant="primary"
           >
-            Send Email
+            Create Email
           </Button>
         </div>
       </div>
