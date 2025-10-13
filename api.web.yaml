@@ -149,25 +149,6 @@ paths:
         default:
           description: Unexpected error
 
-  /profile/chosen-name-change-request:
-    post:
-      description: Request a change to the user's chosen name
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ChosenNameChangeRequest"
-      responses:
-        "200":
-          description: Request submitted successfully
-        "400":
-          description: Invalid request
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
   /agreements/{agreementType}:
     get:
       description: Get the latest approved researcher agreement
@@ -735,19 +716,6 @@ components:
       properties:
         chosen_name:
           type: string
-
-    ChosenNameChangeRequest:
-      type: object
-      required:
-        - new_chosen_name
-      properties:
-        new_chosen_name:
-          type: string
-          minLength: 3
-          maxLength: 100
-        reason:
-          type: string
-          maxLength: 500
 
     Agreement:
       type: object

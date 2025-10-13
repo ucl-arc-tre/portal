@@ -18,11 +18,6 @@ export type ProfileUpdate = {
     chosen_name: string;
 };
 
-export type ChosenNameChangeRequest = {
-    new_chosen_name: string;
-    reason?: string;
-};
-
 export type Agreement = {
     /**
      * UUID of the agreement
@@ -627,35 +622,6 @@ export type PostProfileTrainingResponses = {
 };
 
 export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
-
-export type PostProfileChosenNameChangeRequestData = {
-    body: ChosenNameChangeRequest;
-    path?: never;
-    query?: never;
-    url: '/profile/chosen-name-change-request';
-};
-
-export type PostProfileChosenNameChangeRequestErrors = {
-    /**
-     * Invalid request
-     */
-    400: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PostProfileChosenNameChangeRequestResponses = {
-    /**
-     * Request submitted successfully
-     */
-    200: unknown;
-};
 
 export type GetAgreementsByAgreementTypeData = {
     body?: never;

@@ -1,7 +1,6 @@
 package users
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"time"
@@ -43,36 +42,4 @@ func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {
 	attrs := types.UserAttributes{}
 	result := s.db.Select("chosen_name").Limit(1).Where("user_id = ?", user.ID).Find(&attrs)
 	return attrs.ChosenName, types.NewErrFromGorm(result.Error)
-}
-
-func (s *Service) CreateChosenNameChangeRequest(ctx context.Context, user types.User, newChosenName types.ChosenName, reason *string) error {
-	if isValid := chosenNamePattern.MatchString(string(newChosenName)); !isValid {
-		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", newChosenName))
-	}
-
-	// get the users current chosen name
-	currentAttributes, err := s.Attributes(user)
-	if err != nil {
-		return err
-	}
-
-	recipientEmail := "arc.tre@ucl.ac.uk"
-	reasonStr := ""
-	if reason != nil {
-		reasonStr = *reason
-	}
-
-	if err := s.entra.SendChosenNameChangeRequestNotification(
-		ctx,
-		recipientEmail,
-		user.Username,
-		currentAttributes.ChosenName,
-		newChosenName,
-		reasonStr,
-	); err != nil {
-		log.Error().Err(err).Msg("Failed to send chosen name change request notification")
-		return err
-	}
-
-	return nil
 }
