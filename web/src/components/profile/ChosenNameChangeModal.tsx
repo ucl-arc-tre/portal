@@ -8,7 +8,7 @@ type ChosenNameChangeModalProps = {
   currentChosenName?: string;
 };
 
-const emailAddress = "arc.tre@ucl.ac.uk";
+const emailAddress = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.tre@ucl.ac.uk";
 const emailSubject = "TRE Portal: Chosen Name Change Request";
 const emailBody = `Dear UCL Information Governance,
 
