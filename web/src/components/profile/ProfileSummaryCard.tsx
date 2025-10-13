@@ -14,9 +14,11 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
     <div className={styles["profile-summary-container"]}>
       <div className={styles.header}>
         <h3 className={styles.title}>Profile Information</h3>
-        <button className={styles["username-change-link"]} onClick={() => setShowChosenNameChangeModal(true)}>
-          request chosen name change
-        </button>
+        {chosenName && (
+          <button className={styles["username-change-link"]} onClick={() => setShowChosenNameChangeModal(true)}>
+            request chosen name change
+          </button>
+        )}
       </div>
 
       <div className={styles.content}>
