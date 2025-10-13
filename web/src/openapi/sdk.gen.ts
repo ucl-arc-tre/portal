@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetAgreementsByAgreementTypeData, GetAgreementsByAgreementTypeErrors, GetAgreementsByAgreementTypeResponses, GetAuthData, GetAuthErrors, GetAuthResponses, GetLogoutData, GetLogoutErrors, GetLogoutResponses, GetProfileAgreementsData, GetProfileAgreementsErrors, GetProfileAgreementsResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetProfileTrainingData, GetProfileTrainingErrors, GetProfileTrainingResponses, GetStudiesByStudyIdAgreementsData, GetStudiesByStudyIdAgreementsErrors, GetStudiesByStudyIdAgreementsResponses, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses, GetStudiesByStudyIdAssetsByAssetIdContractsData, GetStudiesByStudyIdAssetsByAssetIdContractsErrors, GetStudiesByStudyIdAssetsByAssetIdContractsResponses, GetStudiesByStudyIdAssetsByAssetIdData, GetStudiesByStudyIdAssetsByAssetIdErrors, GetStudiesByStudyIdAssetsByAssetIdResponses, GetStudiesByStudyIdAssetsData, GetStudiesByStudyIdAssetsErrors, GetStudiesByStudyIdAssetsResponses, GetStudiesByStudyIdData, GetStudiesByStudyIdErrors, GetStudiesByStudyIdResponses, GetStudiesData, GetStudiesErrors, GetStudiesResponses, GetUsersData, GetUsersErrors, GetUsersResponses, PostProfileAgreementsData, PostProfileAgreementsErrors, PostProfileAgreementsResponses, PostProfileData, PostProfileErrors, PostProfileResponses, PostProfileTrainingData, PostProfileTrainingErrors, PostProfileTrainingResponses, PostStudiesAdminByStudyIdReviewData, PostStudiesAdminByStudyIdReviewErrors, PostStudiesAdminByStudyIdReviewResponses, PostStudiesByStudyIdAgreementsData, PostStudiesByStudyIdAgreementsErrors, PostStudiesByStudyIdAgreementsResponses, PostStudiesByStudyIdAssetsByAssetIdContractsUploadData, PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors, PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses, PostStudiesByStudyIdAssetsData, PostStudiesByStudyIdAssetsErrors, PostStudiesByStudyIdAssetsResponses, PostStudiesData, PostStudiesErrors, PostStudiesResponses, PostUsersApprovedResearchersImportCsvData, PostUsersApprovedResearchersImportCsvErrors, PostUsersApprovedResearchersImportCsvResponses, PostUsersByUserIdTrainingData, PostUsersByUserIdTrainingErrors, PostUsersByUserIdTrainingResponses, PostUsersInviteData, PostUsersInviteErrors, PostUsersInviteResponses, PutProfileData, PutProfileErrors, PutProfileResponses, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses } from './types.gen';
+import type { GetAgreementsByAgreementTypeData, GetAgreementsByAgreementTypeErrors, GetAgreementsByAgreementTypeResponses, GetAuthData, GetAuthErrors, GetAuthResponses, GetLogoutData, GetLogoutErrors, GetLogoutResponses, GetProfileAgreementsData, GetProfileAgreementsErrors, GetProfileAgreementsResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetProfileTrainingData, GetProfileTrainingErrors, GetProfileTrainingResponses, GetStudiesByStudyIdAgreementsData, GetStudiesByStudyIdAgreementsErrors, GetStudiesByStudyIdAgreementsResponses, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses, GetStudiesByStudyIdAssetsByAssetIdContractsData, GetStudiesByStudyIdAssetsByAssetIdContractsErrors, GetStudiesByStudyIdAssetsByAssetIdContractsResponses, GetStudiesByStudyIdAssetsByAssetIdData, GetStudiesByStudyIdAssetsByAssetIdErrors, GetStudiesByStudyIdAssetsByAssetIdResponses, GetStudiesByStudyIdAssetsData, GetStudiesByStudyIdAssetsErrors, GetStudiesByStudyIdAssetsResponses, GetStudiesByStudyIdData, GetStudiesByStudyIdErrors, GetStudiesByStudyIdResponses, GetStudiesData, GetStudiesErrors, GetStudiesResponses, GetUsersData, GetUsersErrors, GetUsersResponses, PostProfileAgreementsData, PostProfileAgreementsErrors, PostProfileAgreementsResponses, PostProfileData, PostProfileErrors, PostProfileResponses, PostProfileTrainingData, PostProfileTrainingErrors, PostProfileTrainingResponses, PostStudiesAdminByStudyIdReviewData, PostStudiesAdminByStudyIdReviewErrors, PostStudiesAdminByStudyIdReviewResponses, PostStudiesByStudyIdAgreementsData, PostStudiesByStudyIdAgreementsErrors, PostStudiesByStudyIdAgreementsResponses, PostStudiesByStudyIdAssetsByAssetIdContractsUploadData, PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors, PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses, PostStudiesByStudyIdAssetsData, PostStudiesByStudyIdAssetsErrors, PostStudiesByStudyIdAssetsResponses, PostStudiesData, PostStudiesErrors, PostStudiesResponses, PostUsersApprovedResearchersImportCsvData, PostUsersApprovedResearchersImportCsvErrors, PostUsersApprovedResearchersImportCsvResponses, PostUsersByUserIdTrainingData, PostUsersByUserIdTrainingErrors, PostUsersByUserIdTrainingResponses, PostUsersInviteData, PostUsersInviteErrors, PostUsersInviteResponses, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses, PutUsersByUserIdAttributesData, PutUsersByUserIdAttributesErrors, PutUsersByUserIdAttributesResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -43,20 +43,6 @@ export const getProfile = <ThrowOnError extends boolean = false>(options?: Optio
  */
 export const postProfile = <ThrowOnError extends boolean = false>(options: Options<PostProfileData, ThrowOnError>) => {
     return (options.client ?? client).post<PostProfileResponses, PostProfileErrors, ThrowOnError>({
-        url: '/profile',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
- * Update another user's chosen name (admin only)
- */
-export const putProfile = <ThrowOnError extends boolean = false>(options: Options<PutProfileData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutProfileResponses, PutProfileErrors, ThrowOnError>({
         url: '/profile',
         ...options,
         headers: {
@@ -137,6 +123,20 @@ export const getUsers = <ThrowOnError extends boolean = false>(options: Options<
 export const postUsersByUserIdTraining = <ThrowOnError extends boolean = false>(options: Options<PostUsersByUserIdTrainingData, ThrowOnError>) => {
     return (options.client ?? client).post<PostUsersByUserIdTrainingResponses, PostUsersByUserIdTrainingErrors, ThrowOnError>({
         url: '/users/{userId}/training',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Update a user's attributes (admin only)
+ */
+export const putUsersByUserIdAttributes = <ThrowOnError extends boolean = false>(options: Options<PutUsersByUserIdAttributesData, ThrowOnError>) => {
+    return (options.client ?? client).put<PutUsersByUserIdAttributesResponses, PutUsersByUserIdAttributesErrors, ThrowOnError>({
+        url: '/users/{userId}/attributes',
         ...options,
         headers: {
             'Content-Type': 'application/json',

@@ -144,3 +144,29 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 
 	ctx.Status(http.StatusNoContent)
 }
+
+func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
+	var requestBody openapi.PutUsersUserIdAttributesJSONRequestBody
+	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
+		return
+	}
+
+	userID, err := uuid.Parse(userId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid user ID")
+		return
+	}
+
+	targetUser, err := h.users.UserById(userID)
+	if err != nil {
+		setError(ctx, err, "Failed to find user")
+		return
+	}
+
+	if err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
+		setError(ctx, err, "Failed to update chosen name")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

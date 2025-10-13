@@ -677,14 +677,6 @@ type ValidationError struct {
 	ErrorMessage string `json:"error_message"`
 }
 
-// PutProfileJSONBody defines parameters for PutProfile.
-type PutProfileJSONBody struct {
-	ChosenName string `json:"chosen_name"`
-
-	// UserId ID of the user to update
-	UserId string `json:"user_id"`
-}
-
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
@@ -697,11 +689,13 @@ type PostUsersInviteJSONBody struct {
 	Email string `json:"email"`
 }
 
+// PutUsersUserIdAttributesJSONBody defines parameters for PutUsersUserIdAttributes.
+type PutUsersUserIdAttributesJSONBody struct {
+	ChosenName string `json:"chosen_name"`
+}
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
-
-// PutProfileJSONRequestBody defines body for PutProfile for application/json ContentType.
-type PutProfileJSONRequestBody PutProfileJSONBody
 
 // PostProfileAgreementsJSONRequestBody defines body for PostProfileAgreements for application/json ContentType.
 type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
@@ -730,6 +724,9 @@ type PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody = Con
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
 
+// PutUsersUserIdAttributesJSONRequestBody defines body for PutUsersUserIdAttributes for application/json ContentType.
+type PutUsersUserIdAttributesJSONRequestBody PutUsersUserIdAttributesJSONBody
+
 // PostUsersUserIdTrainingJSONRequestBody defines body for PostUsersUserIdTraining for application/json ContentType.
 type PostUsersUserIdTrainingJSONRequestBody = UserTrainingUpdate
 
@@ -750,9 +747,6 @@ type ServerInterface interface {
 
 	// (POST /profile)
 	PostProfile(c *gin.Context)
-
-	// (PUT /profile)
-	PutProfile(c *gin.Context)
 
 	// (GET /profile/agreements)
 	GetProfileAgreements(c *gin.Context)
@@ -813,6 +807,9 @@ type ServerInterface interface {
 
 	// (POST /users/invite)
 	PostUsersInvite(c *gin.Context)
+
+	// (PUT /users/{userId}/attributes)
+	PutUsersUserIdAttributes(c *gin.Context, userId string)
 
 	// (POST /users/{userId}/training)
 	PostUsersUserIdTraining(c *gin.Context, userId string)
@@ -901,19 +898,6 @@ func (siw *ServerInterfaceWrapper) PostProfile(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfile(c)
-}
-
-// PutProfile operation middleware
-func (siw *ServerInterfaceWrapper) PutProfile(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PutProfile(c)
 }
 
 // GetProfileAgreements operation middleware
@@ -1380,6 +1364,30 @@ func (siw *ServerInterfaceWrapper) PostUsersInvite(c *gin.Context) {
 	siw.Handler.PostUsersInvite(c)
 }
 
+// PutUsersUserIdAttributes operation middleware
+func (siw *ServerInterfaceWrapper) PutUsersUserIdAttributes(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutUsersUserIdAttributes(c, userId)
+}
+
 // PostUsersUserIdTraining operation middleware
 func (siw *ServerInterfaceWrapper) PostUsersUserIdTraining(c *gin.Context) {
 
@@ -1436,7 +1444,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
-	router.PUT(options.BaseURL+"/profile", wrapper.PutProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
@@ -1457,5 +1464,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
+	router.PUT(options.BaseURL+"/users/:userId/attributes", wrapper.PutUsersUserIdAttributes)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
 }

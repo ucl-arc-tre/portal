@@ -53,36 +53,6 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-    put:
-      description: Update another user's chosen name (admin only)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user_id
-                - chosen_name
-              properties:
-                user_id:
-                  type: string
-                  description: ID of the user to update
-                chosen_name:
-                  type: string
-      responses:
-        "200":
-          description: Successfully updated chosen name
-        "400":
-          description: Invalid request
-        "403":
-          description: Forbidden
-        "404":
-          description: User not found
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
 
   /profile/agreements:
     get:
@@ -223,6 +193,41 @@ paths:
           description: Forbidden
         "404":
           description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /users/{userId}/attributes:
+    put:
+      description: Update a user's attributes (admin only)
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          description: ID of the user to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chosen_name
+              properties:
+                chosen_name:
+                  type: string
+      responses:
+        "200":
+          description: Successfully updated attributes
+        "400":
+          description: Invalid request
+        "403":
+          description: Forbidden
+        "404":
+          description: User not found
         "500":
           description: Internal server error
         default:

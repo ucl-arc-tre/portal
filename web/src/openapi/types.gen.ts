@@ -481,49 +481,6 @@ export type PostProfileResponses = {
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
 
-export type PutProfileData = {
-    body: {
-        /**
-         * ID of the user to update
-         */
-        user_id: string;
-        chosen_name: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/profile';
-};
-
-export type PutProfileErrors = {
-    /**
-     * Invalid request
-     */
-    400: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * User not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PutProfileResponses = {
-    /**
-     * Successfully updated chosen name
-     */
-    200: unknown;
-};
-
 export type GetProfileAgreementsData = {
     body?: never;
     path?: never;
@@ -728,6 +685,50 @@ export type PostUsersByUserIdTrainingResponses = {
 };
 
 export type PostUsersByUserIdTrainingResponse = PostUsersByUserIdTrainingResponses[keyof PostUsersByUserIdTrainingResponses];
+
+export type PutUsersByUserIdAttributesData = {
+    body: {
+        chosen_name: string;
+    };
+    path: {
+        /**
+         * ID of the user to update
+         */
+        userId: string;
+    };
+    query?: never;
+    url: '/users/{userId}/attributes';
+};
+
+export type PutUsersByUserIdAttributesErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutUsersByUserIdAttributesResponses = {
+    /**
+     * Successfully updated attributes
+     */
+    200: unknown;
+};
 
 export type PostUsersApprovedResearchersImportCsvData = {
     body: Blob | File;

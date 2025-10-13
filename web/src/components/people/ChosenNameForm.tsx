@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Dialog from "@/components/ui/Dialog";
 import Button from "@/components/ui/Button";
-import { putProfile } from "@/openapi";
+import { putUsersByUserIdAttributes } from "@/openapi";
 import styles from "./ChosenNameForm.module.css";
 
 type Props = {
@@ -23,9 +23,11 @@ export default function ChosenNameForm(props: Props) {
     setErrorMessage("");
 
     try {
-      const response = await putProfile({
+      const response = await putUsersByUserIdAttributes({
+        path: {
+          userId: userId,
+        },
         body: {
-          user_id: userId,
           chosen_name: chosenName,
         },
       });
