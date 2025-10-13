@@ -1,6 +1,11 @@
 import { useState } from "react";
 import ChosenNameChangeModal from "./ChosenNameChangeModal";
 import styles from "./ProfileSummaryCard.module.css";
+import dynamic from "next/dynamic";
+
+const EditIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Edit), {
+  ssr: false,
+});
 
 type ProfileSummaryCardProps = {
   chosenName?: string;
@@ -14,18 +19,24 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
     <div className={styles["profile-summary-container"]}>
       <div className={styles.header}>
         <h3 className={styles.title}>Profile Information</h3>
-        {chosenName && (
-          <button className={styles["username-change-link"]} onClick={() => setShowChosenNameChangeModal(true)}>
-            request chosen name change
-          </button>
-        )}
       </div>
 
       <div className={styles.content}>
         <div className={styles.row}>
           <div className={styles.field}>
             <span className={styles.label}>Chosen name:</span>
-            <span className={styles.value}>{chosenName || <span className={styles.placeholder}>Not set</span>}</span>
+            <span className={styles.value}>
+              {chosenName || <span className={styles.placeholder}>Not set</span>}
+              {chosenName && (
+                <button
+                  className={styles["edit-icon-button"]}
+                  onClick={() => setShowChosenNameChangeModal(true)}
+                  aria-label="Request chosen name change"
+                >
+                  <EditIcon />
+                </button>
+              )}
+            </span>
           </div>
           <div className={styles.field}>
             <span className={styles.label}>Username:</span>

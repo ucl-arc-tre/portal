@@ -72,12 +72,32 @@
 .value {
   color: var(--foreground);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .placeholder {
   color: #52555a;
   font-style: italic;
   font-weight: 400;
+}
+
+.edit-icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0070e8;
+}
+
+.edit-icon-button:hover {
+  color: #0056b3;
+}
+
+.edit-icon-button:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .roles {
