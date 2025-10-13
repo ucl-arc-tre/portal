@@ -57,6 +57,7 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
         isOpen={showChosenNameChangeModal}
         onClose={() => setShowChosenNameChangeModal(false)}
         currentChosenName={chosenName}
+        username={username}
       />
     </div>
   );

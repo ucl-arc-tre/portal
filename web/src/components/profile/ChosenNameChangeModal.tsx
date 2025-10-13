@@ -6,15 +6,26 @@ type ChosenNameChangeModalProps = {
   isOpen: boolean;
   onClose: () => void;
   currentChosenName?: string;
+  username?: string;
 };
 
 const emailAddress = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.tre@ucl.ac.uk";
 const emailSubject = "TRE Portal: Chosen Name Change Request";
-const emailBody = `Dear UCL Information Governance,
+
+export default function ChosenNameChangeModal({
+  isOpen,
+  onClose,
+  currentChosenName,
+  username,
+}: ChosenNameChangeModalProps) {
+  if (!isOpen) return null;
+
+  const emailBody = `Dear UCL Information Governance,
 
 I would like to request a change to my chosen name in the UCL ARC Services Portal.
 
-Current chosen name: [Your current chosen name]
+Username: ${username || ""}
+Current chosen name: ${currentChosenName || "Not set"}
 Requested new chosen name: [Your desired chosen name]
 Reason for change: [Optional - please provide a brief reason]
 
@@ -22,12 +33,7 @@ Thank you for your assistance.
 
 Kind regards`;
 
-export default function ChosenNameChangeModal({ isOpen, onClose, currentChosenName }: ChosenNameChangeModalProps) {
-  if (!isOpen) return null;
-
-  const encodedEmailBody = encodeURIComponent(
-    emailBody.replace("[Your current chosen name]", currentChosenName || "Not set")
-  );
+  const encodedEmailBody = encodeURIComponent(emailBody);
   const encodedEmailSubject = encodeURIComponent(emailSubject);
 
   return (
@@ -37,19 +43,12 @@ export default function ChosenNameChangeModal({ isOpen, onClose, currentChosenNa
 
         <div className={styles.description}>
           <p>
-            To change your chosen name, please send an email to the UCL Information Governance team with your request.
+            To change your chosen name, please send an email to the UCL Information Governance team with your request
+            (template text provided using the &apos;Create Email&apos; button below).
           </p>
           <p>
             <strong>Current chosen name:</strong> {currentChosenName || "Not set"}
           </p>
-        </div>
-
-        <div className={styles["email-template"]}>
-          <h3>Email Template</h3>
-          <p>You can use the following template for your email:</p>
-          <pre className={styles["template-text"]}>
-            {emailBody.replace("[Your current chosen name]", currentChosenName || "Not set")}
-          </pre>
         </div>
 
         <div className={styles.actions}>
