@@ -547,7 +547,7 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 	}
 	err = h.studies.UpdateStudy(studyUUID, studyData)
 	if err != nil {
-		setError(ctx, err, "Failed to update study status")
+		setError(ctx, err, "Failed to update study")
 		return
 	}
 
