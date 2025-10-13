@@ -114,7 +114,7 @@ export default function Studies(props: Props) {
   return (
     <>
       {studyFormOpen && (
-        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudies={fetchStudies} />
+        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudyData={fetchStudies} />
       )}
 
       {showUclStaffModal && (
