@@ -52,10 +52,6 @@ Kind regards`;
         </div>
 
         <div className={styles.actions}>
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Close
-          </Button>
-
           <Button
             as="a"
             href={`mailto:${emailAddress}?subject=${encodedEmailSubject}&body=${encodedEmailBody}`}
