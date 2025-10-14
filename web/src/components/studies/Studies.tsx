@@ -102,8 +102,6 @@ export default function Studies(props: Props) {
           </Button>
         </div>
 
-        {tab === "all" && <div>search bar</div>}
-
         {studiesLoading && <Loading message="Loading studies..." />}
 
         <StudySelection studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />

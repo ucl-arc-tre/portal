@@ -227,8 +227,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
         </div>
       </Box>
 
-      {/* Admin actions */}
-
       {isAdmin && (
         <AdminFeedbackSection
           status={study.approval_status}

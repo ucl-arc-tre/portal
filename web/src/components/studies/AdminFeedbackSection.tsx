@@ -61,7 +61,7 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
                     : styles["form-hidden"]
               }`}
             >
-              <label htmlFor="feedback">Outline what the changes are required to attain approval</label>
+              <label htmlFor="feedback">Outline which changes are required to attain approval</label>
               <Textarea
                 name="feedback"
                 id="feedback"
