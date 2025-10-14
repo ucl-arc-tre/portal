@@ -49,7 +49,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   useEffect(() => {
     const calculateRiskScore = () => {
-      // todo: how to determine if they have data?
+      // todo: how to determine if they have data? will depend on projects having data already: https://github.com/ucl-arc-tre/portal/issues/10
       let score = 0;
 
       if (study.involves_data_processing_outside_eea) score += 10;
