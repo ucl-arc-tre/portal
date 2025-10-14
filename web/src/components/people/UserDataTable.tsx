@@ -6,6 +6,7 @@ import Button from "../ui/Button";
 import styles from "./UserDataTable.module.css";
 import { useState } from "react";
 import TrainingForm from "./TrainingForm";
+import ChosenNameForm from "./ChosenNameForm";
 
 type Props = {
   canEdit: boolean;
@@ -16,8 +17,9 @@ type Props = {
 export default function UserDataTable(Props: Props) {
   const { canEdit, users, setUsers, isLoading } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
-
+  const [chosenNameDialogOpen, setChosenNameDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedUserChosenName, setSelectedUserChosenName] = useState("");
 
   const updateTrainingDateCell = (id: string, training: TrainingRecord) => {
     // get people object and find the person with the right selectedUserId then update the training
@@ -45,6 +47,19 @@ export default function UserDataTable(Props: Props) {
     setTrainingDialogOpen(true);
   };
 
+  const handleEditChosenNameClick = (userId: string, currentName: string) => {
+    setSelectedUserId(userId);
+    setSelectedUserChosenName(currentName || "");
+    setChosenNameDialogOpen(true);
+  };
+
+  const updateChosenNameCell = (userId: string, chosenName: string) => {
+    if (!users) return;
+
+    const updatedUsers = users.map((user) => (user.user.id === userId ? { ...user, chosen_name: chosenName } : user));
+    setUsers(updatedUsers);
+  };
+
   if (!users) return null;
   if (isLoading) {
     return (
@@ -63,6 +78,16 @@ export default function UserDataTable(Props: Props) {
           updateTrainingDateCell={updateTrainingDateCell}
         />
       )}
+
+      {chosenNameDialogOpen && (
+        <ChosenNameForm
+          userId={selectedUserId}
+          currentChosenName={selectedUserChosenName}
+          setChosenNameDialogOpen={setChosenNameDialogOpen}
+          updateChosenNameCell={updateChosenNameCell}
+        />
+      )}
+
       <p>
         Please note the dates shown are when the agreement/training is <em>valid from</em>
       </p>
@@ -70,6 +95,7 @@ export default function UserDataTable(Props: Props) {
         <thead>
           <tr>
             <th>User</th>
+            <th>Chosen Name</th>
             <th>Roles</th>
             <th>Agreements</th>
             <th>Training</th>
@@ -80,6 +106,21 @@ export default function UserDataTable(Props: Props) {
             <tr key={userData.user.id} className={styles.row}>
               <td className={styles.user}>
                 {userData.user.username} <small>{userData.user.id}</small>
+              </td>
+              <td className={styles.chosenName}>
+                <div className={styles.chosenNameContainer}>
+                  <div>{userData.chosen_name || <em>Not set</em>}</div>
+                  {canEdit && (
+                    <Button
+                      variant="tertiary"
+                      size="small"
+                      onClick={() => handleEditChosenNameClick(userData.user.id, userData.chosen_name || "")}
+                      className={styles.edit}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
               </td>
               <td className={styles.roles}>
                 {userData.roles
