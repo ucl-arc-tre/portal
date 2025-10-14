@@ -542,7 +542,7 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
-	validationError, err := h.studies.ValidateStudyData(ctx, studyData)
+	validationError, err := h.studies.ValidateStudyData(ctx, studyData, true)
 	if err != nil {
 		setError(ctx, err, "Failed to validate study data")
 		return

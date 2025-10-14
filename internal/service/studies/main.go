@@ -72,7 +72,7 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.Use
 	return admins, nil
 }
 
-func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
+func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) (*openapi.ValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
@@ -91,13 +91,18 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		}
 	}
 
+	maxExpectedStudies := 0
+	if isUpdate {
+		maxExpectedStudies = 1
+	}
+
 	// Check if the study title already exists
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
-	if count > 0 {
+	if count > int64(maxExpectedStudies) {
 		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
@@ -112,7 +117,7 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 }
 
 func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
-	validationError, err := s.ValidateStudyData(ctx, studyData)
+	validationError, err := s.ValidateStudyData(ctx, studyData, false)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
@@ -242,8 +247,23 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return types.NewNotFoundError("study not found")
 	}
 	study := studies[0]
-
 	setStudyFromStudyData(&study, studyData)
+
+	studyAdmins, err := s.createStudyAdmins(studyData)
+	if err != nil {
+		return err
+	}
+
+	for _, studyAdminUser := range studyAdmins {
+		studyAdmin := types.StudyAdmin{
+			StudyID: study.ID,
+			UserID:  studyAdminUser.ID,
+		}
+		if err := s.db.Create(&studyAdmin).Error; err != nil {
+			return types.NewErrFromGorm(err, "failed to create study admin")
+		}
+	}
+
 	result := s.db.Model(&study).Where("id = ?", id).Updates(&study)
 
 	return types.NewErrFromGorm(result.Error)
