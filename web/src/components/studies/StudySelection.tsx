@@ -21,6 +21,16 @@ export default function StudySelection(props: StudySelectionProps) {
     Approved: 4,
   };
 
+  if (studies.length === 0) {
+    return (
+      <div className={styles["study-selection"]}>
+        <div className={styles["studies-list"]}>
+          <p>No studies found</p>;
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles["study-selection"]}>
       {!isAdmin && <h2 className={styles["studies-heading"]}>Your Studies</h2>}

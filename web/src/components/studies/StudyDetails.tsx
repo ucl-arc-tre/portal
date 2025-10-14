@@ -111,17 +111,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
             </dd>
           </dl>
 
-          {feedback && (
-            <Alert type={"warning"} className={styles["feedback-alert"]}>
-              <h4>This study has been rejected and the following feedback has been provided:</h4>
-              <p>{feedback}</p>
-              <hr></hr>
-              <small>
-                <em>Please adjust as appropriate and request another review.</em>
-              </small>
-            </Alert>
-          )}
-
           <h3>Additional Information</h3>
           <hr />
           <dl className={styles.grouping}>
@@ -224,6 +213,17 @@ export default function StudyDetails(props: StudyDetailsProps) {
                 </dd>
               )}
           </dl>
+
+          {feedback && (
+            <Alert type={"warning"} className={styles["feedback-alert"]}>
+              <h4>This study has been rejected and the following feedback has been provided:</h4>
+              <p>{feedback}</p>
+              <hr></hr>
+              <small>
+                <em>Please adjust as appropriate and request another review.</em>
+              </small>
+            </Alert>
+          )}
         </div>
       </Box>
 
