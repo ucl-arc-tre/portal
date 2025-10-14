@@ -38,7 +38,8 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     {
       id: "study-assets",
       title: "Information Assets",
-      description: "Create and manage at least one study asset. You can create more assets at any time.",
+      description:
+        "Create and manage at least one information asset. You can create more assets at any time. Note that contracts can also be attached to assets, in some cases this is required.",
       completed: assetManagementCompleted,
       current: agreementCompleted && !assetManagementCompleted,
     },
