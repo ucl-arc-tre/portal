@@ -101,6 +101,7 @@ export type UserData = {
     roles: Array<string>;
     agreements: UserAgreements;
     training_record: ProfileTraining;
+    chosen_name?: string;
 };
 
 export type UserTrainingUpdate = {
@@ -684,6 +685,50 @@ export type PostUsersByUserIdTrainingResponses = {
 };
 
 export type PostUsersByUserIdTrainingResponse = PostUsersByUserIdTrainingResponses[keyof PostUsersByUserIdTrainingResponses];
+
+export type PutUsersByUserIdAttributesData = {
+    body: {
+        chosen_name: string;
+    };
+    path: {
+        /**
+         * ID of the user to update
+         */
+        userId: string;
+    };
+    query?: never;
+    url: '/users/{userId}/attributes';
+};
+
+export type PutUsersByUserIdAttributesErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutUsersByUserIdAttributesResponses = {
+    /**
+     * Successfully updated attributes
+     */
+    200: unknown;
+};
 
 export type PostUsersApprovedResearchersImportCsvData = {
     body: Blob | File;
