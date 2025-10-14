@@ -658,6 +658,7 @@ type UserAgreements struct {
 // UserData defines model for UserData.
 type UserData struct {
 	Agreements     UserAgreements  `json:"agreements"`
+	ChosenName     *string         `json:"chosen_name,omitempty"`
 	Roles          []string        `json:"roles"`
 	TrainingRecord ProfileTraining `json:"training_record"`
 	User           User            `json:"user"`
@@ -686,6 +687,11 @@ type GetUsersParams struct {
 type PostUsersInviteJSONBody struct {
 	// Email Email address of the person to be invited
 	Email string `json:"email"`
+}
+
+// PutUsersUserIdAttributesJSONBody defines parameters for PutUsersUserIdAttributes.
+type PutUsersUserIdAttributesJSONBody struct {
+	ChosenName string `json:"chosen_name"`
 }
 
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
@@ -717,6 +723,9 @@ type PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody = Con
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
+
+// PutUsersUserIdAttributesJSONRequestBody defines body for PutUsersUserIdAttributes for application/json ContentType.
+type PutUsersUserIdAttributesJSONRequestBody PutUsersUserIdAttributesJSONBody
 
 // PostUsersUserIdTrainingJSONRequestBody defines body for PostUsersUserIdTraining for application/json ContentType.
 type PostUsersUserIdTrainingJSONRequestBody = UserTrainingUpdate
@@ -798,6 +807,9 @@ type ServerInterface interface {
 
 	// (POST /users/invite)
 	PostUsersInvite(c *gin.Context)
+
+	// (PUT /users/{userId}/attributes)
+	PutUsersUserIdAttributes(c *gin.Context, userId string)
 
 	// (POST /users/{userId}/training)
 	PostUsersUserIdTraining(c *gin.Context, userId string)
@@ -1352,6 +1364,30 @@ func (siw *ServerInterfaceWrapper) PostUsersInvite(c *gin.Context) {
 	siw.Handler.PostUsersInvite(c)
 }
 
+// PutUsersUserIdAttributes operation middleware
+func (siw *ServerInterfaceWrapper) PutUsersUserIdAttributes(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutUsersUserIdAttributes(c, userId)
+}
+
 // PostUsersUserIdTraining operation middleware
 func (siw *ServerInterfaceWrapper) PostUsersUserIdTraining(c *gin.Context) {
 
@@ -1428,5 +1464,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
+	router.PUT(options.BaseURL+"/users/:userId/attributes", wrapper.PutUsersUserIdAttributes)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
 }
