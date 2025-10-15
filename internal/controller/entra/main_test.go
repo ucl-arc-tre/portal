@@ -1,6 +1,7 @@
 package entra
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,4 +34,12 @@ func TestEmployeeTypeStaffRegex(t *testing.T) {
 	for _, invalid := range []string{"Staffandother", "astaffb", "student", "a, b", "otherstaff"} {
 		assert.False(t, employeeTypeIsStaff(invalid), invalid)
 	}
+}
+
+func TestErrorContains(t *testing.T) {
+	assert.False(t, errContains(nil, "anything"))
+	assert.False(t, errContains(nil, ""))
+	assert.False(t, errContains(errors.New("alice"), "bob"))
+	assert.True(t, errContains(errors.New("alice"), "alice"))
+	assert.True(t, errContains(errors.New("alice and bob"), "alice"))
 }
