@@ -199,26 +199,18 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 	messageInfo.SetCustomizedMessageBody(&message)
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
-	sponsorData, err := c.client.Users().ByUserId(string(sponsor.Username)).Get(ctx,
-		&graphusers.UserItemRequestBuilderGetRequestConfiguration{
-			QueryParameters: &graphusers.UserItemRequestBuilderGetQueryParameters{
-				Select: []string{"id"},
-			},
-		},
-	)
+	sponsorUserData, err := c.userData(ctx, sponsor.Username)
 	if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("failed to get sponsor [%v] entra identity", sponsor.Username))
+		return nil, err
 	}
 
-	// NOTE: the below should work but doesn't
-	//requestBody.SetInvitedUserSponsors([]graphmodels.DirectoryObjectable{
-	//	sponsorData,
-	//})
-	// so use the raw additional data instead
+	// NOTE:
+	// requestBody.SetInvitedUserSponsors([]graphmodels.DirectoryObjectable{sponsorData})
+	// should work but doesn't, so use the raw additional data instead
 	requestBody.SetAdditionalData(map[string]any{
-		"invitedUserSponsors": []map[string]string{{
-			"id": mustParseUserObjectId(sponsorData).String(),
-		}},
+		"invitedUserSponsors": []map[string]string{
+			{"id": sponsorUserData.Id.String()},
+		},
 	})
 
 	response, err := c.client.Invitations().Post(ctx, requestBody, nil)
