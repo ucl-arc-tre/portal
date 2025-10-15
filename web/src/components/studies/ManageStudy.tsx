@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getStudiesByStudyId, Study } from "@/openapi";
+import { Study } from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
@@ -12,18 +12,17 @@ import StudyForm from "./StudyForm";
 
 type ManageStudyProps = {
   study: Study;
-  // fetchStudy: (id: string) => Promise<void>;
+  fetchStudy: (id?: string) => Promise<void>;
 };
 
-export default function ManageStudy({ study }: ManageStudyProps) {
+export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
   const [studyFormOpen, setStudyFormOpen] = useState(false);
-  const [currentStudy, setCurrentStudy] = useState(study);
 
   const { userData } = useAuth();
   const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && currentStudy.owner_username === userData.username) || false;
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
@@ -49,8 +48,8 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     if (!agreementCompleted) {
       return (
         <StudyAgreement
-          studyId={currentStudy.id}
-          studyTitle={currentStudy.title}
+          studyId={study.id}
+          studyTitle={study.title}
           agreementCompleted={agreementCompleted}
           setAgreementCompleted={setAgreementCompleted}
         />
@@ -61,20 +60,12 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       return (
         <>
           <Assets
-            studyId={currentStudy.id}
-            studyTitle={currentStudy.title}
+            studyId={study.id}
+            studyTitle={study.title}
             setAssetManagementCompleted={setAssetManagementCompleted}
           />
         </>
       );
-    }
-  };
-
-  const getStudy = async () => {
-    const studyId = currentStudy.id;
-    const response = await getStudiesByStudyId({ path: { studyId } });
-    if (response.response.ok && response.data) {
-      setCurrentStudy(response.data);
     }
   };
 
@@ -84,13 +75,13 @@ export default function ManageStudy({ study }: ManageStudyProps) {
         <StudyForm
           username={userData.username}
           setStudyFormOpen={setStudyFormOpen}
-          editingStudy={currentStudy}
-          fetchStudyData={getStudy}
+          editingStudy={study}
+          fetchStudyData={fetchStudy}
         />
       )}
       <StudyDetails
         studyStepsCompleted={studyStepsCompleted}
-        study={currentStudy}
+        study={study}
         isAdmin={false}
         isStudyOwner={isStudyOwner}
         setStudyFormOpen={setStudyFormOpen}
@@ -114,7 +105,7 @@ export default function ManageStudy({ study }: ManageStudyProps) {
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <Assets studyId={currentStudy.id} studyTitle={currentStudy.title} />
+            <Assets studyId={study.id} studyTitle={study.title} />
           </div>
         </>
       )}

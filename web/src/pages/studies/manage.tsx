@@ -25,13 +25,13 @@ export default function ManageStudyPage() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
 
-  const fetchStudy = async (id: string) => {
+  const fetchStudy = async (id?: string) => {
     setStudyIsLoading(true);
     setStudyError(null);
 
     try {
       const response = await getStudiesByStudyId({
-        path: { studyId: id },
+        path: { studyId: id! },
       });
 
       if (response.response.ok && response.data) {
@@ -167,7 +167,11 @@ export default function ManageStudyPage() {
       <Breadcrumbs studyId={study.id} studyTitle={study.title} />
       <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
-      {isAdmin ? <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} /> : <ManageStudy study={study} />}
+      {isAdmin ? (
+        <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} />
+      ) : (
+        <ManageStudy study={study} fetchStudy={fetchStudy} />
+      )}
     </>
   );
 }

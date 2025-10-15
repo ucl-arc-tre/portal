@@ -25,7 +25,7 @@ export default function StudySelection(props: StudySelectionProps) {
     return (
       <div className={styles["study-selection"]}>
         <div className={styles["studies-list"]}>
-          <p>No studies found</p>;
+          <p>No studies found</p>
         </div>
       </div>
     );
