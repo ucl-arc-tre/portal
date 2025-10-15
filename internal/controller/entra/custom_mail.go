@@ -5,6 +5,8 @@ import (
 	"context"
 	"html/template"
 
+	"os"
+
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -27,19 +29,41 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 		return err
 	}
 
-	wr := new(bytes.Buffer)
-	err = t.Execute(wr, struct {
+	templateReader := new(bytes.Buffer)
+	err = t.Execute(templateReader, struct {
 		Content string
 	}{
-		Content: content,
+		Content: content, // set the content from the args
 	})
 	if err != nil {
 		return err
 	}
-	htmlContent := wr.String()
+	htmlContent := templateReader.String()
 
-	body.SetContent(&htmlContent) // set the content from the args
-	// todo: get the img to work
+	body.SetContent(&htmlContent)
+
+	// has attachments to allow banner to work
+	hasAttachments := true
+	message.SetHasAttachments(&hasAttachments)
+	banner := graphmodels.NewFileAttachment()
+	oDataType := "#microsoft.graph.fileAttachment"
+	banner.SetOdataType(&oDataType)
+	svgType := "image/svg+xml"
+	banner.SetContentType(&svgType)
+	svgName := "ucl-banner.svg"
+	banner.SetName(&svgName)
+	svgId := "uclBanner"
+	banner.SetContentId(&svgId)
+	banner.SetIsInline(&hasAttachments)
+
+	// read the file into bytes
+	svgFile, err := os.ReadFile("internal/controller/entra/ucl-banner.svg")
+	if err != nil {
+		return err
+	}
+	banner.SetContentBytes(svgFile)
+
+	message.SetAttachments([]graphmodels.Attachmentable{banner})
 	message.SetBody(body)
 
 	// set up the recipients
