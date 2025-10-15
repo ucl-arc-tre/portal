@@ -39,7 +39,7 @@ export type StudyFormData = {
 type StudyProps = {
   username: string;
   setStudyFormOpen: (name: boolean) => void;
-  fetchStudyData?: () => void;
+  fetchStudyData?: (id?: string) => void;
   editingStudy?: Study | null;
 };
 
@@ -239,7 +239,11 @@ export default function StudyForm(StudyProps: StudyProps) {
       if (response.data) {
         setStudyFormOpen(false);
         if (fetchStudyData) {
-          fetchStudyData();
+          if (studyId) {
+            fetchStudyData(studyId);
+          } else {
+            fetchStudyData();
+          }
         }
         return;
       }
@@ -396,8 +400,8 @@ export default function StudyForm(StudyProps: StudyProps) {
                       )}
                     />
                   </Label>
-
-                  <Button type="button" onClick={() => remove(index)} size="small">
+                  {/* disabling for editing until we get removal on backend implemented */}
+                  <Button type="button" onClick={() => remove(index)} size="small" disabled={Boolean(editingStudy)}>
                     Remove
                   </Button>
                 </div>
