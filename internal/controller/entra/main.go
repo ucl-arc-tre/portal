@@ -114,7 +114,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 		},
 	}
 	data, err := c.client.Users().ByUserId(userId).Get(ctx, configuration)
-	if err != nil && strings.Contains(err.Error(), "does not exist") {
+	if err != nil && errContains(err, "does not exist") {
 		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
 	} else if err != nil {
 		return nil, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
@@ -215,10 +215,10 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 
 	response, err := c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
+		if errContains(err, "already exists") || errContains(err, "existing user") {
 			// bit of a mystery how this ends up being triggered, will investigate on other deployments
 			log.Warn().Any("email", email).Msg("user supposedly didn't exist but invitation thinks otherwise")
-			return c.sendInviteExistingEntraUser(ctx, email, sponsor)
+			return nil, types.NewErrServerError("attempted to invite existing entra user")
 		}
 		log.Debug().Err(err).Msg("Failed to invite user to entra")
 		return nil, types.NewErrServerError(err)
@@ -291,4 +291,8 @@ func usernameIsExternal(username types.Username) bool {
 
 func mustParseUserObjectId(model graphmodels.Userable) ObjectId {
 	return ObjectId(uuid.MustParse(*model.GetId()))
+}
+
+func errContains(err error, substr string) bool {
+	return err != nil && strings.Contains(err.Error(), substr)
 }
