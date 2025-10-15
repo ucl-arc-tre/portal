@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
-import { Asset, AssetBase, ValidationError, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Asset,
+  AssetBase,
+  ValidationError,
+  getStudiesByStudyIdAssets,
+  getStudiesByStudyIdAssetsByAssetIdContracts,
+  postStudiesByStudyIdAssets,
+} from "@/openapi";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -9,48 +16,74 @@ import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
 
-type StudyAssetsProps = {
+type InformationAssetsProps = {
   studyId: string;
   studyTitle: string;
   setAssetManagementCompleted?: (completed: boolean) => void;
 };
 
-export default function Assets(props: StudyAssetsProps) {
+export default function Assets(props: InformationAssetsProps) {
   const { studyId, studyTitle, setAssetManagementCompleted } = props;
 
-  const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
+  const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
 
+  const checkAssetManagementCompleted = useCallback(
+    async (assets: Asset[]) => {
+      // for each asset, check if it requires a contract and if it does, that there is one
+
+      const checkContractsForAsset = async (assetId: string) => {
+        const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+          path: { studyId: studyId, assetId: assetId },
+        });
+        if (!response.response.ok) {
+          console.error("Failed to get contracts for asset:", response.error);
+        } else if (response.response.ok && response.data) {
+          return response.data.length > 0;
+        }
+      };
+
+      const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
+      const requiredContractChecks = assetsRequiringContracts.map((asset) => checkContractsForAsset(asset.id));
+      const results = await Promise.all(requiredContractChecks);
+      return results.every((hasContract) => hasContract);
+    },
+    [studyId]
+  );
+
   useEffect(() => {
-    const fetchStudyAssetData = async () => {
+    const fetchInformationAssetData = async () => {
       setIsLoading(true);
 
       try {
         setError(null);
 
-        const studyAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
+        const informationAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
 
-        if (studyAssetResult.response.status === 200 && studyAssetResult.data) {
-          setStudyAssets(studyAssetResult.data);
+        if (informationAssetResult.response.status === 200 && informationAssetResult.data) {
+          setInformationAssets(informationAssetResult.data);
 
-          if (studyAssetResult.data.length > 0) {
-            if (setAssetManagementCompleted) {
+          if (informationAssetResult.data.length > 0) {
+            const assets = informationAssetResult.data;
+            const assetsComplete = await checkAssetManagementCompleted(assets);
+
+            if (setAssetManagementCompleted && assetsComplete) {
               setAssetManagementCompleted(true);
             }
           }
         }
       } catch (err) {
-        console.error("Failed to load study assets:", err);
-        setError("Failed to load study assets. Please try again later.");
+        console.error("Failed to load Information Assets:", err);
+        setError("Failed to load Information Assets. Please try again later.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchStudyAssetData();
-  }, [studyId, setAssetManagementCompleted]);
+    fetchInformationAssetData();
+  }, [studyId, setAssetManagementCompleted, checkAssetManagementCompleted]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);
@@ -70,8 +103,11 @@ export default function Assets(props: StudyAssetsProps) {
     // Refresh assets list after successful creation
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
     if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
-      setStudyAssets(updatedAssetsResult.data);
-      if (setAssetManagementCompleted) {
+      setInformationAssets(updatedAssetsResult.data);
+      const assets = updatedAssetsResult.data;
+      const assetsComplete = await checkAssetManagementCompleted(assets);
+
+      if (setAssetManagementCompleted && assetsComplete) {
         setAssetManagementCompleted(true);
       }
       setShowAssetForm(false);
@@ -116,7 +152,7 @@ export default function Assets(props: StudyAssetsProps) {
         </div>
       </Callout>
 
-      {studyAssets.length === 0 ? (
+      {informationAssets.length === 0 ? (
         <div>
           <div className={styles["no-assets-message"]}>
             <p>No assets have been created for this study yet.</p>
@@ -133,7 +169,7 @@ export default function Assets(props: StudyAssetsProps) {
         <div>
           <div className={styles["assets-summary"]}>
             <span>Assets for this study:</span>
-            <span className={styles["assets-count-badge"]}>{studyAssets.length}</span>
+            <span className={styles["assets-count-badge"]}>{informationAssets.length}</span>
           </div>
 
           <div className={styles["asset-actions"]}>
@@ -147,8 +183,13 @@ export default function Assets(props: StudyAssetsProps) {
           )}
 
           <div className={styles["assets-grid"]}>
-            {studyAssets.map((asset) => (
-              <AssetCard key={asset.id} studyId={studyId} asset={asset} />
+            {informationAssets.map((asset) => (
+              <AssetCard
+                key={asset.id}
+                studyId={studyId}
+                asset={asset}
+                checkCompleted={checkAssetManagementCompleted}
+              />
             ))}
           </div>
         </div>

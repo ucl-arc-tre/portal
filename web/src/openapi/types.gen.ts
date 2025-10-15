@@ -303,9 +303,9 @@ export type StudyBase = {
 };
 
 /**
- * Request payload for creating a new study
+ * Request payload for creating a new study or updating an existing one
  */
-export type StudyCreateRequest = StudyBase;
+export type StudyRequest = StudyBase;
 
 /**
  * A research study
@@ -790,7 +790,12 @@ export type PostUsersInviteResponses = {
 export type GetStudiesData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * get studies by status
+         */
+        status?: StudyApprovalStatus;
+    };
     url: '/studies';
 };
 
@@ -816,7 +821,7 @@ export type GetStudiesResponses = {
 export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
 
 export type PostStudiesData = {
-    body: StudyCreateRequest;
+    body: StudyRequest;
     path?: never;
     query?: never;
     url: '/studies';
@@ -891,6 +896,50 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
+export type PutStudiesByStudyIdData = {
+    body: StudyRequest;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}';
+};
+
+export type PutStudiesByStudyIdErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutStudiesByStudyIdError = PutStudiesByStudyIdErrors[keyof PutStudiesByStudyIdErrors];
+
+export type PutStudiesByStudyIdResponses = {
+    /**
+     * Study updated successfully
+     */
+    200: unknown;
+};
+
 export type PostStudiesAdminByStudyIdReviewData = {
     body: StudyReview;
     path: {
@@ -923,6 +972,44 @@ export type PostStudiesAdminByStudyIdReviewErrors = {
 };
 
 export type PostStudiesAdminByStudyIdReviewResponses = {
+    /**
+     * Study review submitted successfully
+     */
+    201: unknown;
+};
+
+export type PatchStudiesByStudyIdPendingData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/pending';
+};
+
+export type PatchStudiesByStudyIdPendingErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PatchStudiesByStudyIdPendingResponses = {
     /**
      * Study review submitted successfully
      */

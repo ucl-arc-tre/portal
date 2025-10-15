@@ -281,6 +281,13 @@ paths:
   /studies:
     get:
       description: Get all studies accessible to the current user
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: "#/components/schemas/StudyApprovalStatus"
+          required: false
+          description: get studies by status
       responses:
         "200":
           content:
@@ -302,7 +309,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StudyCreateRequest"
+              $ref: "#/components/schemas/StudyRequest"
       responses:
         "201":
           description: Study created successfully
@@ -345,6 +352,38 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    put:
+      description: Update a specific study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyRequest"
+      responses:
+        "200":
+          description: Study updated successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /studies/admin/{studyId}/review:
     post:
@@ -362,6 +401,28 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/StudyReview"
+      responses:
+        "201":
+          description: Study review submitted successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /studies/{studyId}/pending:
+    patch:
+      description: Update study status to pending
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
       responses:
         "201":
           description: Study review submitted successfully
@@ -1073,10 +1134,10 @@ components:
           type: string
           description: Username of the user who owns the study
 
-    StudyCreateRequest:
+    StudyRequest:
       allOf:
         - $ref: "#/components/schemas/StudyBase"
-      description: Request payload for creating a new study
+      description: Request payload for creating a new study or updating an existing one
 
     Study:
       allOf:

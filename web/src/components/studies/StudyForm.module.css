@@ -27,6 +27,7 @@
   width: 100%;
   margin-block: 1.8rem;
   padding-inline: 4%;
+  padding-bottom: 0.8rem;
 
   a {
     color: var(--form-link);

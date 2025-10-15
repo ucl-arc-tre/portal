@@ -12,7 +12,7 @@ describe("Contract Management", () => {
     cy.mockAssetAccess();
     cy.mockStudyAgreementText();
     cy.mockStudyAgreementsConfirmed();
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
   });
 
   it("should display contract management section for an asset", () => {

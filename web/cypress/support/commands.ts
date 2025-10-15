@@ -200,15 +200,15 @@ declare global {
 
       /**
        * Mock empty assets list for a study
-       * @example cy.mockStudyAssetsEmpty()
+       * @example cy.mockInformationAssetsEmpty()
        */
-      mockStudyAssetsEmpty(): Chainable<any>;
+      mockInformationAssetsEmpty(): Chainable<any>;
 
       /**
        * Mock assets list with sample assets
-       * @example cy.mockStudyAssetsWithSample()
+       * @example cy.mockInformationAssetsWithSample()
        */
-      mockStudyAssetsWithSample(): Chainable<any>;
+      mockInformationAssetsWithSample(): Chainable<any>;
 
       /**
        * Mock successful asset creation
@@ -576,13 +576,13 @@ Cypress.Commands.add("waitForStudyCreation", () => {
 });
 
 // Asset fixture commands
-Cypress.Commands.add("mockStudyAssetsEmpty", () => {
+Cypress.Commands.add("mockInformationAssetsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets", {
     fixture: "assets-empty.json",
   }).as("getAssetsEmpty");
 });
 
-Cypress.Commands.add("mockStudyAssetsWithSample", () => {
+Cypress.Commands.add("mockInformationAssetsWithSample", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets", {
     fixture: "assets-with-sample.json",
   }).as("getAssetsWithSample");

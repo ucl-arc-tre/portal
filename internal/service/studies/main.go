@@ -39,7 +39,7 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
@@ -58,7 +58,7 @@ func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCre
 	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
 }
 
-func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]types.User, error) {
+func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.User, error) {
 	admins := []types.User{}
 
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
@@ -72,7 +72,7 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]typ
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) (*openapi.ValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
@@ -91,13 +91,18 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 		}
 	}
 
+	maxExpectedStudies := 0
+	if isUpdate {
+		maxExpectedStudies = 1
+	}
+
 	// Check if the study title already exists
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
-	if count > 0 {
+	if count > int64(maxExpectedStudies) {
 		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
@@ -111,8 +116,8 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
-	validationError, err := s.validateStudyData(ctx, owner, studyData)
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
+	validationError, err := s.ValidateStudyData(ctx, studyData, false)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
@@ -139,6 +144,13 @@ func (s *Service) AllStudies() ([]types.Study, error) {
 	return studies, types.NewErrFromGorm(err)
 }
 
+func (s *Service) PendingStudies() ([]types.Study, error) {
+	studies := []types.Study{}
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Pending).Find(&studies).Error
+
+	return studies, types.NewErrFromGorm(err)
+}
+
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
@@ -146,23 +158,12 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	return studies, types.NewErrFromGorm(err)
 }
 
-// handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
-	// Start a transaction
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	study := types.Study{
-		OwnerUserID:                owner.ID,
-		Title:                      studyData.Title,
-		DataControllerOrganisation: studyData.DataControllerOrganisation,
-		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+// given a study and data from a request, line up the values
+func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
+	if studyData.Title != "" {
+		study.Title = studyData.Title
 	}
-
+	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.Description = studyData.Description
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
@@ -183,6 +184,25 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	study.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
 	study.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
 	study.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
+
+}
+
+// handles the database transaction for creating a study and its admins
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) (*types.Study, error) {
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	study := types.Study{
+		OwnerUserID:    owner.ID,
+		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+	}
+
+	setStudyFromStudyData(&study, studyData)
 
 	// Create the study
 	if err := tx.Create(&study).Error; err != nil {
@@ -214,6 +234,37 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	study := types.Study{}
 	feedback := review.Feedback
 	status := review.Status
+
 	result := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback)
 	return types.NewErrFromGorm(result.Error, "failed to update study review")
+}
+
+func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
+	studies, err := s.StudiesById(id)
+	if err != nil {
+		return err
+	} else if len(studies) == 0 {
+		return types.NewNotFoundError("study not found")
+	}
+	study := studies[0]
+	setStudyFromStudyData(&study, studyData)
+
+	studyAdmins, err := s.createStudyAdmins(studyData)
+	if err != nil {
+		return err
+	}
+
+	for _, studyAdminUser := range studyAdmins {
+		studyAdmin := types.StudyAdmin{
+			StudyID: study.ID,
+			UserID:  studyAdminUser.ID,
+		}
+		if err := s.db.Create(&studyAdmin).Error; err != nil {
+			return types.NewErrFromGorm(err, "failed to create study admin")
+		}
+	}
+
+	result := s.db.Model(&study).Where("id = ?", id).Updates(&study)
+
+	return types.NewErrFromGorm(result.Error)
 }

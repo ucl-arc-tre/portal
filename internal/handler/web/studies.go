@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
@@ -109,7 +108,37 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	}
 }
 
-func (h *Handler) GetStudies(ctx *gin.Context) {
+func (h *Handler) studiesAdmin(params openapi.GetStudiesParams) ([]types.Study, error) {
+	if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
+		// admins can see all pending studies
+		return h.studies.PendingStudies()
+
+	} else if params.Status != nil {
+		return []types.Study{}, types.NewErrInvalidObject("Invalid query param")
+	} else {
+		// Admins can see all studies normally
+		return h.studies.AllStudies()
+	}
+
+}
+
+func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
+	// Non-admin users can only see studies they own
+
+	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+	if err != nil {
+		return []types.Study{}, err
+	}
+
+	studies, err := h.studies.StudiesById(studyIds...)
+	if err != nil {
+		return []types.Study{}, err
+	}
+
+	return studies, nil
+}
+
+func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) {
 	user := middleware.GetUser(ctx)
 
 	var studies []types.Study
@@ -121,24 +150,18 @@ func (h *Handler) GetStudies(ctx *gin.Context) {
 	}
 
 	if isAdmin {
-		// Admins can see all studies
-		studies, err = h.studies.AllStudies()
+
+		studies, err = h.studiesAdmin(params)
 		if err != nil {
-			setError(ctx, err, "Failed to get studies")
-			return
-		}
-	} else {
-		// Non-admin users can only see studies they own
-		var studyIds []uuid.UUID
-		studyIds, err = rbac.StudyIDsWithRole(user, rbac.StudyOwner)
-		if err != nil {
-			setError(ctx, err, "Failed to get user's study access")
+			setError(ctx, err, "Failed to get studies for admin")
 			return
 		}
 
-		studies, err = h.studies.StudiesById(studyIds...)
+	} else {
+
+		studies, err = h.studiesStudyOwner(user)
 		if err != nil {
-			setError(ctx, err, "Failed to get studies")
+			setError(ctx, err, "Failed to get studies for study owner")
 			return
 		}
 	}
@@ -171,7 +194,7 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
-	studyData := openapi.StudyCreateRequest{}
+	studyData := openapi.StudyRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
@@ -195,7 +218,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	assets, err := h.studies.StudyAssets(studyUUID)
+	assets, err := h.studies.InformationAssets(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return
@@ -239,7 +262,7 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 		return
 	}
 
-	asset, err := h.studies.StudyAssetById(uuids[0], uuids[1])
+	asset, err := h.studies.InformationAssetById(uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve asset")
 		return
@@ -486,6 +509,50 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 	err = h.studies.UpdateStudyReview(studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
+	review := openapi.StudyReview{
+		Status: openapi.Pending,
+	}
+
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	err = h.studies.UpdateStudyReview(studyUUID, review)
+	if err != nil {
+		setError(ctx, err, "Failed to update study feedback")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	studyData := openapi.StudyRequest{}
+	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
+		return
+	}
+	validationError, err := h.studies.ValidateStudyData(ctx, studyData, true)
+	if err != nil {
+		setError(ctx, err, "Failed to validate study data")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+	err = h.studies.UpdateStudy(studyUUID, studyData)
+	if err != nil {
+		setError(ctx, err, "Failed to update study")
 		return
 	}
 

@@ -115,16 +115,18 @@ export default function ProfileSetup(props: Props) {
           ariaLabel="Profile setup progress"
         />
       ) : userData?.roles.includes("staff") ? (
-        <StepProgress
-          steps={profileSetupSteps}
-          isComplete={profileStepsCompleted}
-          completionTitle="Profile Complete!"
-          completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
-          completionButtonText="Go to studies"
-          completionButtonHref="/studies"
-          introText="Complete the following steps to set up your profile and become an approved researcher."
-          ariaLabel="Profile setup progress"
-        />
+        !profileStepsCompleted && (
+          <StepProgress
+            steps={profileSetupSteps}
+            isComplete={profileStepsCompleted}
+            completionTitle="Profile Complete!"
+            completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
+            completionButtonText="Go to studies"
+            completionButtonHref="/studies"
+            introText="Complete the following steps to set up your profile and become an approved researcher."
+            ariaLabel="Profile setup progress"
+          />
+        )
       ) : (
         <StepProgress
           steps={profileSetupSteps}
