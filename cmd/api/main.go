@@ -12,6 +12,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/router"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
+	"github.com/ucl-arc-tre/portal/internal/service/environments"
 )
 
 func main() {
@@ -27,6 +28,7 @@ func initialise() {
 	graceful.InitDB()
 	rbac.Init()
 	agreements.Init()
+	environments.Init()
 }
 
 // Add the web API defined by its OpenAPI spec with suitable middleware
