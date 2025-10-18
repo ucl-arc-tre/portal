@@ -204,7 +204,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("[data-cy='approved-researcher-agreement']").should("not.exist");
 
     // Should have the option to upload another certificate
-    cy.contains("Upload another certificate").should("be.visible");
+    cy.contains("Verify another certificate").should("be.visible");
   });
 
   const getDateMonthsAgo = (months: number) => {
