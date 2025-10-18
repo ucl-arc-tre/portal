@@ -113,6 +113,8 @@
   color: #666;
   line-height: 1.6;
   font-size: 1rem;
+  display: inline-block;
+  word-break: break-word;
 }
 
 .study-actions {
