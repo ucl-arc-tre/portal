@@ -3,6 +3,7 @@ import styles from "./Layout.module.css";
 import Nav from "@/components/nav/Nav";
 import { useAuth } from "@/hooks/useAuth";
 import dynamic from "next/dynamic";
+import Feedback from "../ui/Feedback";
 
 const Header = dynamic(() => import("uikit-react-public").then((mod) => mod.Header), {
   ssr: false,
@@ -20,6 +21,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header title="UCL ARC Services Portal" className={styles["ucl-header"]} />
 
       {isAuthed && <Nav />}
+      {isAuthed && <Feedback />}
       <main className={styles.content}>{children}</main>
       <Footer className={styles.footer} />
     </div>
