@@ -108,7 +108,7 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
         setTrainingCertificateCompleted(true);
       }
     } catch (err) {
-      setErrorMessage(`Certificate upload failed: ${err instanceof Error ? err.message : "Unknown error"}. `);
+      setErrorMessage(`Certificate verification failed: ${err instanceof Error ? err.message : "Unknown error"}. `);
       setErrorType("error");
     } finally {
       setIsSubmitting(false);
@@ -164,7 +164,7 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
           Higher Education Researcher (Education)&quot; which should provide you access to the course.
           <br />
           <br />
-          <strong>Please complete the course and upload the PDF certificate below.</strong>
+          <strong>Please complete the course and verify the PDF certificate below.</strong>
         </p>
         <p>
           Note that the name on your certificate must match the chosen name you entered in step 1 for validation to

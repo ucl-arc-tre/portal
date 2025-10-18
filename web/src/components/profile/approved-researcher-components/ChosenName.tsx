@@ -59,7 +59,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
       <div className={styles.description}>
         Please enter your name as you would choose to have it appear on forms related to our services.
         <div>
-          <strong> This name must match the name on your training certificate</strong> that you will upload in the next
+          <strong> This name must match the name on your training certificate</strong> that you will verify in the next
           step.
         </div>
       </div>

@@ -64,7 +64,7 @@ export default function ProfileSetup(props: Props) {
     {
       id: "certificate",
       title: "Training Certificate",
-      description: "Upload your NHS Digital Data Security Awareness certificate",
+      description: "Verify your NHS Digital Data Security Awareness certificate",
       completed: !expiryUrgency && trainingCertificateCompleted,
       current: hasChosenName && agreementCompleted,
       expiryUrgency: expiryUrgency,
@@ -111,7 +111,7 @@ export default function ProfileSetup(props: Props) {
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
           completionTitle="Your certificate is expiring soon!"
-          completionSubtitle=" To retain access to the portal, please upload a new certificate."
+          completionSubtitle=" To retain access to the portal, please verify a new certificate."
           ariaLabel="Profile setup progress"
         />
       ) : userData?.roles.includes("staff") ? (
@@ -144,7 +144,7 @@ export default function ProfileSetup(props: Props) {
             uploading a new document.
           </p>
           <Button variant="secondary" size="small" onClick={toggleShowCertReupload}>
-            {!showCertReupload ? "Upload another certificate" : "Cancel"}
+            {!showCertReupload ? "Verify another certificate" : "Cancel"}
           </Button>
           <div
             className={`${styles["certificate-container"]} ${
