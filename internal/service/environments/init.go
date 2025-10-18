@@ -32,7 +32,7 @@ func Init() {
 		}).FirstOrCreate(&types.Environment{})
 
 		if result.Error != nil {
-			panic(fmt.Sprintf("failed to initalise agreement: %v", result.Error))
+			panic(fmt.Sprintf("failed to initalise environment: %v", result.Error))
 		}
 	}
 }
