@@ -286,6 +286,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 			usernames = append(usernames, upn.Username())
 		}
 	}
+
 	return usernames, nil
 }
 
