@@ -227,7 +227,9 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 	if response.GetInvitedUser() == nil || response.GetInvitedUser().GetId() == nil {
 		return nil, types.NewErrServerError("invite response did not contain id of user")
 	}
-	return &InvitedUserData{Id: mustParseUserObjectId(response.GetInvitedUser())}, nil
+	id := mustParseUserObjectId(response.GetInvitedUser())
+
+	return &InvitedUserData{Id: id}, nil
 }
 
 func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
@@ -286,7 +288,6 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 			usernames = append(usernames, upn.Username())
 		}
 	}
-
 	return usernames, nil
 }
 
