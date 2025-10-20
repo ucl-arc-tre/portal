@@ -76,7 +76,7 @@ func New() *Controller {
 	return controller
 }
 
-func userIdForExternal(username types.Username) (string, error) {
+func userPrincipalNameForExternal(username types.Username) (UserPrincipalName, error) {
 	if config.EntraTenantPrimaryDomain() == "" {
 		return "", types.NewErrServerError("Entra tenant primary domain is not set")
 	}
@@ -86,23 +86,24 @@ func userIdForExternal(username types.Username) (string, error) {
 		return "", types.NewErrInvalidObject("invalid email")
 	}
 
+	email := parts[0]
 	domain := parts[1]
+	upn := fmt.Sprintf("%s_%s#EXT#@%s", email, domain, config.EntraTenantPrimaryDomain())
 
-	userId := fmt.Sprintf("%s_%s#EXT#@%s", parts[0], domain, config.EntraTenantPrimaryDomain())
-	return userId, nil
+	return UserPrincipalName(upn), nil
 }
 
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
-	userId := ""
+	userPrincipalName := UserPrincipalName("")
 	if usernameIsExternal(username) {
-		externalUserId, err := userIdForExternal(username)
+		externalUserPrincipalName, err := userPrincipalNameForExternal(username)
 		if err != nil {
 			return nil, err
 		}
-		userId = externalUserId
+		userPrincipalName = externalUserPrincipalName
 	} else {
-		userId = string(username)
+		userPrincipalName = UserPrincipalName(username)
 	}
 
 	if userData, exists := c.userDataCache.Get(username); exists {
@@ -113,7 +114,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 			Select: []string{"mail", "employeeType", "id"},
 		},
 	}
-	data, err := c.client.Users().ByUserId(userId).Get(ctx, configuration)
+	data, err := c.client.Users().ByUserId(string(userPrincipalName)).Get(ctx, configuration)
 	if err != nil && errContains(err, "does not exist") {
 		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
 	} else if err != nil {
@@ -245,7 +246,7 @@ func employeeTypeIsStaff(employeeType string) bool {
 	return employeeTypeStaffPattern.MatchString(employeeType)
 }
 
-// FindUsernames searches entra for usernames given a query of email, user principal or display name
+// FindUsernames searches entra for usernames given a query of email, user principal
 func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
 	queryRegex := regexp.MustCompile(`^\w[\w.\s0-9@-]+\w$`)
 	queryIsValid := queryRegex.MatchString(query)
@@ -254,9 +255,10 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 	}
 
 	filterQuery := fmt.Sprintf(
-		`startswith(displayName,'%s') or startswith(userPrincipalName,'%s') or startswith(givenName,'%s') or startswith(mail,'%s')`,
-		query, query, query, query,
+		`startswith(userPrincipalName,'%s') or startswith(mail,'%s')`,
+		query, query,
 	)
+
 	resultLimit := int32(20) // limits to 20 results or 20 per page if more than 20 results
 
 	headers := abstractions.NewRequestHeaders()
@@ -266,6 +268,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 		QueryParameters: &graphusers.UsersRequestBuilderGetQueryParameters{
 			Filter: &filterQuery,
 			Top:    &resultLimit,
+			Select: []string{"userPrincipalName"},
 		},
 	}
 
@@ -279,7 +282,8 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 	userMatches := data.GetValue()
 	for _, user := range userMatches {
 		if user.GetUserPrincipalName() != nil {
-			usernames = append(usernames, types.Username(*user.GetUserPrincipalName()))
+			upn := UserPrincipalName(*user.GetUserPrincipalName())
+			usernames = append(usernames, upn.Username())
 		}
 	}
 	return usernames, nil
