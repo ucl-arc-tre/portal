@@ -12,11 +12,12 @@ import (
 
 func (s *Service) InviteUser(ctx context.Context, email string, sponsor types.Sponsor) error {
 
-	if err := s.entra.SendInvite(ctx, email, sponsor); err != nil {
+	user, err := s.entra.SendInvite(ctx, email, sponsor)
+	if err != nil {
 		return err
 	}
 
-	if err := s.entra.AddtoInvitedUserGroup(ctx, email); err != nil {
+	if err := s.entra.AddtoInvitedUserGroup(ctx, *user); err != nil {
 		if strings.Contains(err.Error(), "One or more added object references already exist for the following modified properties") {
 			log.Warn().Msg("User is already in group")
 			return nil
