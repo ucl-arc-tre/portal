@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/google/uuid"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	abstractions "github.com/microsoft/kiota-abstractions-go"
 	graph "github.com/microsoftgraph/msgraph-sdk-go"
@@ -114,12 +115,19 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 		},
 	}
 	data, err := c.client.Users().ByUserId(string(userPrincipalName)).Get(ctx, configuration)
-	if err != nil && strings.Contains(err.Error(), "does not exist") {
+	if err != nil && errContains(err, "does not exist") {
 		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
 	} else if err != nil {
 		return nil, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
+	} else if data.GetId() == nil {
+		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] had no entra id", username))
 	}
-	userData := UserData{Email: data.GetMail(), EmployeeType: data.GetEmployeeType(), Id: data.GetId()}
+
+	userData := UserData{
+		Id:           mustParseUserObjectId(data),
+		Email:        data.GetMail(),
+		EmployeeType: data.GetEmployeeType(),
+	}
 	_ = c.userDataCache.Add(username, userData)
 
 	return &userData, nil
@@ -145,7 +153,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 	return employeeTypeIsStaff(*userData.EmployeeType), nil
 }
 
-func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
 	user, err := c.userData(ctx, types.Username(email))
 	if err == nil {
 		log.Debug().Any("user", user).Msg("User already exists in entra")
@@ -153,20 +161,24 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	} else if errors.Is(err, types.ErrNotFound) {
 		return c.sendInviteNewEntraUser(ctx, email, sponsor)
 	} else {
-		return err
+		return nil, err
 	}
 }
 
-func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
 	log.Debug().Str("email", email).Msg("Inviting existing entra user to portal")
-	err := c.SendCustomInviteNotification(ctx, email, sponsor)
+
+	user, err := c.userData(ctx, types.Username(email))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	if err := c.SendCustomInviteNotification(ctx, email, sponsor); err != nil {
+		return nil, err
+	}
+	return &InvitedUserData{Id: user.Id}, nil
 }
 
-func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
 	log.Debug().Str("email", email).Msg("Inviting new entra user to portal")
 
 	requestBody := graphmodels.NewInvitation()
@@ -185,38 +197,50 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 		message = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
 	}
 	messageInfo := graphmodels.NewInvitedUserMessageInfo()
-
 	messageInfo.SetCustomizedMessageBody(&message)
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
-	_, err := c.client.Invitations().Post(ctx, requestBody, nil)
+	sponsorUserData, err := c.userData(ctx, sponsor.Username)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
+		return nil, err
+	}
+
+	// NOTE:
+	// requestBody.SetInvitedUserSponsors([]graphmodels.DirectoryObjectable{sponsorData})
+	// should work but doesn't, so use the raw additional data instead
+	requestBody.SetAdditionalData(map[string]any{
+		"invitedUserSponsors": []map[string]string{
+			{"id": sponsorUserData.Id.String()},
+		},
+	})
+
+	response, err := c.client.Invitations().Post(ctx, requestBody, nil)
+	if err != nil {
+		if errContains(err, "already exists") || errContains(err, "existing user") {
 			// bit of a mystery how this ends up being triggered, will investigate on other deployments
 			log.Warn().Any("email", email).Msg("user supposedly didn't exist but invitation thinks otherwise")
-			return c.sendInviteExistingEntraUser(ctx, email, sponsor)
+			return nil, types.NewErrServerError("attempted to invite existing entra user")
 		}
 		log.Debug().Err(err).Msg("Failed to invite user to entra")
-		return types.NewErrServerError(err)
+		return nil, types.NewErrServerError(err)
 	}
-	return nil
+	if response.GetInvitedUser() == nil || response.GetInvitedUser().GetId() == nil {
+		return nil, types.NewErrServerError("invite response did not contain id of user")
+	}
+	id := mustParseUserObjectId(response.GetInvitedUser())
+
+	return &InvitedUserData{Id: id}, nil
 }
 
-func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, email string) error {
-	log.Debug().Str("email", email).Msg("Adding invited user to invited user group")
-
-	user, err := c.userData(ctx, types.Username(email))
-	if err != nil {
-		log.Err(err).Str("email", email).Msg("Failed to get user data to get user id")
-		return err
-	}
+func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
+	log.Debug().Str("objectId", user.Id.String()).Msg("Adding invited user to invited user group")
 
 	groupId := config.EntraInvitedUserGroup()
 	requestBody := graphmodels.NewReferenceCreate()
-	odataId := fmt.Sprintf("https://graph.microsoft.com/v1.0/directoryObjects/%s", *user.Id)
+	odataId := fmt.Sprintf("https://graph.microsoft.com/v1.0/directoryObjects/%v", user.Id.String())
 	requestBody.SetOdataId(&odataId)
 
-	err = c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
+	err := c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
 	return types.NewErrServerError(err)
 }
 
@@ -269,4 +293,12 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 
 func usernameIsExternal(username types.Username) bool {
 	return !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain())
+}
+
+func mustParseUserObjectId(model graphmodels.Userable) ObjectId {
+	return ObjectId(uuid.MustParse(*model.GetId()))
+}
+
+func errContains(err error, substr string) bool {
+	return err != nil && strings.Contains(err.Error(), substr)
 }

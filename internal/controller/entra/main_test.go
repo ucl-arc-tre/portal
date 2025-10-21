@@ -1,6 +1,7 @@
 package entra
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,6 +42,17 @@ func TestUsernameFromUserPrincipalNamePrimaryDomain(t *testing.T) {
 }
 
 func TestUsernameFromUserPrincipalNameExternal(t *testing.T) {
-	upn := UserPrincipalName("alice.smith@example.com#EXT#@testTenant.com")
+	upn := UserPrincipalName("alice.smith_example.com#EXT#@testTenant.com")
 	assert.Equal(t, types.Username("alice.smith@example.com"), upn.Username())
+
+	upn = UserPrincipalName("alice.doe_smith_example.com#EXT#@testTenant.com")
+	assert.Equal(t, types.Username("alice.doe_smith@example.com"), upn.Username())
+}
+
+func TestErrorContains(t *testing.T) {
+	assert.False(t, errContains(nil, "anything"))
+	assert.False(t, errContains(nil, ""))
+	assert.False(t, errContains(errors.New("alice"), "bob"))
+	assert.True(t, errContains(errors.New("alice"), "alice"))
+	assert.True(t, errContains(errors.New("alice and bob"), "alice"))
 }
