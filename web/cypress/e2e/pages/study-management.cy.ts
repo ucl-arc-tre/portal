@@ -156,5 +156,47 @@ describe("Information Assets Management", () => {
     cy.mockInformationAssetsWithSample();
     cy.wait("@getAssetsWithSample");
     cy.contains("Sample Asset Title 1").should("be.visible");
+    cy.contains("requires a contract").should("be.visible");
+  });
+});
+
+describe("Study Updates", () => {
+  beforeEach(() => {
+    cy.mockAuthAsStudyOwner();
+
+    cy.mockStudiesWithNewStudy();
+    cy.mockStudyAccess();
+    cy.mockStudyAgreementText();
+    cy.mockStudyAgreementsConfirmed();
+    cy.mockAssetCreation();
+    cy.mockInformationAssetsWithSample();
+    cy.mockContractsWithSample();
+
+    cy.visit("/studies/manage?studyId=123456789");
+    cy.waitForAuth();
+    cy.wait("@getStudyById");
+    cy.wait("@getStudyAgreementText");
+    cy.wait("@getStudyAgreementsConfirmed");
+    cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsWithSample");
+  });
+
+  it("should successfully update a study as its owner", () => {
+    cy.contains("My New Test Study").should("be.visible");
+    cy.contains("Manage Study").click();
+
+    cy.contains("Risk Score").should("be.visible");
+    cy.contains("Additional Information").should("be.visible");
+    cy.contains("Mark Ready for Review").should("be.visible");
+    cy.contains("Edit Study").click();
+
+    cy.get("textarea#description").type("My New Test Study Description");
+    cy.get("[data-cy='next']").click();
+    cy.get("[data-cy='next']").click();
+
+    cy.get("button[type='submit']").click();
+
+    cy.mockStudyUpdate();
+    cy.wait("@updateStudy");
   });
 });

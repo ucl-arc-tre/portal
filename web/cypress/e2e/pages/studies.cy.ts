@@ -21,6 +21,16 @@ describe(`Studies page content`, () => {
 
     cy.contains("Create Your First Study").should("be.visible");
   });
+
+  it("should show different content for admins", () => {
+    cy.loginAsAdmin();
+    cy.mockAuthAsAdminApprovedResearcher();
+    cy.visit("/studies");
+    cy.waitForAuth();
+
+    cy.contains("Pending Studies").should("be.visible");
+    cy.contains("All Studies").should("be.visible");
+  });
 });
 
 describe("Approved researcher can create studies", () => {
