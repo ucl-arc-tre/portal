@@ -3,15 +3,17 @@
   position: fixed;
   top: 50%;
   right: 0;
-  background: black;
+  background: var(--green-300);
   color: white;
   padding-top: 20px;
   padding-bottom: 20px;
   padding-left: 8px;
   padding-right: 5px;
   font-weight: bold;
+  transition: all 0.3s ease;
 
   &:hover {
-    background: #424242;
+    background: var(--green-200);
+    padding-right: 10px;
   }
 }
