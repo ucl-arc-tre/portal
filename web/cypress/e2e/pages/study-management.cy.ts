@@ -182,6 +182,7 @@ describe("Study Updates", () => {
   });
 
   it("should successfully update a study as its owner", () => {
+    cy.mockStudyUpdate();
     cy.contains("My New Test Study").should("be.visible");
     cy.contains("Manage Study").click();
 
@@ -190,13 +191,13 @@ describe("Study Updates", () => {
     cy.contains("Mark Ready for Review").should("be.visible");
     cy.contains("Edit Study").click();
 
+    // edit the description and submit
     cy.get("textarea#description").type("My New Test Study Description");
     cy.get("[data-cy='next']").click();
     cy.get("[data-cy='next']").click();
 
     cy.get("button[type='submit']").click();
 
-    cy.mockStudyUpdate();
     cy.wait("@updateStudy");
   });
 });
