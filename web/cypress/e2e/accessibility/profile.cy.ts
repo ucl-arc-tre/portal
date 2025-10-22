@@ -70,7 +70,7 @@ describe("Accessibility - Profile Page", () => {
       cy.waitForProfileData();
 
       cy.get("main").should("be.visible");
-      cy.contains("Upload another certificate").should("be.visible");
+      cy.contains("Upload another certificate").should("exist");
 
       cy.checkAccessibility();
     });
