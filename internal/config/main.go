@@ -143,5 +143,5 @@ func env(key string) string {
 }
 
 func PortalUrl() string {
-	return k.String("entra.portal_url")
+	return k.String("url")
 }

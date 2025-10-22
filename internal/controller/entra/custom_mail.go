@@ -14,7 +14,7 @@ import (
 )
 
 //go:embed ucl-banner.svg
-var svgFile string
+var uclBannerSVGContent string
 
 func (c *Controller) createCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
 	// set up the email
@@ -60,7 +60,7 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 	banner.SetContentId(&svgId)
 	banner.SetIsInline(&hasAttachments)
 
-	banner.SetContentBytes([]byte(svgFile))
+	banner.SetContentBytes([]byte(uclBannerSVGContent))
 
 	message.SetAttachments([]graphmodels.Attachmentable{banner})
 	message.SetBody(body)
