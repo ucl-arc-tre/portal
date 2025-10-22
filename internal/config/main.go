@@ -141,3 +141,7 @@ func env(key string) string {
 		panic(fmt.Errorf("[%v] env var unset", key))
 	}
 }
+
+func PortalUrl() string {
+	return k.String("url")
+}

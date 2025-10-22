@@ -30,6 +30,7 @@ entra:
   mail_client_secret: <CHANGE_ME>
   mail_user_principal: <CHANGE_ME> # eg. rp2@ucl.ac.uk, found in entra by searching for the mailbox
 
+url: <CHANGE_ME> # eg. https://portal.arc.ucl.ac.uk
 tre:
   users: # Map of usernames to passwords for HTTP basic auth
     username: password # pragma: allowlist secret
