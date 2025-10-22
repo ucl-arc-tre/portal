@@ -512,6 +512,12 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		return
 	}
 
+	err = h.studies.SendReviewEmailNotification(ctx, studyUUID, review)
+	if err != nil {
+		setError(ctx, err, "Failed to send study notification")
+		return
+	}
+
 	ctx.Status(http.StatusOK)
 }
 func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
