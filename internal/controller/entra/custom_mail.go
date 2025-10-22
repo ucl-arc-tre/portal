@@ -109,8 +109,8 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 	// email to notify IAO + IAA when study has been reviewed
 	// todo: set up usage of this
 
-	content := ""
-	subject := ""
+	content := "There has been an update to your study request, please log into the portal to view the changes."
+	subject := "Notification: Something has changed in your study request"
 
 	switch review.Status {
 	case openapi.Approved:
