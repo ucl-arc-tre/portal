@@ -3,9 +3,8 @@ package entra
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"html/template"
-
-	"os"
 
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
@@ -13,6 +12,9 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
+
+//go:embed ucl-banner.svg
+var svgFile string
 
 func (c *Controller) createCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
 	// set up the email
@@ -58,12 +60,7 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 	banner.SetContentId(&svgId)
 	banner.SetIsInline(&hasAttachments)
 
-	// read the file into bytes
-	svgFile, err := os.ReadFile("internal/controller/entra/ucl-banner.svg")
-	if err != nil {
-		return err
-	}
-	banner.SetContentBytes(svgFile)
+	banner.SetContentBytes([]byte(svgFile))
 
 	message.SetAttachments([]graphmodels.Attachmentable{banner})
 	message.SetBody(body)
