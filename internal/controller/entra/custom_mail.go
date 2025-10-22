@@ -115,8 +115,12 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		subject = "Notification: Your study has been approved!"
 		content = "Your study has been approved! You will be notified when you have any contracts or assets approaching expiry."
 	} else {
-		content = "Your study has not been approved, please review the feedback and request another review once the changes have been addressed. <br><br>Feedback: " + *review.Feedback
-		subject = "Notification: Your study has feedback to address"
+		content = "Your study has not been approved, please review the feedback and request another review once the changes have been addressed."
+		subject = "Notification: Unfortunately, your study has not been approved"
+		if review.Feedback != nil {
+			content += " <br><br>Feedback: " + *review.Feedback
+			subject = "Notification: Your study has feedback to address"
+		}
 	}
 
 	return c.createCustomEmail(ctx, subject, []string{email}, content)
