@@ -31,9 +31,11 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 
 	templateReader := new(bytes.Buffer)
 	err = t.Execute(templateReader, struct {
-		Content string
+		Content   string
+		PortalUrl string
 	}{
-		Content: content, // set the content from the args
+		Content:   content, // set the content from the args
+		PortalUrl: config.PortalUrl(),
 	})
 	if err != nil {
 		return err
