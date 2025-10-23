@@ -1,4 +1,4 @@
-import { postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import { getStudiesByStudyIdAssets, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -6,12 +6,15 @@ import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
 import InfoTooltip from "../ui/InfoTooltip";
+import { storageDefinitions } from "../shared/storageDefinitions";
+import Loading from "../ui/Loading";
 
 type StudyDetailsProps = {
   study: Study;
 };
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
+  const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
@@ -60,9 +63,20 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
   };
 
   useEffect(() => {
-    const calculateRiskScore = () => {
-      // todo: how to determine if they have data?
+    const fetchAssets = async () => {
+      const studyId = study.id;
+      const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
+      if (assetResponse.response.ok && assetResponse.data) {
+        if (assetResponse.data.length > 0) {
+          return assetResponse.data;
+        } else {
+          return [];
+        }
+      }
+    };
+    const calculateRiskScore = async () => {
       let score = 0;
+      setRiskScoreLoading(true);
 
       if (study.involves_data_processing_outside_eea) score += 10;
       if (study.requires_dbs) score += 5;
@@ -70,7 +84,40 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       if (study.involves_third_party && !study.involves_mnca) score += 5;
       if (study.involves_nhs_england || study.involves_cag) score += 5;
 
+      const assets = await fetchAssets();
+
+      if (assets && assets.length > 0) {
+        let assetRiskScore = 0;
+
+        for (const asset of assets) {
+          // for each asset, loop through each location and calculate the score of that asset in that location
+          // then sum these and repeat for all assets
+          let assetScore = 0;
+          const NhsMultiplier = 3;
+
+          asset.locations.forEach((loc) => {
+            // get location from storageDefinitions
+            const location = storageDefinitions.find((def) => def.value === loc);
+
+            if (!location) return;
+
+            // do calculation based on whether it's nhs data
+            // an asset in a different location counts as another asset
+            if (study.involves_nhs_england) {
+              assetScore += asset.tier * NhsMultiplier * location!.riskScore;
+            } else {
+              assetScore += asset.tier * location!.riskScore;
+            }
+          });
+
+          assetRiskScore += assetScore;
+        }
+
+        score += assetRiskScore;
+      }
+
       setRiskScore(score);
+      setRiskScoreLoading(false);
     };
 
     calculateRiskScore();
@@ -86,7 +133,8 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
           </span>
           <span>
-            Risk Score: <span className={styles["risk-score"]}>{riskScore}</span>
+            Risk Score:{" "}
+            <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading loaderOnly /> : riskScore}</span>
           </span>
           <StudyStatusBadge status={approvalStatus} isAdmin={true} />
         </div>
