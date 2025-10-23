@@ -294,7 +294,7 @@ export const storageDefinitions: StorageDefinition[] = [
     value: "staff_carries_items",
     definition:
       "If items can be carried by a staff member from the point of their inception or collection to a secure office location without stop-offs then this will be considered secure.",
-    riskScore: 7,
+    riskScore: 2,
   },
   {
     name: "Standard postage/courier",
@@ -308,14 +308,14 @@ export const storageDefinitions: StorageDefinition[] = [
     value: "third_party_dspt",
     definition:
       "External service provider with up-to-date Data Security & Protection Toolkit, where there is a data sharing agreement in place.",
-    riskScore: 10,
+    riskScore: 3,
   },
   {
     name: "Text (SMS)",
     value: "text_sms",
     definition:
       "A text message can be used to send, for example, a password or an appointment time. However, users should be careful not to include other linked information or contextual information that might make the text itself sensitive or risk an information security incident. So, a password should not be accompanied by a username or URL wherein the login could be pieced together, which should be sent via a different method.",
-    riskScore: 10,
+    riskScore: 8,
   },
   {
     name: "Royal Mail with application support",
