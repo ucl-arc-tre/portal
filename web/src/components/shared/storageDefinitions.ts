@@ -87,7 +87,7 @@ export const storageDefinitions: StorageDefinition[] = [
   {
     name: "GalaxKey",
     value: "galaxkey",
-    definition: "No further requirements.",
+    definition: "Commercial encryption platform. May be used for clinical trials.No further requirements.",
     riskScore: 3,
   },
   {
