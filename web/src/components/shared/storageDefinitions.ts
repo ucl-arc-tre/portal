@@ -115,7 +115,7 @@ export const storageDefinitions: StorageDefinition[] = [
     value: "internet_download_upload_unsecured",
     definition:
       "Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to download or upload research participants' personal data without a secure connection.",
-    riskScore: 3,
+    riskScore: 5,
   },
   {
     name: "Laptop/PC (partially secured)",
