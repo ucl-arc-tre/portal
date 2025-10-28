@@ -134,7 +134,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
           </span>
           <span>
             Risk Score:{" "}
-            <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading loaderOnly /> : riskScore}</span>
+            <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
           <StudyStatusBadge status={approvalStatus} isAdmin={true} />
         </div>
