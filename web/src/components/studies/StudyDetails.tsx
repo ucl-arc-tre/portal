@@ -87,7 +87,7 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       const assets = await fetchAssets();
 
       if (assets && assets.length > 0) {
-        let assetRiskScore = 0;
+        let assetsRiskScore = 0;
 
         for (const asset of assets) {
           // for each asset, loop through each location and calculate the score of that asset in that location
@@ -110,10 +110,10 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             }
           });
 
-          assetRiskScore += assetScore;
+          assetsRiskScore += assetScore;
         }
 
-        score += assetRiskScore;
+        score += assetsRiskScore;
       }
 
       setRiskScore(score);
