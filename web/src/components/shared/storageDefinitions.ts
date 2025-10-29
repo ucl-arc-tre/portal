@@ -197,7 +197,7 @@ export const storageDefinitions: StorageDefinition[] = [
     value: "online_database_partially_secured",
     definition:
       "The software provider must: - host your data exclusively within the UK or the European Economic Area (EEA) - have a signed data processing agreement",
-    riskScore: 5,
+    riskScore: 4,
   },
   {
     name: "Online database/survey tool (security unconfirmed)",
