@@ -151,7 +151,7 @@ export default function PeoplePage() {
             )}
           </form>
           <HelperText>
-            <small>Search by display name, user principal or email</small>
+            <small>Search by email address or user principal</small>
           </HelperText>
         </div>
       )}
