@@ -216,7 +216,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 			StudyID: study.ID,
 			UserID:  studyAdminUser.ID,
 		}
-		if err := tx.Create(&studyAdmin).Error; err != nil {
+		if err := tx.FirstOrCreate(&studyAdmin).Error; err != nil {
 			tx.Rollback()
 			return nil, types.NewErrFromGorm(err, "failed to create study admin")
 		}
