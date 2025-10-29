@@ -51,18 +51,18 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
     additional_study_admin_usernames: data.additionalStudyAdminUsernames
       .map((admin) => admin.value.trim())
       .map((username) => `${username}${domainName}`),
-    involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
-    involves_cag: data.involvesCag ? data.involvesCag : undefined,
+    involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : false,
+    involves_cag: data.involvesCag ? data.involvesCag : false,
     cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
-    involves_ethics_approval: data.involvesEthicsApproval ? data.involvesEthicsApproval : undefined,
-    involves_hra_approval: data.involvesHraApproval ? data.involvesHraApproval : undefined,
+    involves_ethics_approval: data.involvesEthicsApproval ? data.involvesEthicsApproval : false,
+    involves_hra_approval: data.involvesHraApproval ? data.involvesHraApproval : false,
     iras_id: data.irasId ? data.irasId : undefined,
-    is_nhs_associated: data.isNhsAssociated ? data.isNhsAssociated : undefined,
-    involves_nhs_england: data.involvesNhsEngland ? data.involvesNhsEngland : undefined,
+    is_nhs_associated: data.isNhsAssociated ? data.isNhsAssociated : false,
+    involves_nhs_england: data.involvesNhsEngland ? data.involvesNhsEngland : false,
     nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
-    involves_mnca: data.involvesMnca ? data.involvesMnca : undefined,
-    requires_dspt: data.requiresDspt ? data.requiresDspt : undefined,
-    requires_dbs: data.requiresDbs ? data.requiresDbs : undefined,
+    involves_mnca: data.involvesMnca ? data.involvesMnca : false,
+    requires_dspt: data.requiresDspt ? data.requiresDspt : false,
+    requires_dbs: data.requiresDbs ? data.requiresDbs : false,
     is_data_protection_office_registered: data.isDataProtectionOfficeRegistered
       ? data.isDataProtectionOfficeRegistered
       : undefined,
@@ -70,15 +70,15 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
         ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
         : undefined,
-    involves_third_party: data.involvesThirdParty ? data.involvesThirdParty : undefined,
-    involves_external_users: data.involvesExternalUsers ? data.involvesExternalUsers : undefined,
-    involves_participant_consent: data.involvesParticipantConsent ? data.involvesParticipantConsent : undefined,
+    involves_third_party: data.involvesThirdParty ? data.involvesThirdParty : false,
+    involves_external_users: data.involvesExternalUsers ? data.involvesExternalUsers : false,
+    involves_participant_consent: data.involvesParticipantConsent ? data.involvesParticipantConsent : false,
     involves_indirect_data_collection: data.involvesIndirectDataCollection
       ? data.involvesIndirectDataCollection
-      : undefined,
+      : false,
     involves_data_processing_outside_eea: data.involvesDataProcessingOutsideEea
       ? data.involvesDataProcessingOutsideEea
-      : undefined,
+      : false,
   };
 
   return studyData;
@@ -231,6 +231,8 @@ export default function StudyForm(StudyProps: StudyProps) {
           body: studyData,
         });
       } else {
+        // check study checkboxes vs form data and set mismatched ones to false
+
         response = await putStudiesByStudyId({
           path: { studyId },
           body: studyData,
