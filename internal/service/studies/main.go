@@ -98,7 +98,7 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 
 	// Check if the study title already exists
 	var count int64
-	err := s.db.Model(&types.Study{}).Where("title = ?", studyData.Title).Count(&count).Error
+	err := s.db.Model(&types.Study{}).Where("LOWER(title) = LOWER(?)", studyData.Title).Count(&count).Error
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
