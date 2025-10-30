@@ -62,73 +62,83 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
     setFeedback(event.target.value);
   };
 
-  useEffect(() => {
-    const fetchAssets = async () => {
-      const studyId = study.id;
-      const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
-      if (assetResponse.response.ok && assetResponse.data) {
-        if (assetResponse.data.length > 0) {
-          return assetResponse.data;
+  const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined) => {
+    let assetsRiskScore = 0;
+
+    for (const asset of assets) {
+      // for each asset, loop through each location and calculate the score of that asset in that location
+      // then sum these and repeat for all assets
+      let assetScore = 0;
+      const NhsMultiplier = 3;
+
+      asset.locations.forEach((loc) => {
+        // get location from storageDefinitions
+        const location = storageDefinitions.find((def) => def.value === loc);
+
+        if (!location) return;
+
+        // do calculation based on whether it's nhs data
+        // an asset in a different location counts as another asset
+        if (involvesNhsEngland) {
+          assetScore += asset.tier * NhsMultiplier * location!.riskScore;
         } else {
-          return [];
+          assetScore += asset.tier * location!.riskScore;
         }
-      }
-    };
+      });
 
-    const calculateAssetsRiskScore = (assets: Asset[], score: number) => {
-      let assetsRiskScore = 0;
+      assetsRiskScore += assetScore;
+    }
 
-      for (const asset of assets) {
-        // for each asset, loop through each location and calculate the score of that asset in that location
-        // then sum these and repeat for all assets
-        let assetScore = 0;
-        const NhsMultiplier = 3;
+    score += assetsRiskScore;
 
-        asset.locations.forEach((loc) => {
-          // get location from storageDefinitions
-          const location = storageDefinitions.find((def) => def.value === loc);
+    return score;
+  };
 
-          if (!location) return;
+  const calculateBaseRiskScore = (study: Study) => {
+    let score = 0;
 
-          // do calculation based on whether it's nhs data
-          // an asset in a different location counts as another asset
-          if (study.involves_nhs_england) {
-            assetScore += asset.tier * NhsMultiplier * location!.riskScore;
-          } else {
-            assetScore += asset.tier * location!.riskScore;
-          }
-        });
+    if (study.involves_data_processing_outside_eea) score += 10;
+    if (study.requires_dbs) score += 5;
+    if (study.requires_dspt) score += 5;
+    if (study.involves_third_party && !study.involves_mnca) score += 5;
+    if (study.involves_nhs_england || study.involves_cag) score += 5;
 
-        assetsRiskScore += assetScore;
-      }
+    return score;
+  };
 
-      score += assetsRiskScore;
-
-      return score;
-    };
-    const calculateRiskScore = async () => {
-      let score = 0;
-      setRiskScoreLoading(true);
-
-      if (study.involves_data_processing_outside_eea) score += 10;
-      if (study.requires_dbs) score += 5;
-      if (study.requires_dspt) score += 5;
-      if (study.involves_third_party && !study.involves_mnca) score += 5;
-      if (study.involves_nhs_england || study.involves_cag) score += 5;
-
-      const assets = await fetchAssets();
-
-      if (assets && assets.length > 0) {
-        const updatedScore = calculateAssetsRiskScore(assets, score);
-        setRiskScore(updatedScore);
+  const fetchAssets = async (studyId: string) => {
+    const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
+    if (assetResponse.response.ok && assetResponse.data) {
+      if (assetResponse.data.length > 0) {
+        return assetResponse.data;
       } else {
-        setRiskScore(score);
+        return [];
       }
+    }
+  };
 
-      setRiskScoreLoading(false);
+  useEffect(() => {
+    const calculateRiskScore = async (study: Study) => {
+      const studyId = study.id;
+      const baseRiskScore = calculateBaseRiskScore(study);
+      const assets = await fetchAssets(studyId);
+      if (!assets || assets.length === 0) return baseRiskScore;
+      return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
+    };
+    const getRiskScore = async () => {
+      setRiskScoreLoading(true);
+      try {
+        const score = await calculateRiskScore(study);
+        setRiskScore(score);
+      } catch (error) {
+        console.error("Failed to calculate risk score:", error);
+      } finally {
+        setRiskScoreLoading(false);
+      }
     };
 
-    calculateRiskScore();
+    getRiskScore();
+
     setApprovalStatus(study.approval_status);
   }, [study]);
 
