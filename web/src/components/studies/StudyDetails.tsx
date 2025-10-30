@@ -1,4 +1,4 @@
-import { getStudiesByStudyIdAssets, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import { Asset, getStudiesByStudyIdAssets, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -74,6 +74,38 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
         }
       }
     };
+
+    const calculateAssetsRiskScore = (assets: Asset[], score: number) => {
+      let assetsRiskScore = 0;
+
+      for (const asset of assets) {
+        // for each asset, loop through each location and calculate the score of that asset in that location
+        // then sum these and repeat for all assets
+        let assetScore = 0;
+        const NhsMultiplier = 3;
+
+        asset.locations.forEach((loc) => {
+          // get location from storageDefinitions
+          const location = storageDefinitions.find((def) => def.value === loc);
+
+          if (!location) return;
+
+          // do calculation based on whether it's nhs data
+          // an asset in a different location counts as another asset
+          if (study.involves_nhs_england) {
+            assetScore += asset.tier * NhsMultiplier * location!.riskScore;
+          } else {
+            assetScore += asset.tier * location!.riskScore;
+          }
+        });
+
+        assetsRiskScore += assetScore;
+      }
+
+      score += assetsRiskScore;
+
+      return score;
+    };
     const calculateRiskScore = async () => {
       let score = 0;
       setRiskScoreLoading(true);
@@ -87,36 +119,12 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       const assets = await fetchAssets();
 
       if (assets && assets.length > 0) {
-        let assetsRiskScore = 0;
-
-        for (const asset of assets) {
-          // for each asset, loop through each location and calculate the score of that asset in that location
-          // then sum these and repeat for all assets
-          let assetScore = 0;
-          const NhsMultiplier = 3;
-
-          asset.locations.forEach((loc) => {
-            // get location from storageDefinitions
-            const location = storageDefinitions.find((def) => def.value === loc);
-
-            if (!location) return;
-
-            // do calculation based on whether it's nhs data
-            // an asset in a different location counts as another asset
-            if (study.involves_nhs_england) {
-              assetScore += asset.tier * NhsMultiplier * location!.riskScore;
-            } else {
-              assetScore += asset.tier * location!.riskScore;
-            }
-          });
-
-          assetsRiskScore += assetScore;
-        }
-
-        score += assetsRiskScore;
+        const updatedScore = calculateAssetsRiskScore(assets, score);
+        setRiskScore(updatedScore);
+      } else {
+        setRiskScore(score);
       }
 
-      setRiskScore(score);
       setRiskScoreLoading(false);
     };
 
