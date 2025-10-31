@@ -23,6 +23,48 @@
   margin-bottom: 0;
 }
 
+.yes-no-unsure-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+
+  button {
+    padding: 0.2rem 0.35rem;
+    border-radius: 10px;
+
+    /* base is unsure */
+    border: 2px solid var(--text--secondary);
+    color: var(--text--secondary);
+    background-color: #efefef;
+
+    &.unsure-selected {
+      background-color: var(--text--secondary);
+      color: #fff;
+    }
+
+    &.yes {
+      background-color: #def4e4;
+      border-color: var(--green-100);
+    }
+
+    &.yes-selected {
+      background-color: var(--green-200);
+      color: #fff;
+    }
+
+    &.no {
+      background-color: #f4dede;
+      border-color: #9b0505;
+    }
+
+    &.no-selected {
+      background-color: #9b0505;
+      color: #fff;
+    }
+  }
+}
+
 .form {
   width: 100%;
   margin-block: 1.8rem;
