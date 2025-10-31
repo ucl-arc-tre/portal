@@ -12,6 +12,61 @@ import Loading from "../ui/Loading";
 type StudyDetailsProps = {
   study: Study;
 };
+
+const fetchAssets = async (studyId: string) => {
+  const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
+  if (assetResponse.response.ok && assetResponse.data) {
+    if (assetResponse.data.length > 0) {
+      return assetResponse.data;
+    } else {
+      return [];
+    }
+  }
+};
+
+const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined) => {
+  let assetsRiskScore = 0;
+
+  for (const asset of assets) {
+    // for each asset, loop through each location and calculate the score of that asset in that location
+    // then sum these and repeat for all assets
+    let assetScore = 0;
+    const NhsMultiplier = 3;
+
+    asset.locations.forEach((loc) => {
+      // get location from storageDefinitions
+      const location = storageDefinitions.find((def) => def.value === loc);
+
+      if (!location) return;
+
+      // do calculation based on whether it's nhs data
+      // an asset in a different location counts as another asset
+      if (involvesNhsEngland) {
+        assetScore += asset.tier * NhsMultiplier * location!.riskScore;
+      } else {
+        assetScore += asset.tier * location!.riskScore;
+      }
+    });
+
+    assetsRiskScore += assetScore;
+  }
+
+  score += assetsRiskScore;
+
+  return score;
+};
+
+const calculateBaseRiskScore = (study: Study) => {
+  let score = 0;
+
+  if (study.involves_data_processing_outside_eea) score += 10;
+  if (study.requires_dbs) score += 5;
+  if (study.requires_dspt) score += 5;
+  if (study.involves_third_party && !study.involves_mnca) score += 5;
+  if (study.involves_nhs_england || study.involves_cag) score += 5;
+
+  return score;
+};
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
@@ -60,61 +115,6 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
-  };
-
-  const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined) => {
-    let assetsRiskScore = 0;
-
-    for (const asset of assets) {
-      // for each asset, loop through each location and calculate the score of that asset in that location
-      // then sum these and repeat for all assets
-      let assetScore = 0;
-      const NhsMultiplier = 3;
-
-      asset.locations.forEach((loc) => {
-        // get location from storageDefinitions
-        const location = storageDefinitions.find((def) => def.value === loc);
-
-        if (!location) return;
-
-        // do calculation based on whether it's nhs data
-        // an asset in a different location counts as another asset
-        if (involvesNhsEngland) {
-          assetScore += asset.tier * NhsMultiplier * location!.riskScore;
-        } else {
-          assetScore += asset.tier * location!.riskScore;
-        }
-      });
-
-      assetsRiskScore += assetScore;
-    }
-
-    score += assetsRiskScore;
-
-    return score;
-  };
-
-  const calculateBaseRiskScore = (study: Study) => {
-    let score = 0;
-
-    if (study.involves_data_processing_outside_eea) score += 10;
-    if (study.requires_dbs) score += 5;
-    if (study.requires_dspt) score += 5;
-    if (study.involves_third_party && !study.involves_mnca) score += 5;
-    if (study.involves_nhs_england || study.involves_cag) score += 5;
-
-    return score;
-  };
-
-  const fetchAssets = async (studyId: string) => {
-    const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
-    if (assetResponse.response.ok && assetResponse.data) {
-      if (assetResponse.data.length > 0) {
-        return assetResponse.data;
-      } else {
-        return [];
-      }
-    }
   };
 
   useEffect(() => {
