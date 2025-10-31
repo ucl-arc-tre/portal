@@ -70,7 +70,7 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
                 onChange={handleFeedbackChange}
                 value={feedback}
               />
-              <Button onClick={handleFeedbackSubmit} type="button">
+              <Button onClick={handleFeedbackSubmit} type="button" disabled={!feedback || feedback.trim().length === 0}>
                 Submit
               </Button>
             </form>
