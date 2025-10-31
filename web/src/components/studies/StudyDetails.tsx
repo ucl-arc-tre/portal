@@ -75,11 +75,16 @@ export default function StudyDetails(props: StudyDetailsProps) {
             {study.feedback ? "Respond to Feedback" : "Edit Study"}
           </Button>
 
-          {studyStepsCompleted && (
-            <Button onClick={() => handleUpdateStudyStatus("Pending")} size="small">
-              Mark Ready for Review
-            </Button>
-          )}
+          {studyStepsCompleted &&
+            (approvalStatus !== "Pending" ? (
+              <Button onClick={() => handleUpdateStudyStatus("Pending")} size="small">
+                Mark Ready for Review
+              </Button>
+            ) : (
+              <Button disabled size="small">
+                Submitted for Review
+              </Button>
+            ))}
         </div>
       )}
 
@@ -91,7 +96,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <span>
             Risk Score: <span className={styles["risk-score"]}>{riskScore}</span>
           </span>
-          <StudyStatusBadge status={approvalStatus} isAdmin={true} />
+          <StudyStatusBadge status={approvalStatus} isAdmin={isAdmin} />
         </div>
         <h3 className={styles.description}>{study.description}</h3>
         <div>
