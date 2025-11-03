@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
   npm run build
 
-# --------------------------------------------------------
+# -------------------------------------------------
 FROM scratch AS api-release
 
 COPY --from=builder /etc/passwd /etc/passwd
