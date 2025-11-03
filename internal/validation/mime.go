@@ -26,6 +26,6 @@ func MimeType(stream io.ReadSeeker) (types.MimeType, error) {
 		return "", types.NewErrServerError(fmt.Errorf("failed reset seek to start [%v]", err))
 	}
 
-	buff = buff[:nBytesRead] // fill remaining bytes with zeros
+	buff = buff[:nBytesRead] // truncate to nBytesRead length to remove any trailing zero bytes
 	return types.MimeType(http.DetectContentType(buff)), nil
 }
