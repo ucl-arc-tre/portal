@@ -18,11 +18,12 @@ func NewSecure() gin.HandlerFunc {
 		SSLRedirect:           true,
 		STSSeconds:            315360000,
 		STSIncludeSubdomains:  true,
-		FrameDeny:             true,
+		FrameDeny:             false, // no longer recommended or widely supported
 		ContentTypeNosniff:    true,
-		BrowserXssFilter:      true,
+		BrowserXssFilter:      false, // no longer recommended or widely supported
 		ContentSecurityPolicy: "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
 		IENoOpen:              true,
 		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
+		ReferrerPolicy:        "strict-origin-when-cross-origin",
 	})
 }
