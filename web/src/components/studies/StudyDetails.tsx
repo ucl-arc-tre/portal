@@ -67,6 +67,13 @@ const calculateBaseRiskScore = (study: Study) => {
 
   return score;
 };
+
+const calculateRiskScore = async (study: Study) => {
+  const baseRiskScore = calculateBaseRiskScore(study);
+  const assets = await fetchAssets(study.id);
+  if (!assets || assets.length === 0) return baseRiskScore;
+  return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
+};
 export default function StudyDetails({ study }: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
@@ -118,13 +125,6 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
   };
 
   useEffect(() => {
-    const calculateRiskScore = async (study: Study) => {
-      const studyId = study.id;
-      const baseRiskScore = calculateBaseRiskScore(study);
-      const assets = await fetchAssets(studyId);
-      if (!assets || assets.length === 0) return baseRiskScore;
-      return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
-    };
     const getRiskScore = async () => {
       setRiskScoreLoading(true);
       try {
