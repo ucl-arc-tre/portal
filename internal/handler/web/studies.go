@@ -15,6 +15,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 func mustParseDate(dateStr string) time.Time {
@@ -340,6 +341,14 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		}
 	}()
 
+	if mimeType, err := validation.MimeType(file); err != nil {
+		setError(ctx, err, "Failed to determine MIME type of file")
+		return
+	} else if mimeType != types.MimeTypePdf {
+		setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not PDF", mimeType)), "Invalid MIME type")
+		return
+	}
+
 	// Create the final contract record for storage
 	contractData := types.Contract{
 		AssetID:               uuids[1],
@@ -398,6 +407,14 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 				log.Error().Err(err).Msg("Failed to close uploaded file")
 			}
 		}()
+
+		if mimeType, err := validation.MimeType(file); err != nil {
+			setError(ctx, err, "Failed to determine MIME type of file")
+			return
+		} else if mimeType != types.MimeTypePdf {
+			setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not PDF", mimeType)), "Invalid MIME type")
+			return
+		}
 
 		contractObj = &types.S3Object{
 			Content: file,
@@ -459,9 +476,9 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	ctx.DataFromReader(
 		http.StatusOK,
 		*object.NumBytes,
-		"application/octet-stream",
+		"application/pdf",
 		object.Content, map[string]string{
-			"Content-Disposition": "attachment; filename=contract.txt", // todo set filename
+			"Content-Disposition": "attachment",
 		},
 	)
 }
