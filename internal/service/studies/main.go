@@ -67,7 +67,17 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.Use
 			log.Err(err).Any("username", studyAdminUsername).Msg("Failed to get persisted user. Cannot create study admin")
 			return admins, err
 		}
-		admins = append(admins, user)
+		found := false
+		for _, admin := range admins {
+			if admin == user {
+				found = true
+				break // User is already an admin, no need to add
+			}
+		}
+
+		if !found {
+			admins = append(admins, user)
+		}
 	}
 	return admins, nil
 }

@@ -134,6 +134,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     trigger,
     reset,
     formState: { errors, isValid },
+    getValues,
   } = useForm<StudyFormData>({
     mode: "onChange",
     criteriaMode: "all",
@@ -411,14 +412,28 @@ export default function StudyForm(StudyProps: StudyProps) {
                       control={control}
                       rules={{
                         required: "Username is required",
-                        validate: (value) => {
-                          if (!value || value.trim() === "") {
-                            return "Username is required";
-                          }
-                          if (value.includes("@")) {
-                            return `Enter only the username part (without ${domainName})`;
-                          }
-                          return true;
+                        validate: {
+                          isNotEmpty: (value) => {
+                            if (!value || value.trim() === "") {
+                              return "Username is required";
+                            }
+                            return true;
+                          },
+                          notEmailPart: (value) => {
+                            if (value.includes("@")) {
+                              return `Enter only the username part (without ${domainName})`;
+                            }
+                            return true;
+                          },
+                          isUnique: (value) => {
+                            // Retrieve all current admin usernames
+                            const allAdminUsernames = getValues(`additionalStudyAdminUsernames`).map(
+                              (admin) => admin.value
+                            );
+                            // Count the occurrences of the current value
+                            const duplicateCount = allAdminUsernames.filter((username) => username === value).length;
+                            return duplicateCount <= 1 || "Username has already been entered";
+                          },
                         },
                       }}
                       render={({ field, fieldState }) => (
