@@ -32,6 +32,7 @@
   button {
     padding: 0.2rem 0.35rem;
     border-radius: 10px;
+    cursor: pointer;
 
     /* base is unsure */
     border: 2px solid var(--text--secondary);
@@ -50,16 +51,18 @@
 
     &.yes-selected {
       background-color: var(--green-200);
+      border-color: var(--green-100);
       color: #fff;
     }
 
     &.no {
       background-color: #f4dede;
-      border-color: #9b0505;
+      border-color: #c61111;
     }
 
     &.no-selected {
       background-color: #9b0505;
+      border-color: #c61111;
       color: #fff;
     }
   }
