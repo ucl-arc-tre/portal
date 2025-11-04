@@ -456,7 +456,7 @@ type Study struct {
 	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
 
 	// CagReference CAG reference number
-	CagReference *string `json:"cag_reference,omitempty"`
+	CagReference *string `json:"cag_reference"`
 
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
@@ -465,7 +465,7 @@ type Study struct {
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
 	// DataProtectionNumber Full data protection registration number
-	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+	DataProtectionNumber *string `json:"data_protection_number"`
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
@@ -475,49 +475,49 @@ type Study struct {
 	Id string `json:"id"`
 
 	// InvolvesCag Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
-	InvolvesCag *bool `json:"involves_cag,omitempty"`
+	InvolvesCag *bool `json:"involves_cag"`
 
 	// InvolvesDataProcessingOutsideEea Whether data is processed outside UK/EEA
-	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea,omitempty"`
+	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea"`
 
 	// InvolvesEthicsApproval Whether Research Ethics Committee approval is involved (seeking/have sought)
-	InvolvesEthicsApproval *bool `json:"involves_ethics_approval,omitempty"`
+	InvolvesEthicsApproval *bool `json:"involves_ethics_approval"`
 
 	// InvolvesExternalUsers Whether external users will have access to the study
-	InvolvesExternalUsers *bool `json:"involves_external_users,omitempty"`
+	InvolvesExternalUsers *bool `json:"involves_external_users"`
 
 	// InvolvesHraApproval Whether Health Research Authority approval is involved (seeking/have sought)
-	InvolvesHraApproval *bool `json:"involves_hra_approval,omitempty"`
+	InvolvesHraApproval *bool `json:"involves_hra_approval"`
 
 	// InvolvesIndirectDataCollection Whether data is collected indirectly for the study (e.g. via a third party)
-	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection,omitempty"`
+	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection"`
 
 	// InvolvesMnca Whether the HRA Model Non-Commercial Agreement is involved
-	InvolvesMnca *bool `json:"involves_mnca,omitempty"`
+	InvolvesMnca *bool `json:"involves_mnca"`
 
 	// InvolvesNhsEngland Whether NHS England is involved in the research
-	InvolvesNhsEngland *bool `json:"involves_nhs_england,omitempty"`
+	InvolvesNhsEngland *bool `json:"involves_nhs_england"`
 
 	// InvolvesParticipantConsent Whether participant consent is involved (seeking/have sought)
-	InvolvesParticipantConsent *bool `json:"involves_participant_consent,omitempty"`
+	InvolvesParticipantConsent *bool `json:"involves_participant_consent"`
 
 	// InvolvesThirdParty Whether third party organizations are involved
-	InvolvesThirdParty *bool `json:"involves_third_party,omitempty"`
+	InvolvesThirdParty *bool `json:"involves_third_party"`
 
 	// InvolvesUclSponsorship Whether UCL sponsorship is involved (seeking/have sought)
-	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship,omitempty"`
+	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship"`
 
 	// IrasId IRAS ID if applicable
-	IrasId *string `json:"iras_id,omitempty"`
+	IrasId *string `json:"iras_id"`
 
 	// IsDataProtectionOfficeRegistered Whether the study is registered with the UCL Data Protection Office
-	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered,omitempty"`
+	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered"`
 
 	// IsNhsAssociated Whether the research is associated with NHS
-	IsNhsAssociated *bool `json:"is_nhs_associated,omitempty"`
+	IsNhsAssociated *bool `json:"is_nhs_associated"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string `json:"nhs_england_reference"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
@@ -526,10 +526,10 @@ type Study struct {
 	OwnerUsername *string `json:"owner_username,omitempty"`
 
 	// RequiresDbs Whether a DBS check is required for staff
-	RequiresDbs *bool `json:"requires_dbs,omitempty"`
+	RequiresDbs *bool `json:"requires_dbs"`
 
 	// RequiresDspt Whether NHS Data Security & Protection Toolkit is required
-	RequiresDspt *bool `json:"requires_dspt,omitempty"`
+	RequiresDspt *bool `json:"requires_dspt"`
 
 	// Title Title of the study
 	Title string `json:"title"`
@@ -547,61 +547,61 @@ type StudyBase struct {
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
 	// CagReference CAG reference number
-	CagReference *string `json:"cag_reference,omitempty"`
+	CagReference *string `json:"cag_reference"`
 
 	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
 	// DataProtectionNumber Full data protection registration number
-	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+	DataProtectionNumber *string `json:"data_protection_number"`
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
 
 	// InvolvesCag Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
-	InvolvesCag *bool `json:"involves_cag,omitempty"`
+	InvolvesCag *bool `json:"involves_cag"`
 
 	// InvolvesDataProcessingOutsideEea Whether data is processed outside UK/EEA
-	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea,omitempty"`
+	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea"`
 
 	// InvolvesEthicsApproval Whether Research Ethics Committee approval is involved (seeking/have sought)
-	InvolvesEthicsApproval *bool `json:"involves_ethics_approval,omitempty"`
+	InvolvesEthicsApproval *bool `json:"involves_ethics_approval"`
 
 	// InvolvesExternalUsers Whether external users will have access to the study
-	InvolvesExternalUsers *bool `json:"involves_external_users,omitempty"`
+	InvolvesExternalUsers *bool `json:"involves_external_users"`
 
 	// InvolvesHraApproval Whether Health Research Authority approval is involved (seeking/have sought)
-	InvolvesHraApproval *bool `json:"involves_hra_approval,omitempty"`
+	InvolvesHraApproval *bool `json:"involves_hra_approval"`
 
 	// InvolvesIndirectDataCollection Whether data is collected indirectly for the study (e.g. via a third party)
-	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection,omitempty"`
+	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection"`
 
 	// InvolvesMnca Whether the HRA Model Non-Commercial Agreement is involved
-	InvolvesMnca *bool `json:"involves_mnca,omitempty"`
+	InvolvesMnca *bool `json:"involves_mnca"`
 
 	// InvolvesNhsEngland Whether NHS England is involved in the research
-	InvolvesNhsEngland *bool `json:"involves_nhs_england,omitempty"`
+	InvolvesNhsEngland *bool `json:"involves_nhs_england"`
 
 	// InvolvesParticipantConsent Whether participant consent is involved (seeking/have sought)
-	InvolvesParticipantConsent *bool `json:"involves_participant_consent,omitempty"`
+	InvolvesParticipantConsent *bool `json:"involves_participant_consent"`
 
 	// InvolvesThirdParty Whether third party organizations are involved
-	InvolvesThirdParty *bool `json:"involves_third_party,omitempty"`
+	InvolvesThirdParty *bool `json:"involves_third_party"`
 
 	// InvolvesUclSponsorship Whether UCL sponsorship is involved (seeking/have sought)
-	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship,omitempty"`
+	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship"`
 
 	// IrasId IRAS ID if applicable
-	IrasId *string `json:"iras_id,omitempty"`
+	IrasId *string `json:"iras_id"`
 
 	// IsDataProtectionOfficeRegistered Whether the study is registered with the UCL Data Protection Office
-	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered,omitempty"`
+	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered"`
 
 	// IsNhsAssociated Whether the research is associated with NHS
-	IsNhsAssociated *bool `json:"is_nhs_associated,omitempty"`
+	IsNhsAssociated *bool `json:"is_nhs_associated"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string `json:"nhs_england_reference"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
@@ -610,10 +610,10 @@ type StudyBase struct {
 	OwnerUsername *string `json:"owner_username,omitempty"`
 
 	// RequiresDbs Whether a DBS check is required for staff
-	RequiresDbs *bool `json:"requires_dbs,omitempty"`
+	RequiresDbs *bool `json:"requires_dbs"`
 
 	// RequiresDspt Whether NHS Data Security & Protection Toolkit is required
-	RequiresDspt *bool `json:"requires_dspt,omitempty"`
+	RequiresDspt *bool `json:"requires_dspt"`
 
 	// Title Title of the study
 	Title string `json:"title"`

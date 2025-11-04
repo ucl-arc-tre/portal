@@ -1066,66 +1066,86 @@ components:
           type: array
           items:
             type: string
+            nullable: true
           description: List of additional study administrator usernames (empty array if none)
         data_controller_organisation:
           type: string
           description: The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
         involves_ucl_sponsorship:
           type: boolean
+          nullable: true
           description: Whether UCL sponsorship is involved (seeking/have sought)
         involves_cag:
           type: boolean
+          nullable: true
           description: Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
         cag_reference:
           type: string
+          nullable: true
           description: CAG reference number
         involves_ethics_approval:
           type: boolean
+          nullable: true
           description: Whether Research Ethics Committee approval is involved (seeking/have sought)
         involves_hra_approval:
           type: boolean
+          nullable: true
           description: Whether Health Research Authority approval is involved (seeking/have sought)
         iras_id:
           type: string
+          nullable: true
           description: IRAS ID if applicable
         is_nhs_associated:
           type: boolean
+          nullable: true
           description: Whether the research is associated with NHS
         involves_nhs_england:
           type: boolean
+          nullable: true
           description: Whether NHS England is involved in the research
         nhs_england_reference:
           type: string
+          nullable: true
           description: NHS England DARS NIC number
         involves_mnca:
           type: boolean
+          nullable: true
           description: Whether the HRA Model Non-Commercial Agreement is involved
         requires_dspt:
           type: boolean
+          nullable: true
           description: Whether NHS Data Security & Protection Toolkit is required
         requires_dbs:
           type: boolean
+          nullable: true
           description: Whether a DBS check is required for staff
         is_data_protection_office_registered:
           type: boolean
+          nullable: true
           description: Whether the study is registered with the UCL Data Protection Office
         data_protection_number:
           type: string
+          nullable: true
           description: Full data protection registration number
         involves_third_party:
           type: boolean
+          nullable: true
           description: Whether third party organizations are involved
         involves_external_users:
           type: boolean
+          nullable: true
           description: Whether external users will have access to the study
         involves_participant_consent:
           type: boolean
+          nullable: true
           description: Whether participant consent is involved (seeking/have sought)
         involves_indirect_data_collection:
           type: boolean
+          nullable: true
           description: Whether data is collected indirectly for the study (e.g. via a third party)
         involves_data_processing_outside_eea:
           type: boolean
+          nullable: true
           description: Whether data is processed outside UK/EEA
         owner_user_id:
           type: string

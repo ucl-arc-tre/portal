@@ -12,28 +12,28 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  cagReference: string;
+  cagReference: string | null;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
   dataProtectionId: number;
-  dataProtectionNumber: string;
-  nhsEnglandReference: number;
-  irasId: string;
-  involvesUclSponsorship: boolean;
-  involvesCag: boolean;
-  involvesEthicsApproval: boolean;
-  involvesHraApproval: boolean;
-  requiresDbs: boolean;
-  isDataProtectionOfficeRegistered: boolean;
-  involvesThirdParty: boolean;
-  involvesExternalUsers: boolean;
-  involvesParticipantConsent: boolean;
-  involvesIndirectDataCollection: boolean;
-  involvesDataProcessingOutsideEea: boolean;
-  isNhsAssociated: boolean;
-  involvesNhsEngland: boolean;
-  involvesMnca: boolean;
-  requiresDspt: boolean;
+  dataProtectionNumber: string | null;
+  nhsEnglandReference: number | null;
+  irasId: string | null;
+  involvesUclSponsorship: boolean | null;
+  involvesCag: boolean | null;
+  involvesEthicsApproval: boolean | null;
+  involvesHraApproval: boolean | null;
+  requiresDbs: boolean | null;
+  isDataProtectionOfficeRegistered: boolean | null;
+  involvesThirdParty: boolean | null;
+  involvesExternalUsers: boolean | null;
+  involvesParticipantConsent: boolean | null;
+  involvesIndirectDataCollection: boolean | null;
+  involvesDataProcessingOutsideEea: boolean | null;
+  isNhsAssociated: boolean | null;
+  involvesNhsEngland: boolean | null;
+  involvesMnca: boolean | null;
+  requiresDspt: boolean | null;
 };
 
 type StudyProps = {
@@ -51,34 +51,32 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
     additional_study_admin_usernames: data.additionalStudyAdminUsernames
       .map((admin) => admin.value.trim())
       .map((username) => `${username}${domainName}`),
-    involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
-    involves_cag: data.involvesCag ? data.involvesCag : undefined,
+    involves_ucl_sponsorship: data.involvesUclSponsorship !== undefined ? data.involvesUclSponsorship : undefined,
+    involves_cag: data.involvesCag !== undefined ? data.involvesCag : undefined,
     cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
-    involves_ethics_approval: data.involvesEthicsApproval ? data.involvesEthicsApproval : undefined,
-    involves_hra_approval: data.involvesHraApproval ? data.involvesHraApproval : undefined,
+    involves_ethics_approval: data.involvesEthicsApproval !== undefined ? data.involvesEthicsApproval : undefined,
+    involves_hra_approval: data.involvesHraApproval !== undefined ? data.involvesHraApproval : undefined,
     iras_id: data.irasId ? data.irasId : undefined,
-    is_nhs_associated: data.isNhsAssociated ? data.isNhsAssociated : undefined,
-    involves_nhs_england: data.involvesNhsEngland ? data.involvesNhsEngland : undefined,
+    is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
+    involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
     nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
-    involves_mnca: data.involvesMnca ? data.involvesMnca : undefined,
-    requires_dspt: data.requiresDspt ? data.requiresDspt : undefined,
-    requires_dbs: data.requiresDbs ? data.requiresDbs : undefined,
-    is_data_protection_office_registered: data.isDataProtectionOfficeRegistered
-      ? data.isDataProtectionOfficeRegistered
-      : undefined,
+    involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
+    requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
+    requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
+    is_data_protection_office_registered:
+      data.isDataProtectionOfficeRegistered !== undefined ? data.isDataProtectionOfficeRegistered : undefined,
     data_protection_number:
       data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
         ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
         : undefined,
-    involves_third_party: data.involvesThirdParty ? data.involvesThirdParty : undefined,
-    involves_external_users: data.involvesExternalUsers ? data.involvesExternalUsers : undefined,
-    involves_participant_consent: data.involvesParticipantConsent ? data.involvesParticipantConsent : undefined,
-    involves_indirect_data_collection: data.involvesIndirectDataCollection
-      ? data.involvesIndirectDataCollection
-      : undefined,
-    involves_data_processing_outside_eea: data.involvesDataProcessingOutsideEea
-      ? data.involvesDataProcessingOutsideEea
-      : undefined,
+    involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
+    involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
+    involves_participant_consent:
+      data.involvesParticipantConsent !== undefined ? data.involvesParticipantConsent : undefined,
+    involves_indirect_data_collection:
+      data.involvesIndirectDataCollection !== undefined ? data.involvesIndirectDataCollection : undefined,
+    involves_data_processing_outside_eea:
+      data.involvesDataProcessingOutsideEea !== undefined ? data.involvesDataProcessingOutsideEea : undefined,
   };
 
   return studyData;
@@ -94,8 +92,8 @@ function YesNoUnsureButtons({
   value,
   onChange,
 }: {
-  value: boolean | "unsure" | undefined;
-  onChange: (value: boolean | "unsure") => void;
+  value: boolean | null | undefined;
+  onChange: (value: boolean | null) => void;
 }) {
   return (
     <div className={styles["yes-no-unsure-buttons"]}>
@@ -116,10 +114,9 @@ function YesNoUnsureButtons({
       <button
         type="button"
         onClick={() => {
-          console.log(value);
-          onChange("unsure");
+          onChange(null);
         }}
-        className={value === "unsure" || value === undefined ? styles["unsure-selected"] : styles.unsure}
+        className={value === null || value === undefined ? styles["unsure-selected"] : styles.unsure}
       >
         Unsure
       </button>
@@ -225,7 +222,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         description: study.description,
         owner: study.owner_username!,
         additionalStudyAdminUsernames: study.additional_study_admin_usernames.map((username) => ({
-          value: username.split("@")[0],
+          value: username!.split("@")[0],
         })),
         dataControllerOrganisation: study.data_controller_organisation,
         cagReference: study.cag_reference,
@@ -257,7 +254,6 @@ export default function StudyForm(StudyProps: StudyProps) {
   const handleStudySubmit = async (data: StudyFormData, studyId?: string) => {
     setIsSubmitting(true);
     setSubmitError(null);
-    console.log(data);
 
     try {
       // Convert form data to API format
@@ -512,7 +508,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             />
           </Label>
 
-          {showCagRef && (
+          {showCagRef === true && (
             <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
               <Input type="text" id="cagRef" {...register("cagReference")} />
@@ -545,7 +541,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             />
           </Label>
 
-          {showIrasId && (
+          {showIrasId === true && (
             <Label htmlFor="irasId">
               <span>
                 {" "}
@@ -574,7 +570,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             />
           </Label>
 
-          {showNhsRelated && (
+          {showNhsRelated === true && (
             <>
               <Label htmlFor="nhsEngland" className={styles["checkbox-label"]}>
                 NHS England will be involved in gatekeeping and/or providing data for this research
@@ -585,7 +581,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
                 />
               </Label>
-              {showNhsEnglandRef && (
+              {showNhsEnglandRef === true && (
                 <Label htmlFor="nhsEnglandRef">
                   NHSE{" "}
                   <a href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number.">
@@ -651,7 +647,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             />
           </Label>
 
-          {showDataProtectionNumber && (
+          {showDataProtectionNumber === true && (
             <Label htmlFor="dataProtectionNumber">
               Data Protection Registration Number*:
               <HelperText>
