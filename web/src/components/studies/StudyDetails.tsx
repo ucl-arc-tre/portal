@@ -1,4 +1,10 @@
-import { postStudiesAdminByStudyIdReview, patchStudiesByStudyIdPending, Study } from "@/openapi";
+import {
+  postStudiesAdminByStudyIdReview,
+  patchStudiesByStudyIdPending,
+  Study,
+  Asset,
+  getStudiesByStudyIdAssets,
+} from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -7,6 +13,8 @@ import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
 import InfoTooltip from "../ui/InfoTooltip";
 import AdminFeedbackSection from "./AdminFeedbackSection";
+import { storageDefinitions } from "../shared/storageDefinitions";
+import Loading from "../ui/Loading";
 
 type StudyDetailsProps = {
   study: Study;
@@ -15,9 +23,72 @@ type StudyDetailsProps = {
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
 };
+
+const fetchAssets = async (studyId: string) => {
+  const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
+  if (assetResponse.response.ok && assetResponse.data) {
+    if (assetResponse.data.length > 0) {
+      return assetResponse.data;
+    } else {
+      return [];
+    }
+  }
+};
+
+const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined) => {
+  let assetsRiskScore = 0;
+
+  for (const asset of assets) {
+    // for each asset, loop through each location and calculate the score of that asset in that location
+    // then sum these and repeat for all assets
+    let assetScore = 0;
+    const NhsMultiplier = 3;
+
+    asset.locations.forEach((loc) => {
+      // get location from storageDefinitions
+      const location = storageDefinitions.find((def) => def.value === loc);
+
+      if (!location) return;
+
+      // do calculation based on whether it's nhs data
+      // an asset in a different location counts as another asset
+      if (involvesNhsEngland) {
+        assetScore += asset.tier * NhsMultiplier * location!.riskScore;
+      } else {
+        assetScore += asset.tier * location!.riskScore;
+      }
+    });
+
+    assetsRiskScore += assetScore;
+  }
+
+  score += assetsRiskScore;
+
+  return score;
+};
+
+const calculateBaseRiskScore = (study: Study) => {
+  let score = 0;
+
+  if (study.involves_data_processing_outside_eea) score += 10;
+  if (study.requires_dbs) score += 5;
+  if (study.requires_dspt) score += 5;
+  if (study.involves_third_party && !study.involves_mnca) score += 5;
+  if (study.involves_nhs_england || study.involves_cag) score += 5;
+
+  return score;
+};
+
+const calculateRiskScore = async (study: Study) => {
+  const baseRiskScore = calculateBaseRiskScore(study);
+  const assets = await fetchAssets(study.id);
+  if (!assets || assets.length === 0) return baseRiskScore;
+  return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
+};
 export default function StudyDetails(props: StudyDetailsProps) {
   const { study, isAdmin, isStudyOwner, setStudyFormOpen, studyStepsCompleted } = props;
   const [riskScore, setRiskScore] = useState(0);
+  const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
 
@@ -48,20 +119,20 @@ export default function StudyDetails(props: StudyDetailsProps) {
   };
 
   useEffect(() => {
-    const calculateRiskScore = () => {
-      // todo: how to determine if they have data? will depend on projects having data already: https://github.com/ucl-arc-tre/portal/issues/10
-      let score = 0;
-
-      if (study.involves_data_processing_outside_eea) score += 10;
-      if (study.requires_dbs) score += 5;
-      if (study.requires_dspt) score += 5;
-      if (study.involves_third_party && !study.involves_mnca) score += 5;
-      if (study.involves_nhs_england || study.involves_cag) score += 5;
-
-      setRiskScore(score);
+    const getRiskScore = async () => {
+      setRiskScoreLoading(true);
+      try {
+        const score = await calculateRiskScore(study);
+        setRiskScore(score);
+      } catch (error) {
+        console.error("Failed to calculate risk score:", error);
+      } finally {
+        setRiskScoreLoading(false);
+      }
     };
 
-    calculateRiskScore();
+    getRiskScore();
+
     setApprovalStatus(study.approval_status);
     if (study.feedback) setFeedback(study.feedback);
   }, [study]);
@@ -94,7 +165,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
             Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
           </span>
           <span>
-            Risk Score: <span className={styles["risk-score"]}>{riskScore}</span>
+            Risk Score:{" "}
+            <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
           <StudyStatusBadge status={approvalStatus} isAdmin={isAdmin} />
         </div>
