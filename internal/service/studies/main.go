@@ -77,6 +77,7 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.Use
 
 		if !found {
 			admins = append(admins, user)
+
 		}
 	}
 	return admins, nil
@@ -226,7 +227,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 			StudyID: study.ID,
 			UserID:  studyAdminUser.ID,
 		}
-		if err := tx.FirstOrCreate(&studyAdmin).Error; err != nil {
+		if err := tx.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
 			tx.Rollback()
 			return nil, types.NewErrFromGorm(err, "failed to create study admin")
 		}
@@ -269,7 +270,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 			StudyID: study.ID,
 			UserID:  studyAdminUser.ID,
 		}
-		if err := s.db.Create(&studyAdmin).Error; err != nil {
+		if err := s.db.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
 			return types.NewErrFromGorm(err, "failed to create study admin")
 		}
 	}
