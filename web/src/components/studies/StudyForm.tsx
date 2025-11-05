@@ -12,13 +12,13 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  cagReference: string | null;
+  cagReference: string | undefined | null;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
   dataProtectionId: number;
-  dataProtectionNumber: string | null;
-  nhsEnglandReference: number | null;
-  irasId: string | null;
+  dataProtectionNumber: string | undefined | null;
+  nhsEnglandReference: number | undefined | null;
+  irasId: string | undefined | null;
   involvesUclSponsorship: boolean | null;
   involvesCag: boolean | null;
   involvesEthicsApproval: boolean | null;
@@ -44,6 +44,7 @@ type StudyProps = {
 };
 
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
+  console.log("cagref value", data.cagReference);
   const studyData: StudyRequest = {
     title: data.title,
     description: data.description ? data.description : undefined,
@@ -250,7 +251,9 @@ export default function StudyForm(StudyProps: StudyProps) {
 
     try {
       // Convert form data to API format
+
       const studyData = convertStudyFormDataToApiRequest(data);
+      console.log("stdyData", studyData, "og data", data);
 
       let response;
       if (!studyId) {
@@ -518,7 +521,7 @@ export default function StudyForm(StudyProps: StudyProps) {
           {showCagRef === true && (
             <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
-              <Input type="text" id="cagRef" {...register("cagReference")} />
+              <input type="text" id="cagRef" {...register("cagReference")} className={styles["option__text-input"]} />
             </Label>
           )}
 
@@ -558,7 +561,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                 ID (if applicable)
               </span>
 
-              <Input type="text" id="irasId" {...register("irasId")} />
+              <input type="text" id="irasId" {...register("irasId")} className={styles["option__text-input"]} />
             </Label>
           )}
         </fieldset>
@@ -595,7 +598,12 @@ export default function StudyForm(StudyProps: StudyProps) {
                     DARS NIC number
                   </a>{" "}
                   (if applicable)
-                  <Input type="number" id="nhsEnglandRef" {...register("nhsEnglandReference")} />
+                  <input
+                    type="number"
+                    id="nhsEnglandRef"
+                    {...register("nhsEnglandReference")}
+                    className={styles["option__text-input"]}
+                  />
                 </Label>
               )}
 
@@ -669,13 +677,13 @@ export default function StudyForm(StudyProps: StudyProps) {
                     required: showDataProtectionNumber ? "Registry ID is required" : false,
                   }}
                   render={({ field }) => (
-                    <Input
+                    <input
                       {...field}
                       type="text"
                       id="dataProtectionPrefix"
                       readOnly={controllerValue?.toLowerCase() === "ucl"}
                       placeholder={controllerValue?.toLowerCase() === "ucl" ? "" : "Registry ID eg ZX1234"}
-                      inputClassName={controllerValue?.toLowerCase() === "ucl" ? styles.readonly : ""}
+                      className={controllerValue?.toLowerCase() === "ucl" ? styles.readonly : ""}
                     />
                   )}
                 />

@@ -115,6 +115,16 @@
       }
     }
 
+    .option__text-input {
+      font-size: 1.1rem;
+      border: 1px solid rgb(102, 102, 102);
+      border-radius: 0px;
+      margin: 5px;
+      padding: 12px;
+      display: block;
+      width: 100%;
+    }
+
     input,
     textarea,
     select {
