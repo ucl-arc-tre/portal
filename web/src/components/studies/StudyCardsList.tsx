@@ -1,25 +1,25 @@
-import Button from "@/components/ui/Button";
-import { Study } from "@/openapi";
 import { useRouter } from "next/router";
-
-import styles from "./StudySelection.module.css";
+import { Study } from "@/openapi";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
+import Button from "@/components/ui/Button";
 
-type StudySelectionProps = {
+import styles from "./StudyCardsList.module.css";
+
+type Props = {
   studies: Study[];
   isAdmin: boolean;
 };
 
-export default function StudySelection(props: StudySelectionProps) {
+const studySortOrder = {
+  Pending: 1,
+  Incomplete: 2,
+  Rejected: 3,
+  Approved: 4,
+};
+
+export default function StudyCardsList(props: Props) {
   const { studies, isAdmin } = props;
   const router = useRouter();
-
-  const studySortOrder = {
-    Pending: 1,
-    Incomplete: 2,
-    Rejected: 3,
-    Approved: 4,
-  };
 
   return (
     <div className={styles["study-selection"]}>
