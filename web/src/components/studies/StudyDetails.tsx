@@ -35,7 +35,7 @@ const fetchAssets = async (studyId: string) => {
   }
 };
 
-const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined) => {
+const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
   let assetsRiskScore = 0;
 
   for (const asset of assets) {
