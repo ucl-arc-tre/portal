@@ -23,51 +23,6 @@
   margin-bottom: 0;
 }
 
-.yes-no-unsure-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 0.4rem;
-  flex-wrap: nowrap;
-
-  button {
-    padding: 0.2rem 0.35rem;
-    border-radius: 10px;
-    cursor: pointer;
-
-    /* base is unsure */
-    border: 2px solid var(--text--secondary);
-    color: var(--text--secondary);
-    background-color: #efefef;
-
-    &.unsure-selected {
-      background-color: var(--text--secondary);
-      color: #fff;
-    }
-
-    &.yes {
-      background-color: #def4e4;
-      border-color: var(--green-100);
-    }
-
-    &.yes-selected {
-      background-color: var(--green-200);
-      border-color: var(--green-100);
-      color: #fff;
-    }
-
-    &.no {
-      background-color: #f4dede;
-      border-color: #c61111;
-    }
-
-    &.no-selected {
-      background-color: #9b0505;
-      border-color: #c61111;
-      color: #fff;
-    }
-  }
-}
-
 .form {
   width: 100%;
   margin-block: 1.8rem;
@@ -88,6 +43,11 @@
     grid-template-columns: 1fr;
     width: 100%;
 
+    /* for some reason HelperText only works within Labels, so ensuring weight for option fields  */
+    [data-testid="ucl-uikit-field__helper-text"] {
+      font-weight: 400;
+    }
+
     &.visible {
       display: block;
     }
@@ -102,87 +62,123 @@
       font-size: 0.75rem;
     }
 
-    label {
+    .option-field {
       padding: 0.4rem;
       font-weight: 400;
       max-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      align-content: center;
 
-      &.checkbox-label {
+      .yes-no-unsure-buttons {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-self: end;
+
+        button {
+          padding: 0.4rem 0.55rem;
+          cursor: pointer;
+
+          /* base */
+          border: 2px solid #0d68cf;
+          color: #0d4b92;
+
+          &.yes {
+            border-radius: 5px 0 0 5px;
+            border-right: none;
+          }
+
+          &.no {
+            border-radius: 0 5px 5px 0;
+            border-left: none;
+          }
+
+          &.selected {
+            background-color: #0d68cf;
+            color: #fff;
+            font-weight: bolder;
+
+            &:where(:nth-child(1)) {
+              border-radius: 5px 0 0 5px;
+              border-right: none;
+            }
+
+            &:where(:nth-child(3)) {
+              border-radius: 0 5px 5px 0;
+              border-left: none;
+            }
+          }
+        }
+      }
+    }
+
+    input,
+    textarea,
+    select {
+      accent-color: var(--green-200);
+
+      &:focus-visible {
+        /* overriding the uikit focus */
+        -webkit-box-shadow: 0 0 1px 1.5px var(--green-100);
+        -moz-box-shadow: 0 0 1px 1.5px var(--green-100);
+        box-shadow: 0 0 1px 1.5px var(--green-100);
+      }
+    }
+
+    textarea {
+      display: block;
+      max-width: 100%;
+    }
+
+    small {
+      display: block;
+    }
+
+    #controller {
+      margin-inline-start: 0.3rem;
+      font-size: 1.2rem;
+      padding: 0.5rem;
+    }
+
+    .data-protection-wrapper {
+      display: flex;
+
+      input {
+        display: inline-block;
+        font-size: 1rem;
+        border: 1px solid rgb(102, 102, 102);
+        border-radius: 0px;
+        margin: 5px;
+        padding: 5px;
+      }
+    }
+
+    .admin-wrapper {
+      margin-bottom: 0.5rem;
+    }
+
+    .admin-label {
+      padding-inline: 0;
+    }
+
+    .username-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      > div:first-child {
         display: flex;
         align-items: center;
-        justify-content: start;
-        gap: 0.6rem;
+        gap: 0.5rem;
       }
 
-      input,
-      textarea,
-      select {
-        accent-color: var(--green-200);
-
-        &:focus-visible {
-          /* overriding the uikit focus */
-          -webkit-box-shadow: 0 0 1px 1.2px var(--green-100);
-          -moz-box-shadow: 0 0 1px 1.2px var(--green-100);
-          box-shadow: 0 0 1px 1.2px var(--green-100);
-        }
-      }
-
-      textarea {
-        display: block;
-        max-width: 100%;
-      }
-
-      input[type="checkbox"] {
-        transform: scale(1.5);
-      }
-
-      small {
-        display: block;
-      }
-
-      #controller {
-        margin-inline-start: 0.3rem;
-        font-size: 1.2rem;
-        padding: 0.5rem;
-      }
-
-      .data-protection-wrapper {
-        display: flex;
-
-        input {
-          display: inline-block;
-          font-size: 1rem;
-          border: 1px solid rgb(102, 102, 102);
-          border-radius: 0px;
-          margin: 2px;
-          padding: 5px;
-        }
-      }
-
-      .admin-wrapper {
-        margin-bottom: 0.5rem;
-      }
-
-      .admin-label {
-        padding-inline: 0;
-      }
-
-      .username-input-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-
-        > div:first-child {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .domain-suffix {
-          color: var(--text--secondary);
-          font-weight: 500;
-          font-size: 1rem;
-        }
+      .domain-suffix {
+        color: var(--text--secondary);
+        font-weight: 500;
+        font-size: 1rem;
       }
     }
   }

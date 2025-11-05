@@ -97,28 +97,20 @@ function YesNoUnsureButtons({
 }) {
   return (
     <div className={styles["yes-no-unsure-buttons"]}>
-      <button
-        type="button"
-        onClick={() => onChange(true)}
-        className={value === true ? styles["yes-selected"] : styles.yes}
-      >
+      <button type="button" onClick={() => onChange(true)} className={value === true ? styles.selected : styles.yes}>
         Yes
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange(false)}
-        className={value === false ? styles["no-selected"] : styles.no}
-      >
-        No
       </button>
       <button
         type="button"
         onClick={() => {
           onChange(null);
         }}
-        className={value === null || value === undefined ? styles["unsure-selected"] : styles.unsure}
+        className={value === null || value === undefined ? styles.selected : styles.unsure}
       >
         Unsure
+      </button>
+      <button type="button" onClick={() => onChange(false)} className={value === false ? styles.selected : styles.no}>
+        No
       </button>
     </div>
   );
@@ -490,7 +482,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         {/* second step */}
         <fieldset className={getFieldsetClass(2)}>
           <legend>Sponsorship & Approvals</legend>
-          <Label htmlFor="uclSponsorship" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             <span>
               We will be seeking/have sought{" "}
               <a href="https://www.ucl.ac.uk/joint-research-office/new-studies/sponsorship-and-grant-submissions">
@@ -504,9 +496,9 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
-          <Label htmlFor="cag" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             <span>
               {" "}
               We will be seeking/have sought approval from the{" "}
@@ -521,7 +513,7 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
           {showCagRef === true && (
             <Label htmlFor="cagRef">
@@ -530,7 +522,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             </Label>
           )}
 
-          <Label htmlFor="ethics" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             We will be seeking/have sought Research Ethics Committee approval for this research
             <Controller
               name="involvesEthicsApproval"
@@ -538,9 +530,9 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
-          <Label htmlFor="hra" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             <span>
               We will be seeking/have sought{" "}
               <a href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/">
@@ -554,7 +546,7 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
           {showIrasId === true && (
             <Label htmlFor="irasId">
@@ -574,7 +566,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         <fieldset className={getFieldsetClass(2)}>
           <legend>NHS</legend>
 
-          <Label htmlFor="nhs" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             This research is associated with the NHS, uses NHS data, works with NHS sites or has use of a/some NHS
             facilities
             <Controller
@@ -583,11 +575,11 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
           {showNhsRelated === true && (
             <>
-              <Label htmlFor="nhsEngland" className={styles["checkbox-label"]}>
+              <div className={styles["option-field"]}>
                 NHS England will be involved in gatekeeping and/or providing data for this research
                 <Controller
                   name="involvesNhsEngland"
@@ -595,7 +587,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   defaultValue={undefined}
                   render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
                 />
-              </Label>
+              </div>
               {showNhsEnglandRef === true && (
                 <Label htmlFor="nhsEnglandRef">
                   NHSE{" "}
@@ -607,7 +599,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                 </Label>
               )}
 
-              <Label htmlFor="mnca" className={styles["checkbox-label"]}>
+              <div className={styles["option-field"]}>
                 <span>
                   The{" "}
                   <a href="https://www.myresearchproject.org.uk/help/hlptemplatesfor.aspx">
@@ -621,9 +613,9 @@ export default function StudyForm(StudyProps: StudyProps) {
                   defaultValue={undefined}
                   render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
                 />
-              </Label>
+              </div>
 
-              <Label htmlFor="dspt" className={styles["checkbox-label"]}>
+              <div className={styles["option-field"]}>
                 This research requires an NHS Data Security & Protection Toolkit registration to be in place at UCL.
                 (This might arise when approaching public bodies for NHS and social care data)
                 <Controller
@@ -632,7 +624,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   defaultValue={undefined}
                   render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
                 />
-              </Label>
+              </div>
             </>
           )}
         </fieldset>
@@ -641,7 +633,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         <fieldset className={getFieldsetClass(3)}>
           <legend>Data</legend>
 
-          <Label htmlFor="dbs" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             There is data related to this research only to be handled by staff who have obtained a Disclosure and
             Barring Service (DBS) check
             <Controller
@@ -650,9 +642,9 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
-          <Label htmlFor="dataProtection" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             The research is already registered with the UCL Data Protection Office
             <Controller
               name="isDataProtectionOfficeRegistered"
@@ -660,7 +652,7 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
           {showDataProtectionNumber === true && (
             <Label htmlFor="dataProtectionNumber">
@@ -727,7 +719,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             </Label>
           )}
 
-          <Label htmlFor="thirdParty" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             Organisations or businesses other than UCL will be involved in creating, storing, modifying, gatekeeping or
             providing data for this research
             <Controller
@@ -736,8 +728,8 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
-          <Label htmlFor="externalUsers" className={styles["checkbox-label"]}>
+          </div>
+          <div className={styles["option-field"]}>
             We plan to give access to someone who is not a member of UCL
             <Controller
               name="involvesExternalUsers"
@@ -745,9 +737,9 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
 
-          <Label htmlFor="consent" className={styles["checkbox-label"]}>
+          <div className={styles["option-field"]}>
             We will be seeking/have sought consent from participants to collect data about them for this research
             <Controller
               name="involvesParticipantConsent"
@@ -755,8 +747,8 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
-          <Label htmlFor="indirectDataCollection" className={styles["checkbox-label"]}>
+          </div>
+          <div className={styles["option-field"]}>
             There is data to be collected indirectly for this research, e.g. by another organisation
             <Controller
               name="involvesIndirectDataCollection"
@@ -764,8 +756,8 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
-          <Label htmlFor="extEea" className={styles["checkbox-label"]}>
+          </div>
+          <div className={styles["option-field"]}>
             There is data related to this research to be processed outside of the UK and the countries that form the
             European Economic Area (For GDPR purposes)
             <Controller
@@ -774,7 +766,7 @@ export default function StudyForm(StudyProps: StudyProps) {
               defaultValue={undefined}
               render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
             />
-          </Label>
+          </div>
         </fieldset>
 
         {stepValidationError && (
