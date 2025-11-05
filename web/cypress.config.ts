@@ -7,7 +7,6 @@ module.exports = defineConfig({
     specPattern: "cypress/e2e/**/*.cy.ts",
     video: false,
     screenshotOnRunFailure: true,
-    experimentalStudio: true,
     experimentalModifyObstructiveThirdPartyCode: true,
     chromeWebSecurity: false, // Necessary for cross-origin logins like AAD
     defaultCommandTimeout: 10000,
