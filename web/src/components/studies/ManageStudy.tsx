@@ -63,6 +63,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
             studyId={study.id}
             studyTitle={study.title}
             setAssetManagementCompleted={setAssetManagementCompleted}
+            isStudyOwner={isStudyOwner}
           />
         </>
       );
@@ -105,7 +106,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <Assets studyId={study.id} studyTitle={study.title} />
+            <Assets studyId={study.id} studyTitle={study.title} isStudyOwner={isStudyOwner} />
           </div>
         </>
       )}

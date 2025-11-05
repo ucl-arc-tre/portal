@@ -15,6 +15,7 @@ import InfoTooltip from "../ui/InfoTooltip";
 import AdminFeedbackSection from "./AdminFeedbackSection";
 import { storageDefinitions } from "../shared/storageDefinitions";
 import Loading from "../ui/Loading";
+import Assets from "../assets/Assets";
 
 type StudyDetailsProps = {
   study: Study;
@@ -305,12 +306,16 @@ export default function StudyDetails(props: StudyDetailsProps) {
       </Box>
 
       {isAdmin && (
-        <AdminFeedbackSection
-          status={study.approval_status}
-          feedback={feedback}
-          setFeedback={setFeedback}
-          handleUpdateStudyStatus={handleUpdateStudyStatus}
-        />
+        <>
+          <Assets studyId={study.id} studyTitle={study.title} isStudyOwner={isStudyOwner} />
+
+          <AdminFeedbackSection
+            status={study.approval_status}
+            feedback={feedback}
+            setFeedback={setFeedback}
+            handleUpdateStudyStatus={handleUpdateStudyStatus}
+          />
+        </>
       )}
     </>
   );

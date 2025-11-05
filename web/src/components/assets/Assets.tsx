@@ -20,10 +20,11 @@ type InformationAssetsProps = {
   studyId: string;
   studyTitle: string;
   setAssetManagementCompleted?: (completed: boolean) => void;
+  isStudyOwner: boolean;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, studyTitle, setAssetManagementCompleted } = props;
+  const { studyId, studyTitle, setAssetManagementCompleted, isStudyOwner } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -127,7 +128,9 @@ export default function Assets(props: InformationAssetsProps) {
       )}
 
       <Callout definition>
-        <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
+        {isStudyOwner && (
+          <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
+        )}
 
         <div className={styles["callout-info-paragraph"]}>
           Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
@@ -152,7 +155,7 @@ export default function Assets(props: InformationAssetsProps) {
         </div>
       </Callout>
 
-      {informationAssets.length === 0 ? (
+      {informationAssets.length === 0 && isStudyOwner ? (
         <div>
           <div className={styles["no-assets-message"]}>
             <p>No assets have been created for this study yet.</p>
@@ -172,14 +175,18 @@ export default function Assets(props: InformationAssetsProps) {
             <span className={styles["assets-count-badge"]}>{informationAssets.length}</span>
           </div>
 
-          <div className={styles["asset-actions"]}>
-            <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary">
-              {showAssetForm ? "Cancel" : "Add Asset"}
-            </Button>
-          </div>
+          {isStudyOwner && (
+            <>
+              <div className={styles["asset-actions"]}>
+                <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary">
+                  {showAssetForm ? "Cancel" : "Add Asset"}
+                </Button>
+              </div>
 
-          {showAssetForm && (
-            <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+              {showAssetForm && (
+                <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+              )}
+            </>
           )}
 
           <div className={styles["assets-grid"]}>
@@ -189,6 +196,7 @@ export default function Assets(props: InformationAssetsProps) {
                 studyId={studyId}
                 asset={asset}
                 checkCompleted={checkAssetManagementCompleted}
+                isStudyOwner={isStudyOwner}
               />
             ))}
           </div>

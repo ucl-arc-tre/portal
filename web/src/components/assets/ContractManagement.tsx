@@ -8,9 +8,10 @@ import styles from "./ContractManagement.module.css";
 type ContractManagementProps = {
   study: Study;
   asset: Asset;
+  isStudyOwner: boolean;
 };
 
-export default function ContractManagement({ study, asset }: ContractManagementProps) {
+export default function ContractManagement({ study, asset, isStudyOwner }: ContractManagementProps) {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,16 +57,24 @@ export default function ContractManagement({ study, asset }: ContractManagementP
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h3>Contract Management</h3>
-        <Button onClick={() => setShowUploadModal(true)} variant="primary">
-          Add Contract
-        </Button>
-      </div>
-
-      <p className={styles.description}>
-        Manage contract documents for this asset. Upload PDF contracts and track their status.
-      </p>
+      {isStudyOwner ? (
+        <>
+          {" "}
+          <div className={styles.header}>
+            <h3>Contract Management</h3>
+            <Button onClick={() => setShowUploadModal(true)} variant="primary">
+              Add Contract
+            </Button>
+          </div>
+          <p className={styles.description}>
+            Manage contract documents for this asset. Upload PDF contracts and track their status.
+          </p>
+        </>
+      ) : (
+        <div className={styles.header}>
+          <h3>Contracts</h3>
+        </div>
+      )}
 
       {contracts.length === 0 &&
         (asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
@@ -94,7 +103,7 @@ export default function ContractManagement({ study, asset }: ContractManagementP
       ) : contracts.length === 0 ? (
         <div className={styles["empty-state"]}>
           <h4>No contracts uploaded</h4>
-          <p>Upload your first contract document to get started.</p>
+          {isStudyOwner && <p>Upload your first contract document to get started.</p>}
         </div>
       ) : (
         <div className={styles["contracts-list"]}>
@@ -105,6 +114,7 @@ export default function ContractManagement({ study, asset }: ContractManagementP
               studyId={study.id}
               assetId={asset.id}
               onEdit={() => handleEditContract(contract)}
+              isStudyOwner={isStudyOwner}
             />
           ))}
         </div>
