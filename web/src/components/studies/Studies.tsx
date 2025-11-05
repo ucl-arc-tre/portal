@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { postStudies, Study, StudyCreateRequest, Auth, ValidationError } from "@/openapi";
-import StudySelection from "../studies/StudySelection";
+import StudyCardsList from "./StudyCardsList";
 import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
@@ -148,7 +148,7 @@ export default function Studies(props: Props) {
             </Button>
           </div>
 
-          <StudySelection studies={studies} isAdmin={false} />
+          <StudyCardsList studies={studies} isAdmin={false} />
         </>
       )}
     </>
