@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Study, Auth, getStudies } from "@/openapi";
-import StudySelection from "../studies/StudySelection";
 import StudyForm from "./StudyForm";
+import StudyCardsList from "./StudyCardsList";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 
@@ -104,7 +104,7 @@ export default function Studies(props: Props) {
 
         {studiesLoading && <Loading message="Loading studies..." />}
 
-        <StudySelection studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+        <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
       </>
     );
   }
@@ -150,7 +150,7 @@ export default function Studies(props: Props) {
             </Button>
           </div>
 
-          <StudySelection studies={studies} isAdmin={false} />
+          <StudyCardsList studies={studies} isAdmin={false} />
         </>
       )}
     </>
