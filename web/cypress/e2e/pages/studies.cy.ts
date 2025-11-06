@@ -94,7 +94,7 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='next']").click();
     cy.get("[data-cy='next']").click();
 
-    cy.get("input[name='isDataProtectionOfficeRegistered']").check();
+    cy.get("[data-cy='isDataProtectionOfficeRegistered']").find("[data-cy='option-yes']").click();
     cy.get("input[name='dataProtectionPrefix']")
       .should("have.value", "Z6364106")
       .should("have.attr", "readonly", "readonly");
@@ -108,7 +108,7 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("[data-cy='next']").click();
     cy.get("[data-cy='next']").click();
 
-    cy.get("input[name='isDataProtectionOfficeRegistered']").check();
+    cy.get("[data-cy='isDataProtectionOfficeRegistered']").find("[data-cy='option-yes']").click();
     cy.get("input[name='dataProtectionPrefix']").should("not.have.attr", "readonly");
     cy.get("input[name='dataProtectionPrefix']").type("A12345678"); // pragma: allowlist secret
   });
@@ -119,7 +119,7 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
     cy.get("[data-cy='next']").click();
-    cy.get("input[name='involvesCag']").check();
+    cy.get("[data-cy='involvesCag']").find("[data-cy='option-yes']").click();
 
     cy.get("input[name='cagReference']").should("be.visible");
   });
@@ -130,7 +130,7 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
     cy.get("[data-cy='next']").click();
-    cy.get("input[name='involvesHraApproval']").check();
+    cy.get("[data-cy='involvesHraApproval']").find("[data-cy='option-yes']").click();
 
     cy.get("input[name='irasId']").should("be.visible");
   });
@@ -141,12 +141,12 @@ describe("Checking conditionally rendered fields", () => {
     cy.get("input[name='dataControllerOrganisation']").type("UCL");
 
     cy.get("[data-cy='next']").click();
-    cy.get("input[name='isNhsAssociated']").check();
+    cy.get("[data-cy='isNhsAssociated']").find("[data-cy='option-yes']").click();
 
-    cy.get("input[name='involvesNhsEngland']").should("be.visible").check();
+    cy.get("[data-cy='involvesNhsEngland']").should("be.visible").find("[data-cy='option-yes']").click();
     cy.get("input[name='nhsEnglandReference']").should("be.visible");
-    cy.get("input[name='involvesMnca']").should("be.visible");
-    cy.get("input[name='requiresDspt']").should("be.visible");
+    cy.get("[data-cy='involvesMnca']").should("be.visible");
+    cy.get("[data-cy='requiresDspt']").should("be.visible");
   });
 });
 
