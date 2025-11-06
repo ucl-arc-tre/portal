@@ -347,6 +347,38 @@ export type ValidationError = {
     error_message: string;
 };
 
+/**
+ * Base project properties
+ */
+export type ProjectBase = {
+    /**
+     * Title of the project
+     */
+    title: string;
+    /**
+     * Description of the project
+     */
+    description?: string;
+};
+
+/**
+ * A project associated with a study
+ */
+export type Project = ProjectBase & {
+    /**
+     * Unique identifier for the project
+     */
+    id: string;
+    /**
+     * Time in RFC3339 format when the project was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the project was last updated
+     */
+    updated_at: string;
+};
+
 export type ContractBase = {
     /**
      * Name of the organisation signatory

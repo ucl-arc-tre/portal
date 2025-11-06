@@ -1132,6 +1132,39 @@ components:
           type: string
           description: Validation error message explaining why the request failed
 
+    ProjectBase:
+      type: object
+      description: Base project properties
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: Title of the project
+        description:
+          type: string
+          description: Description of the project
+
+    Project:
+      allOf:
+        - $ref: "#/components/schemas/ProjectBase"
+        - type: object
+          required:
+            - id
+            - created_at
+            - updated_at
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the project
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the project was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the project was last updated
+      description: A project associated with a study
+
     ContractBase:
       type: object
       required:
