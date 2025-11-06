@@ -6,7 +6,7 @@ beforeEach(() => {
 describe("Contract Management", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseStaffApprovedResearcher();
+    cy.mockAuthAsStudyOwner();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
     cy.mockAssetAccess();

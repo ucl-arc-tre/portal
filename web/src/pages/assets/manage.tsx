@@ -24,7 +24,7 @@ export default function ManageAssetPage() {
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study!.owner_username === userData.username) || false;
+    (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
 
   const fetchData = async (studyIdParam: string, assetIdParam: string) => {
     setLoading(true);
