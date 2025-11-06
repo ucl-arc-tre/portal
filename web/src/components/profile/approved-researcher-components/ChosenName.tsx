@@ -28,7 +28,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const regex = /^[A-Za-z\s-]+(\p{M}\p{L}*)*$/u;
+  const regex = /^[A-Za-z\s\-']+(\p{M}\p{L}*)*$/u;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
