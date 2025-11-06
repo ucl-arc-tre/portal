@@ -348,9 +348,23 @@ export type ValidationError = {
 };
 
 /**
- * Base project properties from the projects table
+ * Request payload for creating a new TRE project
  */
-export type ProjectBase = {
+export type ProjectTreCreateRequest = {
+    /**
+     * Name of the project
+     */
+    name: string;
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
+};
+
+/**
+ * A TRE project with base project details joined in
+ */
+export type ProjectTre = {
     /**
      * Unique identifier for the base project
      */
@@ -368,48 +382,11 @@ export type ProjectBase = {
      */
     creator_user_id: string;
     /**
-     * Time in RFC3339 format when the base project was created
+     * Time in RFC3339 format when the project was created
      */
     created_at: string;
     /**
-     * Time in RFC3339 format when the base project was last updated
-     */
-    updated_at: string;
-};
-
-/**
- * Request payload for creating a new TRE project
- */
-export type ProjectTreCreateRequest = {
-    /**
-     * Name of the project
-     */
-    name: string;
-    /**
-     * Unique identifier of the study to which the project belongs
-     */
-    study_id: string;
-};
-
-export type ProjectTre = ProjectBase & {
-    /**
-     * Unique identifier for the ProjectTRE record
-     */
-    id: string;
-    /**
-     * Unique identifier for the base project
-     */
-    project_id: string;
-    /**
-     * Unique identifier of the TRE environment
-     */
-    environment_id: string;
-    /**
-     * Time in RFC3339 format when the ProjectTRE was created
-     */
-    created_at: string;
-    /**
-     * Time in RFC3339 format when the ProjectTRE was last updated
+     * Time in RFC3339 format when the project was last updated
      */
     updated_at: string;
 };

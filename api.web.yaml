@@ -1203,9 +1203,23 @@ components:
           type: string
           description: Validation error message explaining why the request failed
 
-    ProjectBase:
+    ProjectTRECreateRequest:
       type: object
-      description: Base project properties from the projects table
+      description: Request payload for creating a new TRE project
+      required:
+        - name
+        - study_id
+      properties:
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+
+    ProjectTRE:
+      type: object
+      description: A TRE project with base project details joined in
       required:
         - id
         - name
@@ -1228,52 +1242,10 @@ components:
           description: Unique identifier of the user who created the project
         created_at:
           type: string
-          description: Time in RFC3339 format when the base project was created
+          description: Time in RFC3339 format when the project was created
         updated_at:
           type: string
-          description: Time in RFC3339 format when the base project was last updated
-
-    ProjectTRECreateRequest:
-      type: object
-      description: Request payload for creating a new TRE project
-      required:
-        - name
-        - study_id
-      properties:
-        name:
-          type: string
-          description: Name of the project
-        study_id:
-          type: string
-          description: Unique identifier of the study to which the project belongs
-
-    ProjectTRE:
-      allOf:
-        - $ref: "#/components/schemas/ProjectBase"
-        - type: object
-          description: A TRE project with base project details joined in
-          required:
-            - id
-            - project_id
-            - environment_id
-            - created_at
-            - updated_at
-          properties:
-            id:
-              type: string
-              description: Unique identifier for the ProjectTRE record
-            project_id:
-              type: string
-              description: Unique identifier for the base project
-            environment_id:
-              type: string
-              description: Unique identifier of the TRE environment
-            created_at:
-              type: string
-              description: Time in RFC3339 format when the ProjectTRE was created
-            updated_at:
-              type: string
-              description: Time in RFC3339 format when the ProjectTRE was last updated
+          description: Time in RFC3339 format when the project was last updated
 
     ContractBase:
       type: object
