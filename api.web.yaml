@@ -1137,6 +1137,8 @@ components:
       description: Base project properties
       required:
         - title
+        - environment
+        - study_id
       properties:
         title:
           type: string
@@ -1144,6 +1146,15 @@ components:
         description:
           type: string
           description: Description of the project
+        environment:
+          type: string
+          enum:
+            - TRE
+            - DSH
+          description: Environment the project is for (e.g., "TRE", "DSH" etc.)
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
 
     Project:
       allOf:
@@ -1153,6 +1164,7 @@ components:
             - id
             - created_at
             - updated_at
+            - creator_user_id
           properties:
             id:
               type: string
@@ -1163,7 +1175,15 @@ components:
             updated_at:
               type: string
               description: Time in RFC3339 format when the project was last updated
+            creator_user_id:
+              type: string
+              description: Unique identifier of the user who created the project
       description: A project associated with a study
+
+    ProjectCreateRequest:
+      allOf:
+        - $ref: "#/components/schemas/ProjectBase"
+      description: Request payload for creating a new project
 
     ContractBase:
       type: object

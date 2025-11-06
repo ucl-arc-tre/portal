@@ -359,6 +359,14 @@ export type ProjectBase = {
      * Description of the project
      */
     description?: string;
+    /**
+     * Environment the project is for (e.g., "TRE", "DSH" etc.)
+     */
+    environment: 'TRE' | 'DSH';
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
 };
 
 /**
@@ -377,7 +385,16 @@ export type Project = ProjectBase & {
      * Time in RFC3339 format when the project was last updated
      */
     updated_at: string;
+    /**
+     * Unique identifier of the user who created the project
+     */
+    creator_user_id: string;
 };
+
+/**
+ * Request payload for creating a new project
+ */
+export type ProjectCreateRequest = ProjectBase;
 
 export type ContractBase = {
     /**
