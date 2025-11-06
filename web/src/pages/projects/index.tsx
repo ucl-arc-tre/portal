@@ -6,14 +6,14 @@ import Projects from "@/components/projects/Projects";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
-import { Project } from "@/openapi";
+import { AnyProject } from "@/types/projects";
 
 import styles from "./ProjectsPage.module.css";
 
 export default function ProjectsPage() {
   const router = useRouter();
   const { authInProgress, isAuthed, userData } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<AnyProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

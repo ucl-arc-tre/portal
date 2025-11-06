@@ -374,6 +374,77 @@ paths:
         default:
           description: Unexpected error
 
+  # Project Management - TRE Environment
+  # /projects/tre:
+  #   get:
+  #     description: Get all TRE projects that a user has access to view
+  #     responses:
+  #       "200":
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: "#/components/schemas/ProjectTRE"
+  #       "403":
+  #         description: Forbidden
+  #       "500":
+  #         description: Internal server error
+  #       default:
+  #         description: Unexpected error
+  #   post:
+  #     description: Create a TRE project
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "#/components/schemas/ProjectTRECreateRequest"
+  #     responses:
+  #       "201":
+  #         description: TRE project created successfully
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/ProjectTRE"
+  #       "400":
+  #         description: Validation error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/ValidationError"
+  #       "403":
+  #         description: Forbidden
+  #       "500":
+  #         description: Internal server error
+  #       default:
+  #         description: Unexpected error
+
+  # /projects/tre/{projectId}:
+  #   get:
+  #     description: Get one TRE project with base project details joined in
+  #     parameters:
+  #       - in: path
+  #         name: projectId
+  #         required: true
+  #         description: ID of the TRE project
+  #         schema:
+  #           type: string
+  #     responses:
+  #       "200":
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/ProjectTRE"
+  #       "403":
+  #         description: Forbidden
+  #       "404":
+  #         description: Project not found
+  #       "500":
+  #         description: Internal server error
+  #       default:
+  #         description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -1134,56 +1205,75 @@ components:
 
     ProjectBase:
       type: object
-      description: Base project properties
+      description: Base project properties from the projects table
       required:
-        - title
-        - environment
+        - id
+        - name
+        - study_id
+        - creator_user_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the base project
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+        creator_user_id:
+          type: string
+          description: Unique identifier of the user who created the project
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the base project was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the base project was last updated
+
+    ProjectTRECreateRequest:
+      type: object
+      description: Request payload for creating a new TRE project
+      required:
+        - name
         - study_id
       properties:
-        title:
+        name:
           type: string
-          description: Title of the project
-        description:
-          type: string
-          description: Description of the project
-        environment:
-          type: string
-          enum:
-            - TRE
-            - DSH
-          description: Environment the project is for (e.g., "TRE", "DSH" etc.)
+          description: Name of the project
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
 
-    Project:
+    ProjectTRE:
       allOf:
         - $ref: "#/components/schemas/ProjectBase"
         - type: object
+          description: A TRE project with base project details joined in
           required:
             - id
+            - project_id
+            - environment_id
             - created_at
             - updated_at
-            - creator_user_id
           properties:
             id:
               type: string
-              description: Unique identifier for the project
+              description: Unique identifier for the ProjectTRE record
+            project_id:
+              type: string
+              description: Unique identifier for the base project
+            environment_id:
+              type: string
+              description: Unique identifier of the TRE environment
             created_at:
               type: string
-              description: Time in RFC3339 format when the project was created
+              description: Time in RFC3339 format when the ProjectTRE was created
             updated_at:
               type: string
-              description: Time in RFC3339 format when the project was last updated
-            creator_user_id:
-              type: string
-              description: Unique identifier of the user who created the project
-      description: A project associated with a study
-
-    ProjectCreateRequest:
-      allOf:
-        - $ref: "#/components/schemas/ProjectBase"
-      description: Request payload for creating a new project
+              description: Time in RFC3339 format when the ProjectTRE was last updated
 
     ContractBase:
       type: object

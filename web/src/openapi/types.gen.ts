@@ -348,53 +348,71 @@ export type ValidationError = {
 };
 
 /**
- * Base project properties
+ * Base project properties from the projects table
  */
 export type ProjectBase = {
     /**
-     * Title of the project
+     * Unique identifier for the base project
      */
-    title: string;
+    id: string;
     /**
-     * Description of the project
+     * Name of the project
      */
-    description?: string;
+    name: string;
     /**
-     * Environment the project is for (e.g., "TRE", "DSH" etc.)
+     * Unique identifier of the study to which the project belongs
      */
-    environment: 'TRE' | 'DSH';
+    study_id: string;
+    /**
+     * Unique identifier of the user who created the project
+     */
+    creator_user_id: string;
+    /**
+     * Time in RFC3339 format when the base project was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the base project was last updated
+     */
+    updated_at: string;
+};
+
+/**
+ * Request payload for creating a new TRE project
+ */
+export type ProjectTreCreateRequest = {
+    /**
+     * Name of the project
+     */
+    name: string;
     /**
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
 };
 
-/**
- * A project associated with a study
- */
-export type Project = ProjectBase & {
+export type ProjectTre = ProjectBase & {
     /**
-     * Unique identifier for the project
+     * Unique identifier for the ProjectTRE record
      */
     id: string;
     /**
-     * Time in RFC3339 format when the project was created
+     * Unique identifier for the base project
+     */
+    project_id: string;
+    /**
+     * Unique identifier of the TRE environment
+     */
+    environment_id: string;
+    /**
+     * Time in RFC3339 format when the ProjectTRE was created
      */
     created_at: string;
     /**
-     * Time in RFC3339 format when the project was last updated
+     * Time in RFC3339 format when the ProjectTRE was last updated
      */
     updated_at: string;
-    /**
-     * Unique identifier of the user who created the project
-     */
-    creator_user_id: string;
 };
-
-/**
- * Request payload for creating a new project
- */
-export type ProjectCreateRequest = ProjectBase;
 
 export type ContractBase = {
     /**

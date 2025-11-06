@@ -2,10 +2,10 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import Callout from "../ui/Callout";
-import { Project } from "@/openapi";
+import { AnyProject } from "@/types/projects";
 
 type Props = {
-  projects: Project[];
+  projects: AnyProject[];
 };
 
 export default function Projects(props: Props) {
