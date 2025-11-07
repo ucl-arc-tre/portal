@@ -7,6 +7,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import { AnyProject } from "@/types/projects";
+import { getProjectsTre } from "@/openapi";
 
 import styles from "./ProjectsPage.module.css";
 
@@ -22,9 +23,8 @@ export default function ProjectsPage() {
   const fetchProjects = async () => {
     setIsLoading(true);
     try {
-      // WIP: need to implement actual project fetching
-      // const response = await getProjects();
-      setProjects([]);
+      const response = await getProjectsTre();
+      setProjects(response.data || []);
     } catch (error) {
       console.error("Failed to fetch projects:", error);
       setError("Failed to fetch projects");
