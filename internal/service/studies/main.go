@@ -190,7 +190,7 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 
 }
 
-func (s *Service) createStudyAdminFromStudyAdminUser(studyAdminUsers []types.User, tx *gorm.DB, study *types.Study) error {
+func createStudyAdminFromStudyAdminUser(studyAdminUsers []types.User, tx *gorm.DB, study *types.Study) error {
 	for _, studyAdminUser := range studyAdminUsers {
 		studyAdmin := types.StudyAdmin{
 			StudyID: study.ID,
@@ -228,7 +228,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 	}
 
 	// Create StudyAdmin records for each study admin user
-	err := s.createStudyAdminFromStudyAdminUser(studyAdminUsers, tx, &study)
+	err := createStudyAdminFromStudyAdminUser(studyAdminUsers, tx, &study)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return err
 	}
 
-	err = s.createStudyAdminFromStudyAdminUser(studyAdmins, tx, &study)
+	err = createStudyAdminFromStudyAdminUser(studyAdmins, tx, &study)
 	if err != nil {
 		return err
 	}
