@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/google/uuid"
@@ -67,17 +68,8 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.Use
 			log.Err(err).Any("username", studyAdminUsername).Msg("Failed to get persisted user. Cannot create study admin")
 			return admins, err
 		}
-		found := false
-		for _, admin := range admins {
-			if admin == user {
-				found = true
-				break // User is already an admin, no need to add
-			}
-		}
-
-		if !found {
+		if !slices.Contains(admins, user) {
 			admins = append(admins, user)
-
 		}
 	}
 	return admins, nil
