@@ -105,7 +105,7 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 	return c.createCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
 }
 
-func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails string, review openapi.StudyReview) error {
+func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
 	// email to notify IAO + IAA when study has been reviewed
 	// not 100% sure if this works due to which tenant we match admins against + arctretest.onmicrosoft inboxes??
 
@@ -125,5 +125,5 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		}
 	}
 
-	return c.createCustomEmail(ctx, subject, []string{emails}, content)
+	return c.createCustomEmail(ctx, subject, emails, content)
 }

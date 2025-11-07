@@ -292,9 +292,8 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 	for _, studyAdmin := range studies[0].StudyAdmins {
 		recipients = append(recipients, string(studyAdmin.User.Username))
 	}
-	emails := strings.Join(recipients, ",")
 
-	err = s.entra.SendCustomStudyReviewNotification(ctx, emails, review)
+	err = s.entra.SendCustomStudyReviewNotification(ctx, recipients, review)
 	if err != nil {
 		return err
 	}
