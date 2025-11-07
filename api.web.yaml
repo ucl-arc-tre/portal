@@ -1224,7 +1224,7 @@ components:
         - id
         - name
         - study_id
-        - creator_user_id
+        - creator_username
         - created_at
         - updated_at
       properties:
@@ -1237,9 +1237,9 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
-        creator_user_id:
+        creator_username:
           type: string
-          description: Unique identifier of the user who created the project
+          description: Username of the user who created the project
         created_at:
           type: string
           description: Time in RFC3339 format when the project was created

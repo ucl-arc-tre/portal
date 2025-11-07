@@ -378,9 +378,9 @@ export type ProjectTre = {
      */
     study_id: string;
     /**
-     * Unique identifier of the user who created the project
+     * Username of the user who created the project
      */
-    creator_user_id: string;
+    creator_username: string;
     /**
      * Time in RFC3339 format when the project was created
      */
