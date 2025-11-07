@@ -107,7 +107,6 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
 	// email to notify IAO + IAA when study has been reviewed
-	// not 100% sure if this works due to which tenant we match admins against + arctretest.onmicrosoft inboxes??
 
 	content := "There has been an update to your study request, please log into the portal to view the changes."
 	subject := "Notification: Something has changed in your study request"
