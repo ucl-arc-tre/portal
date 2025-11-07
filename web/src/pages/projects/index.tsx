@@ -44,7 +44,7 @@ export default function ProjectsPage() {
     fetchData();
   }, [isApprovedResearcher]);
 
-  if (authInProgress || !userData) return null;
+  if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
 
   if (!isApprovedResearcher) {
