@@ -973,6 +973,108 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
     201: unknown;
 };
 
+export type GetProjectsTreData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/projects/tre';
+};
+
+export type GetProjectsTreErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsTreResponses = {
+    200: Array<ProjectTre>;
+};
+
+export type GetProjectsTreResponse = GetProjectsTreResponses[keyof GetProjectsTreResponses];
+
+export type PostProjectsTreData = {
+    body: ProjectTreRequest;
+    path?: never;
+    query?: never;
+    url: '/projects/tre';
+};
+
+export type PostProjectsTreErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsTreError = PostProjectsTreErrors[keyof PostProjectsTreErrors];
+
+export type PostProjectsTreResponses = {
+    /**
+     * TRE project created successfully
+     */
+    201: ProjectTre;
+};
+
+export type PostProjectsTreResponse = PostProjectsTreResponses[keyof PostProjectsTreResponses];
+
+export type GetProjectsTreByProjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the TRE project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}';
+};
+
+export type GetProjectsTreByProjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsTreByProjectIdResponses = {
+    200: ProjectTre;
+};
+
+export type GetProjectsTreByProjectIdResponse = GetProjectsTreByProjectIdResponses[keyof GetProjectsTreByProjectIdResponses];
+
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
     path: {
