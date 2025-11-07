@@ -350,7 +350,7 @@ export type ValidationError = {
 /**
  * Request payload for creating a new TRE project
  */
-export type ProjectTreCreateRequest = {
+export type ProjectTreRequest = {
     /**
      * Name of the project
      */

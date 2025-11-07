@@ -399,7 +399,7 @@ paths:
   #       content:
   #         application/json:
   #           schema:
-  #             $ref: "#/components/schemas/ProjectTRECreateRequest"
+  #             $ref: "#/components/schemas/ProjectTRERequest"
   #     responses:
   #       "201":
   #         description: TRE project created successfully
@@ -1203,7 +1203,7 @@ components:
           type: string
           description: Validation error message explaining why the request failed
 
-    ProjectTRECreateRequest:
+    ProjectTRERequest:
       type: object
       description: Request payload for creating a new TRE project
       required:
