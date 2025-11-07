@@ -118,15 +118,13 @@ type Contract struct {
 
 type Project struct {
 	ModelAuditable
-	ProjectID     uuid.UUID `gorm:"not null;index"`
 	Name          string    `gorm:"not null"`
 	CreatorUserID uuid.UUID `gorm:"not null;index"`
 	StudyID       uuid.UUID `gorm:"index"`
 
 	// Relationships
-	Study       Study        `gorm:"foreignKey:StudyID"`
-	CreatorUser User         `gorm:"foreignKey:CreatorUserID"`
-	ProjectTREs []ProjectTRE `gorm:"foreignKey:ProjectID"`
+	Study       Study `gorm:"foreignKey:StudyID"`
+	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
 }
 
 type ProjectTRE struct {
