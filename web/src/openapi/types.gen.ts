@@ -347,6 +347,50 @@ export type ValidationError = {
     error_message: string;
 };
 
+/**
+ * Request payload for creating a new TRE project
+ */
+export type ProjectTreRequest = {
+    /**
+     * Name of the project
+     */
+    name: string;
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
+};
+
+/**
+ * A TRE project with base project details joined in
+ */
+export type ProjectTre = {
+    /**
+     * Unique identifier for the base project
+     */
+    id: string;
+    /**
+     * Name of the project
+     */
+    name: string;
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
+    /**
+     * Username of the user who created the project
+     */
+    creator_username: string;
+    /**
+     * Time in RFC3339 format when the project was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the project was last updated
+     */
+    updated_at: string;
+};
+
 export type ContractBase = {
     /**
      * Name of the organisation signatory

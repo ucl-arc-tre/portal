@@ -1132,6 +1132,50 @@ components:
           type: string
           description: Validation error message explaining why the request failed
 
+    ProjectTRERequest:
+      type: object
+      description: Request payload for creating a new TRE project
+      required:
+        - name
+        - study_id
+      properties:
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+
+    ProjectTRE:
+      type: object
+      description: A TRE project with base project details joined in
+      required:
+        - id
+        - name
+        - study_id
+        - creator_username
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the base project
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+        creator_username:
+          type: string
+          description: Username of the user who created the project
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the project was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the project was last updated
+
     ContractBase:
       type: object
       required:
