@@ -190,6 +190,20 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 
 }
 
+func (s *Service) createStudyAdminFromStudyAdminUser(studyAdminUsers []types.User, tx *gorm.DB, study *types.Study) error {
+	for _, studyAdminUser := range studyAdminUsers {
+		studyAdmin := types.StudyAdmin{
+			StudyID: study.ID,
+			UserID:  studyAdminUser.ID,
+		}
+		if err := tx.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create study admin")
+		}
+	}
+	return nil
+}
+
 // handles the database transaction for creating a study and its admins
 func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) (*types.Study, error) {
 	// Start a transaction
@@ -214,15 +228,9 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 	}
 
 	// Create StudyAdmin records for each study admin user
-	for _, studyAdminUser := range studyAdminUsers {
-		studyAdmin := types.StudyAdmin{
-			StudyID: study.ID,
-			UserID:  studyAdminUser.ID,
-		}
-		if err := tx.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
-			tx.Rollback()
-			return nil, types.NewErrFromGorm(err, "failed to create study admin")
-		}
+	err := s.createStudyAdminFromStudyAdminUser(studyAdminUsers, tx, &study)
+	if err != nil {
+		return nil, err
 	}
 
 	// Commit the transaction
@@ -243,6 +251,13 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 }
 
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	studies, err := s.StudiesById(id)
 	if err != nil {
 		return err
@@ -257,19 +272,21 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return err
 	}
 
-	for _, studyAdminUser := range studyAdmins {
-		studyAdmin := types.StudyAdmin{
-			StudyID: study.ID,
-			UserID:  studyAdminUser.ID,
-		}
-		if err := s.db.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
-			return types.NewErrFromGorm(err, "failed to create study admin")
-		}
+	err = s.createStudyAdminFromStudyAdminUser(studyAdmins, tx, &study)
+	if err != nil {
+		return err
 	}
 
-	result := s.db.Model(&study).Where("id = ?", id).Updates(&study)
+	if err := tx.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to update study")
+	}
 
-	return types.NewErrFromGorm(result.Error)
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit update study transaction")
+	}
+
+	return nil
 }
 
 func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uuid.UUID, review openapi.StudyReview) error {
