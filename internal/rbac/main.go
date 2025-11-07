@@ -1,6 +1,8 @@
 package rbac
 
 import (
+	"fmt"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/util"
@@ -50,7 +52,24 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 // Add a study role for a user
 func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	roleName := makeStudyOwnerRole(studyId).RoleName()
-	return addOwnerRoleForResource(user, roleName, []string{"/studies"}, studyId)
+	policies := []Policy{
+		{
+			RoleName: roleName,
+			Action:   "*",
+			Resource: fmt.Sprintf("/studies/%v", studyId),
+		},
+		{
+			RoleName: roleName,
+			Action:   "*",
+			Resource: fmt.Sprintf("/studies/%v/*", studyId),
+		},
+	}
+	for _, policy := range policies {
+		if _, err := addPolicy(enforcer, policy); err != nil {
+			return false, err
+		}
+	}
+	return AddRole(user, roleName)
 }
 
 // Study IDs where a user has a role
@@ -74,7 +93,15 @@ func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID
 // Add a project TRE owner role for a user
 func AddProjectTreOwnerRole(user types.User, projectId uuid.UUID) (bool, error) {
 	roleName := makeProjectOwnerRole(projectId).RoleName()
-	return addOwnerRoleForResource(user, roleName, []string{"/projects/tre"}, projectId)
+	policy := Policy{
+		RoleName: roleName,
+		Action:   "*",
+		Resource: fmt.Sprintf("/projects/tre/%v", projectId),
+	}
+	if _, err := addPolicy(enforcer, policy); err != nil {
+		return false, err
+	}
+	return AddRole(user, roleName)
 }
 
 // Project IDs where a user has a role
