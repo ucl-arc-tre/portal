@@ -4,7 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (h *Handler) GetProjectsTre(ctx *gin.Context) {
@@ -16,6 +20,23 @@ func (h *Handler) GetProjectsTre(ctx *gin.Context) {
 func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 	req := openapi.ProjectTRERequest{}
 	if err := bindJSONOrSetError(ctx, &req); err != nil {
+		return
+	}
+
+	// Validate that user has owner role on the study
+	studyUUID, err := uuid.Parse(req.StudyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID")
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	requiredStudyRole := rbac.StudyRole{StudyID: studyUUID, Name: rbac.StudyOwner}
+	if hasRole, err := rbac.HasRole(user, requiredStudyRole.RoleName()); err != nil {
+		setError(ctx, err, "Failed to check study access")
+		return
+	} else if !hasRole {
+		ctx.Status(http.StatusForbidden)
 		return
 	}
 
