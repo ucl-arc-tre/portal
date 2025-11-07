@@ -126,8 +126,6 @@ export default function ProjectsPage() {
         description="View and modify projects in the ARC Services Portal"
       />
 
-      <Callout construction></Callout>
-
       <Title text={"Projects"} centered />
 
       <Callout definition>
@@ -137,6 +135,8 @@ export default function ProjectsPage() {
         </Button>
         for more detailed information.
       </Callout>
+
+      <Callout construction></Callout>
 
       <Projects projects={projects} studies={studies} />
     </>
