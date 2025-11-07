@@ -430,6 +430,73 @@ paths:
           description: Forbidden
         "404":
           description: Study not found
+
+  # Project Management - TRE Environment
+  /projects/tre:
+    get:
+      description: Get all TRE projects that a user has access to view
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectTRE"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a TRE project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectTRERequest"
+      responses:
+        "201":
+          description: TRE project created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectTRE"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /projects/tre/{projectId}:
+    get:
+      description: Get one TRE project with base project details joined in
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          description: ID of the TRE project
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectTRE"
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
         "500":
           description: Internal server error
         default:
@@ -1212,6 +1279,50 @@ components:
         error_message:
           type: string
           description: Validation error message explaining why the request failed
+
+    ProjectTRERequest:
+      type: object
+      description: Request payload for creating a new TRE project
+      required:
+        - name
+        - study_id
+      properties:
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+
+    ProjectTRE:
+      type: object
+      description: A TRE project with base project details joined in
+      required:
+        - id
+        - name
+        - study_id
+        - creator_username
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the base project
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+        creator_username:
+          type: string
+          description: Username of the user who created the project
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the project was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the project was last updated
 
     ContractBase:
       type: object

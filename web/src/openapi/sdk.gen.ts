@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetAgreementsByAgreementTypeData, GetAgreementsByAgreementTypeErrors, GetAgreementsByAgreementTypeResponses, GetAuthData, GetAuthErrors, GetAuthResponses, GetLogoutData, GetLogoutErrors, GetLogoutResponses, GetProfileAgreementsData, GetProfileAgreementsErrors, GetProfileAgreementsResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetProfileTrainingData, GetProfileTrainingErrors, GetProfileTrainingResponses, GetStudiesByStudyIdAgreementsData, GetStudiesByStudyIdAgreementsErrors, GetStudiesByStudyIdAgreementsResponses, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses, GetStudiesByStudyIdAssetsByAssetIdContractsData, GetStudiesByStudyIdAssetsByAssetIdContractsErrors, GetStudiesByStudyIdAssetsByAssetIdContractsResponses, GetStudiesByStudyIdAssetsByAssetIdData, GetStudiesByStudyIdAssetsByAssetIdErrors, GetStudiesByStudyIdAssetsByAssetIdResponses, GetStudiesByStudyIdAssetsData, GetStudiesByStudyIdAssetsErrors, GetStudiesByStudyIdAssetsResponses, GetStudiesByStudyIdData, GetStudiesByStudyIdErrors, GetStudiesByStudyIdResponses, GetStudiesData, GetStudiesErrors, GetStudiesResponses, GetUsersData, GetUsersErrors, GetUsersResponses, PatchStudiesByStudyIdPendingData, PatchStudiesByStudyIdPendingErrors, PatchStudiesByStudyIdPendingResponses, PostProfileAgreementsData, PostProfileAgreementsErrors, PostProfileAgreementsResponses, PostProfileData, PostProfileErrors, PostProfileResponses, PostProfileTrainingData, PostProfileTrainingErrors, PostProfileTrainingResponses, PostStudiesAdminByStudyIdReviewData, PostStudiesAdminByStudyIdReviewErrors, PostStudiesAdminByStudyIdReviewResponses, PostStudiesByStudyIdAgreementsData, PostStudiesByStudyIdAgreementsErrors, PostStudiesByStudyIdAgreementsResponses, PostStudiesByStudyIdAssetsByAssetIdContractsUploadData, PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors, PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses, PostStudiesByStudyIdAssetsData, PostStudiesByStudyIdAssetsErrors, PostStudiesByStudyIdAssetsResponses, PostStudiesData, PostStudiesErrors, PostStudiesResponses, PostUsersApprovedResearchersImportCsvData, PostUsersApprovedResearchersImportCsvErrors, PostUsersApprovedResearchersImportCsvResponses, PostUsersByUserIdTrainingData, PostUsersByUserIdTrainingErrors, PostUsersByUserIdTrainingResponses, PostUsersInviteData, PostUsersInviteErrors, PostUsersInviteResponses, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses, PutStudiesByStudyIdData, PutStudiesByStudyIdErrors, PutStudiesByStudyIdResponses, PutUsersByUserIdAttributesData, PutUsersByUserIdAttributesErrors, PutUsersByUserIdAttributesResponses } from './types.gen';
+import type { GetAgreementsByAgreementTypeData, GetAgreementsByAgreementTypeErrors, GetAgreementsByAgreementTypeResponses, GetAuthData, GetAuthErrors, GetAuthResponses, GetLogoutData, GetLogoutErrors, GetLogoutResponses, GetProfileAgreementsData, GetProfileAgreementsErrors, GetProfileAgreementsResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetProfileTrainingData, GetProfileTrainingErrors, GetProfileTrainingResponses, GetProjectsTreByProjectIdData, GetProjectsTreByProjectIdErrors, GetProjectsTreByProjectIdResponses, GetProjectsTreData, GetProjectsTreErrors, GetProjectsTreResponses, GetStudiesByStudyIdAgreementsData, GetStudiesByStudyIdAgreementsErrors, GetStudiesByStudyIdAgreementsResponses, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses, GetStudiesByStudyIdAssetsByAssetIdContractsData, GetStudiesByStudyIdAssetsByAssetIdContractsErrors, GetStudiesByStudyIdAssetsByAssetIdContractsResponses, GetStudiesByStudyIdAssetsByAssetIdData, GetStudiesByStudyIdAssetsByAssetIdErrors, GetStudiesByStudyIdAssetsByAssetIdResponses, GetStudiesByStudyIdAssetsData, GetStudiesByStudyIdAssetsErrors, GetStudiesByStudyIdAssetsResponses, GetStudiesByStudyIdData, GetStudiesByStudyIdErrors, GetStudiesByStudyIdResponses, GetStudiesData, GetStudiesErrors, GetStudiesResponses, GetUsersData, GetUsersErrors, GetUsersResponses, PatchStudiesByStudyIdPendingData, PatchStudiesByStudyIdPendingErrors, PatchStudiesByStudyIdPendingResponses, PostProfileAgreementsData, PostProfileAgreementsErrors, PostProfileAgreementsResponses, PostProfileData, PostProfileErrors, PostProfileResponses, PostProfileTrainingData, PostProfileTrainingErrors, PostProfileTrainingResponses, PostProjectsTreData, PostProjectsTreErrors, PostProjectsTreResponses, PostStudiesAdminByStudyIdReviewData, PostStudiesAdminByStudyIdReviewErrors, PostStudiesAdminByStudyIdReviewResponses, PostStudiesByStudyIdAgreementsData, PostStudiesByStudyIdAgreementsErrors, PostStudiesByStudyIdAgreementsResponses, PostStudiesByStudyIdAssetsByAssetIdContractsUploadData, PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors, PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses, PostStudiesByStudyIdAssetsData, PostStudiesByStudyIdAssetsErrors, PostStudiesByStudyIdAssetsResponses, PostStudiesData, PostStudiesErrors, PostStudiesResponses, PostUsersApprovedResearchersImportCsvData, PostUsersApprovedResearchersImportCsvErrors, PostUsersApprovedResearchersImportCsvResponses, PostUsersByUserIdTrainingData, PostUsersByUserIdTrainingErrors, PostUsersByUserIdTrainingResponses, PostUsersInviteData, PostUsersInviteErrors, PostUsersInviteResponses, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses, PutStudiesByStudyIdData, PutStudiesByStudyIdErrors, PutStudiesByStudyIdResponses, PutUsersByUserIdAttributesData, PutUsersByUserIdAttributesErrors, PutUsersByUserIdAttributesResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -243,6 +243,40 @@ export const postStudiesAdminByStudyIdReview = <ThrowOnError extends boolean = f
 export const patchStudiesByStudyIdPending = <ThrowOnError extends boolean = false>(options: Options<PatchStudiesByStudyIdPendingData, ThrowOnError>) => {
     return (options.client ?? client).patch<PatchStudiesByStudyIdPendingResponses, PatchStudiesByStudyIdPendingErrors, ThrowOnError>({
         url: '/studies/{studyId}/pending',
+        ...options
+    });
+};
+
+/**
+ * Get all TRE projects that a user has access to view
+ */
+export const getProjectsTre = <ThrowOnError extends boolean = false>(options?: Options<GetProjectsTreData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetProjectsTreResponses, GetProjectsTreErrors, ThrowOnError>({
+        url: '/projects/tre',
+        ...options
+    });
+};
+
+/**
+ * Create a TRE project
+ */
+export const postProjectsTre = <ThrowOnError extends boolean = false>(options: Options<PostProjectsTreData, ThrowOnError>) => {
+    return (options.client ?? client).post<PostProjectsTreResponses, PostProjectsTreErrors, ThrowOnError>({
+        url: '/projects/tre',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Get one TRE project with base project details joined in
+ */
+export const getProjectsTreByProjectId = <ThrowOnError extends boolean = false>(options: Options<GetProjectsTreByProjectIdData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetProjectsTreByProjectIdResponses, GetProjectsTreByProjectIdErrors, ThrowOnError>({
+        url: '/projects/tre/{projectId}',
         ...options
     });
 };

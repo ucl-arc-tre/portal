@@ -90,6 +90,38 @@ func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID
 	return studyIDs, nil
 }
 
+// Add a project TRE owner role for a user
+func AddProjectTreOwnerRole(user types.User, projectId uuid.UUID) (bool, error) {
+	roleName := makeProjectOwnerRole(projectId).RoleName()
+	policy := Policy{
+		RoleName: roleName,
+		Action:   "*",
+		Resource: fmt.Sprintf("/projects/tre/%v", projectId),
+	}
+	if _, err := addPolicy(enforcer, policy); err != nil {
+		return false, err
+	}
+	return AddRole(user, roleName)
+}
+
+// Project IDs where a user has a role
+func ProjectIDsWithRole(user types.User, projectRoleName ProjectRoleName) ([]uuid.UUID, error) {
+	roles, err := Roles(user)
+	if err != nil {
+		return []uuid.UUID{}, err
+	}
+	projectIDs := []uuid.UUID{}
+	for _, role := range roles {
+		if isProjectRole(role) {
+			projectRole := mustMakeProjectRole(role)
+			if projectRole.Name == projectRoleName {
+				projectIDs = append(projectIDs, projectRole.ProjectID)
+			}
+		}
+	}
+	return projectIDs, nil
+}
+
 // Remove a role for a user
 func RemoveRole(user types.User, role RoleName) (bool, error) {
 	roleRemoved, err := enforcer.DeleteRoleForUser(user.ID.String(), string(role))

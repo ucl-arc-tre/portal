@@ -447,6 +447,36 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// ProjectTRE A TRE project with base project details joined in
+type ProjectTRE struct {
+	// CreatedAt Time in RFC3339 format when the project was created
+	CreatedAt string `json:"created_at"`
+
+	// CreatorUsername Username of the user who created the project
+	CreatorUsername string `json:"creator_username"`
+
+	// Id Unique identifier for the base project
+	Id string `json:"id"`
+
+	// Name Name of the project
+	Name string `json:"name"`
+
+	// StudyId Unique identifier of the study to which the project belongs
+	StudyId string `json:"study_id"`
+
+	// UpdatedAt Time in RFC3339 format when the project was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
+// ProjectTRERequest Request payload for creating a new TRE project
+type ProjectTRERequest struct {
+	// Name Name of the project
+	Name string `json:"name"`
+
+	// StudyId Unique identifier of the study to which the project belongs
+	StudyId string `json:"study_id"`
+}
+
 // Study defines model for Study.
 type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
@@ -709,6 +739,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
+type PostProjectsTreJSONRequestBody = ProjectTRERequest
+
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyRequest
 
@@ -768,6 +801,15 @@ type ServerInterface interface {
 
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
+
+	// (GET /projects/tre)
+	GetProjectsTre(c *gin.Context)
+
+	// (POST /projects/tre)
+	PostProjectsTre(c *gin.Context)
+
+	// (GET /projects/tre/{projectId})
+	GetProjectsTreProjectId(c *gin.Context, projectId string)
 
 	// (GET /studies)
 	GetStudies(c *gin.Context, params GetStudiesParams)
@@ -965,6 +1007,56 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfileTraining(c)
+}
+
+// GetProjectsTre operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsTre(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsTre(c)
+}
+
+// PostProjectsTre operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsTre(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsTre(c)
+}
+
+// GetProjectsTreProjectId operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsTreProjectId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsTreProjectId(c, projectId)
 }
 
 // GetStudies operation middleware
@@ -1524,6 +1616,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.GET(options.BaseURL+"/projects/tre", wrapper.GetProjectsTre)
+	router.POST(options.BaseURL+"/projects/tre", wrapper.PostProjectsTre)
+	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
