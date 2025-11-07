@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	chosenNamePattern = regexp.MustCompile(`^[A-Za-z\s\-\p{L}\p{M}]*$`)
+	chosenNamePattern = regexp.MustCompile(`^[A-Za-z\s\-'’\p{L}\p{M}]*$`)
 )
 
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
