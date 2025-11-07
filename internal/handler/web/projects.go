@@ -32,15 +32,11 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 	}
 
 	user := middleware.GetUser(ctx)
-	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
-	if err != nil {
+	requiredStudyRole := rbac.StudyRole{StudyID: studyUUID, Name: rbac.StudyOwner}
+	if hasRole, err := rbac.HasRole(user, requiredStudyRole.RoleName()); err != nil {
 		setError(ctx, err, "Failed to check study access")
 		return
-	}
-
-	hasAccess := slices.Contains(studyIds, studyUUID)
-
-	if !hasAccess {
+	} else if !hasRole {
 		ctx.Status(http.StatusForbidden)
 		return
 	}
