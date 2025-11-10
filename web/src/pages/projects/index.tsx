@@ -7,7 +7,9 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import { AnyProject } from "@/types/projects";
-import { getProjectsTre } from "@/openapi";
+import { getProjectsTre, getStudies, Study } from "@/openapi";
+import Callout from "@/components/ui/Callout";
+import Title from "@/components/ui/Title";
 
 import styles from "./ProjectsPage.module.css";
 
@@ -15,20 +17,23 @@ export default function ProjectsPage() {
   const router = useRouter();
   const { authInProgress, isAuthed, userData } = useAuth();
   const [projects, setProjects] = useState<AnyProject[]>([]);
+  const [studies, setStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
-  const fetchProjects = async () => {
+  const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await getProjectsTre();
-      setProjects(response.data || []);
+      const [projectsResponse, studiesResponse] = await Promise.all([getProjectsTre(), getStudies()]);
+      setProjects(projectsResponse.data || []);
+      setStudies(studiesResponse.data || []);
     } catch (error) {
-      console.error("Failed to fetch projects:", error);
-      setError("Failed to fetch projects");
+      console.error("Failed to fetch data:", error);
+      setError("Failed to fetch data");
       setProjects([]);
+      setStudies([]);
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +41,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (!isApprovedResearcher) return;
-    fetchProjects();
+    fetchData();
   }, [isApprovedResearcher]);
 
   if (authInProgress) return null;
@@ -87,26 +92,26 @@ export default function ProjectsPage() {
             <Button onClick={() => router.push("/")} variant="secondary">
               Back to Home
             </Button>
-            <Button onClick={() => fetchProjects()}>Try Again</Button>
           </div>
         </div>
       </>
     );
   }
 
-  if (!projects || projects.length === 0) {
+  if (!studies || studies.length === 0) {
     return (
       <>
         <MetaHead
-          title="Projects Not Found | ARC Services Portal"
-          description="Projects not found in the ARC Services Portal"
+          title="Projects | ARC Services Portal"
+          description="Manage your projects in the ARC Services Portal"
         />
-
-        <div className={styles["not-found-section"]}>
-          <h2>No Projects Found</h2>
+        <Title text={"Projects"} centered />
+        <div className={styles["prerequisite-section"]}>
+          <h2>Create a study first</h2>
+          <p>Before you can create a project, you need to create at least one study.</p>
           <div className={styles["navigation-action"]}>
-            <Button onClick={() => router.push("/")} variant="secondary">
-              Back to Home
+            <Button onClick={() => router.push("/studies")} size="large">
+              Go to Studies
             </Button>
           </div>
         </div>
@@ -121,9 +126,19 @@ export default function ProjectsPage() {
         description="View and modify projects in the ARC Services Portal"
       />
 
-      <div>
-        <Projects projects={projects} />
-      </div>
+      <Title text={"Projects"} centered />
+
+      <Callout definition>
+        A project belongs to a study and can contain multiple assets. Have a look at our
+        <Button href="/glossary" variant="tertiary" size="small" inline>
+          Glossary
+        </Button>
+        for more detailed information.
+      </Callout>
+
+      <Callout construction></Callout>
+
+      <Projects projects={projects} studies={studies} />
     </>
   );
 }
