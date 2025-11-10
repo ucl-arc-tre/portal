@@ -517,12 +517,6 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		return
 	}
 
-	// if status is approved then set feedback to nothing
-	if review.Status == openapi.Approved {
-		emptyReviewString := ""
-		review.Feedback = &emptyReviewString
-	}
-
 	err = h.studies.UpdateStudyReview(studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
