@@ -261,8 +261,6 @@ export default function StudyForm(StudyProps: StudyProps) {
     setSubmitError(null);
 
     try {
-      // Convert form data to API format
-
       const studyData = convertStudyFormDataToApiRequest(data);
       console.log("stdyData", studyData, "og data", data);
 
