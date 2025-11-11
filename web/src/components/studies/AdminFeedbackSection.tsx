@@ -2,31 +2,41 @@ import Box from "../ui/Box";
 import { Textarea } from "../shared/exports";
 import styles from "./AdminFeedbackSection.module.css";
 import Button from "../ui/Button";
+import { useEffect, useState } from "react";
 
 type FeedbackProps = {
   status: string;
-  feedback: string;
-  setFeedback: (feedback: string) => void;
-  handleUpdateStudyStatus: (status: string) => void;
+  feedbackFromStudy: string;
+  handleUpdateStudyStatus: (status: string, feedbackContent?: string) => void;
 };
 export default function AdminFeedbackSection(props: FeedbackProps) {
-  const { status, feedback, setFeedback, handleUpdateStudyStatus } = props;
+  const { status, feedbackFromStudy, handleUpdateStudyStatus } = props;
+  const [feedback, setFeedback] = useState("");
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
   };
 
+  useEffect(() => {
+    const setFeedbackFromStudy = (feedbackFromStudy: string) => {
+      setFeedback(feedbackFromStudy);
+    };
+    if (feedbackFromStudy) {
+      setFeedbackFromStudy(feedbackFromStudy);
+    }
+  });
+
   return (
     <>
       {(status === "Pending" || status === "Rejected") && (
         <div>
-          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved", feedback)}>
             Approve Study
           </Button>
           <Button
             variant="secondary"
             className={styles["reject-button"]}
-            onClick={() => handleUpdateStudyStatus("Rejected")}
+            onClick={() => handleUpdateStudyStatus("Rejected", feedback)}
             disabled={feedback.length === 0}
           >
             Request Changes
