@@ -262,7 +262,6 @@ export default function StudyForm(StudyProps: StudyProps) {
 
     try {
       const studyData = convertStudyFormDataToApiRequest(data);
-      console.log("stdyData", studyData, "og data", data);
 
       let response;
       if (!studyId) {
