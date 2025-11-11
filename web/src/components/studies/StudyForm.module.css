@@ -43,6 +43,10 @@
     grid-template-columns: 1fr;
     width: 100%;
 
+    label {
+      max-width: 1000px;
+    }
+
     /* for some reason HelperText only works within Labels, so ensuring weight for option fields  */
     [data-testid="ucl-uikit-field__helper-text"] {
       font-weight: 400;
