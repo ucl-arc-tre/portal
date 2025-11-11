@@ -116,8 +116,13 @@ export default function Studies(props: Props) {
         </div>
 
         {studiesLoading && <Loading message="Loading studies..." />}
-
-        <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+        {studies.length === 0 ? (
+          <div className={styles["no-studies-message"]}>
+            <h2>No studies found</h2>
+          </div>
+        ) : (
+          <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+        )}
       </>
     );
   }
