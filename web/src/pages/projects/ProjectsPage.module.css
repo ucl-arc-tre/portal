@@ -1,25 +1,5 @@
 .not-approved-section {
   text-align: center;
-  margin: 2rem 0;
-}
-
-.not-approved-section h2 {
-  margin-bottom: 1.5rem;
-}
-
-.not-approved-section button {
-  margin-top: 1rem;
-}
-
-.error-recovery-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.not-approved-section {
-  text-align: center;
   padding: 3rem 2rem;
   background: #f8f9fa;
   border-radius: 8px;
@@ -37,76 +17,4 @@
 .profile-completion-action {
   display: flex;
   justify-content: center;
-}
-
-.navigation-action {
-  display: flex;
-  justify-content: center;
-}
-
-.error-section {
-  text-align: center;
-  padding: 3rem 2rem;
-  background: #fff5f5;
-  border: 1px solid #fed7d7;
-  border-radius: 8px;
-  margin: 2rem 0;
-}
-
-.error-section h2 {
-  color: #c53030;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.error-section p {
-  color: #702459;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-}
-
-.not-found-section {
-  padding: 3rem 2rem;
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  margin: 2rem 0;
-}
-
-.not-found-section h2 {
-  color: #2d3748;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.not-found-section p {
-  color: #4a5568;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-  text-align: center;
-}
-
-.prerequisite-section {
-  text-align: center;
-  padding: 3rem 2rem;
-  background: #fffaf0;
-  border: 1px solid #fbd38d;
-  border-radius: 8px;
-  margin: 2rem 0;
-}
-
-.prerequisite-section h2 {
-  color: #744210;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.prerequisite-section p {
-  color: #975a16;
-  margin-bottom: 2rem;
-  line-height: 1.6;
 }

@@ -1,23 +1,59 @@
-import { useState } from "react";
-import { Study } from "@/openapi";
+import { useState, useEffect } from "react";
+import { Study, getProjectsTre, getStudies } from "@/openapi";
 import { AnyProject } from "@/types/projects";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
+import Loading from "@/components/ui/Loading";
 
 import styles from "./Projects.module.css";
 
-type Props = {
-  projects: AnyProject[];
-  studies: Study[];
-};
-
-export default function Projects(props: Props) {
-  const { projects } = props;
+export default function Projects() {
+  const [projects, setProjects] = useState<AnyProject[]>([]);
+  const [studies, setStudies] = useState<Study[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [projectsResponse, studiesResponse] = await Promise.all([getProjectsTre(), getStudies()]);
+      setProjects(projectsResponse.data || []);
+      setStudies(studiesResponse.data || []);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+      setError("Failed to load projects and studies");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleCreateProjectClick = () => {
     setCreateProjectFormOpen(true);
   };
+
+  const handleProjectCreated = () => {
+    setCreateProjectFormOpen(false);
+    fetchData();
+  };
+
+  if (isLoading) {
+    return <Loading message="Loading projects..." />;
+  }
+
+  if (error) {
+    return (
+      <div className={styles["error-section"]}>
+        <h2>Error Loading Data</h2>
+        <p>{error}</p>
+        <Button onClick={fetchData}>Try Again</Button>
+      </div>
+    );
+  }
 
   return (
     <>
