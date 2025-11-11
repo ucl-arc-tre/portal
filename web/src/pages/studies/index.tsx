@@ -14,7 +14,6 @@ export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isAdmin = userData?.roles.includes("admin");
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -50,7 +49,7 @@ export default function StudiesPage() {
         </span>
       </Callout>
 
-      {!isAdmin && !isApprovedResearcher && (
+      {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
             To create and manage your studies, please first set up your profile by completing the approved researcher
