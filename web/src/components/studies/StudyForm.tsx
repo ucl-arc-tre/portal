@@ -44,7 +44,6 @@ type StudyProps = {
 };
 
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
-  console.log("cagref value", data.cagReference);
   const studyData: StudyRequest = {
     title: data.title,
     description: data.description ? data.description : undefined,
@@ -54,20 +53,24 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       .map((username) => `${username}${domainName}`),
     involves_ucl_sponsorship: data.involvesUclSponsorship !== undefined ? data.involvesUclSponsorship : undefined,
     involves_cag: data.involvesCag !== undefined ? data.involvesCag : undefined,
-    cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
+    cag_reference: data.involvesCag && data.cagReference ? data.cagReference.toString() : undefined,
     involves_ethics_approval: data.involvesEthicsApproval !== undefined ? data.involvesEthicsApproval : undefined,
     involves_hra_approval: data.involvesHraApproval !== undefined ? data.involvesHraApproval : undefined,
-    iras_id: data.irasId ? data.irasId : undefined,
+    iras_id: data.involvesHraApproval && data.irasId ? data.irasId : undefined,
     is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
     involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
-    nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+    nhs_england_reference:
+      data.involvesNhsEngland && data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
     involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
     requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
     requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
     is_data_protection_office_registered:
       data.isDataProtectionOfficeRegistered !== undefined ? data.isDataProtectionOfficeRegistered : undefined,
     data_protection_number:
-      data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
+      data.isDataProtectionOfficeRegistered &&
+      data.dataProtectionPrefix &&
+      data.dataProtectionDate &&
+      data.dataProtectionId
         ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
