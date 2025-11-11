@@ -14,6 +14,8 @@ export default function Projects() {
   const [error, setError] = useState<string | null>(null);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
 
+  console.log(studies);
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -36,10 +38,10 @@ export default function Projects() {
     setCreateProjectFormOpen(true);
   };
 
-  const handleProjectCreated = () => {
-    setCreateProjectFormOpen(false);
-    fetchData();
-  };
+  // const handleProjectCreated = () => {
+  //   setCreateProjectFormOpen(false);
+  //   fetchData();
+  // };
 
   if (isLoading) {
     return <Loading message="Loading projects..." />;
