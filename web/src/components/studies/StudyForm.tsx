@@ -256,9 +256,11 @@ export default function StudyForm(StudyProps: StudyProps) {
     }
   }, [editingStudy, username, reset]);
 
-  const handleStudySubmit = async (data: StudyFormData, studyId?: string) => {
+  const handleStudySubmit = async (data: StudyFormData, editingStudy?: Study | null) => {
     setIsSubmitting(true);
     setSubmitError(null);
+
+    const studyId = editingStudy?.id;
 
     try {
       const studyData = convertStudyFormDataToApiRequest(data);
@@ -270,7 +272,6 @@ export default function StudyForm(StudyProps: StudyProps) {
         });
       } else {
         // check study checkboxes vs form data and set mismatched ones to false
-
         response = await putStudiesByStudyId({
           path: { studyId },
           body: studyData,
@@ -305,11 +306,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     }
   };
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    if (!editingStudy) {
-      await handleStudySubmit(data);
-    } else {
-      await handleStudySubmit(data, editingStudy.id);
-    }
+    await handleStudySubmit(data, editingStudy);
   };
 
   const handleCloseForm = () => {
