@@ -54,7 +54,9 @@ export default function ProjectsPage() {
         for more detailed information.
       </Callout>
 
-      <Callout construction />
+      <Callout construction>
+        Not all project features work yet. We&apos;re actively working on adding more functionality!
+      </Callout>
 
       <Projects />
     </>

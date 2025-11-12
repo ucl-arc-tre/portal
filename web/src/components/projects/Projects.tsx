@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Study, getProjectsTre, getStudies } from "@/openapi";
 import { AnyProject } from "@/types/projects";
 import Button from "@/components/ui/Button";
-import Dialog from "@/components/ui/Dialog";
 import Loading from "@/components/ui/Loading";
+import CreateProjectForm from "./CreateProjectForm";
 
 import styles from "./Projects.module.css";
 
@@ -13,8 +13,6 @@ export default function Projects() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
-
-  console.log(studies);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -38,10 +36,14 @@ export default function Projects() {
     setCreateProjectFormOpen(true);
   };
 
-  // const handleProjectCreated = () => {
-  //   setCreateProjectFormOpen(false);
-  //   fetchData();
-  // };
+  const handleProjectCreated = () => {
+    setCreateProjectFormOpen(false);
+    fetchData();
+  };
+
+  const handleCancelCreate = () => {
+    setCreateProjectFormOpen(false);
+  };
 
   if (isLoading) {
     return <Loading message="Loading projects..." />;
@@ -57,17 +59,26 @@ export default function Projects() {
     );
   }
 
+  if (studies.length === 0) {
+    return (
+      <div className={styles["no-projects-message"]}>
+        <h2>You need to create a study first</h2>
+        <p>Projects belong to studies. Please create a study before creating a project.</p>
+        <Button href="/studies" size="large">
+          Go to Studies
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <>
       {createProjectFormOpen && (
-        <Dialog setDialogOpen={setCreateProjectFormOpen}>
-          <h2>Create New Project</h2>
-          <p>This form is currently being developed. Please check back soon.</p>
-
-          <Button onClick={() => setCreateProjectFormOpen(false)} variant="secondary">
-            Close
-          </Button>
-        </Dialog>
+        <CreateProjectForm
+          studies={studies}
+          handleProjectCreated={handleProjectCreated}
+          handleCancelCreate={handleCancelCreate}
+        />
       )}
 
       {projects.length === 0 ? (
