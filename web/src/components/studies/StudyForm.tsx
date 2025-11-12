@@ -39,7 +39,7 @@ export type StudyFormData = {
 type StudyProps = {
   username: string;
   setStudyFormOpen: (name: boolean) => void;
-  fetchStudyData?: (id?: string) => void;
+  fetchStudyData: (id?: string) => void;
   editingStudy?: Study | null;
 };
 
