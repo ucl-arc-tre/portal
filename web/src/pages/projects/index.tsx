@@ -16,7 +16,7 @@ export default function ProjectsPage() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   if (authInProgress) return null;
-  if (!isAuthed) return <LoginFallback />;
+  if (!isAuthed || !userData) return <LoginFallback />;
 
   if (!isApprovedResearcher) {
     return (
@@ -58,7 +58,7 @@ export default function ProjectsPage() {
         Not all project features work yet. We&apos;re actively working on adding more functionality!
       </Callout>
 
-      <Projects />
+      <Projects userData={userData} />
     </>
   );
 }

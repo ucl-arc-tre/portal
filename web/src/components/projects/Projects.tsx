@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
-import { Study, getProjectsTre, getStudies } from "@/openapi";
+import { Auth, Study, getProjectsTre, getStudies } from "@/openapi";
 import { AnyProject } from "@/types/projects";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import CreateProjectForm from "./CreateProjectForm";
 
 import styles from "./Projects.module.css";
+import Dialog from "../ui/Dialog";
 
-export default function Projects() {
+type Props = {
+  userData: Auth;
+};
+
+export default function Projects({ userData }: Props) {
   const [projects, setProjects] = useState<AnyProject[]>([]);
   const [studies, setStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
+
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -33,6 +41,10 @@ export default function Projects() {
   }, []);
 
   const handleCreateProjectClick = () => {
+    if (!isApprovedStaffResearcher) {
+      setShowUclStaffModal(true);
+      return;
+    }
     setCreateProjectFormOpen(true);
   };
 
@@ -59,7 +71,7 @@ export default function Projects() {
     );
   }
 
-  if (studies.length === 0) {
+  if (studies.length === 0 && isApprovedStaffResearcher) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You need to create a study first</h2>
@@ -71,8 +83,23 @@ export default function Projects() {
     );
   }
 
+  // TODO: Implement admin view for all projects
   return (
     <>
+      {showUclStaffModal && (
+        <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
+          <h2>UCL Staff Only</h2>
+          <p>Only UCL staff members can create projects.</p>
+          <p>If you believe this is an error, please contact your administrator.</p>
+
+          <div className={styles["ucl-staff-modal-actions"]}>
+            <Button onClick={() => setShowUclStaffModal(false)} variant="secondary">
+              Close
+            </Button>
+          </div>
+        </Dialog>
+      )}
+
       {createProjectFormOpen && (
         <CreateProjectForm
           studies={studies}
@@ -81,7 +108,12 @@ export default function Projects() {
         />
       )}
 
-      {projects.length === 0 ? (
+      {!isApprovedStaffResearcher && projects.length === 0 ? (
+        <div className={styles["no-projects-message"]}>
+          <h2>You haven&apos;t been added to any projects yet</h2>
+          <p>Any projects you are added to will appear here once they have been created by a member of staff.</p>
+        </div>
+      ) : projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t created any projects yet</h2>
 
@@ -97,7 +129,7 @@ export default function Projects() {
             </Button>
           </div>
 
-          <p>Projects list will go here ({projects.length} projects)</p>
+          <div> Projects list will go here</div>
         </>
       )}
     </>
