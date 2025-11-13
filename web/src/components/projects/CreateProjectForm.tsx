@@ -94,11 +94,13 @@ export default function CreateProjectForm({ studies, handleProjectCreated, handl
               disabled={isSubmitting}
             >
               <option value="">Select a study...</option>
-              {studies.map((study) => (
-                <option key={study.id} value={study.id}>
-                  {study.title}
-                </option>
-              ))}
+              {studies
+                .filter((study) => study.approval_status === "Approved")
+                .map((study) => (
+                  <option key={study.id} value={study.id}>
+                    {study.title}
+                  </option>
+                ))}
             </select>
             {errors.studyId && (
               <Alert type="error">

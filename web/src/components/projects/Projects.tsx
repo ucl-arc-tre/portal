@@ -20,7 +20,8 @@ export default function Projects({ userData }: Props) {
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
 
-  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
+  const isApprovedStaffResearcher = !!userData?.roles?.includes("approved-staff-researcher");
+  const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -28,6 +29,7 @@ export default function Projects({ userData }: Props) {
       const [projectsResponse, studiesResponse] = await Promise.all([getProjectsTre(), getStudies()]);
       setProjects(projectsResponse.data || []);
       setStudies(studiesResponse.data || []);
+      setError(null);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setError("Failed to load projects and studies");
@@ -71,11 +73,11 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  if (studies.length === 0 && isApprovedStaffResearcher) {
+  if (approvedStudies.length === 0 && isApprovedStaffResearcher) {
     return (
       <div className={styles["no-projects-message"]}>
-        <h2>You need to create a study first</h2>
-        <p>Projects belong to studies. Please create a study before creating a project.</p>
+        <h2>You don&apos;t have any approved studies</h2>
+        <p>Projects belong to studies. Please create a study and submit it for approval before creating a project.</p>
         <Button href="/studies" size="large">
           Go to Studies
         </Button>
