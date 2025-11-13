@@ -14,12 +14,12 @@ type ProjectFormData = {
 };
 
 type Props = {
-  studies: Study[];
+  approvedStudies: Study[];
   handleProjectCreated: () => void;
   handleCancelCreate: () => void;
 };
 
-export default function CreateProjectForm({ studies, handleProjectCreated, handleCancelCreate }: Props) {
+export default function CreateProjectForm({ approvedStudies, handleProjectCreated, handleCancelCreate }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,13 +94,11 @@ export default function CreateProjectForm({ studies, handleProjectCreated, handl
               disabled={isSubmitting}
             >
               <option value="">Select a study...</option>
-              {studies
-                .filter((study) => study.approval_status === "Approved")
-                .map((study) => (
-                  <option key={study.id} value={study.id}>
-                    {study.title}
-                  </option>
-                ))}
+              {approvedStudies.map((approvedStudy) => (
+                <option key={approvedStudy.id} value={approvedStudy.id}>
+                  {approvedStudy.title}
+                </option>
+              ))}
             </select>
             {errors.studyId && (
               <Alert type="error">

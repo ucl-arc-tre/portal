@@ -104,7 +104,7 @@ export default function Projects({ userData }: Props) {
 
       {createProjectFormOpen && (
         <CreateProjectForm
-          studies={studies}
+          approvedStudies={approvedStudies}
           handleProjectCreated={handleProjectCreated}
           handleCancelCreate={handleCancelCreate}
         />
