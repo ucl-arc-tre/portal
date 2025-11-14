@@ -2,7 +2,7 @@ import Box from "../ui/Box";
 import { Textarea } from "../shared/exports";
 import styles from "./AdminFeedbackSection.module.css";
 import Button from "../ui/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type FeedbackProps = {
   status: string;
@@ -11,20 +11,11 @@ type FeedbackProps = {
 };
 export default function AdminFeedbackSection(props: FeedbackProps) {
   const { status, feedbackFromStudy, handleUpdateStudyStatus } = props;
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState(feedbackFromStudy);
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
   };
-
-  useEffect(() => {
-    const setFeedbackFromStudy = (feedbackFromStudy: string) => {
-      setFeedback(feedbackFromStudy);
-    };
-    if (feedbackFromStudy) {
-      setFeedbackFromStudy(feedbackFromStudy);
-    }
-  });
 
   return (
     <>
