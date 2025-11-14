@@ -282,12 +282,10 @@ export default function StudyForm(StudyProps: StudyProps) {
       }
       if (response.data) {
         setStudyFormOpen(false);
-        if (fetchStudyData) {
-          if (studyId) {
-            fetchStudyData(studyId);
-          } else {
-            fetchStudyData();
-          }
+        if (studyId) {
+          fetchStudyData(studyId);
+        } else {
+          fetchStudyData();
         }
         return;
       }
