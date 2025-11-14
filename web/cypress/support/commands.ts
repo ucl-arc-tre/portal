@@ -75,6 +75,12 @@ declare global {
       mockAuthAsBaseInformationAssetOwner(): Chainable<any>;
 
       /**
+       * Mock auth response to return all roles required for study ownership
+       * @example cy.mockAuthAsStudyOwner()
+       */
+      mockAuthAsStudyOwner(): Chainable<any>;
+
+      /**
        * Mock auth response to return tre-ops-staff role without staff status
        * @example cy.mockAuthAsBaseInformationAssetOwner()
        */
@@ -143,6 +149,12 @@ declare global {
        */
       mockStudyCreation(): Chainable<any>;
 
+      /**
+       * Mock successful study update
+       * @example cy.mockStudyUpdate()
+       */
+      mockStudyUpdate(): Chainable<any>;
+
       // Wait commands for fixtures
       /**
        * Wait for the mocked auth request to complete
@@ -188,15 +200,15 @@ declare global {
 
       /**
        * Mock empty assets list for a study
-       * @example cy.mockStudyAssetsEmpty()
+       * @example cy.mockInformationAssetsEmpty()
        */
-      mockStudyAssetsEmpty(): Chainable<any>;
+      mockInformationAssetsEmpty(): Chainable<any>;
 
       /**
        * Mock assets list with sample assets
-       * @example cy.mockStudyAssetsWithSample()
+       * @example cy.mockInformationAssetsWithSample()
        */
-      mockStudyAssetsWithSample(): Chainable<any>;
+      mockInformationAssetsWithSample(): Chainable<any>;
 
       /**
        * Mock successful asset creation
@@ -375,6 +387,12 @@ Cypress.Commands.add("mockAuthAsBaseInformationAssetOwner", () => {
   }).as("getAuth");
 });
 
+Cypress.Commands.add("mockAuthAsStudyOwner", () => {
+  cy.intercept("GET", "/web/api/v0/auth", {
+    fixture: "auth-study-owner.json",
+  }).as("getAuth");
+});
+
 Cypress.Commands.add("mockAuthAsTreOpsStaff", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
     fixture: "auth-tre-ops-staff.json",
@@ -483,6 +501,7 @@ Cypress.Commands.add("mockStudyAccess", () => {
       title: "My New Test Study",
       description: null,
       owner_user_id: "123456789",
+      owner_username: "testuser",
       additional_study_admin_usernames: [],
       data_controller_organisation: "UCL",
       approval_status: "Incomplete",
@@ -522,6 +541,12 @@ Cypress.Commands.add("mockStudyCreation", () => {
   }).as("createStudy");
 });
 
+Cypress.Commands.add("mockStudyUpdate", () => {
+  cy.intercept("PUT", "/web/api/v0/studies/*", {
+    statusCode: 200,
+  }).as("updateStudy");
+});
+
 // Wait commands for studies
 Cypress.Commands.add("waitForStudies", () => {
   cy.wait(["@getStudiesEmpty", "@getStudiesWithNew"]);
@@ -532,13 +557,13 @@ Cypress.Commands.add("waitForStudyCreation", () => {
 });
 
 // Asset fixture commands
-Cypress.Commands.add("mockStudyAssetsEmpty", () => {
+Cypress.Commands.add("mockInformationAssetsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets", {
     fixture: "assets-empty.json",
   }).as("getAssetsEmpty");
 });
 
-Cypress.Commands.add("mockStudyAssetsWithSample", () => {
+Cypress.Commands.add("mockInformationAssetsWithSample", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets", {
     fixture: "assets-with-sample.json",
   }).as("getAssetsWithSample");

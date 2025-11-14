@@ -6,7 +6,7 @@ beforeEach(() => {
 describe("Study Management Workflow", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseStaffApprovedResearcher();
+    cy.mockAuthAsStudyOwner();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
     cy.mockStudyAgreementText();
@@ -14,7 +14,7 @@ describe("Study Management Workflow", () => {
 
   it("should display study agreement form when agreement not confirmed", () => {
     cy.mockStudyAgreementsEmpty();
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -29,7 +29,7 @@ describe("Study Management Workflow", () => {
   it("should complete agreement workflow and show asset creation", () => {
     cy.mockStudyAgreementsEmpty();
     cy.mockStudyAgreementConfirmation();
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -51,7 +51,7 @@ describe("Study Management Workflow", () => {
 
   it("should show assets section when agreement already confirmed", () => {
     cy.mockStudyAgreementsConfirmed();
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -67,10 +67,10 @@ describe("Study Management Workflow", () => {
   });
 });
 
-describe("Study Assets Management", () => {
+describe("Information Assets Management", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseStaffApprovedResearcher();
+    cy.mockAuthAsStudyOwner();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
     cy.mockStudyAgreementText();
@@ -78,7 +78,7 @@ describe("Study Assets Management", () => {
   });
 
   it("should display asset creation button when no assets exist", () => {
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -93,7 +93,7 @@ describe("Study Assets Management", () => {
   });
 
   it("should display existing assets and allow creating additional ones", () => {
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -114,7 +114,7 @@ describe("Study Assets Management", () => {
   });
 
   it("should successfully create a new asset", () => {
-    cy.mockStudyAssetsEmpty();
+    cy.mockInformationAssetsEmpty();
     cy.mockAssetCreation();
 
     cy.visit("/studies/manage?studyId=123456789");
@@ -153,8 +153,51 @@ describe("Study Assets Management", () => {
 
     cy.visit("/studies/manage?studyId=123456789");
 
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
     cy.wait("@getAssetsWithSample");
     cy.contains("Sample Asset Title 1").should("be.visible");
+    cy.contains("requires a contract").should("be.visible");
+  });
+});
+
+describe("Study Updates", () => {
+  beforeEach(() => {
+    cy.mockAuthAsStudyOwner();
+
+    cy.mockStudiesWithNewStudy();
+    cy.mockStudyAccess();
+    cy.mockStudyAgreementText();
+    cy.mockStudyAgreementsConfirmed();
+    cy.mockAssetCreation();
+    cy.mockInformationAssetsWithSample();
+    cy.mockContractsWithSample();
+
+    cy.visit("/studies/manage?studyId=123456789");
+    cy.waitForAuth();
+    cy.wait("@getStudyById");
+    cy.wait("@getStudyAgreementText");
+    cy.wait("@getStudyAgreementsConfirmed");
+    cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsWithSample");
+  });
+
+  it("should successfully update a study as its owner", () => {
+    cy.mockStudyUpdate();
+    cy.contains("My New Test Study").should("be.visible");
+    cy.contains("Manage Study").click();
+
+    cy.contains("Risk Score").should("be.visible");
+    cy.contains("Additional Information").should("be.visible");
+    cy.contains("Mark Ready for Review").should("be.visible");
+    cy.contains("Edit Study").click();
+
+    // edit the description and submit
+    cy.get("textarea#description").type("My New Test Study Description");
+    cy.get("[data-cy='next']").click();
+    cy.get("[data-cy='next']").click();
+
+    cy.get("button[type='submit']").click();
+
+    cy.wait("@updateStudy");
   });
 });

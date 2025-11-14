@@ -30,6 +30,19 @@
   white-space: nowrap;
 }
 
+.asset-incomplete {
+  border-color: #bc5709;
+}
+
+.asset-incomplete__message {
+  text-align: left;
+}
+
+.asset-incomplete__icon {
+  height: 1rem;
+  color: #bc5709;
+}
+
 .asset-meta {
   display: flex;
   gap: 0.5rem;
@@ -115,16 +128,15 @@
 }
 
 .asset-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-direction: column;
+  display: grid;
+  gap: 0.85rem;
   align-items: center;
   margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid #e9ecef;
 }
 
-@media (width >= 768px) {
+@media (width >=768px) {
   .asset-meta {
     flex-direction: row;
     flex-wrap: wrap;
@@ -133,8 +145,10 @@
   }
 
   .asset-actions {
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
+    grid-template-columns: 3fr 2fr;
+
+    button {
+      grid-column: 2;
+    }
   }
 }

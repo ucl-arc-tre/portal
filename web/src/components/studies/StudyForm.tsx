@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
-import styles from "./CreateStudyForm.module.css";
+import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
+import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
 
 export type StudyFormData = {
   title: string;
@@ -11,65 +12,143 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  cagReference: number;
+  cagReference: string | undefined | null;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
   dataProtectionId: number;
-  dataProtectionNumber: string;
-  nhsEnglandReference: number;
-  irasId: string;
-  involvesUclSponsorship: boolean;
-  involvesCag: boolean;
-  involvesEthicsApproval: boolean;
-  involvesHraApproval: boolean;
-  requiresDbs: boolean;
-  isDataProtectionOfficeRegistered: boolean;
-  involvesThirdParty: boolean;
-  involvesExternalUsers: boolean;
-  involvesParticipantConsent: boolean;
-  involvesIndirectDataCollection: boolean;
-  involvesDataProcessingOutsideEea: boolean;
-  isNhsAssociated: boolean;
-  involvesNhsEngland: boolean;
-  involvesMnca: boolean;
-  requiresDspt: boolean;
+  dataProtectionNumber: string | undefined | null;
+  nhsEnglandReference: number | undefined | null;
+  irasId: string | undefined | null;
+  involvesUclSponsorship: boolean | null;
+  involvesCag: boolean | null;
+  involvesEthicsApproval: boolean | null;
+  involvesHraApproval: boolean | null;
+  requiresDbs: boolean | null;
+  isDataProtectionOfficeRegistered: boolean | null;
+  involvesThirdParty: boolean | null;
+  involvesExternalUsers: boolean | null;
+  involvesParticipantConsent: boolean | null;
+  involvesIndirectDataCollection: boolean | null;
+  involvesDataProcessingOutsideEea: boolean | null;
+  isNhsAssociated: boolean | null;
+  involvesNhsEngland: boolean | null;
+  involvesMnca: boolean | null;
+  requiresDspt: boolean | null;
 };
 
-type CreateStudyProps = {
+type StudyProps = {
   username: string;
-  setCreateStudyFormOpen: (name: boolean) => void;
-  handleStudySubmit: (data: StudyFormData) => Promise<void>;
-  submitError: string | null;
-  isSubmitting: boolean;
-  setSubmitError: (error: string | null) => void;
+  setStudyFormOpen: (name: boolean) => void;
+  fetchStudyData: (id?: string) => void;
+  editingStudy?: Study | null;
 };
 
-// what is this?
-// A brief comment for context might be good here
+const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
+  const studyData: StudyRequest = {
+    title: data.title,
+    description: data.description ? data.description : undefined,
+    data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
+    additional_study_admin_usernames: data.additionalStudyAdminUsernames
+      .map((admin) => admin.value.trim())
+      .map((username) => `${username}${domainName}`),
+    involves_ucl_sponsorship: data.involvesUclSponsorship !== undefined ? data.involvesUclSponsorship : undefined,
+    involves_cag: data.involvesCag !== undefined ? data.involvesCag : undefined,
+    cag_reference: data.involvesCag && data.cagReference ? data.cagReference.toString() : undefined,
+    involves_ethics_approval: data.involvesEthicsApproval !== undefined ? data.involvesEthicsApproval : undefined,
+    involves_hra_approval: data.involvesHraApproval !== undefined ? data.involvesHraApproval : undefined,
+    iras_id: data.involvesHraApproval && data.irasId ? data.irasId : undefined,
+    is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
+    involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
+    nhs_england_reference:
+      data.involvesNhsEngland && data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+    involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
+    requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
+    requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
+    is_data_protection_office_registered:
+      data.isDataProtectionOfficeRegistered !== undefined ? data.isDataProtectionOfficeRegistered : undefined,
+    data_protection_number:
+      data.isDataProtectionOfficeRegistered &&
+      data.dataProtectionPrefix &&
+      data.dataProtectionDate &&
+      data.dataProtectionId
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
+        : undefined,
+    involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
+    involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
+    involves_participant_consent:
+      data.involvesParticipantConsent !== undefined ? data.involvesParticipantConsent : undefined,
+    involves_indirect_data_collection:
+      data.involvesIndirectDataCollection !== undefined ? data.involvesIndirectDataCollection : undefined,
+    involves_data_processing_outside_eea:
+      data.involvesDataProcessingOutsideEea !== undefined ? data.involvesDataProcessingOutsideEea : undefined,
+  };
+
+  return studyData;
+};
+
+// data protection office id
 const UclDpoId = "Z6364106";
 
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME;
+// this should match the domain that is used for the entra ID users in the portal
+const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
-export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
-  const { username, setCreateStudyFormOpen, handleStudySubmit, submitError, isSubmitting, setSubmitError } =
-    CreateStudyProps;
+function YesNoUnsureButtons({
+  value,
+  onChange,
+}: {
+  value: boolean | null | undefined;
+  onChange: (value: boolean | null) => void;
+}) {
+  return (
+    <div className={styles["yes-no-unsure-buttons"]}>
+      <button
+        type="button"
+        onClick={() => onChange(true)}
+        data-cy="option-yes"
+        className={value === true ? styles.selected : styles.yes}
+      >
+        Yes
+      </button>
+      <button
+        type="button"
+        data-cy="option-unsure"
+        onClick={() => {
+          onChange(null);
+        }}
+        className={value === null || value === undefined ? styles.selected : styles.unsure}
+      >
+        Unsure
+      </button>
+      <button
+        type="button"
+        data-cy="option-no"
+        onClick={() => onChange(false)}
+        className={value === false ? styles.selected : styles.no}
+      >
+        No
+      </button>
+    </div>
+  );
+}
+
+export default function StudyForm(StudyProps: StudyProps) {
+  const { username, setStudyFormOpen, fetchStudyData, editingStudy } = StudyProps;
   const {
     register,
     handleSubmit,
     control,
     setValue,
     trigger,
+    reset,
     formState: { errors, isValid },
+    getValues,
   } = useForm<StudyFormData>({
     mode: "onChange",
     criteriaMode: "all",
-    defaultValues: {
-      title: "",
-      dataControllerOrganisation: "",
-      owner: username,
-      additionalStudyAdminUsernames: [],
-    },
+    defaultValues: { title: "", dataControllerOrganisation: "", owner: username, additionalStudyAdminUsernames: [] },
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [stepValidationError, setStepValidationError] = useState<string | null>(null);
@@ -142,20 +221,105 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
     }
   }, [controllerValue, setValue]);
 
+  // if update get the study to populate the fields
+  useEffect(() => {
+    if (editingStudy) {
+      const study = editingStudy;
+      reset({
+        title: study.title,
+        description: study.description,
+        owner: study.owner_username!,
+        additionalStudyAdminUsernames: study.additional_study_admin_usernames.map((username) => ({
+          value: username!.split("@")[0],
+        })),
+        dataControllerOrganisation: study.data_controller_organisation,
+        cagReference: study.cag_reference,
+        dataProtectionPrefix: study.data_protection_number?.split("/")[0],
+        dataProtectionDate: study.data_protection_number?.split("/")[1],
+        dataProtectionId: Number(study.data_protection_number?.split("/")[2]),
+        dataProtectionNumber: study.data_protection_number,
+        nhsEnglandReference: Number(study.nhs_england_reference),
+        irasId: study.iras_id,
+        involvesUclSponsorship: study.involves_ucl_sponsorship,
+        involvesCag: study.involves_cag,
+        involvesEthicsApproval: study.involves_ethics_approval,
+        involvesHraApproval: study.involves_hra_approval,
+        requiresDbs: study.requires_dbs,
+        isDataProtectionOfficeRegistered: study.is_data_protection_office_registered,
+        involvesThirdParty: study.involves_third_party,
+        involvesExternalUsers: study.involves_external_users,
+        involvesParticipantConsent: study.involves_participant_consent,
+        involvesIndirectDataCollection: study.involves_indirect_data_collection,
+        involvesDataProcessingOutsideEea: study.involves_data_processing_outside_eea,
+        isNhsAssociated: study.is_nhs_associated,
+        involvesNhsEngland: study.involves_nhs_england,
+        involvesMnca: study.involves_mnca,
+        requiresDspt: study.requires_dspt,
+      });
+    }
+  }, [editingStudy, username, reset]);
+
+  const handleStudySubmit = async (data: StudyFormData, editingStudy?: Study | null) => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const studyId = editingStudy?.id;
+
+    try {
+      const studyData = convertStudyFormDataToApiRequest(data);
+
+      let response;
+      if (!studyId) {
+        response = await postStudies({
+          body: studyData,
+        });
+      } else {
+        // check study checkboxes vs form data and set mismatched ones to false
+        response = await putStudiesByStudyId({
+          path: { studyId },
+          body: studyData,
+        });
+      }
+      if (response.data) {
+        setStudyFormOpen(false);
+        if (studyId) {
+          fetchStudyData(studyId);
+        } else {
+          fetchStudyData();
+        }
+        return;
+      }
+
+      if (response.error) {
+        const errorData = response.error as ValidationError;
+        if (errorData?.error_message) {
+          setSubmitError(errorData.error_message);
+          return;
+        }
+      }
+
+      setSubmitError("An unknown error occurred.");
+    } catch (error) {
+      console.error(`Failed to ${studyId ? "update" : "create"} study:`, error);
+      setSubmitError(`Failed to ${studyId ? "update" : "create"} study Please try again.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    await handleStudySubmit(data);
+    await handleStudySubmit(data, editingStudy);
   };
 
   const handleCloseForm = () => {
     setSubmitError(null);
-    setCreateStudyFormOpen(false);
+    setStudyFormOpen(false);
   };
 
   const getFieldsetClass = (step: number) =>
     `${styles.fieldset} ${currentStep === step ? styles.visible : styles.hidden}`;
   return (
     <Dialog setDialogOpen={handleCloseForm} className={styles["study-dialog"]} cy="create-study-form">
-      <h2>Create Study</h2>
+      <h2>{editingStudy ? "Update Study" : "Create Study"}</h2>
       <div className={styles["step-progress"]}>
         <div
           className={`${styles["step-dot"]} ${currentStep === 1 ? styles["active"] : ""} ${isValid ? styles.valid : ""}`}
@@ -249,14 +413,28 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                       control={control}
                       rules={{
                         required: "Username is required",
-                        validate: (value) => {
-                          if (!value || value.trim() === "") {
-                            return "Username is required";
-                          }
-                          if (value.includes("@")) {
-                            return `Enter only the username part (without ${domainName})`;
-                          }
-                          return true;
+                        validate: {
+                          isNotEmpty: (value) => {
+                            if (!value || value.trim() === "") {
+                              return "Username is required";
+                            }
+                            return true;
+                          },
+                          notEmailPart: (value) => {
+                            if (value.includes("@")) {
+                              return `Enter only the username part (without ${domainName})`;
+                            }
+                            return true;
+                          },
+                          isUnique: (value) => {
+                            // Retrieve all current admin usernames
+                            const allAdminUsernames = getValues(`additionalStudyAdminUsernames`).map(
+                              (admin) => admin.value
+                            );
+                            // Count the occurrences of the current value
+                            const duplicateCount = allAdminUsernames.filter((username) => username === value).length;
+                            return duplicateCount <= 1 || "Username has already been entered";
+                          },
                         },
                       }}
                       render={({ field, fieldState }) => (
@@ -274,8 +452,8 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                       )}
                     />
                   </Label>
-
-                  <Button type="button" onClick={() => remove(index)} size="small">
+                  {/* disabling for editing until we get removal on backend implemented */}
+                  <Button type="button" onClick={() => remove(index)} size="small" disabled={Boolean(editingStudy)}>
                     Remove
                   </Button>
                 </div>
@@ -313,8 +491,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         {/* second step */}
         <fieldset className={getFieldsetClass(2)}>
           <legend>Sponsorship & Approvals</legend>
-          <Label htmlFor="uclSponsorship" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="uclSponsorship" {...register("involvesUclSponsorship")} />{" "}
+          <div className={styles["option-field"]} data-cy="involvesUclSponsorship">
             <span>
               We will be seeking/have sought{" "}
               <a href="https://www.ucl.ac.uk/joint-research-office/new-studies/sponsorship-and-grant-submissions">
@@ -322,10 +499,15 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               </a>{" "}
               of this research
             </span>
-          </Label>
+            <Controller
+              name="involvesUclSponsorship"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          <Label htmlFor="cag" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="cag" {...register("involvesCag")} />
+          <div className={styles["option-field"]} data-cy="involvesCag">
             <span>
               {" "}
               We will be seeking/have sought approval from the{" "}
@@ -334,22 +516,32 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               </a>{" "}
               for this research
             </span>
-          </Label>
+            <Controller
+              name="involvesCag"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          {showCagRef && (
+          {showCagRef === true && (
             <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
-              <Input type="text" id="cagRef" {...register("cagReference")} />
+              <input type="text" id="cagRef" {...register("cagReference")} className={styles["option__text-input"]} />
             </Label>
           )}
 
-          <Label htmlFor="ethics" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="ethics" {...register("involvesEthicsApproval")} />
+          <div className={styles["option-field"]} data-cy="involvesEthicsApproval">
             We will be seeking/have sought Research Ethics Committee approval for this research
-          </Label>
+            <Controller
+              name="involvesEthicsApproval"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          <Label htmlFor="hra" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="hra" {...register("involvesHraApproval")} />{" "}
+          <div className={styles["option-field"]} data-cy="involvesHraApproval">
             <span>
               We will be seeking/have sought{" "}
               <a href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/">
@@ -357,9 +549,15 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
               </a>{" "}
               approval of this research
             </span>
-          </Label>
+            <Controller
+              name="involvesHraApproval"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          {showIrasId && (
+          {showIrasId === true && (
             <Label htmlFor="irasId">
               <span>
                 {" "}
@@ -369,7 +567,7 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                 ID (if applicable)
               </span>
 
-              <Input type="text" id="irasId" {...register("irasId")} />
+              <input type="text" id="irasId" {...register("irasId")} className={styles["option__text-input"]} />
             </Label>
           )}
         </fieldset>
@@ -377,31 +575,45 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <fieldset className={getFieldsetClass(2)}>
           <legend>NHS</legend>
 
-          <Label htmlFor="nhs" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="nhs" {...register("isNhsAssociated")} />
+          <div className={styles["option-field"]} data-cy="isNhsAssociated">
             This research is associated with the NHS, uses NHS data, works with NHS sites or has use of a/some NHS
             facilities
-          </Label>
+            <Controller
+              name="isNhsAssociated"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          {showNhsRelated && (
+          {showNhsRelated === true && (
             <>
-              <Label htmlFor="nhsEngland" className={styles["checkbox-label"]}>
-                <input type="checkbox" id="nhsEngland" {...register("involvesNhsEngland")} />
+              <div className={styles["option-field"]} data-cy="involvesNhsEngland">
                 NHS England will be involved in gatekeeping and/or providing data for this research
-              </Label>
-              {showNhsEnglandRef && (
+                <Controller
+                  name="involvesNhsEngland"
+                  control={control}
+                  defaultValue={undefined}
+                  render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+                />
+              </div>
+              {showNhsEnglandRef === true && (
                 <Label htmlFor="nhsEnglandRef">
                   NHSE{" "}
                   <a href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number.">
                     DARS NIC number
                   </a>{" "}
                   (if applicable)
-                  <Input type="number" id="nhsEnglandRef" {...register("nhsEnglandReference")} />
+                  <input
+                    type="number"
+                    id="nhsEnglandRef"
+                    {...register("nhsEnglandReference")}
+                    className={styles["option__text-input"]}
+                  />
                 </Label>
               )}
 
-              <Label htmlFor="mnca" className={styles["checkbox-label"]}>
-                <input type="checkbox" id="mnca" {...register("involvesMnca")} />{" "}
+              <div className={styles["option-field"]} data-cy="involvesMnca">
                 <span>
                   The{" "}
                   <a href="https://www.myresearchproject.org.uk/help/hlptemplatesfor.aspx">
@@ -409,13 +621,24 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                   </a>{" "}
                   will be in place across all sites when working with NHS sites
                 </span>
-              </Label>
+                <Controller
+                  name="involvesMnca"
+                  control={control}
+                  defaultValue={undefined}
+                  render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+                />
+              </div>
 
-              <Label htmlFor="dspt" className={styles["checkbox-label"]}>
-                <input type="checkbox" id="dspt" {...register("requiresDspt")} />
+              <div className={styles["option-field"]} data-cy="requiresDspt">
                 This research requires an NHS Data Security & Protection Toolkit registration to be in place at UCL.
                 (This might arise when approaching public bodies for NHS and social care data)
-              </Label>
+                <Controller
+                  name="requiresDspt"
+                  control={control}
+                  defaultValue={undefined}
+                  render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+                />
+              </div>
             </>
           )}
         </fieldset>
@@ -424,18 +647,28 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
         <fieldset className={getFieldsetClass(3)}>
           <legend>Data</legend>
 
-          <Label htmlFor="dbs" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="dbs" {...register("requiresDbs")} />
+          <div className={styles["option-field"]} data-cy="requiresDbs">
             There is data related to this research only to be handled by staff who have obtained a Disclosure and
             Barring Service (DBS) check
-          </Label>
+            <Controller
+              name="requiresDbs"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          <Label htmlFor="dataProtection" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="dataProtection" {...register("isDataProtectionOfficeRegistered")} />
+          <div className={styles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
             The research is already registered with the UCL Data Protection Office
-          </Label>
+            <Controller
+              name="isDataProtectionOfficeRegistered"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          {showDataProtectionNumber && (
+          {showDataProtectionNumber === true && (
             <Label htmlFor="dataProtectionNumber">
               Data Protection Registration Number*:
               <HelperText>
@@ -450,13 +683,13 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
                     required: showDataProtectionNumber ? "Registry ID is required" : false,
                   }}
                   render={({ field }) => (
-                    <Input
+                    <input
                       {...field}
                       type="text"
                       id="dataProtectionPrefix"
                       readOnly={controllerValue?.toLowerCase() === "ucl"}
                       placeholder={controllerValue?.toLowerCase() === "ucl" ? "" : "Registry ID eg ZX1234"}
-                      inputClassName={controllerValue?.toLowerCase() === "ucl" ? styles.readonly : ""}
+                      className={controllerValue?.toLowerCase() === "ucl" ? styles.readonly : ""}
                     />
                   )}
                 />
@@ -500,29 +733,54 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
             </Label>
           )}
 
-          <Label htmlFor="thirdParty" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="thirdParty" {...register("involvesThirdParty")} />
+          <div className={styles["option-field"]} data-cy="involvesThirdParty">
             Organisations or businesses other than UCL will be involved in creating, storing, modifying, gatekeeping or
             providing data for this research
-          </Label>
-          <Label htmlFor="externalUsers" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="externalUsers" {...register("involvesExternalUsers")} />
+            <Controller
+              name="involvesThirdParty"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
+          <div className={styles["option-field"]} data-cy="involvesExternalUsers">
             We plan to give access to someone who is not a member of UCL
-          </Label>
+            <Controller
+              name="involvesExternalUsers"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
 
-          <Label htmlFor="consent" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="consent" {...register("involvesParticipantConsent")} />
+          <div className={styles["option-field"]} data-cy="involvesParticipantConsent">
             We will be seeking/have sought consent from participants to collect data about them for this research
-          </Label>
-          <Label htmlFor="indirectDataCollection" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="indirectDataCollection" {...register("involvesIndirectDataCollection")} />
+            <Controller
+              name="involvesParticipantConsent"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
+          <div className={styles["option-field"]} data-cy="involvesIndirectDataCollection">
             There is data to be collected indirectly for this research, e.g. by another organisation
-          </Label>
-          <Label htmlFor="extEea" className={styles["checkbox-label"]}>
-            <input type="checkbox" id="extEea" {...register("involvesDataProcessingOutsideEea")} />
+            <Controller
+              name="involvesIndirectDataCollection"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
+          <div className={styles["option-field"]} data-cy="involvesDataProcessingOutsideEea">
             There is data related to this research to be processed outside of the UK and the countries that form the
             European Economic Area (For GDPR purposes)
-          </Label>
+            <Controller
+              name="involvesDataProcessingOutsideEea"
+              control={control}
+              defaultValue={undefined}
+              render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+            />
+          </div>
         </fieldset>
 
         {stepValidationError && (
@@ -558,7 +816,8 @@ export default function CreateStudyForm(CreateStudyProps: CreateStudyProps) {
 
         {currentStep === totalSteps && (
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating study..." : "Create Study"}
+            {editingStudy && isSubmitting ? "Updating study..." : editingStudy && "Update Study"}
+            {!editingStudy && isSubmitting ? "Creating study..." : !editingStudy && "Create Study"}
           </Button>
         )}
       </form>

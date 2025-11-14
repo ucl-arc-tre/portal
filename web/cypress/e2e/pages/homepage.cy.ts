@@ -61,7 +61,7 @@ describe(`Homepage Tests`, () => {
       cy.waitForAuth();
       cy.waitForChosenName();
 
-      cy.contains("View Studies").should("be.visible");
+      cy.contains("Studies").should("be.visible");
     });
   });
 

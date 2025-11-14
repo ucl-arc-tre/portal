@@ -11,12 +11,13 @@ export default function StudyStatusBadge({ status, isAdmin }: BadgeProps) {
     switch (status) {
       case "Incomplete":
         if (isAdmin) {
-          return "The study owner has yet to agree to the study agreement.";
-        } else return "Click 'manage study' to complete your study setup.";
+          return "The study owner has yet to request a review of the study.";
+        } else return "Please complete your study setup and request a review.";
       case "Pending":
         if (isAdmin) {
-          return "Study is ready for review - you may update this status as needed.";
-        } else return "Study is under review and awaiting approval from administrators.";
+          return "Study is ready for review - either approve or leave feedback to the study owner.";
+        } else
+          return "Study is under review and awaiting approval from administrators. You can still make changes if necessary.";
       case "Approved":
         return "Study has been approved and is ready for use.";
       case "Rejected":

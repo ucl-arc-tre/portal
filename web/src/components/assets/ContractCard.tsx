@@ -8,9 +8,10 @@ type ContractCardProps = {
   studyId: string;
   assetId: string;
   onEdit: () => void;
+  isStudyOwner: boolean;
 };
 
-export default function ContractCard({ contract, studyId, assetId, onEdit }: ContractCardProps) {
+export default function ContractCard({ contract, studyId, assetId, onEdit, isStudyOwner }: ContractCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,9 +106,11 @@ export default function ContractCard({ contract, studyId, assetId, onEdit }: Con
           {downloading ? "Downloading..." : "Download PDF"}
         </Button>
 
-        <Button onClick={onEdit} size="small">
-          Edit
-        </Button>
+        {isStudyOwner && (
+          <Button onClick={onEdit} size="small">
+            Edit
+          </Button>
+        )}
       </div>
     </div>
   );

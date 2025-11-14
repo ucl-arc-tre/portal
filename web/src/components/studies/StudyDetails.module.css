@@ -1,3 +1,11 @@
+.study-actions {
+  margin-block: 1rem;
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+  justify-content: center;
+}
+
 .pre-description {
   display: flex;
   flex-direction: row;
@@ -9,6 +17,13 @@
   dd {
     display: inline-block;
   }
+}
+
+.description {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  text-align: center;
 }
 
 .grey-value {
@@ -37,7 +52,7 @@
 }
 
 .feedback-alert {
-  margin-block: 1rem;
+  margin-top: 1rem;
 }
 
 .additional-info {
@@ -47,11 +62,12 @@
 .badge {
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   align-items: center;
+  align-content: center;
   gap: 0.25rem;
   max-width: fit-content;
 }
@@ -71,6 +87,10 @@
     font-weight: 400;
     text-transform: none;
     letter-spacing: normal;
+
+    svg {
+      height: 12px !important;
+    }
   }
 }
 
@@ -78,88 +98,4 @@
   display: flex;
   gap: 0.5rem;
   margin-block: 0.8rem;
-}
-
-.approve-button {
-  background-color: var(--green-100) !important;
-  border-color: var(--green-100) !important;
-  margin-inline: 0.4rem;
-}
-
-.reject-button {
-  color: #a50909 !important;
-  border: 2px solid #a50909 !important;
-  margin-inline: 0.4rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #a50909 !important;
-    color: #fff !important;
-  }
-}
-
-.feedback-container {
-  margin-block: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.feedback-form {
-  overflow: hidden;
-  transition: all 1.6s ease 0.2s;
-  max-height: 0px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-
-  &.form-hidden {
-    display: none;
-    max-height: 0px;
-  }
-
-  &.form-collapsing {
-    * {
-      animation: slide-up-fade 1.3s ease 0s 1 normal forwards;
-      transition:
-        opacity 1s,
-        transform 0.8s 1s;
-    }
-  }
-
-  &.form-visible {
-    max-height: 100vh;
-
-    animation: fade-slide-down 1.4s ease 0s 1 normal forwards;
-    transition:
-      opacity 1.4s,
-      transform 1s 1.2s;
-  }
-}
-
-@keyframes fade-slide-down {
-  0% {
-    opacity: 0;
-    transform: translateY(-80px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-up-fade {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(-80px);
-  }
 }

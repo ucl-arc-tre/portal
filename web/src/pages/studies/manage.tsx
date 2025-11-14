@@ -25,26 +25,28 @@ export default function ManageStudyPage() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
 
-  const fetchStudy = async (id: string) => {
+  const fetchStudy = async (id?: string) => {
     setStudyIsLoading(true);
     setStudyError(null);
 
     try {
-      const response = await getStudiesByStudyId({
-        path: { studyId: id },
-      });
+      if (id) {
+        const response = await getStudiesByStudyId({
+          path: { studyId: id },
+        });
 
-      if (response.response.ok && response.data) {
-        setStudy(response.data);
-      } else {
-        if (response.response.status === 404) {
-          setStudyError("Study not found or you don't have access to it.");
-        } else if (response.response.status === 403) {
-          setStudyError("You don't have permission to access this study.");
-        } else if (response.response.status === 406) {
-          setStudyError("The study ID is not valid. Please check and try again.");
+        if (response.response.ok && response.data) {
+          setStudy(response.data);
         } else {
-          setStudyError("Failed to load study. Please try again later.");
+          if (response.response.status === 404) {
+            setStudyError("Study not found or you don't have access to it.");
+          } else if (response.response.status === 403) {
+            setStudyError("You don't have permission to access this study.");
+          } else if (response.response.status === 406) {
+            setStudyError("The study ID is not valid. Please check and try again.");
+          } else {
+            setStudyError("Failed to load study. Please try again later.");
+          }
         }
       }
     } catch (error) {
@@ -167,7 +169,11 @@ export default function ManageStudyPage() {
       <Breadcrumbs studyId={study.id} studyTitle={study.title} />
       <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
-      {isAdmin ? <StudyDetails study={study} /> : <ManageStudy study={study} />}
+      {isAdmin ? (
+        <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} />
+      ) : (
+        <ManageStudy study={study} fetchStudy={fetchStudy} />
+      )}
     </>
   );
 }

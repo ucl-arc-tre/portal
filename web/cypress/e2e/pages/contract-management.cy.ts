@@ -6,13 +6,13 @@ beforeEach(() => {
 describe("Contract Management", () => {
   beforeEach(() => {
     cy.loginAsBase();
-    cy.mockAuthAsBaseStaffApprovedResearcher();
+    cy.mockAuthAsStudyOwner();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
     cy.mockAssetAccess();
     cy.mockStudyAgreementText();
     cy.mockStudyAgreementsConfirmed();
-    cy.mockStudyAssetsWithSample();
+    cy.mockInformationAssetsWithSample();
   });
 
   it("should display contract management section for an asset", () => {

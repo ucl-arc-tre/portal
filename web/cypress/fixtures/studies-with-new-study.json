@@ -4,6 +4,7 @@
     "title": "My New Test Study",
     "description": null,
     "owner_user_id": "123456789",
+    "owner_username": "testuser",
     "additional_study_admin_usernames": [],
     "data_controller_organisation": "UCL",
     "involves_ucl_sponsorship": null,
