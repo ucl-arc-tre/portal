@@ -35,24 +35,32 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
         </div>
       )}
 
-      <Box>
-        <div className={styles["feedback-container"]}>
-          <form className={styles["feedback-form"]}>
-            <label htmlFor="feedback">
-              Optionally provide feedback for the study owner. This can be advice for future management or things
-              required for approval. <br></br>To reject the study you must provide feedback.
-            </label>
-            <Textarea
-              name="feedback"
-              id="feedback"
-              cols={30}
-              rows={10}
-              onChange={handleFeedbackChange}
-              value={feedback}
-            />
-          </form>
+      {status === "Approved" && (
+        <div>
+          <Button onClick={() => handleUpdateStudyStatus("Approved", feedback)}>Update Feedback</Button>
         </div>
-      </Box>
+      )}
+
+      {status !== "Incomplete" && (
+        <Box>
+          <div className={styles["feedback-container"]}>
+            <form className={styles["feedback-form"]}>
+              <label htmlFor="feedback">
+                Optionally provide feedback for the study owner. This can be advice for future management or things
+                required for approval. <br></br>To reject the study you must provide feedback.
+              </label>
+              <Textarea
+                name="feedback"
+                id="feedback"
+                cols={30}
+                rows={10}
+                onChange={handleFeedbackChange}
+                value={feedback}
+              />
+            </form>
+          </div>
+        </Box>
+      )}
     </>
   );
 }
