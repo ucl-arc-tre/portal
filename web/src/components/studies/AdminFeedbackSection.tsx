@@ -37,7 +37,9 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
 
       {status === "Approved" && (
         <div>
-          <Button onClick={() => handleUpdateStudyStatus("Approved", feedback)}>Update Feedback</Button>
+          <Button onClick={() => handleUpdateStudyStatus("Approved", feedback)}>
+            {feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
+          </Button>
         </div>
       )}
 
