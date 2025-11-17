@@ -101,7 +101,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
         path: { studyId },
         body: { status: "Approved", feedback: feedbackContent },
       });
-      if (response.response.ok) {
+      if (!response.response.ok) {
+        console.error("Failed to update study status:", response.error);
+        return response;
+      } else {
         setApprovalStatus("Approved");
         if (feedbackContent) setFeedback(feedbackContent);
       }
@@ -110,7 +113,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
         path: { studyId },
         body: { status: "Rejected", feedback: feedbackContent },
       });
-      if (response.response.ok) {
+      if (!response.response.ok) {
+        console.error("Failed to update study status:", response.error);
+        return response;
+      } else {
         setApprovalStatus("Rejected");
         if (feedbackContent) setFeedback(feedbackContent);
       }
@@ -118,7 +124,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
       const response = await patchStudiesByStudyIdPending({
         path: { studyId },
       });
-      if (response.response.ok) {
+      if (!response.response.ok) {
+        console.error("Failed to update study status:", response.error);
+        return response;
+      } else {
         setApprovalStatus("Pending");
       }
     }

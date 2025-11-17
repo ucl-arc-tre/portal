@@ -1,5 +1,5 @@
 import Box from "../ui/Box";
-import { Textarea } from "../shared/exports";
+import { Alert, AlertMessage, Textarea } from "../shared/exports";
 import styles from "./AdminFeedbackSection.module.css";
 import Button from "../ui/Button";
 import { useState } from "react";
@@ -7,27 +7,45 @@ import { useState } from "react";
 type FeedbackProps = {
   status: string;
   feedbackFromStudy: string;
-  handleUpdateStudyStatus: (status: string, feedbackContent?: string) => void;
+  handleUpdateStudyStatus: (
+    status: string,
+    feedbackContent?: string
+  ) => Promise<
+    | ({ data: unknown; error: undefined } & { request: Request; response: Response })
+    | ({ data: undefined; error: unknown } & { request: Request; response: Response })
+    | undefined
+  >;
 };
 export default function AdminFeedbackSection(props: FeedbackProps) {
   const { status, feedbackFromStudy, handleUpdateStudyStatus } = props;
   const [feedback, setFeedback] = useState(feedbackFromStudy);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
+  };
+
+  const handleStudyStatusUpdate = async (status: string, feedbackContent?: string) => {
+    const err = await handleUpdateStudyStatus(status, feedbackContent);
+    if (!err) {
+      setSuccessMessage("Feedback updated successfully");
+    } else {
+      setErrorMessage("Something went wrong please try again");
+    }
   };
 
   return (
     <>
       {(status === "Pending" || status === "Rejected") && (
         <div>
-          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved", feedback)}>
+          <Button className={styles["approve-button"]} onClick={() => handleStudyStatusUpdate("Approved", feedback)}>
             Approve Study
           </Button>
           <Button
             variant="secondary"
             className={styles["reject-button"]}
-            onClick={() => handleUpdateStudyStatus("Rejected", feedback)}
+            onClick={() => handleStudyStatusUpdate("Rejected", feedback)}
             disabled={feedback.length === 0}
           >
             Request Changes
@@ -37,11 +55,18 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
 
       {status === "Approved" && (
         <div>
-          <Button onClick={() => handleUpdateStudyStatus("Approved", feedback)}>
+          <Button onClick={() => handleStudyStatusUpdate("Approved", feedback)}>
             {feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
           </Button>
         </div>
       )}
+
+      {errorMessage ||
+        (successMessage && (
+          <Alert type={errorMessage ? "error" : "success"}>
+            <AlertMessage>{errorMessage || successMessage}</AlertMessage>
+          </Alert>
+        ))}
 
       {status !== "Incomplete" && (
         <Box>
