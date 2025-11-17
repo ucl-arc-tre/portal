@@ -8,7 +8,7 @@ import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError 
 
 export type StudyFormData = {
   title: string;
-  description: string;
+  description: string | undefined;
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
@@ -46,7 +46,7 @@ type StudyProps = {
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
   const studyData: StudyRequest = {
     title: data.title,
-    description: data.description ? data.description : undefined,
+    description: data.description && data.description?.trim().length > 0 ? data.description : undefined,
     data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
     additional_study_admin_usernames: data.additionalStudyAdminUsernames
       .map((admin) => admin.value.trim())
