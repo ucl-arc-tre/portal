@@ -374,6 +374,23 @@ paths:
         default:
           description: Unexpected error
 
+  # Environments
+  /environments:
+    get:
+      description: Get all available environments with their tier mappings
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Environment"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Project Management - TRE Environment
   /projects/tre:
     get:
@@ -1216,6 +1233,27 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
+        asset_id:
+          type: string
+          description: Optional unique identifier of an asset to link to this project
+
+    Environment:
+      type: object
+      description: An environment with its tier mapping
+      required:
+        - id
+        - name
+        - tier
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the environment
+        name:
+          type: string
+          description: Name of the environment (e.g., "ARC Trusted Research Environment")
+        tier:
+          type: integer
+          description: Maximum data tier this environment can handle (assets with tier <= this value can be used)
 
     ProjectTRE:
       type: object

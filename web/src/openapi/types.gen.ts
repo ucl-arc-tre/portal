@@ -359,6 +359,28 @@ export type ProjectTreRequest = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
+    /**
+     * Optional unique identifier of an asset to link to this project
+     */
+    asset_id?: string;
+};
+
+/**
+ * An environment with its tier mapping
+ */
+export type Environment = {
+    /**
+     * Unique identifier for the environment
+     */
+    id: string;
+    /**
+     * Name of the environment (e.g., "ARC Trusted Research Environment")
+     */
+    name: string;
+    /**
+     * Maximum data tier this environment can handle (assets with tier <= this value can be used)
+     */
+    tier: number;
 };
 
 /**
@@ -972,6 +994,30 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
      */
     201: unknown;
 };
+
+export type GetEnvironmentsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/environments';
+};
+
+export type GetEnvironmentsErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetEnvironmentsResponses = {
+    200: Array<Environment>;
+};
+
+export type GetEnvironmentsResponse = GetEnvironmentsResponses[keyof GetEnvironmentsResponses];
 
 export type GetProjectsTreData = {
     body?: never;

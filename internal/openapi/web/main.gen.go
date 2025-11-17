@@ -411,6 +411,18 @@ type ContractUploadObject struct {
 // ContractUploadObjectStatus Current status of the contract
 type ContractUploadObjectStatus string
 
+// Environment An environment with its tier mapping
+type Environment struct {
+	// Id Unique identifier for the environment
+	Id string `json:"id"`
+
+	// Name Name of the environment (e.g., "ARC Trusted Research Environment")
+	Name string `json:"name"`
+
+	// Tier Maximum data tier this environment can handle (assets with tier <= this value can be used)
+	Tier int `json:"tier"`
+}
+
 // Profile defines model for Profile.
 type Profile struct {
 	ChosenName string `json:"chosen_name"`
@@ -470,6 +482,9 @@ type ProjectTRE struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
+	// AssetId Optional unique identifier of an asset to link to this project
+	AssetId *string `json:"asset_id,omitempty"`
+
 	// Name Name of the project
 	Name string `json:"name"`
 
@@ -772,6 +787,9 @@ type ServerInterface interface {
 	// (GET /auth)
 	GetAuth(c *gin.Context)
 
+	// (GET /environments)
+	GetEnvironments(c *gin.Context)
+
 	// (GET /logout)
 	GetLogout(c *gin.Context)
 
@@ -901,6 +919,19 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	}
 
 	siw.Handler.GetAuth(c)
+}
+
+// GetEnvironments operation middleware
+func (siw *ServerInterfaceWrapper) GetEnvironments(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetEnvironments(c)
 }
 
 // GetLogout operation middleware
@@ -1533,6 +1564,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/agreements/:agreementType", wrapper.GetAgreementsAgreementType)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
+	router.GET(options.BaseURL+"/environments", wrapper.GetEnvironments)
 	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
