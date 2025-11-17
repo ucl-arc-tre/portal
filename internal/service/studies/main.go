@@ -88,7 +88,7 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		return &openapi.ValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
 	}
 
-	if studyData.IsDataProtectionOfficeRegistered != nil {
+	if studyData.IsDataProtectionOfficeRegistered != nil && *studyData.IsDataProtectionOfficeRegistered {
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
 			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
