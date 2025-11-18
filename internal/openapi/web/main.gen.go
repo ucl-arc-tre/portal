@@ -498,7 +498,7 @@ type Study struct {
 	DataProtectionNumber *string `json:"data_protection_number"`
 
 	// Description Description of the study
-	Description *string `json:"description,omitempty"`
+	Description *string `json:"description"`
 	Feedback    *string `json:"feedback,omitempty"`
 
 	// Id Unique identifier for the study
@@ -586,7 +586,7 @@ type StudyBase struct {
 	DataProtectionNumber *string `json:"data_protection_number"`
 
 	// Description Description of the study
-	Description *string `json:"description,omitempty"`
+	Description *string `json:"description"`
 
 	// InvolvesCag Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
 	InvolvesCag *bool `json:"involves_cag"`

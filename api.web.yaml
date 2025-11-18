@@ -1128,6 +1128,7 @@ components:
           description: Title of the study
         description:
           type: string
+          nullable: true
           description: Description of the study
         additional_study_admin_usernames:
           type: array
