@@ -41,43 +41,65 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.radio-group {
+.assets-label {
+  font-weight: bold;
+}
+
+.assets-fieldset {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.asset-wrapper {
   display: flex;
-  flex-direction: column;
-}
-
-.radio-option,
-.radio-option-disabled {
-  display: grid;
-  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.asset-wrapper .select {
+  flex: 1;
+}
+
+.remove-asset-button {
+  padding: 0.5rem 0.75rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background-color 0.2s;
 }
 
-.radio-option-disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.remove-asset-button:hover {
+  background-color: #c82333;
 }
 
-.radio-option input[type="radio"],
-.radio-option-disabled input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  cursor: pointer;
+.remove-asset-button:focus {
+  outline: 2px solid #dc3545;
+  outline-offset: 2px;
 }
 
-.radio-option span,
-.radio-option-disabled span {
-  font-size: 1rem;
-  color: #1a1a1a;
-  font-weight: 500;
+.add-asset-button {
+  margin-top: 0.5rem;
 }
 
-.radio-option-disabled span {
-  color: #666;
+.environment-docs {
+  padding: 0.75rem;
+  background-color: #e7f3ff;
+}
+
+.environment-docs a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.environment-docs a:hover {
+  text-decoration: underline;
 }
 
 .actions {

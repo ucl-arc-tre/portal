@@ -27,8 +27,23 @@ export default function Projects({ userData }: Props) {
     setIsLoading(true);
     try {
       const [projectsResponse, studiesResponse] = await Promise.all([getProjectsTre(), getStudies()]);
-      setProjects(projectsResponse.data || []);
-      setStudies(studiesResponse.data || []);
+
+      if (projectsResponse.response.ok && projectsResponse.data) {
+        setProjects(projectsResponse.data);
+      } else {
+        throw new Error(
+          `Failed to fetch projects: ${projectsResponse.response.status} ${projectsResponse.response.statusText}`
+        );
+      }
+
+      if (studiesResponse.response.ok && studiesResponse.data) {
+        setStudies(studiesResponse.data);
+      } else {
+        throw new Error(
+          `Failed to fetch studies: ${studiesResponse.response.status} ${studiesResponse.response.statusText}`
+        );
+      }
+
       setError(null);
     } catch (error) {
       console.error("Failed to fetch data:", error);
