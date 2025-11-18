@@ -360,9 +360,9 @@ export type ProjectTreRequest = {
      */
     study_id: string;
     /**
-     * Optional unique identifier of an asset to link to this project
+     * Optional list of asset identifiers to link to this project
      */
-    asset_id?: string;
+    asset_ids?: Array<string>;
 };
 
 /**

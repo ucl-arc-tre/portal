@@ -482,8 +482,8 @@ type ProjectTRE struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
-	// AssetId Optional unique identifier of an asset to link to this project
-	AssetId *string `json:"asset_id,omitempty"`
+	// AssetIds Optional list of asset identifiers to link to this project
+	AssetIds *[]string `json:"asset_ids,omitempty"`
 
 	// Name Name of the project
 	Name string `json:"name"`

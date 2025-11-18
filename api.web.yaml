@@ -1233,9 +1233,11 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
-        asset_id:
-          type: string
-          description: Optional unique identifier of an asset to link to this project
+        asset_ids:
+          type: array
+          description: Optional list of asset identifiers to link to this project
+          items:
+            type: string
 
     Environment:
       type: object
