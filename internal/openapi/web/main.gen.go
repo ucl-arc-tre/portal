@@ -501,7 +501,7 @@ type Study struct {
 	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
 
 	// CagReference CAG reference number
-	CagReference *string `json:"cag_reference,omitempty"`
+	CagReference *string `json:"cag_reference"`
 
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
@@ -510,7 +510,7 @@ type Study struct {
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
 	// DataProtectionNumber Full data protection registration number
-	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+	DataProtectionNumber *string `json:"data_protection_number"`
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
@@ -520,49 +520,49 @@ type Study struct {
 	Id string `json:"id"`
 
 	// InvolvesCag Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
-	InvolvesCag *bool `json:"involves_cag,omitempty"`
+	InvolvesCag *bool `json:"involves_cag"`
 
 	// InvolvesDataProcessingOutsideEea Whether data is processed outside UK/EEA
-	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea,omitempty"`
+	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea"`
 
 	// InvolvesEthicsApproval Whether Research Ethics Committee approval is involved (seeking/have sought)
-	InvolvesEthicsApproval *bool `json:"involves_ethics_approval,omitempty"`
+	InvolvesEthicsApproval *bool `json:"involves_ethics_approval"`
 
 	// InvolvesExternalUsers Whether external users will have access to the study
-	InvolvesExternalUsers *bool `json:"involves_external_users,omitempty"`
+	InvolvesExternalUsers *bool `json:"involves_external_users"`
 
 	// InvolvesHraApproval Whether Health Research Authority approval is involved (seeking/have sought)
-	InvolvesHraApproval *bool `json:"involves_hra_approval,omitempty"`
+	InvolvesHraApproval *bool `json:"involves_hra_approval"`
 
 	// InvolvesIndirectDataCollection Whether data is collected indirectly for the study (e.g. via a third party)
-	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection,omitempty"`
+	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection"`
 
 	// InvolvesMnca Whether the HRA Model Non-Commercial Agreement is involved
-	InvolvesMnca *bool `json:"involves_mnca,omitempty"`
+	InvolvesMnca *bool `json:"involves_mnca"`
 
 	// InvolvesNhsEngland Whether NHS England is involved in the research
-	InvolvesNhsEngland *bool `json:"involves_nhs_england,omitempty"`
+	InvolvesNhsEngland *bool `json:"involves_nhs_england"`
 
 	// InvolvesParticipantConsent Whether participant consent is involved (seeking/have sought)
-	InvolvesParticipantConsent *bool `json:"involves_participant_consent,omitempty"`
+	InvolvesParticipantConsent *bool `json:"involves_participant_consent"`
 
 	// InvolvesThirdParty Whether third party organizations are involved
-	InvolvesThirdParty *bool `json:"involves_third_party,omitempty"`
+	InvolvesThirdParty *bool `json:"involves_third_party"`
 
 	// InvolvesUclSponsorship Whether UCL sponsorship is involved (seeking/have sought)
-	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship,omitempty"`
+	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship"`
 
 	// IrasId IRAS ID if applicable
-	IrasId *string `json:"iras_id,omitempty"`
+	IrasId *string `json:"iras_id"`
 
 	// IsDataProtectionOfficeRegistered Whether the study is registered with the UCL Data Protection Office
-	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered,omitempty"`
+	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered"`
 
 	// IsNhsAssociated Whether the research is associated with NHS
-	IsNhsAssociated *bool `json:"is_nhs_associated,omitempty"`
+	IsNhsAssociated *bool `json:"is_nhs_associated"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string `json:"nhs_england_reference"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
@@ -571,10 +571,10 @@ type Study struct {
 	OwnerUsername *string `json:"owner_username,omitempty"`
 
 	// RequiresDbs Whether a DBS check is required for staff
-	RequiresDbs *bool `json:"requires_dbs,omitempty"`
+	RequiresDbs *bool `json:"requires_dbs"`
 
 	// RequiresDspt Whether NHS Data Security & Protection Toolkit is required
-	RequiresDspt *bool `json:"requires_dspt,omitempty"`
+	RequiresDspt *bool `json:"requires_dspt"`
 
 	// Title Title of the study
 	Title string `json:"title"`
@@ -592,61 +592,61 @@ type StudyBase struct {
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
 	// CagReference CAG reference number
-	CagReference *string `json:"cag_reference,omitempty"`
+	CagReference *string `json:"cag_reference"`
 
 	// DataControllerOrganisation The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
 	DataControllerOrganisation string `json:"data_controller_organisation"`
 
 	// DataProtectionNumber Full data protection registration number
-	DataProtectionNumber *string `json:"data_protection_number,omitempty"`
+	DataProtectionNumber *string `json:"data_protection_number"`
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
 
 	// InvolvesCag Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
-	InvolvesCag *bool `json:"involves_cag,omitempty"`
+	InvolvesCag *bool `json:"involves_cag"`
 
 	// InvolvesDataProcessingOutsideEea Whether data is processed outside UK/EEA
-	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea,omitempty"`
+	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea"`
 
 	// InvolvesEthicsApproval Whether Research Ethics Committee approval is involved (seeking/have sought)
-	InvolvesEthicsApproval *bool `json:"involves_ethics_approval,omitempty"`
+	InvolvesEthicsApproval *bool `json:"involves_ethics_approval"`
 
 	// InvolvesExternalUsers Whether external users will have access to the study
-	InvolvesExternalUsers *bool `json:"involves_external_users,omitempty"`
+	InvolvesExternalUsers *bool `json:"involves_external_users"`
 
 	// InvolvesHraApproval Whether Health Research Authority approval is involved (seeking/have sought)
-	InvolvesHraApproval *bool `json:"involves_hra_approval,omitempty"`
+	InvolvesHraApproval *bool `json:"involves_hra_approval"`
 
 	// InvolvesIndirectDataCollection Whether data is collected indirectly for the study (e.g. via a third party)
-	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection,omitempty"`
+	InvolvesIndirectDataCollection *bool `json:"involves_indirect_data_collection"`
 
 	// InvolvesMnca Whether the HRA Model Non-Commercial Agreement is involved
-	InvolvesMnca *bool `json:"involves_mnca,omitempty"`
+	InvolvesMnca *bool `json:"involves_mnca"`
 
 	// InvolvesNhsEngland Whether NHS England is involved in the research
-	InvolvesNhsEngland *bool `json:"involves_nhs_england,omitempty"`
+	InvolvesNhsEngland *bool `json:"involves_nhs_england"`
 
 	// InvolvesParticipantConsent Whether participant consent is involved (seeking/have sought)
-	InvolvesParticipantConsent *bool `json:"involves_participant_consent,omitempty"`
+	InvolvesParticipantConsent *bool `json:"involves_participant_consent"`
 
 	// InvolvesThirdParty Whether third party organizations are involved
-	InvolvesThirdParty *bool `json:"involves_third_party,omitempty"`
+	InvolvesThirdParty *bool `json:"involves_third_party"`
 
 	// InvolvesUclSponsorship Whether UCL sponsorship is involved (seeking/have sought)
-	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship,omitempty"`
+	InvolvesUclSponsorship *bool `json:"involves_ucl_sponsorship"`
 
 	// IrasId IRAS ID if applicable
-	IrasId *string `json:"iras_id,omitempty"`
+	IrasId *string `json:"iras_id"`
 
 	// IsDataProtectionOfficeRegistered Whether the study is registered with the UCL Data Protection Office
-	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered,omitempty"`
+	IsDataProtectionOfficeRegistered *bool `json:"is_data_protection_office_registered"`
 
 	// IsNhsAssociated Whether the research is associated with NHS
-	IsNhsAssociated *bool `json:"is_nhs_associated,omitempty"`
+	IsNhsAssociated *bool `json:"is_nhs_associated"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string `json:"nhs_england_reference"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
@@ -655,17 +655,17 @@ type StudyBase struct {
 	OwnerUsername *string `json:"owner_username,omitempty"`
 
 	// RequiresDbs Whether a DBS check is required for staff
-	RequiresDbs *bool `json:"requires_dbs,omitempty"`
+	RequiresDbs *bool `json:"requires_dbs"`
 
 	// RequiresDspt Whether NHS Data Security & Protection Toolkit is required
-	RequiresDspt *bool `json:"requires_dspt,omitempty"`
+	RequiresDspt *bool `json:"requires_dspt"`
 
 	// Title Title of the study
 	Title string `json:"title"`
 }
 
-// StudyCreateRequest Base study properties
-type StudyCreateRequest = StudyBase
+// StudyRequest Base study properties
+type StudyRequest = StudyBase
 
 // StudyReview defines model for StudyReview.
 type StudyReview struct {
@@ -722,6 +722,12 @@ type ValidationError struct {
 	ErrorMessage string `json:"error_message"`
 }
 
+// GetStudiesParams defines parameters for GetStudies.
+type GetStudiesParams struct {
+	// Status get studies by status
+	Status *StudyApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
@@ -752,10 +758,13 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
 
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
-type PostStudiesJSONRequestBody = StudyCreateRequest
+type PostStudiesJSONRequestBody = StudyRequest
 
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
+
+// PutStudiesStudyIdJSONRequestBody defines body for PutStudiesStudyId for application/json ContentType.
+type PutStudiesStudyIdJSONRequestBody = StudyRequest
 
 // PostStudiesStudyIdAgreementsJSONRequestBody defines body for PostStudiesStudyIdAgreements for application/json ContentType.
 type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
@@ -821,7 +830,7 @@ type ServerInterface interface {
 	GetProjectsTreProjectId(c *gin.Context, projectId string)
 
 	// (GET /studies)
-	GetStudies(c *gin.Context)
+	GetStudies(c *gin.Context, params GetStudiesParams)
 
 	// (POST /studies)
 	PostStudies(c *gin.Context)
@@ -831,6 +840,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId})
 	GetStudiesStudyId(c *gin.Context, studyId string)
+
+	// (PUT /studies/{studyId})
+	PutStudiesStudyId(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/agreements)
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
@@ -858,6 +870,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
 	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
+
+	// (PATCH /studies/{studyId}/pending)
+	PatchStudiesStudyIdPending(c *gin.Context, studyId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -1078,6 +1093,19 @@ func (siw *ServerInterfaceWrapper) GetProjectsTreProjectId(c *gin.Context) {
 // GetStudies operation middleware
 func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetStudiesParams
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "status", c.Request.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1085,7 +1113,7 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetStudies(c)
+	siw.Handler.GetStudies(c, params)
 }
 
 // PostStudies operation middleware
@@ -1147,6 +1175,30 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
 	}
 
 	siw.Handler.GetStudiesStudyId(c, studyId)
+}
+
+// PutStudiesStudyId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutStudiesStudyId(c, studyId)
 }
 
 // GetStudiesStudyIdAgreements operation middleware
@@ -1428,6 +1480,30 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
 }
 
+// PatchStudiesStudyIdPending operation middleware
+func (siw *ServerInterfaceWrapper) PatchStudiesStudyIdPending(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PatchStudiesStudyIdPending(c, studyId)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -1579,6 +1655,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
+	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
@@ -1588,6 +1665,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
 	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId", wrapper.PutStudiesStudyIdAssetsAssetIdContractsContractId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
+	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

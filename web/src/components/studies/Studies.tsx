@@ -1,117 +1,136 @@
-import { useState } from "react";
-import { postStudies, Study, StudyCreateRequest, Auth, ValidationError } from "@/openapi";
+import { useEffect, useState } from "react";
+import { Study, Auth, getStudies } from "@/openapi";
+import StudyForm from "./StudyForm";
 import StudyCardsList from "./StudyCardsList";
-import CreateStudyForm, { StudyFormData } from "./CreateStudyForm";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 
 import styles from "./Studies.module.css";
+import Loading from "../ui/Loading";
+import { Alert, AlertMessage } from "../shared/exports";
 
 type Props = {
   userData: Auth;
-  studies: Study[];
-  fetchStudies: () => void;
 };
 
 export default function Studies(props: Props) {
-  const { userData, studies, fetchStudies } = props;
-  const [createStudyFormOpen, setCreateStudyFormOpen] = useState(false);
+  const { userData } = props;
+  const [studyFormOpen, setStudyFormOpen] = useState(false);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [studiesLoading, setStudiesLoading] = useState(true);
+  const [studies, setStudies] = useState<Study[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // this should match the domain that is used for the entra ID users in the portal
-  const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+  const [tab, setTab] = useState("pending");
+  const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
+
+  const isAdmin = userData.roles.includes("admin");
+
+  useEffect(() => {
+    const fetchPendingStudies = async () => {
+      setStudiesLoading(true);
+      try {
+        const response = await getStudies({ query: { status: "Pending" } });
+        if (response.response.ok && response.data) {
+          setPendingStudies(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to get pending studies:", error);
+        setErrorMessage("Failed to get pending studies. Please try again.");
+      } finally {
+        setStudiesLoading(false);
+      }
+    };
+    if (isAdmin) {
+      fetchPendingStudies();
+    }
+  }, [isAdmin]);
+
+  const handleAllStudiesClick = async () => {
+    setTab("all");
+
+    if (!studies.length) {
+      fetchStudies();
+    }
+  };
+
+  const handlePendingStudiesClick = async () => {
+    setTab("pending");
+  };
+
+  const fetchStudies = async () => {
+    setStudiesLoading(true);
+    try {
+      const response = await getStudies();
+      setStudies(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch studies:", error);
+      setErrorMessage("Failed to fetch studies. Please try again.");
+      setStudies([]);
+    } finally {
+      setStudiesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudies();
+  }, []);
 
   const handleCreateStudyClick = () => {
     if (!userData.roles.includes("approved-staff-researcher")) {
       setShowUclStaffModal(true);
       return;
     }
-    setCreateStudyFormOpen(true);
+    setStudyFormOpen(true);
   };
 
-  const handleStudySubmit = async (data: StudyFormData) => {
-    setIsSubmitting(true);
-    setSubmitError(null);
+  if (errorMessage) {
+    return (
+      <Alert type="error">
+        <AlertMessage>{errorMessage}</AlertMessage>
+      </Alert>
+    );
+  }
 
-    try {
-      // Convert form data to StudyCreateRequest API format
-      const studyData: StudyCreateRequest = {
-        title: data.title,
-        description: data.description ? data.description : undefined,
-        data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
-        additional_study_admin_usernames: data.additionalStudyAdminUsernames
-          .map((admin) => admin.value.trim())
-          .map((username) => `${username}${domainName}`),
-        involves_ucl_sponsorship: data.involvesUclSponsorship ? data.involvesUclSponsorship : undefined,
-        involves_cag: data.involvesCag ? data.involvesCag : undefined,
-        cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
-        involves_ethics_approval: data.involvesEthicsApproval ? data.involvesEthicsApproval : undefined,
-        involves_hra_approval: data.involvesHraApproval ? data.involvesHraApproval : undefined,
-        iras_id: data.irasId ? data.irasId : undefined,
-        is_nhs_associated: data.isNhsAssociated ? data.isNhsAssociated : undefined,
-        involves_nhs_england: data.involvesNhsEngland ? data.involvesNhsEngland : undefined,
-        nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
-        involves_mnca: data.involvesMnca ? data.involvesMnca : undefined,
-        requires_dspt: data.requiresDspt ? data.requiresDspt : undefined,
-        requires_dbs: data.requiresDbs ? data.requiresDbs : undefined,
-        is_data_protection_office_registered: data.isDataProtectionOfficeRegistered
-          ? data.isDataProtectionOfficeRegistered
-          : undefined,
-        data_protection_number:
-          data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
-            ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
-            : undefined,
-        involves_third_party: data.involvesThirdParty ? data.involvesThirdParty : undefined,
-        involves_external_users: data.involvesExternalUsers ? data.involvesExternalUsers : undefined,
-        involves_participant_consent: data.involvesParticipantConsent ? data.involvesParticipantConsent : undefined,
-        involves_indirect_data_collection: data.involvesIndirectDataCollection
-          ? data.involvesIndirectDataCollection
-          : undefined,
-        involves_data_processing_outside_eea: data.involvesDataProcessingOutsideEea
-          ? data.involvesDataProcessingOutsideEea
-          : undefined,
-      };
+  if (isAdmin) {
+    return (
+      <>
+        {tab === "pending" && <h2>Studies to Review</h2>}
+        {tab === "all" && <h2>All Studies</h2>}
 
-      const response = await postStudies({
-        body: studyData,
-      });
+        <div className={styles["study-tabs"]}>
+          <Button
+            onClick={handlePendingStudiesClick}
+            variant="secondary"
+            className={`${styles.tab} ${styles["pending-studies-tab"]} ${tab === "pending" ? styles.active : ""}`}
+          >
+            Pending Studies
+          </Button>
+          <Button
+            onClick={handleAllStudiesClick}
+            variant="secondary"
+            className={`${styles.tab} ${styles["all-studies-tab"]} ${tab === "all" ? styles.active : ""}`}
+          >
+            All Studies
+          </Button>
+        </div>
 
-      if (response.data) {
-        setCreateStudyFormOpen(false);
-        fetchStudies();
-        return;
-      }
-
-      if (response.error) {
-        const errorData = response.error as ValidationError;
-        if (errorData?.error_message) {
-          setSubmitError(errorData.error_message);
-          return;
-        }
-      }
-
-      setSubmitError("An unknown error occurred.");
-    } catch (error) {
-      console.error("Failed to create study:", error);
-      setSubmitError("Failed to create study. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+        {studiesLoading && <Loading message="Loading studies..." />}
+        {studies.length === 0 ? (
+          <div className={styles["no-studies-message"]}>
+            <h2>No studies found</h2>
+          </div>
+        ) : (
+          <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
-      {createStudyFormOpen && (
-        <CreateStudyForm
-          username={userData.username}
-          setCreateStudyFormOpen={setCreateStudyFormOpen}
-          handleStudySubmit={handleStudySubmit}
-          submitError={submitError}
-          isSubmitting={isSubmitting}
-          setSubmitError={setSubmitError}
-        />
+      {studyFormOpen && (
+        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudyData={fetchStudies} />
       )}
 
       {showUclStaffModal && (
@@ -126,6 +145,7 @@ export default function Studies(props: Props) {
           </div>
         </Dialog>
       )}
+      {studiesLoading && <Loading message="Loading studies..." />}
 
       {!userData.roles.includes("approved-staff-researcher") && studies.length === 0 ? (
         <div className={styles["no-studies-message"]}>

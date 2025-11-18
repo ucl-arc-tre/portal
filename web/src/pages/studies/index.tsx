@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getStudies, Study } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import Studies from "@/components/studies/Studies";
@@ -8,37 +6,14 @@ import Button from "@/components/ui/Button";
 import Title from "@/components/ui/Title";
 import InfoTooltip from "@/components/ui/InfoTooltip";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Loading from "@/components/ui/Loading";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
-import StudyCardsList from "@/components/studies/StudyCardsList";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
-  const [studies, setStudies] = useState<Study[]>([]);
-  const [studiesLoading, setStudiesLoading] = useState(true);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isAdmin = userData?.roles.includes("admin");
-
-  const fetchStudies = async () => {
-    setStudiesLoading(true);
-    try {
-      const response = await getStudies();
-      setStudies(response.data || []);
-    } catch (error) {
-      console.error("Failed to fetch studies:", error);
-      setStudies([]);
-    } finally {
-      setStudiesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!isApprovedResearcher && !isAdmin) return;
-    fetchStudies();
-  }, [isApprovedResearcher, isAdmin]);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -74,9 +49,7 @@ export default function StudiesPage() {
         </span>
       </Callout>
 
-      {isAdmin && <StudyCardsList studies={studies} isAdmin={true} />}
-
-      {!isAdmin && !isApprovedResearcher && (
+      {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
             To create and manage your studies, please first set up your profile by completing the approved researcher
@@ -89,11 +62,7 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {!isAdmin && isApprovedResearcher && studiesLoading && <Loading message="Loading studies..." />}
-
-      {!isAdmin && isApprovedResearcher && !studiesLoading && (
-        <Studies userData={userData!} studies={studies} fetchStudies={fetchStudies} />
-      )}
+      {isApprovedResearcher && <Studies userData={userData!} />}
     </>
   );
 }

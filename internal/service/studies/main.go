@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/google/uuid"
@@ -39,7 +40,7 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
@@ -58,7 +59,7 @@ func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyCre
 	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
 }
 
-func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]types.User, error) {
+func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.User, error) {
 	admins := []types.User{}
 
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
@@ -67,12 +68,14 @@ func (s *Service) createStudyAdmins(studyData openapi.StudyCreateRequest) ([]typ
 			log.Err(err).Any("username", studyAdminUsername).Msg("Failed to get persisted user. Cannot create study admin")
 			return admins, err
 		}
-		admins = append(admins, user)
+		if !slices.Contains(admins, user) {
+			admins = append(admins, user)
+		}
 	}
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
+func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) (*openapi.ValidationError, error) {
 	if !titlePattern.MatchString(studyData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
@@ -85,10 +88,15 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 		return &openapi.ValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
 	}
 
-	if studyData.IsDataProtectionOfficeRegistered != nil {
+	if studyData.IsDataProtectionOfficeRegistered != nil && *studyData.IsDataProtectionOfficeRegistered {
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
 			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
+	}
+
+	maxExpectedStudies := 0
+	if isUpdate {
+		maxExpectedStudies = 1
 	}
 
 	// Check if the study title already exists
@@ -97,7 +105,7 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
-	if count > 0 {
+	if count > int64(maxExpectedStudies) {
 		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
 	}
 
@@ -111,8 +119,8 @@ func (s *Service) validateStudyData(ctx context.Context, owner types.User, study
 	return nil, nil
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyCreateRequest) (*openapi.ValidationError, error) {
-	validationError, err := s.validateStudyData(ctx, owner, studyData)
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
+	validationError, err := s.ValidateStudyData(ctx, studyData, false)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
@@ -139,6 +147,13 @@ func (s *Service) AllStudies() ([]types.Study, error) {
 	return studies, types.NewErrFromGorm(err)
 }
 
+func (s *Service) PendingStudies() ([]types.Study, error) {
+	studies := []types.Study{}
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Pending).Find(&studies).Error
+
+	return studies, types.NewErrFromGorm(err)
+}
+
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
@@ -146,23 +161,12 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	return studies, types.NewErrFromGorm(err)
 }
 
-// handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateRequest, studyAdminUsers []types.User) (*types.Study, error) {
-	// Start a transaction
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	study := types.Study{
-		OwnerUserID:                owner.ID,
-		Title:                      studyData.Title,
-		DataControllerOrganisation: studyData.DataControllerOrganisation,
-		ApprovalStatus:             string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+// given a study and data from a request, line up the values
+func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
+	if studyData.Title != "" {
+		study.Title = studyData.Title
 	}
-
+	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.Description = studyData.Description
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
@@ -184,6 +188,39 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	study.InvolvesIndirectDataCollection = studyData.InvolvesIndirectDataCollection
 	study.InvolvesDataProcessingOutsideEea = studyData.InvolvesDataProcessingOutsideEea
 
+}
+
+func createStudyAdminFromStudyAdminUser(studyAdminUsers []types.User, tx *gorm.DB, study *types.Study) error {
+	for _, studyAdminUser := range studyAdminUsers {
+		studyAdmin := types.StudyAdmin{
+			StudyID: study.ID,
+			UserID:  studyAdminUser.ID,
+		}
+		if err := tx.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create study admin")
+		}
+	}
+	return nil
+}
+
+// handles the database transaction for creating a study and its admins
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) (*types.Study, error) {
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	study := types.Study{
+		OwnerUserID:    owner.ID,
+		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+	}
+
+	setStudyFromStudyData(&study, studyData)
+
 	// Create the study
 	if err := tx.Create(&study).Error; err != nil {
 		tx.Rollback()
@@ -191,15 +228,9 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyCreateReq
 	}
 
 	// Create StudyAdmin records for each study admin user
-	for _, studyAdminUser := range studyAdminUsers {
-		studyAdmin := types.StudyAdmin{
-			StudyID: study.ID,
-			UserID:  studyAdminUser.ID,
-		}
-		if err := tx.Create(&studyAdmin).Error; err != nil {
-			tx.Rollback()
-			return nil, types.NewErrFromGorm(err, "failed to create study admin")
-		}
+	err := createStudyAdminFromStudyAdminUser(studyAdminUsers, tx, &study)
+	if err != nil {
+		return nil, err
 	}
 
 	// Commit the transaction
@@ -214,6 +245,66 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	study := types.Study{}
 	feedback := review.Feedback
 	status := review.Status
+
 	result := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback)
 	return types.NewErrFromGorm(result.Error, "failed to update study review")
+}
+
+func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	studies, err := s.StudiesById(id)
+	if err != nil {
+		return err
+	} else if len(studies) == 0 {
+		return types.NewNotFoundError("study not found")
+	}
+	study := studies[0]
+	setStudyFromStudyData(&study, studyData)
+
+	studyAdmins, err := s.createStudyAdmins(studyData)
+	if err != nil {
+		return err
+	}
+
+	err = createStudyAdminFromStudyAdminUser(studyAdmins, tx, &study)
+	if err != nil {
+		return err
+	}
+
+	if err := tx.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to update study")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit update study transaction")
+	}
+
+	return nil
+}
+
+func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uuid.UUID, review openapi.StudyReview) error {
+
+	studies, err := s.StudiesById(studyUUID)
+	if err != nil {
+		return err
+	}
+
+	// IAO + IAAs should be recipients
+	recipients := []string{string(studies[0].Owner.Username)}
+	for _, studyAdmin := range studies[0].StudyAdmins {
+		recipients = append(recipients, string(studyAdmin.User.Username))
+	}
+
+	err = s.entra.SendCustomStudyReviewNotification(ctx, recipients, review)
+	if err != nil {
+		return err
+	}
+	return nil
 }
