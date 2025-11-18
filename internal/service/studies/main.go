@@ -166,8 +166,6 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 	if studyData.Title != "" {
 		study.Title = studyData.Title
 	}
-	log.Debug().Msg("within setStudyFromStudyData")
-
 	study.Description = studyData.Description
 	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
@@ -253,7 +251,6 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 }
 
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
-
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
