@@ -87,6 +87,21 @@
   margin-top: 0.5rem;
 }
 
+.environment-docs {
+  padding: 0.75rem;
+  background-color: #e7f3ff;
+}
+
+.environment-docs a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.environment-docs a:hover {
+  text-decoration: underline;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

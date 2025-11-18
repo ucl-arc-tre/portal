@@ -234,6 +234,37 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
               </Alert>
             )}
             <HelperText>Select the environment where this project will be deployed</HelperText>
+
+            {selectedEnvironmentId &&
+              (() => {
+                const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
+                if (!selectedEnvironment) return null;
+
+                switch (selectedEnvironment.name) {
+                  case "ARC Trusted Research Environment":
+                    return (
+                      <div className={styles["environment-docs"]}>
+                        <a href="https://docs.tre.arc.ucl.ac.uk/" target="_blank" rel="noopener noreferrer">
+                          View TRE documentation
+                        </a>
+                      </div>
+                    );
+                  case "Data Safe Haven":
+                    return (
+                      <div className={styles["environment-docs"]}>
+                        <a
+                          href="https://www.ucl.ac.uk/isd/services/file-storage-sharing/data-safe-haven-dsh"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          View DSH documentation
+                        </a>
+                      </div>
+                    );
+                  default:
+                    return null;
+                }
+              })()}
           </div>
 
           <div className={styles["form-field"]}>
