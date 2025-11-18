@@ -166,8 +166,10 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 	if studyData.Title != "" {
 		study.Title = studyData.Title
 	}
-	study.DataControllerOrganisation = studyData.DataControllerOrganisation
+	log.Debug().Msg("within setStudyFromStudyData")
+
 	study.Description = studyData.Description
+	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
 	study.CagReference = studyData.CagReference
@@ -251,6 +253,7 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 }
 
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
+
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -277,7 +280,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return err
 	}
 
-	if err := tx.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
+	if err := tx.Updates(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
@@ -285,6 +288,8 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 	if err := tx.Commit().Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to commit update study transaction")
 	}
+
+	log.Debug().Any("description", study.Description).Msg("Updated study...maybe")
 
 	return nil
 }
