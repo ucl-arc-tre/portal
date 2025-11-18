@@ -130,6 +130,13 @@ export default function StudyDetails(props: StudyDetailsProps) {
       } else {
         setApprovalStatus("Pending");
       }
+    } else if (status === "Pending") {
+      const response = await patchStudiesByStudyIdPending({
+        path: { studyId },
+      });
+      if (response.response.ok) {
+        setApprovalStatus("Pending");
+      }
     }
   };
 

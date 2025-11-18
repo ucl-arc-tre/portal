@@ -8,7 +8,7 @@ import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError 
 
 export type StudyFormData = {
   title: string;
-  description: string;
+  description: string | undefined;
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
@@ -39,35 +39,38 @@ export type StudyFormData = {
 type StudyProps = {
   username: string;
   setStudyFormOpen: (name: boolean) => void;
-  fetchStudyData?: (id?: string) => void;
+  fetchStudyData: (id?: string) => void;
   editingStudy?: Study | null;
 };
 
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
-  console.log("cagref value", data.cagReference);
   const studyData: StudyRequest = {
     title: data.title,
-    description: data.description ? data.description : undefined,
+    description: data.description && data.description?.trim().length > 0 ? data.description : undefined,
     data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
     additional_study_admin_usernames: data.additionalStudyAdminUsernames
       .map((admin) => admin.value.trim())
       .map((username) => `${username}${domainName}`),
     involves_ucl_sponsorship: data.involvesUclSponsorship !== undefined ? data.involvesUclSponsorship : undefined,
     involves_cag: data.involvesCag !== undefined ? data.involvesCag : undefined,
-    cag_reference: data.cagReference ? data.cagReference.toString() : undefined,
+    cag_reference: data.involvesCag && data.cagReference ? data.cagReference.toString() : undefined,
     involves_ethics_approval: data.involvesEthicsApproval !== undefined ? data.involvesEthicsApproval : undefined,
     involves_hra_approval: data.involvesHraApproval !== undefined ? data.involvesHraApproval : undefined,
-    iras_id: data.irasId ? data.irasId : undefined,
+    iras_id: data.involvesHraApproval && data.irasId ? data.irasId : undefined,
     is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
     involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
-    nhs_england_reference: data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+    nhs_england_reference:
+      data.involvesNhsEngland && data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
     involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
     requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
     requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
     is_data_protection_office_registered:
       data.isDataProtectionOfficeRegistered !== undefined ? data.isDataProtectionOfficeRegistered : undefined,
     data_protection_number:
-      data.dataProtectionPrefix && data.dataProtectionDate && data.dataProtectionId
+      data.isDataProtectionOfficeRegistered &&
+      data.dataProtectionPrefix &&
+      data.dataProtectionDate &&
+      data.dataProtectionId
         ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
@@ -256,15 +259,14 @@ export default function StudyForm(StudyProps: StudyProps) {
     }
   }, [editingStudy, username, reset]);
 
-  const handleStudySubmit = async (data: StudyFormData, studyId?: string) => {
+  const handleStudySubmit = async (data: StudyFormData, editingStudy?: Study | null) => {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    try {
-      // Convert form data to API format
+    const studyId = editingStudy?.id;
 
+    try {
       const studyData = convertStudyFormDataToApiRequest(data);
-      console.log("stdyData", studyData, "og data", data);
 
       let response;
       if (!studyId) {
@@ -273,7 +275,6 @@ export default function StudyForm(StudyProps: StudyProps) {
         });
       } else {
         // check study checkboxes vs form data and set mismatched ones to false
-
         response = await putStudiesByStudyId({
           path: { studyId },
           body: studyData,
@@ -281,12 +282,10 @@ export default function StudyForm(StudyProps: StudyProps) {
       }
       if (response.data) {
         setStudyFormOpen(false);
-        if (fetchStudyData) {
-          if (studyId) {
-            fetchStudyData(studyId);
-          } else {
-            fetchStudyData();
-          }
+        if (studyId) {
+          fetchStudyData(studyId);
+        } else {
+          fetchStudyData();
         }
         return;
       }
@@ -308,11 +307,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     }
   };
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
-    if (!editingStudy) {
-      await handleStudySubmit(data);
-    } else {
-      await handleStudySubmit(data, editingStudy.id);
-    }
+    await handleStudySubmit(data, editingStudy);
   };
 
   const handleCloseForm = () => {

@@ -7,6 +7,7 @@ import Dialog from "@/components/ui/Dialog";
 
 import styles from "./Studies.module.css";
 import Loading from "../ui/Loading";
+import { Alert, AlertMessage } from "../shared/exports";
 
 type Props = {
   userData: Auth;
@@ -18,6 +19,7 @@ export default function Studies(props: Props) {
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [studiesLoading, setStudiesLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [tab, setTab] = useState("pending");
   const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
@@ -31,10 +33,12 @@ export default function Studies(props: Props) {
         const response = await getStudies({ query: { status: "Pending" } });
         if (response.response.ok && response.data) {
           setPendingStudies(response.data);
-          setStudiesLoading(false);
         }
       } catch (error) {
         console.error("Failed to get pending studies:", error);
+        setErrorMessage("Failed to get pending studies. Please try again.");
+      } finally {
+        setStudiesLoading(false);
       }
     };
     if (isAdmin) {
@@ -61,6 +65,7 @@ export default function Studies(props: Props) {
       setStudies(response.data || []);
     } catch (error) {
       console.error("Failed to fetch studies:", error);
+      setErrorMessage("Failed to fetch studies. Please try again.");
       setStudies([]);
     } finally {
       setStudiesLoading(false);
@@ -78,6 +83,14 @@ export default function Studies(props: Props) {
     }
     setStudyFormOpen(true);
   };
+
+  if (errorMessage) {
+    return (
+      <Alert type="error">
+        <AlertMessage>{errorMessage}</AlertMessage>
+      </Alert>
+    );
+  }
 
   if (isAdmin) {
     return (
@@ -103,8 +116,13 @@ export default function Studies(props: Props) {
         </div>
 
         {studiesLoading && <Loading message="Loading studies..." />}
-
-        <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+        {studies.length === 0 ? (
+          <div className={styles["no-studies-message"]}>
+            <h2>No studies found</h2>
+          </div>
+        ) : (
+          <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+        )}
       </>
     );
   }

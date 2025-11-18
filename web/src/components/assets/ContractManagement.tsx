@@ -51,6 +51,9 @@ export default function ContractManagement({ study, asset, isStudyOwner }: Contr
   };
 
   const handleEditContract = (contract: Contract) => {
+    if (!isStudyOwner) {
+      return;
+    }
     setEditingContract(contract);
     setShowUploadModal(true);
   };
@@ -120,17 +123,19 @@ export default function ContractManagement({ study, asset, isStudyOwner }: Contr
         </div>
       )}
 
-      <ContractUploadForm
-        study={study}
-        asset={asset}
-        isOpen={showUploadModal}
-        onClose={() => {
-          setShowUploadModal(false);
-          setEditingContract(null);
-        }}
-        onSuccess={handleUploadSuccess}
-        editingContract={editingContract}
-      />
+      {isStudyOwner && (
+        <ContractUploadForm
+          study={study}
+          asset={asset}
+          isOpen={showUploadModal}
+          onClose={() => {
+            setShowUploadModal(false);
+            setEditingContract(null);
+          }}
+          onSuccess={handleUploadSuccess}
+          editingContract={editingContract}
+        />
+      )}
     </div>
   );
 }

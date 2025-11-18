@@ -19,3 +19,29 @@
   justify-content: center;
   padding: 2rem 0;
 }
+
+.error-section {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.error-section h2 {
+  color: #c53030;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.error-section p {
+  color: #702459;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.ucl-staff-modal-actions {
+  margin-top: 1.5rem;
+}
