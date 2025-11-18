@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
   postProjectsTre,
   ProjectTreRequest,
@@ -19,8 +19,8 @@ import styles from "./CreateProjectForm.module.css";
 type ProjectFormData = {
   name: string;
   studyId: string;
-  assetId: string;
   environmentId: string;
+  assetIds: { value: string }[];
 };
 
 type Props = {
@@ -43,22 +43,28 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm<ProjectFormData>({
     defaultValues: {
       name: "",
       studyId: "",
-      assetId: "",
       environmentId: "",
+      assetIds: [],
     },
   });
 
   const selectedStudyId = watch("studyId");
   const selectedEnvironmentId = watch("environmentId");
+  const selectedAssetIds = watch("assetIds");
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "assetIds",
+  });
 
   // Reset asset selection when environment changes
   useEffect(() => {
-    setValue("assetId", "");
+    setValue("assetIds", []);
   }, [selectedEnvironmentId, setValue]);
 
   useEffect(() => {
@@ -129,10 +135,11 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
 
       switch (selectedEnvironment.name) {
         case "ARC Trusted Research Environment":
+          const assetIds = data.assetIds.map((asset) => asset.value).filter((id) => id !== "");
           const requestBody: ProjectTreRequest = {
             name: data.name,
             study_id: data.studyId,
-            ...(data.assetId && { asset_id: data.assetId }),
+            ...(assetIds.length > 0 && { asset_ids: assetIds }),
           };
           response = await postProjectsTre({ body: requestBody });
           break;
@@ -230,44 +237,78 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
           </div>
 
           <div className={styles["form-field"]}>
-            <label htmlFor="assetId">Asset</label>
-            <select
-              id="assetId"
-              className={styles.select}
-              {...register("assetId")}
-              disabled={isSubmitting || !selectedStudyId || !selectedEnvironmentId || isLoadingAssets}
-            >
-              <option value="">
-                {!selectedStudyId
-                  ? "Select a study first..."
-                  : !selectedEnvironmentId
-                    ? "Select an environment first..."
-                    : isLoadingAssets
-                      ? "Loading assets..."
-                      : assets.length === 0
-                        ? "No assets available for this study"
-                        : "Select an asset (optional)..."}
-              </option>
-              {assets.map((asset) => {
-                const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
-                const isCompatible =
-                  !selectedEnvironmentId || !selectedEnvironment || asset.tier <= selectedEnvironment.tier;
-                const label = isCompatible
-                  ? `${asset.title} (Tier ${asset.tier})`
-                  : `${asset.title} (Tier ${asset.tier}) - Incompatible with selected environment (max tier ${selectedEnvironment?.tier})`;
+            <span className={styles["assets-label"]}>Add assets (optional):</span>
+            <fieldset className={styles["assets-fieldset"]}>
+              {fields.map((field, index) => (
+                <div key={field.id} className={styles["asset-wrapper"]}>
+                  <label htmlFor={`asset-${index}`} className={styles["asset-label"]}>
+                    Asset {index + 1}:
+                  </label>
 
-                return (
-                  <option key={asset.id} value={asset.id} disabled={!isCompatible}>
-                    {label}
-                  </option>
-                );
-              })}
-            </select>
-            {errors.assetId && (
-              <Alert type="error">
-                <AlertMessage>{errors.assetId.message}</AlertMessage>
-              </Alert>
-            )}
+                  <Controller
+                    name={`assetIds.${index}.value` as const}
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        id={`asset-${index}`}
+                        className={styles.select}
+                        disabled={isSubmitting || !selectedStudyId || !selectedEnvironmentId || isLoadingAssets}
+                      >
+                        <option value="">
+                          {!selectedStudyId
+                            ? "Select a study first..."
+                            : !selectedEnvironmentId
+                              ? "Select an environment first..."
+                              : isLoadingAssets
+                                ? "Loading assets..."
+                                : assets.length === 0
+                                  ? "No assets available for this study"
+                                  : "Select an asset (optional)..."}
+                        </option>
+                        {assets.map((asset) => {
+                          const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
+                          const isCompatible =
+                            !selectedEnvironmentId || !selectedEnvironment || asset.tier <= selectedEnvironment.tier;
+                          const isAlreadySelected = selectedAssetIds.some(
+                            (selected, selectedIndex) => selected.value === asset.id && selectedIndex !== index
+                          );
+                          const label = isCompatible
+                            ? `${asset.title} (Tier ${asset.tier})`
+                            : `${asset.title} (Tier ${asset.tier}) - Incompatible with selected environment (max tier ${selectedEnvironment?.tier})`;
+
+                          return (
+                            <option key={asset.id} value={asset.id} disabled={!isCompatible || isAlreadySelected}>
+                              {label}
+                              {isAlreadySelected ? " - Already selected" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    )}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className={styles["remove-asset-button"]}
+                    aria-label={`Remove asset ${index + 1}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                className={styles["add-asset-button"]}
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => append({ value: "" })}
+              >
+                Add Asset
+              </Button>
+            </fieldset>
             <HelperText>Optionally link this project to an existing asset from the selected study</HelperText>
           </div>
 
