@@ -3,10 +3,18 @@ import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 import { formatDate } from "../shared/exports";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+
+const AlertCircleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertCircle), {
+  ssr: false,
+});
 
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
+  checkCompleted: (assets: Asset[]) => Promise<boolean>;
+  isStudyOwner: boolean;
 };
 
 const formatClassification = (classification: string) => {
@@ -17,8 +25,18 @@ const formatProtection = (protection: string) => {
   return protection.replace(/_/g, " ");
 };
 
-export default function AssetCard({ studyId, asset }: AssetCardProps) {
+export default function AssetCard(props: AssetCardProps) {
+  const { studyId, asset, checkCompleted, isStudyOwner } = props;
   const router = useRouter();
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  useEffect(() => {
+    const isAssetCompleted = async () => {
+      const response = await checkCompleted([asset]);
+      return setIsCompleted(response);
+    };
+    isAssetCompleted();
+  });
 
   const getClassificationClass = (classification: string) => {
     switch (classification) {
@@ -34,7 +52,7 @@ export default function AssetCard({ studyId, asset }: AssetCardProps) {
   };
 
   return (
-    <div className={styles["asset-card"]}>
+    <div className={`${styles["asset-card"]} ${!isCompleted ? styles["asset-incomplete"] : ""}`}>
       <div className={styles["asset-header"]}>
         <h4 className={styles["asset-title"]}>{asset.title}</h4>
         <div className={styles["asset-meta"]}>
@@ -77,8 +95,14 @@ export default function AssetCard({ studyId, asset }: AssetCardProps) {
       </div>
 
       <div className={styles["asset-actions"]}>
+        {!isCompleted && (
+          <small className={styles["asset-incomplete__message"]}>
+            <AlertCircleIcon className={styles["asset-incomplete__icon"]} />
+            This asset requires a contract that has not yet been added
+          </small>
+        )}
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
-          Manage Asset
+          {isStudyOwner ? "Manage Asset" : "View Asset"}
         </Button>
       </div>
     </div>

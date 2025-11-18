@@ -6,14 +6,23 @@ import StudyAgreement from "./StudyAgreement";
 import Assets from "../assets/Assets";
 
 import styles from "./ManageStudy.module.css";
+import StudyDetails from "./StudyDetails";
+import { useAuth } from "@/hooks/useAuth";
+import StudyForm from "./StudyForm";
 
 type ManageStudyProps = {
   study: Study;
+  fetchStudy: (id?: string) => Promise<void>;
 };
 
-export default function ManageStudy({ study }: ManageStudyProps) {
+export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
+  const [studyFormOpen, setStudyFormOpen] = useState(false);
+
+  const { userData } = useAuth();
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted;
 
@@ -27,8 +36,9 @@ export default function ManageStudy({ study }: ManageStudyProps) {
     },
     {
       id: "study-assets",
-      title: "Study Assets",
-      description: "Create and manage at least one study asset. You can create more assets at any time.",
+      title: "Information Assets",
+      description:
+        "Create and manage at least one information asset. You can create more assets at any time. Note that contracts can also be attached to assets, in some cases this is required.",
       completed: assetManagementCompleted,
       current: agreementCompleted && !assetManagementCompleted,
     },
@@ -48,32 +58,57 @@ export default function ManageStudy({ study }: ManageStudyProps) {
 
     if (!assetManagementCompleted) {
       return (
-        <Assets studyId={study.id} studyTitle={study.title} setAssetManagementCompleted={setAssetManagementCompleted} />
+        <>
+          <Assets
+            studyId={study.id}
+            studyTitle={study.title}
+            setAssetManagementCompleted={setAssetManagementCompleted}
+            isStudyOwner={isStudyOwner}
+          />
+        </>
       );
     }
   };
 
   return (
     <>
-      <StepProgress
-        steps={studySteps}
-        isComplete={studyStepsCompleted}
-        completionTitle="Study Setup Complete!"
-        completionSubtitle="You have successfully completed all study setup steps."
-        completionButtonText="Go to studies"
-        completionButtonHref="/studies"
-        introText="Complete the following steps to set up your study."
-        ariaLabel="Study setup progress"
+      {studyFormOpen && userData && (
+        <StudyForm
+          username={userData.username}
+          setStudyFormOpen={setStudyFormOpen}
+          editingStudy={study}
+          fetchStudyData={fetchStudy}
+        />
+      )}
+      <StudyDetails
+        studyStepsCompleted={studyStepsCompleted}
+        study={study}
+        isAdmin={false}
+        isStudyOwner={isStudyOwner}
+        setStudyFormOpen={setStudyFormOpen}
       />
 
-      {!studyStepsCompleted && <StepArrow />}
+      {!studyStepsCompleted && (
+        <>
+          <StepProgress
+            steps={studySteps}
+            isComplete={studyStepsCompleted}
+            introText="Complete the following steps to set up your study."
+            ariaLabel="Study setup progress"
+          />
+
+          <StepArrow />
+        </>
+      )}
 
       {getCurrentStepComponent()}
 
       {studyStepsCompleted && (
-        <div className={styles["completed-section"]}>
-          <Assets studyId={study.id} studyTitle={study.title} />
-        </div>
+        <>
+          <div className={styles["completed-section"]}>
+            <Assets studyId={study.id} studyTitle={study.title} isStudyOwner={isStudyOwner} />
+          </div>
+        </>
       )}
     </>
   );

@@ -211,7 +211,7 @@ export type StudyBase = {
     /**
      * List of additional study administrator usernames (empty array if none)
      */
-    additional_study_admin_usernames: Array<string>;
+    additional_study_admin_usernames: Array<string | null>;
     /**
      * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
      */
@@ -219,79 +219,79 @@ export type StudyBase = {
     /**
      * Whether UCL sponsorship is involved (seeking/have sought)
      */
-    involves_ucl_sponsorship?: boolean;
+    involves_ucl_sponsorship?: boolean | null;
     /**
      * Whether Confidentiality Advisory Group approval is involved (seeking/have sought)
      */
-    involves_cag?: boolean;
+    involves_cag?: boolean | null;
     /**
      * CAG reference number
      */
-    cag_reference?: string;
+    cag_reference?: string | null;
     /**
      * Whether Research Ethics Committee approval is involved (seeking/have sought)
      */
-    involves_ethics_approval?: boolean;
+    involves_ethics_approval?: boolean | null;
     /**
      * Whether Health Research Authority approval is involved (seeking/have sought)
      */
-    involves_hra_approval?: boolean;
+    involves_hra_approval?: boolean | null;
     /**
      * IRAS ID if applicable
      */
-    iras_id?: string;
+    iras_id?: string | null;
     /**
      * Whether the research is associated with NHS
      */
-    is_nhs_associated?: boolean;
+    is_nhs_associated?: boolean | null;
     /**
      * Whether NHS England is involved in the research
      */
-    involves_nhs_england?: boolean;
+    involves_nhs_england?: boolean | null;
     /**
      * NHS England DARS NIC number
      */
-    nhs_england_reference?: string;
+    nhs_england_reference?: string | null;
     /**
      * Whether the HRA Model Non-Commercial Agreement is involved
      */
-    involves_mnca?: boolean;
+    involves_mnca?: boolean | null;
     /**
      * Whether NHS Data Security & Protection Toolkit is required
      */
-    requires_dspt?: boolean;
+    requires_dspt?: boolean | null;
     /**
      * Whether a DBS check is required for staff
      */
-    requires_dbs?: boolean;
+    requires_dbs?: boolean | null;
     /**
      * Whether the study is registered with the UCL Data Protection Office
      */
-    is_data_protection_office_registered?: boolean;
+    is_data_protection_office_registered?: boolean | null;
     /**
      * Full data protection registration number
      */
-    data_protection_number?: string;
+    data_protection_number?: string | null;
     /**
      * Whether third party organizations are involved
      */
-    involves_third_party?: boolean;
+    involves_third_party?: boolean | null;
     /**
      * Whether external users will have access to the study
      */
-    involves_external_users?: boolean;
+    involves_external_users?: boolean | null;
     /**
      * Whether participant consent is involved (seeking/have sought)
      */
-    involves_participant_consent?: boolean;
+    involves_participant_consent?: boolean | null;
     /**
      * Whether data is collected indirectly for the study (e.g. via a third party)
      */
-    involves_indirect_data_collection?: boolean;
+    involves_indirect_data_collection?: boolean | null;
     /**
      * Whether data is processed outside UK/EEA
      */
-    involves_data_processing_outside_eea?: boolean;
+    involves_data_processing_outside_eea?: boolean | null;
     /**
      * ID of the user who owns the study
      */
@@ -303,9 +303,9 @@ export type StudyBase = {
 };
 
 /**
- * Request payload for creating a new study
+ * Request payload for creating a new study or updating an existing one
  */
-export type StudyCreateRequest = StudyBase;
+export type StudyRequest = StudyBase;
 
 /**
  * A research study
@@ -834,7 +834,12 @@ export type PostUsersInviteResponses = {
 export type GetStudiesData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * get studies by status
+         */
+        status?: StudyApprovalStatus;
+    };
     url: '/studies';
 };
 
@@ -860,7 +865,7 @@ export type GetStudiesResponses = {
 export type GetStudiesResponse = GetStudiesResponses[keyof GetStudiesResponses];
 
 export type PostStudiesData = {
-    body: StudyCreateRequest;
+    body: StudyRequest;
     path?: never;
     query?: never;
     url: '/studies';
@@ -935,6 +940,50 @@ export type GetStudiesByStudyIdResponses = {
 
 export type GetStudiesByStudyIdResponse = GetStudiesByStudyIdResponses[keyof GetStudiesByStudyIdResponses];
 
+export type PutStudiesByStudyIdData = {
+    body: StudyRequest;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}';
+};
+
+export type PutStudiesByStudyIdErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutStudiesByStudyIdError = PutStudiesByStudyIdErrors[keyof PutStudiesByStudyIdErrors];
+
+export type PutStudiesByStudyIdResponses = {
+    /**
+     * Study updated successfully
+     */
+    200: unknown;
+};
+
 export type PostStudiesAdminByStudyIdReviewData = {
     body: StudyReview;
     path: {
@@ -967,6 +1016,36 @@ export type PostStudiesAdminByStudyIdReviewErrors = {
 };
 
 export type PostStudiesAdminByStudyIdReviewResponses = {
+    /**
+     * Study review submitted successfully
+     */
+    201: unknown;
+};
+
+export type PatchStudiesByStudyIdPendingData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/pending';
+};
+
+export type PatchStudiesByStudyIdPendingErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+};
+
+export type PatchStudiesByStudyIdPendingResponses = {
     /**
      * Study review submitted successfully
      */

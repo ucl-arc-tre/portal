@@ -1,16 +1,28 @@
-import { Asset, getStudiesByStudyIdAssets, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import {
+  postStudiesAdminByStudyIdReview,
+  patchStudiesByStudyIdPending,
+  Study,
+  Asset,
+  getStudiesByStudyIdAssets,
+} from "@/openapi";
 import Box from "../ui/Box";
-import { Alert, AlertMessage, formatDate, Textarea } from "../shared/exports";
+import { Alert, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
 import StudyStatusBadge from "../ui/StudyStatusBadge";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
 import InfoTooltip from "../ui/InfoTooltip";
+import AdminFeedbackSection from "./AdminFeedbackSection";
 import { storageDefinitions } from "../shared/storageDefinitions";
 import Loading from "../ui/Loading";
+import Assets from "../assets/Assets";
 
 type StudyDetailsProps = {
   study: Study;
+  isAdmin: boolean;
+  isStudyOwner: boolean;
+  setStudyFormOpen?: (name: boolean) => void;
+  studyStepsCompleted?: boolean;
 };
 
 const fetchAssets = async (studyId: string) => {
@@ -24,7 +36,7 @@ const fetchAssets = async (studyId: string) => {
   }
 };
 
-const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined) => {
+const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
   let assetsRiskScore = 0;
 
   for (const asset of assets) {
@@ -74,19 +86,17 @@ const calculateRiskScore = async (study: Study) => {
   if (!assets || assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
-export default function StudyDetails({ study }: StudyDetailsProps) {
+export default function StudyDetails(props: StudyDetailsProps) {
+  const { study, isAdmin, isStudyOwner, setStudyFormOpen, studyStepsCompleted } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const handleUpdateStudyStatus = async (status: string) => {
     const studyId = study.id;
 
     if (status === "Approved") {
-      // set as approved
       const response = await postStudiesAdminByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
       if (response.response.ok) {
         setApprovalStatus("Approved");
@@ -99,29 +109,14 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
       if (response.response.ok) {
         setApprovalStatus("Rejected");
       }
+    } else if (status === "Pending") {
+      const response = await patchStudiesByStudyIdPending({
+        path: { studyId },
+      });
+      if (response.response.ok) {
+        setApprovalStatus("Pending");
+      }
     }
-  };
-
-  const toggleShowFeedbackForm = () => {
-    // for smooth collapse
-    if (showFeedbackForm) {
-      setIsCollapsing(true);
-      setTimeout(() => {
-        setShowFeedbackForm(false);
-        setIsCollapsing(false);
-      }, 1400);
-    } else {
-      setShowFeedbackForm(true);
-    }
-  };
-
-  const handleFeedbackSubmit = () => {
-    handleUpdateStudyStatus("Rejected");
-    toggleShowFeedbackForm();
-  };
-
-  const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFeedback(event.target.value);
   };
 
   useEffect(() => {
@@ -140,11 +135,31 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
     getRiskScore();
 
     setApprovalStatus(study.approval_status);
+    if (study.feedback) setFeedback(study.feedback);
   }, [study]);
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
+      {isStudyOwner && setStudyFormOpen && (
+        <div className={styles["study-actions"]}>
+          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)}>
+            {study.feedback ? "Respond to Feedback" : "Edit Study"}
+          </Button>
+
+          {studyStepsCompleted &&
+            (approvalStatus !== "Pending" ? (
+              <Button onClick={() => handleUpdateStudyStatus("Pending")} size="small">
+                Mark Ready for Review
+              </Button>
+            ) : (
+              <Button disabled size="small">
+                Submitted for Review
+              </Button>
+            ))}
+        </div>
+      )}
+
       <Box>
         <div className={styles["pre-description"]}>
           <span>
@@ -154,9 +169,9 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             Risk Score:{" "}
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
-          <StudyStatusBadge status={approvalStatus} isAdmin={true} />
+          <StudyStatusBadge status={approvalStatus} isAdmin={isAdmin} />
         </div>
-        <h2>{study.description}</h2>
+        <h3 className={styles.description}>{study.description}</h3>
         <div>
           <dl className={styles.ownership}>
             <dd>
@@ -174,20 +189,8 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             </dd>
           </dl>
 
-          {study.feedback && (
-            <Alert type={"warning"} className={styles["feedback-alert"]}>
-              <AlertMessage>
-                <h4>This study has been rejected and the following feedback has been provided:</h4>
-                <p>{study.feedback}</p>
-              </AlertMessage>
-              <hr></hr>
-              <small>
-                <em>Please adjust as appropriate and request another review.</em>
-              </small>
-            </Alert>
-          )}
-
           <h3>Additional Information</h3>
+          <hr />
           <dl className={styles.grouping}>
             <h4>Sponsorships & Approvals</h4>
             {study.involves_ucl_sponsorship && (
@@ -195,7 +198,8 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
             )}
             {study.involves_cag && (
               <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                CAG approval <InfoTooltip text="increases risk score by 5" />
+                CAG approval
+                <InfoTooltip text="increases risk score by 5" />
               </dd>
             )}
             {study.involves_ethics_approval && (
@@ -287,46 +291,31 @@ export default function StudyDetails({ study }: StudyDetailsProps) {
                 </dd>
               )}
           </dl>
+
+          {feedback && (
+            <Alert type={"warning"} className={styles["feedback-alert"]}>
+              <h4>This study has been rejected and the following feedback has been provided:</h4>
+              <p>{feedback}</p>
+              <hr></hr>
+              <small>
+                <em>Please adjust as appropriate and request another review.</em>
+              </small>
+            </Alert>
+          )}
         </div>
       </Box>
 
-      {study.approval_status === "Pending" && (
-        <div>
-          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
-            Approve Study
-          </Button>
-          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
-            {showFeedbackForm ? "Cancel" : "Request Changes"}
-          </Button>
-        </div>
-      )}
-      {showFeedbackForm && (
-        <Box>
-          <div className={styles["feedback-container"]}>
-            <form
-              className={`${styles["feedback-form"]} ${
-                isCollapsing
-                  ? styles["form-collapsing"]
-                  : showFeedbackForm
-                    ? styles["form-visible"]
-                    : styles["form-hidden"]
-              }`}
-            >
-              <label htmlFor="feedback">Outline what the changes are required to attain approval</label>
-              <Textarea
-                name="feedback"
-                id="feedback"
-                cols={30}
-                rows={10}
-                onChange={handleFeedbackChange}
-                value={feedback}
-              />
-              <Button onClick={handleFeedbackSubmit} type="button">
-                Submit
-              </Button>
-            </form>
-          </div>
-        </Box>
+      {isAdmin && (
+        <>
+          <Assets studyId={study.id} studyTitle={study.title} isStudyOwner={isStudyOwner} />
+
+          <AdminFeedbackSection
+            status={study.approval_status}
+            feedback={feedback}
+            setFeedback={setFeedback}
+            handleUpdateStudyStatus={handleUpdateStudyStatus}
+          />
+        </>
       )}
     </>
   );

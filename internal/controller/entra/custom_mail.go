@@ -105,9 +105,8 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 	return c.createCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
 }
 
-func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, email string, review openapi.StudyReview) error {
+func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
 	// email to notify IAO + IAA when study has been reviewed
-	// todo: set up usage of this
 
 	content := "There has been an update to your study request, please log into the portal to view the changes."
 	subject := "Notification: Something has changed in your study request"
@@ -125,5 +124,5 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		}
 	}
 
-	return c.createCustomEmail(ctx, subject, []string{email}, content)
+	return c.createCustomEmail(ctx, subject, emails, content)
 }

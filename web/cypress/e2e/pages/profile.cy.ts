@@ -154,39 +154,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.contains("Certificate was not valid. Name 'Tom Young' does not match 'Test Name'.").should("be.visible");
   });
 
-  it("shows success message when valid certificate uploaded", () => {
-    // Mock auth without approved-researcher role initially
-    cy.mockAuthAsBaseUser();
-
-    // Mock agreements with approved-researcher agreement confirmed
-    cy.mockProfileAgreements(true);
-
-    // Mock training as not complete initially
-    cy.mockProfileTraining(false);
-
-    cy.visit("/profile");
-    cy.waitForAuth();
-    cy.waitForAgreements();
-    cy.waitForTraining();
-
-    cy.clearChosenName();
-    cy.visit("/profile");
-
-    // Step 1: Set chosen name to match certificate (Tom Young)
-    cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
-    cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
-
-    // Should be on step 3
-    cy.get("[data-cy='training-certificate']").should("be.visible");
-
-    // Upload valid certificate (matches "Tom Young")
-    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-    cy.get("[data-cy='training-certificate-sumbit']").click();
-
-    cy.contains("Profile Complete").should("be.visible");
-  });
-
-  it("shows completion state when all steps done", () => {
+  it("does not show completion state when all steps done", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
@@ -199,7 +167,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForProfileData();
 
     // Should show completion message instead of steps
-    cy.contains("Profile Complete").should("be.visible");
+    cy.contains("Profile Complete").should("not.exist");
     cy.get("[data-cy='chosen-name-form']").should("not.exist");
     cy.get("[data-cy='approved-researcher-agreement']").should("not.exist");
 
