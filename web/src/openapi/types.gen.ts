@@ -360,9 +360,17 @@ export type ProjectTreRequest = {
      */
     study_id: string;
     /**
+     * Whether this project should be saved as a draft (true) or created as active (false)
+     */
+    is_draft?: boolean;
+    /**
      * Optional list of asset identifiers to link to this project
      */
     asset_ids?: Array<string>;
+    /**
+     * Optional list of email addresses for additional approved researchers who will have access to this project
+     */
+    additional_approved_researcher_usernames?: Array<string>;
 };
 
 /**

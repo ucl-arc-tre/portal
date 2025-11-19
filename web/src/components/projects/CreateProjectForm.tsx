@@ -16,11 +16,15 @@ import { HelperText, Alert, AlertMessage } from "../shared/exports";
 
 import styles from "./CreateProjectForm.module.css";
 
+// this should match the domain that is used for the entra ID users in the portal
+const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+
 type ProjectFormData = {
   name: string;
   studyId: string;
   environmentId: string;
   assetIds: { value: string }[];
+  additionalApprovedResearchers: { value: string }[];
 };
 
 type Props = {
@@ -44,22 +48,38 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     watch,
     setValue,
     control,
+    getValues,
     formState: { errors },
   } = useForm<ProjectFormData>({
+    mode: "onChange",
     defaultValues: {
       name: "",
       studyId: "",
       environmentId: "",
       assetIds: [],
+      additionalApprovedResearchers: [],
     },
   });
 
   const selectedStudyId = watch("studyId");
   const selectedEnvironmentId = watch("environmentId");
   const selectedAssetIds = watch("assetIds");
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: assetFields,
+    append: appendAsset,
+    remove: removeAsset,
+  } = useFieldArray({
     control,
     name: "assetIds",
+  });
+
+  const {
+    fields: researcherFields,
+    append: appendResearcher,
+    remove: removeResearcher,
+  } = useFieldArray({
+    control,
+    name: "additionalApprovedResearchers",
   });
 
   // Reset asset selection when environment changes
@@ -122,7 +142,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     fetchAssets();
   }, [selectedStudyId, selectedEnvironmentId]);
 
-  const onSubmit = async (data: ProjectFormData) => {
+  const submitProject = async (data: ProjectFormData, options: { isDraft: boolean }) => {
     setIsSubmitting(true);
     setError(null);
 
@@ -136,10 +156,16 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
       switch (selectedEnvironment.name) {
         case "ARC Trusted Research Environment":
           const assetIds = data.assetIds.map((asset) => asset.value).filter((id) => id !== "");
+          const researcherUsernames = data.additionalApprovedResearchers
+            .map((researcher) => researcher.value.trim())
+            .filter((username) => username !== "")
+            .map((username) => `${username}${domainName}`);
           const requestBody: ProjectTreRequest = {
             name: data.name,
             study_id: data.studyId,
+            is_draft: options.isDraft,
             ...(assetIds.length > 0 && { asset_ids: assetIds }),
+            ...(researcherUsernames.length > 0 && { additional_approved_researcher_usernames: researcherUsernames }),
           };
           response = await postProjectsTre({ body: requestBody });
           break;
@@ -174,7 +200,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={(e) => e.preventDefault()}>
           <div className={styles["form-field"]}>
             <label htmlFor="studyId">Study *</label>
             <select
@@ -268,11 +294,44 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
           </div>
 
           <div className={styles["form-field"]}>
-            <span className={styles["assets-label"]}>Add assets (optional):</span>
-            <fieldset className={styles["assets-fieldset"]}>
-              {fields.map((field, index) => (
-                <div key={field.id} className={styles["asset-wrapper"]}>
-                  <label htmlFor={`asset-${index}`} className={styles["asset-label"]}>
+            <label htmlFor="name">Project Name *</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="e.g., my-project"
+              {...register("name", {
+                required: "Project name is required",
+                pattern: {
+                  value: /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, // todo: select the correct pattern based on the picked environment
+                  message:
+                    "Must start and end with a lowercase letter or number. Only lowercase letters, numbers, and hyphens allowed.",
+                },
+                minLength: {
+                  value: 3,
+                  message: "Project name must be at least 3 characters",
+                },
+                maxLength: {
+                  value: 50,
+                  message: "Project name must be less than 50 characters",
+                },
+              })}
+              disabled={isSubmitting}
+            />
+
+            {errors.name && (
+              <Alert type="error">
+                <AlertMessage>{errors.name.message}</AlertMessage>
+              </Alert>
+            )}
+            <HelperText>Use lowercase letters, numbers, and hyphens only (3-50 characters)</HelperText>
+          </div>
+
+          <div className={styles["form-field"]}>
+            <span className={styles["section-label"]}>Add assets (optional):</span>
+            <fieldset className={styles["dynamic-fieldset"]}>
+              {assetFields.map((field, index) => (
+                <div key={field.id} className={styles["item-wrapper"]}>
+                  <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
                     Asset {index + 1}:
                   </label>
 
@@ -321,8 +380,8 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
 
                   <button
                     type="button"
-                    onClick={() => remove(index)}
-                    className={styles["remove-asset-button"]}
+                    onClick={() => removeAsset(index)}
+                    className={styles["remove-button"]}
                     aria-label={`Remove asset ${index + 1}`}
                   >
                     ×
@@ -331,53 +390,118 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
               ))}
 
               <Button
-                className={styles["add-asset-button"]}
+                className={styles["add-button"]}
                 type="button"
                 variant="secondary"
                 size="small"
-                onClick={() => append({ value: "" })}
+                onClick={() => appendAsset({ value: "" })}
               >
                 Add Asset
               </Button>
             </fieldset>
-            <HelperText>Optionally link this project to an existing asset from the selected study</HelperText>
+            <HelperText>Optionally link this project to one or more existing assets from the selected study</HelperText>
           </div>
 
           <div className={styles["form-field"]}>
-            <label htmlFor="name">Project Name *</label>
-            <input
-              id="name"
-              type="text"
-              placeholder="e.g., my-project"
-              {...register("name", {
-                required: "Project name is required",
-                pattern: {
-                  value: /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, // todo: select the correct pattern based on the picked environment
-                  message:
-                    "Must start and end with a lowercase letter or number. Only lowercase letters, numbers, and hyphens allowed.",
-                },
-                minLength: {
-                  value: 3,
-                  message: "Project name must be at least 3 characters",
-                },
-                maxLength: {
-                  value: 50,
-                  message: "Project name must be less than 50 characters",
-                },
-              })}
-              disabled={isSubmitting}
-            />
+            <span className={styles["section-label"]}>Additional Approved Researchers (optional):</span>
+            <fieldset className={styles["dynamic-fieldset"]}>
+              <HelperText style={{ marginBottom: "1rem" }}>
+                Add approved researchers who will have access to this project. Enter their usernames.
+              </HelperText>
 
-            {errors.name && (
-              <Alert type="error">
-                <AlertMessage>{errors.name.message}</AlertMessage>
-              </Alert>
-            )}
-            <HelperText>Use lowercase letters, numbers, and hyphens only (3-50 characters)</HelperText>
+              {researcherFields.map((field, index) => (
+                <div key={field.id} className={styles["item-wrapper"]}>
+                  <label htmlFor={`researcher-${index}`} className={styles["item-label"]}>
+                    Researcher {index + 1}:
+                  </label>
+
+                  <Controller
+                    name={`additionalApprovedResearchers.${index}.value` as const}
+                    control={control}
+                    rules={{
+                      required: "Username is required",
+                      validate: {
+                        isNotEmpty: (value) => {
+                          if (!value || value.trim() === "") {
+                            return "Username is required";
+                          }
+                          return true;
+                        },
+                        notEmailPart: (value) => {
+                          if (value.includes("@")) {
+                            return `Enter only the username part (without ${domainName})`;
+                          }
+                          return true;
+                        },
+                        isUnique: (value) => {
+                          const allUsernames = getValues("additionalApprovedResearchers").map((r) => r.value);
+                          const duplicateCount = allUsernames.filter((username) => username === value).length;
+                          return duplicateCount <= 1 || "Username has already been entered";
+                        },
+                      },
+                    }}
+                    render={({ field, fieldState }) => (
+                      <div className={styles["username-input-wrapper"]}>
+                        <div>
+                          <input
+                            {...field}
+                            id={`researcher-${index}`}
+                            type="text"
+                            placeholder="Valid username"
+                            className={styles.select}
+                            disabled={isSubmitting}
+                          />
+                          <span className={styles["domain-suffix"]}>{domainName}</span>
+                        </div>
+                        {fieldState.error && (
+                          <Alert type="error">
+                            <AlertMessage>{fieldState.error.message}</AlertMessage>
+                          </Alert>
+                        )}
+                      </div>
+                    )}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeResearcher(index)}
+                    className={styles["remove-button"]}
+                    aria-label={`Remove researcher ${index + 1}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                className={styles["add-button"]}
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => appendResearcher({ value: "" })}
+              >
+                Add Researcher
+              </Button>
+            </fieldset>
+            <HelperText>Optionally add approved researchers to this project</HelperText>
           </div>
 
           <div className={styles.actions}>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isSubmitting}
+              onClick={handleSubmit((data) => submitProject(data, { isDraft: true }))}
+            >
+              {isSubmitting ? "Saving..." : "Save as Draft"}
+            </Button>
+
+            <Button
+              className="create-project-button"
+              type="button"
+              disabled={isSubmitting}
+              onClick={handleSubmit((data) => submitProject(data, { isDraft: false }))}
+            >
               {isSubmitting ? "Creating..." : "Create Project"}
             </Button>
           </div>

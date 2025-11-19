@@ -41,28 +41,29 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.assets-label {
+.section-label {
   font-weight: bold;
 }
 
-.assets-fieldset {
+.dynamic-fieldset {
   border: 1px solid #ccc;
   padding: 1rem;
   border-radius: 4px;
 }
 
-.asset-wrapper {
+.item-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   margin-bottom: 0.5rem;
 }
 
-.asset-wrapper .select {
-  flex: 1;
+.item-wrapper .select,
+.item-wrapper input {
+  max-width: 400px;
 }
 
-.remove-asset-button {
+.remove-button {
   padding: 0.5rem 0.75rem;
   background-color: #dc3545;
   color: white;
@@ -74,17 +75,41 @@
   transition: background-color 0.2s;
 }
 
-.remove-asset-button:hover {
+.remove-button:hover {
   background-color: #c82333;
 }
 
-.remove-asset-button:focus {
+.remove-button:focus {
   outline: 2px solid #dc3545;
   outline-offset: 2px;
 }
 
-.add-asset-button {
+.add-button {
   margin-top: 0.5rem;
+}
+
+.item-label {
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.username-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.username-input-wrapper > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.domain-suffix {
+  color: var(--text--secondary);
+  font-weight: 500;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .environment-docs {
@@ -104,7 +129,8 @@
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
   margin-top: 1rem;
   padding-top: 1rem;

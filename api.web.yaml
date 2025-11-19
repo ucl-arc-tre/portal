@@ -1310,9 +1310,18 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
+        is_draft:
+          type: boolean
+          description: Whether this project should be saved as a draft (true) or created as active (false)
+          default: false
         asset_ids:
           type: array
           description: Optional list of asset identifiers to link to this project
+          items:
+            type: string
+        additional_approved_researcher_usernames:
+          type: array
+          description: Optional list of email addresses for additional approved researchers who will have access to this project
           items:
             type: string
 

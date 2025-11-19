@@ -121,6 +121,7 @@ type Project struct {
 	Name          string    `gorm:"not null"`
 	CreatorUserID uuid.UUID `gorm:"not null;index"`
 	StudyID       uuid.UUID `gorm:"index"`
+	IsDraft       bool      `gorm:"not null;default:false"`
 
 	// Relationships
 	Study       Study `gorm:"foreignKey:StudyID"`

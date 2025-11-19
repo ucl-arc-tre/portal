@@ -482,8 +482,14 @@ type ProjectTRE struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
+	// AdditionalApprovedResearcherUsernames Optional list of email addresses for additional approved researchers who will have access to this project
+	AdditionalApprovedResearcherUsernames *[]string `json:"additional_approved_researcher_usernames,omitempty"`
+
 	// AssetIds Optional list of asset identifiers to link to this project
 	AssetIds *[]string `json:"asset_ids,omitempty"`
+
+	// IsDraft Whether this project should be saved as a draft (true) or created as active (false)
+	IsDraft *bool `json:"is_draft,omitempty"`
 
 	// Name Name of the project
 	Name string `json:"name"`
