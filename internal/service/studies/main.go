@@ -280,7 +280,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return err
 	}
 
-	if err := tx.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
+	if err := tx.Model(&study).Where("id = ?", id).Select("*").Updates(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
@@ -288,8 +288,6 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 	if err := tx.Commit().Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to commit update study transaction")
 	}
-
-	log.Debug().Any("description", study.Description).Msg("Updated study...maybe")
 
 	return nil
 }
