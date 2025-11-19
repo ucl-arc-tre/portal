@@ -19,8 +19,9 @@ type Project struct {
 
 type ProjectTRE struct {
 	ModelAuditable
-	ProjectID     uuid.UUID `gorm:"not null;index"`
-	EnvironmentID uuid.UUID `gorm:"not null;index"`
+	ProjectID                     uuid.UUID `gorm:"not null;index"`
+	EnvironmentID                 uuid.UUID `gorm:"not null;index"`
+	EgressNumberRequiredApprovals int       `gorm:"not null;default:1"`
 
 	// Relationships
 	Environment Environment `gorm:"foreignKey:EnvironmentID"`
@@ -59,9 +60,11 @@ type ProjectRole struct {
 
 type ProjectRoleRequirement struct {
 	Model
-	RoleID      uuid.UUID `gorm:"not null;index"`
-	Requirement string    `gorm:"not null"`
+	RoleID        uuid.UUID `gorm:"not null;index"`
+	EnvironmentID uuid.UUID `gorm:"not null;index"`
+	Requirement   string    `gorm:"not null"`
 
 	// Relationships
-	Role ProjectRole `gorm:"foreignKey:RoleID"`
+	Role        ProjectRole `gorm:"foreignKey:RoleID"`
+	Environment Environment `gorm:"foreignKey:EnvironmentID"`
 }
