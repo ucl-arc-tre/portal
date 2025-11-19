@@ -45,7 +45,8 @@
 
     label {
       max-width: 1000px;
-      justify-self: center;
+      justify-self: start;
+      margin-inline-start: 1vw;
     }
 
     /* for some reason HelperText only works within Labels, so ensuring weight for option fields  */
