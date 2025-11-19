@@ -163,27 +163,42 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 
 // given a study and data from a request, line up the values
 func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
+	falseVal := false
 	if studyData.Title != "" {
 		study.Title = studyData.Title
 	}
-	log.Debug().Msg("within setStudyFromStudyData")
-
 	study.Description = studyData.Description
 	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
-	study.CagReference = studyData.CagReference
+	if studyData.InvolvesCag == &falseVal {
+		study.CagReference = nil
+	} else {
+		study.CagReference = studyData.CagReference
+	}
 	study.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
 	study.InvolvesHraApproval = studyData.InvolvesHraApproval
-	study.IrasId = studyData.IrasId
+	if studyData.InvolvesHraApproval == &falseVal {
+		study.IrasId = nil
+	} else {
+		study.IrasId = studyData.IrasId
+	}
 	study.IsNhsAssociated = studyData.IsNhsAssociated
 	study.InvolvesNhsEngland = studyData.InvolvesNhsEngland
-	study.NhsEnglandReference = studyData.NhsEnglandReference
+	if studyData.InvolvesNhsEngland == &falseVal {
+		study.NhsEnglandReference = nil
+	} else {
+		study.NhsEnglandReference = studyData.NhsEnglandReference
+	}
 	study.InvolvesMnca = studyData.InvolvesMnca
 	study.RequiresDspt = studyData.RequiresDspt
 	study.RequiresDbs = studyData.RequiresDbs
 	study.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
-	study.DataProtectionNumber = studyData.DataProtectionNumber
+	if studyData.IsDataProtectionOfficeRegistered == &falseVal {
+		study.DataProtectionNumber = nil
+	} else {
+		study.DataProtectionNumber = studyData.DataProtectionNumber
+	}
 	study.InvolvesThirdParty = studyData.InvolvesThirdParty
 	study.InvolvesExternalUsers = studyData.InvolvesExternalUsers
 	study.InvolvesParticipantConsent = studyData.InvolvesParticipantConsent
@@ -280,6 +295,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return err
 	}
 
+	// .Select("*") allows setting values to nil
 	if err := tx.Model(&study).Where("id = ?", id).Select("*").Updates(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study")
