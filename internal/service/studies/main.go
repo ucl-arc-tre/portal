@@ -280,7 +280,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return err
 	}
 
-	if err := tx.Updates(&study).Error; err != nil {
+	if err := tx.Model(&study).Where("id = ?", id).Updates(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
