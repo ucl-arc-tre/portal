@@ -163,7 +163,6 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 
 // given a study and data from a request, line up the values
 func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
-	falseVal := false
 	if studyData.Title != "" {
 		study.Title = studyData.Title
 	}
@@ -171,21 +170,21 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 	study.DataControllerOrganisation = studyData.DataControllerOrganisation
 	study.InvolvesUclSponsorship = studyData.InvolvesUclSponsorship
 	study.InvolvesCag = studyData.InvolvesCag
-	if studyData.InvolvesCag == &falseVal {
+	if studyData.InvolvesCag != nil && !*studyData.InvolvesCag {
 		study.CagReference = nil
 	} else {
 		study.CagReference = studyData.CagReference
 	}
 	study.InvolvesEthicsApproval = studyData.InvolvesEthicsApproval
 	study.InvolvesHraApproval = studyData.InvolvesHraApproval
-	if studyData.InvolvesHraApproval == &falseVal {
+	if studyData.InvolvesHraApproval != nil && !*studyData.InvolvesHraApproval {
 		study.IrasId = nil
 	} else {
 		study.IrasId = studyData.IrasId
 	}
 	study.IsNhsAssociated = studyData.IsNhsAssociated
 	study.InvolvesNhsEngland = studyData.InvolvesNhsEngland
-	if studyData.InvolvesNhsEngland == &falseVal {
+	if studyData.InvolvesNhsEngland != nil && !*studyData.InvolvesNhsEngland {
 		study.NhsEnglandReference = nil
 	} else {
 		study.NhsEnglandReference = studyData.NhsEnglandReference
@@ -194,7 +193,7 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 	study.RequiresDspt = studyData.RequiresDspt
 	study.RequiresDbs = studyData.RequiresDbs
 	study.IsDataProtectionOfficeRegistered = studyData.IsDataProtectionOfficeRegistered
-	if studyData.IsDataProtectionOfficeRegistered == &falseVal {
+	if studyData.IsDataProtectionOfficeRegistered != nil && !*studyData.IsDataProtectionOfficeRegistered {
 		study.DataProtectionNumber = nil
 	} else {
 		study.DataProtectionNumber = studyData.DataProtectionNumber
