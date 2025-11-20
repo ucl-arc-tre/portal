@@ -468,13 +468,6 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
-// ProjectMemberRequest A project member with their assigned roles
-type ProjectMemberRequest struct {
-	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
-	Roles    []ProjectTRERoleName `json:"roles"`
-	Username string               `json:"username"`
-}
-
 // ProjectTRE A TRE project with base project details joined in
 type ProjectTRE struct {
 	// CreatedAt Time in RFC3339 format when the project was created
@@ -496,6 +489,13 @@ type ProjectTRE struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+// ProjectTREMember A project member with their assigned roles
+type ProjectTREMember struct {
+	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
+	Roles    []ProjectTRERoleName `json:"roles"`
+	Username string               `json:"username"`
+}
+
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
 	// AssetIds Optional list of asset identifiers to link to this project
@@ -505,7 +505,7 @@ type ProjectTRERequest struct {
 	IsDraft *bool `json:"is_draft,omitempty"`
 
 	// Members Optional list of project members with their roles
-	Members *[]ProjectMemberRequest `json:"members,omitempty"`
+	Members *[]ProjectTREMember `json:"members,omitempty"`
 
 	// Name Name of the project
 	Name string `json:"name"`

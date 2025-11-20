@@ -370,13 +370,13 @@ export type ProjectTreRequest = {
     /**
      * Optional list of project members with their roles
      */
-    members?: Array<ProjectMemberRequest>;
+    members?: Array<ProjectTreMember>;
 };
 
 /**
  * A project member with their assigned roles
  */
-export type ProjectMemberRequest = {
+export type ProjectTreMember = {
     username: string;
     /**
      * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])

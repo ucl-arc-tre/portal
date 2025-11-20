@@ -1323,9 +1323,9 @@ components:
           type: array
           description: Optional list of project members with their roles
           items:
-            $ref: "#/components/schemas/ProjectMemberRequest"
+            $ref: "#/components/schemas/ProjectTREMember"
 
-    ProjectMemberRequest:
+    ProjectTREMember:
       type: object
       description: A project member with their assigned roles
       required:
