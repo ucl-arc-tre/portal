@@ -44,8 +44,8 @@
 .field textarea:focus,
 .field select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: var(--form-blue--light);
+  box-shadow: 0 0 0 2px var(--form-blue--shadow);
 }
 
 .field textarea {

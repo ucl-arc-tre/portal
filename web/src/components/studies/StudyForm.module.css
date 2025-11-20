@@ -24,10 +24,15 @@
 }
 
 .form {
-  width: 100%;
+  /* width: 100%;
   margin-block: 1.8rem;
   padding-inline: 4%;
-  padding-bottom: 0.8rem;
+  padding-bottom: 0.8rem; */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-inline: 4%;
 
   a {
     color: var(--form-link);
@@ -40,13 +45,16 @@
     padding: 1rem;
     margin-block-end: 1.5rem;
     display: grid;
-    grid-template-columns: 1fr;
+    gap: 0.5rem;
     width: 100%;
 
     label {
-      max-width: 1000px;
+      width: 100%;
       justify-self: start;
-      margin-inline-start: 1vw;
+      font-weight: 700;
+      color: #1a1a1a;
+      font-size: 1rem;
+      line-height: 1.4;
     }
 
     /* for some reason HelperText only works within Labels, so ensuring weight for option fields  */
@@ -55,7 +63,8 @@
     }
 
     &.visible {
-      display: block;
+      display: grid;
+      visibility: visible;
     }
 
     &.hidden {
@@ -134,13 +143,14 @@
     input,
     textarea,
     select {
-      accent-color: var(--green-200);
+      accent-color: var(--form-blue--light);
 
       &:focus-visible {
         /* overriding the uikit focus */
-        -webkit-box-shadow: 0 0 1px 1.5px var(--green-100);
-        -moz-box-shadow: 0 0 1px 1.5px var(--green-100);
-        box-shadow: 0 0 1px 1.5px var(--green-100);
+        -webkit-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+        -moz-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+        box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+        outline: none;
       }
     }
 
