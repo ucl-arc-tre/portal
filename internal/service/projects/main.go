@@ -20,7 +20,7 @@ func New() *Service {
 
 // ValidateRoleAssignment checks if a user meets the requirements for a role
 // Example: To be a desktop user, you need to be an approved researcher (portal role)
-func (s *Service) ValidateRoleAssignment(userID uuid.UUID, roleName string) error {
+func (s *Service) ValidateRoleAssignment(userID uuid.UUID, role types.ProjectTRERoleName) error {
 	// Get the user to check portal-level roles
 	var user types.User
 	if err := s.db.First(&user, userID).Error; err != nil {
@@ -28,16 +28,16 @@ func (s *Service) ValidateRoleAssignment(userID uuid.UUID, roleName string) erro
 	}
 
 	// Role validation based on requirements
-	switch roleName {
-	case types.ProjectRoleIngresser:
+	switch role {
+	case types.ProjectTREIngresser:
 		// No requirements
 		return nil
 
-	case types.ProjectRoleEgresser:
+	case types.ProjectTREEgresser:
 		// TODO: Define requirements for egresser
 		return nil
 
-	case types.ProjectRoleDesktopUser:
+	case types.ProjectTREDesktopUser:
 		// Requires: Approved Researcher (portal role)
 		hasRole, err := rbac.HasRole(user, rbac.ApprovedResearcher)
 		if err != nil {
@@ -48,7 +48,11 @@ func (s *Service) ValidateRoleAssignment(userID uuid.UUID, roleName string) erro
 		}
 		return nil
 
+	case types.ProjectTREEgressRequester, types.ProjectTREEgressChecker:
+		// TODO: Requires Desktop User role (TRE role)
+		return nil
+
 	default:
-		return fmt.Errorf("unknown role: %s", roleName)
+		return fmt.Errorf("unknown role: %s", role)
 	}
 }

@@ -34,32 +34,26 @@ type ProjectMember struct {
 	UserID    uuid.UUID `gorm:"not null;index"`
 
 	// Relationships
-	Project Project             `gorm:"foreignKey:ProjectID"`
-	User    User                `gorm:"foreignKey:UserID"`
-	Roles   []ProjectMemberRole `gorm:"foreignKey:ProjectMemberID"`
+	Project         Project                 `gorm:"foreignKey:ProjectID"`
+	User            User                    `gorm:"foreignKey:UserID"`
+	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectMemberID"`
 }
 
-type ProjectMemberRole struct {
-	Model
-	ProjectMemberID uuid.UUID `gorm:"not null;index"`
-	RoleID          uuid.UUID `gorm:"not null;index"`
+type ProjectTRERoleName string
+
+const (
+	ProjectTREDesktopUser     ProjectTRERoleName = "desktop_user"     // allows access to a desktop
+	ProjectTREIngresser       ProjectTRERoleName = "ingresser"        // can upload data into the TRE
+	ProjectTREEgresser        ProjectTRERoleName = "egresser"         // can download data from the TRE
+	ProjectTREEgressRequester ProjectTRERoleName = "egress_requester" // can request data to be egressed
+	ProjectTREEgressChecker   ProjectTRERoleName = "egress_checker"   // can approve egress requests
+)
+
+type ProjectTRERoleBinding struct {
+	ModelAuditable
+	ProjectMemberID uuid.UUID          `gorm:"not null;index"`
+	Role            ProjectTRERoleName `gorm:"not null;index"`
 
 	// Relationships
 	ProjectMember ProjectMember `gorm:"foreignKey:ProjectMemberID"`
-	Role          ProjectRole   `gorm:"foreignKey:RoleID"`
 }
-
-type ProjectRole struct {
-	Model
-	Name        string `gorm:"unique;not null"`
-	Description string `gorm:"type:text"`
-}
-
-// Project role constants
-const (
-	ProjectRoleIngresser       = "ingresser"
-	ProjectRoleEgresser        = "egresser"
-	ProjectRoleEgressRequester = "egress_requester"
-	ProjectRoleEgressChecker   = "egress_checker"
-	ProjectRoleDesktopUser     = "desktop_user"
-)

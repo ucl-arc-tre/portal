@@ -13,7 +13,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/router"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
-	"github.com/ucl-arc-tre/portal/internal/service/projects"
 )
 
 func main() {
@@ -30,7 +29,6 @@ func initialise() {
 	rbac.Init()
 	agreements.Init()
 	environments.Init()
-	projects.Init()
 }
 
 // Add the web API defined by its OpenAPI spec with suitable middleware
