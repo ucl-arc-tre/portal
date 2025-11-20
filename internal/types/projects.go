@@ -12,9 +12,8 @@ type Project struct {
 	IsDraft       bool      `gorm:"not null;default:false"`
 
 	// Relationships
-	Study          Study           `gorm:"foreignKey:StudyID"`
-	CreatorUser    User            `gorm:"foreignKey:CreatorUserID"`
-	ProjectMembers []ProjectMember `gorm:"foreignKey:ProjectID"`
+	Study       Study `gorm:"foreignKey:StudyID"`
+	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
 }
 
 type ProjectTRE struct {
@@ -24,18 +23,9 @@ type ProjectTRE struct {
 	EgressNumberRequiredApprovals int       `gorm:"not null;default:1"`
 
 	// Relationships
-	Environment Environment `gorm:"foreignKey:EnvironmentID"`
-	Project     Project     `gorm:"foreignKey:ProjectID"`
-}
-
-type ProjectMember struct {
-	ModelAuditable
-	ProjectID uuid.UUID `gorm:"not null;index"`
-	UserID    uuid.UUID `gorm:"not null;index"`
-
-	// Relationships
-	Project Project `gorm:"foreignKey:ProjectID"`
-	User    User    `gorm:"foreignKey:UserID"`
+	Environment     Environment             `gorm:"foreignKey:EnvironmentID"`
+	Project         Project                 `gorm:"foreignKey:ProjectID"`
+	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
 }
 
 type ProjectTRERoleName string
