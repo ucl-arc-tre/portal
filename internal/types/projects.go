@@ -53,18 +53,13 @@ type ProjectRole struct {
 	Model
 	Name        string `gorm:"unique;not null"`
 	Description string `gorm:"type:text"`
-
-	// Relationships
-	Requirements []ProjectRoleRequirement `gorm:"foreignKey:RoleID"`
 }
 
-type ProjectRoleRequirement struct {
-	Model
-	RoleID        uuid.UUID `gorm:"not null;index"`
-	EnvironmentID uuid.UUID `gorm:"not null;index"`
-	Requirement   string    `gorm:"not null"`
-
-	// Relationships
-	Role        ProjectRole `gorm:"foreignKey:RoleID"`
-	Environment Environment `gorm:"foreignKey:EnvironmentID"`
-}
+// Project role constants
+const (
+	ProjectRoleIngresser       = "ingresser"
+	ProjectRoleEgresser        = "egresser"
+	ProjectRoleEgressRequester = "egress_requester"
+	ProjectRoleEgressChecker   = "egress_checker"
+	ProjectRoleDesktopUser     = "desktop_user"
+)
