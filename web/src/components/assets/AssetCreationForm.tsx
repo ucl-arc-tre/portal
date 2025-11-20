@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -7,13 +6,7 @@ import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
-
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
+import { Alert, AlertMessage } from "../shared/exports";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
