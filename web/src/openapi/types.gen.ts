@@ -368,10 +368,26 @@ export type ProjectTreRequest = {
      */
     asset_ids?: Array<string>;
     /**
-     * Optional list of email addresses for additional approved researchers who will have access to this project
+     * Optional list of project members with their roles
      */
-    additional_approved_researcher_usernames?: Array<string>;
+    members?: Array<ProjectMemberRequest>;
 };
+
+/**
+ * A project member with their assigned roles
+ */
+export type ProjectMemberRequest = {
+    username: string;
+    /**
+     * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
+     */
+    roles: Array<ProjectTreRoleName>;
+};
+
+/**
+ * Available TRE project roles
+ */
+export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker';
 
 /**
  * An environment with its tier mapping

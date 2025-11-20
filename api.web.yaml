@@ -1319,11 +1319,36 @@ components:
           description: Optional list of asset identifiers to link to this project
           items:
             type: string
-        additional_approved_researcher_usernames:
+        members:
           type: array
-          description: Optional list of email addresses for additional approved researchers who will have access to this project
+          description: Optional list of project members with their roles
           items:
-            type: string
+            $ref: "#/components/schemas/ProjectMemberRequest"
+
+    ProjectMemberRequest:
+      type: object
+      description: A project member with their assigned roles
+      required:
+        - username
+        - roles
+      properties:
+        username:
+          type: string
+        roles:
+          type: array
+          description: List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
+          items:
+            $ref: "#/components/schemas/ProjectTRERoleName"
+
+    ProjectTRERoleName:
+      type: string
+      description: Available TRE project roles
+      enum:
+        - desktop_user
+        - ingresser
+        - egresser
+        - egress_requester
+        - egress_checker
 
     Environment:
       type: object
