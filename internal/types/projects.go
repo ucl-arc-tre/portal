@@ -34,9 +34,8 @@ type ProjectMember struct {
 	UserID    uuid.UUID `gorm:"not null;index"`
 
 	// Relationships
-	Project         Project                 `gorm:"foreignKey:ProjectID"`
-	User            User                    `gorm:"foreignKey:UserID"`
-	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectMemberID"`
+	Project Project `gorm:"foreignKey:ProjectID"`
+	User    User    `gorm:"foreignKey:UserID"`
 }
 
 type ProjectTRERoleName string
@@ -51,9 +50,11 @@ const (
 
 type ProjectTRERoleBinding struct {
 	ModelAuditable
-	ProjectMemberID uuid.UUID          `gorm:"not null;index"`
-	Role            ProjectTRERoleName `gorm:"not null;index"`
+	ProjectTREID uuid.UUID          `gorm:"not null;index"`
+	UserID       uuid.UUID          `gorm:"not null;index"`
+	Role         ProjectTRERoleName `gorm:"not null;index"`
 
 	// Relationships
-	ProjectMember ProjectMember `gorm:"foreignKey:ProjectMemberID"`
+	ProjectTRE ProjectTRE `gorm:"foreignKey:ProjectTREID"`
+	User       User       `gorm:"foreignKey:UserID"`
 }
