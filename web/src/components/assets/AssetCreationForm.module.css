@@ -8,14 +8,6 @@
   background: #fafafa;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 1rem;
-  padding-inline: 4%;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -122,13 +114,13 @@
 }
 
 .definitions-link {
-  color: #0066cc;
+  color: var(--form-link);
   text-decoration: underline;
   font-weight: 500;
 }
 
 .definitions-link:hover {
-  color: #004499;
+  color: var(--form-link-hover);
   text-decoration: none;
 }
 

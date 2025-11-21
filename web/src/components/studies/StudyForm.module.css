@@ -23,209 +23,207 @@
   margin-bottom: 0;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1rem;
-  padding-inline: 4%;
+.form-link {
+  color: var(--form-link);
+  text-decoration: underline;
 
-  a {
-    color: var(--form-link);
-    text-decoration: underline;
+  &:hover {
+    color: var(--form-link--hover);
+    text-decoration: none;
+  }
+}
+
+.fieldset {
+  border: none;
+  padding-bottom: 0.4rem;
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+
+  label {
+    width: 100%;
+    justify-self: start;
+    font-weight: 700;
+    color: #1a1a1a;
+    font-size: 1rem;
+    line-height: 1.4;
   }
 
-  .fieldset {
-    border: none;
-    padding-bottom: 0.4rem;
+  /* for some reason HelperText only works within Labels, so ensuring weight for option fields  */
+  [data-testid="ucl-uikit-field__helper-text"] {
+    font-weight: 400;
+  }
+
+  &.visible {
     display: grid;
-    gap: 0.5rem;
-    width: 100%;
+    visibility: visible;
+  }
 
-    label {
-      width: 100%;
-      justify-self: start;
-      font-weight: 700;
-      color: #1a1a1a;
-      font-size: 1rem;
-      line-height: 1.4;
-    }
+  &.hidden {
+    visibility: hidden;
+    display: none;
+  }
 
-    /* for some reason HelperText only works within Labels, so ensuring weight for option fields  */
-    [data-testid="ucl-uikit-field__helper-text"] {
-      font-weight: 400;
-    }
+  .option-field {
+    padding: 0.4rem;
+    font-weight: 400;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-content: center;
 
-    &.visible {
-      display: grid;
-      visibility: visible;
-    }
-
-    &.hidden {
-      visibility: hidden;
-      display: none;
-    }
-
-    .option-field {
-      padding: 0.4rem;
-      font-weight: 400;
-      max-width: 100%;
+    .yes-no-unsure-buttons {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.8rem;
-      align-content: center;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-self: end;
 
-      .yes-no-unsure-buttons {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-self: end;
+      button {
+        padding: 0.4rem 0.55rem;
+        cursor: pointer;
 
-        button {
-          padding: 0.4rem 0.55rem;
-          cursor: pointer;
+        /* base */
+        border: 2px solid #0d68cf;
+        color: #0d4b92;
 
-          /* base */
-          border: 2px solid #0d68cf;
-          color: #0d4b92;
+        &.yes {
+          border-radius: 5px 0 0 5px;
+          border-right: none;
+        }
 
-          &.yes {
+        &.no {
+          border-radius: 0 5px 5px 0;
+          border-left: none;
+        }
+
+        &.selected {
+          background-color: #0d68cf;
+          color: #fff;
+          font-weight: bolder;
+
+          &:where(:nth-child(1)) {
             border-radius: 5px 0 0 5px;
             border-right: none;
           }
 
-          &.no {
+          &:where(:nth-child(3)) {
             border-radius: 0 5px 5px 0;
             border-left: none;
-          }
-
-          &.selected {
-            background-color: #0d68cf;
-            color: #fff;
-            font-weight: bolder;
-
-            &:where(:nth-child(1)) {
-              border-radius: 5px 0 0 5px;
-              border-right: none;
-            }
-
-            &:where(:nth-child(3)) {
-              border-radius: 0 5px 5px 0;
-              border-left: none;
-            }
           }
         }
       }
     }
+  }
 
-    .option__text-input {
-      font-size: 1.1rem;
+  .option__text-input {
+    font-size: 1.1rem;
+    border: 1px solid rgb(102, 102, 102);
+    border-radius: 0px;
+    margin: 5px;
+    padding: 12px;
+    display: block;
+    width: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    accent-color: var(--form-blue--light);
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+
+    &:focus-visible {
+      /* overriding the uikit focus */
+      -webkit-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+      -moz-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+      box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+      outline: none;
+    }
+  }
+
+  textarea {
+    display: block;
+    max-width: 100%;
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+  }
+
+  small {
+    display: block;
+  }
+
+  #controller {
+    margin-inline-start: 0.3rem;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+  }
+
+  .data-protection-wrapper {
+    display: flex;
+
+    input {
+      display: inline-block;
+      font-size: 1rem;
       border: 1px solid rgb(102, 102, 102);
       border-radius: 0px;
       margin: 5px;
-      padding: 12px;
-      display: block;
-      width: 100%;
+      padding: 5px;
+    }
+  }
+
+  .admin-wrapper {
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-label {
+    padding-inline: 0;
+  }
+
+  .username-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    > div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    input,
-    textarea,
-    select {
-      accent-color: var(--form-blue--light);
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    .domain-suffix {
+      color: var(--text--secondary);
+      font-weight: 500;
       font-size: 1rem;
-      transition: border-color 0.2s;
-
-      &:focus-visible {
-        /* overriding the uikit focus */
-        -webkit-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
-        -moz-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
-        box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
-        outline: none;
-      }
-    }
-
-    textarea {
-      display: block;
-      max-width: 100%;
-      resize: vertical;
-      min-height: 100px;
-      font-family: inherit;
-    }
-
-    small {
-      display: block;
-    }
-
-    #controller {
-      margin-inline-start: 0.3rem;
-      font-size: 1.2rem;
-      padding: 0.5rem;
-    }
-
-    .data-protection-wrapper {
-      display: flex;
-
-      input {
-        display: inline-block;
-        font-size: 1rem;
-        border: 1px solid rgb(102, 102, 102);
-        border-radius: 0px;
-        margin: 5px;
-        padding: 5px;
-      }
-    }
-
-    .admin-wrapper {
-      margin-bottom: 0.5rem;
-    }
-
-    .admin-label {
-      padding-inline: 0;
-    }
-
-    .username-input-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-
-      > div:first-child {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .domain-suffix {
-        color: var(--text--secondary);
-        font-weight: 500;
-        font-size: 1rem;
-      }
     }
   }
+}
 
-  .button--continue {
-    float: inline-end;
-  }
+.button--continue {
+  float: inline-end;
+}
 
-  .button--continue,
-  .button--back {
-    margin-inline: 0.4%;
-    margin-bottom: 1rem;
-  }
+.button--continue,
+.button--back {
+  margin-inline: 0.4%;
+  margin-bottom: 1rem;
+}
 
-  .form-helper--invalid {
-    text-align: center;
-    color: red;
-  }
+.form-helper--invalid {
+  text-align: center;
+  color: red;
+}
 
-  .readonly {
-    cursor: not-allowed;
+.readonly {
+  cursor: not-allowed;
 
-    &:focus-visible {
-      box-shadow: none !important;
-    }
+  &:focus-visible {
+    box-shadow: none !important;
   }
 }
 

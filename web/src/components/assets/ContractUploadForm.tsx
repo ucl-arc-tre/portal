@@ -218,7 +218,7 @@ export default function ContractUploadModal({
           : "Upload a PDF contract document for this asset. Only PDF files up to 10MB are accepted."}
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="form">
         <div className={styles["upload-section"]}>
           <div className={styles["file-input"]}>
             <input

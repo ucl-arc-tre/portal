@@ -87,7 +87,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
     <Dialog setDialogOpen={closeModal} cy="create-asset-form">
       <h2>Create New Asset</h2>
 
-      <form onSubmit={handleSubmit(onFormSubmit)} className={styles.form}>
+      <form onSubmit={handleSubmit(onFormSubmit)} className="form">
         <div className={styles.field}>
           <Label htmlFor="title">Title *</Label>
           <input
