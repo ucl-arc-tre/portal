@@ -355,7 +355,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
           <div className={styles["checkbox-group"]}>
             {storageDefinitions.map((storage) => (
-              <Label key={storage.value} className={styles["checkbox-label"]}>
+              <label key={storage.value} className={styles["checkbox-label"]}>
                 <input
                   type="checkbox"
                   value={storage.value}
@@ -365,7 +365,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   className={styles.checkbox}
                 />
                 {storage.name}
-              </Label>
+              </label>
             ))}
           </div>
 
@@ -380,7 +380,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           <Label htmlFor="requires_contract">Does this asset require a contract? *</Label>
           <p>Answering yes will require you to add a contract document in a later step</p>
           <div className={styles["radio-group"]}>
-            <Label className={styles["radio-label"]}>
+            <label className={styles["radio-label"]}>
               <input
                 type="radio"
                 value="true"
@@ -390,9 +390,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={styles.radio}
               />
               Yes
-            </Label>
+            </label>
 
-            <Label className={styles["radio-label"]}>
+            <label className={styles["radio-label"]}>
               <input
                 type="radio"
                 value="false"
@@ -402,7 +402,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={styles.radio}
               />
               No
-            </Label>
+            </label>
           </div>
           {errors.requires_contract && (
             <Alert type="error">
@@ -417,7 +417,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             in place at the organisation? *
           </Label>
           <div className={styles["radio-group"]}>
-            <Label className={styles["radio-label"]}>
+            <label className={styles["radio-label"]}>
               <input
                 type="radio"
                 value="true"
@@ -427,9 +427,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={styles.radio}
               />
               Yes
-            </Label>
+            </label>
 
-            <Label className={styles["radio-label"]}>
+            <label className={styles["radio-label"]}>
               <input
                 type="radio"
                 value="false"
@@ -439,7 +439,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={styles.radio}
               />
               No
-            </Label>
+            </label>
           </div>
           {errors.has_dspt && (
             <Alert type="error">
@@ -453,7 +453,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             Is this asset stored or processed outside of the UK and the European Economic Area at all? *
           </Label>
           <div className={styles["radio-group"]}>
-            <Label className={styles["radio-label"]}>
+            <label className={styles["radio-label"]}>
               <input
                 type="radio"
                 value="true"
@@ -463,9 +463,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={styles.radio}
               />
               Yes
-            </Label>
+            </label>
 
-            <Label className={styles["radio-label"]}>
+            <label className={styles["radio-label"]}>
               <input
                 type="radio"
                 value="false"
@@ -475,7 +475,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={styles.radio}
               />
               No
-            </Label>
+            </label>
           </div>
           {errors.stored_outside_uk_eea && (
             <Alert type="error">
