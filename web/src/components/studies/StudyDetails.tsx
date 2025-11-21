@@ -93,21 +93,42 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState("");
 
-  const handleUpdateStudyStatus = async (status: string) => {
+  const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
 
     if (status === "Approved") {
-      const response = await postStudiesAdminByStudyIdReview({ path: { studyId }, body: { status: "Approved" } });
-      if (response.response.ok) {
+      const response = await postStudiesAdminByStudyIdReview({
+        path: { studyId },
+        body: { status: "Approved", feedback: feedbackContent },
+      });
+      if (!response.response.ok) {
+        console.error("Failed to update study status:", response.error);
+        return response;
+      } else {
         setApprovalStatus("Approved");
+        if (feedbackContent) setFeedback(feedbackContent);
       }
     } else if (status === "Rejected") {
       const response = await postStudiesAdminByStudyIdReview({
         path: { studyId },
-        body: { status: "Rejected", feedback: feedback },
+        body: { status: "Rejected", feedback: feedbackContent },
       });
-      if (response.response.ok) {
+      if (!response.response.ok) {
+        console.error("Failed to update study status:", response.error);
+        return response;
+      } else {
         setApprovalStatus("Rejected");
+        if (feedbackContent) setFeedback(feedbackContent);
+      }
+    } else if (status === "Pending") {
+      const response = await patchStudiesByStudyIdPending({
+        path: { studyId },
+      });
+      if (!response.response.ok) {
+        console.error("Failed to update study status:", response.error);
+        return response;
+      } else {
+        setApprovalStatus("Pending");
       }
     } else if (status === "Pending") {
       const response = await patchStudiesByStudyIdPending({
@@ -293,13 +314,17 @@ export default function StudyDetails(props: StudyDetailsProps) {
           </dl>
 
           {feedback && (
-            <Alert type={"warning"} className={styles["feedback-alert"]}>
-              <h4>This study has been rejected and the following feedback has been provided:</h4>
+            <Alert type={approvalStatus === "approved" ? "info" : "warning"} className={styles["feedback-alert"]}>
+              <h4>This study has been given the following feedback:</h4>
               <p>{feedback}</p>
-              <hr></hr>
-              <small>
-                <em>Please adjust as appropriate and request another review.</em>
-              </small>
+              {approvalStatus !== "approved" && (
+                <>
+                  <hr></hr>
+                  <small>
+                    <em>Please adjust as appropriate and request another review.</em>
+                  </small>
+                </>
+              )}
             </Alert>
           )}
         </div>
@@ -311,8 +336,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
           <AdminFeedbackSection
             status={study.approval_status}
-            feedback={feedback}
-            setFeedback={setFeedback}
+            feedbackFromStudy={feedback}
             handleUpdateStudyStatus={handleUpdateStudyStatus}
           />
         </>
