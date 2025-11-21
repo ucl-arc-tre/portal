@@ -58,7 +58,7 @@
 }
 
 .assets-count-badge {
-  background: #007bff;
+  background: var(--form-blue--light);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 12px;

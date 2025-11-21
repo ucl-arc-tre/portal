@@ -8,14 +8,6 @@
   background: #fafafa;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 1rem;
-  padding-inline: 4%;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -44,8 +36,8 @@
 .field textarea:focus,
 .field select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: var(--form-blue--light);
+  box-shadow: 0 0 0 2px var(--form-blue--shadow);
 }
 
 .field textarea {
@@ -122,13 +114,13 @@
 }
 
 .definitions-link {
-  color: #0066cc;
+  color: var(--form-link);
   text-decoration: underline;
   font-weight: 500;
 }
 
 .definitions-link:hover {
-  color: #004499;
+  color: var(--form-link-hover);
   text-decoration: none;
 }
 
@@ -150,6 +142,7 @@
   background-color: #f8f9fa;
   transition: all 0.2s ease;
   min-width: 90px;
+  max-width: 10svw;
   text-align: center;
 }
 

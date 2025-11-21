@@ -9,7 +9,10 @@
   --green-100: #328543;
   --green-50: #64bb75;
 
-  --form-link: #4023a7;
+  --form-link: #0066cc;
+  --form-link--hover: #004499;
+  --form-blue--light: #007bff;
+  --form-blue--shadow: rgba(0, 123, 255, 0.25);
 
   --grey-border--light: #ced1d7;
 }
@@ -60,4 +63,12 @@ dialog {
   font-size: 0.875rem;
   font-weight: 500;
   margin-inline: 0.2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  padding-inline: 4%;
+  gap: 1.5rem;
 }

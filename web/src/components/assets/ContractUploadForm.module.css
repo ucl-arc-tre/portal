@@ -2,12 +2,7 @@
   margin-bottom: 1.5rem;
   color: var(--color-text-secondary);
   font-size: 1rem;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  text-align: center;
 }
 
 .upload-section {
@@ -136,8 +131,8 @@
 .form-input:focus,
 .form-select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: var(--form-blue--light);
+  box-shadow: 0 0 0 2px var(--form-blue--shadow);
 }
 
 .form-error {
@@ -157,7 +152,7 @@
   padding: 1.5rem;
 }
 
-@media (width >= 768px) {
+@media (width >=768px) {
   .actions {
     flex-direction: row;
     justify-content: flex-end;

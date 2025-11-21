@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -7,13 +6,7 @@ import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
-
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
+import { Alert, AlertMessage, Label } from "../shared/exports";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
@@ -94,9 +87,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
     <Dialog setDialogOpen={closeModal} cy="create-asset-form">
       <h2>Create New Asset</h2>
 
-      <form onSubmit={handleSubmit(onFormSubmit)} className={styles.form}>
+      <form onSubmit={handleSubmit(onFormSubmit)} className="form">
         <div className={styles.field}>
-          <label htmlFor="title">Title *</label>
+          <Label htmlFor="title">Title *</Label>
           <input
             id="title"
             type="text"
@@ -116,7 +109,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="description">Description *</label>
+          <Label htmlFor="description">Description *</Label>
           <textarea
             id="description"
             rows={4}
@@ -136,7 +129,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="classification_impact">Classification Impact *</label>
+          <Label htmlFor="classification_impact">Classification Impact *</Label>
           <div className={styles["info-text"]}>
             <p>
               You should be aware of{" "}
@@ -173,7 +166,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
         {showTierSelection && (
           <div className={styles.field}>
-            <label htmlFor="tier">Security Tier *</label>
+            <Label htmlFor="tier">Security Tier *</Label>
             <div className={styles["info-text"]}>
               <p>
                 Please select the appropriate security tier based on{" "}
@@ -209,7 +202,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         )}
 
         <div className={styles.field}>
-          <label htmlFor="protection">What protection is applied to this asset in the form described here? *</label>
+          <Label htmlFor="protection">What protection is applied to this asset in the form described here? *</Label>
           <select
             id="protection"
             {...register("protection", {
@@ -249,7 +242,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="legal_basis">What is the legal basis for holding this asset? *</label>
+          <Label htmlFor="legal_basis">What is the legal basis for holding this asset? *</Label>
           <div className={styles["info-text"]}>
             <p>
               Select the most relevant legal basis from the six options available. To learn more about the legal basis
@@ -305,7 +298,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="format">What format is the asset in? *</label>
+          <Label htmlFor="format">What format is the asset in? *</Label>
           <select
             id="format"
             {...register("format", {
@@ -327,9 +320,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="expires_at" className={styles["red-text"]}>
+          <Label htmlFor="expires_at" className={styles["red-text"]}>
             What is the asset&apos;s retention expiry date? *
-          </label>
+          </Label>
           <input
             id="expires_at"
             type="date"
@@ -347,7 +340,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="location">
+          <Label htmlFor="location">
             Where will these files/items be saved/stored and how will they be moved? Select all of the touchpoints that
             are relevant including backups. *{" "}
             <a
@@ -358,7 +351,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             >
               What do these options mean? (Must read)
             </a>
-          </label>
+          </Label>
 
           <div className={styles["checkbox-group"]}>
             {storageDefinitions.map((storage) => (
@@ -384,7 +377,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="requires_contract">Does this asset require a contract? *</label>
+          <Label htmlFor="requires_contract">Does this asset require a contract? *</Label>
           <p>Answering yes will require you to add a contract document in a later step</p>
           <div className={styles["radio-group"]}>
             <label className={styles["radio-label"]}>
@@ -419,10 +412,10 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="has_dspt">
+          <Label htmlFor="has_dspt">
             Is this information provided under condition of there being an up to date Data Security & Protection Toolkit
             in place at the organisation? *
-          </label>
+          </Label>
           <div className={styles["radio-group"]}>
             <label className={styles["radio-label"]}>
               <input
@@ -456,9 +449,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="stored_outside_uk_eea">
+          <Label htmlFor="stored_outside_uk_eea">
             Is this asset stored or processed outside of the UK and the European Economic Area at all? *
-          </label>
+          </Label>
           <div className={styles["radio-group"]}>
             <label className={styles["radio-label"]}>
               <input
@@ -492,7 +485,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="status">Status *</label>
+          <Label htmlFor="status">Status *</Label>
           <select
             id="status"
             {...register("status", {

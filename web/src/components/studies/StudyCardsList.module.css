@@ -20,7 +20,7 @@
   left: 0;
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, #007bff, #0056b3);
+  background: linear-gradient(90deg, var(--form-blue--light), #0056b3);
   margin-left: 0.4rem;
 }
 
@@ -93,7 +93,7 @@
 .study-card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translateY(-3px);
-  border-color: #007bff;
+  border-color: var(--form-blue--light);
 }
 
 .study-info {

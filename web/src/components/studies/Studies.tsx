@@ -120,6 +120,10 @@ export default function Studies(props: Props) {
           <div className={styles["no-studies-message"]}>
             <h2>No studies found</h2>
           </div>
+        ) : tab === "pending" && pendingStudies.length === 0 ? (
+          <div className={styles["no-studies-message"]}>
+            <h2>No studies pending approval</h2>
+          </div>
         ) : (
           <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
         )}
