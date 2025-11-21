@@ -36,7 +36,6 @@
 
   .fieldset {
     border: none;
-    padding: 1rem;
     padding-bottom: 0.4rem;
     display: grid;
     gap: 0.5rem;
@@ -133,6 +132,11 @@
     textarea,
     select {
       accent-color: var(--form-blue--light);
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
 
       &:focus-visible {
         /* overriding the uikit focus */
@@ -146,6 +150,9 @@
     textarea {
       display: block;
       max-width: 100%;
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
     }
 
     small {
