@@ -207,7 +207,7 @@ export type StudyBase = {
     /**
      * Description of the study
      */
-    description?: string;
+    description?: string | null;
     /**
      * List of additional study administrator usernames (empty array if none)
      */
