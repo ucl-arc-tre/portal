@@ -314,13 +314,17 @@ export default function StudyDetails(props: StudyDetailsProps) {
           </dl>
 
           {feedback && (
-            <Alert type={"warning"} className={styles["feedback-alert"]}>
+            <Alert type={approvalStatus === "approved" ? "info" : "warning"} className={styles["feedback-alert"]}>
               <h4>This study has been given the following feedback:</h4>
               <p>{feedback}</p>
-              <hr></hr>
-              <small>
-                <em>Please adjust as appropriate and request another review.</em>
-              </small>
+              {approvalStatus !== "approved" && (
+                <>
+                  <hr></hr>
+                  <small>
+                    <em>Please adjust as appropriate and request another review.</em>
+                  </small>
+                </>
+              )}
             </Alert>
           )}
         </div>
