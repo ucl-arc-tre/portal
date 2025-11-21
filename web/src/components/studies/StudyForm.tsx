@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { Input, Alert, AlertMessage, HelperText, Textarea } from "../shared/exports";
+import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/exports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
@@ -342,8 +342,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>
-          <legend>Study Details</legend>
-          <label htmlFor="studyName">
+          <Label htmlFor="studyName">
             Study Name*:
             <Controller
               name="title"
@@ -367,9 +366,9 @@ export default function StudyForm(StudyProps: StudyProps) {
                 <AlertMessage>{errors.title.message}</AlertMessage>
               </Alert>
             )}
-          </label>
+          </Label>
 
-          <label htmlFor="description">
+          <Label htmlFor="description">
             Study Description:
             <Controller
               name="description"
@@ -377,12 +376,11 @@ export default function StudyForm(StudyProps: StudyProps) {
               rules={{ maxLength: 255 }}
               render={({ field }) => <Textarea {...field} id="description" />}
             />
-          </label>
+          </Label>
         </fieldset>
 
         <fieldset className={getFieldsetClass(1)}>
-          <legend>Ownership</legend>
-          <label htmlFor="owner">
+          <Label htmlFor="owner">
             Study Owner (PI):
             <Input
               type="email"
@@ -395,8 +393,8 @@ export default function StudyForm(StudyProps: StudyProps) {
             <HelperText>
               If you are not the study owner, contact the owner and ask them to fill out this form on their account.
             </HelperText>
-          </label>
-          <label>
+          </Label>
+          <Label>
             Additional Study Administrators (optional):
             <fieldset className={styles.fieldset}>
               <HelperText style={{ marginBottom: "1rem" }}>
@@ -406,7 +404,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
               {fields.map((field, index) => (
                 <div key={field.id} className={styles["admin-wrapper"]}>
-                  <label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
+                  <Label htmlFor={`admin-${index}`} className={styles["admin-Label"]}>
                     Administrator {index + 1}:
                     <Controller
                       name={`additionalStudyAdminUsernames.${index}.value` as const}
@@ -451,7 +449,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                         </div>
                       )}
                     />
-                  </label>
+                  </Label>
                   {/* disabling for editing until we get removal on backend implemented */}
                   <Button type="button" onClick={() => remove(index)} size="small" disabled={Boolean(editingStudy)}>
                     Remove
@@ -469,9 +467,9 @@ export default function StudyForm(StudyProps: StudyProps) {
                 Add Administrator
               </Button>
             </fieldset>
-          </label>
+          </Label>
 
-          <label htmlFor="controller">
+          <Label htmlFor="controller">
             Data Controller (organisation)*:
             <Controller
               name="dataControllerOrganisation"
@@ -485,12 +483,11 @@ export default function StudyForm(StudyProps: StudyProps) {
                 <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
               </Alert>
             )}
-          </label>
+          </Label>
         </fieldset>
 
         {/* second step */}
         <fieldset className={getFieldsetClass(2)}>
-          <legend>Sponsorship & Approvals</legend>
           <div className={styles["option-field"]} data-cy="involvesUclSponsorship">
             <span>
               We will be seeking/have sought{" "}
@@ -525,10 +522,10 @@ export default function StudyForm(StudyProps: StudyProps) {
           </div>
 
           {showCagRef === true && (
-            <label htmlFor="cagRef">
+            <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
               <input type="text" id="cagRef" {...register("cagReference")} className={styles["option__text-input"]} />
-            </label>
+            </Label>
           )}
 
           <div className={styles["option-field"]} data-cy="involvesEthicsApproval">
@@ -558,7 +555,7 @@ export default function StudyForm(StudyProps: StudyProps) {
           </div>
 
           {showIrasId === true && (
-            <label htmlFor="irasId">
+            <Label htmlFor="irasId">
               <span>
                 {" "}
                 <a href="https://www.gov.uk/guidance/clinical-trials-for-medicines-apply-for-approval-in-the-uk#:~:text=Integrated%20Research%20Application%20System%20(IRAS)">
@@ -568,13 +565,11 @@ export default function StudyForm(StudyProps: StudyProps) {
               </span>
 
               <input type="text" id="irasId" {...register("irasId")} className={styles["option__text-input"]} />
-            </label>
+            </Label>
           )}
         </fieldset>
 
         <fieldset className={getFieldsetClass(2)}>
-          <legend>NHS</legend>
-
           <div className={styles["option-field"]} data-cy="isNhsAssociated">
             This research is associated with the NHS, uses NHS data, works with NHS sites or has use of a/some NHS
             facilities
@@ -598,7 +593,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                 />
               </div>
               {showNhsEnglandRef === true && (
-                <label htmlFor="nhsEnglandRef">
+                <Label htmlFor="nhsEnglandRef">
                   NHSE{" "}
                   <a href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number.">
                     DARS NIC number
@@ -610,7 +605,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                     {...register("nhsEnglandReference")}
                     className={styles["option__text-input"]}
                   />
-                </label>
+                </Label>
               )}
 
               <div className={styles["option-field"]} data-cy="involvesMnca">
@@ -645,8 +640,6 @@ export default function StudyForm(StudyProps: StudyProps) {
 
         {/* third step */}
         <fieldset className={getFieldsetClass(3)}>
-          <legend>Data</legend>
-
           <div className={styles["option-field"]} data-cy="requiresDbs">
             There is data related to this research only to be handled by staff who have obtained a Disclosure and
             Barring Service (DBS) check
@@ -669,7 +662,7 @@ export default function StudyForm(StudyProps: StudyProps) {
           </div>
 
           {showDataProtectionNumber === true && (
-            <label htmlFor="dataProtectionNumber">
+            <Label htmlFor="dataProtectionNumber">
               Data Protection Registration Number*:
               <HelperText>
                 This is comprised of a registry ID, the year and month the data was registered and a 2-3 digit number.
@@ -730,7 +723,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   </AlertMessage>
                 </Alert>
               )}
-            </label>
+            </Label>
           )}
 
           <div className={styles["option-field"]} data-cy="involvesThirdParty">

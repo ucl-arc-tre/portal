@@ -24,13 +24,8 @@
 }
 
 .form {
-  /* width: 100%;
-  margin-block: 1.8rem;
-  padding-inline: 4%;
-  padding-bottom: 0.8rem; */
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
   margin-top: 1rem;
   padding-inline: 4%;
 
@@ -40,10 +35,9 @@
   }
 
   .fieldset {
-    border: 1px solid var(--grey-border--light);
-    border-radius: 3px;
+    border: none;
     padding: 1rem;
-    margin-block-end: 1.5rem;
+    padding-bottom: 0.4rem;
     display: grid;
     gap: 0.5rem;
     width: 100%;
@@ -70,11 +64,6 @@
     &.hidden {
       visibility: hidden;
       display: none;
-    }
-
-    legend {
-      color: var(--text--secondary);
-      font-size: 0.75rem;
     }
 
     .option-field {
