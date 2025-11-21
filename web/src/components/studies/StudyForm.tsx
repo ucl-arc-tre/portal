@@ -46,7 +46,7 @@ type StudyProps = {
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
   const studyData: StudyRequest = {
     title: data.title,
-    description: data.description && data.description?.trim().length > 0 ? data.description : undefined,
+    description: data.description && data.description?.trim().length > 0 ? data.description : null,
     data_controller_organisation: data.dataControllerOrganisation.toLowerCase(),
     additional_study_admin_usernames: data.additionalStudyAdminUsernames
       .map((admin) => admin.value.trim())
@@ -227,7 +227,7 @@ export default function StudyForm(StudyProps: StudyProps) {
       const study = editingStudy;
       reset({
         title: study.title,
-        description: study.description,
+        description: study.description?.trim(),
         owner: study.owner_username!,
         additionalStudyAdminUsernames: study.additional_study_admin_usernames.map((username) => ({
           value: username!.split("@")[0],
