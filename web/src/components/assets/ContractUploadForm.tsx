@@ -13,6 +13,7 @@ import {
   Contract,
 } from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
+import { Label } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -228,10 +229,10 @@ export default function ContractUploadModal({
               className={styles["hidden-input"]}
               id="contract-file-input"
             />
-            <label htmlFor="contract-file-input" className={styles["file-label"]}>
+            <Label htmlFor="contract-file-input" className={styles["file-label"]}>
               <div className={styles["upload-icon"]}>📄</div>
               <span>{editingContract ? "Choose new PDF file (optional)" : "Choose PDF file or drag and drop"}</span>
-            </label>
+            </Label>
           </div>
 
           {uploadFile && (
@@ -267,7 +268,7 @@ export default function ContractUploadModal({
           <h4>Contract Details</h4>
 
           <div className={styles["form-group"]}>
-            <label htmlFor="organisationSignatory">{organisationName} Signatory *</label>
+            <Label htmlFor="organisationSignatory">{organisationName} Signatory *</Label>
             <input
               id="organisationSignatory"
               type="text"
@@ -285,7 +286,7 @@ export default function ContractUploadModal({
           </div>
 
           <div className={styles["form-group"]}>
-            <label htmlFor="thirdPartyName">Third Party Name *</label>
+            <Label htmlFor="thirdPartyName">Third Party Name *</Label>
             <input
               id="thirdPartyName"
               type="text"
@@ -301,7 +302,7 @@ export default function ContractUploadModal({
           </div>
 
           <div className={styles["form-group"]}>
-            <label htmlFor="status">Contract Status *</label>
+            <Label htmlFor="status">Contract Status *</Label>
             <select
               id="status"
               {...register("status", {
@@ -317,7 +318,7 @@ export default function ContractUploadModal({
           </div>
 
           <div className={styles["form-group"]}>
-            <label htmlFor="startDate">Start Date *</label>
+            <Label htmlFor="startDate">Start Date *</Label>
             <input
               id="startDate"
               type="date"
@@ -330,7 +331,7 @@ export default function ContractUploadModal({
           </div>
 
           <div className={styles["form-group"]}>
-            <label htmlFor="expiryDate">Expiry Date *</label>
+            <Label htmlFor="expiryDate">Expiry Date *</Label>
             <input
               id="expiryDate"
               type="date"
