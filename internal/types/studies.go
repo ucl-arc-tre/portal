@@ -115,24 +115,3 @@ type Contract struct {
 	Asset       Asset `gorm:"foreignKey:AssetID"`
 	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
 }
-
-type Project struct {
-	ModelAuditable
-	Name          string    `gorm:"not null"`
-	CreatorUserID uuid.UUID `gorm:"not null;index"`
-	StudyID       uuid.UUID `gorm:"index"`
-
-	// Relationships
-	Study       Study `gorm:"foreignKey:StudyID"`
-	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
-}
-
-type ProjectTRE struct {
-	ModelAuditable
-	ProjectID     uuid.UUID `gorm:"not null;index"`
-	EnvironmentID uuid.UUID `gorm:"not null;index"`
-
-	// Relationships
-	Environment Environment `gorm:"foreignKey:EnvironmentID"`
-	Project     Project     `gorm:"foreignKey:ProjectID"`
-}

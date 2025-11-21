@@ -10,6 +10,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/auth"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
@@ -20,6 +21,7 @@ type Handler struct {
 	studies      *studies.Service
 	auth         *auth.Service
 	environments *environments.Service
+	projects     *projects.Service
 }
 
 func New() *Handler {
@@ -30,6 +32,7 @@ func New() *Handler {
 		studies:      studies.New(),
 		auth:         auth.New(),
 		environments: environments.New(),
+		projects:     projects.New(),
 	}
 }
 
