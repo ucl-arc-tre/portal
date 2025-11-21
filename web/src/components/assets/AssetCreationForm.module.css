@@ -150,6 +150,7 @@
   background-color: #f8f9fa;
   transition: all 0.2s ease;
   min-width: 90px;
+  max-width: 10svw;
   text-align: center;
 }
 
