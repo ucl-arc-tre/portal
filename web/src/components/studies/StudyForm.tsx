@@ -71,7 +71,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId.toString()}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
@@ -216,6 +216,8 @@ export default function StudyForm(StudyProps: StudyProps) {
   useEffect(() => {
     if (controllerValue?.toLowerCase() === "ucl") {
       setValue("dataProtectionPrefix", UclDpoId);
+    } else if (editingStudy && editingStudy.data_protection_number) {
+      setValue("dataProtectionPrefix", editingStudy.data_protection_number.split("/")[0]);
     } else {
       setValue("dataProtectionPrefix", "");
     }
@@ -256,9 +258,6 @@ export default function StudyForm(StudyProps: StudyProps) {
         involvesMnca: study.involves_mnca,
         requiresDspt: study.requires_dspt,
       });
-      if (study.data_protection_number) {
-        setValue("dataProtectionPrefix", study.data_protection_number.split("/")[0]);
-      }
     }
   }, [editingStudy, username, reset]);
 
@@ -724,7 +723,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                     },
                   }}
                   render={({ field }) => (
-                    <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
+                    <input {...field} type="number" id="dataProtectionId" placeholder="eg 123" value={field.value} />
                   )}
                 />
               </div>
