@@ -256,6 +256,9 @@ export default function StudyForm(StudyProps: StudyProps) {
         involvesMnca: study.involves_mnca,
         requiresDspt: study.requires_dspt,
       });
+      if (study.data_protection_number) {
+        setValue("dataProtectionPrefix", study.data_protection_number.split("/")[0]);
+      }
     }
   }, [editingStudy, username, reset]);
 
