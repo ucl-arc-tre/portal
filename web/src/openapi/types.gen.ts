@@ -390,22 +390,6 @@ export type ProjectTreMember = {
 export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker';
 
 /**
- * A project member with their assigned roles (DSH-specific)
- */
-export type ProjectDshMember = {
-    username: string;
-    /**
-     * List of roles to assign to this user
-     */
-    roles?: Array<ProjectDshRoleName>;
-};
-
-/**
- * Available DSH project roles
- */
-export type ProjectDshRoleName = 'test_role_1' | 'test_role_2';
-
-/**
  * An environment with its tier mapping
  */
 export type Environment = {
