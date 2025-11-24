@@ -1351,6 +1351,27 @@ components:
         - egress_requester
         - egress_checker
 
+    ProjectDSHMember:
+      type: object
+      description: A project member with their assigned roles (DSH-specific)
+      required:
+        - username
+      properties:
+        username:
+          type: string
+        roles:
+          type: array
+          description: List of roles to assign to this user
+          items:
+            $ref: "#/components/schemas/ProjectDSHRoleName"
+
+    ProjectDSHRoleName:
+      type: string
+      description: Available DSH project roles
+      enum:
+        - test_role_1
+        - test_role_2
+
     Environment:
       type: object
       description: An environment with its tier mapping

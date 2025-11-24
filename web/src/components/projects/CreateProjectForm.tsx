@@ -3,6 +3,8 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
   postProjectsTre,
   ProjectTreRequest,
+  ProjectTreRoleName,
+  ProjectDshRoleName,
   ValidationError,
   Study,
   Asset,
@@ -10,6 +12,7 @@ import {
   getStudiesByStudyIdAssets,
   getEnvironments,
 } from "@/openapi";
+import { AnyProjectRoleName } from "@/types/projects";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import { HelperText, Alert, AlertMessage } from "../shared/exports";
@@ -19,12 +22,42 @@ import styles from "./CreateProjectForm.module.css";
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
+// TRE roles
+const TRE_ROLES: AnyProjectRoleName[] = ["desktop_user", "ingresser", "egresser", "egress_requester", "egress_checker"];
+const TRE_ROLE_LABELS: Record<ProjectTreRoleName, string> = {
+  desktop_user: "Desktop User",
+  ingresser: "Ingresser",
+  egresser: "Egresser",
+  egress_requester: "Egress Requester",
+  egress_checker: "Egress Checker",
+};
+
+// DSH roles (test placeholders)
+const DSH_ROLES: AnyProjectRoleName[] = ["test_role_1", "test_role_2"];
+const DSH_ROLE_LABELS: Record<ProjectDshRoleName, string> = {
+  test_role_1: "Test Role 1",
+  test_role_2: "Test Role 2",
+};
+
+// Combined role labels for lookup
+const ROLE_LABELS: Record<AnyProjectRoleName, string> = {
+  ...TRE_ROLE_LABELS,
+  ...DSH_ROLE_LABELS,
+};
+
+// Get available roles based on environment
+const getAvailableRoles = (environmentName: string): AnyProjectRoleName[] => {
+  if (environmentName === "ARC Trusted Research Environment") return TRE_ROLES;
+  if (environmentName === "Data Safe Haven") return DSH_ROLES;
+  return [];
+};
+
 type ProjectFormData = {
   name: string;
   studyId: string;
   environmentId: string;
   assetIds: { value: string }[];
-  additionalApprovedResearchers: { value: string }[];
+  additionalApprovedResearchers: { username: string; roles: AnyProjectRoleName[] }[];
 };
 
 type Props = {
@@ -51,6 +84,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     setValue,
     control,
     getValues,
+    trigger,
     formState: { errors },
   } = useForm<ProjectFormData>({
     mode: "onChange",
@@ -144,8 +178,16 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     fetchAssets();
   }, [selectedStudyId, selectedEnvironmentId]);
 
-  const nextStep = () => {
-    if (currentStep !== totalSteps) setCurrentStep(currentStep + 1);
+  const nextStep = async () => {
+    if (currentStep === totalSteps) return;
+
+    // Validate step 1 fields before proceeding
+    if (currentStep === 1) {
+      const isValid = await trigger(["name", "studyId", "environmentId"]);
+      if (!isValid) return;
+    }
+
+    setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
@@ -161,21 +203,25 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
       const selectedEnvironment = environments.find((env) => env.id === data.environmentId);
       if (!selectedEnvironment) throw new Error("Selected environment not found");
 
+      const assetIds = data.assetIds.map((asset) => asset.value).filter((id) => id !== "");
+
       let response;
 
       switch (selectedEnvironment.name) {
         case "ARC Trusted Research Environment":
-          const assetIds = data.assetIds.map((asset) => asset.value).filter((id) => id !== "");
-          const researcherUsernames = data.additionalApprovedResearchers
-            .map((researcher) => researcher.value.trim())
-            .filter((username) => username !== "")
-            .map((username) => `${username}${domainName}`);
+          const treMembers = data.additionalApprovedResearchers
+            .filter((researcher) => researcher.username.trim() !== "" && researcher.roles.length > 0)
+            .map((researcher) => ({
+              username: `${researcher.username.trim()}${domainName}`,
+              roles: researcher.roles as ProjectTreRoleName[],
+            }));
+
           const requestBody: ProjectTreRequest = {
             name: data.name,
             study_id: data.studyId,
             is_draft: options.isDraft,
             ...(assetIds.length > 0 && { asset_ids: assetIds }),
-            ...(researcherUsernames.length > 0 && { additional_approved_researcher_usernames: researcherUsernames }),
+            ...(treMembers.length > 0 && { members: treMembers }),
           };
           response = await postProjectsTre({ body: requestBody });
           break;
@@ -436,81 +482,144 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
               <div className={styles["form-field"]}>
                 <span className={styles["section-label"]}>Additional Approved Researchers (optional):</span>
                 <fieldset className={styles["dynamic-fieldset"]}>
-                  {researcherFields.map((field, index) => (
-                    <div key={field.id} className={styles["item-wrapper"]}>
-                      <label htmlFor={`researcher-${index}`} className={styles["item-label"]}>
-                        Researcher {index + 1}:
-                      </label>
+                  {researcherFields.map((field, index) => {
+                    const researcher = watch(`additionalApprovedResearchers.${index}`);
+                    const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
+                    const availableRoles = selectedEnvironment ? getAvailableRoles(selectedEnvironment.name) : [];
+                    const availableRolesToAdd = availableRoles.filter((role) => !researcher?.roles?.includes(role));
 
-                      <Controller
-                        name={`additionalApprovedResearchers.${index}.value` as const}
-                        control={control}
-                        rules={{
-                          required: "Username is required",
-                          validate: {
-                            isNotEmpty: (value) => {
-                              if (!value || value.trim() === "") {
-                                return "Username is required";
-                              }
-                              return true;
-                            },
-                            notEmailPart: (value) => {
-                              if (value.includes("@")) {
-                                return `Enter only the username part (without ${domainName})`;
-                              }
-                              return true;
-                            },
-                            isUnique: (value) => {
-                              const allUsernames = getValues("additionalApprovedResearchers").map((r) => r.value);
-                              const duplicateCount = allUsernames.filter((username) => username === value).length;
-                              return duplicateCount <= 1 || "Username has already been entered";
-                            },
-                          },
-                        }}
-                        render={({ field, fieldState }) => (
-                          <div className={styles["username-input-wrapper"]}>
-                            <div>
-                              <input
-                                {...field}
-                                id={`researcher-${index}`}
-                                type="text"
-                                placeholder="Valid username"
-                                className={styles.select}
+                    return (
+                      <div key={field.id} className={styles["item-wrapper"]}>
+                        <div className={styles["researcher-content"]}>
+                          <div>
+                            <label htmlFor={`researcher-${index}`} className={styles["field-label"]}>
+                              Username:
+                            </label>
+                            <Controller
+                              name={`additionalApprovedResearchers.${index}.username` as const}
+                              control={control}
+                              rules={{
+                                required: "Username is required",
+                                validate: {
+                                  isNotEmpty: (value) => {
+                                    if (!value || value.trim() === "") {
+                                      return "Username is required";
+                                    }
+                                    return true;
+                                  },
+                                  notEmailPart: (value) => {
+                                    if (value.includes("@")) {
+                                      return `Enter only the username part (without ${domainName})`;
+                                    }
+                                    return true;
+                                  },
+                                  isUnique: (value) => {
+                                    const allUsernames = getValues("additionalApprovedResearchers").map(
+                                      (user) => user.username
+                                    );
+                                    const duplicateCount = allUsernames.filter((username) => username === value).length;
+                                    return duplicateCount <= 1 || "Username has already been entered";
+                                  },
+                                },
+                              }}
+                              render={({ field: usernameField, fieldState }) => (
+                                <div className={styles["username-input-wrapper"]}>
+                                  <div>
+                                    <input
+                                      {...usernameField}
+                                      id={`researcher-${index}`}
+                                      type="text"
+                                      placeholder="Valid username"
+                                      className={styles.select}
+                                      disabled={isSubmitting}
+                                    />
+                                    <span className={styles["domain-suffix"]}>{domainName}</span>
+                                  </div>
+                                  {fieldState.error && (
+                                    <Alert type="error">
+                                      <AlertMessage>{fieldState.error.message}</AlertMessage>
+                                    </Alert>
+                                  )}
+                                </div>
+                              )}
+                            />
+                          </div>
+
+                          <div>
+                            <label className={styles["field-label"]}>Roles:</label>
+                            {researcher?.roles && researcher.roles.length > 0 && (
+                              <div className={styles["role-tags"]}>
+                                {researcher.roles.map((role) => (
+                                  <span key={role} className={styles["role-tag"]}>
+                                    {ROLE_LABELS[role]}
+                                    <button
+                                      type="button"
+                                      className={styles["role-tag-remove"]}
+                                      onClick={() => {
+                                        const currentRoles = getValues(`additionalApprovedResearchers.${index}.roles`);
+                                        setValue(
+                                          `additionalApprovedResearchers.${index}.roles`,
+                                          currentRoles.filter((chosenRole) => chosenRole !== role)
+                                        );
+                                      }}
+                                      aria-label={`Remove ${role} role`}
+                                    >
+                                      ×
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {availableRolesToAdd.length > 0 && (
+                              <select
+                                className={`${styles.select} ${styles["role-dropdown"]}`}
+                                value=""
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    const currentRoles =
+                                      getValues(`additionalApprovedResearchers.${index}.roles`) || [];
+                                    setValue(`additionalApprovedResearchers.${index}.roles`, [
+                                      ...currentRoles,
+                                      e.target.value as AnyProjectRoleName,
+                                    ]);
+                                  }
+                                }}
                                 disabled={isSubmitting}
-                              />
-                              <span className={styles["domain-suffix"]}>{domainName}</span>
-                            </div>
-                            {fieldState.error && (
-                              <Alert type="error">
-                                <AlertMessage>{fieldState.error.message}</AlertMessage>
-                              </Alert>
+                              >
+                                <option value="">+ Add role...</option>
+                                {availableRolesToAdd.map((role) => (
+                                  <option key={role} value={role}>
+                                    {ROLE_LABELS[role]}
+                                  </option>
+                                ))}
+                              </select>
                             )}
                           </div>
-                        )}
-                      />
+                        </div>
 
-                      <button
-                        type="button"
-                        onClick={() => removeResearcher(index)}
-                        className={styles["remove-button"]}
-                        aria-label={`Remove researcher ${index + 1}`}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                        <button
+                          type="button"
+                          onClick={() => removeResearcher(index)}
+                          className={styles["remove-button"]}
+                          aria-label={`Remove researcher ${index + 1}`}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
 
                   <Button
                     className={styles["add-button"]}
                     type="button"
                     variant="secondary"
                     size="small"
-                    onClick={() => appendResearcher({ value: "" })}
+                    onClick={() => appendResearcher({ username: "", roles: [] })}
                   >
                     Add Researcher
                   </Button>
                 </fieldset>
-                <HelperText>Optionally add approved researchers to this project</HelperText>
+                <HelperText>Optionally add approved researchers with their roles to this project</HelperText>
               </div>
             </>
           )}

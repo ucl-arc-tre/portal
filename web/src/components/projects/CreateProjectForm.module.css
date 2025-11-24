@@ -76,9 +76,13 @@
 
 .item-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
 }
 
 .item-wrapper .select,
@@ -96,6 +100,8 @@
   font-size: 1.25rem;
   line-height: 1;
   transition: background-color 0.2s;
+  align-self: flex-start;
+  flex-shrink: 0;
 }
 
 .remove-button:hover {
@@ -148,6 +154,57 @@
 
 .environment-docs a:hover {
   text-decoration: underline;
+}
+
+.role-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background-color: #e7f3ff;
+  border: 1px solid #007bff;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: #007bff;
+}
+
+.role-tag-remove {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: bold;
+}
+
+.role-tag-remove:hover {
+  color: #0056b3;
+}
+
+.role-dropdown {
+  margin-top: 0.5rem;
+}
+
+.researcher-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.researcher-content > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .actions {
