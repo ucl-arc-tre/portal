@@ -360,10 +360,34 @@ export type ProjectTreRequest = {
      */
     study_id: string;
     /**
+     * Whether this project should be saved as a draft (true) or created as active (false)
+     */
+    is_draft?: boolean;
+    /**
      * Optional list of asset identifiers to link to this project
      */
     asset_ids?: Array<string>;
+    /**
+     * Optional list of project members with their roles
+     */
+    members?: Array<ProjectTreMember>;
 };
+
+/**
+ * A project member with their assigned roles
+ */
+export type ProjectTreMember = {
+    username: string;
+    /**
+     * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
+     */
+    roles: Array<ProjectTreRoleName>;
+};
+
+/**
+ * Available TRE project roles
+ */
+export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker';
 
 /**
  * An environment with its tier mapping

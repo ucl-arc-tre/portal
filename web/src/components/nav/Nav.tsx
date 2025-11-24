@@ -73,7 +73,10 @@ export default function Nav() {
 
           {canSeeStudies && <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />}
 
-          {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
+          {process.env.NEXT_PUBLIC_ENABLE_PROJECTS === "true" && canSeeProjects && (
+            <NavItem href="/projects" icon={<FileIcon />} title="Projects" />
+          )}
+
           {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
 
           {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}

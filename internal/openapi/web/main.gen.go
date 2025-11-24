@@ -134,6 +134,15 @@ const (
 	ContractUploadObjectStatusProposed ContractUploadObjectStatus = "proposed"
 )
 
+// Defines values for ProjectTRERoleName.
+const (
+	DesktopUser     ProjectTRERoleName = "desktop_user"
+	EgressChecker   ProjectTRERoleName = "egress_checker"
+	EgressRequester ProjectTRERoleName = "egress_requester"
+	Egresser        ProjectTRERoleName = "egresser"
+	Ingresser       ProjectTRERoleName = "ingresser"
+)
+
 // Defines values for StudyApprovalStatus.
 const (
 	Approved   StudyApprovalStatus = "Approved"
@@ -480,10 +489,23 @@ type ProjectTRE struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+// ProjectTREMember A project member with their assigned roles
+type ProjectTREMember struct {
+	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
+	Roles    []ProjectTRERoleName `json:"roles"`
+	Username string               `json:"username"`
+}
+
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
 	// AssetIds Optional list of asset identifiers to link to this project
 	AssetIds *[]string `json:"asset_ids,omitempty"`
+
+	// IsDraft Whether this project should be saved as a draft (true) or created as active (false)
+	IsDraft *bool `json:"is_draft,omitempty"`
+
+	// Members Optional list of project members with their roles
+	Members *[]ProjectTREMember `json:"members,omitempty"`
 
 	// Name Name of the project
 	Name string `json:"name"`
@@ -491,6 +513,9 @@ type ProjectTRERequest struct {
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
 }
+
+// ProjectTRERoleName Available TRE project roles
+type ProjectTRERoleName string
 
 // Study defines model for Study.
 type Study struct {
