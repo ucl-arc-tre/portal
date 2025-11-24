@@ -22,7 +22,6 @@ import styles from "./CreateProjectForm.module.css";
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
-// TRE roles
 const TRE_ROLES: AnyProjectRoleName[] = ["desktop_user", "ingresser", "egresser", "egress_requester", "egress_checker"];
 const TRE_ROLE_LABELS: Record<ProjectTreRoleName, string> = {
   desktop_user: "Desktop User",
@@ -32,7 +31,6 @@ const TRE_ROLE_LABELS: Record<ProjectTreRoleName, string> = {
   egress_checker: "Egress Checker",
 };
 
-// DSH roles (test placeholders)
 const DSH_ROLES: AnyProjectRoleName[] = ["test_role_1", "test_role_2"];
 const DSH_ROLE_LABELS: Record<ProjectDshRoleName, string> = {
   test_role_1: "Test Role 1",
@@ -45,7 +43,6 @@ const ROLE_LABELS: Record<AnyProjectRoleName, string> = {
   ...DSH_ROLE_LABELS,
 };
 
-// Get available roles based on environment
 const getAvailableRoles = (environmentName: string): AnyProjectRoleName[] => {
   if (environmentName === "ARC Trusted Research Environment") return TRE_ROLES;
   if (environmentName === "Data Safe Haven") return DSH_ROLES;
