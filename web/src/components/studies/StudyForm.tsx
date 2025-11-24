@@ -800,31 +800,32 @@ export default function StudyForm(StudyProps: StudyProps) {
           </Alert>
         )}
 
-        {currentStep > 1 && (
-          <Button
-            type="button"
-            variant="secondary"
-            size="small"
-            onClick={prevStep}
-            className={styles["button--back"]}
-            cy="back"
-          >
-            &larr; Back
-          </Button>
-        )}
+        <div className={styles["buttons-container"]}>
+          {currentStep > 1 && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              onClick={prevStep}
+              className={styles["button--back"]}
+              cy="back"
+            >
+              &larr; Back
+            </Button>
+          )}
 
-        {currentStep < totalSteps && (
-          <Button
-            type="button"
-            size="small"
-            onClick={() => nextStep()}
-            className={styles["button--continue"]}
-            cy="next"
-          >
-            Next &rarr;
-          </Button>
-        )}
-
+          {currentStep < totalSteps && (
+            <Button
+              type="button"
+              size="small"
+              onClick={() => nextStep()}
+              className={styles["button--continue"]}
+              cy="next"
+            >
+              Next &rarr;
+            </Button>
+          )}
+        </div>
         {currentStep === totalSteps && (
           <Button type="submit" disabled={isSubmitting}>
             {editingStudy && isSubmitting ? "Updating study..." : editingStudy && "Update Study"}

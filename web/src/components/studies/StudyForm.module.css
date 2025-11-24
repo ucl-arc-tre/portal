@@ -204,14 +204,21 @@
   }
 }
 
+.buttons-container {
+  display: grid;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .button--continue {
-  float: inline-end;
+  grid-column: 2;
 }
 
 .button--continue,
 .button--back {
   margin-inline: 0.4%;
   margin-bottom: 1rem;
+  text-wrap: nowrap;
 }
 
 .form-helper--invalid {
