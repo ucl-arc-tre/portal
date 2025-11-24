@@ -41,6 +41,7 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 	}
 
 	// TODO: Implement project creation logic
+	// validate project request roles
 
 	ctx.Status(http.StatusNotImplemented)
 }
