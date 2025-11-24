@@ -71,7 +71,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
@@ -605,7 +605,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   </a>{" "}
                   (if applicable)
                   <input
-                    type="number"
+                    type="text"
                     id="nhsEnglandRef"
                     {...register("nhsEnglandReference")}
                     className={styles["option__text-input"]}
@@ -717,7 +717,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                     },
                   }}
                   render={({ field }) => (
-                    <input {...field} type="number" id="dataProtectionId" placeholder="eg 123" value={field.value} />
+                    <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
                   )}
                 />
               </div>
