@@ -530,7 +530,10 @@ export default function StudyForm(StudyProps: StudyProps) {
           {showCagRef === true && (
             <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
-              <input type="text" id="cagRef" {...register("cagReference")} className={styles["option__text-input"]} />
+              <input type="text" id="cagRefp1" {...register("cagReference")} className={styles["option__text-input"]} />
+              <span>/CAG/</span>
+              <input type="text" id="cagRefp2" {...register("cagReference")} className={styles["option__text-input"]} />
+              <input type="text" id="cagRef" {...register("cagReference")} hidden />
             </Label>
           )}
 
@@ -570,7 +573,13 @@ export default function StudyForm(StudyProps: StudyProps) {
                 ID (if applicable)
               </span>
 
-              <input type="text" id="irasId" {...register("irasId")} className={styles["option__text-input"]} />
+              <input
+                type="text"
+                id="irasId"
+                {...register("irasId")}
+                className={styles["option__text-input"]}
+                maxLength={7}
+              />
             </Label>
           )}
         </fieldset>
