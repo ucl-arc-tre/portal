@@ -235,8 +235,8 @@ export default function StudyForm(StudyProps: StudyProps) {
         dataControllerOrganisation: study.data_controller_organisation,
         cagReference: study.cag_reference,
         dataProtectionPrefix: study.data_protection_number?.split("/")[0],
-        dataProtectionDate: study.data_protection_number?.split("/")[1],
-        dataProtectionId: Number(study.data_protection_number?.split("/")[2]),
+        dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
+        dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
         dataProtectionNumber: study.data_protection_number,
         nhsEnglandReference: Number(study.nhs_england_reference),
         irasId: study.iras_id,
@@ -707,12 +707,16 @@ export default function StudyForm(StudyProps: StudyProps) {
                   control={control}
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
-                    min: {
-                      value: 0,
-                      message: "Cannot be a negative number",
+                    pattern: {
+                      value: /^[0-9]{1,3}$/,
+                      message: "Must be a number between 1 and 3 digits",
                     },
-                    max: {
-                      value: 999,
+                    minLength: {
+                      value: 1,
+                      message: "Must be at least 1 digit",
+                    },
+                    maxLength: {
+                      value: 3,
                       message: "Cannot be more than 3 digits",
                     },
                   }}
