@@ -71,7 +71,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId.toString()}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${Number(data.dataProtectionId)}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
