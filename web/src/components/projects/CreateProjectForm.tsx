@@ -611,7 +611,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                     Add Researcher
                   </Button>
                 </fieldset>
-                <HelperText>Optionally add approved researchers with their roles to this project</HelperText>
+                <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
               </div>
             </>
           )}
