@@ -21,13 +21,21 @@ import styles from "./CreateProjectForm.module.css";
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
-const TRE_ROLES: ProjectTreRoleName[] = ["desktop_user", "ingresser", "egresser", "egress_requester", "egress_checker"];
+const TRE_ROLES: ProjectTreRoleName[] = [
+  "desktop_user",
+  "ingresser",
+  "egresser",
+  "egress_requester",
+  "egress_checker",
+  "trusted_egresser",
+];
 const TRE_ROLE_LABELS: Record<ProjectTreRoleName, string> = {
   desktop_user: "Desktop User",
   ingresser: "Ingresser",
   egresser: "Egresser",
   egress_requester: "Egress Requester",
   egress_checker: "Egress Checker",
+  trusted_egresser: "Trusted Egresser",
 };
 
 const ROLE_LABELS: Record<AnyProjectRoleName, string> = {
