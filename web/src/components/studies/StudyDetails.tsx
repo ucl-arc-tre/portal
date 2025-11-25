@@ -4,6 +4,7 @@ import {
   Study,
   Asset,
   getStudiesByStudyIdAssets,
+  StudyApprovalStatus,
 } from "@/openapi";
 import Box from "../ui/Box";
 import { Alert, formatDate } from "../shared/exports";
@@ -91,8 +92,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [approvalStatus, setApprovalStatus] = useState("");
-
+  const [approvalStatus, setApprovalStatus] = useState<StudyApprovalStatus | undefined>(undefined);
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
 
@@ -190,7 +190,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
             Risk Score:{" "}
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
-          <StudyStatusBadge status={approvalStatus} isAdmin={isAdmin} />
+          <StudyStatusBadge status={approvalStatus} isAdmin={isAdmin} />{" "}
         </div>
         <h3 className={styles.description}>{study.description}</h3>
         <div>
