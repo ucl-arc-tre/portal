@@ -709,16 +709,12 @@ export default function StudyForm(StudyProps: StudyProps) {
                   control={control}
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
-                    pattern: {
-                      value: /^[0-9]{1,3}$/,
-                      message: "Must be a number between 1 and 3 digits",
+                    min: {
+                      value: 0,
+                      message: "Cannot be a negative number",
                     },
-                    minLength: {
-                      value: 1,
-                      message: "Must be at least 1 digit",
-                    },
-                    maxLength: {
-                      value: 3,
+                    max: {
+                      value: 999,
                       message: "Cannot be more than 3 digits",
                     },
                   }}
