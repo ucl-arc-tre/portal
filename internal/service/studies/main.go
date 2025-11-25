@@ -92,6 +92,13 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
 			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
+		if studyData.DataProtectionNumber != nil {
+			parts := strings.Split(*studyData.DataProtectionNumber, "/")
+			if len(parts) > 3 && strings.HasPrefix(parts[3], "0") {
+
+				return &openapi.ValidationError{ErrorMessage: "data protection ID should not start with 0"}, nil
+			}
+		}
 	}
 
 	maxExpectedStudies := 0
