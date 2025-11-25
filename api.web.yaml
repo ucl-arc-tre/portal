@@ -1350,6 +1350,7 @@ components:
         - egresser
         - egress_requester
         - egress_checker
+        - trusted_egresser
 
     Environment:
       type: object
