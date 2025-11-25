@@ -533,7 +533,13 @@ export default function StudyForm(StudyProps: StudyProps) {
               <input type="text" id="cagRefp1" {...register("cagReference")} className={styles["option__text-input"]} />
               <span>/CAG/</span>
               <input type="text" id="cagRefp2" {...register("cagReference")} className={styles["option__text-input"]} />
-              <input type="text" id="cagRef" {...register("cagReference")} hidden />
+              <input
+                type="text"
+                id="cagRef"
+                {...register("cagReference")}
+                hidden
+                // value={`${cagRefp1}/CAG/${cagRefp2}`}
+              />
             </Label>
           )}
 
