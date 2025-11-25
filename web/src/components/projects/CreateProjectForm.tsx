@@ -521,7 +521,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                                       {...usernameField}
                                       id={`researcher-${index}`}
                                       type="text"
-                                      placeholder="Valid username"
+                                      placeholder="ccaxyz"
                                       className={styles.select}
                                       disabled={isSubmitting}
                                     />
