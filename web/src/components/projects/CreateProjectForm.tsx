@@ -45,7 +45,7 @@ const TRE_ROLE_DESCRIPTIONS: Record<ProjectTreRoleName, string> = {
   egresser: "Can download data from the TRE environment after approval",
   egress_requester: "Can request data to be downloaded from the TRE",
   egress_checker: "Can review and approve egress requests from other users",
-  trusted_egresser: "Can download data from the TRE environment without requiring approval",
+  trusted_egresser: "Can download potentially sensitive data from the TRE environment to trusted locations",
 };
 
 const ROLE_LABELS: Record<AnyProjectRoleName, string> = {
