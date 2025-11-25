@@ -175,6 +175,12 @@
   color: #007bff;
 }
 
+.role-tooltip span[class*="tooltip__content"] {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .role-tag-remove {
   background: none;
   border: none;

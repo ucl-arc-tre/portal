@@ -14,6 +14,7 @@ import {
 import { AnyProjectRoleName } from "@/types/projects";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
+import InfoTooltip from "../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage } from "../shared/exports";
 
 import styles from "./CreateProjectForm.module.css";
@@ -38,9 +39,23 @@ const TRE_ROLE_LABELS: Record<ProjectTreRoleName, string> = {
   trusted_egresser: "Trusted Egresser",
 };
 
+const TRE_ROLE_DESCRIPTIONS: Record<ProjectTreRoleName, string> = {
+  desktop_user: "Can access the desktop environment and work with data within the TRE",
+  ingresser: "Can upload data into the TRE environment",
+  egresser: "Can download data from the TRE environment after approval",
+  egress_requester: "Can request data to be downloaded from the TRE",
+  egress_checker: "Can review and approve egress requests from other users",
+  trusted_egresser: "Can download data from the TRE environment without requiring approval",
+};
+
 const ROLE_LABELS: Record<AnyProjectRoleName, string> = {
   // add more roles as they become available e.g. ...DSH_ROLE_LABELS,
   ...TRE_ROLE_LABELS,
+};
+
+const ROLE_DESCRIPTIONS: Record<AnyProjectRoleName, string> = {
+  // add more roles as they become available e.g. ...DSH_ROLE_DESCRIPTIONS,
+  ...TRE_ROLE_DESCRIPTIONS,
 };
 
 const getAvailableRoles = (environmentName: string): AnyProjectRoleName[] => {
@@ -552,6 +567,9 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                                 {researcher.roles.map((role) => (
                                   <span key={role} className={styles["role-tag"]}>
                                     {ROLE_LABELS[role]}
+                                    <span className={styles["role-tooltip"]}>
+                                      <InfoTooltip text={ROLE_DESCRIPTIONS[role]} />
+                                    </span>
                                     <button
                                       type="button"
                                       className={styles["role-tag-remove"]}
