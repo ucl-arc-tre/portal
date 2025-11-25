@@ -141,6 +141,7 @@ const (
 	EgressRequester ProjectTRERoleName = "egress_requester"
 	Egresser        ProjectTRERoleName = "egresser"
 	Ingresser       ProjectTRERoleName = "ingresser"
+	TrustedEgresser ProjectTRERoleName = "trusted_egresser"
 )
 
 // Defines values for StudyApprovalStatus.
