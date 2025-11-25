@@ -212,6 +212,9 @@ export default function StudyForm(StudyProps: StudyProps) {
     control,
   });
 
+  const [cagRefp1, setCagRefp1] = useState("");
+  const [cagRefp2, setCagRefp2] = useState("");
+
   // Update dataProtectionPrefix when controller changes
   useEffect(() => {
     if (controllerValue?.toLowerCase() === "ucl") {
@@ -258,6 +261,10 @@ export default function StudyForm(StudyProps: StudyProps) {
       });
       if (study.data_protection_number) {
         setValue("dataProtectionPrefix", study.data_protection_number.split("/")[0]);
+      }
+      if (study.cag_reference) {
+        setCagRefp1(study.cag_reference.split("/")[0]);
+        setCagRefp2(study.cag_reference.split("/")[2]);
       }
     }
   }, [editingStudy, username, reset]);
@@ -530,16 +537,30 @@ export default function StudyForm(StudyProps: StudyProps) {
           {showCagRef === true && (
             <Label htmlFor="cagRef">
               Confidentiality Advisory Group Reference
-              <input type="text" id="cagRefp1" {...register("cagReference")} className={styles["option__text-input"]} />
-              <span>/CAG/</span>
-              <input type="text" id="cagRefp2" {...register("cagReference")} className={styles["option__text-input"]} />
-              <input
-                type="text"
-                id="cagRef"
-                {...register("cagReference")}
-                hidden
-                // value={`${cagRefp1}/CAG/${cagRefp2}`}
-              />
+              <div className={styles["cag-wrapper"]}>
+                <input
+                  type="text"
+                  id="cagRefp1"
+                  className={styles["option__text-input"]}
+                  onChange={(event) => setCagRefp1(event.target.value)}
+                  maxLength={6}
+                />
+                <span>/CAG/</span>
+                <input
+                  type="text"
+                  id="cagRefp2"
+                  className={styles["option__text-input"]}
+                  onChange={(event) => setCagRefp2(event.target.value)}
+                  maxLength={5}
+                />
+                <input
+                  type="text"
+                  id="cagRef"
+                  {...register("cagReference")}
+                  hidden
+                  value={`${cagRefp1}/CAG/${cagRefp2}`}
+                />
+              </div>
             </Label>
           )}
 
