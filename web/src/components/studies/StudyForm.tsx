@@ -18,7 +18,7 @@ export type StudyFormData = {
   dataProtectionId: number;
   dataProtectionNumber: string | undefined | null;
   nhsEnglandReference: number | undefined | null;
-  irasId: string | undefined | null;
+  irasId: string | undefined;
   involvesUclSponsorship: boolean | null;
   involvesCag: boolean | null;
   involvesEthicsApproval: boolean | null;
@@ -239,7 +239,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
         dataProtectionNumber: study.data_protection_number,
         nhsEnglandReference: Number(study.nhs_england_reference),
-        irasId: study.iras_id,
+        irasId: study.iras_id || "",
         involvesUclSponsorship: study.involves_ucl_sponsorship,
         involvesCag: study.involves_cag,
         involvesEthicsApproval: study.involves_ethics_approval,
@@ -595,14 +595,34 @@ export default function StudyForm(StudyProps: StudyProps) {
                 </a>{" "}
                 ID (if applicable)
               </span>
+              <HelperText>7-digit ID</HelperText>
 
-              <input
-                type="text"
-                id="irasId"
-                {...register("irasId")}
-                className={styles["option__text-input"]}
-                maxLength={7}
+              <Controller
+                name="irasId"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /\d/,
+                    message: "Digits only",
+                  },
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    id="irasId"
+                    {...register("irasId")}
+                    className={styles["option__text-input"]}
+                    maxLength={7}
+                    placeholder="eg. 1234567"
+                  />
+                )}
               />
+              {errors.irasId && (
+                <Alert type="error">
+                  <AlertMessage>{errors.irasId.message}</AlertMessage>
+                </Alert>
+              )}
             </Label>
           )}
         </fieldset>
