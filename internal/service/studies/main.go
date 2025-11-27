@@ -22,6 +22,7 @@ import (
 
 var (
 	titlePattern = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
+	cagPattern   = regexp.MustCompile(`^\d{2}/CAG/\d{4}$`)
 )
 
 type Service struct {
@@ -92,6 +93,11 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
 			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
+	}
+
+	if studyData.CagReference != nil && (len(*studyData.CagReference) != 11 || !cagPattern.MatchString(*studyData.CagReference)) {
+		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
+
 	}
 
 	maxExpectedStudies := 0

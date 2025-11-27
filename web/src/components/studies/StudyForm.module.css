@@ -121,7 +121,7 @@
     }
 
     .option__text-input {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       border: 1px solid rgb(102, 102, 102);
       border-radius: 0px;
       margin: 5px;
@@ -196,13 +196,6 @@
         font-size: 1rem;
       }
     }
-  }
-
-  .cag-wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-size: 1.2rem;
   }
 
   .button--continue {

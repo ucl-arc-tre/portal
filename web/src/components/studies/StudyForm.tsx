@@ -12,7 +12,7 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  cagReference: string | undefined | null;
+  cagReference: string | undefined;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
   dataProtectionId: number;
@@ -212,9 +212,6 @@ export default function StudyForm(StudyProps: StudyProps) {
     control,
   });
 
-  const [cagRefp1, setCagRefp1] = useState("");
-  const [cagRefp2, setCagRefp2] = useState("");
-
   // Update dataProtectionPrefix when controller changes
   useEffect(() => {
     if (controllerValue?.toLowerCase() === "ucl") {
@@ -236,7 +233,7 @@ export default function StudyForm(StudyProps: StudyProps) {
           value: username!.split("@")[0],
         })),
         dataControllerOrganisation: study.data_controller_organisation,
-        cagReference: study.cag_reference,
+        cagReference: study.cag_reference || "",
         dataProtectionPrefix: study.data_protection_number?.split("/")[0],
         dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
         dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
@@ -261,10 +258,6 @@ export default function StudyForm(StudyProps: StudyProps) {
       });
       if (study.data_protection_number) {
         setValue("dataProtectionPrefix", study.data_protection_number.split("/")[0]);
-      }
-      if (study.cag_reference) {
-        setCagRefp1(study.cag_reference.split("/")[0]);
-        setCagRefp2(study.cag_reference.split("/")[2]);
       }
     }
   }, [editingStudy, username, reset]);
@@ -536,31 +529,34 @@ export default function StudyForm(StudyProps: StudyProps) {
 
           {showCagRef === true && (
             <Label htmlFor="cagRef">
-              Confidentiality Advisory Group Reference
-              <div className={styles["cag-wrapper"]}>
-                <input
-                  type="text"
-                  id="cagRefp1"
-                  className={styles["option__text-input"]}
-                  onChange={(event) => setCagRefp1(event.target.value)}
-                  maxLength={6}
-                />
-                <span>/CAG/</span>
-                <input
-                  type="text"
-                  id="cagRefp2"
-                  className={styles["option__text-input"]}
-                  onChange={(event) => setCagRefp2(event.target.value)}
-                  maxLength={5}
-                />
-                <input
-                  type="text"
-                  id="cagRef"
-                  {...register("cagReference")}
-                  hidden
-                  value={`${cagRefp1}/CAG/${cagRefp2}`}
-                />
-              </div>
+              Confidentiality Advisory Group Reference (if applicable)
+              <HelperText>Format: xx/CAG/xxxx eg. 45/CAG/1234</HelperText>
+              <Controller
+                name="cagReference"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^\d{2}\/CAG\/\d{4}$/i,
+                    message: "Must follow the format provided",
+                  },
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    className={styles["option__text-input"]}
+                    type="text"
+                    id="cagRef"
+                    placeholder="eg. 12/CAG/3456"
+                    value={field.value?.toUpperCase()}
+                    maxLength={11}
+                  />
+                )}
+              />
+              {errors.cagReference && (
+                <Alert type="error">
+                  <AlertMessage>{errors.cagReference.message}</AlertMessage>
+                </Alert>
+              )}
             </Label>
           )}
 
