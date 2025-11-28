@@ -787,7 +787,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
                     pattern: {
-                      value: /^[0-9]{1,3}$/,
+                      value: /^[1-9]{1,3}$/,
                       message: "Must be a number between 1 and 3 digits",
                     },
                     minLength: {
