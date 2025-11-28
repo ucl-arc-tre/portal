@@ -12,13 +12,13 @@ export type StudyFormData = {
   owner: string;
   additionalStudyAdminUsernames: { value: string }[];
   dataControllerOrganisation: string;
-  cagReference: string | undefined | null;
+  cagReference: string | undefined;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
   dataProtectionId: number;
   dataProtectionNumber: string | undefined | null;
-  nhsEnglandReference: number | undefined | null;
-  irasId: string | undefined | null;
+  nhsEnglandReference: string | undefined;
+  irasId: string | undefined;
   involvesUclSponsorship: boolean | null;
   involvesCag: boolean | null;
   involvesEthicsApproval: boolean | null;
@@ -60,7 +60,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
     is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
     involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
     nhs_england_reference:
-      data.involvesNhsEngland && data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+      data.involvesNhsEngland && data.nhsEnglandReference ? `DARS-NIC-${data.nhsEnglandReference}` : undefined,
     involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
     requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
     requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
@@ -71,7 +71,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
@@ -233,13 +233,13 @@ export default function StudyForm(StudyProps: StudyProps) {
           value: username!.split("@")[0],
         })),
         dataControllerOrganisation: study.data_controller_organisation,
-        cagReference: study.cag_reference,
+        cagReference: study.cag_reference || "",
         dataProtectionPrefix: study.data_protection_number?.split("/")[0],
-        dataProtectionDate: study.data_protection_number?.split("/")[1],
-        dataProtectionId: Number(study.data_protection_number?.split("/")[2]),
+        dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
+        dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
         dataProtectionNumber: study.data_protection_number,
-        nhsEnglandReference: Number(study.nhs_england_reference),
-        irasId: study.iras_id,
+        nhsEnglandReference: study.nhs_england_reference?.split(/(?<=DARS-NIC-)(\d{6}-\d{5}-\d{2})/)[1] || "",
+        irasId: study.iras_id || "",
         involvesUclSponsorship: study.involves_ucl_sponsorship,
         involvesCag: study.involves_cag,
         involvesEthicsApproval: study.involves_ethics_approval,
@@ -256,6 +256,9 @@ export default function StudyForm(StudyProps: StudyProps) {
         involvesMnca: study.involves_mnca,
         requiresDspt: study.requires_dspt,
       });
+      if (study.data_protection_number) {
+        setValue("dataProtectionPrefix", study.data_protection_number.split("/")[0]);
+      }
     }
   }, [editingStudy, username, reset]);
 
@@ -526,8 +529,34 @@ export default function StudyForm(StudyProps: StudyProps) {
 
           {showCagRef === true && (
             <Label htmlFor="cagRef">
-              Confidentiality Advisory Group Reference
-              <input type="text" id="cagRef" {...register("cagReference")} className={styles["option__text-input"]} />
+              Confidentiality Advisory Group Reference (if applicable)
+              <HelperText>Format: xx/CAG/xxxx eg. 45/CAG/1234</HelperText>
+              <Controller
+                name="cagReference"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /^\d{2}\/CAG\/\d{4}$/i,
+                    message: "Must follow the format provided",
+                  },
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    className={styles["option__text-input"]}
+                    type="text"
+                    id="cagRef"
+                    placeholder="eg. 12/CAG/3456"
+                    value={field.value?.toUpperCase()}
+                    maxLength={11}
+                  />
+                )}
+              />
+              {errors.cagReference && (
+                <Alert type="error">
+                  <AlertMessage>{errors.cagReference.message}</AlertMessage>
+                </Alert>
+              )}
             </Label>
           )}
 
@@ -566,8 +595,34 @@ export default function StudyForm(StudyProps: StudyProps) {
                 </a>{" "}
                 ID (if applicable)
               </span>
+              <HelperText>7-digit ID</HelperText>
 
-              <input type="text" id="irasId" {...register("irasId")} className={styles["option__text-input"]} />
+              <Controller
+                name="irasId"
+                control={control}
+                rules={{
+                  pattern: {
+                    value: /\d/,
+                    message: "Digits only",
+                  },
+                }}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    id="irasId"
+                    {...register("irasId")}
+                    className={styles["option__text-input"]}
+                    maxLength={7}
+                    placeholder="eg. 1234567"
+                  />
+                )}
+              />
+              {errors.irasId && (
+                <Alert type="error">
+                  <AlertMessage>{errors.irasId.message}</AlertMessage>
+                </Alert>
+              )}
             </Label>
           )}
         </fieldset>
@@ -604,12 +659,36 @@ export default function StudyForm(StudyProps: StudyProps) {
                     DARS NIC number
                   </a>{" "}
                   (if applicable)
-                  <input
-                    type="number"
-                    id="nhsEnglandRef"
-                    {...register("nhsEnglandReference")}
-                    className={styles["option__text-input"]}
-                  />
+                  <HelperText>Format: DARS-NIC-XXXXXX-XXXXX-XX</HelperText>
+                  <div className={styles["nhse-ref"]}>
+                    DARS-NIC-
+                    <Controller
+                      name="nhsEnglandReference"
+                      control={control}
+                      rules={{
+                        pattern: {
+                          value: /\d{6}-\d{5}-\d{2}$/,
+                          message: "Must follow the format provided. You only need to insert numbers and dashes",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          className={styles["option__text-input"]}
+                          type="text"
+                          id="nhsEnglandRef"
+                          placeholder="eg. XXXXXX-XXXXX-XX"
+                          value={field.value}
+                          maxLength={15}
+                        />
+                      )}
+                    />
+                  </div>
+                  {errors.nhsEnglandReference && (
+                    <Alert type="error">
+                      <AlertMessage>{errors.nhsEnglandReference.message}</AlertMessage>
+                    </Alert>
+                  )}
                 </Label>
               )}
 
@@ -707,17 +786,21 @@ export default function StudyForm(StudyProps: StudyProps) {
                   control={control}
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
-                    min: {
-                      value: 0,
-                      message: "Cannot be a negative number",
+                    pattern: {
+                      value: /^[0-9]{1,3}$/,
+                      message: "Must be a number between 1 and 3 digits",
                     },
-                    max: {
-                      value: 999,
+                    minLength: {
+                      value: 1,
+                      message: "Must be at least 1 digit",
+                    },
+                    maxLength: {
+                      value: 3,
                       message: "Cannot be more than 3 digits",
                     },
                   }}
                   render={({ field }) => (
-                    <input {...field} type="number" id="dataProtectionId" placeholder="eg 123" value={field.value} />
+                    <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
                   )}
                 />
               </div>

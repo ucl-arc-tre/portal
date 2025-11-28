@@ -121,7 +121,7 @@
     }
 
     .option__text-input {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       border: 1px solid rgb(102, 102, 102);
       border-radius: 0px;
       margin: 5px;
@@ -195,6 +195,15 @@
         font-weight: 500;
         font-size: 1rem;
       }
+    }
+
+    .nhse-ref {
+      display: flex;
+      flex-direction: row;
+      text-wrap: nowrap;
+      align-items: center;
+      color: var(--text--secondary);
+      margin-inline: 0.5rem;
     }
   }
 
