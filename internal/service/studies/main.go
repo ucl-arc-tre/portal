@@ -96,12 +96,12 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		}
 	}
 
-	if studyData.CagReference != nil && (len(*studyData.CagReference) != 11 || !cagPattern.MatchString(*studyData.CagReference)) {
+	if studyData.CagReference != nil && !cagPattern.MatchString(*studyData.CagReference) {
 		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
 
 	}
 
-	if studyData.NhsEnglandReference != nil && (len(*studyData.NhsEnglandReference) != 24 || !nhsePattern.MatchString(*studyData.NhsEnglandReference)) {
+	if studyData.NhsEnglandReference != nil && !nhsePattern.MatchString(*studyData.NhsEnglandReference) {
 		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
 
 	}
