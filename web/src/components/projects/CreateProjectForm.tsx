@@ -16,53 +16,12 @@ import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage } from "../shared/exports";
+import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";
 
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
-
-const TRE_ROLES: ProjectTreRoleName[] = [
-  "desktop_user",
-  "ingresser",
-  "egresser",
-  "egress_requester",
-  "egress_checker",
-  "trusted_egresser",
-];
-const TRE_ROLE_LABELS: Record<ProjectTreRoleName, string> = {
-  desktop_user: "Desktop User",
-  ingresser: "Ingresser",
-  egresser: "Egresser",
-  egress_requester: "Egress Requester",
-  egress_checker: "Egress Checker",
-  trusted_egresser: "Trusted Egresser",
-};
-
-const TRE_ROLE_DESCRIPTIONS: Record<ProjectTreRoleName, string> = {
-  desktop_user: "Can access the desktop environment and work with data within the TRE",
-  ingresser: "Can upload data into the TRE environment",
-  egresser: "Can download data from the TRE environment after approval",
-  egress_requester: "Can request data to be downloaded from the TRE",
-  egress_checker: "Can review and approve egress requests from other users",
-  trusted_egresser: "Can download potentially sensitive data from the TRE environment to trusted locations",
-};
-
-const ROLE_LABELS: Record<AnyProjectRoleName, string> = {
-  // add more roles as they become available e.g. ...DSH_ROLE_LABELS,
-  ...TRE_ROLE_LABELS,
-};
-
-const ROLE_DESCRIPTIONS: Record<AnyProjectRoleName, string> = {
-  // add more roles as they become available e.g. ...DSH_ROLE_DESCRIPTIONS,
-  ...TRE_ROLE_DESCRIPTIONS,
-};
-
-const getAvailableRoles = (environmentName: string): AnyProjectRoleName[] => {
-  // add more environments as they become available e.g. if (environmentName === "Data Safe Haven") return DSH_ROLES;
-  if (environmentName === "ARC Trusted Research Environment") return TRE_ROLES;
-  return [];
-};
 
 type ProjectFormData = {
   name: string;
@@ -379,27 +338,34 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
 
               <div className={styles["form-field"]}>
                 <label htmlFor="name">Project Name *</label>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="e.g., my-project"
-                  {...register("name", {
+                <Controller
+                  name="name"
+                  control={control}
+                  rules={{
                     required: "Project name is required",
-                    pattern: {
-                      value: /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, // todo: select the correct pattern based on the picked environment
-                      message:
-                        "Must start and end with a lowercase letter or number. Only lowercase letters, numbers, and hyphens allowed.",
+                    validate: {
+                      format: (value) => {
+                        const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
+                        if (!selectedEnvironment) return true; // Skip validation if no environment selected
+
+                        const validation = getProjectNameValidation(selectedEnvironment.name);
+
+                        if (value.length < validation.minLength) {
+                          return `Project name must be at least ${validation.minLength} characters`;
+                        }
+                        if (value.length > validation.maxLength) {
+                          return `Project name must be less than ${validation.maxLength} characters`;
+                        }
+                        if (!validation.pattern.test(value)) {
+                          return validation.patternMessage;
+                        }
+                        return true;
+                      },
                     },
-                    minLength: {
-                      value: 3,
-                      message: "Project name must be at least 3 characters",
-                    },
-                    maxLength: {
-                      value: 50,
-                      message: "Project name must be less than 50 characters",
-                    },
-                  })}
-                  disabled={isSubmitting}
+                  }}
+                  render={({ field }) => (
+                    <input {...field} id="name" type="text" placeholder="e.g., my-project" disabled={isSubmitting} />
+                  )}
                 />
 
                 {errors.name && (
@@ -407,7 +373,13 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                     <AlertMessage>{errors.name.message}</AlertMessage>
                   </Alert>
                 )}
-                <HelperText>Use lowercase letters, numbers, and hyphens only (3-50 characters)</HelperText>
+                <HelperText>
+                  {(() => {
+                    const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
+                    if (!selectedEnvironment) return "Select an environment to see naming requirements";
+                    return getProjectNameValidation(selectedEnvironment.name).helperText;
+                  })()}
+                </HelperText>
               </div>
 
               <div className={styles["form-field"]}>
