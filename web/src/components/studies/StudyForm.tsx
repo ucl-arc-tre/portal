@@ -17,7 +17,7 @@ export type StudyFormData = {
   dataProtectionDate: string;
   dataProtectionId: number;
   dataProtectionNumber: string | undefined | null;
-  nhsEnglandReference: number | undefined | null;
+  nhsEnglandReference: string | undefined;
   irasId: string | undefined;
   involvesUclSponsorship: boolean | null;
   involvesCag: boolean | null;
@@ -60,7 +60,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
     is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
     involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
     nhs_england_reference:
-      data.involvesNhsEngland && data.nhsEnglandReference ? data.nhsEnglandReference.toString() : undefined,
+      data.involvesNhsEngland && data.nhsEnglandReference ? `DARS-NIC-${data.nhsEnglandReference}` : undefined,
     involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
     requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
     requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
@@ -238,7 +238,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
         dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
         dataProtectionNumber: study.data_protection_number,
-        nhsEnglandReference: Number(study.nhs_england_reference),
+        nhsEnglandReference: study.nhs_england_reference?.split(/(?<=DARS-NIC-)(\d{6}-\d{5}-\d{2})/)[1] || "",
         irasId: study.iras_id || "",
         involvesUclSponsorship: study.involves_ucl_sponsorship,
         involvesCag: study.involves_cag,
@@ -659,12 +659,36 @@ export default function StudyForm(StudyProps: StudyProps) {
                     DARS NIC number
                   </a>{" "}
                   (if applicable)
-                  <input
-                    type="text"
-                    id="nhsEnglandRef"
-                    {...register("nhsEnglandReference")}
-                    className={styles["option__text-input"]}
-                  />
+                  <HelperText>Format: DARS-NIC-XXXXXX-XXXXX-XX</HelperText>
+                  <div className={styles["nhse-ref"]}>
+                    DARS-NIC-
+                    <Controller
+                      name="nhsEnglandReference"
+                      control={control}
+                      rules={{
+                        pattern: {
+                          value: /\d{6}-\d{5}-\d{2}$/,
+                          message: "Must follow the format provided. You only need to insert numbers and dashes",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          className={styles["option__text-input"]}
+                          type="text"
+                          id="nhsEnglandRef"
+                          placeholder="eg. XXXXXX-XXXXX-XX"
+                          value={field.value}
+                          maxLength={15}
+                        />
+                      )}
+                    />
+                  </div>
+                  {errors.nhsEnglandReference && (
+                    <Alert type="error">
+                      <AlertMessage>{errors.nhsEnglandReference.message}</AlertMessage>
+                    </Alert>
+                  )}
                 </Label>
               )}
 

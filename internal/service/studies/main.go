@@ -23,6 +23,7 @@ import (
 var (
 	titlePattern = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	cagPattern   = regexp.MustCompile(`^\d{2}/CAG/\d{4}$`)
+	nhsePattern  = regexp.MustCompile(`^DARS-NIC-\d{6}-\d{5}-\d{2}$`)
 )
 
 type Service struct {
@@ -96,6 +97,11 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 	}
 
 	if studyData.CagReference != nil && (len(*studyData.CagReference) != 11 || !cagPattern.MatchString(*studyData.CagReference)) {
+		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
+
+	}
+
+	if studyData.NhsEnglandReference != nil && (len(*studyData.NhsEnglandReference) != 24 || !nhsePattern.MatchString(*studyData.NhsEnglandReference)) {
 		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
 
 	}

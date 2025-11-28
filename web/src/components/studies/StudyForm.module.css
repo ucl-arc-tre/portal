@@ -196,6 +196,15 @@
         font-size: 1rem;
       }
     }
+
+    .nhse-ref {
+      display: flex;
+      flex-direction: row;
+      text-wrap: nowrap;
+      align-items: center;
+      color: var(--text--secondary);
+      margin-inline: 0.5rem;
+    }
   }
 
   .button--continue {
