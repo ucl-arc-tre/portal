@@ -1,67 +1,81 @@
 import Box from "../ui/Box";
-import { Textarea } from "../shared/exports";
+import { Alert, AlertMessage, Textarea } from "../shared/exports";
 import styles from "./AdminFeedbackSection.module.css";
 import Button from "../ui/Button";
 import { useState } from "react";
-
+import { StudyApprovalStatus } from "@/openapi";
 type FeedbackProps = {
   status: string;
-  feedback: string;
-  setFeedback: (feedback: string) => void;
-  handleUpdateStudyStatus: (status: string) => void;
+  feedbackFromStudy: string;
+  handleUpdateStudyStatus: (
+    status: StudyApprovalStatus,
+    feedbackContent?: string
+  ) => Promise<
+    | ({ data: unknown; error: undefined } & { request: Request; response: Response })
+    | ({ data: undefined; error: unknown } & { request: Request; response: Response })
+    | undefined
+  >;
 };
 export default function AdminFeedbackSection(props: FeedbackProps) {
-  const { status, feedback, setFeedback, handleUpdateStudyStatus } = props;
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  const [isCollapsing, setIsCollapsing] = useState(false);
-
-  const toggleShowFeedbackForm = () => {
-    // for smooth collapse
-    if (showFeedbackForm) {
-      setIsCollapsing(true);
-      setTimeout(() => {
-        setShowFeedbackForm(false);
-        setIsCollapsing(false);
-      }, 1400);
-    } else {
-      setShowFeedbackForm(true);
-    }
-  };
-
-  const handleFeedbackSubmit = () => {
-    handleUpdateStudyStatus("Rejected");
-    toggleShowFeedbackForm();
-  };
+  const { status, feedbackFromStudy, handleUpdateStudyStatus } = props;
+  const [feedback, setFeedback] = useState(feedbackFromStudy);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
   };
+
+  const handleStudyStatusUpdate = async (status: StudyApprovalStatus, feedbackContent?: string) => {
+    const err = await handleUpdateStudyStatus(status, feedbackContent);
+    if (!err) {
+      setSuccessMessage("Feedback updated successfully");
+    } else {
+      setErrorMessage("Something went wrong please try again");
+    }
+  };
+
   return (
     <>
       {(status === "Pending" || status === "Rejected") && (
         <div>
-          <Button className={styles["approve-button"]} onClick={() => handleUpdateStudyStatus("Approved")}>
+          <Button className={styles["approve-button"]} onClick={() => handleStudyStatusUpdate("Approved", feedback)}>
             Approve Study
           </Button>
-          <Button variant="secondary" className={styles["reject-button"]} onClick={toggleShowFeedbackForm}>
-            {showFeedbackForm ? "Cancel" : "Request Changes"}
+          <Button
+            variant="secondary"
+            className={styles["reject-button"]}
+            onClick={() => handleStudyStatusUpdate("Rejected", feedback)}
+            disabled={feedback.length === 0}
+          >
+            Request Changes
           </Button>
         </div>
       )}
 
-      {showFeedbackForm && (
+      {status === "Approved" && (
+        <div>
+          <Button onClick={() => handleStudyStatusUpdate("Approved", feedback)}>
+            {feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
+          </Button>
+        </div>
+      )}
+
+      {errorMessage ||
+        (successMessage && (
+          <Alert type={errorMessage ? "error" : "success"}>
+            <AlertMessage>{errorMessage || successMessage}</AlertMessage>
+          </Alert>
+        ))}
+
+      {status !== "Incomplete" && (
         <Box>
           <div className={styles["feedback-container"]}>
-            <form
-              className={`${styles["feedback-form"]} ${
-                isCollapsing
-                  ? styles["form-collapsing"]
-                  : showFeedbackForm
-                    ? styles["form-visible"]
-                    : styles["form-hidden"]
-              }`}
-            >
-              <label htmlFor="feedback">Outline which changes are required to attain approval</label>
+            <form className={styles["feedback-form"]}>
+              <label htmlFor="feedback">
+                Optionally provide feedback for the study owner. This can be advice for future management or things
+                required for approval. <br></br>To reject the study you must provide feedback.
+              </label>
               <Textarea
                 name="feedback"
                 id="feedback"
@@ -70,9 +84,6 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
                 onChange={handleFeedbackChange}
                 value={feedback}
               />
-              <Button onClick={handleFeedbackSubmit} type="button" disabled={!feedback || feedback.trim().length === 0}>
-                Submit
-              </Button>
             </form>
           </div>
         </Box>
