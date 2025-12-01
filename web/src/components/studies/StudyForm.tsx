@@ -259,6 +259,12 @@ export default function StudyForm(StudyProps: StudyProps) {
       if (study.data_protection_number) {
         setValue("dataProtectionPrefix", study.data_protection_number.split("/")[0]);
       }
+      if (study.nhs_england_reference) {
+        setValue(
+          "nhsEnglandReference",
+          study.nhs_england_reference.split(/(?<=DARS-NIC-)(\d{6}-\d{5}-\d{2})/)[1] || ""
+        );
+      }
     }
   }, [editingStudy, username, reset]);
 
@@ -787,7 +793,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
                     pattern: {
-                      value: /^[1-9]{1,3}$/,
+                      value: /^[1-9]\d{0,2}$/,
                       message: "Must be a number between 1 and 3 digits",
                     },
                     minLength: {
