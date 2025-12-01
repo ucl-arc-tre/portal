@@ -6,10 +6,10 @@ import (
 
 type Project struct {
 	ModelAuditable
-	Name          string    `gorm:"not null"`
-	CreatorUserID uuid.UUID `gorm:"not null;index"`
-	StudyID       uuid.UUID `gorm:"index"`
-	IsDraft       bool      `gorm:"not null;default:false"`
+	Name           string    `gorm:"not null"`
+	CreatorUserID  uuid.UUID `gorm:"not null;index"`
+	StudyID        uuid.UUID `gorm:"index"`
+	ApprovalStatus string    `gorm:"not null;default:'Incomplete'"`
 
 	// Relationships
 	Study       Study `gorm:"foreignKey:StudyID"`

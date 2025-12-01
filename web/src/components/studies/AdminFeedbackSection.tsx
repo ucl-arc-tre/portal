@@ -3,12 +3,12 @@ import { Alert, AlertMessage, Textarea } from "../shared/exports";
 import styles from "./AdminFeedbackSection.module.css";
 import Button from "../ui/Button";
 import { useState } from "react";
-import { StudyApprovalStatus } from "@/openapi";
+import { ApprovalStatus } from "@/openapi";
 type FeedbackProps = {
   status: string;
   feedbackFromStudy: string;
   handleUpdateStudyStatus: (
-    status: StudyApprovalStatus,
+    status: ApprovalStatus,
     feedbackContent?: string
   ) => Promise<
     | ({ data: unknown; error: undefined } & { request: Request; response: Response })
@@ -26,7 +26,7 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
     setFeedback(event.target.value);
   };
 
-  const handleStudyStatusUpdate = async (status: StudyApprovalStatus, feedbackContent?: string) => {
+  const handleStudyStatusUpdate = async (status: ApprovalStatus, feedbackContent?: string) => {
     const err = await handleUpdateStudyStatus(status, feedbackContent);
     if (!err) {
       setSuccessMessage("Feedback updated successfully");

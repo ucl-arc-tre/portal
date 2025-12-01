@@ -175,6 +175,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
       if (!selectedEnvironment) throw new Error("Selected environment not found");
 
       const assetIds = data.assetIds.map((asset) => asset.value).filter((id) => id !== "");
+      const approvalStatus = options.isDraft ? "Incomplete" : "Pending";
 
       let response;
 
@@ -190,7 +191,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
           const requestBody: ProjectTreRequest = {
             name: data.name,
             study_id: data.studyId,
-            is_draft: options.isDraft,
+            approval_status: approvalStatus,
             ...(assetIds.length > 0 && { asset_ids: assetIds }),
             ...(treMembers.length > 0 && { members: treMembers }),
           };

@@ -44,7 +44,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		Description:                      study.Description,
 		OwnerUserId:                      &ownerUserIDStr,
 		OwnerUsername:                    &ownerUsernameStr,
-		ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
+		ApprovalStatus:                   openapi.ApprovalStatus(study.ApprovalStatus),
 		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 		DataControllerOrganisation:       study.DataControllerOrganisation,
 		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
@@ -110,7 +110,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 }
 
 func (h *Handler) studiesAdmin(params openapi.GetStudiesParams) ([]types.Study, error) {
-	if params.Status != nil && openapi.StudyApprovalStatus(*params.Status) == openapi.Pending {
+	if params.Status != nil && openapi.ApprovalStatus(*params.Status) == openapi.Pending {
 		// admins can see all pending studies
 		return h.studies.PendingStudies()
 

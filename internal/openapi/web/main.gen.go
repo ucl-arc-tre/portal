@@ -18,6 +18,14 @@ const (
 	AgreementTypeStudyOwner         AgreementType = "study-owner"
 )
 
+// Defines values for ApprovalStatus.
+const (
+	Approved   ApprovalStatus = "Approved"
+	Incomplete ApprovalStatus = "Incomplete"
+	Pending    ApprovalStatus = "Pending"
+	Rejected   ApprovalStatus = "Rejected"
+)
+
 // Defines values for AssetClassificationImpact.
 const (
 	AssetClassificationImpactConfidential       AssetClassificationImpact = "confidential"
@@ -144,14 +152,6 @@ const (
 	TrustedEgresser ProjectTRERoleName = "trusted_egresser"
 )
 
-// Defines values for StudyApprovalStatus.
-const (
-	Approved   StudyApprovalStatus = "Approved"
-	Incomplete StudyApprovalStatus = "Incomplete"
-	Pending    StudyApprovalStatus = "Pending"
-	Rejected   StudyApprovalStatus = "Rejected"
-)
-
 // Defines values for TrainingKind.
 const (
 	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
@@ -172,6 +172,9 @@ type AgreementConfirmation struct {
 
 // AgreementType defines model for AgreementType.
 type AgreementType string
+
+// ApprovalStatus Current approval status (used for studies, projects, etc.)
+type ApprovalStatus string
 
 // Asset defines model for Asset.
 type Asset struct {
@@ -471,6 +474,9 @@ type ProfileUpdate struct {
 
 // ProjectTRE A TRE project with base project details joined in
 type ProjectTRE struct {
+	// ApprovalStatus Current approval status (used for studies, projects, etc.)
+	ApprovalStatus ApprovalStatus `json:"approval_status"`
+
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
 
@@ -499,11 +505,11 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
+	// ApprovalStatus Current approval status (used for studies, projects, etc.)
+	ApprovalStatus ApprovalStatus `json:"approval_status"`
+
 	// AssetIds Optional list of asset identifiers to link to this project
 	AssetIds *[]string `json:"asset_ids,omitempty"`
-
-	// IsDraft Whether this project should be saved as a draft (true) or created as active (false)
-	IsDraft *bool `json:"is_draft,omitempty"`
 
 	// Members Optional list of project members with their roles
 	Members *[]ProjectTREMember `json:"members,omitempty"`
@@ -523,8 +529,8 @@ type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
-	// ApprovalStatus Current approval status of the study
-	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
+	// ApprovalStatus Current approval status (used for studies, projects, etc.)
+	ApprovalStatus ApprovalStatus `json:"approval_status"`
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference"`
@@ -608,9 +614,6 @@ type Study struct {
 	// UpdatedAt Time in RFC3339 format when the study was last updated
 	UpdatedAt string `json:"updated_at"`
 }
-
-// StudyApprovalStatus Current approval status of the study
-type StudyApprovalStatus string
 
 // StudyBase Base study properties
 type StudyBase struct {
@@ -698,8 +701,8 @@ type StudyReview struct {
 	// Feedback Feedback for the study
 	Feedback *string `json:"feedback,omitempty"`
 
-	// Status Current approval status of the study
-	Status StudyApprovalStatus `json:"status"`
+	// Status Current approval status (used for studies, projects, etc.)
+	Status ApprovalStatus `json:"status"`
 }
 
 // TrainingKind defines model for TrainingKind.
@@ -751,7 +754,7 @@ type ValidationError struct {
 // GetStudiesParams defines parameters for GetStudies.
 type GetStudiesParams struct {
 	// Status get studies by status
-	Status *StudyApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
+	Status *ApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.

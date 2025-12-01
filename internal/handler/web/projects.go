@@ -18,32 +18,44 @@ func (h *Handler) GetProjectsTre(ctx *gin.Context) {
 }
 
 func (h *Handler) PostProjectsTre(ctx *gin.Context) {
-	req := openapi.ProjectTRERequest{}
-	if err := bindJSONOrSetError(ctx, &req); err != nil {
+	projectTreData := openapi.ProjectTRERequest{}
+	if err := bindJSONOrSetError(ctx, &projectTreData); err != nil {
 		return
 	}
 
-	// Validate that user has owner role on the study
-	studyUUID, err := uuid.Parse(req.StudyId)
+	studyUUID, err := uuid.Parse(projectTreData.StudyId)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID")
 		return
 	}
 
 	user := middleware.GetUser(ctx)
-	requiredStudyRole := rbac.StudyRole{StudyID: studyUUID, Name: rbac.StudyOwner}
-	if hasRole, err := rbac.HasRole(user, requiredStudyRole.RoleName()); err != nil {
+	// Validate that user has owner role on the study
+	studyOwnerRole := rbac.StudyRole{StudyID: studyUUID, Name: rbac.StudyOwner}
+	if isStudyOwner, err := rbac.HasRole(user, studyOwnerRole.RoleName()); err != nil {
 		setError(ctx, err, "Failed to check study access")
 		return
-	} else if !hasRole {
+	} else if !isStudyOwner {
 		ctx.Status(http.StatusForbidden)
 		return
 	}
 
-	// TODO: Implement project creation logic
-	// validate project request roles
+	isUpdate := false
+	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID, isUpdate)
+	if err != nil {
+		setError(ctx, err, "Failed to validate project")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
 
-	ctx.Status(http.StatusNotImplemented)
+	if err := h.projects.CreateProjectTRE(ctx, user, studyUUID, projectTreData); err != nil {
+		setError(ctx, err, "Failed to create project")
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
 }
 
 func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
