@@ -39,7 +39,7 @@
 }
 
 .username-change-link:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--form-blue--light);
   outline-offset: 2px;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .edit-icon-button:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--form-blue--light);
   outline-offset: 2px;
   border-radius: 4px;
 }
