@@ -2,6 +2,7 @@ package projects
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -82,20 +83,21 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, member := range members {
-		// Validate member has at least one role
 		if len(member.Roles) == 0 {
 			errorMessage += fmt.Sprintf("• User '%s' must have at least one role assigned\n\n", member.Username)
 			continue
 		}
 
-		// Get user from database to check if they exist and get their User struct for RBAC checks
-		user, err := s.users.PersistedUser(types.Username(member.Username))
+		user, err := s.users.UserByUsername(types.Username(member.Username))
 		if err != nil {
+			if errors.Is(err, types.ErrNotFound) {
+				errorMessage += fmt.Sprintf("• User '%s' not found. They must become an approved researcher before being added to a project\n\n", member.Username)
+				continue
+			}
 			return nil, err
 		}
 
-		// Check if user has approved researcher role
-		isApprovedResearcher, err := rbac.HasRole(user, rbac.ApprovedResearcher)
+		isApprovedResearcher, err := rbac.HasRole(*user, rbac.ApprovedResearcher)
 		if err != nil {
 			return nil, types.NewErrServerError(fmt.Errorf("failed to check approved researcher role for %s: %w", member.Username, err))
 		}
@@ -142,8 +144,7 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 
 func (s *Service) createProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
 	for _, member := range members {
-		// Get user from database
-		user, err := s.users.PersistedUser(types.Username(member.Username))
+		user, err := s.users.UserByUsername(types.Username(member.Username))
 		if err != nil {
 			return err
 		}
