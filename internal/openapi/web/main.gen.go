@@ -505,11 +505,11 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
-	// ApprovalStatus Current approval status (used for studies, projects, etc.)
-	ApprovalStatus ApprovalStatus `json:"approval_status"`
-
 	// AssetIds Optional list of asset identifiers to link to this project
 	AssetIds *[]string `json:"asset_ids,omitempty"`
+
+	// IsDraft Whether this is a draft submission (true) or final submission (false)
+	IsDraft bool `json:"is_draft"`
 
 	// Members Optional list of project members with their roles
 	Members *[]ProjectTREMember `json:"members,omitempty"`

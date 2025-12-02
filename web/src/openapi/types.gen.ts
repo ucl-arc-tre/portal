@@ -359,7 +359,10 @@ export type ProjectTreRequest = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
-    approval_status: ApprovalStatus;
+    /**
+     * Whether this is a draft submission (true) or final submission (false)
+     */
+    is_draft: boolean;
     /**
      * Optional list of asset identifiers to link to this project
      */

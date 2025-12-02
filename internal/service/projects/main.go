@@ -56,8 +56,8 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 		}
 	}
 
-	// only validate members if not in draft mode (Incomplete status)
-	if projectTreData.ApprovalStatus != openapi.Incomplete {
+	// only validate members if not in draft mode
+	if !projectTreData.IsDraft {
 		if projectTreData.Members != nil && len(*projectTreData.Members) > 0 {
 			validationError, err := s.validateProjectMembers(*projectTreData.Members)
 			if err != nil || validationError != nil {
@@ -188,11 +188,14 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}()
 
 	// Create Project record
+	// TODO: discuss how each project status should be set on creation
+	approvalStatus := string(openapi.Incomplete)
+
 	project := types.Project{
 		Name:           projectTreData.Name,
 		CreatorUserID:  creator.ID,
 		StudyID:        studyUUID,
-		ApprovalStatus: string(projectTreData.ApprovalStatus),
+		ApprovalStatus: approvalStatus,
 	}
 
 	if err := tx.Create(&project).Error; err != nil {

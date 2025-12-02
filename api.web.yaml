@@ -1304,7 +1304,7 @@ components:
       required:
         - name
         - study_id
-        - approval_status
+        - is_draft
       properties:
         name:
           type: string
@@ -1312,10 +1312,10 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
-        approval_status:
-          $ref: "#/components/schemas/ApprovalStatus"
-          description: Initial approval status - Incomplete for drafts, Pending for submission
-          default: Incomplete
+        is_draft:
+          type: boolean
+          description: Whether this is a draft submission (true) or final submission (false)
+          default: false
         asset_ids:
           type: array
           description: Optional list of asset identifiers to link to this project
