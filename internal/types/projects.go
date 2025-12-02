@@ -12,8 +12,9 @@ type Project struct {
 	ApprovalStatus string    `gorm:"not null;default:'Incomplete'"`
 
 	// Relationships
-	Study       Study `gorm:"foreignKey:StudyID"`
-	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
+	Study         Study          `gorm:"foreignKey:StudyID"`
+	CreatorUser   User           `gorm:"foreignKey:CreatorUserID"`
+	ProjectAssets []ProjectAsset `gorm:"foreignKey:ProjectID"`
 }
 
 type ProjectTRE struct {
