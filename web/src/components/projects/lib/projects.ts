@@ -1,23 +1,23 @@
 import { ProjectTreRoleName } from "@/openapi";
 import { ProjectNameValidation, AnyProjectRoleName } from "@/types/projects";
 
-// Project name validation patterns per environment
 // Note: These patterns are also validated on the backend in internal/validation/patterns.go
-const TRE_PROJECT_NAME_PATTERN = /^[0-9a-z]{4,14}$/;
-const TRE_PROJECT_NAME_MIN_LENGTH = 4;
-const TRE_PROJECT_NAME_MAX_LENGTH = 14;
+const VALIDATION_CONFIG: Record<string, ProjectNameValidation> = {
+  "ARC Trusted Research Environment": {
+    pattern: /^[0-9a-z]{4,14}$/,
+    minLength: 4,
+    maxLength: 14,
+    patternMessage: "Must be 4-14 characters long and contain only lowercase letters and numbers",
+    helperText: "Use lowercase letters and numbers only (4-14 characters)",
+  },
+};
 
 export const getProjectNameValidation = (environmentName: string): ProjectNameValidation => {
-  if (environmentName === "ARC Trusted Research Environment") {
-    return {
-      pattern: TRE_PROJECT_NAME_PATTERN,
-      minLength: TRE_PROJECT_NAME_MIN_LENGTH,
-      maxLength: TRE_PROJECT_NAME_MAX_LENGTH,
-      patternMessage: "Must be 4-14 characters long and contain only lowercase letters and numbers",
-      helperText: "Use lowercase letters and numbers only (4-14 characters)",
-    };
+  const config = VALIDATION_CONFIG[environmentName];
+  if (!config) {
+    throw new Error(`Unsupported environment: ${environmentName}`);
   }
-  throw new Error(`Unsupported environment: ${environmentName}`);
+  return config;
 };
 
 // Role definitions per environment
