@@ -182,7 +182,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
       switch (selectedEnvironment.name) {
         case "ARC Trusted Research Environment":
           const treMembers = data.additionalApprovedResearchers
-            .filter((researcher) => researcher.username.trim() !== "" && researcher.roles.length > 0)
+            .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
               username: `${researcher.username.trim()}${domainName}`,
               roles: researcher.roles as ProjectTreRoleName[],
@@ -535,56 +535,83 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
 
                           <div>
                             <label className={styles["field-label"]}>Roles:</label>
-                            {researcher?.roles && researcher.roles.length > 0 && (
-                              <div className={styles["role-tags"]}>
-                                {researcher.roles.map((role) => (
-                                  <span key={role} className={styles["role-tag"]}>
-                                    {ROLE_LABELS[role]}
-                                    <span className={styles["role-tooltip"]}>
-                                      <InfoTooltip text={ROLE_DESCRIPTIONS[role]} />
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className={styles["role-tag-remove"]}
-                                      onClick={() => {
-                                        const currentRoles = getValues(`additionalApprovedResearchers.${index}.roles`);
-                                        setValue(
-                                          `additionalApprovedResearchers.${index}.roles`,
-                                          currentRoles.filter((chosenRole) => chosenRole !== role)
-                                        );
+                            <Controller
+                              name={`additionalApprovedResearchers.${index}.roles` as const}
+                              control={control}
+                              rules={{
+                                validate: {
+                                  hasAtLeastOneRole: (value) => {
+                                    if (!value || value.length === 0) {
+                                      return "At least one role is required";
+                                    }
+                                    return true;
+                                  },
+                                },
+                              }}
+                              render={({ fieldState }) => (
+                                <div>
+                                  {researcher?.roles && researcher.roles.length > 0 && (
+                                    <div className={styles["role-tags"]}>
+                                      {researcher.roles.map((role) => (
+                                        <span key={role} className={styles["role-tag"]}>
+                                          {ROLE_LABELS[role]}
+                                          <span className={styles["role-tooltip"]}>
+                                            <InfoTooltip text={ROLE_DESCRIPTIONS[role]} />
+                                          </span>
+                                          <button
+                                            type="button"
+                                            className={styles["role-tag-remove"]}
+                                            onClick={() => {
+                                              const currentRoles = getValues(
+                                                `additionalApprovedResearchers.${index}.roles`
+                                              );
+                                              setValue(
+                                                `additionalApprovedResearchers.${index}.roles`,
+                                                currentRoles.filter((chosenRole) => chosenRole !== role),
+                                                { shouldValidate: true }
+                                              );
+                                            }}
+                                            aria-label={`Remove ${role} role`}
+                                          >
+                                            ×
+                                          </button>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {availableRolesToAdd.length > 0 && (
+                                    <select
+                                      className={`${styles.select} ${styles["role-dropdown"]}`}
+                                      value=""
+                                      onChange={(e) => {
+                                        if (e.target.value) {
+                                          const currentRoles =
+                                            getValues(`additionalApprovedResearchers.${index}.roles`) || [];
+                                          setValue(
+                                            `additionalApprovedResearchers.${index}.roles`,
+                                            [...currentRoles, e.target.value as AnyProjectRoleName],
+                                            { shouldValidate: true }
+                                          );
+                                        }
                                       }}
-                                      aria-label={`Remove ${role} role`}
+                                      disabled={isSubmitting}
                                     >
-                                      ×
-                                    </button>
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            {availableRolesToAdd.length > 0 && (
-                              <select
-                                className={`${styles.select} ${styles["role-dropdown"]}`}
-                                value=""
-                                onChange={(e) => {
-                                  if (e.target.value) {
-                                    const currentRoles =
-                                      getValues(`additionalApprovedResearchers.${index}.roles`) || [];
-                                    setValue(`additionalApprovedResearchers.${index}.roles`, [
-                                      ...currentRoles,
-                                      e.target.value as AnyProjectRoleName,
-                                    ]);
-                                  }
-                                }}
-                                disabled={isSubmitting}
-                              >
-                                <option value="">+ Add role...</option>
-                                {availableRolesToAdd.map((role) => (
-                                  <option key={role} value={role}>
-                                    {ROLE_LABELS[role]}
-                                  </option>
-                                ))}
-                              </select>
-                            )}
+                                      <option value="">+ Add role...</option>
+                                      {availableRolesToAdd.map((role) => (
+                                        <option key={role} value={role}>
+                                          {ROLE_LABELS[role]}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  )}
+                                  {fieldState.error && (
+                                    <Alert type="error">
+                                      <AlertMessage>{fieldState.error.message}</AlertMessage>
+                                    </Alert>
+                                  )}
+                                </div>
+                              )}
+                            />
                           </div>
                         </div>
 
@@ -630,6 +657,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
 
             {currentStep === totalSteps && (
               <>
+                {/* TODO: Enable submitting in draft mode
                 <Button
                   type="button"
                   variant="secondary"
@@ -637,7 +665,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                   onClick={handleSubmit((data) => submitProject(data, { isDraft: true }))}
                 >
                   {isSubmitting ? "Saving..." : "Save as Draft"}
-                </Button>
+                </Button> */}
 
                 <Button
                   className="create-project-button"

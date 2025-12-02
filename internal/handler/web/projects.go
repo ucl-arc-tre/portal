@@ -40,8 +40,10 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 		return
 	}
 
+	// TODO: Allow additional study admins to create projects (need to add StudyAdmin RBAC role)
+
 	isUpdate := false
-	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID, isUpdate)
+	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID, user, isUpdate)
 	if err != nil {
 		setError(ctx, err, "Failed to validate project")
 		return

@@ -48,3 +48,13 @@ type ProjectTRERoleBinding struct {
 	ProjectTRE ProjectTRE `gorm:"foreignKey:ProjectTREID"`
 	User       User       `gorm:"foreignKey:UserID"`
 }
+
+type ProjectAsset struct {
+	ModelAuditable
+	ProjectID uuid.UUID `gorm:"not null;index"`
+	AssetID   uuid.UUID `gorm:"not null;index"`
+
+	// Relationships
+	Project Project `gorm:"foreignKey:ProjectID"`
+	Asset   Asset   `gorm:"foreignKey:AssetID"`
+}

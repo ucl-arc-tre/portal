@@ -2,25 +2,35 @@ package projects
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	db *gorm.DB
+	db    *gorm.DB
+	entra *entra.Controller
+	users *users.Service
 }
 
 func New() *Service {
-	return &Service{db: graceful.NewDB()}
+	return &Service{
+		db:    graceful.NewDB(),
+		entra: entra.New(),
+		users: users.New(),
+	}
 }
 
-func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, isUpdate bool) (*openapi.ValidationError, error) {
+func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, creator types.User, isUpdate bool) (*openapi.ValidationError, error) {
 	// Validate project name format
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
 		return &openapi.ValidationError{ErrorMessage: "Project name must start and end with a lowercase letter or number, and contain only lowercase letters, numbers, and hyphens"}, nil
@@ -60,12 +70,65 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	}
 
 	// only validate members if not in draft mode (Incomplete status)
-	// if projectTreData.ApprovalStatus != "Incomplete" {
-	// 	// TODO: Validate members exist and have required roles
-	// 	// TODO: Validate role dependencies
-	// }
+	if projectTreData.ApprovalStatus != openapi.Incomplete {
+		if projectTreData.Members != nil && len(*projectTreData.Members) > 0 {
+			validationError, err := s.validateProjectMembers(ctx, *projectTreData.Members, creator.Username)
+			if err != nil || validationError != nil {
+				return validationError, err
+			}
+		}
+	}
 
 	return nil, nil
+}
+
+func (s *Service) validateProjectMembers(ctx context.Context, members []openapi.ProjectTREMember, creatorUsername types.Username) (*openapi.ValidationError, error) {
+	errorMessage := ""
+	for _, member := range members {
+		// Validate member has at least one role
+		if len(member.Roles) == 0 {
+			errorMessage += fmt.Sprintf("• User '%s' must have at least one role assigned\n\n", member.Username)
+			continue
+		}
+
+		// Validate that the creator is not adding themselves as a member
+		// TODO: check if this is actually needed, or if it is actually valid to add yourself as a member
+		if types.Username(member.Username) == creatorUsername {
+			errorMessage += "• You cannot add yourself as a project member (you are already the project creator)\n\n"
+			continue
+		}
+
+		// Get user from database to check if they exist and get their User struct for RBAC checks
+		user, err := s.users.PersistedUser(types.Username(member.Username))
+		if err != nil {
+			return nil, types.NewErrServerError(fmt.Errorf("failed to get user %s: %w", member.Username, err))
+		}
+
+		// Check if user is a staff member
+		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(member.Username))
+		if errors.Is(err, types.ErrNotFound) {
+			errorMessage += fmt.Sprintf("• User '%s' not found in directory\n\n", member.Username)
+			continue
+		} else if err != nil {
+			return nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", member.Username, err))
+		} else if !isStaff {
+			errorMessage += fmt.Sprintf("• User '%s' is not a staff member\n\n", member.Username)
+			continue
+		}
+
+		// Check if user has approved researcher role
+		isApprovedResearcher, err := rbac.HasRole(user, rbac.ApprovedResearcher)
+		if err != nil {
+			return nil, types.NewErrServerError(fmt.Errorf("failed to check approved researcher role for %s: %w", member.Username, err))
+		}
+		if !isApprovedResearcher {
+			errorMessage += fmt.Sprintf("• User '%s' does not have the approved researcher role\n\n", member.Username)
+		}
+	}
+	if errorMessage == "" {
+		return nil, nil
+	}
+	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
 }
 
 func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environmentTier int) (*openapi.ValidationError, error) {
@@ -99,12 +162,106 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 	return nil, nil
 }
 
+func (s *Service) createProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+	for _, member := range members {
+		// Get user from database
+		user, err := s.users.PersistedUser(types.Username(member.Username))
+		if err != nil {
+			return types.NewErrServerError(fmt.Errorf("failed to get user %s: %w", member.Username, err))
+		}
+
+		// Create a role binding for each role assigned to this member
+		for _, role := range member.Roles {
+			roleBinding := types.ProjectTRERoleBinding{
+				ProjectTREID: projectTREID,
+				UserID:       user.ID,
+				Role:         types.ProjectTRERoleName(role),
+			}
+
+			if err := tx.Create(&roleBinding).Error; err != nil {
+				return types.NewErrFromGorm(err, fmt.Sprintf("failed to create role binding for user %s", member.Username))
+			}
+		}
+	}
+	return nil
+}
+
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
-	// TODO: Create project in transaction:
-	// - Create Project record
-	// - Create ProjectTRE record
-	// - Create ProjectTRERoleBinding records for each member+role
-	// - Add RBAC roles for project members
+	// Get TRE environment
+	var treEnvironment types.Environment
+	err := s.db.Where("name = ?", "ARC Trusted Research Environment").First(&treEnvironment).Error
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to fetch TRE environment")
+	}
+
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Create Project record
+	project := types.Project{
+		Name:           projectTreData.Name,
+		CreatorUserID:  creator.ID,
+		StudyID:        studyUUID,
+		ApprovalStatus: string(projectTreData.ApprovalStatus),
+	}
+
+	if err := tx.Create(&project).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to create project")
+	}
+
+	// Create ProjectTRE record
+	projectTRE := types.ProjectTRE{
+		ProjectID:                     project.ID,
+		EnvironmentID:                 treEnvironment.ID,
+		EgressNumberRequiredApprovals: 1, // TODO: discuss with team if this should be configurable
+	}
+
+	if err := tx.Create(&projectTRE).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to create project TRE")
+	}
+
+	// Create ProjectAsset records for each asset
+	if projectTreData.AssetIds != nil {
+		for _, assetIDStr := range *projectTreData.AssetIds {
+			assetUUID, err := uuid.Parse(assetIDStr)
+			if err != nil {
+				tx.Rollback()
+				return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
+			}
+
+			projectAsset := types.ProjectAsset{
+				ProjectID: project.ID,
+				AssetID:   assetUUID,
+			}
+
+			if err := tx.Create(&projectAsset).Error; err != nil {
+				tx.Rollback()
+				return types.NewErrFromGorm(err, "failed to create project asset")
+			}
+		}
+	}
+
+	if projectTreData.Members != nil {
+		if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, *projectTreData.Members); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit create project transaction")
+	}
+
+	if _, err := rbac.AddProjectTreOwnerRole(creator, project.ID); err != nil {
+		return err
+	}
 
 	return nil
 }
