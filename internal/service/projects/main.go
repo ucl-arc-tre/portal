@@ -101,7 +101,7 @@ func (s *Service) validateProjectMembers(ctx context.Context, members []openapi.
 		// Get user from database to check if they exist and get their User struct for RBAC checks
 		user, err := s.users.PersistedUser(types.Username(member.Username))
 		if err != nil {
-			return nil, types.NewErrServerError(fmt.Errorf("failed to get user %s: %w", member.Username, err))
+			return nil, err
 		}
 
 		// Check if user is a staff member
