@@ -2,11 +2,9 @@ package projects
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -19,14 +17,12 @@ import (
 
 type Service struct {
 	db    *gorm.DB
-	entra *entra.Controller
 	users *users.Service
 }
 
 func New() *Service {
 	return &Service{
 		db:    graceful.NewDB(),
-		entra: entra.New(),
 		users: users.New(),
 	}
 }
@@ -96,18 +92,6 @@ func (s *Service) validateProjectMembers(ctx context.Context, members []openapi.
 		user, err := s.users.PersistedUser(types.Username(member.Username))
 		if err != nil {
 			return nil, err
-		}
-
-		// Check if user is a staff member
-		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(member.Username))
-		if errors.Is(err, types.ErrNotFound) {
-			errorMessage += fmt.Sprintf("• User '%s' not found in directory\n\n", member.Username)
-			continue
-		} else if err != nil {
-			return nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", member.Username, err))
-		} else if !isStaff {
-			errorMessage += fmt.Sprintf("• User '%s' is not a staff member\n\n", member.Username)
-			continue
 		}
 
 		// Check if user has approved researcher role
