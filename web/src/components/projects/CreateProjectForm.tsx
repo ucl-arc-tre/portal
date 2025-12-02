@@ -191,8 +191,8 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
             name: data.name,
             study_id: data.studyId,
             is_draft: options.isDraft,
-            ...(assetIds.length > 0 && { asset_ids: assetIds }),
-            ...(treMembers.length > 0 && { members: treMembers }),
+            asset_ids: assetIds,
+            members: treMembers,
           };
           response = await postProjectsTre({ body: requestBody });
           break;

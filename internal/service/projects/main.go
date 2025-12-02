@@ -42,7 +42,7 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	}
 
 	// Validate assets belong to study and are compatible with TRE environment tier
-	if projectTreData.AssetIds != nil && len(*projectTreData.AssetIds) > 0 {
+	if len(projectTreData.AssetIds) > 0 {
 		// Get TRE environment tier
 		var treEnvironment types.Environment
 		err = s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
@@ -50,19 +50,17 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 			return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
 		}
 
-		validationError, err := s.validateAssets(*projectTreData.AssetIds, studyUUID, treEnvironment.Tier)
+		validationError, err := s.validateAssets(projectTreData.AssetIds, studyUUID, treEnvironment.Tier)
 		if err != nil || validationError != nil {
 			return validationError, err
 		}
 	}
 
 	// only validate members if not in draft mode
-	if !projectTreData.IsDraft {
-		if projectTreData.Members != nil && len(*projectTreData.Members) > 0 {
-			validationError, err := s.validateProjectMembers(*projectTreData.Members)
-			if err != nil || validationError != nil {
-				return validationError, err
-			}
+	if !projectTreData.IsDraft && len(projectTreData.Members) > 0 {
+		validationError, err := s.validateProjectMembers(projectTreData.Members)
+		if err != nil || validationError != nil {
+			return validationError, err
 		}
 	}
 
@@ -231,31 +229,28 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}
 
 	// Create ProjectAsset records for each asset
-	if projectTreData.AssetIds != nil {
-		for _, assetIDStr := range *projectTreData.AssetIds {
-			assetUUID, err := uuid.Parse(assetIDStr)
-			if err != nil {
-				tx.Rollback()
-				return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
-			}
+	for _, assetIDStr := range projectTreData.AssetIds {
+		assetUUID, err := uuid.Parse(assetIDStr)
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
+		}
 
-			projectAsset := types.ProjectAsset{
-				ProjectID: project.ID,
-				AssetID:   assetUUID,
-			}
+		projectAsset := types.ProjectAsset{
+			ProjectID: project.ID,
+			AssetID:   assetUUID,
+		}
 
-			if err := tx.Create(&projectAsset).Error; err != nil {
-				tx.Rollback()
-				return types.NewErrFromGorm(err, "failed to create project asset")
-			}
+		if err := tx.Create(&projectAsset).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create project asset")
 		}
 	}
 
-	if projectTreData.Members != nil {
-		if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, *projectTreData.Members); err != nil {
-			tx.Rollback()
-			return err
-		}
+	// Create ProjectTRERoleBinding records for each member+role
+	if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {

@@ -505,14 +505,14 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
-	// AssetIds Optional list of asset identifiers to link to this project
-	AssetIds *[]string `json:"asset_ids,omitempty"`
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
 
 	// IsDraft Whether this is a draft submission (true) or final submission (false)
 	IsDraft bool `json:"is_draft"`
 
-	// Members Optional list of project members with their roles
-	Members *[]ProjectTREMember `json:"members,omitempty"`
+	// Members List of project members with their roles (can be empty)
+	Members []ProjectTREMember `json:"members"`
 
 	// Name Name of the project
 	Name string `json:"name"`

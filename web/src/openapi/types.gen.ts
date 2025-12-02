@@ -364,13 +364,13 @@ export type ProjectTreRequest = {
      */
     is_draft: boolean;
     /**
-     * Optional list of asset identifiers to link to this project
+     * List of asset identifiers to link to this project (can be empty)
      */
-    asset_ids?: Array<string>;
+    asset_ids: Array<string>;
     /**
-     * Optional list of project members with their roles
+     * List of project members with their roles (can be empty)
      */
-    members?: Array<ProjectTreMember>;
+    members: Array<ProjectTreMember>;
 };
 
 /**

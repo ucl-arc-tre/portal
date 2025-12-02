@@ -1305,6 +1305,8 @@ components:
         - name
         - study_id
         - is_draft
+        - asset_ids
+        - members
       properties:
         name:
           type: string
@@ -1318,12 +1320,12 @@ components:
           default: false
         asset_ids:
           type: array
-          description: Optional list of asset identifiers to link to this project
+          description: List of asset identifiers to link to this project (can be empty)
           items:
             type: string
         members:
           type: array
-          description: Optional list of project members with their roles
+          description: List of project members with their roles (can be empty)
           items:
             $ref: "#/components/schemas/ProjectTREMember"
 
