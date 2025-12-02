@@ -33,7 +33,7 @@ func New() *Service {
 func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, creator types.User, isUpdate bool) (*openapi.ValidationError, error) {
 	// Validate project name format
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
-		return &openapi.ValidationError{ErrorMessage: "Project name must start and end with a lowercase letter or number, and contain only lowercase letters, numbers, and hyphens"}, nil
+		return &openapi.ValidationError{ErrorMessage: "Project name must be 4-14 characters long and contain only lowercase letters and numbers"}, nil
 	}
 
 	// Note: No need to validate study exists - handler already checks user is study owner

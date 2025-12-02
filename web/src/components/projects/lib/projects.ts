@@ -3,9 +3,9 @@ import { ProjectNameValidation, AnyProjectRoleName } from "@/types/projects";
 
 // Project name validation patterns per environment
 // Note: These patterns are also validated on the backend in internal/validation/patterns.go
-const TRE_PROJECT_NAME_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
-const TRE_PROJECT_NAME_MIN_LENGTH = 3;
-const TRE_PROJECT_NAME_MAX_LENGTH = 50;
+const TRE_PROJECT_NAME_PATTERN = /^[0-9a-z]{4,14}$/;
+const TRE_PROJECT_NAME_MIN_LENGTH = 4;
+const TRE_PROJECT_NAME_MAX_LENGTH = 14;
 
 export const getProjectNameValidation = (environmentName: string): ProjectNameValidation => {
   if (environmentName === "ARC Trusted Research Environment") {
@@ -13,9 +13,8 @@ export const getProjectNameValidation = (environmentName: string): ProjectNameVa
       pattern: TRE_PROJECT_NAME_PATTERN,
       minLength: TRE_PROJECT_NAME_MIN_LENGTH,
       maxLength: TRE_PROJECT_NAME_MAX_LENGTH,
-      patternMessage:
-        "Must start and end with a lowercase letter or number. Only lowercase letters, numbers, and hyphens allowed.",
-      helperText: "Use lowercase letters, numbers, and hyphens only (3-50 characters)",
+      patternMessage: "Must be 4-14 characters long and contain only lowercase letters and numbers",
+      helperText: "Use lowercase letters and numbers only (4-14 characters)",
     };
   }
   // Default fallback
