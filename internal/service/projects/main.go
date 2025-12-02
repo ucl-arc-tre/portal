@@ -10,6 +10,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -58,7 +59,7 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	if projectTreData.AssetIds != nil && len(*projectTreData.AssetIds) > 0 {
 		// Get TRE environment tier
 		var treEnvironment types.Environment
-		err = s.db.Where("name = ?", "ARC Trusted Research Environment").First(&treEnvironment).Error
+		err = s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
 		if err != nil {
 			return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
 		}
@@ -189,7 +190,7 @@ func (s *Service) createProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UU
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
 	// Get TRE environment
 	var treEnvironment types.Environment
-	err := s.db.Where("name = ?", "ARC Trusted Research Environment").First(&treEnvironment).Error
+	err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to fetch TRE environment")
 	}

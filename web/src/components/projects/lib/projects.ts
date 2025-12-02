@@ -17,14 +17,7 @@ export const getProjectNameValidation = (environmentName: string): ProjectNameVa
       helperText: "Use lowercase letters and numbers only (4-14 characters)",
     };
   }
-  // Default fallback
-  return {
-    pattern: /^.+$/,
-    minLength: 3,
-    maxLength: 50,
-    patternMessage: "Invalid project name format",
-    helperText: "Enter a valid project name",
-  };
+  throw new Error(`Unsupported environment: ${environmentName}`);
 };
 
 // Role definitions per environment
