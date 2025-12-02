@@ -69,7 +69,7 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	// only validate members if not in draft mode (Incomplete status)
 	if projectTreData.ApprovalStatus != openapi.Incomplete {
 		if projectTreData.Members != nil && len(*projectTreData.Members) > 0 {
-			validationError, err := s.validateProjectMembers(ctx, *projectTreData.Members, creator.Username)
+			validationError, err := s.validateProjectMembers(*projectTreData.Members)
 			if err != nil || validationError != nil {
 				return validationError, err
 			}
@@ -79,7 +79,7 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	return nil, nil
 }
 
-func (s *Service) validateProjectMembers(ctx context.Context, members []openapi.ProjectTREMember, creatorUsername types.Username) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, member := range members {
 		// Validate member has at least one role
