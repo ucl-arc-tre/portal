@@ -92,13 +92,6 @@ func (s *Service) validateProjectMembers(ctx context.Context, members []openapi.
 			continue
 		}
 
-		// Validate that the creator is not adding themselves as a member
-		// TODO: check if this is actually needed, or if it is actually valid to add yourself as a member
-		if types.Username(member.Username) == creatorUsername {
-			errorMessage += "• You cannot add yourself as a project member (you are already the project creator)\n\n"
-			continue
-		}
-
 		// Get user from database to check if they exist and get their User struct for RBAC checks
 		user, err := s.users.PersistedUser(types.Username(member.Username))
 		if err != nil {
