@@ -9,7 +9,7 @@ type Project struct {
 	Name           string    `gorm:"not null"`
 	CreatorUserID  uuid.UUID `gorm:"not null;index"`
 	StudyID        uuid.UUID `gorm:"index"`
-	ApprovalStatus string    `gorm:"not null;default:'Incomplete'"`
+	ApprovalStatus string    `gorm:"not null"`
 
 	// Relationships
 	Study         Study          `gorm:"foreignKey:StudyID"`
