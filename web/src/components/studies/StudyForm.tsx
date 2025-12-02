@@ -43,6 +43,14 @@ type StudyProps = {
   editingStudy?: Study | null;
 };
 
+const formatdataProtectionId = (id: number): string => {
+  if (id < 10) {
+    return `0${id}`;
+  } else {
+    return `${id}`;
+  }
+};
+
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
   const studyData: StudyRequest = {
     title: data.title,
@@ -71,7 +79,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${Number(data.dataProtectionId)}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${formatdataProtectionId(data.dataProtectionId)}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
@@ -721,7 +729,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
                     min: {
-                      value: 0,
+                      value: 1,
                       message: "Cannot be a negative number",
                     },
                     max: {
