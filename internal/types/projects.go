@@ -39,6 +39,14 @@ const (
 	ProjectTREEgressChecker   ProjectTRERoleName = "egress_checker"   // can approve egress requests
 )
 
+var AllProjectTRERoles = []ProjectTRERoleName{
+	ProjectTREDesktopUser,
+	ProjectTREIngresser,
+	ProjectTREEgresser,
+	ProjectTREEgressRequester,
+	ProjectTREEgressChecker,
+}
+
 type ProjectTRERoleBinding struct {
 	ModelAuditable
 	ProjectTREID uuid.UUID          `gorm:"not null;index"`

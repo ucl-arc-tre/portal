@@ -89,6 +89,15 @@ func (s *Service) validateProjectNameUniqueness(projectName string, isUpdate boo
 	return nil, nil
 }
 
+func isValidProjectTRERole(role openapi.ProjectTRERoleName) bool {
+	for _, validRole := range types.AllProjectTRERoles {
+		if string(validRole) == string(role) {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*openapi.ValidationError, error) {
 	errorMessage := ""
 	for _, member := range members {
@@ -112,6 +121,12 @@ func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*o
 		}
 		if !isApprovedResearcher {
 			errorMessage += fmt.Sprintf("• User '%s' does not have the approved researcher role\n\n", member.Username)
+		}
+
+		for _, role := range member.Roles {
+			if !isValidProjectTRERole(role) {
+				errorMessage += fmt.Sprintf("• User '%s' has invalid role '%s'\n\n", member.Username, role)
+			}
 		}
 	}
 	if errorMessage == "" {
