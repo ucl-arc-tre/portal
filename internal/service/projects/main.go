@@ -167,7 +167,7 @@ func (s *Service) createProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UU
 		// Get user from database
 		user, err := s.users.PersistedUser(types.Username(member.Username))
 		if err != nil {
-			return types.NewErrServerError(fmt.Errorf("failed to get user %s: %w", member.Username, err))
+			return err
 		}
 
 		// Create a role binding for each role assigned to this member
