@@ -220,7 +220,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	projectTRE := types.ProjectTRE{
 		ProjectID:                     project.ID,
 		EnvironmentID:                 treEnvironment.ID,
-		EgressNumberRequiredApprovals: 1, // TODO: discuss with team if this should be configurable
+		EgressNumberRequiredApprovals: 2, // TODO: this needs follow up UI/UX and backend validation work, need to discuss with the team
 	}
 
 	if err := tx.Create(&projectTRE).Error; err != nil {
