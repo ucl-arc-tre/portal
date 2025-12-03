@@ -48,6 +48,9 @@ COPY web/package-lock.json web/package.json \
 ARG NEXT_PUBLIC_AGREEMENT_TIMER=180 # Seconds required before agreements can be agreed to
 ENV NEXT_PUBLIC_AGREEMENT_TIMER=$NEXT_PUBLIC_AGREEMENT_TIMER
 
+ARG NEXT_PUBLIC_ENABLE_PROJECTS=true # Enable projects feature
+ENV NEXT_PUBLIC_ENABLE_PROJECTS=$NEXT_PUBLIC_ENABLE_PROJECTS
+
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
   npm run build
