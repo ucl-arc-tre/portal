@@ -15,7 +15,7 @@ export type StudyFormData = {
   cagReference: string | undefined | null;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
-  dataProtectionId: number;
+  dataProtectionId: string;
   dataProtectionNumber: string | undefined | null;
   nhsEnglandReference: number | undefined | null;
   irasId: string | undefined | null;
@@ -41,14 +41,6 @@ type StudyProps = {
   setStudyFormOpen: (name: boolean) => void;
   fetchStudyData: (id?: string) => void;
   editingStudy?: Study | null;
-};
-
-const formatdataProtectionId = (id: number): string => {
-  if (id < 10) {
-    return `0${id}`;
-  } else {
-    return `${id}`;
-  }
 };
 
 const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
@@ -79,7 +71,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${formatdataProtectionId(data.dataProtectionId)}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
@@ -246,7 +238,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         cagReference: study.cag_reference,
         dataProtectionPrefix: study.data_protection_number?.split("/")[0],
         dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
-        dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
+        dataProtectionId: study.data_protection_number?.split("/")[3],
         dataProtectionNumber: study.data_protection_number,
         nhsEnglandReference: Number(study.nhs_england_reference),
         irasId: study.iras_id,
