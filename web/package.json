@@ -14,7 +14,7 @@
     "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
   },
   "dependencies": {
-    "next": "16.0.6",
+    "next": "16.0.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.67.0",
