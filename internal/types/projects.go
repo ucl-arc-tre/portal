@@ -6,14 +6,15 @@ import (
 
 type Project struct {
 	ModelAuditable
-	Name          string    `gorm:"not null"`
-	CreatorUserID uuid.UUID `gorm:"not null;index"`
-	StudyID       uuid.UUID `gorm:"index"`
-	IsDraft       bool      `gorm:"not null;default:false"`
+	Name           string    `gorm:"not null"`
+	CreatorUserID  uuid.UUID `gorm:"not null;index"`
+	StudyID        uuid.UUID `gorm:"index"`
+	ApprovalStatus string    `gorm:"not null"`
 
 	// Relationships
-	Study       Study `gorm:"foreignKey:StudyID"`
-	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
+	Study         Study          `gorm:"foreignKey:StudyID"`
+	CreatorUser   User           `gorm:"foreignKey:CreatorUserID"`
+	ProjectAssets []ProjectAsset `gorm:"foreignKey:ProjectID"`
 }
 
 type ProjectTRE struct {
@@ -38,6 +39,14 @@ const (
 	ProjectTREEgressChecker   ProjectTRERoleName = "egress_checker"   // can approve egress requests
 )
 
+var AllProjectTRERoles = []ProjectTRERoleName{
+	ProjectTREDesktopUser,
+	ProjectTREIngresser,
+	ProjectTREEgresser,
+	ProjectTREEgressRequester,
+	ProjectTREEgressChecker,
+}
+
 type ProjectTRERoleBinding struct {
 	ModelAuditable
 	ProjectTREID uuid.UUID          `gorm:"not null;index"`
@@ -47,4 +56,14 @@ type ProjectTRERoleBinding struct {
 	// Relationships
 	ProjectTRE ProjectTRE `gorm:"foreignKey:ProjectTREID"`
 	User       User       `gorm:"foreignKey:UserID"`
+}
+
+type ProjectAsset struct {
+	ModelAuditable
+	ProjectID uuid.UUID `gorm:"not null;index"`
+	AssetID   uuid.UUID `gorm:"not null;index"`
+
+	// Relationships
+	Project Project `gorm:"foreignKey:ProjectID"`
+	Asset   Asset   `gorm:"foreignKey:AssetID"`
 }

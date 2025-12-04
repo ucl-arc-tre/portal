@@ -323,17 +323,17 @@ export type Study = StudyBase & {
      * Time in RFC3339 format when the study was last updated
      */
     updated_at: string;
-    approval_status: StudyApprovalStatus;
+    approval_status: ApprovalStatus;
     feedback?: string;
 };
 
 /**
- * Current approval status of the study
+ * Current approval status (used for studies, projects, etc.)
  */
-export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
 export type StudyReview = {
-    status: StudyApprovalStatus;
+    status: ApprovalStatus;
     /**
      * Feedback for the study
      */
@@ -360,17 +360,17 @@ export type ProjectTreRequest = {
      */
     study_id: string;
     /**
-     * Whether this project should be saved as a draft (true) or created as active (false)
+     * Whether this is a draft submission (true) or final submission (false)
      */
-    is_draft?: boolean;
+    is_draft: boolean;
     /**
-     * Optional list of asset identifiers to link to this project
+     * List of asset identifiers to link to this project (can be empty)
      */
-    asset_ids?: Array<string>;
+    asset_ids: Array<string>;
     /**
-     * Optional list of project members with their roles
+     * List of project members with their roles (can be empty)
      */
-    members?: Array<ProjectTreMember>;
+    members: Array<ProjectTreMember>;
 };
 
 /**
@@ -427,6 +427,7 @@ export type ProjectTre = {
      * Username of the user who created the project
      */
     creator_username: string;
+    approval_status: ApprovalStatus;
     /**
      * Time in RFC3339 format when the project was created
      */
@@ -884,7 +885,7 @@ export type GetStudiesData = {
         /**
          * get studies by status
          */
-        status?: StudyApprovalStatus;
+        status?: ApprovalStatus;
     };
     url: '/studies';
 };

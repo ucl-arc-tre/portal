@@ -138,6 +138,8 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO: assign a study admin role to each study admin user?
 	if _, err := rbac.AddStudyOwnerRole(owner, study.ID); err != nil {
 		return nil, err
 	}

@@ -35,6 +35,7 @@ services:
       target: web-frontend-release
       args:
         NEXT_PUBLIC_AGREEMENT_TIMER: 1
+        NEXT_PUBLIC_ENABLE_PROJECTS: true
     environment:
       PORT: "8080"
       IS_TESTING: true
