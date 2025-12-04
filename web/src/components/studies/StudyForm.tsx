@@ -728,17 +728,14 @@ export default function StudyForm(StudyProps: StudyProps) {
                   control={control}
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
-                    min: {
-                      value: 1,
-                      message: "Cannot be a negative number",
-                    },
-                    max: {
-                      value: 999,
-                      message: "Cannot be more than 3 digits",
+                    pattern: {
+                      value: /^(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$/,
+                      message:
+                        "Must be 2 or 3 digits. Values below 10 should be prefixed with a 0. Values above must not have a 0 prefix.",
                     },
                   }}
                   render={({ field }) => (
-                    <input {...field} type="number" id="dataProtectionId" placeholder="eg 123" value={field.value} />
+                    <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
                   )}
                 />
               </div>
