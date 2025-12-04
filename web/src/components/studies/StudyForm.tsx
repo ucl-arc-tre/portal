@@ -15,7 +15,7 @@ export type StudyFormData = {
   cagReference: string | undefined | null;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
-  dataProtectionId: number;
+  dataProtectionId: string;
   dataProtectionNumber: string | undefined | null;
   nhsEnglandReference: number | undefined | null;
   irasId: string | undefined | null;
@@ -71,7 +71,7 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
       data.dataProtectionPrefix &&
       data.dataProtectionDate &&
       data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate}/${data.dataProtectionId}`
+        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
@@ -216,6 +216,8 @@ export default function StudyForm(StudyProps: StudyProps) {
   useEffect(() => {
     if (controllerValue?.toLowerCase() === "ucl") {
       setValue("dataProtectionPrefix", UclDpoId);
+    } else if (editingStudy && editingStudy.data_protection_number) {
+      setValue("dataProtectionPrefix", editingStudy.data_protection_number.split("/")[0]);
     } else {
       setValue("dataProtectionPrefix", "");
     }
@@ -235,8 +237,8 @@ export default function StudyForm(StudyProps: StudyProps) {
         dataControllerOrganisation: study.data_controller_organisation,
         cagReference: study.cag_reference,
         dataProtectionPrefix: study.data_protection_number?.split("/")[0],
-        dataProtectionDate: study.data_protection_number?.split("/")[1],
-        dataProtectionId: Number(study.data_protection_number?.split("/")[2]),
+        dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
+        dataProtectionId: study.data_protection_number?.split("/")[3],
         dataProtectionNumber: study.data_protection_number,
         nhsEnglandReference: Number(study.nhs_england_reference),
         irasId: study.iras_id,
@@ -615,7 +617,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                   </a>{" "}
                   (if applicable)
                   <input
-                    type="number"
+                    type="text"
                     id="nhsEnglandRef"
                     {...register("nhsEnglandReference")}
                     className={styles["option__text-input"]}
@@ -718,17 +720,14 @@ export default function StudyForm(StudyProps: StudyProps) {
                   control={control}
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
-                    min: {
-                      value: 0,
-                      message: "Cannot be a negative number",
-                    },
-                    max: {
-                      value: 999,
-                      message: "Cannot be more than 3 digits",
+                    pattern: {
+                      value: /^(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$/,
+                      message:
+                        "Must be 2 or 3 digits. Values below 10 should be prefixed with a 0. Values above must not have a 0 prefix.",
                     },
                   }}
                   render={({ field }) => (
-                    <input {...field} type="number" id="dataProtectionId" placeholder="eg 123" value={field.value} />
+                    <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
                   )}
                 />
               </div>

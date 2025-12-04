@@ -21,7 +21,8 @@ import (
 )
 
 var (
-	titlePattern = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
+	titlePattern                = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
+	dataProtectionNumberPattern = regexp.MustCompile(`^\w+\/\d{4}\/\d{2}\/(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$`)
 )
 
 type Service struct {
@@ -89,8 +90,11 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 	}
 
 	if studyData.IsDataProtectionOfficeRegistered != nil && *studyData.IsDataProtectionOfficeRegistered {
-		if studyData.DataProtectionNumber == nil || strings.TrimSpace(*studyData.DataProtectionNumber) == "" {
+		if studyData.DataProtectionNumber == nil {
 			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
+		}
+		if !dataProtectionNumberPattern.MatchString(*studyData.DataProtectionNumber) {
+			return &openapi.ValidationError{ErrorMessage: "data protection ID invalid format"}, nil
 		}
 	}
 
