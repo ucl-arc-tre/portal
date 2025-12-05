@@ -50,7 +50,7 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 	return roleAdded, types.NewErrServerError(err)
 }
 
-// todo
+// Add a child role to a parent role
 func AddChildRole(parentRole RoleName, childRole RoleName) (bool, error) {
 	roleAdded, err := enforcer.AddRoleForUser(string(parentRole), string(childRole))
 	return roleAdded, types.NewErrServerError(err)
