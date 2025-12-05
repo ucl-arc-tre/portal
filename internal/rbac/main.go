@@ -2,6 +2,7 @@ package rbac
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
@@ -49,6 +50,12 @@ func AddRole(user types.User, role RoleName) (bool, error) {
 	return roleAdded, types.NewErrServerError(err)
 }
 
+// todo
+func AddChildRole(parentRole RoleName, childRole RoleName) (bool, error) {
+	roleAdded, err := enforcer.AddRoleForUser(string(parentRole), string(childRole))
+	return roleAdded, types.NewErrServerError(err)
+}
+
 // Add a study role for a user
 func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	roleName := makeStudyOwnerRole(studyId).RoleName()
@@ -90,8 +97,9 @@ func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID
 	return studyIDs, nil
 }
 
-// Add a project TRE owner role for a user
-func AddProjectTreOwnerRole(user types.User, projectId uuid.UUID) (bool, error) {
+// Add a project TRE owner role and add the role binding to
+// the parent study role so study owners inherit a project owner role
+func AddProjectTreOwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
 	roleName := makeProjectOwnerRole(projectId).RoleName()
 	policy := Policy{
 		RoleName: roleName,
@@ -101,7 +109,8 @@ func AddProjectTreOwnerRole(user types.User, projectId uuid.UUID) (bool, error) 
 	if _, err := addPolicy(enforcer, policy); err != nil {
 		return false, err
 	}
-	return AddRole(user, roleName)
+	studyRole := StudyRole{StudyID: studyId, Name: StudyOwner}
+	return AddChildRole(studyRole.RoleName(), roleName)
 }
 
 // Project IDs where a user has a role
@@ -130,7 +139,7 @@ func RemoveRole(user types.User, role RoleName) (bool, error) {
 
 // Get all roles of a user
 func Roles(user types.User) ([]RoleName, error) {
-	rawRoles, err := enforcer.GetRolesForUser(user.ID.String())
+	rawRoles, err := enforcer.GetImplicitRolesForUser(user.ID.String())
 	if err != nil {
 		return []RoleName{}, err
 	}
@@ -143,8 +152,11 @@ func Roles(user types.User) ([]RoleName, error) {
 
 // Does the user have a role?
 func HasRole(user types.User, role RoleName) (bool, error) {
-	hasRole, err := enforcer.HasRoleForUser(user.ID.String(), string(role))
-	return hasRole, types.NewErrServerError(err)
+	roles, err := Roles(user)
+	if err != nil {
+		return false, err
+	}
+	return slices.Contains(roles, role), nil
 }
 
 func userIdsWithRole(role RoleName) ([]uuid.UUID, error) {
