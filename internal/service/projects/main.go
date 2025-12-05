@@ -253,12 +253,13 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return err
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit create project transaction")
+	if _, err := rbac.AddProjectTreOwnerRole(studyUUID, project.ID); err != nil {
+		tx.Rollback()
+		return err
 	}
 
-	if _, err := rbac.AddProjectTreOwnerRole(creator, project.ID); err != nil {
-		return err
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit create project transaction")
 	}
 
 	return nil
