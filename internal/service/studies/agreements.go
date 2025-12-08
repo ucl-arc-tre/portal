@@ -2,8 +2,6 @@ package studies
 
 import (
 	"github.com/google/uuid"
-	"github.com/ucl-arc-tre/portal/internal/config"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -19,21 +17,18 @@ func (s *Service) ConfirmStudyAgreement(user types.User, studyID uuid.UUID, agre
 }
 
 // returns all agreement signatures for a specific study and user
-func (s *Service) GetStudyAgreementSignatures(user types.User, studyID uuid.UUID) ([]openapi.ConfirmedAgreement, error) {
+func (s *Service) GetStudyAgreementSignatureUsernames(studyID uuid.UUID) ([]types.Username, error) {
 	studySignatures := []types.StudyAgreementSignature{}
-	result := s.db.Where("user_id = ? AND study_id = ?", user.ID, studyID).Find(&studySignatures)
+	result := s.db.Preload("User").Where("study_id = ?", studyID).Find(&studySignatures)
 
 	if result.Error != nil {
 		return nil, types.NewErrFromGorm(result.Error)
 	}
 
-	signatures := []openapi.ConfirmedAgreement{}
+	usernames := []types.Username{}
 	for _, signature := range studySignatures {
-		signatures = append(signatures, openapi.ConfirmedAgreement{
-			AgreementType: openapi.AgreementTypeStudyOwner,
-			ConfirmedAt:   signature.CreatedAt.Format(config.TimeFormat),
-		})
+		usernames = append(usernames, signature.User.Username)
 	}
 
-	return signatures, nil
+	return usernames, nil
 }

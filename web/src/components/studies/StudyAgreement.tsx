@@ -23,7 +23,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { refreshAuth } = useAuth();
+  const { refreshAuth, userData } = useAuth();
 
   useEffect(() => {
     const fetchStudyAgreementData = async () => {
@@ -42,8 +42,8 @@ export default function StudyAgreement(props: StudyAgreementProps) {
         // Check if the user has already accepted the study agreement
         const studyAgreementsResult = await getStudiesByStudyIdAgreements({ path: { studyId } });
         if (studyAgreementsResult.response.status == 200 && studyAgreementsResult.data) {
-          const confirmedAgreements = studyAgreementsResult.data.confirmed_agreements;
-          const isConfirmed = confirmedAgreements.some((agreement) => agreement.agreement_type == "study-owner");
+          const confirmedAgreements = studyAgreementsResult.data.usernames;
+          const isConfirmed = userData?.username && confirmedAgreements.includes(userData?.username);
 
           if (isConfirmed) {
             setAgreementCompleted(true);
@@ -61,7 +61,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
     };
 
     fetchStudyAgreementData();
-  }, [studyId, setAgreementCompleted]);
+  }, [studyId, setAgreementCompleted, userData]);
 
   if (isLoading) return null;
 
@@ -92,7 +92,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
       <h2 className="subtitle">Study Owner Agreement for study: {studyTitle}</h2>
 
       {error && (
-        <div className={styles["error-message"]}>
+        <div className={"error-message"}>
           <strong>Error:</strong> {error}
         </div>
       )}

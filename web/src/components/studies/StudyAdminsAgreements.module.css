@@ -1,0 +1,16 @@
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+}
+
+.bullet {
+  padding: 0.4rem;
+  margin-left: 1rem;
+}
+
+.description {
+  padding-bottom: 1rem;
+}

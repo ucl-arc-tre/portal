@@ -615,6 +615,12 @@ type Study struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+// StudyAgreements defines model for StudyAgreements.
+type StudyAgreements struct {
+	// Usernames Usernames of those that have agreed to the study agreement
+	Usernames []string `json:"usernames"`
+}
+
 // StudyBase Base study properties
 type StudyBase struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
