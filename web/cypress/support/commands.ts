@@ -659,7 +659,7 @@ Cypress.Commands.add("mockContractEdit", () => {
 
 // Project fixture commands
 Cypress.Commands.add("mockProjectsEmpty", () => {
-  cy.intercept("GET", "/web/api/v0/projects/tre", {
+  cy.intercept("GET", "/web/api/v0/projects", {
     fixture: "projects-empty.json",
   }).as("getProjectsEmpty");
 });
