@@ -24,6 +24,25 @@ func projectToOpenApi(project types.Project) openapi.ProjectTRE {
 	}
 }
 
+func (h *Handler) projectsAdmin() ([]types.Project, error) {
+	return h.projects.AllProjectsTre()
+}
+
+func (h *Handler) projectsProjectOwner(user types.User) ([]types.Project, error) {
+	// Get project IDs where user has owner role (includes inherited via study ownership)
+	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
+	if err != nil {
+		return []types.Project{}, err
+	}
+
+	projects, err := h.projects.ProjectsById(projectIds...)
+	if err != nil {
+		return []types.Project{}, err
+	}
+
+	return projects, nil
+}
+
 func (h *Handler) GetProjectsTre(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
@@ -44,10 +63,10 @@ func (h *Handler) GetProjectsTre(ctx *gin.Context) {
 
 	if isAdmin || isTreOpsStaff {
 		// Admin & TRE ops staff: fetch ALL projects
-		projects, err = h.projects.AllProjectsTre()
+		projects, err = h.projectsAdmin()
 	} else {
 		// Regular user: fetch only projects they own (via RBAC)
-		projects, err = h.projects.ProjectsTre(user)
+		projects, err = h.projectsProjectOwner(user)
 	}
 
 	if err != nil {
