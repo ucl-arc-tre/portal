@@ -36,6 +36,7 @@ export default function ProjectCardsList(props: Props) {
 
               <div className={styles["project-info"]}>
                 <h3 className={styles["project-title"]}>{project.name}</h3>
+                <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
                 <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
               </div>
 

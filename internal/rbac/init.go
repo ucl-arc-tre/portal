@@ -49,6 +49,7 @@ func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 		{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
 		{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
+		{RoleName: ApprovedResearcher, Resource: "/projects", Action: ReadAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: ReadAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: WriteAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/environments", Action: ReadAction},

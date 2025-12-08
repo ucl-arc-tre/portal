@@ -472,6 +472,33 @@ type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// Project A project with base details (environment-agnostic)
+type Project struct {
+	// ApprovalStatus Current approval status (used for studies, projects, etc.)
+	ApprovalStatus ApprovalStatus `json:"approval_status"`
+
+	// CreatedAt Time in RFC3339 format when the project was created
+	CreatedAt string `json:"created_at"`
+
+	// CreatorUsername Username of the user who created the project
+	CreatorUsername string `json:"creator_username"`
+
+	// EnvironmentName Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+	EnvironmentName string `json:"environment_name"`
+
+	// Id Unique identifier for the project
+	Id string `json:"id"`
+
+	// Name Name of the project
+	Name string `json:"name"`
+
+	// StudyId Unique identifier of the study to which the project belongs
+	StudyId string `json:"study_id"`
+
+	// UpdatedAt Time in RFC3339 format when the project was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
 // ProjectTRE A TRE project with base project details joined in
 type ProjectTRE struct {
 	// ApprovalStatus Current approval status (used for studies, projects, etc.)
@@ -482,6 +509,9 @@ type ProjectTRE struct {
 
 	// CreatorUsername Username of the user who created the project
 	CreatorUsername string `json:"creator_username"`
+
+	// EnvironmentName Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+	EnvironmentName string `json:"environment_name"`
 
 	// Id Unique identifier for the base project
 	Id string `json:"id"`
@@ -849,6 +879,9 @@ type ServerInterface interface {
 	// (POST /profile/training)
 	PostProfileTraining(c *gin.Context)
 
+	// (GET /projects)
+	GetProjects(c *gin.Context)
+
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
 
@@ -1067,6 +1100,19 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfileTraining(c)
+}
+
+// GetProjects operation middleware
+func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjects(c)
 }
 
 // GetProjectsTre operation middleware
@@ -1677,6 +1723,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
+	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)
 	router.GET(options.BaseURL+"/projects/tre", wrapper.GetProjectsTre)
 	router.POST(options.BaseURL+"/projects/tre", wrapper.PostProjectsTre)
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)

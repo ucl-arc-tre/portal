@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Auth, Study, getProjectsTre, getStudies } from "@/openapi";
+import { Auth, Study, getProjects, getStudies } from "@/openapi";
 import { AnyProject } from "@/types/projects";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
@@ -27,7 +27,7 @@ export default function Projects({ userData }: Props) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [projectsResponse, studiesResponse] = await Promise.all([getProjectsTre(), getStudies()]);
+      const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
 
       if (projectsResponse.response.ok && projectsResponse.data) {
         setProjects(projectsResponse.data);
