@@ -202,18 +202,18 @@
       font-size: 1rem;
     }
   }
+}
 
-  .nhse-ref {
-    display: flex;
-    flex-direction: row;
-    text-wrap: nowrap;
-    align-items: center;
-    color: var(--text--secondary);
-    margin-inline: 0.5rem;
+.nhse-ref {
+  display: flex;
+  flex-direction: row;
+  text-wrap: nowrap;
+  align-items: center;
+  color: var(--text--secondary);
+  margin-inline: 0.5rem;
 
-    .option__text-input {
-      max-width: 50%;
-    }
+  .option__text-input {
+    max-width: 50%;
   }
 }
 
