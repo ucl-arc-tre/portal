@@ -60,7 +60,9 @@ const convertStudyFormDataToApiRequest = (data: StudyFormData) => {
     is_nhs_associated: data.isNhsAssociated !== undefined ? data.isNhsAssociated : undefined,
     involves_nhs_england: data.involvesNhsEngland !== undefined ? data.involvesNhsEngland : undefined,
     nhs_england_reference:
-      data.involvesNhsEngland && data.nhsEnglandReference ? `DARS-NIC-${data.nhsEnglandReference}` : undefined,
+      data.involvesNhsEngland && data.nhsEnglandReference
+        ? `${data.nhsEnglandReference.includes("DARS-NIC-") ? data.nhsEnglandReference : `DARS-NIC-${data.nhsEnglandReference}`}`
+        : undefined,
     involves_mnca: data.involvesMnca !== undefined ? data.involvesMnca : undefined,
     requires_dspt: data.requiresDspt !== undefined ? data.requiresDspt : undefined,
     requires_dbs: data.requiresDbs !== undefined ? data.requiresDbs : undefined,
