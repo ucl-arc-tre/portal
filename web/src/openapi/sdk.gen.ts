@@ -21,129 +21,89 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * Authentication and authorization status of the user
  */
-export const getAuth = <ThrowOnError extends boolean = false>(options?: Options<GetAuthData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetAuthResponses, GetAuthErrors, ThrowOnError>({
-        url: '/auth',
-        ...options
-    });
-};
+export const getAuth = <ThrowOnError extends boolean = false>(options?: Options<GetAuthData, ThrowOnError>) => (options?.client ?? client).get<GetAuthResponses, GetAuthErrors, ThrowOnError>({ url: '/auth', ...options });
 
 /**
  * Users profile
  */
-export const getProfile = <ThrowOnError extends boolean = false>(options?: Options<GetProfileData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetProfileResponses, GetProfileErrors, ThrowOnError>({
-        url: '/profile',
-        ...options
-    });
-};
+export const getProfile = <ThrowOnError extends boolean = false>(options?: Options<GetProfileData, ThrowOnError>) => (options?.client ?? client).get<GetProfileResponses, GetProfileErrors, ThrowOnError>({ url: '/profile', ...options });
 
 /**
  * Update own profile chosen name
  */
-export const postProfile = <ThrowOnError extends boolean = false>(options: Options<PostProfileData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostProfileResponses, PostProfileErrors, ThrowOnError>({
-        url: '/profile',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postProfile = <ThrowOnError extends boolean = false>(options: Options<PostProfileData, ThrowOnError>) => (options.client ?? client).post<PostProfileResponses, PostProfileErrors, ThrowOnError>({
+    url: '/profile',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get all the agreements a user has agreed to
  */
-export const getProfileAgreements = <ThrowOnError extends boolean = false>(options?: Options<GetProfileAgreementsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetProfileAgreementsResponses, GetProfileAgreementsErrors, ThrowOnError>({
-        url: '/profile/agreements',
-        ...options
-    });
-};
+export const getProfileAgreements = <ThrowOnError extends boolean = false>(options?: Options<GetProfileAgreementsData, ThrowOnError>) => (options?.client ?? client).get<GetProfileAgreementsResponses, GetProfileAgreementsErrors, ThrowOnError>({ url: '/profile/agreements', ...options });
 
 /**
  * Update the agreements for a user
  */
-export const postProfileAgreements = <ThrowOnError extends boolean = false>(options: Options<PostProfileAgreementsData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostProfileAgreementsResponses, PostProfileAgreementsErrors, ThrowOnError>({
-        url: '/profile/agreements',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postProfileAgreements = <ThrowOnError extends boolean = false>(options: Options<PostProfileAgreementsData, ThrowOnError>) => (options.client ?? client).post<PostProfileAgreementsResponses, PostProfileAgreementsErrors, ThrowOnError>({
+    url: '/profile/agreements',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get the training record status for a user
  */
-export const getProfileTraining = <ThrowOnError extends boolean = false>(options?: Options<GetProfileTrainingData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetProfileTrainingResponses, GetProfileTrainingErrors, ThrowOnError>({
-        url: '/profile/training',
-        ...options
-    });
-};
+export const getProfileTraining = <ThrowOnError extends boolean = false>(options?: Options<GetProfileTrainingData, ThrowOnError>) => (options?.client ?? client).get<GetProfileTrainingResponses, GetProfileTrainingErrors, ThrowOnError>({ url: '/profile/training', ...options });
 
 /**
  * Update the training record for a user
  */
-export const postProfileTraining = <ThrowOnError extends boolean = false>(options: Options<PostProfileTrainingData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostProfileTrainingResponses, PostProfileTrainingErrors, ThrowOnError>({
-        url: '/profile/training',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postProfileTraining = <ThrowOnError extends boolean = false>(options: Options<PostProfileTrainingData, ThrowOnError>) => (options.client ?? client).post<PostProfileTrainingResponses, PostProfileTrainingErrors, ThrowOnError>({
+    url: '/profile/training',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get the latest approved researcher agreement
  */
-export const getAgreementsByAgreementType = <ThrowOnError extends boolean = false>(options: Options<GetAgreementsByAgreementTypeData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetAgreementsByAgreementTypeResponses, GetAgreementsByAgreementTypeErrors, ThrowOnError>({
-        url: '/agreements/{agreementType}',
-        ...options
-    });
-};
+export const getAgreementsByAgreementType = <ThrowOnError extends boolean = false>(options: Options<GetAgreementsByAgreementTypeData, ThrowOnError>) => (options.client ?? client).get<GetAgreementsByAgreementTypeResponses, GetAgreementsByAgreementTypeErrors, ThrowOnError>({ url: '/agreements/{agreementType}', ...options });
 
 /**
  * Get all the users a user has access to view
  */
-export const getUsers = <ThrowOnError extends boolean = false>(options: Options<GetUsersData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetUsersResponses, GetUsersErrors, ThrowOnError>({
-        url: '/users',
-        ...options
-    });
-};
+export const getUsers = <ThrowOnError extends boolean = false>(options: Options<GetUsersData, ThrowOnError>) => (options.client ?? client).get<GetUsersResponses, GetUsersErrors, ThrowOnError>({ url: '/users', ...options });
 
-export const postUsersByUserIdTraining = <ThrowOnError extends boolean = false>(options: Options<PostUsersByUserIdTrainingData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostUsersByUserIdTrainingResponses, PostUsersByUserIdTrainingErrors, ThrowOnError>({
-        url: '/users/{userId}/training',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postUsersByUserIdTraining = <ThrowOnError extends boolean = false>(options: Options<PostUsersByUserIdTrainingData, ThrowOnError>) => (options.client ?? client).post<PostUsersByUserIdTrainingResponses, PostUsersByUserIdTrainingErrors, ThrowOnError>({
+    url: '/users/{userId}/training',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Update a user's attributes (admin only)
  */
-export const putUsersByUserIdAttributes = <ThrowOnError extends boolean = false>(options: Options<PutUsersByUserIdAttributesData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutUsersByUserIdAttributesResponses, PutUsersByUserIdAttributesErrors, ThrowOnError>({
-        url: '/users/{userId}/attributes',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const putUsersByUserIdAttributes = <ThrowOnError extends boolean = false>(options: Options<PutUsersByUserIdAttributesData, ThrowOnError>) => (options.client ?? client).put<PutUsersByUserIdAttributesResponses, PutUsersByUserIdAttributesErrors, ThrowOnError>({
+    url: '/users/{userId}/attributes',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Upload a CSV file with fields
@@ -152,259 +112,179 @@ export const putUsersByUserIdAttributes = <ThrowOnError extends boolean = false>
  * <NHSD training completed at date: string, e.g. 2021-03-11>
  *
  */
-export const postUsersApprovedResearchersImportCsv = <ThrowOnError extends boolean = false>(options: Options<PostUsersApprovedResearchersImportCsvData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostUsersApprovedResearchersImportCsvResponses, PostUsersApprovedResearchersImportCsvErrors, ThrowOnError>({
-        bodySerializer: null,
-        url: '/users/approved-researchers/import/csv',
-        ...options,
-        headers: {
-            'Content-Type': 'text/csv',
-            ...options.headers
-        }
-    });
-};
+export const postUsersApprovedResearchersImportCsv = <ThrowOnError extends boolean = false>(options: Options<PostUsersApprovedResearchersImportCsvData, ThrowOnError>) => (options.client ?? client).post<PostUsersApprovedResearchersImportCsvResponses, PostUsersApprovedResearchersImportCsvErrors, ThrowOnError>({
+    bodySerializer: null,
+    url: '/users/approved-researchers/import/csv',
+    ...options,
+    headers: {
+        'Content-Type': 'text/csv',
+        ...options.headers
+    }
+});
 
-export const postUsersInvite = <ThrowOnError extends boolean = false>(options: Options<PostUsersInviteData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostUsersInviteResponses, PostUsersInviteErrors, ThrowOnError>({
-        url: '/users/invite',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postUsersInvite = <ThrowOnError extends boolean = false>(options: Options<PostUsersInviteData, ThrowOnError>) => (options.client ?? client).post<PostUsersInviteResponses, PostUsersInviteErrors, ThrowOnError>({
+    url: '/users/invite',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get all studies accessible to the current user
  */
-export const getStudies = <ThrowOnError extends boolean = false>(options?: Options<GetStudiesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetStudiesResponses, GetStudiesErrors, ThrowOnError>({
-        url: '/studies',
-        ...options
-    });
-};
+export const getStudies = <ThrowOnError extends boolean = false>(options?: Options<GetStudiesData, ThrowOnError>) => (options?.client ?? client).get<GetStudiesResponses, GetStudiesErrors, ThrowOnError>({ url: '/studies', ...options });
 
 /**
  * Create a new study
  */
-export const postStudies = <ThrowOnError extends boolean = false>(options: Options<PostStudiesData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostStudiesResponses, PostStudiesErrors, ThrowOnError>({
-        url: '/studies',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postStudies = <ThrowOnError extends boolean = false>(options: Options<PostStudiesData, ThrowOnError>) => (options.client ?? client).post<PostStudiesResponses, PostStudiesErrors, ThrowOnError>({
+    url: '/studies',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get details of a specific study
  */
-export const getStudiesByStudyId = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetStudiesByStudyIdResponses, GetStudiesByStudyIdErrors, ThrowOnError>({
-        url: '/studies/{studyId}',
-        ...options
-    });
-};
+export const getStudiesByStudyId = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdData, ThrowOnError>) => (options.client ?? client).get<GetStudiesByStudyIdResponses, GetStudiesByStudyIdErrors, ThrowOnError>({ url: '/studies/{studyId}', ...options });
 
 /**
  * Update a specific study
  */
-export const putStudiesByStudyId = <ThrowOnError extends boolean = false>(options: Options<PutStudiesByStudyIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutStudiesByStudyIdResponses, PutStudiesByStudyIdErrors, ThrowOnError>({
-        url: '/studies/{studyId}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const putStudiesByStudyId = <ThrowOnError extends boolean = false>(options: Options<PutStudiesByStudyIdData, ThrowOnError>) => (options.client ?? client).put<PutStudiesByStudyIdResponses, PutStudiesByStudyIdErrors, ThrowOnError>({
+    url: '/studies/{studyId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Update study status + opportunity to update feedback
  */
-export const postStudiesAdminByStudyIdReview = <ThrowOnError extends boolean = false>(options: Options<PostStudiesAdminByStudyIdReviewData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostStudiesAdminByStudyIdReviewResponses, PostStudiesAdminByStudyIdReviewErrors, ThrowOnError>({
-        url: '/studies/admin/{studyId}/review',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postStudiesAdminByStudyIdReview = <ThrowOnError extends boolean = false>(options: Options<PostStudiesAdminByStudyIdReviewData, ThrowOnError>) => (options.client ?? client).post<PostStudiesAdminByStudyIdReviewResponses, PostStudiesAdminByStudyIdReviewErrors, ThrowOnError>({
+    url: '/studies/admin/{studyId}/review',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Update study status to pending
  */
-export const patchStudiesByStudyIdPending = <ThrowOnError extends boolean = false>(options: Options<PatchStudiesByStudyIdPendingData, ThrowOnError>) => {
-    return (options.client ?? client).patch<PatchStudiesByStudyIdPendingResponses, PatchStudiesByStudyIdPendingErrors, ThrowOnError>({
-        url: '/studies/{studyId}/pending',
-        ...options
-    });
-};
+export const patchStudiesByStudyIdPending = <ThrowOnError extends boolean = false>(options: Options<PatchStudiesByStudyIdPendingData, ThrowOnError>) => (options.client ?? client).patch<PatchStudiesByStudyIdPendingResponses, PatchStudiesByStudyIdPendingErrors, ThrowOnError>({ url: '/studies/{studyId}/pending', ...options });
 
 /**
  * Get all available environments with their tier mappings
  */
-export const getEnvironments = <ThrowOnError extends boolean = false>(options?: Options<GetEnvironmentsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetEnvironmentsResponses, GetEnvironmentsErrors, ThrowOnError>({
-        url: '/environments',
-        ...options
-    });
-};
+export const getEnvironments = <ThrowOnError extends boolean = false>(options?: Options<GetEnvironmentsData, ThrowOnError>) => (options?.client ?? client).get<GetEnvironmentsResponses, GetEnvironmentsErrors, ThrowOnError>({ url: '/environments', ...options });
 
 /**
  * Get all TRE projects that a user has access to view
  */
-export const getProjectsTre = <ThrowOnError extends boolean = false>(options?: Options<GetProjectsTreData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetProjectsTreResponses, GetProjectsTreErrors, ThrowOnError>({
-        url: '/projects/tre',
-        ...options
-    });
-};
+export const getProjectsTre = <ThrowOnError extends boolean = false>(options?: Options<GetProjectsTreData, ThrowOnError>) => (options?.client ?? client).get<GetProjectsTreResponses, GetProjectsTreErrors, ThrowOnError>({ url: '/projects/tre', ...options });
 
 /**
  * Create a TRE project
  */
-export const postProjectsTre = <ThrowOnError extends boolean = false>(options: Options<PostProjectsTreData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostProjectsTreResponses, PostProjectsTreErrors, ThrowOnError>({
-        url: '/projects/tre',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postProjectsTre = <ThrowOnError extends boolean = false>(options: Options<PostProjectsTreData, ThrowOnError>) => (options.client ?? client).post<PostProjectsTreResponses, PostProjectsTreErrors, ThrowOnError>({
+    url: '/projects/tre',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get one TRE project with base project details joined in
  */
-export const getProjectsTreByProjectId = <ThrowOnError extends boolean = false>(options: Options<GetProjectsTreByProjectIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetProjectsTreByProjectIdResponses, GetProjectsTreByProjectIdErrors, ThrowOnError>({
-        url: '/projects/tre/{projectId}',
-        ...options
-    });
-};
+export const getProjectsTreByProjectId = <ThrowOnError extends boolean = false>(options: Options<GetProjectsTreByProjectIdData, ThrowOnError>) => (options.client ?? client).get<GetProjectsTreByProjectIdResponses, GetProjectsTreByProjectIdErrors, ThrowOnError>({ url: '/projects/tre/{projectId}', ...options });
 
 /**
  * Get all assets for a specific study
  */
-export const getStudiesByStudyIdAssets = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetStudiesByStudyIdAssetsResponses, GetStudiesByStudyIdAssetsErrors, ThrowOnError>({
-        url: '/studies/{studyId}/assets',
-        ...options
-    });
-};
+export const getStudiesByStudyIdAssets = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsData, ThrowOnError>) => (options.client ?? client).get<GetStudiesByStudyIdAssetsResponses, GetStudiesByStudyIdAssetsErrors, ThrowOnError>({ url: '/studies/{studyId}/assets', ...options });
 
 /**
  * Create a new asset for a specific study
  */
-export const postStudiesByStudyIdAssets = <ThrowOnError extends boolean = false>(options: Options<PostStudiesByStudyIdAssetsData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostStudiesByStudyIdAssetsResponses, PostStudiesByStudyIdAssetsErrors, ThrowOnError>({
-        url: '/studies/{studyId}/assets',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postStudiesByStudyIdAssets = <ThrowOnError extends boolean = false>(options: Options<PostStudiesByStudyIdAssetsData, ThrowOnError>) => (options.client ?? client).post<PostStudiesByStudyIdAssetsResponses, PostStudiesByStudyIdAssetsErrors, ThrowOnError>({
+    url: '/studies/{studyId}/assets',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get details of a specific asset within a study
  */
-export const getStudiesByStudyIdAssetsByAssetId = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsByAssetIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetStudiesByStudyIdAssetsByAssetIdResponses, GetStudiesByStudyIdAssetsByAssetIdErrors, ThrowOnError>({
-        url: '/studies/{studyId}/assets/{assetId}',
-        ...options
-    });
-};
+export const getStudiesByStudyIdAssetsByAssetId = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsByAssetIdData, ThrowOnError>) => (options.client ?? client).get<GetStudiesByStudyIdAssetsByAssetIdResponses, GetStudiesByStudyIdAssetsByAssetIdErrors, ThrowOnError>({ url: '/studies/{studyId}/assets/{assetId}', ...options });
 
 /**
  * Log the user out
  */
-export const getLogout = <ThrowOnError extends boolean = false>(options?: Options<GetLogoutData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetLogoutResponses, GetLogoutErrors, ThrowOnError>({
-        url: '/logout',
-        ...options
-    });
-};
+export const getLogout = <ThrowOnError extends boolean = false>(options?: Options<GetLogoutData, ThrowOnError>) => (options?.client ?? client).get<GetLogoutResponses, GetLogoutErrors, ThrowOnError>({ url: '/logout', ...options });
 
 /**
  * Get all agreements signed for a specific study
  */
-export const getStudiesByStudyIdAgreements = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAgreementsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetStudiesByStudyIdAgreementsResponses, GetStudiesByStudyIdAgreementsErrors, ThrowOnError>({
-        url: '/studies/{studyId}/agreements',
-        ...options
-    });
-};
+export const getStudiesByStudyIdAgreements = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAgreementsData, ThrowOnError>) => (options.client ?? client).get<GetStudiesByStudyIdAgreementsResponses, GetStudiesByStudyIdAgreementsErrors, ThrowOnError>({ url: '/studies/{studyId}/agreements', ...options });
 
 /**
  * Sign an agreement for a specific study
  */
-export const postStudiesByStudyIdAgreements = <ThrowOnError extends boolean = false>(options: Options<PostStudiesByStudyIdAgreementsData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostStudiesByStudyIdAgreementsResponses, PostStudiesByStudyIdAgreementsErrors, ThrowOnError>({
-        url: '/studies/{studyId}/agreements',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postStudiesByStudyIdAgreements = <ThrowOnError extends boolean = false>(options: Options<PostStudiesByStudyIdAgreementsData, ThrowOnError>) => (options.client ?? client).post<PostStudiesByStudyIdAgreementsResponses, PostStudiesByStudyIdAgreementsErrors, ThrowOnError>({
+    url: '/studies/{studyId}/agreements',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get all contracts for a specific asset
  */
-export const getStudiesByStudyIdAssetsByAssetIdContracts = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsByAssetIdContractsData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetStudiesByStudyIdAssetsByAssetIdContractsResponses, GetStudiesByStudyIdAssetsByAssetIdContractsErrors, ThrowOnError>({
-        url: '/studies/{studyId}/assets/{assetId}/contracts',
-        ...options
-    });
-};
+export const getStudiesByStudyIdAssetsByAssetIdContracts = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsByAssetIdContractsData, ThrowOnError>) => (options.client ?? client).get<GetStudiesByStudyIdAssetsByAssetIdContractsResponses, GetStudiesByStudyIdAssetsByAssetIdContractsErrors, ThrowOnError>({ url: '/studies/{studyId}/assets/{assetId}/contracts', ...options });
 
 /**
  * Upload a contract object e.g. PDF
  */
-export const postStudiesByStudyIdAssetsByAssetIdContractsUpload = <ThrowOnError extends boolean = false>(options: Options<PostStudiesByStudyIdAssetsByAssetIdContractsUploadData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses, PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors, ThrowOnError>({
-        ...formDataBodySerializer,
-        url: '/studies/{studyId}/assets/{assetId}/contracts/upload',
-        ...options,
-        headers: {
-            'Content-Type': null,
-            ...options.headers
-        }
-    });
-};
+export const postStudiesByStudyIdAssetsByAssetIdContractsUpload = <ThrowOnError extends boolean = false>(options: Options<PostStudiesByStudyIdAssetsByAssetIdContractsUploadData, ThrowOnError>) => (options.client ?? client).post<PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses, PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors, ThrowOnError>({
+    ...formDataBodySerializer,
+    url: '/studies/{studyId}/assets/{assetId}/contracts/upload',
+    ...options,
+    headers: {
+        'Content-Type': null,
+        ...options.headers
+    }
+});
 
 /**
  * Update contract metadata and optionally replace file
  */
-export const putStudiesByStudyIdAssetsByAssetIdContractsByContractId = <ThrowOnError extends boolean = false>(options: Options<PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors, ThrowOnError>({
-        ...formDataBodySerializer,
-        url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}',
-        ...options,
-        headers: {
-            'Content-Type': null,
-            ...options.headers
-        }
-    });
-};
+export const putStudiesByStudyIdAssetsByAssetIdContractsByContractId = <ThrowOnError extends boolean = false>(options: Options<PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData, ThrowOnError>) => (options.client ?? client).put<PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses, PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors, ThrowOnError>({
+    ...formDataBodySerializer,
+    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}',
+    ...options,
+    headers: {
+        'Content-Type': null,
+        ...options.headers
+    }
+});
 
 /**
  * Get a contract object e.g. PDF
  */
-export const getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors, ThrowOnError>({
-        url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/download',
-        ...options
-    });
-};
+export const getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload = <ThrowOnError extends boolean = false>(options: Options<GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData, ThrowOnError>) => (options.client ?? client).get<GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses, GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors, ThrowOnError>({ url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/download', ...options });
