@@ -453,7 +453,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                     />
                   </Label>
                   {/* disabling for editing until we get removal on backend implemented */}
-                  <Button type="button" onClick={() => remove(index)} size="small" disabled={Boolean(editingStudy)}>
+                  <Button type="button" onClick={() => remove(index)} size="small">
                     Remove
                   </Button>
                 </div>

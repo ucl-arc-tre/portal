@@ -144,7 +144,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 		return false, err
 	}
 
-	log.Debug().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
+	log.Trace().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
 
 	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
 		return false, types.NewNotFoundError("employee type unset")
