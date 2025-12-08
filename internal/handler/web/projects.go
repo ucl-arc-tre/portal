@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -18,8 +19,8 @@ func projectToOpenApi(project types.Project) openapi.ProjectTRE {
 		StudyId:         project.StudyID.String(),
 		CreatorUsername: string(project.CreatorUser.Username),
 		ApprovalStatus:  openapi.ApprovalStatus(project.ApprovalStatus),
-		CreatedAt:       project.CreatedAt.Format("2006-01-02T15:04:05Z07:00"), // RFC3339
-		UpdatedAt:       project.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"), // RFC3339
+		CreatedAt:       project.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:       project.UpdatedAt.Format(config.TimeFormat),
 	}
 }
 
