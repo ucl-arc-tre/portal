@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { Input, Alert, AlertMessage, Label, HelperText, Textarea } from "../shared/exports";
+import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/exports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
@@ -15,7 +15,7 @@ export type StudyFormData = {
   cagReference: string | undefined;
   dataProtectionPrefix: string;
   dataProtectionDate: string;
-  dataProtectionId: number;
+  dataProtectionId: string;
   dataProtectionNumber: string | undefined | null;
   nhsEnglandReference: string | undefined;
   irasId: string | undefined;
@@ -216,6 +216,8 @@ export default function StudyForm(StudyProps: StudyProps) {
   useEffect(() => {
     if (controllerValue?.toLowerCase() === "ucl") {
       setValue("dataProtectionPrefix", UclDpoId);
+    } else if (editingStudy && editingStudy.data_protection_number) {
+      setValue("dataProtectionPrefix", editingStudy.data_protection_number.split("/")[0]);
     } else {
       setValue("dataProtectionPrefix", "");
     }
@@ -236,7 +238,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         cagReference: study.cag_reference || "",
         dataProtectionPrefix: study.data_protection_number?.split("/")[0],
         dataProtectionDate: `${study.data_protection_number?.split("/")[1]}-${study.data_protection_number?.split("/")[2]}`,
-        dataProtectionId: Number(study.data_protection_number?.split("/")[3]),
+        dataProtectionId: study.data_protection_number?.split("/")[3],
         dataProtectionNumber: study.data_protection_number,
         nhsEnglandReference: study.nhs_england_reference?.split(/(?<=DARS-NIC-)(\d{6}-\d{5}-\d{2})/)[1] || "",
         irasId: study.iras_id || "",
@@ -338,7 +340,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         <div className={`${styles["step-dot"]} ${currentStep === 3 ? styles["active"] : ""}`}></div>
       </div>
 
-      <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      <form className="form" onSubmit={handleSubmit(onSubmit)}>
         {submitError && (
           <div className={styles["error-alert"]}>
             {submitError.split("\n").map((line, index) => (
@@ -351,7 +353,6 @@ export default function StudyForm(StudyProps: StudyProps) {
 
         {/* first step */}
         <fieldset className={getFieldsetClass(1)}>
-          <legend>Study Details</legend>
           <Label htmlFor="studyName">
             Study Name*:
             <Controller
@@ -390,7 +391,6 @@ export default function StudyForm(StudyProps: StudyProps) {
         </fieldset>
 
         <fieldset className={getFieldsetClass(1)}>
-          <legend>Ownership</legend>
           <Label htmlFor="owner">
             Study Owner (PI):
             <Input
@@ -415,7 +415,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
               {fields.map((field, index) => (
                 <div key={field.id} className={styles["admin-wrapper"]}>
-                  <Label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
+                  <Label htmlFor={`admin-${index}`} className={styles["admin-Label"]}>
                     Administrator {index + 1}:
                     <Controller
                       name={`additionalStudyAdminUsernames.${index}.value` as const}
@@ -499,11 +499,13 @@ export default function StudyForm(StudyProps: StudyProps) {
 
         {/* second step */}
         <fieldset className={getFieldsetClass(2)}>
-          <legend>Sponsorship & Approvals</legend>
           <div className={styles["option-field"]} data-cy="involvesUclSponsorship">
             <span>
               We will be seeking/have sought{" "}
-              <a href="https://www.ucl.ac.uk/joint-research-office/new-studies/sponsorship-and-grant-submissions">
+              <a
+                className={styles["form-link"]}
+                href="https://www.ucl.ac.uk/joint-research-office/new-studies/sponsorship-and-grant-submissions"
+              >
                 UCL sponsorship
               </a>{" "}
               of this research
@@ -520,7 +522,10 @@ export default function StudyForm(StudyProps: StudyProps) {
             <span>
               {" "}
               We will be seeking/have sought approval from the{" "}
-              <a href="https://www.hra.nhs.uk/about-us/committees-and-services/confidentiality-advisory-group/">
+              <a
+                className={styles["form-link"]}
+                href="https://www.hra.nhs.uk/about-us/committees-and-services/confidentiality-advisory-group/"
+              >
                 Confidentiality Advisory Group
               </a>{" "}
               for this research
@@ -579,7 +584,10 @@ export default function StudyForm(StudyProps: StudyProps) {
           <div className={styles["option-field"]} data-cy="involvesHraApproval">
             <span>
               We will be seeking/have sought{" "}
-              <a href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/">
+              <a
+                className={styles["form-link"]}
+                href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/"
+              >
                 Health Research Authority
               </a>{" "}
               approval of this research
@@ -596,7 +604,10 @@ export default function StudyForm(StudyProps: StudyProps) {
             <Label htmlFor="irasId">
               <span>
                 {" "}
-                <a href="https://www.gov.uk/guidance/clinical-trials-for-medicines-apply-for-approval-in-the-uk#:~:text=Integrated%20Research%20Application%20System%20(IRAS)">
+                <a
+                  className={styles["form-link"]}
+                  href="https://www.gov.uk/guidance/clinical-trials-for-medicines-apply-for-approval-in-the-uk#:~:text=Integrated%20Research%20Application%20System%20(IRAS)"
+                >
                   IRAS
                 </a>{" "}
                 ID (if applicable)
@@ -634,8 +645,6 @@ export default function StudyForm(StudyProps: StudyProps) {
         </fieldset>
 
         <fieldset className={getFieldsetClass(2)}>
-          <legend>NHS</legend>
-
           <div className={styles["option-field"]} data-cy="isNhsAssociated">
             This research is associated with the NHS, uses NHS data, works with NHS sites or has use of a/some NHS
             facilities
@@ -661,7 +670,10 @@ export default function StudyForm(StudyProps: StudyProps) {
               {showNhsEnglandRef === true && (
                 <Label htmlFor="nhsEnglandRef">
                   NHSE{" "}
-                  <a href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number.">
+                  <a
+                    className={styles["form-link"]}
+                    href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number."
+                  >
                     DARS NIC number
                   </a>{" "}
                   (if applicable)
@@ -701,7 +713,10 @@ export default function StudyForm(StudyProps: StudyProps) {
               <div className={styles["option-field"]} data-cy="involvesMnca">
                 <span>
                   The{" "}
-                  <a href="https://www.myresearchproject.org.uk/help/hlptemplatesfor.aspx">
+                  <a
+                    className={styles["form-link"]}
+                    href="https://www.myresearchproject.org.uk/help/hlptemplatesfor.aspx"
+                  >
                     HRA Model Non-Commercial Agreement
                   </a>{" "}
                   will be in place across all sites when working with NHS sites
@@ -730,8 +745,6 @@ export default function StudyForm(StudyProps: StudyProps) {
 
         {/* third step */}
         <fieldset className={getFieldsetClass(3)}>
-          <legend>Data</legend>
-
           <div className={styles["option-field"]} data-cy="requiresDbs">
             There is data related to this research only to be handled by staff who have obtained a Disclosure and
             Barring Service (DBS) check
@@ -793,16 +806,9 @@ export default function StudyForm(StudyProps: StudyProps) {
                   rules={{
                     required: showDataProtectionNumber ? "Registration number is required" : false,
                     pattern: {
-                      value: /^[1-9]\d{0,2}$/,
-                      message: "Must be a number between 1 and 3 digits",
-                    },
-                    minLength: {
-                      value: 1,
-                      message: "Must be at least 1 digit",
-                    },
-                    maxLength: {
-                      value: 3,
-                      message: "Cannot be more than 3 digits",
+                      value: /^(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$/,
+                      message:
+                        "Must be 2 or 3 digits. Values below 10 should be prefixed with a 0. Values above must not have a 0 prefix.",
                     },
                   }}
                   render={({ field }) => (
@@ -878,31 +884,32 @@ export default function StudyForm(StudyProps: StudyProps) {
           </Alert>
         )}
 
-        {currentStep > 1 && (
-          <Button
-            type="button"
-            variant="secondary"
-            size="small"
-            onClick={prevStep}
-            className={styles["button--back"]}
-            cy="back"
-          >
-            &larr; Back
-          </Button>
-        )}
+        <div className={styles["buttons-container"]}>
+          {currentStep > 1 && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              onClick={prevStep}
+              className={styles["button--back"]}
+              cy="back"
+            >
+              &larr; Back
+            </Button>
+          )}
 
-        {currentStep < totalSteps && (
-          <Button
-            type="button"
-            size="small"
-            onClick={() => nextStep()}
-            className={styles["button--continue"]}
-            cy="next"
-          >
-            Next &rarr;
-          </Button>
-        )}
-
+          {currentStep < totalSteps && (
+            <Button
+              type="button"
+              size="small"
+              onClick={() => nextStep()}
+              className={styles["button--continue"]}
+              cy="next"
+            >
+              Next &rarr;
+            </Button>
+          )}
+        </div>
         {currentStep === totalSteps && (
           <Button type="submit" disabled={isSubmitting}>
             {editingStudy && isSubmitting ? "Updating study..." : editingStudy && "Update Study"}

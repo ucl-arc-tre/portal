@@ -283,6 +283,24 @@ declare global {
       mockContractEdit(): Chainable<any>;
 
       /**
+       * Mock empty projects list
+       * @example cy.mockProjectsEmpty()
+       */
+      mockProjectsEmpty(): Chainable<any>;
+
+      /**
+       * Mock studies list with an approved study
+       * @example cy.mockStudiesWithApprovedStudy()
+       */
+      mockStudiesWithApprovedStudy(): Chainable<any>;
+
+      /**
+       * Mock environments list with TRE environment
+       * @example cy.mockEnvironmentsTre()
+       */
+      mockEnvironmentsTre(): Chainable<any>;
+
+      /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
        * @param selector - Optional selector to check specific element (defaults to entire page)
        * @example cy.checkAccessibility()
@@ -637,4 +655,23 @@ Cypress.Commands.add("mockContractEdit", () => {
   cy.intercept("PUT", "/web/api/v0/studies/*/assets/*/contracts/*", {
     statusCode: 204,
   }).as("editContract");
+});
+
+// Project fixture commands
+Cypress.Commands.add("mockProjectsEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/projects/tre", {
+    fixture: "projects-empty.json",
+  }).as("getProjectsEmpty");
+});
+
+Cypress.Commands.add("mockStudiesWithApprovedStudy", () => {
+  cy.intercept("GET", "/web/api/v0/studies", {
+    fixture: "studies-with-approved-study.json",
+  }).as("getStudiesWithApproved");
+});
+
+Cypress.Commands.add("mockEnvironmentsTre", () => {
+  cy.intercept("GET", "/web/api/v0/environments", {
+    fixture: "environments-tre.json",
+  }).as("getEnvironments");
 });

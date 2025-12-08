@@ -1,14 +1,14 @@
-import { StudyApprovalStatus } from "@/openapi";
+import { ApprovalStatus } from "@/openapi";
 import InfoTooltip from "./InfoTooltip";
 import styles from "./StudyStatusBadge.module.css";
 
 type BadgeProps = {
-  status: StudyApprovalStatus | undefined;
+  status: ApprovalStatus | undefined;
   isAdmin: boolean;
 };
 
 export default function StudyStatusBadge({ status, isAdmin }: BadgeProps) {
-  function getStatusDescription(status: StudyApprovalStatus | undefined): string {
+  function getStatusDescription(status: ApprovalStatus | undefined): string {
     switch (status) {
       case "Incomplete":
         if (isAdmin) {

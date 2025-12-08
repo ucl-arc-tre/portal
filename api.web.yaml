@@ -285,7 +285,7 @@ paths:
         - in: query
           name: status
           schema:
-            $ref: "#/components/schemas/StudyApprovalStatus"
+            $ref: "#/components/schemas/ApprovalStatus"
           required: false
           description: get studies by status
       responses:
@@ -1264,19 +1264,19 @@ components:
               type: string
               description: Time in RFC3339 format when the study was last updated
             approval_status:
-              $ref: "#/components/schemas/StudyApprovalStatus"
+              $ref: "#/components/schemas/ApprovalStatus"
             feedback:
               type: string
       description: A research study
 
-    StudyApprovalStatus:
+    ApprovalStatus:
       type: string
       enum:
         - Incomplete
         - Pending
         - Approved
         - Rejected
-      description: Current approval status of the study
+      description: Current approval status (used for studies, projects, etc.)
 
     StudyReview:
       type: object
@@ -1284,7 +1284,7 @@ components:
         - status
       properties:
         status:
-          $ref: "#/components/schemas/StudyApprovalStatus"
+          $ref: "#/components/schemas/ApprovalStatus"
         feedback:
           type: string
           description: Feedback for the study
@@ -1304,6 +1304,9 @@ components:
       required:
         - name
         - study_id
+        - is_draft
+        - asset_ids
+        - members
       properties:
         name:
           type: string
@@ -1313,16 +1316,16 @@ components:
           description: Unique identifier of the study to which the project belongs
         is_draft:
           type: boolean
-          description: Whether this project should be saved as a draft (true) or created as active (false)
+          description: Whether this is a draft submission (true) or final submission (false)
           default: false
         asset_ids:
           type: array
-          description: Optional list of asset identifiers to link to this project
+          description: List of asset identifiers to link to this project (can be empty)
           items:
             type: string
         members:
           type: array
-          description: Optional list of project members with their roles
+          description: List of project members with their roles (can be empty)
           items:
             $ref: "#/components/schemas/ProjectTREMember"
 
@@ -1378,6 +1381,7 @@ components:
         - name
         - study_id
         - creator_username
+        - approval_status
         - created_at
         - updated_at
       properties:
@@ -1393,6 +1397,8 @@ components:
         creator_username:
           type: string
           description: Username of the user who created the project
+        approval_status:
+          $ref: "#/components/schemas/ApprovalStatus"
         created_at:
           type: string
           description: Time in RFC3339 format when the project was created

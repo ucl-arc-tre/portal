@@ -1,5 +1,5 @@
 # ------------- DEV SECTION ----------------
-FROM golang:1.25.3-alpine AS builder
+FROM golang:1.25.4-alpine AS builder
 
 RUN adduser --uid 1000 --disabled-password user && \
     apk add -U --no-cache ca-certificates
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # -------------------------------------------
 # Whole repo should be mounted in under /repo
-FROM golang:1.25.3-alpine AS api-dev
+FROM golang:1.25.4-alpine AS api-dev
 
 RUN go install github.com/air-verse/air@latest
 
@@ -47,6 +47,9 @@ COPY web/package-lock.json web/package.json \
 
 ARG NEXT_PUBLIC_AGREEMENT_TIMER=180 # Seconds required before agreements can be agreed to
 ENV NEXT_PUBLIC_AGREEMENT_TIMER=$NEXT_PUBLIC_AGREEMENT_TIMER
+
+ARG NEXT_PUBLIC_ENABLE_PROJECTS=false # feature gate for projects
+ENV NEXT_PUBLIC_ENABLE_PROJECTS=$NEXT_PUBLIC_ENABLE_PROJECTS
 
 RUN --mount=type=cache,target=/app/node_modules \
   npm ci && \
