@@ -264,3 +264,34 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 
 	return nil
 }
+
+// ProjectsTre retrieves all TRE projects that a user has access to (via ownership)
+func (s *Service) ProjectsTre(user types.User) ([]types.Project, error) {
+	// Get project IDs where user has owner role (includes inherited via study ownership)
+	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
+	if err != nil {
+		return []types.Project{}, err
+	}
+
+	if len(projectIds) == 0 {
+		return []types.Project{}, nil
+	}
+
+	var projects []types.Project
+	err = s.db.
+		Preload("CreatorUser").
+		Where("id IN ?", projectIds).
+		Find(&projects).Error
+
+	return projects, types.NewErrFromGorm(err, "failed to retrieve projects")
+}
+
+// AllProjectsTre retrieves all TRE projects (for admins and TRE ops staff)
+func (s *Service) AllProjectsTre() ([]types.Project, error) {
+	var projects []types.Project
+	err := s.db.
+		Preload("CreatorUser").
+		Find(&projects).Error
+
+	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
+}

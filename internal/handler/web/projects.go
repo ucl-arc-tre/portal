@@ -11,10 +11,56 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) GetProjectsTre(ctx *gin.Context) {
-	// TODO: Implement project fetching logic
+func projectToOpenApi(project types.Project) openapi.ProjectTRE {
+	return openapi.ProjectTRE{
+		Id:              project.ID.String(),
+		Name:            project.Name,
+		StudyId:         project.StudyID.String(),
+		CreatorUsername: string(project.CreatorUser.Username),
+		ApprovalStatus:  openapi.ApprovalStatus(project.ApprovalStatus),
+		CreatedAt:       project.CreatedAt.Format("2006-01-02T15:04:05Z07:00"), // RFC3339
+		UpdatedAt:       project.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"), // RFC3339
+	}
+}
 
-	ctx.JSON(http.StatusOK, []openapi.ProjectTRE{})
+func (h *Handler) GetProjectsTre(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+
+	var projects []types.Project
+	var err error
+
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	if isAdmin || isTreOpsStaff {
+		// Admin & TRE ops staff: fetch ALL projects
+		projects, err = h.projects.AllProjectsTre()
+	} else {
+		// Regular user: fetch only projects they own (via RBAC)
+		projects, err = h.projects.ProjectsTre(user)
+	}
+
+	if err != nil {
+		setError(ctx, err, "Failed to get projects")
+		return
+	}
+
+	// Convert to OpenAPI format
+	response := []openapi.ProjectTRE{}
+	for _, project := range projects {
+		response = append(response, projectToOpenApi(project))
+	}
+
+	ctx.JSON(http.StatusOK, response)
 }
 
 func (h *Handler) PostProjectsTre(ctx *gin.Context) {
