@@ -208,6 +208,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		Name:           projectTreData.Name,
 		CreatorUserID:  creator.ID,
 		StudyID:        studyUUID,
+		EnvironmentID:  treEnvironment.ID,
 		ApprovalStatus: approvalStatus,
 	}
 
@@ -219,7 +220,6 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	// Create ProjectTRE record
 	projectTRE := types.ProjectTRE{
 		ProjectID:                     project.ID,
-		EnvironmentID:                 treEnvironment.ID,
 		EgressNumberRequiredApprovals: 2, // TODO: this needs follow up UI/UX and backend validation work, need to discuss with the team
 	}
 
@@ -263,4 +263,31 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}
 
 	return nil
+}
+
+// retrieves projects by their IDs
+func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]types.Project, error) {
+	if len(projectIds) == 0 {
+		return []types.Project{}, nil
+	}
+
+	var projects []types.Project
+	err := s.db.
+		Preload("CreatorUser").
+		Preload("Environment").
+		Where("id IN ?", projectIds).
+		Find(&projects).Error
+
+	return projects, types.NewErrFromGorm(err, "failed to retrieve projects")
+}
+
+// retrieves all projects (for admins and TRE ops staff)
+func (s *Service) AllProjects() ([]types.Project, error) {
+	var projects []types.Project
+	err := s.db.
+		Preload("CreatorUser").
+		Preload("Environment").
+		Find(&projects).Error
+
+	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
 }
