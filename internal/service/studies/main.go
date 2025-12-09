@@ -20,6 +20,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	maxNumberStudyAdmins = 5
+)
+
 var (
 	titlePattern                = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	dataProtectionNumberPattern = regexp.MustCompile(`^\w+\/\d{4}\/\d{2}\/(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$`)
@@ -96,6 +100,10 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		if !dataProtectionNumberPattern.MatchString(*studyData.DataProtectionNumber) {
 			return &openapi.ValidationError{ErrorMessage: "data protection ID invalid format"}, nil
 		}
+	}
+
+	if len(studyData.AdditionalStudyAdminUsernames) > maxNumberStudyAdmins {
+		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("must have fewer than %d study admins", maxNumberStudyAdmins)}, nil
 	}
 
 	maxExpectedStudies := 0
