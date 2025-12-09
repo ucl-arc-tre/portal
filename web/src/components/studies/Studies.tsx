@@ -160,14 +160,14 @@ export default function Studies(props: Props) {
         <div className={styles["no-studies-message"]}>
           <h2>You haven&apos;t created any studies yet</h2>
 
-          <Button onClick={handleCreateStudyClick} size="large">
+          <Button onClick={handleCreateStudyClick} size="large" data-cy="create-study-button">
             Create Your First Study
           </Button>
         </div>
       ) : (
         <>
           <div className={styles["create-study-section"]}>
-            <Button onClick={handleCreateStudyClick} size="large">
+            <Button onClick={handleCreateStudyClick} size="large" data-cy="create-study-button">
               Create New Study
             </Button>
           </div>

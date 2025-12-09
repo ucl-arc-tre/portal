@@ -62,7 +62,7 @@ export default function StudyAdminsAgreements(props: StudyAdminsAgreementsProps)
   }
 
   return (
-    <div className={styles["container"]}>
+    <div className={styles["container"]} data-cy="study-admins-agreement-prompt">
       <p className={styles["description"]}>The following administrators must agree to the study agreement:</p>
       {unagreedUsernames.map((username) => (
         <li className={styles["bullet"]} key={username}>

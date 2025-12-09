@@ -159,7 +159,7 @@ export default function Assets(props: InformationAssetsProps) {
         <div>
           <div className={styles["no-assets-message"]}>
             <p>No assets have been created for this study yet.</p>
-            <Button onClick={() => setShowAssetForm(true)} variant="primary">
+            <Button onClick={() => setShowAssetForm(true)} variant="primary" data-cy="add-asset-button">
               Add First Asset
             </Button>
           </div>
@@ -178,7 +178,7 @@ export default function Assets(props: InformationAssetsProps) {
           {isStudyOwner && (
             <>
               <div className={styles["asset-actions"]}>
-                <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary">
+                <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
                   {showAssetForm ? "Cancel" : "Add Asset"}
                 </Button>
               </div>

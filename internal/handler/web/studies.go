@@ -322,7 +322,7 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 		setError(ctx, err, "Failed to get study agreements")
 		return
 	}
-	studyAgreements := openapi.StudyAgreements{}
+	studyAgreements := openapi.StudyAgreements{Usernames: []string{}}
 	for _, username := range usernames {
 		studyAgreements.Usernames = append(studyAgreements.Usernames, string(username))
 	}

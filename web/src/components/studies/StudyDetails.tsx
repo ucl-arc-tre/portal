@@ -164,7 +164,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
     <>
       {isStudyOwner && setStudyFormOpen && (
         <div className={styles["study-actions"]}>
-          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)}>
+          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
             {study.feedback ? "Respond to Feedback" : "Edit Study"}
           </Button>
 
