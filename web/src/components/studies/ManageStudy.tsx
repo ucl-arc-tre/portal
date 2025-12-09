@@ -25,6 +25,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const { userData } = useAuth();
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
+  const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
+  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted && adminsAgreementsCompleted;
 
@@ -72,7 +74,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
             studyId={study.id}
             studyTitle={study.title}
             setAssetManagementCompleted={setAssetManagementCompleted}
-            isStudyOwner={isStudyOwner}
+            canModify={isStudyOwnerOrAdmin}
           />
         </>
       );
@@ -105,6 +107,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         study={study}
         isAdmin={false}
         isStudyOwner={isStudyOwner}
+        isStudyAdmin={isStudyAdmin}
         setStudyFormOpen={setStudyFormOpen}
       />
 
@@ -126,7 +129,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <Assets studyId={study.id} studyTitle={study.title} isStudyOwner={isStudyOwner} />
+            <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
           </div>
         </>
       )}
