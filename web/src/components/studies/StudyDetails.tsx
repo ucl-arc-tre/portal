@@ -200,9 +200,11 @@ export default function StudyDetails(props: StudyDetailsProps) {
             </dd>
             <dd>
               Admins:
-              {study.additional_study_admin_usernames.length > 0 && (
-                <span className={styles["grey-value"]}>{study.additional_study_admin_usernames}</span>
-              )}
+              {study.additional_study_admin_usernames.map((username) => (
+                <li key={username}>
+                  <span className={styles["grey-value"]}>{username}</span>
+                </li>
+              ))}
             </dd>
             <dd>
               Data Controller:{" "}
