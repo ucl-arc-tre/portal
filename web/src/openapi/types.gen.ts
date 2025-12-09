@@ -408,6 +408,41 @@ export type Environment = {
 };
 
 /**
+ * A project with base details (environment-agnostic)
+ */
+export type Project = {
+    /**
+     * Unique identifier for the project
+     */
+    id: string;
+    /**
+     * Name of the project
+     */
+    name: string;
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
+    /**
+     * Username of the user who created the project
+     */
+    creator_username: string;
+    approval_status: ApprovalStatus;
+    /**
+     * Time in RFC3339 format when the project was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the project was last updated
+     */
+    updated_at: string;
+    /**
+     * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+     */
+    environment_name: string;
+};
+
+/**
  * A TRE project with base project details joined in
  */
 export type ProjectTre = {
@@ -436,6 +471,10 @@ export type ProjectTre = {
      * Time in RFC3339 format when the project was last updated
      */
     updated_at: string;
+    /**
+     * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+     */
+    environment_name: string;
 };
 
 export type ContractBase = {
@@ -1122,6 +1161,34 @@ export type GetEnvironmentsResponses = {
 };
 
 export type GetEnvironmentsResponse = GetEnvironmentsResponses[keyof GetEnvironmentsResponses];
+
+export type GetProjectsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/projects';
+};
+
+export type GetProjectsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsResponses = {
+    200: Array<Project>;
+};
+
+export type GetProjectsResponse = GetProjectsResponses[keyof GetProjectsResponses];
 
 export type GetProjectsTreData = {
     body?: never;

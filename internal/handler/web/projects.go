@@ -5,16 +5,85 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) GetProjectsTre(ctx *gin.Context) {
-	// TODO: Implement project fetching logic
+func (h *Handler) GetProjects(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
 
-	ctx.JSON(http.StatusOK, []openapi.ProjectTRE{})
+	var projects []types.Project
+	var err error
+
+	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	if isAdmin || isTreOpsStaff {
+		// Admin & TRE ops staff: fetch ALL projects
+		projects, err = h.projectsAdmin()
+	} else {
+		// Regular user: fetch only projects they own (via RBAC)
+		projects, err = h.projectsProjectOwner(user)
+	}
+
+	if err != nil {
+		setError(ctx, err, "Failed to get projects")
+		return
+	}
+
+	// Convert to OpenAPI format
+	response := []openapi.Project{}
+	for _, project := range projects {
+		response = append(response, openapi.Project{
+			Id:              project.ID.String(),
+			Name:            project.Name,
+			StudyId:         project.StudyID.String(),
+			CreatorUsername: string(project.CreatorUser.Username),
+			ApprovalStatus:  openapi.ApprovalStatus(project.ApprovalStatus),
+			CreatedAt:       project.CreatedAt.Format(config.TimeFormat),
+			UpdatedAt:       project.UpdatedAt.Format(config.TimeFormat),
+			EnvironmentName: string(project.Environment.Name),
+		})
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) projectsAdmin() ([]types.Project, error) {
+	return h.projects.AllProjects()
+}
+
+func (h *Handler) projectsProjectOwner(user types.User) ([]types.Project, error) {
+	// Get project IDs where user has owner role (includes inherited via study ownership)
+	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
+	if err != nil {
+		return []types.Project{}, err
+	}
+
+	projects, err := h.projects.ProjectsById(projectIds...)
+	if err != nil {
+		return []types.Project{}, err
+	}
+
+	return projects, nil
+}
+
+func (h *Handler) GetProjectsTre(ctx *gin.Context) {
+	// todo: implement fetching tre projects
+
+	ctx.Status(http.StatusNotImplemented)
 }
 
 func (h *Handler) PostProjectsTre(ctx *gin.Context) {
