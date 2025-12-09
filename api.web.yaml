@@ -448,6 +448,25 @@ paths:
         default:
           description: Unexpected error
 
+  # Project Management - All Environments
+  /projects:
+    get:
+      description: Get all projects that a user has access to view (across all environments)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Project Management - TRE Environment
   /projects/tre:
     get:
@@ -1383,6 +1402,43 @@ components:
           type: integer
           description: Maximum data tier this environment can handle (assets with tier <= this value can be used)
 
+    Project:
+      type: object
+      description: A project with base details (environment-agnostic)
+      required:
+        - id
+        - name
+        - study_id
+        - creator_username
+        - approval_status
+        - created_at
+        - updated_at
+        - environment_name
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the project
+        name:
+          type: string
+          description: Name of the project
+        study_id:
+          type: string
+          description: Unique identifier of the study to which the project belongs
+        creator_username:
+          type: string
+          description: Username of the user who created the project
+        approval_status:
+          $ref: "#/components/schemas/ApprovalStatus"
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the project was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the project was last updated
+        environment_name:
+          type: string
+          description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+
     ProjectTRE:
       type: object
       description: A TRE project with base project details joined in
@@ -1394,6 +1450,7 @@ components:
         - approval_status
         - created_at
         - updated_at
+        - environment_name
       properties:
         id:
           type: string
@@ -1415,6 +1472,9 @@ components:
         updated_at:
           type: string
           description: Time in RFC3339 format when the project was last updated
+        environment_name:
+          type: string
+          description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
 
     ContractBase:
       type: object

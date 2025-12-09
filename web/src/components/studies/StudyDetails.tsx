@@ -9,7 +9,7 @@ import {
 import Box from "../ui/Box";
 import { Alert, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
-import StudyStatusBadge from "../ui/StudyStatusBadge";
+import StatusBadge from "../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
 import InfoTooltip from "../ui/InfoTooltip";
@@ -190,7 +190,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
             Risk Score:{" "}
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
-          <StudyStatusBadge status={approvalStatus} isAdmin={isAdmin} />{" "}
+          <StatusBadge status={approvalStatus} isAdmin={isAdmin} />{" "}
         </div>
         <h3 className={styles.description}>{study.description}</h3>
         <div>

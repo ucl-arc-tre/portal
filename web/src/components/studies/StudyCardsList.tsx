@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { Study } from "@/openapi";
-import StudyStatusBadge from "../ui/StudyStatusBadge";
+import StudyStatusBadge from "../ui/StatusBadge";
 import Button from "@/components/ui/Button";
 
 import styles from "./StudyCardsList.module.css";
