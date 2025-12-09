@@ -36,6 +36,7 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 		{RoleName: Base, Resource: "/profile/agreements", Action: WriteAction},
 		{RoleName: Base, Resource: "/profile/training", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile/training", Action: WriteAction},
+		{RoleName: Base, Resource: "/projects", Action: ReadAction},
 		{RoleName: Base, Resource: "/logout", Action: ReadAction},
 	}
 	for _, policy := range policies {
@@ -49,7 +50,6 @@ func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 		{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
 		{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
-		{RoleName: ApprovedResearcher, Resource: "/projects", Action: ReadAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: ReadAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: WriteAction},
 		{RoleName: ApprovedStaffResearcher, Resource: "/environments", Action: ReadAction},
