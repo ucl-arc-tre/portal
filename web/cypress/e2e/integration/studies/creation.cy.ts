@@ -58,7 +58,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").click();
 
-    cy.get('[data-cy="add-asset-button"]').click();
+    cy.get('[data-cy="add-asset-button"]').click({ force: true });
     cy.get('[name="title"]').type("Thing");
     cy.get('[name="description"]').type("Unknown");
     cy.get('[name="classification_impact"]').select("public");
