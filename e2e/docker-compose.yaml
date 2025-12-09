@@ -34,8 +34,7 @@ services:
       context: ..
       target: web-frontend-release
       args:
-        NEXT_PUBLIC_AGREEMENT_TIMER: 1
-        NEXT_PUBLIC_ENABLE_PROJECTS: true
+        NODE_ENV: test
     environment:
       PORT: "8080"
       IS_TESTING: true
@@ -63,8 +62,11 @@ services:
     depends_on:
       - nginx
     working_dir: /repo/web
+
     volumes:
       - ../:/repo
+      - node_modules:/repo/web/node_modules
+      - cypress_cache:/root/.cache
     environment:
       CYPRESS_baseUrl: "https://nginx:443"
     entrypoint: /bin/sh
@@ -87,3 +89,7 @@ services:
       - ./..:/repo
     depends_on:
       - api
+
+volumes:
+  node_modules:
+  cypress_cache:
