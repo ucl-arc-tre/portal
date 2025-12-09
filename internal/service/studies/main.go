@@ -137,12 +137,12 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 		return validationError, err
 	}
 
-	studyAdmins, err := s.createStudyAdminUsers(studyData)
+	studyAdminUsers, err := s.createStudyAdminUsers(studyData)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := s.createStudy(owner, studyData, studyAdmins); err != nil {
+	if err := s.createStudy(owner, studyData, studyAdminUsers); err != nil {
 		return nil, err
 	}
 
@@ -320,12 +320,12 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 	study := studies[0]
 	setStudyFromStudyData(&study, studyData)
 
-	studyAdmins, err := s.createStudyAdminUsers(studyData)
+	studyAdminUsers, err := s.createStudyAdminUsers(studyData)
 	if err != nil {
 		return err
 	}
 
-	if err := createStudyAdmins(studyAdmins, tx, &study); err != nil {
+	if err := createStudyAdmins(studyAdminUsers, tx, &study); err != nil {
 		return err
 	}
 
