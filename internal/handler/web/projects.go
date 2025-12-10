@@ -164,7 +164,6 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		Assets:          &assets,
 	}
 
-	// Add TRE-specific data if available
 	if projectTRE != nil {
 		members := extractProjectMembers(projectTRE)
 		response.Members = &members
@@ -174,29 +173,18 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 }
 
 func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
-	type memberRoles struct {
-		username string
-		roles    []openapi.ProjectTRERoleName
-	}
-
-	membersMap := map[string]*memberRoles{}
+	rolesMap := map[string][]openapi.ProjectTRERoleName{}
 
 	for _, binding := range projectTRE.TRERoleBindings {
 		username := string(binding.User.Username)
-		if membersMap[username] == nil {
-			membersMap[username] = &memberRoles{
-				username: username,
-				roles:    []openapi.ProjectTRERoleName{},
-			}
-		}
-		membersMap[username].roles = append(membersMap[username].roles, openapi.ProjectTRERoleName(binding.Role))
+		rolesMap[username] = append(rolesMap[username], openapi.ProjectTRERoleName(binding.Role))
 	}
 
 	members := []openapi.ProjectTREMember{}
-	for _, member := range membersMap {
+	for username, roles := range rolesMap {
 		members = append(members, openapi.ProjectTREMember{
-			Username: member.username,
-			Roles:    member.roles,
+			Username: username,
+			Roles:    roles,
 		})
 	}
 
