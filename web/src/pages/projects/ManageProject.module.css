@@ -183,6 +183,16 @@
   font-weight: 600;
 }
 
+.empty-message {
+  color: #666;
+  font-style: italic;
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
 @media (max-width: 768px) {
   .field {
     grid-template-columns: 1fr;

@@ -147,9 +147,9 @@ export default function ManageProjectPage() {
           </div>
         </div>
 
-        {project.members && project.members.length > 0 && (
-          <div className={styles.section}>
-            <h3>Project Members</h3>
+        <div className={styles.section}>
+          <h3>Project Members</h3>
+          {project.members && project.members.length > 0 ? (
             <ul className={styles["members-list"]}>
               {project.members.map((member, index) => (
                 <li key={index} className={styles["member-item"]}>
@@ -164,12 +164,14 @@ export default function ManageProjectPage() {
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          ) : (
+            <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
+          )}
+        </div>
 
-        {project.assets && project.assets.length > 0 && (
-          <div className={styles.section}>
-            <h3>Assets</h3>
+        <div className={styles.section}>
+          <h3>Assets</h3>
+          {project.assets && project.assets.length > 0 ? (
             <ul className={styles["assets-list"]}>
               {project.assets.map((asset) => (
                 <li key={asset.id} className={styles["asset-item"]}>
@@ -181,8 +183,10 @@ export default function ManageProjectPage() {
                 </li>
               ))}
             </ul>
-          </div>
-        )}
+          ) : (
+            <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
+          )}
+        </div>
       </div>
     </>
   );

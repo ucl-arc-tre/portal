@@ -152,6 +152,12 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
 	}
 
+	// Extract members from TRE role bindings
+	members := []openapi.ProjectTREMember{}
+	if projectTRE != nil {
+		members = extractProjectMembers(projectTRE)
+	}
+
 	response := openapi.ProjectTRE{
 		Id:              project.ID.String(),
 		Name:            project.Name,
@@ -161,12 +167,8 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		CreatedAt:       project.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:       project.UpdatedAt.Format(config.TimeFormat),
 		EnvironmentName: string(project.Environment.Name),
-		Assets:          &assets,
-	}
-
-	if projectTRE != nil {
-		members := extractProjectMembers(projectTRE)
-		response.Members = &members
+		Assets:          assets,
+		Members:         members,
 	}
 
 	ctx.JSON(http.StatusOK, response)

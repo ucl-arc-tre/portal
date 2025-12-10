@@ -482,11 +482,11 @@ export type ProjectTre = {
     /**
      * List of assets associated with this project
      */
-    assets?: Array<Asset>;
+    assets: Array<Asset>;
     /**
      * List of project members with their roles (TRE-specific)
      */
-    members?: Array<ProjectTreMember>;
+    members: Array<ProjectTreMember>;
 };
 
 export type ContractBase = {

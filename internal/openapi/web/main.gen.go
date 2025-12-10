@@ -508,7 +508,7 @@ type ProjectTRE struct {
 	ApprovalStatus ApprovalStatus `json:"approval_status"`
 
 	// Assets List of assets associated with this project
-	Assets *[]Asset `json:"assets,omitempty"`
+	Assets []Asset `json:"assets"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
@@ -523,7 +523,7 @@ type ProjectTRE struct {
 	Id string `json:"id"`
 
 	// Members List of project members with their roles (TRE-specific)
-	Members *[]ProjectTREMember `json:"members,omitempty"`
+	Members []ProjectTREMember `json:"members"`
 
 	// Name Name of the project
 	Name string `json:"name"`

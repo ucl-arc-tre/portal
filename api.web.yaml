@@ -1446,6 +1446,8 @@ components:
         - created_at
         - updated_at
         - environment_name
+        - assets
+        - members
       properties:
         id:
           type: string
