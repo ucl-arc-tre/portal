@@ -302,10 +302,6 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.Project, *types.Pr
 		Where("id = ?", projectId).
 		First(&project).Error
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil, nil
-	}
-
 	if err != nil {
 		return nil, nil, types.NewErrFromGorm(err, "failed to retrieve project")
 	}
