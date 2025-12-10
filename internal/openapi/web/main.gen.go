@@ -477,9 +477,6 @@ type Project struct {
 	// ApprovalStatus Current approval status (used for studies, projects, etc.)
 	ApprovalStatus ApprovalStatus `json:"approval_status"`
 
-	// Assets List of assets associated with this project
-	Assets *[]Asset `json:"assets,omitempty"`
-
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
 

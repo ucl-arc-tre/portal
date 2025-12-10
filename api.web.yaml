@@ -1428,11 +1428,6 @@ components:
         environment_name:
           type: string
           description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
-        assets:
-          type: array
-          description: List of assets associated with this project
-          items:
-            $ref: "#/components/schemas/Asset"
 
     ProjectTRE:
       type: object

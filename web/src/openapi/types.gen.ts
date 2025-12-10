@@ -440,10 +440,6 @@ export type Project = {
      * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
      */
     environment_name: string;
-    /**
-     * List of assets associated with this project
-     */
-    assets?: Array<Asset>;
 };
 
 /**
