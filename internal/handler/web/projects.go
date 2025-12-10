@@ -135,38 +135,35 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	project, projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	projectTRE, err := h.projects.ProjectTreById(projectUUID)
 	if err != nil {
-		setError(ctx, err, "Failed to get project")
+		setError(ctx, err, "Failed to get tre project")
 		return
 	}
 
-	if project == nil {
+	if projectTRE == nil {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
 
 	// Extract assets from ProjectAssets relationship
 	assets := []openapi.Asset{}
-	for _, projectAsset := range project.ProjectAssets {
+	for _, projectAsset := range projectTRE.Project.ProjectAssets {
 		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
 	}
 
 	// Extract members from TRE role bindings
-	members := []openapi.ProjectTREMember{}
-	if projectTRE != nil {
-		members = extractProjectMembers(projectTRE)
-	}
+	members := extractProjectMembers(projectTRE)
 
 	response := openapi.ProjectTRE{
-		Id:              project.ID.String(),
-		Name:            project.Name,
-		StudyId:         project.StudyID.String(),
-		CreatorUsername: string(project.CreatorUser.Username),
-		ApprovalStatus:  openapi.ApprovalStatus(project.ApprovalStatus),
-		CreatedAt:       project.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:       project.UpdatedAt.Format(config.TimeFormat),
-		EnvironmentName: string(project.Environment.Name),
+		Id:              projectTRE.Project.ID.String(),
+		Name:            projectTRE.Project.Name,
+		StudyId:         projectTRE.Project.StudyID.String(),
+		CreatorUsername: string(projectTRE.Project.CreatorUser.Username),
+		ApprovalStatus:  openapi.ApprovalStatus(projectTRE.Project.ApprovalStatus),
+		CreatedAt:       projectTRE.Project.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:       projectTRE.Project.UpdatedAt.Format(config.TimeFormat),
+		EnvironmentName: string(projectTRE.Project.Environment.Name),
 		Assets:          assets,
 		Members:         members,
 	}
