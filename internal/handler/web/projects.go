@@ -173,17 +173,16 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 }
 
 func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
-	rolesMap := map[string][]openapi.ProjectTRERoleName{}
+	rolesMap := map[types.Username][]openapi.ProjectTRERoleName{}
 
 	for _, binding := range projectTRE.TRERoleBindings {
-		username := string(binding.User.Username)
-		rolesMap[username] = append(rolesMap[username], openapi.ProjectTRERoleName(binding.Role))
+		rolesMap[binding.User.Username] = append(rolesMap[binding.User.Username], openapi.ProjectTRERoleName(binding.Role))
 	}
 
 	members := []openapi.ProjectTREMember{}
 	for username, roles := range rolesMap {
 		members = append(members, openapi.ProjectTREMember{
-			Username: username,
+			Username: string(username),
 			Roles:    roles,
 		})
 	}
