@@ -477,6 +477,9 @@ type Project struct {
 	// ApprovalStatus Current approval status (used for studies, projects, etc.)
 	ApprovalStatus ApprovalStatus `json:"approval_status"`
 
+	// Assets List of assets associated with this project
+	Assets *[]Asset `json:"assets,omitempty"`
+
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
 
@@ -499,10 +502,13 @@ type Project struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// ProjectTRE A TRE project with base project details joined in
+// ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
 	// ApprovalStatus Current approval status (used for studies, projects, etc.)
 	ApprovalStatus ApprovalStatus `json:"approval_status"`
+
+	// Assets List of assets associated with this project
+	Assets *[]Asset `json:"assets,omitempty"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
@@ -515,6 +521,9 @@ type ProjectTRE struct {
 
 	// Id Unique identifier for the base project
 	Id string `json:"id"`
+
+	// Members List of project members with their roles (TRE-specific)
+	Members *[]ProjectTREMember `json:"members,omitempty"`
 
 	// Name Name of the project
 	Name string `json:"name"`

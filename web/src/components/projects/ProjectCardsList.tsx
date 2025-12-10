@@ -41,7 +41,12 @@ export default function ProjectCardsList(props: Props) {
               </div>
 
               <div className={styles["project-actions"]}>
-                <Button onClick={() => router.push(`/projects/${project.id}`)} size="small">
+                <Button
+                  onClick={() =>
+                    router.push(`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`)
+                  }
+                  size="small"
+                >
                   Manage Project
                 </Button>
               </div>

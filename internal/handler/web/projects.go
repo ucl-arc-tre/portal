@@ -135,8 +135,70 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	// TODO: Implement project fetching logic
+	project, projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get project")
+		return
+	}
 
-	_ = projectUUID // avoid unused variable error for now
-	ctx.Status(http.StatusNotImplemented)
+	if project == nil {
+		ctx.Status(http.StatusNotFound)
+		return
+	}
+
+	// Extract assets from ProjectAssets relationship
+	assets := []openapi.Asset{}
+	for _, projectAsset := range project.ProjectAssets {
+		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
+	}
+
+	response := openapi.ProjectTRE{
+		Id:              project.ID.String(),
+		Name:            project.Name,
+		StudyId:         project.StudyID.String(),
+		CreatorUsername: string(project.CreatorUser.Username),
+		ApprovalStatus:  openapi.ApprovalStatus(project.ApprovalStatus),
+		CreatedAt:       project.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:       project.UpdatedAt.Format(config.TimeFormat),
+		EnvironmentName: string(project.Environment.Name),
+		Assets:          &assets,
+	}
+
+	// Add TRE-specific data if available
+	if projectTRE != nil {
+		members := extractProjectMembers(projectTRE)
+		response.Members = &members
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
+	type memberRoles struct {
+		username string
+		roles    []openapi.ProjectTRERoleName
+	}
+
+	membersMap := map[string]*memberRoles{}
+
+	for _, binding := range projectTRE.TRERoleBindings {
+		username := string(binding.User.Username)
+		if membersMap[username] == nil {
+			membersMap[username] = &memberRoles{
+				username: username,
+				roles:    []openapi.ProjectTRERoleName{},
+			}
+		}
+		membersMap[username].roles = append(membersMap[username].roles, openapi.ProjectTRERoleName(binding.Role))
+	}
+
+	members := []openapi.ProjectTREMember{}
+	for _, member := range membersMap {
+		members = append(members, openapi.ProjectTREMember{
+			Username: member.username,
+			Roles:    member.roles,
+		})
+	}
+
+	return members
 }
