@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Auth, Study, getProjects, getStudies } from "@/openapi";
-import { AnyProject } from "@/types/projects";
+import { Auth, Study, Project, getProjects, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import CreateProjectForm from "./CreateProjectForm";
@@ -14,7 +13,7 @@ type Props = {
 };
 
 export default function Projects({ userData }: Props) {
-  const [projects, setProjects] = useState<AnyProject[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [studies, setStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

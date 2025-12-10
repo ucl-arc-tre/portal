@@ -1,13 +1,12 @@
 import { useRouter } from "next/router";
-import { ApprovalStatus } from "@/openapi";
-import { AnyProject } from "@/types/projects";
+import { ApprovalStatus, Project } from "@/openapi";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 
 type Props = {
-  projects: AnyProject[];
+  projects: Project[];
 };
 
 const projectSortOrder: Record<ApprovalStatus, number> = {
