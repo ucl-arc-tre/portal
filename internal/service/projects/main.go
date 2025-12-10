@@ -313,10 +313,6 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.Project, *types.Pr
 		Where("project_id = ?", projectId).
 		First(&projectTRE).Error
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return &project, nil, nil
-	}
-
 	if err != nil {
 		return nil, nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
 	}
