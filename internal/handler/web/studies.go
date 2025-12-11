@@ -294,16 +294,17 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 		return
 	}
 
-	user := middleware.GetUser(ctx)
-	signatures, err := h.studies.GetStudyAgreementSignatures(user, studyUUID)
+	usernames, err := h.studies.GetStudyAgreementSignatureUsernames(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to get study agreements")
 		return
 	}
+	studyAgreements := openapi.StudyAgreements{Usernames: []string{}}
+	for _, username := range usernames {
+		studyAgreements.Usernames = append(studyAgreements.Usernames, string(username))
+	}
 
-	ctx.JSON(http.StatusOK, openapi.UserAgreements{
-		ConfirmedAgreements: signatures,
-	})
+	ctx.JSON(http.StatusOK, studyAgreements)
 }
 
 func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {

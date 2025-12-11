@@ -8,7 +8,7 @@ This project uses the [Cypress](https://www.cypress.io/) testing framework for r
 cypress/e2e/
 ├── accessibility/          # Accessibility compliance tests
 ├── integration/            # Full end-to-end tests with real database interaction
-└── ui/                     # UI-focused tests with mocked APIs
+└── pages/                  # UI-focused tests with mocked APIs
 ```
 
 ## Test Categories

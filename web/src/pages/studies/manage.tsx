@@ -170,7 +170,7 @@ export default function ManageStudyPage() {
       <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
 
       {isAdmin ? (
-        <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} />
+        <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} isStudyAdmin={false} />
       ) : (
         <ManageStudy study={study} fetchStudy={fetchStudy} />
       )}

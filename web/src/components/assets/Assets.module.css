@@ -10,15 +10,6 @@
   border: 1px solid #e5e7eb;
 }
 
-.error-message {
-  color: #d32f2f;
-  background-color: #fdeaea;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 12px;
-  margin-bottom: 16px;
-}
-
 .no-assets-message {
   color: #6c757d;
   padding: 12px;

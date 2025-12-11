@@ -656,7 +656,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserAgreements"
+                $ref: "#/components/schemas/StudyAgreements"
         "403":
           description: Forbidden
         "404":
@@ -936,6 +936,17 @@ components:
           items:
             $ref: "#/components/schemas/ConfirmedAgreement"
 
+    StudyAgreements:
+      type: object
+      required:
+        - usernames
+      properties:
+        usernames:
+          type: array
+          description: Usernames of those that have agreed to the study agreement
+          items:
+            type: string
+
     TrainingKind:
       type: string
       enum:
@@ -1170,7 +1181,6 @@ components:
           type: array
           items:
             type: string
-            nullable: true
           description: List of additional study administrator usernames (empty array if none)
         data_controller_organisation:
           type: string

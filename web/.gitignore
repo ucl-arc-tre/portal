@@ -21,6 +21,7 @@
 .env.*.local
 !.env.production
 !.env.development
+!.env.test
 
 # Cypress and testing
 cypress/videos

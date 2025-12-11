@@ -14,7 +14,7 @@ type AssetCardProps = {
   asset: Asset;
   studyId: string;
   checkCompleted: (assets: Asset[]) => Promise<boolean>;
-  isStudyOwner: boolean;
+  canModify: boolean;
 };
 
 const formatClassification = (classification: string) => {
@@ -26,7 +26,7 @@ const formatProtection = (protection: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, checkCompleted, isStudyOwner } = props;
+  const { studyId, asset, checkCompleted, canModify } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
 
@@ -102,7 +102,7 @@ export default function AssetCard(props: AssetCardProps) {
           </small>
         )}
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
-          {isStudyOwner ? "Manage Asset" : "View Asset"}
+          {canModify ? "Manage Asset" : "View Asset"}
         </Button>
       </div>
     </div>

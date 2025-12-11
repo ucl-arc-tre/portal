@@ -452,8 +452,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                       )}
                     />
                   </Label>
-                  {/* disabling for editing until we get removal on backend implemented */}
-                  <Button type="button" onClick={() => remove(index)} size="small" disabled={Boolean(editingStudy)}>
+                  <Button type="button" onClick={() => remove(index)} size="small">
                     Remove
                   </Button>
                 </div>
@@ -465,6 +464,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                 size="small"
                 onClick={() => append({ value: "" })}
                 style={{ marginTop: "0.5rem" }}
+                data-cy="add-study-admin-button"
               >
                 Add Administrator
               </Button>
