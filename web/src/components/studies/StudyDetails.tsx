@@ -194,7 +194,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
             Risk Score:{" "}
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
-          <StatusBadge status={approvalStatus} isIGOpsStaff={isIGOpsStaff} />{" "}
+          <StatusBadge status={approvalStatus} isOpsStaff={isIGOpsStaff} />{" "}
         </div>
         <h3 className={styles.description}>{study.description}</h3>
         <div>

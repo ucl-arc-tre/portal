@@ -4,18 +4,19 @@ import styles from "./StatusBadge.module.css";
 
 type BadgeProps = {
   status: ApprovalStatus | undefined;
-  isIGOpsStaff: boolean;
+  isOpsStaff: boolean;
 };
 
-export default function StatusBadge({ status, isIGOpsStaff }: BadgeProps) {
+export default function StatusBadge(props: BadgeProps) {
+  const { status, isOpsStaff } = props;
   function getStatusDescription(status: ApprovalStatus | undefined): string {
     switch (status) {
       case "Incomplete":
-        if (isIGOpsStaff) {
+        if (isOpsStaff) {
           return "The owner has yet to request a review.";
         } else return "Please complete the required setup and request a review.";
       case "Pending":
-        if (isIGOpsStaff) {
+        if (isOpsStaff) {
           return "Ready for review - either approve or leave feedback to the owner.";
         } else
           return "Under review and awaiting approval from administrators. You can still make changes if necessary.";

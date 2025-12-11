@@ -32,7 +32,7 @@ export default function StudyCardsList(props: Props) {
           .map((study) => (
             <div key={study.id} className={styles["study-card"]}>
               <div className={styles["status-indicator"]}>
-                <StudyStatusBadge status={study.approval_status} isIGOpsStaff={isIGOpsStaff} />
+                <StudyStatusBadge status={study.approval_status} isOpsStaff={isIGOpsStaff} />
               </div>
 
               <div className={styles["study-info"]}>
