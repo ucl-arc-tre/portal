@@ -866,6 +866,7 @@ components:
               - information-asset-owner
               - information-asset-administrator
               - tre-ops-staff
+              - ig-ops-staff
 
     Profile:
       type: object

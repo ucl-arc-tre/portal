@@ -24,6 +24,7 @@ const (
 	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
 	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
 	TreOpsStaff                   = RoleName(openapi.AuthRolesTreOpsStaff)                   // Lesser admin role for tre ops staff
+	IGOpsStaff                    = RoleName(openapi.AuthRolesIgOpsStaff)                    // Information governance operations staff
 
 	ReadAction  = Action("read")
 	WriteAction = Action("write")

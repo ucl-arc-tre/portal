@@ -108,6 +108,7 @@ const (
 	AuthRolesApprovedResearcher            AuthRoles = "approved-researcher"
 	AuthRolesApprovedStaffResearcher       AuthRoles = "approved-staff-researcher"
 	AuthRolesBase                          AuthRoles = "base"
+	AuthRolesIgOpsStaff                    AuthRoles = "ig-ops-staff"
 	AuthRolesInformationAssetAdministrator AuthRoles = "information-asset-administrator"
 	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
 	AuthRolesStaff                         AuthRoles = "staff"
