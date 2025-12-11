@@ -40,7 +40,11 @@ export default function StudyCardsList(props: Props) {
               </div>
 
               <div className={styles["study-actions"]}>
-                <Button onClick={() => router.push(`/studies/manage?studyId=${study.id}`)} size="small">
+                <Button
+                  onClick={() => router.push(`/studies/manage?studyId=${study.id}`)}
+                  size="small"
+                  data-cy="manage-study-button"
+                >
                   {isAdmin ? "View Study" : "Manage Study"}
                 </Button>
               </div>

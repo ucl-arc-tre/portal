@@ -24,6 +24,8 @@ func Init() {
 
 	addUserRoleBindings(config.AdminUsernames(), Admin)
 	addUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
+
+	runMigrations()
 }
 
 func addBasePolicies(enforcer *casbin.Enforcer) {
@@ -127,5 +129,4 @@ func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role Ro
 			panic(fmt.Sprintf("failed to remove role for user [%v]", err))
 		}
 	}
-
 }

@@ -47,6 +47,13 @@ export type UserAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
 };
 
+export type StudyAgreements = {
+    /**
+     * Usernames of those that have agreed to the study agreement
+     */
+    usernames: Array<string>;
+};
+
 export type TrainingKind = 'training_kind_nhsd';
 
 export type ProfileTrainingUpdate = {
@@ -211,7 +218,7 @@ export type StudyBase = {
     /**
      * List of additional study administrator usernames (empty array if none)
      */
-    additional_study_admin_usernames: Array<string | null>;
+    additional_study_admin_usernames: Array<string>;
     /**
      * The organisation acting as data controller for the study (e.g., "UCL" or custom organization name)
      */
@@ -443,7 +450,7 @@ export type Project = {
 };
 
 /**
- * A TRE project with base project details joined in
+ * A TRE project with base project details and environment-specific data
  */
 export type ProjectTre = {
     /**
@@ -475,6 +482,14 @@ export type ProjectTre = {
      * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
      */
     environment_name: string;
+    /**
+     * List of assets associated with this project
+     */
+    assets: Array<Asset>;
+    /**
+     * List of project members with their roles (TRE-specific)
+     */
+    members: Array<ProjectTreMember>;
 };
 
 export type ContractBase = {
@@ -1465,7 +1480,7 @@ export type GetStudiesByStudyIdAgreementsErrors = {
 };
 
 export type GetStudiesByStudyIdAgreementsResponses = {
-    200: UserAgreements;
+    200: StudyAgreements;
 };
 
 export type GetStudiesByStudyIdAgreementsResponse = GetStudiesByStudyIdAgreementsResponses[keyof GetStudiesByStudyIdAgreementsResponses];

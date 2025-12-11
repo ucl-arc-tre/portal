@@ -72,29 +72,6 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 	}
 }
 
-func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
-	return openapi.Asset{
-		Id:                   asset.ID.String(),
-		CreatorUserId:        asset.CreatorUserID.String(),
-		StudyId:              asset.StudyID.String(),
-		Title:                asset.Title,
-		Description:          asset.Description,
-		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
-		Tier:                 asset.Tier,
-		Protection:           openapi.AssetProtection(asset.Protection),
-		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
-		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            asset.ExpiresAt.Format(config.TimeFormat),
-		Locations:            asset.LocationStrings(),
-		RequiresContract:     asset.RequiresContract,
-		HasDspt:              asset.HasDspt,
-		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
-		Status:               openapi.AssetStatus(asset.Status),
-		CreatedAt:            asset.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
-	}
-}
-
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	return openapi.Contract{
 		Id:                    contract.ID.String(),
@@ -317,16 +294,17 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 		return
 	}
 
-	user := middleware.GetUser(ctx)
-	signatures, err := h.studies.GetStudyAgreementSignatures(user, studyUUID)
+	usernames, err := h.studies.GetStudyAgreementSignatureUsernames(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to get study agreements")
 		return
 	}
+	studyAgreements := openapi.StudyAgreements{Usernames: []string{}}
+	for _, username := range usernames {
+		studyAgreements.Usernames = append(studyAgreements.Usernames, string(username))
+	}
 
-	ctx.JSON(http.StatusOK, openapi.UserAgreements{
-		ConfirmedAgreements: signatures,
-	})
+	ctx.JSON(http.StatusOK, studyAgreements)
 }
 
 func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {

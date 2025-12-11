@@ -22,6 +22,7 @@ type StudyDetailsProps = {
   study: Study;
   isAdmin: boolean;
   isStudyOwner: boolean;
+  isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
 };
@@ -88,11 +89,14 @@ const calculateRiskScore = async (study: Study) => {
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 export default function StudyDetails(props: StudyDetailsProps) {
-  const { study, isAdmin, isStudyOwner, setStudyFormOpen, studyStepsCompleted } = props;
+  const { study, isAdmin, isStudyOwner, isStudyAdmin, setStudyFormOpen, studyStepsCompleted } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
+
+  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
 
@@ -162,9 +166,9 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
-      {isStudyOwner && setStudyFormOpen && (
+      {isStudyOwnerOrAdmin && setStudyFormOpen && (
         <div className={styles["study-actions"]}>
-          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)}>
+          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
             {study.feedback ? "Respond to Feedback" : "Edit Study"}
           </Button>
 
@@ -200,9 +204,11 @@ export default function StudyDetails(props: StudyDetailsProps) {
             </dd>
             <dd>
               Admins:
-              {study.additional_study_admin_usernames.length > 0 && (
-                <span className={styles["grey-value"]}>{study.additional_study_admin_usernames}</span>
-              )}
+              {study.additional_study_admin_usernames.map((username) => (
+                <li key={username}>
+                  <span className={styles["grey-value"]}>{username}</span>
+                </li>
+              ))}
             </dd>
             <dd>
               Data Controller:{" "}
@@ -332,7 +338,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
       {isAdmin && (
         <>
-          <Assets studyId={study.id} studyTitle={study.title} isStudyOwner={isStudyOwner} />
+          <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
 
           <AdminFeedbackSection
             status={study.approval_status}

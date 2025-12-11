@@ -135,8 +135,56 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	// TODO: Implement project fetching logic
+	projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get tre project")
+		return
+	}
 
-	_ = projectUUID // avoid unused variable error for now
-	ctx.Status(http.StatusNotImplemented)
+	if projectTRE == nil {
+		ctx.Status(http.StatusNotFound)
+		return
+	}
+
+	// Extract assets from ProjectAssets relationship
+	assets := []openapi.Asset{}
+	for _, projectAsset := range projectTRE.Project.ProjectAssets {
+		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
+	}
+
+	// Extract members from TRE role bindings
+	members := extractProjectMembers(projectTRE)
+
+	response := openapi.ProjectTRE{
+		Id:              projectTRE.Project.ID.String(),
+		Name:            projectTRE.Project.Name,
+		StudyId:         projectTRE.Project.StudyID.String(),
+		CreatorUsername: string(projectTRE.Project.CreatorUser.Username),
+		ApprovalStatus:  openapi.ApprovalStatus(projectTRE.Project.ApprovalStatus),
+		CreatedAt:       projectTRE.Project.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:       projectTRE.Project.UpdatedAt.Format(config.TimeFormat),
+		EnvironmentName: string(projectTRE.Project.Environment.Name),
+		Assets:          assets,
+		Members:         members,
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
+	rolesMap := map[types.Username][]openapi.ProjectTRERoleName{}
+
+	for _, binding := range projectTRE.TRERoleBindings {
+		rolesMap[binding.User.Username] = append(rolesMap[binding.User.Username], openapi.ProjectTRERoleName(binding.Role))
+	}
+
+	members := []openapi.ProjectTREMember{}
+	for username, roles := range rolesMap {
+		members = append(members, openapi.ProjectTREMember{
+			Username: string(username),
+			Roles:    roles,
+		})
+	}
+
+	return members
 }

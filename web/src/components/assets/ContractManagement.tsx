@@ -8,10 +8,10 @@ import styles from "./ContractManagement.module.css";
 type ContractManagementProps = {
   study: Study;
   asset: Asset;
-  isStudyOwner: boolean;
+  canModify: boolean;
 };
 
-export default function ContractManagement({ study, asset, isStudyOwner }: ContractManagementProps) {
+export default function ContractManagement({ study, asset, canModify }: ContractManagementProps) {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export default function ContractManagement({ study, asset, isStudyOwner }: Contr
   };
 
   const handleEditContract = (contract: Contract) => {
-    if (!isStudyOwner) {
+    if (!canModify) {
       return;
     }
     setEditingContract(contract);
@@ -60,7 +60,7 @@ export default function ContractManagement({ study, asset, isStudyOwner }: Contr
 
   return (
     <div className={styles.container}>
-      {isStudyOwner ? (
+      {canModify ? (
         <>
           {" "}
           <div className={styles.header}>
@@ -106,7 +106,7 @@ export default function ContractManagement({ study, asset, isStudyOwner }: Contr
       ) : contracts.length === 0 ? (
         <div className={styles["empty-state"]}>
           <h4>No contracts uploaded</h4>
-          {isStudyOwner && <p>Upload your first contract document to get started.</p>}
+          {canModify && <p>Upload your first contract document to get started.</p>}
         </div>
       ) : (
         <div className={styles["contracts-list"]}>
@@ -117,13 +117,13 @@ export default function ContractManagement({ study, asset, isStudyOwner }: Contr
               studyId={study.id}
               assetId={asset.id}
               onEdit={() => handleEditContract(contract)}
-              isStudyOwner={isStudyOwner}
+              canModify={canModify}
             />
           ))}
         </div>
       )}
 
-      {isStudyOwner && (
+      {canModify && (
         <ContractUploadForm
           study={study}
           asset={asset}

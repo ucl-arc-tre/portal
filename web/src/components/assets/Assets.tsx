@@ -20,11 +20,11 @@ type InformationAssetsProps = {
   studyId: string;
   studyTitle: string;
   setAssetManagementCompleted?: (completed: boolean) => void;
-  isStudyOwner: boolean;
+  canModify: boolean;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, studyTitle, setAssetManagementCompleted, isStudyOwner } = props;
+  const { studyId, studyTitle, setAssetManagementCompleted, canModify } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -128,7 +128,7 @@ export default function Assets(props: InformationAssetsProps) {
       )}
 
       <Callout definition>
-        {isStudyOwner && (
+        {canModify && (
           <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
         )}
 
@@ -155,11 +155,11 @@ export default function Assets(props: InformationAssetsProps) {
         </div>
       </Callout>
 
-      {informationAssets.length === 0 && isStudyOwner ? (
+      {informationAssets.length === 0 && canModify ? (
         <div>
           <div className={styles["no-assets-message"]}>
             <p>No assets have been created for this study yet.</p>
-            <Button onClick={() => setShowAssetForm(true)} variant="primary">
+            <Button onClick={() => setShowAssetForm(true)} variant="primary" data-cy="add-asset-button">
               Add First Asset
             </Button>
           </div>
@@ -175,10 +175,10 @@ export default function Assets(props: InformationAssetsProps) {
             <span className={styles["assets-count-badge"]}>{informationAssets.length}</span>
           </div>
 
-          {isStudyOwner && (
+          {canModify && (
             <>
               <div className={styles["asset-actions"]}>
-                <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary">
+                <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
                   {showAssetForm ? "Cancel" : "Add Asset"}
                 </Button>
               </div>
@@ -196,7 +196,7 @@ export default function Assets(props: InformationAssetsProps) {
                 studyId={studyId}
                 asset={asset}
                 checkCompleted={checkAssetManagementCompleted}
-                isStudyOwner={isStudyOwner}
+                canModify={canModify}
               />
             ))}
           </div>

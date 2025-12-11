@@ -20,6 +20,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	maxNumberStudyAdmins = 5
+)
+
 var (
 	titlePattern                = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	dataProtectionNumberPattern = regexp.MustCompile(`^\w+\/\d{4}\/\d{2}\/(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$`)
@@ -62,7 +66,7 @@ func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyReq
 	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
 }
 
-func (s *Service) createStudyAdmins(studyData openapi.StudyRequest) ([]types.User, error) {
+func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types.User, error) {
 	admins := []types.User{}
 
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
@@ -107,7 +111,10 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 
 	if studyData.NhsEnglandReference != nil && !nhsePattern.MatchString(*studyData.NhsEnglandReference) {
 		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
+	}
 
+	if len(studyData.AdditionalStudyAdminUsernames) > maxNumberStudyAdmins {
+		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("must have fewer than %d study admins", maxNumberStudyAdmins)}, nil
 	}
 
 	maxExpectedStudies := 0
@@ -141,20 +148,15 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 		return validationError, err
 	}
 
-	studyAdmins, err := s.createStudyAdmins(studyData)
+	studyAdminUsers, err := s.createStudyAdminUsers(studyData)
 	if err != nil {
 		return nil, err
 	}
 
-	study, err := s.createStudy(owner, studyData, studyAdmins)
-	if err != nil {
+	if err := s.createStudy(owner, studyData, studyAdminUsers); err != nil {
 		return nil, err
 	}
 
-	// TODO: assign a study admin role to each study admin user?
-	if _, err := rbac.AddStudyOwnerRole(owner, study.ID); err != nil {
-		return nil, err
-	}
 	return nil, nil
 }
 
@@ -224,29 +226,57 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 
 }
 
-func createStudyAdminFromStudyAdminUser(studyAdminUsers []types.User, tx *gorm.DB, study *types.Study) error {
-	for _, studyAdminUser := range studyAdminUsers {
+func createStudyAdmins(users []types.User, tx *gorm.DB, study *types.Study) error {
+	existingStudyAdmins := []types.StudyAdmin{}
+	if err := tx.Unscoped().Preload("User").Where("study_id = ?", study.ID).Find(&existingStudyAdmins).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to list study admins")
+	}
+
+	userIds := []uuid.UUID{}
+	for _, user := range users {
+		userIds = append(userIds, user.ID)
+	}
+
+	studyAdminRole := rbac.StudyRole{StudyID: study.ID, Name: rbac.StudyOwner}
+	for _, studyAdmin := range existingStudyAdmins {
+		studyAdminInRequested := slices.Contains(userIds, studyAdmin.UserID)
+		if !studyAdminInRequested {
+			log.Debug().Any("username", studyAdmin.User.Username).Msg("Deleting study admin")
+			if err := tx.Delete(&studyAdmin).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to delete study admin")
+			}
+			if _, err := rbac.RemoveRole(studyAdmin.User, studyAdminRole.RoleName()); err != nil {
+				return err
+			}
+		}
+		if studyAdminInRequested && studyAdmin.DeletedAt.Valid { // is currently deleted
+			log.Debug().Any("username", studyAdmin.User.Username).Msg("Un-deleting study admin")
+			if err := tx.Unscoped().Model(&studyAdmin).Update("deleted_at", nil).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to undelete study admin")
+			}
+		}
+	}
+
+	for _, user := range users {
 		studyAdmin := types.StudyAdmin{
 			StudyID: study.ID,
-			UserID:  studyAdminUser.ID,
+			UserID:  user.ID,
 		}
-		if err := tx.Where("study_id = ? AND user_id = ?", study.ID, studyAdminUser.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
-			tx.Rollback()
+		if err := tx.Unscoped().Where("study_id = ? AND user_id = ?", study.ID, user.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
 			return types.NewErrFromGorm(err, "failed to create study admin")
+		}
+		if _, err := rbac.AddRole(user, studyAdminRole.RoleName()); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
 // handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) (*types.Study, error) {
+func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) error {
 	// Start a transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer rollbackTransactionOnPanic(tx)
 
 	study := types.Study{
 		OwnerUserID:    owner.ID,
@@ -258,40 +288,39 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 	// Create the study
 	if err := tx.Create(&study).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err)
+		return types.NewErrFromGorm(err)
+	}
+
+	if _, err := rbac.AddStudyOwnerRole(owner, study.ID); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	// Create StudyAdmin records for each study admin user
-	err := createStudyAdminFromStudyAdminUser(studyAdminUsers, tx, &study)
-	if err != nil {
-		return nil, err
+	if err := createStudyAdmins(studyAdminUsers, tx, &study); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return nil, types.NewErrFromGorm(err, "failed to commit create study transaction")
+		return types.NewErrFromGorm(err, "failed to commit create study transaction")
 	}
 
-	return &study, nil
+	return nil
 }
 
 func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
-	study := types.Study{}
-	feedback := review.Feedback
-	status := review.Status
-
-	result := s.db.Model(&study).Where("id = ?", id).Update("approval_status", status).Update("feedback", feedback)
+	result := s.db.Model(&types.Study{}).Where("id = ?", id).
+		Update("approval_status", review.Status).
+		Update("feedback", review.Feedback)
 	return types.NewErrFromGorm(result.Error, "failed to update study review")
 }
 
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
 
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer rollbackTransactionOnPanic(tx)
 
 	studies, err := s.StudiesById(id)
 	if err != nil {
@@ -302,13 +331,12 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 	study := studies[0]
 	setStudyFromStudyData(&study, studyData)
 
-	studyAdmins, err := s.createStudyAdmins(studyData)
+	studyAdminUsers, err := s.createStudyAdminUsers(studyData)
 	if err != nil {
 		return err
 	}
 
-	err = createStudyAdminFromStudyAdminUser(studyAdmins, tx, &study)
-	if err != nil {
+	if err := createStudyAdmins(studyAdminUsers, tx, &study); err != nil {
 		return err
 	}
 
@@ -343,4 +371,10 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 		return err
 	}
 	return nil
+}
+
+func rollbackTransactionOnPanic(tx *gorm.DB) {
+	if r := recover(); r != nil {
+		tx.Rollback()
+	}
 }

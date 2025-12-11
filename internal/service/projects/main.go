@@ -291,3 +291,21 @@ func (s *Service) AllProjects() ([]types.Project, error) {
 
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
 }
+
+// retrieves a single TRE project by ID with all related data
+func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error) {
+	var projectTRE types.ProjectTRE
+	err := s.db.
+		Preload("Project.CreatorUser").
+		Preload("Project.Environment").
+		Preload("Project.ProjectAssets.Asset").
+		Preload("TRERoleBindings.User").
+		Where("project_id = ?", projectId).
+		First(&projectTRE).Error
+
+	if err != nil {
+		return nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
+	}
+
+	return &projectTRE, nil
+}
