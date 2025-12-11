@@ -9,5 +9,5 @@ import (
 type ApprovedResearcherImportRecord struct {
 	Username                types.Username
 	AgreedToAgreement       bool
-	NHSDTrainingCompletedAt time.Time
+	NHSDTrainingCompletedAt *time.Time
 }

@@ -25,8 +25,10 @@ func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement type
 		if err := s.ConfirmAgreement(user, agreement.ID); err != nil {
 			return err
 		}
-		if err := s.CreateNHSDTrainingRecord(user, record.NHSDTrainingCompletedAt); err != nil {
-			return err
+		if record.NHSDTrainingCompletedAt != nil {
+			if err := s.CreateNHSDTrainingRecord(user, *record.NHSDTrainingCompletedAt); err != nil {
+				return err
+			}
 		}
 		log.Debug().Any("user", user).Msg("Inserted approved researcher")
 	}
@@ -45,14 +47,17 @@ func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResear
 		} else if len(raw) != 3 {
 			return records, fmt.Errorf("failed to parse csv line: %v", raw)
 		}
-		nhsdTrainingCompletedAt, err := time.Parse("2006-01-02", raw[2])
-		if err != nil {
-			return records, err
-		}
+
 		record := ApprovedResearcherImportRecord{
-			Username:                types.Username(raw[0]),
-			AgreedToAgreement:       raw[1] == "true",
-			NHSDTrainingCompletedAt: nhsdTrainingCompletedAt,
+			Username:          types.Username(raw[0]),
+			AgreedToAgreement: raw[1] == "true",
+		}
+		if raw[2] != "" {
+			if completedAt, err := time.Parse("2006-01-02", raw[2]); err != nil {
+				return records, err
+			} else {
+				record.NHSDTrainingCompletedAt = &completedAt
+			}
 		}
 		records = append(records, record)
 	}
