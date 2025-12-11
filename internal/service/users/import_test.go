@@ -14,11 +14,16 @@ func TestApprovedResearcherImportParsingValid(t *testing.T) {
 	assert.NoError(t, err)
 	records, err := approvedResearcherImportRecordsFromCSV(content)
 	assert.NoError(t, err)
-	assert.Len(t, records, 2)
+	assert.Len(t, records, 3)
+	expectedBobNHSDTrainingCompletedAt := time.Date(2021, time.March, 11, 0, 0, 0, 0, time.UTC)
 	assert.Equal(t, records[0], ApprovedResearcherImportRecord{
 		Username:                types.Username("bob@example.com"),
 		AgreedToAgreement:       true,
-		NHSDTrainingCompletedAt: time.Date(2021, time.March, 11, 0, 0, 0, 0, time.UTC),
+		NHSDTrainingCompletedAt: &expectedBobNHSDTrainingCompletedAt,
+	})
+	assert.Equal(t, records[2], ApprovedResearcherImportRecord{
+		Username:          types.Username("john@example.com"),
+		AgreedToAgreement: true,
 	})
 	assert.False(t, records[1].AgreedToAgreement)
 }
