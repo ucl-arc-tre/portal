@@ -161,6 +161,20 @@ func HasRole(user types.User, role RoleName) (bool, error) {
 	return slices.Contains(roles, role), nil
 }
 
+// Does the user have any of the listed roles
+func HasAnyRole(user types.User, required ...RoleName) (bool, error) {
+	roles, err := Roles(user)
+	if err != nil {
+		return false, err
+	}
+	for _, requiredRole := range required {
+		if slices.Contains(roles, requiredRole) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func userIdsWithRole(role RoleName) ([]uuid.UUID, error) {
 	userIds, err := enforcer.GetUsersForRole(string(role))
 	if err != nil {
