@@ -697,7 +697,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                           className={styles["option__text-input"]}
                           type="text"
                           id="nhsEnglandRef"
-                          placeholder="eg. XXXXXX-XXXXX-XX"
+                          placeholder="eg. 123456-12345-12"
                           value={field.value}
                           maxLength={15}
                         />
