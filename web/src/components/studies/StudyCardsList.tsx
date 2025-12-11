@@ -7,7 +7,8 @@ import styles from "./StudyCardsList.module.css";
 
 type Props = {
   studies: Study[];
-  isAdmin: boolean;
+  isIGOpsStaff: boolean;
+  canSeeAll: boolean;
 };
 
 const studySortOrder = {
@@ -18,12 +19,12 @@ const studySortOrder = {
 };
 
 export default function StudyCardsList(props: Props) {
-  const { studies, isAdmin } = props;
+  const { studies, isIGOpsStaff, canSeeAll } = props;
   const router = useRouter();
 
   return (
     <div className={styles["study-selection"]}>
-      {!isAdmin && <h2 className={styles["studies-heading"]}>Your Studies</h2>}
+      {!canSeeAll && <h2 className={styles["studies-heading"]}>Your Studies</h2>}
 
       <div className={styles["studies-list"]}>
         {studies
@@ -31,7 +32,7 @@ export default function StudyCardsList(props: Props) {
           .map((study) => (
             <div key={study.id} className={styles["study-card"]}>
               <div className={styles["status-indicator"]}>
-                <StudyStatusBadge status={study.approval_status} isAdmin={isAdmin} />
+                <StudyStatusBadge status={study.approval_status} isIGOpsStaff={isIGOpsStaff} />
               </div>
 
               <div className={styles["study-info"]}>
@@ -45,7 +46,7 @@ export default function StudyCardsList(props: Props) {
                   size="small"
                   data-cy="manage-study-button"
                 >
-                  {isAdmin ? "View Study" : "Manage Study"}
+                  {isIGOpsStaff ? "View Study" : "Manage Study"}
                 </Button>
               </div>
             </div>
