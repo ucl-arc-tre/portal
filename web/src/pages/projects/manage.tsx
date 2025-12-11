@@ -11,6 +11,7 @@ import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 
 import styles from "./ManageProject.module.css";
+import Box from "@/components/ui/Box";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -122,72 +123,70 @@ export default function ManageProjectPage() {
 
       <Title text={`Manage Project: ${project.name}`} />
 
-      <div className={styles["project-info"]}>
-        <div className={styles.section}>
-          <h3>Project Details</h3>
-          <div className={styles.field}>
-            <label>Name:</label>
-            <span>{project.name}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Environment:</label>
-            <span>{project.environment_name}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Status:</label>
-            <span className={styles.status}>{project.approval_status}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Created by:</label>
-            <span>{project.creator_username}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Created:</label>
-            <span>{new Date(project.created_at).toLocaleDateString()}</span>
-          </div>
+      <Box>
+        <h2 className={styles.sectionTitle}>Project Details</h2>
+        <div className={styles.field}>
+          <label>Name:</label>
+          <span>{project.name}</span>
         </div>
+        <div className={styles.field}>
+          <label>Environment:</label>
+          <span>{project.environment_name}</span>
+        </div>
+        <div className={styles.field}>
+          <label>Status:</label>
+          <span className={styles.status}>{project.approval_status}</span>
+        </div>
+        <div className={styles.field}>
+          <label>Created by:</label>
+          <span>{project.creator_username}</span>
+        </div>
+        <div className={styles.field}>
+          <label>Created:</label>
+          <span>{new Date(project.created_at).toLocaleDateString()}</span>
+        </div>
+      </Box>
 
-        <div className={styles.section}>
-          <h3>Project Members</h3>
-          {project.members && project.members.length > 0 ? (
-            <ul className={styles["members-list"]}>
-              {project.members.map((member, index) => (
-                <li key={index} className={styles["member-item"]}>
-                  <span className={styles["member-username"]}>{member.username}</span>
-                  <div className={styles["member-roles"]}>
-                    {member.roles.map((role, roleIndex) => (
-                      <span key={roleIndex} className={styles["role-badge"]}>
-                        {role.replace(/_/g, " ")}
-                      </span>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
-          )}
-        </div>
+      <Box>
+        <h2 className={styles.sectionTitle}>Project Members</h2>
+        {project.members && project.members.length > 0 ? (
+          <ul className={styles["members-list"]}>
+            {project.members.map((member, index) => (
+              <li key={index} className={styles["member-item"]}>
+                <span className={styles["member-username"]}>{member.username}</span>
+                <div className={styles["member-roles"]}>
+                  {member.roles.map((role, roleIndex) => (
+                    <span key={roleIndex} className={styles["role-badge"]}>
+                      {role.replace(/_/g, " ")}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
+        )}
+      </Box>
 
-        <div className={styles.section}>
-          <h3>Assets</h3>
-          {project.assets && project.assets.length > 0 ? (
-            <ul className={styles["assets-list"]}>
-              {project.assets.map((asset) => (
-                <li key={asset.id} className={styles["asset-item"]}>
-                  <div className={styles["asset-info"]}>
-                    <strong>{asset.title}</strong>
-                    <p>{asset.description}</p>
-                    <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
-          )}
-        </div>
-      </div>
+      <Box>
+        <h2 className={styles.sectionTitle}>Assets</h2>
+        {project.assets && project.assets.length > 0 ? (
+          <ul className={styles["assets-list"]}>
+            {project.assets.map((asset) => (
+              <li key={asset.id} className={styles["asset-item"]}>
+                <div className={styles["asset-info"]}>
+                  <strong>{asset.title}</strong>
+                  <p>{asset.description}</p>
+                  <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
+        )}
+      </Box>
     </>
   );
 }
