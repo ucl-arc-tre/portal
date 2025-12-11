@@ -1,7 +1,15 @@
-# UCL ARC Portal
+# UCL ARC Services Portal
 
 Management portal for [UCL ARC](https://www.ucl.ac.uk/advanced-research-computing/)
 services.
+
+Production site: https://portal.arc.ucl.ac.uk/
+
+Staging site: https://portal.ucl-arc.dev/
+
+# Overview
+
+The Service Portal aims to serve as a single entry point for researchers and other users to manage and engage with the various services and platforms provided by ARC, eg. TRE, DSH.
 
 ## ⚙️ Deployment
 
@@ -17,6 +25,10 @@ make dev
 ```
 
 then go to http://localhost:8000. To destroy it run `make dev-destroy`. To see other commands run `make help`.
+
+### staging and production
+
+Tese deployments are managed by the TRE team. Staging will update after merging into `main`
 
 ## 🏗️ Development
 
