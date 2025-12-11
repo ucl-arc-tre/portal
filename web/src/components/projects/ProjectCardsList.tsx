@@ -1,13 +1,12 @@
 import { useRouter } from "next/router";
-import { ApprovalStatus } from "@/openapi";
-import { AnyProject } from "@/types/projects";
+import { ApprovalStatus, Project } from "@/openapi";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 
 type Props = {
-  projects: AnyProject[];
+  projects: Project[];
 };
 
 const projectSortOrder: Record<ApprovalStatus, number> = {
@@ -41,7 +40,12 @@ export default function ProjectCardsList(props: Props) {
               </div>
 
               <div className={styles["project-actions"]}>
-                <Button onClick={() => router.push(`/projects/${project.id}`)} size="small">
+                <Button
+                  onClick={() =>
+                    router.push(`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`)
+                  }
+                  size="small"
+                >
                   Manage Project
                 </Button>
               </div>

@@ -443,7 +443,7 @@ export type Project = {
 };
 
 /**
- * A TRE project with base project details joined in
+ * A TRE project with base project details and environment-specific data
  */
 export type ProjectTre = {
     /**
@@ -475,6 +475,14 @@ export type ProjectTre = {
      * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
      */
     environment_name: string;
+    /**
+     * List of assets associated with this project
+     */
+    assets: Array<Asset>;
+    /**
+     * List of project members with their roles (TRE-specific)
+     */
+    members: Array<ProjectTreMember>;
 };
 
 export type ContractBase = {
