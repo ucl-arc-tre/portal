@@ -8,6 +8,8 @@ export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
 const botStaffUsername = Cypress.env("botStaffUsername") as string;
 const botStaffPassword = Cypress.env("botStaffPassword") as string;
+const botIGUsername = Cypress.env("botIGUsername") as string;
+const botIGPassword = Cypress.env("botIGPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
