@@ -27,6 +27,8 @@ const (
 var (
 	titlePattern                = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
 	dataProtectionNumberPattern = regexp.MustCompile(`^\w+\/\d{4}\/\d{2}\/(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$`)
+	cagPattern                  = regexp.MustCompile(`^\d{2}/CAG/\d{4}$`)
+	nhsePattern                 = regexp.MustCompile(`^DARS-NIC-\d{6}-\d{5}-\d{2}$`)
 )
 
 type Service struct {
@@ -100,6 +102,15 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		if !dataProtectionNumberPattern.MatchString(*studyData.DataProtectionNumber) {
 			return &openapi.ValidationError{ErrorMessage: "data protection ID invalid format"}, nil
 		}
+	}
+
+	if studyData.CagReference != nil && !cagPattern.MatchString(*studyData.CagReference) {
+		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
+
+	}
+
+	if studyData.NhsEnglandReference != nil && !nhsePattern.MatchString(*studyData.NhsEnglandReference) {
+		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
 	}
 
 	if len(studyData.AdditionalStudyAdminUsernames) > maxNumberStudyAdmins {
