@@ -11,6 +11,9 @@ Staging site: https://portal.ucl-arc.dev/
 
 The Service Portal aims to serve as a single entry point for researchers and other users to manage and engage with the various services and platforms provided by ARC, eg. TRE, DSH.
 
+Currently, the services within the portal have the following entity relationships:
+![entity diagram](web/public/entity_diagram.drawio.svg)
+
 ## ⚙️ Deployment
 
 ### dev
@@ -28,7 +31,7 @@ then go to http://localhost:8000. To destroy it run `make dev-destroy`. To see o
 
 ### staging and production
 
-Tese deployments are managed by the TRE team. Staging will update after merging into `main`
+These deployments are managed by the TRE team. Staging will update after merging into `main`
 
 ## 🏗️ Development
 
