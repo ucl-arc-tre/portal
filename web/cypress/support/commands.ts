@@ -60,9 +60,9 @@ declare global {
 
       /**
        * Mock auth response to return admin and approved researcher roles
-       * @example cy.mockAuthAsAdminApprovedResearcher()
+       * @example cy.mockAuthAsIGOpsStaffApprovedResearcher()
        */
-      mockAuthAsAdminApprovedResearcher(): Chainable<any>;
+      mockAuthAsIGOpsStaffApprovedResearcher(): Chainable<any>;
 
       /**
        * Mock auth response to return base and approved researcher roles with staff status
@@ -389,9 +389,9 @@ Cypress.Commands.add("mockAuthAsAdminBase", () => {
   }).as("getAuth");
 });
 
-Cypress.Commands.add("mockAuthAsAdminApprovedResearcher", () => {
+Cypress.Commands.add("mockAuthAsIGOpsStaffApprovedResearcher", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
-    fixture: "auth-admin-approved-researcher.json",
+    fixture: "auth-ig-ops-staff-approved-researcher.json",
   }).as("getAuth");
 });
 

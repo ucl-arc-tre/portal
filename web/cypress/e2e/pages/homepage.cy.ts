@@ -55,7 +55,7 @@ describe(`Homepage Tests`, () => {
     it("points to studies page for admin Approved Researcher", () => {
       cy.loginAsAdmin();
       cy.mockProfileChosenName("Tom Young");
-      cy.mockAuthAsAdminApprovedResearcher();
+      cy.mockAuthAsIGOpsStaffApprovedResearcher();
 
       cy.visit("/");
       cy.waitForAuth();

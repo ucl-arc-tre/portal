@@ -12,7 +12,7 @@ export default function UserTasks() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPendingStudies, setHasPendingStudies] = useState(false);
 
-  const isAdmin = userData?.roles.includes("admin");
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   useEffect(() => {
@@ -51,8 +51,8 @@ export default function UserTasks() {
         console.error("Failed to get pending studies:", error);
       }
     };
-    if (isAdmin) fetchPendingStudies();
-  }, [isAdmin]);
+    if (isIGOpsStaff) fetchPendingStudies();
+  }, [isIGOpsStaff]);
 
   if (authInProgress) return null;
 
@@ -90,7 +90,7 @@ export default function UserTasks() {
         </div>
       ) : (
         <div className={styles["completed-tasks"]}>
-          {isAdmin ? (
+          {isIGOpsStaff ? (
             <>
               {hasPendingStudies ? (
                 <>

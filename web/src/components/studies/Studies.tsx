@@ -144,7 +144,7 @@ export default function Studies(props: Props) {
           <StudyCardsList
             studies={tab === "pending" ? pendingStudies : studies}
             isIGOpsStaff={isIgOpsStaff}
-            canSeeAll={true}
+            canSeeAll={canSeeAll}
           />
         )}
       </>
@@ -192,7 +192,7 @@ export default function Studies(props: Props) {
             </Button>
           </div>
 
-          <StudyCardsList studies={studies} canSeeAll={false} isIGOpsStaff={false} />
+          <StudyCardsList studies={studies} canSeeAll={canSeeAll} isIGOpsStaff={false} />
         </>
       )}
     </>
