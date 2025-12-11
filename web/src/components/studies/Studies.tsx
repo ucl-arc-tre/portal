@@ -75,10 +75,8 @@ export default function Studies(props: Props) {
   };
 
   useEffect(() => {
-    if (canSeeAll) {
-      fetchAllStudies();
-    }
-  }, [canSeeAll]);
+    fetchAllStudies();
+  }, []);
 
   const handleCreateStudyClick = () => {
     if (!userData.roles.includes("approved-staff-researcher")) {

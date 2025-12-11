@@ -20,7 +20,7 @@ import Assets from "../assets/Assets";
 
 type StudyDetailsProps = {
   study: Study;
-  isAdmin: boolean;
+  isIGOpsStaff: boolean;
   isStudyOwner: boolean;
   isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
@@ -89,7 +89,7 @@ const calculateRiskScore = async (study: Study) => {
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 export default function StudyDetails(props: StudyDetailsProps) {
-  const { study, isAdmin, isStudyOwner, isStudyAdmin, setStudyFormOpen, studyStepsCompleted } = props;
+  const { study, isIGOpsStaff, isStudyOwner, isStudyAdmin, setStudyFormOpen, studyStepsCompleted } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -194,7 +194,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
             Risk Score:{" "}
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
-          <StatusBadge status={approvalStatus} isAdmin={isAdmin} />{" "}
+          <StatusBadge status={approvalStatus} isIGOpsStaff={isIGOpsStaff} />{" "}
         </div>
         <h3 className={styles.description}>{study.description}</h3>
         <div>
@@ -336,7 +336,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
         </div>
       </Box>
 
-      {isAdmin && (
+      {isIGOpsStaff && (
         <>
           <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
 
