@@ -126,6 +126,7 @@ export default function Studies(props: Props) {
             onClick={handleAllStudiesClick}
             variant="secondary"
             className={`${styles.tab} ${styles["all-studies-tab"]} ${tab === "all" ? styles.active : ""}`}
+            data-cy="all-studies-tab-button"
           >
             All Studies
           </Button>

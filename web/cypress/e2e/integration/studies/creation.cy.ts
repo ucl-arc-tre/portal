@@ -4,31 +4,19 @@ beforeEach(() => {
 });
 
 describe("Study creation end-to-end", () => {
-  beforeEach(() => {
+  it("staff should become an approved researcher", () => {
     cy.loginAsStaff();
+    becomeApprovedResearcher();
   });
 
-  it("should become an approved researcher", () => {
-    cy.visit("/profile");
-
-    cy.contains("Profile Information").should("be.visible");
-
-    cy.get("body").then(($body) => {
-      if ($body.text().includes("Save Name")) {
-        cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
-        cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
-      }
-      if ($body.text().includes("Approved Researcher Agreement")) {
-        cy.get("[data-cy='agreement-agree']").click();
-      }
-      if (!$body.text().includes("Verify another certificate")) {
-        cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-        cy.get("[data-cy='training-certificate-sumbit']").click();
-      }
-    });
+  it("ig ops staff should become an approved researcher", () => {
+    cy.loginAsIGOps();
+    becomeApprovedResearcher();
   });
 
-  it("should successfully create a study", () => {
+  it("staff should successfully create a study", () => {
+    cy.loginAsStaff();
+
     // Visit page and wait for initial load
     cy.visit("/studies");
 
@@ -78,4 +66,31 @@ describe("Study creation end-to-end", () => {
 
     cy.get('[data-cy="study-admins-agreement-prompt"]').contains(additionalAdminUsernamePrefix).should("be.visible");
   });
+
+  it("ig ops should see a study", () => {
+    cy.loginAsIGOps();
+    cy.visit("/studies");
+    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('[data-cy="study-card"]').first().contains("View Study").should("be.visible");
+  });
 });
+
+function becomeApprovedResearcher() {
+  cy.visit("/profile");
+
+  cy.contains("Profile Information").should("be.visible");
+
+  cy.get("body").then(($body) => {
+    if ($body.text().includes("Save Name")) {
+      cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
+      cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
+    }
+    if ($body.text().includes("Approved Researcher Agreement")) {
+      cy.get("[data-cy='agreement-agree']").click();
+    }
+    if (!$body.text().includes("Verify another certificate")) {
+      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
+      cy.get("[data-cy='training-certificate-sumbit']").click();
+    }
+  });
+}

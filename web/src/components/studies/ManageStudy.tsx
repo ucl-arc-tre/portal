@@ -105,7 +105,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       <StudyDetails
         studyStepsCompleted={studyStepsCompleted}
         study={study}
-        isAdmin={false}
+        isIGOpsStaff={false}
         isStudyOwner={isStudyOwner}
         isStudyAdmin={isStudyAdmin}
         setStudyFormOpen={setStudyFormOpen}

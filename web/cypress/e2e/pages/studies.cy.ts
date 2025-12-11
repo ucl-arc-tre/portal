@@ -23,7 +23,7 @@ describe(`Studies page content`, () => {
   });
 
   it("should show different content for admins", () => {
-    cy.loginAsAdmin();
+    cy.loginAsIGOps();
     cy.mockAuthAsIGOpsStaffApprovedResearcher();
     cy.visit("/studies");
     cy.waitForAuth();

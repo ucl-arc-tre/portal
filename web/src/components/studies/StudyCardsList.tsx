@@ -30,7 +30,7 @@ export default function StudyCardsList(props: Props) {
         {studies
           .sort((a, b) => studySortOrder[a.approval_status] - studySortOrder[b.approval_status])
           .map((study) => (
-            <div key={study.id} className={styles["study-card"]}>
+            <div key={study.id} className={styles["study-card"]} data-cy="study-card">
               <div className={styles["status-indicator"]}>
                 <StudyStatusBadge status={study.approval_status} isOpsStaff={isIGOpsStaff} />
               </div>
