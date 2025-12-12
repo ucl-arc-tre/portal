@@ -187,65 +187,6 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	assets, err := h.studies.InformationAssets(studyUUID)
-	if err != nil {
-		setError(ctx, err, "Failed to retrieve assets")
-		return
-	}
-
-	response := []openapi.Asset{}
-	for _, asset := range assets {
-		response = append(response, assetToOpenApiAsset(asset))
-	}
-
-	ctx.JSON(http.StatusOK, response)
-}
-
-func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	assetData := openapi.AssetBase{}
-	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
-		return
-	}
-
-	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateAsset(user, assetData, studyUUID)
-	if err != nil {
-		setError(ctx, err, "Failed to create asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-
-	ctx.Status(http.StatusCreated)
-}
-
-func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
-	if err != nil {
-		return
-	}
-
-	asset, err := h.studies.InformationAssetById(uuids[0], uuids[1])
-	if err != nil {
-		setError(ctx, err, "Failed to retrieve asset")
-		return
-	}
-
-	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
-}
-
 // confirms a study agreement for the study ID and user
 func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
