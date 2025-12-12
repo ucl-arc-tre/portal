@@ -10,6 +10,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+// Helper functions
+
 func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 	return openapi.Asset{
 		Id:                   asset.ID.String(),
@@ -32,6 +34,8 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
 	}
 }
+
+// Handler methods
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
