@@ -1,4 +1,0 @@
-{
-  "username": "cypress-admin-approved-researcher@example.com",
-  "roles": ["base", "approved-researcher", "staff", "approved-staff-researcher", "admin"]
-}

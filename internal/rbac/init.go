@@ -21,9 +21,11 @@ func Init() {
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
 	addTreOpsStaffPolicy(enforcer)
+	addIgOpsStaffPolicy(enforcer)
 
 	addUserRoleBindings(config.AdminUsernames(), Admin)
 	addUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
+	addUserRoleBindings(config.IGOpsStaffUsernames(), IGOpsStaff)
 
 	runMigrations()
 }
@@ -42,35 +44,43 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 		{RoleName: Base, Resource: "/logout", Action: ReadAction},
 	}
 	for _, policy := range policies {
-		mustAddPolicy(enforcer, policy)
+		mustAddPolicies(enforcer, policy)
 	}
 }
 
 func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
-	policies := []Policy{
-		{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
-		{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
-		{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
-		{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
-		{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: ReadAction},
-		{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: WriteAction},
-		{RoleName: ApprovedStaffResearcher, Resource: "/environments", Action: ReadAction},
-	}
-	for _, policy := range policies {
-		mustAddPolicy(enforcer, policy)
-	}
+	mustAddPolicies(enforcer,
+		Policy{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
+		Policy{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: ReadAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: WriteAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/environments", Action: ReadAction},
+	)
 }
 
 func addAdminPolicy(enforcer *casbin.Enforcer) {
-	mustAddPolicy(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
+	mustAddPolicies(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
 }
 
 func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
-	mustAddPolicy(enforcer, Policy{RoleName: TreOpsStaff, Resource: "*", Action: ReadAction})
+	mustAddPolicies(enforcer, Policy{RoleName: TreOpsStaff, Resource: "*", Action: ReadAction})
 }
 
-func mustAddPolicy(enforcer *casbin.Enforcer, policy Policy) {
-	_ = must(addPolicy(enforcer, policy))
+func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
+	mustAddPolicies(enforcer,
+		Policy{RoleName: IGOpsStaff, Resource: "/studies", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: WriteAction},
+	)
+}
+
+func mustAddPolicies(enforcer *casbin.Enforcer, policies ...Policy) {
+	for _, policy := range policies {
+		_ = must(addPolicy(enforcer, policy))
+	}
 }
 
 func addPolicy(enforcer *casbin.Enforcer, policy Policy) (bool, error) {

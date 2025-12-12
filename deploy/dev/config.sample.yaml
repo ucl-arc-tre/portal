@@ -1,10 +1,17 @@
 debug: true
-admin_usernames:
+
+# Deploy-time configurable list of role bindings for identity
+# provided usernames
+admin_usernames: # Global portal admins
   - bob@example.com
-tre_ops_staff_usernames:
+tre_ops_staff_usernames: # Trusted research environment staff
   - bob@example.com
+ig_ops_staff_usernames: # Information governance operations staff
+  - bob@example.com
+
 db:
   dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC # pragma: allowlist secret
+
 s3:
   dev: # Required S3 config in dev
     host: s3:8333 # Host:port of the s3 service
@@ -15,6 +22,7 @@ s3:
   # Access keys for user with S3:GetObject and S3:PutObject on the bucket
   access_key_id: s3
   secret_access_key: s3 # pragma: allowlist secret
+
 entra:
   # EntraID app registration with User.Read.All & User.Invite.All application permissions
   tenant_id: <CHANGE_ME>

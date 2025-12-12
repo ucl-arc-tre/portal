@@ -23,6 +23,9 @@ func TestRBAC(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, Admin, roles[0])
 	assert.True(t, must(HasRole(bob, Admin)))
+	assert.True(t, must(HasAnyListedRole(bob, Admin)))
+	assert.True(t, must(HasAnyListedRole(bob, Admin, Base)))
+	assert.False(t, must(HasAnyListedRole(bob, IGOpsStaff)))
 
 	addedBaseRole, err := AddRole(bob, Base)
 	assert.NoError(t, err)

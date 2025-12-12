@@ -39,7 +39,11 @@ export default function AdminFeedbackSection(props: FeedbackProps) {
     <>
       {(status === "Pending" || status === "Rejected") && (
         <div>
-          <Button className={styles["approve-button"]} onClick={() => handleStudyStatusUpdate("Approved", feedback)}>
+          <Button
+            className={styles["approve-button"]}
+            onClick={() => handleStudyStatusUpdate("Approved", feedback)}
+            data-cy="study-approve-button"
+          >
             Approve Study
           </Button>
           <Button
