@@ -174,7 +174,11 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
           {studyStepsCompleted &&
             (approvalStatus !== "Pending" ? (
-              <Button onClick={() => handleUpdateStudyStatus("Pending")} size="small">
+              <Button
+                onClick={() => handleUpdateStudyStatus("Pending")}
+                size="small"
+                data-cy="study-ready-for-review-button"
+              >
                 Mark Ready for Review
               </Button>
             ) : (

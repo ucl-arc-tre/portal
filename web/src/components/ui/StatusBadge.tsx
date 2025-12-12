@@ -30,7 +30,7 @@ export default function StatusBadge(props: BadgeProps) {
   }
 
   return (
-    <span className={`${styles["status-badge"]} ${styles[`status-${status?.toLowerCase()}`]}`}>
+    <span className={`${styles["status-badge"]} ${styles[`status-${status?.toLowerCase()}`]}`} data-cy="status-badge">
       {status}
       <span className={styles["tooltip-wrapper"]}>
         <InfoTooltip text={getStatusDescription(status)} />

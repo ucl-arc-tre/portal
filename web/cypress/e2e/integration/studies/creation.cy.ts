@@ -4,6 +4,8 @@ beforeEach(() => {
 });
 
 describe("Study creation end-to-end", () => {
+  const studyTitle = `study-${Date.now()}`;
+
   it("staff should become an approved researcher", () => {
     cy.loginAsStaff();
     becomeApprovedResearcher();
@@ -19,8 +21,6 @@ describe("Study creation end-to-end", () => {
 
     // Visit page and wait for initial load
     cy.visit("/studies");
-
-    const studyTitle = `study-${Date.now()}`;
 
     cy.get('[data-cy="create-study-button"]').click();
     cy.get('[name="title"]').type(studyTitle);
@@ -64,14 +64,33 @@ describe("Study creation end-to-end", () => {
     cy.get('[name="status"]').select("active");
     cy.get("button[type='submit']").click();
 
+    cy.contains("Manage Study").should("be.visible");
     cy.get('[data-cy="study-admins-agreement-prompt"]').contains(additionalAdminUsernamePrefix).should("be.visible");
+
+    // remove added study admin
+    cy.get('[data-cy="edit-study-button"]').click();
+    cy.get('[data-cy="remove-study-admin-button"]').click();
+    cy.get('[data-cy="next"]').click();
+    cy.get('[data-cy="next"]').click();
+    cy.get("button[type='submit']").click();
+
+    // mark as ready for review
+    cy.get('[data-cy="study-ready-for-review-button"]').click();
   });
 
   it("ig ops should see a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
-    cy.get('[data-cy="study-card"]').first().contains("View Study").should("be.visible");
+    cy.get('[data-cy="study-card"]').first().contains("View Study").click();
+    cy.get('[data-cy="study-approve-button"]').click();
+  });
+
+  it("staff should see an approved study", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).parent().parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
   });
 });
 
