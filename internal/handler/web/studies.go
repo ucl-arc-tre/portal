@@ -121,7 +121,7 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 
 	var studies []types.Study
 
-	isAdminOrIGOps, err := rbac.HasAnyRole(user, rbac.Admin, rbac.IGOpsStaff)
+	isAdminOrIGOps, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return

@@ -162,7 +162,7 @@ func HasRole(user types.User, role RoleName) (bool, error) {
 }
 
 // Does the user have any of the listed roles
-func HasAnyRole(user types.User, required ...RoleName) (bool, error) {
+func HasAnyListedRole(user types.User, required ...RoleName) (bool, error) {
 	roles, err := Roles(user)
 	if err != nil {
 		return false, err

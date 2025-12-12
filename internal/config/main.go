@@ -119,18 +119,18 @@ func SetforTesting(key string, value string) error {
 	return k.Set(key, value)
 }
 func AdminUsernames() []types.Username {
-	return kUsernames("admin_usernames")
+	return usernames("admin_usernames")
 }
 
 func TreOpsStaffUsernames() []types.Username {
-	return kUsernames("tre_ops_staff_usernames")
+	return usernames("tre_ops_staff_usernames")
 }
 
 func IGOpsStaffUsernames() []types.Username {
-	return kUsernames("ig_ops_staff_usernames")
+	return usernames("ig_ops_staff_usernames")
 }
 
-func kUsernames(key string) []types.Username {
+func usernames(key string) []types.Username {
 	usernames := []types.Username{}
 	for _, username := range k.Strings(key) {
 		usernames = append(usernames, types.Username(username))
