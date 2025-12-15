@@ -7,7 +7,7 @@ import styles from "./ProjectCardsList.module.css";
 
 type Props = {
   projects: Project[];
-  isAdminView?: boolean;
+  isAdminView: boolean;
 };
 
 const projectSortOrder: Record<ApprovalStatus, number> = {

@@ -153,11 +153,11 @@ export default function ManageProjectPage() {
       <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} />
 
       {canApprove && project.approval_status !== "Approved" && (
-        <div className={styles.approvalSection}>
-          <p className={styles.approvalInfo}>
+        <div className={styles["approval-section"]}>
+          <p className={styles["approval-info"]}>
             Please review the below project details, members, and assets before approving this project.
           </p>
-          <div className={styles.approvalActions}>
+          <div className={styles["approval-actions"]}>
             <Button onClick={handleApprove} disabled={isApproving} size="large">
               {isApproving ? "Approving..." : "Approve Project"}
             </Button>
@@ -166,7 +166,7 @@ export default function ManageProjectPage() {
       )}
 
       <Box>
-        <h2 className={styles.sectionTitle}>Project Details</h2>
+        <h2 className={styles["section-title"]}>Project Details</h2>
         <div className={styles.field}>
           <label>Name:</label>
           <span>{project.name}</span>
