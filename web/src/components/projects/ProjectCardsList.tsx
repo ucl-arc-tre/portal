@@ -31,7 +31,7 @@ export default function ProjectCardsList(props: Props) {
           .map((project) => (
             <div key={project.id} className={styles["project-card"]}>
               <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.approval_status} isOpsStaff={false} />
+                <StatusBadge status={project.approval_status} isOpsStaff={isAdminView} type="project" />
               </div>
 
               <div className={styles["project-info"]}>

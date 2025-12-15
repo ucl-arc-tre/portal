@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { AnyProject } from "@/types/projects";
-import { getProjectsTreByProjectId } from "@/openapi";
+import { getProjectsTreByProjectId, postProjectsTreAdminByProjectIdApprove } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -73,6 +73,31 @@ export default function ManageProjectPage() {
     }
   }, [projectId, environment]);
 
+  const handleApprove = async () => {
+    if (!projectId || typeof projectId !== "string") return;
+
+    setIsApproving(true);
+    setError(null);
+
+    try {
+      const response = await postProjectsTreAdminByProjectIdApprove({
+        path: { projectId },
+      });
+
+      if (response.response.ok) {
+        // Refresh project data to show updated status
+        await fetchData(projectId, environment as string);
+      } else {
+        setError("Failed to approve project. Please try again.");
+      }
+    } catch (err) {
+      console.error("Failed to approve project:", err);
+      setError("Failed to approve project. Please try again.");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
   if (loading) return <Loading />;
@@ -133,7 +158,7 @@ export default function ManageProjectPage() {
             Please review the below project details, members, and assets before approving this project.
           </p>
           <div className={styles.approvalActions}>
-            <Button onClick={() => alert("Approval functionality coming soon")} disabled={isApproving} size="large">
+            <Button onClick={handleApprove} disabled={isApproving} size="large">
               {isApproving ? "Approving..." : "Approve Project"}
             </Button>
           </div>
