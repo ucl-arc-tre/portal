@@ -190,7 +190,7 @@ export default function ManageProjectPage() {
       </Box>
 
       <Box>
-        <h2 className={styles.sectionTitle}>Project Members</h2>
+        <h2 className={styles["section-title"]}>Project Members</h2>
         {project.members && project.members.length > 0 ? (
           <ul className={styles["members-list"]}>
             {project.members.map((member, index) => (
@@ -212,7 +212,7 @@ export default function ManageProjectPage() {
       </Box>
 
       <Box>
-        <h2 className={styles.sectionTitle}>Assets</h2>
+        <h2 className={styles["section-title"]}>Assets</h2>
         {project.assets && project.assets.length > 0 ? (
           <ul className={styles["assets-list"]}>
             {project.assets.map((asset) => (
