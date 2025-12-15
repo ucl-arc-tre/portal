@@ -309,3 +309,15 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 
 	return &projectTRE, nil
 }
+
+func (s *Service) ApproveProject(projectId uuid.UUID) error {
+	err := s.db.Model(&types.Project{}).
+		Where("id = ?", projectId).
+		Update("approval_status", "Approved").Error
+
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to approve project")
+	}
+
+	return nil
+}
