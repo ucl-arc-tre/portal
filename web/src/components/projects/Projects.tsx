@@ -127,7 +127,12 @@ export default function Projects({ userData }: Props) {
         />
       )}
 
-      {!isApprovedStaffResearcher && projects.length === 0 ? (
+      {isAdminView && projects.length === 0 ? (
+        <div className={styles["no-projects-message"]}>
+          <h2>No projects are currently submitted for review</h2>
+          <p>Projects created by users will appear here for approval.</p>
+        </div>
+      ) : !isApprovedStaffResearcher && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t been added to any projects yet</h2>
           <p>Any projects you are added to will appear here once they have been created by a member of staff.</p>
@@ -142,11 +147,13 @@ export default function Projects({ userData }: Props) {
         </div>
       ) : (
         <>
-          <div className={styles["create-project-section"]}>
-            <Button onClick={handleCreateProjectClick} size="large">
-              Create New Project
-            </Button>
-          </div>
+          {!isAdminView && (
+            <div className={styles["create-project-section"]}>
+              <Button onClick={handleCreateProjectClick} size="large">
+                Create New Project
+              </Button>
+            </div>
+          )}
 
           <ProjectCardsList projects={projects} isAdminView={isAdminView} />
         </>

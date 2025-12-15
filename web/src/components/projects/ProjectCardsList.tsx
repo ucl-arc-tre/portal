@@ -23,7 +23,7 @@ export default function ProjectCardsList(props: Props) {
 
   return (
     <div className={styles["project-selection"]}>
-      <h2 className={styles["projects-heading"]}>{isAdminView ? "All Projects" : "Your Projects"}</h2>
+      <h2 className={styles["projects-heading"]}>{isAdminView ? "All Projects pending review" : "Your Projects"}</h2>
 
       <div className={styles["projects-list"]}>
         {projects
@@ -47,7 +47,7 @@ export default function ProjectCardsList(props: Props) {
                   }
                   size="small"
                 >
-                  Manage Project
+                  {`Manage Project ${isAdminView ? "Approval" : ""}`}
                 </Button>
               </div>
             </div>

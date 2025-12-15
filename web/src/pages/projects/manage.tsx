@@ -20,8 +20,12 @@ export default function ManageProjectPage() {
   const [project, setProject] = useState<AnyProject | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isApproving, setIsApproving] = useState(false);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
+  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
+  const canApprove = isAdmin || isTreOpsStaff;
 
   const fetchData = async (projectIdParam: string, environmentParam: string) => {
     setLoading(true);
@@ -121,7 +125,20 @@ export default function ManageProjectPage() {
     <>
       <MetaHead title={`Manage Project: ${project.name}`} description={`Manage project details for ${project.name}`} />
 
-      <Title text={`Manage Project: ${project.name}`} />
+      <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} />
+
+      {canApprove && project.approval_status !== "Approved" && (
+        <div className={styles.approvalSection}>
+          <p className={styles.approvalInfo}>
+            Please review the below project details, members, and assets before approving this project.
+          </p>
+          <div className={styles.approvalActions}>
+            <Button onClick={() => alert("Approval functionality coming soon")} disabled={isApproving} size="large">
+              {isApproving ? "Approving..." : "Approve Project"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Box>
         <h2 className={styles.sectionTitle}>Project Details</h2>
