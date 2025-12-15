@@ -21,6 +21,9 @@ export default function Projects({ userData }: Props) {
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
 
   const isApprovedStaffResearcher = !!userData?.roles?.includes("approved-staff-researcher");
+  const isAdmin = !!userData?.roles?.includes("admin");
+  const isTreOpsStaff = !!userData?.roles?.includes("tre-ops-staff");
+  const isAdminView = isAdmin || isTreOpsStaff;
   const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
 
   const fetchData = async () => {
@@ -88,7 +91,7 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  if (approvedStudies.length === 0 && isApprovedStaffResearcher) {
+  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isAdminView) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You don&apos;t have any approved studies</h2>
@@ -100,7 +103,6 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  // TODO: Implement admin view for all projects
   return (
     <>
       {showUclStaffModal && (
@@ -146,7 +148,7 @@ export default function Projects({ userData }: Props) {
             </Button>
           </div>
 
-          <ProjectCardsList projects={projects} />
+          <ProjectCardsList projects={projects} isAdminView={isAdminView} />
         </>
       )}
     </>

@@ -7,6 +7,7 @@ import styles from "./ProjectCardsList.module.css";
 
 type Props = {
   projects: Project[];
+  isAdminView?: boolean;
 };
 
 const projectSortOrder: Record<ApprovalStatus, number> = {
@@ -17,12 +18,12 @@ const projectSortOrder: Record<ApprovalStatus, number> = {
 };
 
 export default function ProjectCardsList(props: Props) {
-  const { projects } = props;
+  const { projects, isAdminView = false } = props;
   const router = useRouter();
 
   return (
     <div className={styles["project-selection"]}>
-      <h2 className={styles["projects-heading"]}>Your Projects</h2>
+      <h2 className={styles["projects-heading"]}>{isAdminView ? "All Projects" : "Your Projects"}</h2>
 
       <div className={styles["projects-list"]}>
         {projects
