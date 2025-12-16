@@ -30,12 +30,9 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 		return
 	}
 
-	if isAdmin {
-		// Admin: fetch ALL projects
+	if isAdmin || isTreOpsStaff {
+		// Admin & TRE ops staff: fetch ALL projects
 		projects, err = h.projectsAdmin()
-	} else if isTreOpsStaff {
-		// TRE ops staff: fetch only PENDING projects (submitted for review)
-		projects, err = h.projectsPendingForReview()
 	} else {
 		// Regular user: fetch only projects they own (via RBAC)
 		projects, err = h.projectsProjectOwner(user)
