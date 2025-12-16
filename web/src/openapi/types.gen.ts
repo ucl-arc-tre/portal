@@ -6,7 +6,7 @@ export type ClientOptions = {
 
 export type Auth = {
     username: string;
-    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff'>;
+    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff'>;
 };
 
 export type Profile = {
@@ -1306,6 +1306,44 @@ export type GetProjectsTreByProjectIdResponses = {
 };
 
 export type GetProjectsTreByProjectIdResponse = GetProjectsTreByProjectIdResponses[keyof GetProjectsTreByProjectIdResponses];
+
+export type PostProjectsTreAdminByProjectIdApproveData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the TRE project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/admin/{projectId}/approve';
+};
+
+export type PostProjectsTreAdminByProjectIdApproveErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsTreAdminByProjectIdApproveResponses = {
+    /**
+     * Project approved successfully
+     */
+    200: unknown;
+};
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;

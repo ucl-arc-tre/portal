@@ -23,7 +23,7 @@ export default function ManageStudyPage() {
   const [studyError, setStudyError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isAdmin = userData?.roles.includes("admin");
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
 
   const fetchStudy = async (id?: string) => {
     setStudyIsLoading(true);
@@ -167,10 +167,10 @@ export default function ManageStudyPage() {
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
       <Breadcrumbs studyId={study.id} studyTitle={study.title} />
-      <Title text={isAdmin ? study.title : `Manage Study: ${study.title}`} centered />
+      <Title text={isIGOpsStaff ? study.title : `Manage Study: ${study.title}`} centered />
 
-      {isAdmin ? (
-        <StudyDetails study={study} isAdmin={isAdmin} isStudyOwner={false} isStudyAdmin={false} />
+      {isIGOpsStaff ? (
+        <StudyDetails study={study} isIGOpsStaff={isIGOpsStaff} isStudyOwner={false} isStudyAdmin={false} />
       ) : (
         <ManageStudy study={study} fetchStudy={fetchStudy} />
       )}

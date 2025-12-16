@@ -8,6 +8,8 @@ export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
 const botStaffUsername = Cypress.env("botStaffUsername") as string;
 const botStaffPassword = Cypress.env("botStaffPassword") as string;
+const botIGOpsUsername = Cypress.env("botIGUsername") as string;
+const botIGOpsPassword = Cypress.env("botIGPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -30,6 +32,12 @@ declare global {
        * @example cy.loginAsStaff()
        */
       loginAsStaff(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as as as staff user
+       * @example cy.loginAsIGOps()
+       */
+      loginAsIGOps(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Clears the chosen name
@@ -58,9 +66,9 @@ declare global {
 
       /**
        * Mock auth response to return admin and approved researcher roles
-       * @example cy.mockAuthAsAdminApprovedResearcher()
+       * @example cy.mockAuthAsIGOpsStaffApprovedResearcher()
        */
-      mockAuthAsAdminApprovedResearcher(): Chainable<any>;
+      mockAuthAsIGOpsStaffApprovedResearcher(): Chainable<any>;
 
       /**
        * Mock auth response to return base and approved researcher roles with staff status
@@ -358,6 +366,20 @@ Cypress.Commands.add("loginAsStaff", () => {
   });
 });
 
+Cypress.Commands.add("loginAsIGOps", () => {
+  cy.session(`login-ig-ops`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID IG operations user Login",
+      message: [`🔐 Authenticating IG user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botIGOpsUsername, botIGOpsPassword);
+    log.snapshot("after");
+    log.end();
+  });
+});
 Cypress.Commands.add("clearChosenName", () => {
   cy.request({
     method: "POST",
@@ -387,9 +409,9 @@ Cypress.Commands.add("mockAuthAsAdminBase", () => {
   }).as("getAuth");
 });
 
-Cypress.Commands.add("mockAuthAsAdminApprovedResearcher", () => {
+Cypress.Commands.add("mockAuthAsIGOpsStaffApprovedResearcher", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
-    fixture: "auth-admin-approved-researcher.json",
+    fixture: "auth-ig-ops-staff-approved-researcher.json",
   }).as("getAuth");
 });
 
