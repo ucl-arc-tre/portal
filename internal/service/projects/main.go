@@ -313,8 +313,8 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 func (s *Service) SubmitProject(projectId uuid.UUID) error {
 	result := s.db.Model(&types.Project{}).
 		Where("id = ?", projectId).
-		Where("approval_status = ?", "Incomplete").
-		Update("approval_status", "Pending")
+		Where("approval_status = ?", openapi.Incomplete).
+		Update("approval_status", openapi.Pending)
 
 	if result.Error != nil {
 		return types.NewErrFromGorm(result.Error, "failed to submit project")
@@ -330,7 +330,7 @@ func (s *Service) SubmitProject(projectId uuid.UUID) error {
 func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	err := s.db.Model(&types.Project{}).
 		Where("id = ?", projectId).
-		Update("approval_status", "Approved").Error
+		Update("approval_status", openapi.Approved).Error
 
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to approve project")
