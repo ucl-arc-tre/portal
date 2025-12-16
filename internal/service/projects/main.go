@@ -311,12 +311,17 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 }
 
 func (s *Service) SubmitProject(projectId uuid.UUID) error {
-	err := s.db.Model(&types.Project{}).
+	result := s.db.Model(&types.Project{}).
 		Where("id = ?", projectId).
-		Update("approval_status", "Pending").Error
+		Where("approval_status = ?", "Incomplete").
+		Update("approval_status", "Pending")
 
-	if err != nil {
-		return types.NewErrFromGorm(err, "failed to submit project")
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to submit project")
+	}
+
+	if result.RowsAffected == 0 {
+		return types.NewErrInvalidObject(fmt.Errorf("project must be in Incomplete status to be submitted"))
 	}
 
 	return nil
