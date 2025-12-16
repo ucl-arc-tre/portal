@@ -30,9 +30,12 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 		return
 	}
 
-	if isAdmin || isTreOpsStaff {
-		// Admin & TRE ops staff: fetch ALL projects
+	if isAdmin {
+		// Admin: fetch ALL projects
 		projects, err = h.projectsAdmin()
+	} else if isTreOpsStaff {
+		// TRE ops staff: fetch only PENDING projects (submitted for review)
+		projects, err = h.projectsPendingForReview()
 	} else {
 		// Regular user: fetch only projects they own (via RBAC)
 		projects, err = h.projectsProjectOwner(user)
@@ -63,6 +66,10 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 
 func (h *Handler) projectsAdmin() ([]types.Project, error) {
 	return h.projects.AllProjects()
+}
+
+func (h *Handler) projectsPendingForReview() ([]types.Project, error) {
+	return h.projects.PendingProjects()
 }
 
 func (h *Handler) projectsProjectOwner(user types.User) ([]types.Project, error) {
@@ -187,6 +194,21 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 	}
 
 	return members
+}
+
+func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	err = h.projects.SubmitProject(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to submit project")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
 
 func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId string) {
