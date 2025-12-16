@@ -9,9 +9,10 @@ Staging site: https://portal.ucl-arc.dev/
 
 # Overview
 
-The Service Portal aims to serve as a single entry point for researchers and other users to manage and engage with the various services and platforms provided by ARC, eg. TRE, DSH.
+The Service Portal aims to serve as a single entry point for researchers and other users to manage and engage with the various services and platforms supported by ARC, eg. TRE, DSH.
 
 Currently, the services within the portal have the following entity relationships:
+
 ![entity diagram](web/public/entity_diagram.drawio.svg)
 
 ## ⚙️ Deployment
@@ -35,4 +36,4 @@ These deployments are managed by the TRE team. Staging will update after merging
 
 ## 🏗️ Development
 
-If you are part of a service team, check our [Services doc](docs/services/README.md). Otherwise, get in touch with [@acholyn](mailto:a.ho-lyn@ucl.ac.uk)
+If you are part of a service team, check our [Services doc](docs/services.md). Otherwise, get in touch with [@acholyn](mailto:a.ho-lyn@ucl.ac.uk)
