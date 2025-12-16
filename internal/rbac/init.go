@@ -68,7 +68,6 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: TreOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/*", Action: ReadAction},
-		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: WriteAction},
 	)
 }
