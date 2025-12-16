@@ -21,9 +21,7 @@ export default function Projects({ userData }: Props) {
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
 
   const isApprovedStaffResearcher = !!userData?.roles?.includes("approved-staff-researcher");
-  const isAdmin = !!userData?.roles?.includes("admin");
-  const isTreOpsStaff = !!userData?.roles?.includes("tre-ops-staff");
-  const isAdminView = isAdmin || isTreOpsStaff;
+  const isOpsStaff = !!userData?.roles?.includes("tre-ops-staff");
   const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
 
   const fetchData = async () => {
@@ -91,7 +89,7 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isAdminView) {
+  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isOpsStaff) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You don&apos;t have any approved studies</h2>
@@ -127,7 +125,7 @@ export default function Projects({ userData }: Props) {
         />
       )}
 
-      {isAdminView && projects.length === 0 ? (
+      {isOpsStaff && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>No projects are currently submitted for review</h2>
           <p>Projects created by users will appear here for approval.</p>
@@ -147,7 +145,7 @@ export default function Projects({ userData }: Props) {
         </div>
       ) : (
         <>
-          {!isAdminView && (
+          {!isOpsStaff && (
             <div className={styles["create-project-section"]}>
               <Button onClick={handleCreateProjectClick} size="large">
                 Create New Project
@@ -155,7 +153,7 @@ export default function Projects({ userData }: Props) {
             </div>
           )}
 
-          <ProjectCardsList projects={projects} isAdminView={isAdminView} />
+          <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} />
         </>
       )}
     </>

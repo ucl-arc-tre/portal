@@ -7,7 +7,7 @@ import styles from "./ProjectCardsList.module.css";
 
 type Props = {
   projects: Project[];
-  isAdminView: boolean;
+  isOpsStaff: boolean;
 };
 
 const projectSortOrder: Record<ApprovalStatus, number> = {
@@ -18,12 +18,12 @@ const projectSortOrder: Record<ApprovalStatus, number> = {
 };
 
 export default function ProjectCardsList(props: Props) {
-  const { projects, isAdminView = false } = props;
+  const { projects, isOpsStaff = false } = props;
   const router = useRouter();
 
   return (
     <div className={styles["project-selection"]}>
-      <h2 className={styles["projects-heading"]}>{isAdminView ? "All Projects pending review" : "Your Projects"}</h2>
+      <h2 className={styles["projects-heading"]}>{isOpsStaff ? "All Projects pending review" : "Your Projects"}</h2>
 
       <div className={styles["projects-list"]}>
         {projects
@@ -31,7 +31,7 @@ export default function ProjectCardsList(props: Props) {
           .map((project) => (
             <div key={project.id} className={styles["project-card"]}>
               <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.approval_status} isOpsStaff={isAdminView} type="project" />
+                <StatusBadge status={project.approval_status} isOpsStaff={isOpsStaff} type="project" />
               </div>
 
               <div className={styles["project-info"]}>
@@ -47,7 +47,7 @@ export default function ProjectCardsList(props: Props) {
                   }
                   size="small"
                 >
-                  {`Manage Project ${isAdminView ? "Approval" : ""}`}
+                  {`Manage Project ${isOpsStaff ? "Approval" : ""}`}
                 </Button>
               </div>
             </div>
