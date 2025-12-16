@@ -102,15 +102,27 @@ func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID
 // the parent study role so study owners inherit a project owner role
 func AddProjectTreOwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
 	projectOwnerRole := makeProjectOwnerRole(projectId)
+	roleName := projectOwnerRole.RoleName()
 
-	policy := Policy{
-		RoleName: projectOwnerRole.RoleName(),
-		Action:   "*",
-		Resource: fmt.Sprintf("/projects/tre/%v", projectId),
+	policies := []Policy{
+		{
+			RoleName: roleName,
+			Action:   "*",
+			Resource: fmt.Sprintf("/projects/tre/%v", projectId),
+		},
+		{
+			RoleName: roleName,
+			Action:   "*",
+			Resource: fmt.Sprintf("/projects/tre/%v/*", projectId),
+		},
 	}
-	if _, err := addPolicy(enforcer, policy); err != nil {
-		return false, err
+
+	for _, policy := range policies {
+		if _, err := addPolicy(enforcer, policy); err != nil {
+			return false, err
+		}
 	}
+
 	studyOwnerRole := makeStudyOwnerRole(studyId)
 	return AddChildRole(studyOwnerRole.RoleName(), projectOwnerRole.RoleName())
 }

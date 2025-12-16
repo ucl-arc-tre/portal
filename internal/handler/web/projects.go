@@ -189,6 +189,21 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 	return members
 }
 
+func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	err = h.projects.SubmitProject(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to submit project")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
 func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId string) {
 	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
 	if err != nil {

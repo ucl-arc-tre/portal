@@ -297,6 +297,12 @@ declare global {
       mockProjectsEmpty(): Chainable<any>;
 
       /**
+       * Mock TRE project with Incomplete status
+       * @example cy.mockProjectTreIncomplete()
+       */
+      mockProjectTreIncomplete(): Chainable<any>;
+
+      /**
        * Mock studies list with an approved study
        * @example cy.mockStudiesWithApprovedStudy()
        */
@@ -684,6 +690,12 @@ Cypress.Commands.add("mockProjectsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/projects", {
     fixture: "projects-empty.json",
   }).as("getProjectsEmpty");
+});
+
+Cypress.Commands.add("mockProjectTreIncomplete", () => {
+  cy.intercept("GET", "/web/api/v0/projects/tre/*", {
+    fixture: "project-tre-incomplete.json",
+  }).as("getProjectTre");
 });
 
 Cypress.Commands.add("mockStudiesWithApprovedStudy", () => {

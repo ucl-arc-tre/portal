@@ -192,3 +192,36 @@ describe("Study creation end-to-end", () => {
     cy.contains("Manage Study").should("be.visible");
   });
 });
+
+describe("Create Project button on study cards", () => {
+  it("should show 'Create Project' button on approved study cards", () => {
+    cy.loginAsStaff();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
+    cy.mockStudiesWithApprovedStudy();
+
+    cy.visit("/studies");
+    cy.waitForAuth();
+    cy.wait("@getStudiesWithApproved");
+
+    // Should see the Create Project button on approved study
+    cy.get('[data-cy="study-card"]').within(() => {
+      cy.contains("Create Project").should("be.visible");
+    });
+  });
+
+  it("should navigate to projects page when Create Project button is clicked", () => {
+    cy.loginAsStaff();
+    cy.mockAuthAsBaseStaffApprovedResearcher();
+    cy.mockStudiesWithApprovedStudy();
+
+    cy.visit("/studies");
+    cy.waitForAuth();
+    cy.wait("@getStudiesWithApproved");
+
+    cy.get('[data-cy="study-card"]').within(() => {
+      cy.contains("Create Project").click();
+    });
+
+    cy.url().should("include", "/projects");
+  });
+});

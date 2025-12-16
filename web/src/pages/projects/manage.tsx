@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { AnyProject } from "@/types/projects";
-import { getProjectsTreByProjectId, postProjectsTreAdminByProjectIdApprove } from "@/openapi";
+import {
+  getProjectsTreByProjectId,
+  postProjectsTreAdminByProjectIdApprove,
+  patchProjectsTreByProjectIdPending,
+} from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -21,6 +25,7 @@ export default function ManageProjectPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isApproving, setIsApproving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
@@ -72,6 +77,30 @@ export default function ManageProjectPage() {
       fetchData(projectId, environment);
     }
   }, [projectId, environment]);
+
+  const handleSubmit = async () => {
+    if (!projectId || typeof projectId !== "string") return;
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await patchProjectsTreByProjectIdPending({
+        path: { projectId },
+      });
+
+      if (response.response.ok) {
+        await fetchData(projectId, environment as string);
+      } else {
+        setError("Failed to submit project. Please try again.");
+      }
+    } catch (err) {
+      console.error("Failed to submit project:", err);
+      setError("Failed to submit project. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleApprove = async () => {
     if (!projectId || typeof projectId !== "string") return;
@@ -152,7 +181,21 @@ export default function ManageProjectPage() {
 
       <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} />
 
-      {canApprove && project.approval_status !== "Approved" && (
+      {!canApprove && project.approval_status === "Incomplete" && (
+        <div className={styles["approval-section"]}>
+          <p className={styles["approval-info"]}>
+            Please review your project details below. Once you are satisfied with the information provided, submit your
+            project for approval by an administrator.
+          </p>
+          <div className={styles["approval-actions"]}>
+            <Button onClick={handleSubmit} disabled={isSubmitting} size="large">
+              {isSubmitting ? "Submitting..." : "Submit Project for Approval"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {canApprove && project.approval_status === "Pending" && (
         <div className={styles["approval-section"]}>
           <p className={styles["approval-info"]}>
             Please review the below project details, members, and assets before approving this project.

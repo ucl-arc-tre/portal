@@ -1307,6 +1307,44 @@ export type GetProjectsTreByProjectIdResponses = {
 
 export type GetProjectsTreByProjectIdResponse = GetProjectsTreByProjectIdResponses[keyof GetProjectsTreByProjectIdResponses];
 
+export type PatchProjectsTreByProjectIdPendingData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the TRE project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}/pending';
+};
+
+export type PatchProjectsTreByProjectIdPendingErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PatchProjectsTreByProjectIdPendingResponses = {
+    /**
+     * Project submitted successfully
+     */
+    200: unknown;
+};
+
 export type PostProjectsTreAdminByProjectIdApproveData = {
     body?: never;
     path: {

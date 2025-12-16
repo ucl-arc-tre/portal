@@ -48,6 +48,11 @@ export default function StudyCardsList(props: Props) {
                 >
                   {isIGOpsStaff ? "View Study" : "Manage Study"}
                 </Button>
+                {!isIGOpsStaff && study.approval_status === "Approved" && (
+                  <Button onClick={() => router.push("/projects")} size="small" variant="secondary">
+                    Create Project
+                  </Button>
+                )}
               </div>
             </div>
           ))}
