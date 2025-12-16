@@ -65,10 +65,6 @@ func (h *Handler) projectsAdmin() ([]types.Project, error) {
 	return h.projects.AllProjects()
 }
 
-func (h *Handler) projectsPendingForReview() ([]types.Project, error) {
-	return h.projects.PendingProjects()
-}
-
 func (h *Handler) projectsProjectOwner(user types.User) ([]types.Project, error) {
 	// Get project IDs where user has owner role (includes inherited via study ownership)
 	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)

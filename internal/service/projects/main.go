@@ -281,7 +281,7 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]types.Project, error)
 	return projects, types.NewErrFromGorm(err, "failed to retrieve projects")
 }
 
-// retrieves all projects (for admins only)
+// retrieves all projects (for admins and TRE ops staff)
 func (s *Service) AllProjects() ([]types.Project, error) {
 	var projects []types.Project
 	err := s.db.
@@ -290,18 +290,6 @@ func (s *Service) AllProjects() ([]types.Project, error) {
 		Find(&projects).Error
 
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
-}
-
-// retrieves only pending projects (for TRE ops staff)
-func (s *Service) PendingProjects() ([]types.Project, error) {
-	var projects []types.Project
-	err := s.db.
-		Preload("CreatorUser").
-		Preload("Environment").
-		Where("approval_status = ?", "Pending").
-		Find(&projects).Error
-
-	return projects, types.NewErrFromGorm(err, "failed to retrieve pending projects")
 }
 
 // retrieves a single TRE project by ID with all related data
