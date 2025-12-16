@@ -188,3 +188,20 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 
 	return members
 }
+
+func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	// TODO: check that the project status is "Pending", otherwise return a 400??
+
+	err = h.projects.ApproveProject(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to approve project")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

@@ -21,6 +21,7 @@ export default function Projects({ userData }: Props) {
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
 
   const isApprovedStaffResearcher = !!userData?.roles?.includes("approved-staff-researcher");
+  const isOpsStaff = !!userData?.roles?.includes("tre-ops-staff");
   const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
 
   const fetchData = async () => {
@@ -88,7 +89,7 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  if (approvedStudies.length === 0 && isApprovedStaffResearcher) {
+  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isOpsStaff) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You don&apos;t have any approved studies</h2>
@@ -100,7 +101,6 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  // TODO: Implement admin view for all projects
   return (
     <>
       {showUclStaffModal && (
@@ -125,7 +125,12 @@ export default function Projects({ userData }: Props) {
         />
       )}
 
-      {!isApprovedStaffResearcher && projects.length === 0 ? (
+      {isOpsStaff && projects.length === 0 ? (
+        <div className={styles["no-projects-message"]}>
+          <h2>No projects are currently submitted for review</h2>
+          <p>Projects created by users will appear here for approval.</p>
+        </div>
+      ) : !isApprovedStaffResearcher && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t been added to any projects yet</h2>
           <p>Any projects you are added to will appear here once they have been created by a member of staff.</p>
@@ -140,13 +145,15 @@ export default function Projects({ userData }: Props) {
         </div>
       ) : (
         <>
-          <div className={styles["create-project-section"]}>
-            <Button onClick={handleCreateProjectClick} size="large">
-              Create New Project
-            </Button>
-          </div>
+          {!isOpsStaff && (
+            <div className={styles["create-project-section"]}>
+              <Button onClick={handleCreateProjectClick} size="large">
+                Create New Project
+              </Button>
+            </div>
+          )}
 
-          <ProjectCardsList projects={projects} />
+          <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} />
         </>
       )}
     </>
