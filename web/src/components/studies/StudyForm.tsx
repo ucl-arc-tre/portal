@@ -463,7 +463,7 @@ export default function StudyForm(StudyProps: StudyProps) {
                       )}
                     />
                   </Label>
-                  <Button type="button" onClick={() => remove(index)} size="small">
+                  <Button type="button" onClick={() => remove(index)} size="small" data-cy="remove-study-admin-button">
                     Remove
                   </Button>
                 </div>

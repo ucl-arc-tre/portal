@@ -57,8 +57,9 @@ export default function Nav() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
   const isIAO = userData?.roles.includes("information-asset-owner");
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
 
-  const canSeeStudies = isApprovedStaffResearcher || isAdmin;
+  const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGOpsStaff;
   const canSeeProjects = isApprovedResearcher || isTreOpsStaff || isAdmin;
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin;
   const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;

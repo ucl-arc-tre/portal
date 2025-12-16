@@ -6,7 +6,7 @@ export type ClientOptions = {
 
 export type Auth = {
     username: string;
-    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff'>;
+    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff'>;
 };
 
 export type Profile = {

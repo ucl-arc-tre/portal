@@ -1,0 +1,4 @@
+{
+  "username": "cypress-ig-approved-researcher@example.com",
+  "roles": ["base", "approved-researcher", "staff", "approved-staff-researcher", "ig-ops-staff"]
+}

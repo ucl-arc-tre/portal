@@ -24,6 +24,7 @@ const (
 	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
 	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
 	TreOpsStaff                   = RoleName(openapi.AuthRolesTreOpsStaff)                   // Lesser admin role for tre ops staff
+	IGOpsStaff                    = RoleName(openapi.AuthRolesIgOpsStaff)                    // Information governance operations staff
 
 	ReadAction  = Action("read")
 	WriteAction = Action("write")
@@ -158,6 +159,20 @@ func HasRole(user types.User, role RoleName) (bool, error) {
 		return false, err
 	}
 	return slices.Contains(roles, role), nil
+}
+
+// Does the user have any of the listed roles
+func HasAnyListedRole(user types.User, required ...RoleName) (bool, error) {
+	roles, err := Roles(user)
+	if err != nil {
+		return false, err
+	}
+	for _, requiredRole := range required {
+		if slices.Contains(roles, requiredRole) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func userIdsWithRole(role RoleName) ([]uuid.UUID, error) {

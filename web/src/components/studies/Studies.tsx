@@ -24,7 +24,9 @@ export default function Studies(props: Props) {
   const [tab, setTab] = useState("pending");
   const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
 
+  const isIgOpsStaff = userData.roles.includes("ig-ops-staff");
   const isAdmin = userData.roles.includes("admin");
+  const canSeeAll = isIgOpsStaff || isAdmin;
 
   useEffect(() => {
     const fetchPendingStudies = async () => {
@@ -41,16 +43,16 @@ export default function Studies(props: Props) {
         setStudiesLoading(false);
       }
     };
-    if (isAdmin) {
+    if (isIgOpsStaff) {
       fetchPendingStudies();
     }
-  }, [isAdmin]);
+  }, [isIgOpsStaff]);
 
   const handleAllStudiesClick = async () => {
     setTab("all");
 
     if (!studies.length) {
-      fetchStudies();
+      fetchAllStudies();
     }
   };
 
@@ -58,7 +60,7 @@ export default function Studies(props: Props) {
     setTab("pending");
   };
 
-  const fetchStudies = async () => {
+  const fetchAllStudies = async () => {
     setStudiesLoading(true);
     try {
       const response = await getStudies();
@@ -73,7 +75,7 @@ export default function Studies(props: Props) {
   };
 
   useEffect(() => {
-    fetchStudies();
+    fetchAllStudies();
   }, []);
 
   const handleCreateStudyClick = () => {
@@ -95,6 +97,20 @@ export default function Studies(props: Props) {
   if (isAdmin) {
     return (
       <>
+        {studies.length === 0 ? (
+          <div className={styles["no-studies-message"]}>
+            <h2>No studies found</h2>
+          </div>
+        ) : (
+          <StudyCardsList studies={studies} isIGOpsStaff={false} canSeeAll={true} />
+        )}
+      </>
+    );
+  }
+
+  if (isIgOpsStaff) {
+    return (
+      <>
         {tab === "pending" && <h2>Studies to Review</h2>}
         {tab === "all" && <h2>All Studies</h2>}
 
@@ -110,6 +126,7 @@ export default function Studies(props: Props) {
             onClick={handleAllStudiesClick}
             variant="secondary"
             className={`${styles.tab} ${styles["all-studies-tab"]} ${tab === "all" ? styles.active : ""}`}
+            data-cy="all-studies-tab-button"
           >
             All Studies
           </Button>
@@ -125,7 +142,11 @@ export default function Studies(props: Props) {
             <h2>No studies pending approval</h2>
           </div>
         ) : (
-          <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} isAdmin={true} />
+          <StudyCardsList
+            studies={tab === "pending" ? pendingStudies : studies}
+            isIGOpsStaff={isIgOpsStaff}
+            canSeeAll={canSeeAll}
+          />
         )}
       </>
     );
@@ -134,7 +155,7 @@ export default function Studies(props: Props) {
   return (
     <>
       {studyFormOpen && (
-        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudyData={fetchStudies} />
+        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudyData={fetchAllStudies} />
       )}
 
       {showUclStaffModal && (
@@ -172,7 +193,7 @@ export default function Studies(props: Props) {
             </Button>
           </div>
 
-          <StudyCardsList studies={studies} isAdmin={false} />
+          <StudyCardsList studies={studies} canSeeAll={canSeeAll} isIGOpsStaff={false} />
         </>
       )}
     </>
