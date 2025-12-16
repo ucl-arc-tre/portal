@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { AnyProject } from "@/types/projects";
-import { getProjectsTreByProjectId } from "@/openapi";
+import { getProjectsTreByProjectId, postProjectsTreAdminByProjectIdApprove } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -20,8 +20,12 @@ export default function ManageProjectPage() {
   const [project, setProject] = useState<AnyProject | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isApproving, setIsApproving] = useState(false);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isAdmin = userData?.roles.includes("admin");
+  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
+  const canApprove = isAdmin || isTreOpsStaff;
 
   const fetchData = async (projectIdParam: string, environmentParam: string) => {
     setLoading(true);
@@ -68,6 +72,31 @@ export default function ManageProjectPage() {
       fetchData(projectId, environment);
     }
   }, [projectId, environment]);
+
+  const handleApprove = async () => {
+    if (!projectId || typeof projectId !== "string") return;
+
+    setIsApproving(true);
+    setError(null);
+
+    try {
+      const response = await postProjectsTreAdminByProjectIdApprove({
+        path: { projectId },
+      });
+
+      if (response.response.ok) {
+        // Refresh project data to show updated status
+        await fetchData(projectId, environment as string);
+      } else {
+        setError("Failed to approve project. Please try again.");
+      }
+    } catch (err) {
+      console.error("Failed to approve project:", err);
+      setError("Failed to approve project. Please try again.");
+    } finally {
+      setIsApproving(false);
+    }
+  };
 
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
@@ -121,10 +150,23 @@ export default function ManageProjectPage() {
     <>
       <MetaHead title={`Manage Project: ${project.name}`} description={`Manage project details for ${project.name}`} />
 
-      <Title text={`Manage Project: ${project.name}`} />
+      <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} />
+
+      {canApprove && project.approval_status !== "Approved" && (
+        <div className={styles["approval-section"]}>
+          <p className={styles["approval-info"]}>
+            Please review the below project details, members, and assets before approving this project.
+          </p>
+          <div className={styles["approval-actions"]}>
+            <Button onClick={handleApprove} disabled={isApproving} size="large">
+              {isApproving ? "Approving..." : "Approve Project"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Box>
-        <h2 className={styles.sectionTitle}>Project Details</h2>
+        <h2 className={styles["section-title"]}>Project Details</h2>
         <div className={styles.field}>
           <label>Name:</label>
           <span>{project.name}</span>
@@ -148,7 +190,7 @@ export default function ManageProjectPage() {
       </Box>
 
       <Box>
-        <h2 className={styles.sectionTitle}>Project Members</h2>
+        <h2 className={styles["section-title"]}>Project Members</h2>
         {project.members && project.members.length > 0 ? (
           <ul className={styles["members-list"]}>
             {project.members.map((member, index) => (
@@ -170,7 +212,7 @@ export default function ManageProjectPage() {
       </Box>
 
       <Box>
-        <h2 className={styles.sectionTitle}>Assets</h2>
+        <h2 className={styles["section-title"]}>Assets</h2>
         {project.assets && project.assets.length > 0 ? (
           <ul className={styles["assets-list"]}>
             {project.assets.map((asset) => (

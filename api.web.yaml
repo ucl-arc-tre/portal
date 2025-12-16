@@ -538,6 +538,28 @@ paths:
         default:
           description: Unexpected error
 
+  /projects/tre/admin/{projectId}/approve:
+    post:
+      description: Approve a TRE project (admin/TRE ops staff only)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          description: ID of the TRE project
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project approved successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
