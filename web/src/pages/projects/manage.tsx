@@ -195,7 +195,7 @@ export default function ManageProjectPage() {
         </div>
       )}
 
-      {canApprove && project.approval_status !== "Approved" && (
+      {canApprove && project.approval_status === "Pending" && (
         <div className={styles["approval-section"]}>
           <p className={styles["approval-info"]}>
             Please review the below project details, members, and assets before approving this project.
