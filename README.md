@@ -36,4 +36,4 @@ These deployments are managed by the TRE team. Staging will update after merging
 
 ## 🏗️ Development
 
-If you are part of a service team, check our [Services doc](docs/services.md). Otherwise, get in touch with [the portal team](mailto:arc.portal-dev@ucl.ac.uk)
+If you are part of a service team, check our [Services doc](docs/services.md). Otherwise, get in touch with [the portal team](mailto:arc.portal@ucl.ac.uk)
