@@ -6,6 +6,7 @@ import {
   getProjectsTreByProjectId,
   postProjectsTreAdminByProjectIdApprove,
   patchProjectsTreByProjectIdPending,
+  Study,
 } from "@/openapi";
 
 import MetaHead from "@/components/meta/Head";
@@ -13,6 +14,7 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
+import CreateProjectForm from "@/components/projects/CreateProjectForm";
 
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
@@ -26,11 +28,16 @@ export default function ManageProjectPage() {
   const [error, setError] = useState<string | null>(null);
   const [isApproving, setIsApproving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const canApprove = isAdmin || isTreOpsStaff;
+  const canEdit = project?.creator_username === userData?.username; // TODO: what about study admins?
+
+  // prepare the approved study for edit form
+  const approvedStudy = project ? [{ id: project.study_id, title: project.study_title } as Study] : [];
 
   const fetchData = async (projectIdParam: string, environmentParam: string) => {
     setLoading(true);
@@ -127,6 +134,17 @@ export default function ManageProjectPage() {
     }
   };
 
+  const handleProjectCreated = () => {
+    setShowEditForm(false);
+    if (projectId && typeof projectId === "string" && environment && typeof environment === "string") {
+      fetchData(projectId, environment);
+    }
+  };
+
+  const handleCancelCreate = () => {
+    setShowEditForm(false);
+  };
+
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
   if (loading) return <Loading />;
@@ -188,10 +206,23 @@ export default function ManageProjectPage() {
             project for approval by an administrator.
           </p>
           <div className={styles["approval-actions"]}>
+            {canEdit && (
+              <Button onClick={() => setShowEditForm(true)} size="large">
+                Edit Project
+              </Button>
+            )}
             <Button onClick={handleSubmit} disabled={isSubmitting} size="large">
               {isSubmitting ? "Submitting..." : "Submit Project for Approval"}
             </Button>
           </div>
+        </div>
+      )}
+
+      {canEdit && project.approval_status !== "Incomplete" && (
+        <div className={styles["approval-section"]}>
+          <Button onClick={() => setShowEditForm(true)} size="large">
+            Edit Project
+          </Button>
         </div>
       )}
 
@@ -229,6 +260,10 @@ export default function ManageProjectPage() {
         <div className={styles.field}>
           <label>Created:</label>
           <span>{new Date(project.created_at).toLocaleDateString()}</span>
+        </div>
+        <div className={styles.field}>
+          <label>Study:</label>
+          <span>{project.study_title}</span>
         </div>
       </Box>
 
@@ -272,6 +307,15 @@ export default function ManageProjectPage() {
           <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
         )}
       </Box>
+
+      {showEditForm && project && (
+        <CreateProjectForm
+          approvedStudies={approvedStudy}
+          editingProject={project}
+          handleProjectCreated={() => handleProjectCreated()}
+          handleCancelCreate={() => handleCancelCreate()}
+        />
+      )}
     </>
   );
 }

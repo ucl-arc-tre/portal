@@ -28,7 +28,7 @@ func New() *Service {
 	}
 }
 
-func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, creator types.User, isUpdate bool) (*openapi.ValidationError, error) {
+func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, creator types.User) (*openapi.ValidationError, error) {
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
 		return &openapi.ValidationError{ErrorMessage: "Project name must be 4-14 characters long and contain only lowercase letters and numbers"}, nil
 	}
@@ -36,7 +36,7 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	// Note: No need to validate study exists - handler already checks user is study owner
 	// Note: No need to validate environment exists - environment is determined by the endpoint (TRE in this case)
 
-	validationError, err := s.validateProjectNameUniqueness(projectTreData.Name, isUpdate)
+	validationError, err := s.validateProjectNameUniqueness(projectTreData.Name)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
@@ -56,8 +56,7 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 		}
 	}
 
-	// only validate members if not in draft mode
-	if !projectTreData.IsDraft && len(projectTreData.Members) > 0 {
+	if len(projectTreData.Members) > 0 {
 		validationError, err := s.validateProjectMembers(projectTreData.Members)
 		if err != nil || validationError != nil {
 			return validationError, err
@@ -67,11 +66,8 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	return nil, nil
 }
 
-func (s *Service) validateProjectNameUniqueness(projectName string, isUpdate bool) (*openapi.ValidationError, error) {
-	maxExpectedProjects := 0 // For new projects, expect zero existing projects with the same name
-	if isUpdate {
-		maxExpectedProjects = 1
-	}
+func (s *Service) validateProjectNameUniqueness(projectName string) (*openapi.ValidationError, error) {
+	maxExpectedProjects := 0 // only one project with a given name should exist
 
 	// Check if project name already exists
 	var count int64
@@ -298,6 +294,7 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 	err := s.db.
 		Preload("Project.CreatorUser").
 		Preload("Project.Environment").
+		Preload("Project.Study").
 		Preload("Project.ProjectAssets.Asset").
 		Preload("TRERoleBindings.User").
 		Where("project_id = ?", projectId).
@@ -334,6 +331,93 @@ func (s *Service) ApproveProject(projectId uuid.UUID) error {
 
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to approve project")
+	}
+
+	return nil
+}
+
+func (s *Service) ValidateProjectTREUpdate(ctx context.Context, projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID, projectUUID uuid.UUID) (*openapi.ValidationError, error) {
+	// Get TRE environment tier for asset validation
+	var treEnvironment types.Environment
+	err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
+	if err != nil {
+		return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
+	}
+
+	// Validate assets belong to study and are compatible with TRE environment tier
+	if len(projectUpdateData.AssetIds) > 0 {
+		validationError, err := s.validateAssets(projectUpdateData.AssetIds, studyUUID, treEnvironment.Tier)
+		if err != nil || validationError != nil {
+			return validationError, err
+		}
+	}
+
+	// Validate members
+	if len(projectUpdateData.Members) > 0 {
+		validationError, err := s.validateProjectMembers(projectUpdateData.Members)
+		if err != nil || validationError != nil {
+			return validationError, err
+		}
+	}
+
+	return nil, nil
+}
+
+func (s *Service) UpdateProjectTRE(ctx context.Context, projectUUID uuid.UUID, projectUpdateData openapi.ProjectTREUpdate) error {
+	// Get the ProjectTRE record
+	var projectTRE types.ProjectTRE
+	err := s.db.Where("project_id = ?", projectUUID).First(&projectTRE).Error
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to get project TRE")
+	}
+
+	// Start a transaction
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Delete existing project assets
+	if err := tx.Where("project_id = ?", projectUUID).Delete(&types.ProjectAsset{}).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete existing project assets")
+	}
+
+	// Create new ProjectAsset records
+	for _, assetIDStr := range projectUpdateData.AssetIds {
+		assetUUID, err := uuid.Parse(assetIDStr)
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
+		}
+
+		projectAsset := types.ProjectAsset{
+			ProjectID: projectUUID,
+			AssetID:   assetUUID,
+		}
+
+		if err := tx.Create(&projectAsset).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create project asset")
+		}
+	}
+
+	// Delete existing role bindings
+	if err := tx.Where("project_tre_id = ?", projectTRE.ID).Delete(&types.ProjectTRERoleBinding{}).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete existing role bindings")
+	}
+
+	// Create new role bindings
+	if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit update project transaction")
 	}
 
 	return nil

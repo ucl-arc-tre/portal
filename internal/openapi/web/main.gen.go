@@ -529,6 +529,9 @@ type ProjectTRE struct {
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
 
+	// StudyTitle Title of the study to which the project belongs
+	StudyTitle string `json:"study_title"`
+
 	// UpdatedAt Time in RFC3339 format when the project was last updated
 	UpdatedAt string `json:"updated_at"`
 }
@@ -545,9 +548,6 @@ type ProjectTRERequest struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
-	// IsDraft Whether this is a draft submission (true) or final submission (false)
-	IsDraft bool `json:"is_draft"`
-
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
 
@@ -560,6 +560,15 @@ type ProjectTRERequest struct {
 
 // ProjectTRERoleName Available TRE project roles
 type ProjectTRERoleName string
+
+// ProjectTREUpdate Request payload for updating an existing TRE project (members and assets only)
+type ProjectTREUpdate struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Members List of project members with their roles (can be empty)
+	Members []ProjectTREMember `json:"members"`
+}
 
 // Study defines model for Study.
 type Study struct {
@@ -829,6 +838,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
 
+// PutProjectsTreProjectIdJSONRequestBody defines body for PutProjectsTreProjectId for application/json ContentType.
+type PutProjectsTreProjectIdJSONRequestBody = ProjectTREUpdate
+
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyRequest
 
@@ -906,6 +918,9 @@ type ServerInterface interface {
 
 	// (GET /projects/tre/{projectId})
 	GetProjectsTreProjectId(c *gin.Context, projectId string)
+
+	// (PUT /projects/tre/{projectId})
+	PutProjectsTreProjectId(c *gin.Context, projectId string)
 
 	// (PATCH /projects/tre/{projectId}/pending)
 	PatchProjectsTreProjectIdPending(c *gin.Context, projectId string)
@@ -1206,6 +1221,30 @@ func (siw *ServerInterfaceWrapper) GetProjectsTreProjectId(c *gin.Context) {
 	}
 
 	siw.Handler.GetProjectsTreProjectId(c, projectId)
+}
+
+// PutProjectsTreProjectId operation middleware
+func (siw *ServerInterfaceWrapper) PutProjectsTreProjectId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutProjectsTreProjectId(c, projectId)
 }
 
 // PatchProjectsTreProjectIdPending operation middleware
@@ -1795,6 +1834,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/projects/tre", wrapper.PostProjectsTre)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)
+	router.PUT(options.BaseURL+"/projects/tre/:projectId", wrapper.PutProjectsTreProjectId)
 	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)

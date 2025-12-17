@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import {
   postProjectsTre,
+  putProjectsTreByProjectId,
   ProjectTreRequest,
   ProjectTreRoleName,
   ValidationError,
@@ -11,7 +12,7 @@ import {
   getStudiesByStudyIdAssets,
   getEnvironments,
 } from "@/openapi";
-import { AnyProjectRoleName } from "@/types/projects";
+import { AnyProject, AnyProjectRoleName } from "@/types/projects";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
@@ -35,9 +36,15 @@ type Props = {
   approvedStudies: Study[];
   handleProjectCreated: () => void;
   handleCancelCreate: () => void;
+  editingProject?: AnyProject | null;
 };
 
-export default function CreateProjectForm({ approvedStudies, handleProjectCreated, handleCancelCreate }: Props) {
+export default function CreateProjectForm({
+  approvedStudies,
+  handleProjectCreated,
+  handleCancelCreate,
+  editingProject,
+}: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -89,10 +96,35 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     name: "additionalApprovedResearchers",
   });
 
-  // Reset asset selection when environment changes
+  // Populate form with existing project data when editing
   useEffect(() => {
-    setValue("assetIds", []);
-  }, [selectedEnvironmentId, setValue]);
+    if (editingProject) {
+      setValue("name", editingProject.name);
+      setValue("studyId", editingProject.study_id);
+
+      const environment = environments.find((env) => env.name === editingProject.environment_name);
+      if (environment) {
+        setValue("environmentId", environment.id);
+      }
+
+      const projectAssetIds = editingProject.assets?.map((asset) => ({ value: asset.id })) || [];
+      setValue("assetIds", projectAssetIds);
+      setAssets(editingProject.assets || []);
+
+      const projectMembers =
+        editingProject.members?.map((member) => ({
+          username: member.username.replace(domainName, ""),
+          roles: member.roles as AnyProjectRoleName[],
+        })) || [];
+      setValue("additionalApprovedResearchers", projectMembers);
+    }
+  }, [editingProject, setValue, environments]);
+
+  useEffect(() => {
+    if (!editingProject) {
+      setValue("assetIds", []);
+    }
+  }, [selectedEnvironmentId, setValue, editingProject]);
 
   useEffect(() => {
     const fetchEnvironments = async () => {
@@ -165,7 +197,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
     if (currentStep !== 1) setCurrentStep(currentStep - 1);
   };
 
-  const submitProject = async (data: ProjectFormData, options: { isDraft: boolean }) => {
+  const submitProject = async (data: ProjectFormData) => {
     setIsSubmitting(true);
     setError(null);
 
@@ -187,14 +219,25 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
               roles: researcher.roles as ProjectTreRoleName[],
             }));
 
-          const requestBody: ProjectTreRequest = {
-            name: data.name,
-            study_id: data.studyId,
-            is_draft: options.isDraft,
-            asset_ids: assetIds,
-            members: treMembers,
-          };
-          response = await postProjectsTre({ body: requestBody });
+          if (editingProject) {
+            // Update existing project (only members and assets)
+            response = await putProjectsTreByProjectId({
+              path: { projectId: editingProject.id },
+              body: {
+                asset_ids: assetIds,
+                members: treMembers,
+              },
+            });
+          } else {
+            // Create new project
+            const requestBody: ProjectTreRequest = {
+              name: data.name,
+              study_id: data.studyId,
+              asset_ids: assetIds,
+              members: treMembers,
+            };
+            response = await postProjectsTre({ body: requestBody });
+          }
           break;
         case "Data Safe Haven":
           throw new Error("DSH projects are not yet supported");
@@ -204,12 +247,13 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
 
       if (response.error) {
         const errorData = response.error as ValidationError;
-        throw new Error(errorData?.error_message || "Failed to create project");
+        throw new Error(
+          errorData?.error_message || (editingProject ? "Failed to update project" : "Failed to create project")
+        );
       }
 
       handleProjectCreated();
     } catch (error) {
-      console.error("Failed to create project:", error);
       setError("Error: " + String((error as Error).message));
     } finally {
       setIsSubmitting(false);
@@ -219,7 +263,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
   return (
     <Dialog setDialogOpen={handleCancelCreate}>
       <div className={styles.container}>
-        <h2>Create New Project</h2>
+        <h2>{editingProject ? "Edit Project" : "Create New Project"}</h2>
 
         <div className={styles["step-progress"]}>
           {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
@@ -249,7 +293,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                   {...register("studyId", {
                     required: "Please select a study",
                   })}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!editingProject}
                 >
                   <option value="">Select a study...</option>
                   {approvedStudies.map((approvedStudy) => (
@@ -274,7 +318,7 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                   {...register("environmentId", {
                     required: "Please select an environment",
                   })}
-                  disabled={isSubmitting || isLoadingEnvironments || !!environmentsError}
+                  disabled={isSubmitting || isLoadingEnvironments || !!environmentsError || !!editingProject}
                 >
                   <option value="">
                     {isLoadingEnvironments
@@ -364,7 +408,13 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
                     },
                   }}
                   render={({ field }) => (
-                    <input {...field} id="name" type="text" placeholder="e.g., my-project" disabled={isSubmitting} />
+                    <input
+                      {...field}
+                      id="name"
+                      type="text"
+                      placeholder="e.g., my-project"
+                      disabled={isSubmitting || !!editingProject}
+                    />
                   )}
                 />
 
@@ -655,26 +705,20 @@ export default function CreateProjectForm({ approvedStudies, handleProjectCreate
             )}
 
             {currentStep === totalSteps && (
-              <>
-                {/* TODO: Enable submitting in draft mode
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isSubmitting}
-                  onClick={handleSubmit((data) => submitProject(data, { isDraft: true }))}
-                >
-                  {isSubmitting ? "Saving..." : "Save as Draft"}
-                </Button> */}
-
-                <Button
-                  className="create-project-button"
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={handleSubmit((data) => submitProject(data, { isDraft: false }))}
-                >
-                  {isSubmitting ? "Creating..." : "Create Project"}
-                </Button>
-              </>
+              <Button
+                className="create-project-button"
+                type="button"
+                disabled={isSubmitting}
+                onClick={handleSubmit((data) => submitProject(data))}
+              >
+                {isSubmitting
+                  ? editingProject
+                    ? "Updating..."
+                    : "Creating..."
+                  : editingProject
+                    ? "Update Project"
+                    : "Create Project"}
+              </Button>
             )}
           </div>
         </form>

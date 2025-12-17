@@ -537,6 +537,38 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    put:
+      description: Update a TRE project (members and assets only)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          description: ID of the TRE project
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectTREUpdate"
+      responses:
+        "200":
+          description: Project updated successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /projects/tre/{projectId}/pending:
     patch:
@@ -1378,7 +1410,6 @@ components:
       required:
         - name
         - study_id
-        - is_draft
         - asset_ids
         - members
       properties:
@@ -1388,10 +1419,24 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
-        is_draft:
-          type: boolean
-          description: Whether this is a draft submission (true) or final submission (false)
-          default: false
+        asset_ids:
+          type: array
+          description: List of asset identifiers to link to this project (can be empty)
+          items:
+            type: string
+        members:
+          type: array
+          description: List of project members with their roles (can be empty)
+          items:
+            $ref: "#/components/schemas/ProjectTREMember"
+
+    ProjectTREUpdate:
+      type: object
+      description: Request payload for updating an existing TRE project (members and assets only)
+      required:
+        - asset_ids
+        - members
+      properties:
         asset_ids:
           type: array
           description: List of asset identifiers to link to this project (can be empty)
@@ -1491,6 +1536,7 @@ components:
         - id
         - name
         - study_id
+        - study_title
         - creator_username
         - approval_status
         - created_at
@@ -1508,6 +1554,9 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
+        study_title:
+          type: string
+          description: Title of the study to which the project belongs
         creator_username:
           type: string
           description: Username of the user who created the project
