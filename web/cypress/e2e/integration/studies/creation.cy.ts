@@ -104,7 +104,7 @@ function becomeApprovedResearcher() {
       cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
       cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
     }
-    if ($body.text().includes("Approved Researcher Agreement")) {
+    if ($body.text().includes("You are reminded that the UCL Information Security Policy")) {
       cy.get("[data-cy='agreement-agree']").click();
     }
     if (!$body.text().includes("Verify another certificate")) {
