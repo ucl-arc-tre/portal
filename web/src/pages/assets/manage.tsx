@@ -136,7 +136,22 @@ export default function ManageAssetPage() {
   return (
     <>
       <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
-      <Breadcrumbs studyId={study.id} studyTitle={study.title} assetId={asset.id} assetTitle={asset.title} />
+      <Breadcrumbs
+        links={[
+          {
+            title: "Studies",
+            url: "/studies",
+          },
+          {
+            title: study.title,
+            url: `/studies/manage?studyId=${study.id}`,
+          },
+          {
+            title: asset.title,
+            url: `/`, // todo
+          },
+        ]}
+      />
 
       <Title text={`Manage Asset: ${asset.title}`} />
 

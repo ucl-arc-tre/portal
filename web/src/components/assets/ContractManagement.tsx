@@ -4,6 +4,7 @@ import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
 import { getStudiesByStudyIdAssetsByAssetIdContracts, Contract, Study, Asset } from "@/openapi";
 import styles from "./ContractManagement.module.css";
+import Box from "@/components/ui/Box";
 
 type ContractManagementProps = {
   study: Study;
@@ -59,7 +60,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
   };
 
   return (
-    <div className={styles.container}>
+    <Box>
       {canModify ? (
         <>
           {" "}
@@ -136,6 +137,6 @@ export default function ContractManagement({ study, asset, canModify }: Contract
           editingContract={editingContract}
         />
       )}
-    </div>
+    </Box>
   );
 }

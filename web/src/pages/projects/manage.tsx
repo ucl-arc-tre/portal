@@ -16,6 +16,7 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -178,6 +179,19 @@ export default function ManageProjectPage() {
   return (
     <>
       <MetaHead title={`Manage Project: ${project.name}`} description={`Manage project details for ${project.name}`} />
+
+      <Breadcrumbs
+        links={[
+          {
+            title: "Projects",
+            url: "/projects",
+          },
+          {
+            title: project.name,
+            url: `/projects/manage?projectId=${project.id}&environment=${project.environment_name}`,
+          },
+        ]}
+      />
 
       <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} />
 
