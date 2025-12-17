@@ -129,11 +129,7 @@ export default function Assets(props: InformationAssetsProps) {
 
       {canModify && (
         <Callout definition>
-          {canModify && (
-            <div className={styles["callout-section"]}>
-              Use this section to view and add assets linked to your study.
-            </div>
-          )}
+          <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
 
           <div className={styles["callout-info-paragraph"]}>
             Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
