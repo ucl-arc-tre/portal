@@ -148,7 +148,7 @@ export default function ManageAssetPage() {
           },
           {
             title: asset.title,
-            url: `/`, // todo
+            url: `/assets/manage?studyId=${study.id}&assetId=${asset.id}`,
           },
         ]}
       />
