@@ -310,10 +310,27 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 	return &projectTRE, nil
 }
 
+func (s *Service) SubmitProject(projectId uuid.UUID) error {
+	result := s.db.Model(&types.Project{}).
+		Where("id = ?", projectId).
+		Where("approval_status = ?", openapi.Incomplete).
+		Update("approval_status", openapi.Pending)
+
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to submit project")
+	}
+
+	if result.RowsAffected == 0 {
+		return types.NewErrInvalidObject(fmt.Errorf("project must be in Incomplete status to be submitted"))
+	}
+
+	return nil
+}
+
 func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	err := s.db.Model(&types.Project{}).
 		Where("id = ?", projectId).
-		Update("approval_status", "Approved").Error
+		Update("approval_status", openapi.Approved).Error
 
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to approve project")
