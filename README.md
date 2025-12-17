@@ -7,7 +7,7 @@ services.
 
 The Service Portal aims to serve as a single entry point for researchers and other users to manage and engage with the various services and platforms supported by ARC, e.g. [TRE](https://www.ucl.ac.uk/advanced-research-computing/sensitive-data-and-trusted-research-environments), [DSH](https://www.ucl.ac.uk/isd/services/file-storage-sharing/data-safe-haven-dsh).
 
-Currently, the entities within the portal have the following  relationships:
+Currently, the entities within the portal have the following relationships:
 
 <p align="center">
   <img src="web/public/entity_diagram.drawio.svg" alt="entity diagram"/>
