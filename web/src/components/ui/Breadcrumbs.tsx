@@ -23,7 +23,7 @@ export default function Breadcrumbs(props: BreadcrumbProps) {
             <Button
               className={index == numLinks - 1 ? styles.current : undefined}
               onClick={() => router.push(link.url)}
-              size="large"
+              size="small"
               variant="tertiary"
             >
               {link.title}

@@ -153,40 +153,42 @@ export default function ManageAssetPage() {
         ]}
       />
 
-      <Title text={`Manage Asset: ${asset.title}`} />
+      <div className="content">
+        <Title text={`Manage Asset: ${asset.title}`} centered />
 
-      <div className={styles["asset-info"]}>
-        <div className={styles.section}>
-          <h3>Asset Details</h3>
-          <div className={styles.field}>
-            <label>Title:</label>
-            <span>{asset.title}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Description:</label>
-            <span>{asset.description}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Classification:</label>
-            <span>{asset.classification_impact}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Protection:</label>
-            <span>{asset.protection}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Status:</label>
-            <span className={styles.status}>{asset.status}</span>
-          </div>
-          {asset.requires_contract && (
+        <div className={styles["asset-info"]}>
+          <div className={styles.section}>
+            <h3>Asset Details</h3>
             <div className={styles.field}>
-              <label>Contract Required:</label>
-              <span>Yes</span>
+              <label>Title:</label>
+              <span>{asset.title}</span>
             </div>
-          )}
-        </div>
+            <div className={styles.field}>
+              <label>Description:</label>
+              <span>{asset.description}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Classification:</label>
+              <span>{asset.classification_impact}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Protection:</label>
+              <span>{asset.protection}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Status:</label>
+              <span className={styles.status}>{asset.status}</span>
+            </div>
+            {asset.requires_contract && (
+              <div className={styles.field}>
+                <label>Contract Required:</label>
+                <span>Yes</span>
+              </div>
+            )}
+          </div>
 
-        <ContractManagement study={study} asset={asset} canModify={isStudyOwner || isStudyAdmin} />
+          <ContractManagement study={study} asset={asset} canModify={isStudyOwner || isStudyAdmin} />
+        </div>
       </div>
     </>
   );

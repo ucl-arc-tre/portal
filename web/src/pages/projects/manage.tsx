@@ -193,99 +193,101 @@ export default function ManageProjectPage() {
         ]}
       />
 
-      <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} />
+      <div className="content">
+        <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} centered />
 
-      {!canApprove && project.approval_status === "Incomplete" && (
-        <div className={styles["approval-section"]}>
-          <p className={styles["approval-info"]}>
-            Please review your project details below. Once you are satisfied with the information provided, submit your
-            project for approval by an administrator.
-          </p>
-          <div className={styles["approval-actions"]}>
-            <Button onClick={handleSubmit} disabled={isSubmitting} size="large">
-              {isSubmitting ? "Submitting..." : "Submit Project for Approval"}
-            </Button>
+        {!canApprove && project.approval_status === "Incomplete" && (
+          <div className={styles["approval-section"]}>
+            <p className={styles["approval-info"]}>
+              Please review your project details below. Once you are satisfied with the information provided, submit
+              your project for approval by an administrator.
+            </p>
+            <div className={styles["approval-actions"]}>
+              <Button onClick={handleSubmit} disabled={isSubmitting} size="large">
+                {isSubmitting ? "Submitting..." : "Submit Project for Approval"}
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {canApprove && project.approval_status === "Pending" && (
-        <div className={styles["approval-section"]}>
-          <p className={styles["approval-info"]}>
-            Please review the below project details, members, and assets before approving this project.
-          </p>
-          <div className={styles["approval-actions"]}>
-            <Button onClick={handleApprove} disabled={isApproving} size="large">
-              {isApproving ? "Approving..." : "Approve Project"}
-            </Button>
+        {canApprove && project.approval_status === "Pending" && (
+          <div className={styles["approval-section"]}>
+            <p className={styles["approval-info"]}>
+              Please review the below project details, members, and assets before approving this project.
+            </p>
+            <div className={styles["approval-actions"]}>
+              <Button onClick={handleApprove} disabled={isApproving} size="large">
+                {isApproving ? "Approving..." : "Approve Project"}
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
-
-      <Box>
-        <h2 className={styles["section-title"]}>Project Details</h2>
-        <div className={styles.field}>
-          <label>Name:</label>
-          <span>{project.name}</span>
-        </div>
-        <div className={styles.field}>
-          <label>Environment:</label>
-          <span>{project.environment_name}</span>
-        </div>
-        <div className={styles.field}>
-          <label>Status:</label>
-          <span className={styles.status}>{project.approval_status}</span>
-        </div>
-        <div className={styles.field}>
-          <label>Created by:</label>
-          <span>{project.creator_username}</span>
-        </div>
-        <div className={styles.field}>
-          <label>Created:</label>
-          <span>{new Date(project.created_at).toLocaleDateString()}</span>
-        </div>
-      </Box>
-
-      <Box>
-        <h2 className={styles["section-title"]}>Project Members</h2>
-        {project.members && project.members.length > 0 ? (
-          <ul className={styles["members-list"]}>
-            {project.members.map((member, index) => (
-              <li key={index} className={styles["member-item"]}>
-                <span className={styles["member-username"]}>{member.username}</span>
-                <div className={styles["member-roles"]}>
-                  {member.roles.map((role, roleIndex) => (
-                    <span key={roleIndex} className={styles["role-badge"]}>
-                      {role.replace(/_/g, " ")}
-                    </span>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
         )}
-      </Box>
 
-      <Box>
-        <h2 className={styles["section-title"]}>Assets</h2>
-        {project.assets && project.assets.length > 0 ? (
-          <ul className={styles["assets-list"]}>
-            {project.assets.map((asset) => (
-              <li key={asset.id} className={styles["asset-item"]}>
-                <div className={styles["asset-info"]}>
-                  <strong>{asset.title}</strong>
-                  <p>{asset.description}</p>
-                  <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
-        )}
-      </Box>
+        <Box>
+          <h2 className={styles["section-title"]}>Project Details</h2>
+          <div className={styles.field}>
+            <label>Name:</label>
+            <span>{project.name}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Environment:</label>
+            <span>{project.environment_name}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Status:</label>
+            <span className={styles.status}>{project.approval_status}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Created by:</label>
+            <span>{project.creator_username}</span>
+          </div>
+          <div className={styles.field}>
+            <label>Created:</label>
+            <span>{new Date(project.created_at).toLocaleDateString()}</span>
+          </div>
+        </Box>
+
+        <Box>
+          <h2 className={styles["section-title"]}>Project Members</h2>
+          {project.members && project.members.length > 0 ? (
+            <ul className={styles["members-list"]}>
+              {project.members.map((member, index) => (
+                <li key={index} className={styles["member-item"]}>
+                  <span className={styles["member-username"]}>{member.username}</span>
+                  <div className={styles["member-roles"]}>
+                    {member.roles.map((role, roleIndex) => (
+                      <span key={roleIndex} className={styles["role-badge"]}>
+                        {role.replace(/_/g, " ")}
+                      </span>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
+          )}
+        </Box>
+
+        <Box>
+          <h2 className={styles["section-title"]}>Assets</h2>
+          {project.assets && project.assets.length > 0 ? (
+            <ul className={styles["assets-list"]}>
+              {project.assets.map((asset) => (
+                <li key={asset.id} className={styles["asset-item"]}>
+                  <div className={styles["asset-info"]}>
+                    <strong>{asset.title}</strong>
+                    <p>{asset.description}</p>
+                    <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
+          )}
+        </Box>
+      </div>
     </>
   );
 }
