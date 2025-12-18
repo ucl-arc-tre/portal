@@ -455,13 +455,7 @@ func (s *Service) updateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UU
 	return nil
 }
 
-func (s *Service) UpdateProjectTRE(projectUUID uuid.UUID, projectUpdateData openapi.ProjectTREUpdate) error {
-	var projectTRE types.ProjectTRE
-	err := s.db.Where("project_id = ?", projectUUID).First(&projectTRE).Error
-	if err != nil {
-		return types.NewErrFromGorm(err, "failed to get project TRE")
-	}
-
+func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateData openapi.ProjectTREUpdate) error {
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -469,7 +463,7 @@ func (s *Service) UpdateProjectTRE(projectUUID uuid.UUID, projectUpdateData open
 		}
 	}()
 
-	if err := s.updateProjectAssets(tx, projectUUID, projectUpdateData.AssetIds); err != nil {
+	if err := s.updateProjectAssets(tx, projectTRE.ProjectID, projectUpdateData.AssetIds); err != nil {
 		tx.Rollback()
 		return err
 	}
