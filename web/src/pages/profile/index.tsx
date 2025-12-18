@@ -96,21 +96,23 @@ export default function ProfilePage() {
         description="View and manage your ARC profile and researcher status"
       />
 
-      <Title text={"Profile Setup"} centered />
-      <div className={styles["profile-content-container"]}>
-        <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
+      <div className="content">
+        <Title text={"Profile Setup"} centered />
+        <div className={styles["profile-content-container"]}>
+          <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
 
-        <ProfileSetup
-          chosenName={chosenName}
-          setChosenName={setChosenName}
-          agreementCompleted={agreementCompleted}
-          setAgreementCompleted={setAgreementCompleted}
-          trainingCertificateCompleted={trainingCertificateCompleted}
-          setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-          userData={userData}
-          expiryUrgency={expiryUrgency}
-          refreshAuth={refreshAuth}
-        />
+          <ProfileSetup
+            chosenName={chosenName}
+            setChosenName={setChosenName}
+            agreementCompleted={agreementCompleted}
+            setAgreementCompleted={setAgreementCompleted}
+            trainingCertificateCompleted={trainingCertificateCompleted}
+            setTrainingCertificateCompleted={setTrainingCertificateCompleted}
+            userData={userData}
+            expiryUrgency={expiryUrgency}
+            refreshAuth={refreshAuth}
+          />
+        </div>
       </div>
     </>
   );

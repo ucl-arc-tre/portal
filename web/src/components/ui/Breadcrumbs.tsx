@@ -2,43 +2,35 @@ import { useRouter } from "next/router";
 import styles from "./Breadcrumbs.module.css";
 import Button from "./Button";
 
+type BreadCrumbLink = {
+  url: string;
+  title: string;
+};
+
 type BreadcrumbProps = {
-  studyId?: string;
-  studyTitle?: string;
-  assetId?: string;
-  assetTitle?: string;
+  links: Array<BreadCrumbLink>;
 };
 
 export default function Breadcrumbs(props: BreadcrumbProps) {
-  const { studyId, studyTitle, assetId, assetTitle } = props;
+  const numLinks = props.links ? props.links.length : 0;
   const router = useRouter();
 
   return (
     <div className={styles.breadcrumbs}>
-      {studyId && (
-        <>
-          <Button onClick={() => router.push("/studies")} size="small" variant="tertiary">
-            Studies
-          </Button>
-          <span> / </span>
-          {assetId ? (
-            <>
-              <Button
-                onClick={() => router.push(`/studies/manage?studyId=${studyId}`)}
-                size="small"
-                variant="tertiary"
-                s
-              >
-                {studyTitle}
-              </Button>
-              <span> / </span>
-              <span className={styles.current}>{assetTitle}</span>
-            </>
-          ) : (
-            <span className={styles.current}>{studyTitle}</span>
-          )}
-        </>
-      )}
+      {props.links &&
+        props.links.map((link, index) => (
+          <span key={index}>
+            <Button
+              className={index == numLinks - 1 ? styles.current : undefined}
+              onClick={() => router.push(link.url)}
+              size="small"
+              variant="tertiary"
+            >
+              {link.title}
+            </Button>
+            {index < numLinks - 1 && <span> / </span>}
+          </span>
+        ))}
     </div>
   );
 }
