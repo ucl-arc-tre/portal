@@ -29,7 +29,7 @@ func New() *Service {
 	}
 }
 
-func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) ValidateProjectTREData(projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
 		return &openapi.ValidationError{ErrorMessage: "Project name must be 4-14 characters long and contain only lowercase letters and numbers"}, nil
 	}
@@ -39,14 +39,14 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 		return validationError, err
 	}
 
-	return s.validateProjectTREAssetsAndMembers(ctx, projectTreData.AssetIds, projectTreData.Members, studyUUID)
+	return s.validateProjectTREAssetsAndMembers(projectTreData.AssetIds, projectTreData.Members, studyUUID)
 }
 
-func (s *Service) ValidateProjectTREUpdate(ctx context.Context, projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
-	return s.validateProjectTREAssetsAndMembers(ctx, projectUpdateData.AssetIds, projectUpdateData.Members, studyUUID)
+func (s *Service) ValidateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+	return s.validateProjectTREAssetsAndMembers(projectUpdateData.AssetIds, projectUpdateData.Members, studyUUID)
 }
 
-func (s *Service) validateProjectTREAssetsAndMembers(ctx context.Context, assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
 	// Validate assets belong to study and are compatible with TRE environment tier
 	if len(assetIds) > 0 {
 		// Get TRE environment tier

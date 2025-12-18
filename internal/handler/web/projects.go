@@ -109,7 +109,7 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 		return
 	}
 
-	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID)
+	validationError, err := h.projects.ValidateProjectTREData(projectTreData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to validate project")
 		return
@@ -180,7 +180,6 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	// Get the existing project to validate study ownership
 	projectTRE, err := h.projects.ProjectTreById(projectUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to get project")
@@ -194,18 +193,7 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 
 	studyUUID := projectTRE.Project.StudyID
 
-	user := middleware.GetUser(ctx)
-	// Validate that user has owner role on the study
-	studyOwnerRole := rbac.StudyRole{StudyID: studyUUID, Name: rbac.StudyOwner}
-	if isStudyOwner, err := rbac.HasRole(user, studyOwnerRole.RoleName()); err != nil {
-		setError(ctx, err, "Failed to check study access")
-		return
-	} else if !isStudyOwner {
-		ctx.Status(http.StatusForbidden)
-		return
-	}
-
-	validationError, err := h.projects.ValidateProjectTREUpdate(ctx, projectUpdateData, studyUUID)
+	validationError, err := h.projects.ValidateProjectTREUpdate(projectUpdateData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to validate project update")
 		return
