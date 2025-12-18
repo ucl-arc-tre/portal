@@ -109,7 +109,7 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 		return
 	}
 
-	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID, user)
+	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to validate project")
 		return
@@ -205,7 +205,7 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	validationError, err := h.projects.ValidateProjectTREUpdate(ctx, projectUpdateData, studyUUID, projectUUID)
+	validationError, err := h.projects.ValidateProjectTREUpdate(ctx, projectUpdateData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to validate project update")
 		return

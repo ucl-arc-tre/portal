@@ -29,36 +29,42 @@ func New() *Service {
 	}
 }
 
-func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, creator types.User) (*openapi.ValidationError, error) {
+func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
 		return &openapi.ValidationError{ErrorMessage: "Project name must be 4-14 characters long and contain only lowercase letters and numbers"}, nil
 	}
-
-	// Note: No need to validate study exists - handler already checks user is study owner
-	// Note: No need to validate environment exists - environment is determined by the endpoint (TRE in this case)
 
 	validationError, err := s.validateProjectNameUniqueness(projectTreData.Name)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
 
+	return s.validateProjectTREAssetsAndMembers(ctx, projectTreData.AssetIds, projectTreData.Members, studyUUID)
+}
+
+func (s *Service) ValidateProjectTREUpdate(ctx context.Context, projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+	return s.validateProjectTREAssetsAndMembers(ctx, projectUpdateData.AssetIds, projectUpdateData.Members, studyUUID)
+}
+
+func (s *Service) validateProjectTREAssetsAndMembers(ctx context.Context, assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
 	// Validate assets belong to study and are compatible with TRE environment tier
-	if len(projectTreData.AssetIds) > 0 {
+	if len(assetIds) > 0 {
 		// Get TRE environment tier
 		var treEnvironment types.Environment
-		err = s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
+		err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
 		if err != nil {
 			return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
 		}
 
-		validationError, err := s.validateAssets(projectTreData.AssetIds, studyUUID, treEnvironment.Tier)
+		validationError, err := s.validateAssets(assetIds, studyUUID, treEnvironment.Tier)
 		if err != nil || validationError != nil {
 			return validationError, err
 		}
 	}
 
-	if len(projectTreData.Members) > 0 {
-		validationError, err := s.validateProjectMembers(projectTreData.Members)
+	// Validate members
+	if len(members) > 0 {
+		validationError, err := s.validateProjectMembers(members)
 		if err != nil || validationError != nil {
 			return validationError, err
 		}
@@ -335,33 +341,6 @@ func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	}
 
 	return nil
-}
-
-func (s *Service) ValidateProjectTREUpdate(ctx context.Context, projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID, projectUUID uuid.UUID) (*openapi.ValidationError, error) {
-	// Get TRE environment tier for asset validation
-	var treEnvironment types.Environment
-	err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
-	if err != nil {
-		return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
-	}
-
-	// Validate assets belong to study and are compatible with TRE environment tier
-	if len(projectUpdateData.AssetIds) > 0 {
-		validationError, err := s.validateAssets(projectUpdateData.AssetIds, studyUUID, treEnvironment.Tier)
-		if err != nil || validationError != nil {
-			return validationError, err
-		}
-	}
-
-	// Validate members
-	if len(projectUpdateData.Members) > 0 {
-		validationError, err := s.validateProjectMembers(projectUpdateData.Members)
-		if err != nil || validationError != nil {
-			return validationError, err
-		}
-	}
-
-	return nil, nil
 }
 
 func (s *Service) updateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, assetIDStrs []string) error {
