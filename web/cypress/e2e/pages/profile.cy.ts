@@ -167,9 +167,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForProfileData();
 
     // Should show completion message instead of steps
-    cy.contains("Profile Complete").should("not.exist");
-    cy.get("[data-cy='chosen-name-form']").should("not.exist");
-    cy.get("[data-cy='approved-researcher-agreement']").should("not.exist");
+    cy.contains("Profile Complete").should("be.visible");
 
     // Should have the option to upload another certificate
     cy.contains("Verify another certificate").should("be.visible");

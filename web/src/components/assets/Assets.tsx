@@ -127,33 +127,33 @@ export default function Assets(props: InformationAssetsProps) {
         </div>
       )}
 
-      <Callout definition>
-        {canModify && (
+      {canModify && (
+        <Callout definition>
           <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
-        )}
 
-        <div className={styles["callout-info-paragraph"]}>
-          Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
-          are owned by a <strong>study</strong>{" "}
-          <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
-          <strong>projects</strong> <InfoTooltip text="Projects are owned by a study and can contain assets" />.
-        </div>
+          <div className={styles["callout-info-paragraph"]}>
+            Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
+            are owned by a <strong>study</strong>{" "}
+            <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
+            <strong>projects</strong> <InfoTooltip text="Projects are owned by a study and can contain assets" />.
+          </div>
 
-        <div className={styles["callout-glossary-section"]}>
-          You can read more detailed information about assets in our
-          <Button href="/glossary" variant="tertiary" size="small" inline>
-            Glossary
-          </Button>
-          and the{" "}
-          <a
-            href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            The National Archives guide on information assets.
-          </a>
-        </div>
-      </Callout>
+          <div className={styles["callout-glossary-section"]}>
+            You can read more detailed information about assets in our
+            <Button href="/glossary" variant="tertiary" size="small" inline>
+              Glossary
+            </Button>
+            and the{" "}
+            <a
+              href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              The National Archives guide on information assets.
+            </a>
+          </div>
+        </Callout>
+      )}
 
       {informationAssets.length === 0 && canModify ? (
         <div>

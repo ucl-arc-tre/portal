@@ -115,7 +115,7 @@ export default function ProfileSetup(props: Props) {
           ariaLabel="Profile setup progress"
         />
       ) : userData?.roles.includes("staff") ? (
-        !profileStepsCompleted && (
+        profileStepsCompleted && (
           <StepProgress
             steps={profileSetupSteps}
             isComplete={profileStepsCompleted}
