@@ -350,7 +350,7 @@ func (s *Service) updateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, assetI
 		return types.NewErrFromGorm(err, "failed to list project assets")
 	}
 
-	// Parse requested asset IDs
+	// Parse requested asset IDs to compare against existing assets and determine which to add, remove, or restore
 	requestedAssetIDs := []uuid.UUID{}
 	for _, assetIDStr := range assetIDStrs {
 		assetUUID, err := uuid.Parse(assetIDStr)
@@ -377,7 +377,7 @@ func (s *Service) updateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, assetI
 		}
 	}
 
-	// Create or find existing project assets
+	// Ensure all requested assets have project asset records, reusing existing records (including soft-deleted ones)
 	for _, assetUUID := range requestedAssetIDs {
 		projectAsset := types.ProjectAsset{
 			ProjectID: projectUUID,
@@ -398,7 +398,7 @@ func (s *Service) updateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UU
 		return types.NewErrFromGorm(err, "failed to list role bindings")
 	}
 
-	// Build map of requested user+role combinations
+	// Build map of requested user+role combinations to compare against existing bindings and determine which to add, remove, or restore
 	type userRoleKey struct {
 		userID uuid.UUID
 		role   types.ProjectTRERoleName
@@ -433,7 +433,7 @@ func (s *Service) updateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UU
 		}
 	}
 
-	// Create or find existing role bindings
+	// Ensure all requested role bindings have records, reusing existing records (including soft-deleted ones)
 	for _, member := range members {
 		user, err := s.users.UserByUsername(types.Username(member.Username))
 		if err != nil {

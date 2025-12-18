@@ -53,6 +53,7 @@ export default function CreateProjectForm({
   const [isLoadingEnvironments, setIsLoadingEnvironments] = useState(true);
   const [environmentsError, setEnvironmentsError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [originalMemberCount, setOriginalMemberCount] = useState(0);
   const totalSteps = 2;
 
   const {
@@ -117,6 +118,7 @@ export default function CreateProjectForm({
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
       setValue("additionalApprovedResearchers", projectMembers);
+      setOriginalMemberCount(projectMembers.length);
     }
   }, [editingProject, setValue, environments]);
 
@@ -568,7 +570,7 @@ export default function CreateProjectForm({
                                       type="text"
                                       placeholder="ccaxyz"
                                       className={styles.select}
-                                      disabled={isSubmitting}
+                                      disabled={isSubmitting || (!!editingProject && index < originalMemberCount)}
                                     />
                                     <span className={styles["domain-suffix"]}>{domainName}</span>
                                   </div>

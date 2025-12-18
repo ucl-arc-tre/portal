@@ -37,6 +37,7 @@ const (
 	ProjectTREEgresser        ProjectTRERoleName = "egresser"         // can download data from the TRE
 	ProjectTREEgressRequester ProjectTRERoleName = "egress_requester" // can request data to be egressed
 	ProjectTREEgressChecker   ProjectTRERoleName = "egress_checker"   // can approve egress requests
+	ProjectTRETrustedEgresser ProjectTRERoleName = "trusted_egresser" // can download data from the TRE without approval
 )
 
 var AllProjectTRERoles = []ProjectTRERoleName{
@@ -45,6 +46,7 @@ var AllProjectTRERoles = []ProjectTRERoleName{
 	ProjectTREEgresser,
 	ProjectTREEgressRequester,
 	ProjectTREEgressChecker,
+	ProjectTRETrustedEgresser,
 }
 
 type ProjectTRERoleBinding struct {
