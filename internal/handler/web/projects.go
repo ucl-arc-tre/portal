@@ -186,11 +186,6 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	if projectTRE == nil {
-		ctx.Status(http.StatusNotFound)
-		return
-	}
-
 	studyUUID := projectTRE.Project.StudyID
 
 	validationError, err := h.projects.ValidateProjectTREUpdate(projectUpdateData, studyUUID)
