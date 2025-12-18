@@ -26,7 +26,7 @@ export default function StatusBadge(props: BadgeProps) {
           return "This study is under review and awaiting approval from an administrator. You can still make changes if necessary.";
         }
       case "Approved":
-        return "This study has been approved and is awaiting deployment.";
+        return "This study has been approved.";
       case "Rejected":
         return "This study has been rejected. Please review feedback and make necessary changes.";
       default:
@@ -49,7 +49,7 @@ export default function StatusBadge(props: BadgeProps) {
           return "This project is awaiting approval from an administrator.";
         }
       case "Approved":
-        return "This project has been approved and is ready for use.";
+        return "This project has been approved and is awaiting deployment.";
       case "Rejected":
         return "This project has been rejected. Please contact support for more information.";
       default:

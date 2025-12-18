@@ -73,6 +73,10 @@ dialog {
   gap: 1.5rem;
 }
 
+.content {
+  width: clamp(50vw, 60vw, 70vw);
+}
+
 .error-message {
   color: #d32f2f;
   background-color: #fdeaea;

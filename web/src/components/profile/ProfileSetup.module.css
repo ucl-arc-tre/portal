@@ -1,5 +1,5 @@
 .current-step {
-  width: 100%;
+  width: 80%;
   margin: 1rem 0 0 0;
 }
 
@@ -29,8 +29,8 @@
 }
 
 .reupload-option {
-  width: 80%;
   margin-block: 0.5rem;
+  margin-top: 1.5rem;
   padding: 1.5rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;

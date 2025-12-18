@@ -166,14 +166,27 @@ export default function ManageStudyPage() {
         title={`Manage ${study.title} | ARC Services Portal`}
         description={`Manage your study "${study.title}" in the ARC Services Portal`}
       />
-      <Breadcrumbs studyId={study.id} studyTitle={study.title} />
+      <Breadcrumbs
+        links={[
+          {
+            title: "Studies",
+            url: "/studies",
+          },
+          {
+            title: study.title,
+            url: `/studies/manage?studyId=${study.id}`,
+          },
+        ]}
+      />
       <Title text={isIGOpsStaff ? study.title : `Manage Study: ${study.title}`} centered />
 
-      {isIGOpsStaff ? (
-        <StudyDetails study={study} isIGOpsStaff={isIGOpsStaff} isStudyOwner={false} isStudyAdmin={false} />
-      ) : (
-        <ManageStudy study={study} fetchStudy={fetchStudy} />
-      )}
+      <div className="content">
+        {isIGOpsStaff ? (
+          <StudyDetails study={study} isIGOpsStaff={isIGOpsStaff} isStudyOwner={false} isStudyAdmin={false} />
+        ) : (
+          <ManageStudy study={study} fetchStudy={fetchStudy} />
+        )}
+      </div>
     </>
   );
 }
