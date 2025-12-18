@@ -202,7 +202,7 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	if err := h.projects.UpdateProjectTRE(ctx, projectUUID, projectUpdateData); err != nil {
+	if err := h.projects.UpdateProjectTRE(projectUUID, projectUpdateData); err != nil {
 		setError(ctx, err, "Failed to update project")
 		return
 	}

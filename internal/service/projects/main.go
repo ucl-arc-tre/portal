@@ -455,7 +455,7 @@ func (s *Service) updateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UU
 	return nil
 }
 
-func (s *Service) UpdateProjectTRE(ctx context.Context, projectUUID uuid.UUID, projectUpdateData openapi.ProjectTREUpdate) error {
+func (s *Service) UpdateProjectTRE(projectUUID uuid.UUID, projectUpdateData openapi.ProjectTREUpdate) error {
 	var projectTRE types.ProjectTRE
 	err := s.db.Where("project_id = ?", projectUUID).First(&projectTRE).Error
 	if err != nil {
