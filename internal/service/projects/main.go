@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -363,15 +364,125 @@ func (s *Service) ValidateProjectTREUpdate(ctx context.Context, projectUpdateDat
 	return nil, nil
 }
 
+func (s *Service) updateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, assetIDStrs []string) error {
+	// Get all existing project assets (including soft-deleted)
+	existingAssets := []types.ProjectAsset{}
+	if err := tx.Unscoped().Where("project_id = ?", projectUUID).Find(&existingAssets).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to list project assets")
+	}
+
+	// Parse requested asset IDs
+	requestedAssetIDs := []uuid.UUID{}
+	for _, assetIDStr := range assetIDStrs {
+		assetUUID, err := uuid.Parse(assetIDStr)
+		if err != nil {
+			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
+		}
+		requestedAssetIDs = append(requestedAssetIDs, assetUUID)
+	}
+
+	// Process existing assets
+	for _, existingAsset := range existingAssets {
+		assetInRequested := slices.Contains(requestedAssetIDs, existingAsset.AssetID)
+		if !assetInRequested && !existingAsset.DeletedAt.Valid {
+			// Asset not in requested list and not already deleted - soft delete it
+			if err := tx.Delete(&existingAsset).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to delete project asset")
+			}
+		}
+		if assetInRequested && existingAsset.DeletedAt.Valid {
+			// Asset in requested list but currently soft-deleted - un-delete it
+			if err := tx.Unscoped().Model(&existingAsset).Update("deleted_at", nil).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to undelete project asset")
+			}
+		}
+	}
+
+	// Create or find existing project assets
+	for _, assetUUID := range requestedAssetIDs {
+		projectAsset := types.ProjectAsset{
+			ProjectID: projectUUID,
+			AssetID:   assetUUID,
+		}
+		if err := tx.Unscoped().Where("project_id = ? AND asset_id = ?", projectUUID, assetUUID).FirstOrCreate(&projectAsset).Error; err != nil {
+			return types.NewErrFromGorm(err, "failed to create project asset")
+		}
+	}
+
+	return nil
+}
+
+func (s *Service) updateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+	// Get all existing role bindings (including soft-deleted)
+	existingBindings := []types.ProjectTRERoleBinding{}
+	if err := tx.Unscoped().Preload("User").Where("project_tre_id = ?", projectTREID).Find(&existingBindings).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to list role bindings")
+	}
+
+	// Build map of requested user+role combinations
+	type userRoleKey struct {
+		userID uuid.UUID
+		role   types.ProjectTRERoleName
+	}
+	requestedBindings := make(map[userRoleKey]bool)
+	for _, member := range members {
+		user, err := s.users.UserByUsername(types.Username(member.Username))
+		if err != nil {
+			return err
+		}
+		for _, role := range member.Roles {
+			key := userRoleKey{userID: user.ID, role: types.ProjectTRERoleName(role)}
+			requestedBindings[key] = true
+		}
+	}
+
+	// Process existing bindings
+	for _, existingBinding := range existingBindings {
+		key := userRoleKey{userID: existingBinding.UserID, role: existingBinding.Role}
+		bindingInRequested := requestedBindings[key]
+		if !bindingInRequested && !existingBinding.DeletedAt.Valid {
+			// Binding not in requested list and not already deleted - soft delete it
+			if err := tx.Delete(&existingBinding).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to delete role binding")
+			}
+		}
+		if bindingInRequested && existingBinding.DeletedAt.Valid {
+			// Binding in requested list but currently soft-deleted - un-delete it
+			if err := tx.Unscoped().Model(&existingBinding).Update("deleted_at", nil).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to undelete role binding")
+			}
+		}
+	}
+
+	// Create or find existing role bindings
+	for _, member := range members {
+		user, err := s.users.UserByUsername(types.Username(member.Username))
+		if err != nil {
+			return err
+		}
+
+		for _, role := range member.Roles {
+			roleBinding := types.ProjectTRERoleBinding{
+				ProjectTREID: projectTREID,
+				UserID:       user.ID,
+				Role:         types.ProjectTRERoleName(role),
+			}
+			if err := tx.Unscoped().Where("project_tre_id = ? AND user_id = ? AND role = ?", projectTREID, user.ID, role).FirstOrCreate(&roleBinding).Error; err != nil {
+				return types.NewErrFromGorm(err, fmt.Sprintf("failed to create role binding for user %s", member.Username))
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s *Service) UpdateProjectTRE(ctx context.Context, projectUUID uuid.UUID, projectUpdateData openapi.ProjectTREUpdate) error {
-	// Get the ProjectTRE record
 	var projectTRE types.ProjectTRE
 	err := s.db.Where("project_id = ?", projectUUID).First(&projectTRE).Error
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to get project TRE")
 	}
 
-	// Start a transaction
 	tx := s.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -379,39 +490,12 @@ func (s *Service) UpdateProjectTRE(ctx context.Context, projectUUID uuid.UUID, p
 		}
 	}()
 
-	// Delete existing project assets
-	if err := tx.Where("project_id = ?", projectUUID).Delete(&types.ProjectAsset{}).Error; err != nil {
+	if err := s.updateProjectAssets(tx, projectUUID, projectUpdateData.AssetIds); err != nil {
 		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to delete existing project assets")
+		return err
 	}
 
-	// Create new ProjectAsset records
-	for _, assetIDStr := range projectUpdateData.AssetIds {
-		assetUUID, err := uuid.Parse(assetIDStr)
-		if err != nil {
-			tx.Rollback()
-			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
-		}
-
-		projectAsset := types.ProjectAsset{
-			ProjectID: projectUUID,
-			AssetID:   assetUUID,
-		}
-
-		if err := tx.Create(&projectAsset).Error; err != nil {
-			tx.Rollback()
-			return types.NewErrFromGorm(err, "failed to create project asset")
-		}
-	}
-
-	// Delete existing role bindings
-	if err := tx.Where("project_tre_id = ?", projectTRE.ID).Delete(&types.ProjectTRERoleBinding{}).Error; err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to delete existing role bindings")
-	}
-
-	// Create new role bindings
-	if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
+	if err := s.updateProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
