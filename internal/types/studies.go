@@ -60,14 +60,6 @@ type StudyAdmin struct {
 	User  User  `gorm:"foreignKey:UserID"`
 }
 
-func (p StudyAdmin) UniqueKey() string {
-	return fmt.Sprintf("%v%v", p.StudyID, p.UserID)
-}
-
-func (p StudyAdmin) IsDeleted() bool {
-	return p.DeletedAt.Valid
-}
-
 type Asset struct {
 	ModelAuditable
 	CreatorUserID        uuid.UUID `gorm:"not null;index"`
