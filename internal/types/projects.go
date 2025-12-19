@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -60,6 +62,14 @@ type ProjectTRERoleBinding struct {
 	User       User       `gorm:"foreignKey:UserID"`
 }
 
+func (p ProjectTRERoleBinding) UniqueKey() string {
+	return fmt.Sprintf("%v%v%v", p.ProjectTREID, p.UserID, p.Role)
+}
+
+func (p ProjectTRERoleBinding) IsDeleted() bool {
+	return p.DeletedAt.Valid
+}
+
 type ProjectAsset struct {
 	ModelAuditable
 	ProjectID uuid.UUID `gorm:"not null;index"`
@@ -68,4 +78,12 @@ type ProjectAsset struct {
 	// Relationships
 	Project Project `gorm:"foreignKey:ProjectID"`
 	Asset   Asset   `gorm:"foreignKey:AssetID"`
+}
+
+func (p ProjectAsset) UniqueKey() string {
+	return fmt.Sprintf("%v%v", p.ProjectID, p.AssetID)
+}
+
+func (p ProjectAsset) IsDeleted() bool {
+	return p.DeletedAt.Valid
 }

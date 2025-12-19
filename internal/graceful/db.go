@@ -1,6 +1,7 @@
 package graceful
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -83,5 +84,43 @@ func migrateDPNValues(db *gorm.DB) {
 		if err != nil {
 			log.Err(err).Msg("Failed to update data_protection_number")
 		}
+	}
+}
+
+type UpdateObject interface {
+	UniqueKey() string
+	IsDeleted() bool
+}
+
+// Update an existing list of many ojects to their new values using
+// unique keys that can only exist once in the database.
+func UpdateManyExisting[T UpdateObject](tx *gorm.DB, old []T, new []T) error {
+	newKeys := []string{}
+	for _, n := range new {
+		newKeys = append(newKeys, n.UniqueKey())
+	}
+	for _, o := range old {
+		inNew := slices.Contains(newKeys, o.UniqueKey())
+		if !inNew && !o.IsDeleted() { // needs deleting
+			if err := tx.Delete(&o).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to delete")
+			}
+		} else if inNew && o.IsDeleted() { // needs un-deleting
+			if err := tx.Unscoped().Model(&o).Update("deleted_at", nil).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to undelete")
+			}
+		}
+	}
+	for _, n := range new {
+		if err := tx.Unscoped().Where(&n).FirstOrCreate(&n).Error; err != nil {
+			return types.NewErrFromGorm(err, "failed to create")
+		}
+	}
+	return nil
+}
+
+func RollbackTransactionOnPanic(tx *gorm.DB) {
+	if r := recover(); r != nil {
+		tx.Rollback()
 	}
 }

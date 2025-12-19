@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"slices"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -164,29 +163,6 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 	return nil, nil
 }
 
-func (s *Service) createProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
-	for _, member := range members {
-		user, err := s.users.UserByUsername(types.Username(member.Username))
-		if err != nil {
-			return err
-		}
-
-		// Create a role binding for each role assigned to this member
-		for _, role := range member.Roles {
-			roleBinding := types.ProjectTRERoleBinding{
-				ProjectTREID: projectTREID,
-				UserID:       user.ID,
-				Role:         types.ProjectTRERoleName(role),
-			}
-
-			if err := tx.Create(&roleBinding).Error; err != nil {
-				return types.NewErrFromGorm(err, fmt.Sprintf("failed to create role binding for user %s", member.Username))
-			}
-		}
-	}
-	return nil
-}
-
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
 	// Get TRE environment
 	var treEnvironment types.Environment
@@ -197,22 +173,15 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 
 	// Start a transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// Create Project record
-	// TODO: discuss how each project status should be set on creation
-	approvalStatus := string(openapi.Incomplete)
-
 	project := types.Project{
 		Name:           projectTreData.Name,
 		CreatorUserID:  creator.ID,
 		StudyID:        studyUUID,
 		EnvironmentID:  treEnvironment.ID,
-		ApprovalStatus: approvalStatus,
+		ApprovalStatus: string(openapi.Incomplete),
 	}
 
 	if err := tx.Create(&project).Error; err != nil {
@@ -231,27 +200,13 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return types.NewErrFromGorm(err, "failed to create project TRE")
 	}
 
-	// Create ProjectAsset records for each asset
-	for _, assetIDStr := range projectTreData.AssetIds {
-		assetUUID, err := uuid.Parse(assetIDStr)
-		if err != nil {
-			tx.Rollback()
-			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
-		}
-
-		projectAsset := types.ProjectAsset{
-			ProjectID: project.ID,
-			AssetID:   assetUUID,
-		}
-
-		if err := tx.Create(&projectAsset).Error; err != nil {
-			tx.Rollback()
-			return types.NewErrFromGorm(err, "failed to create project asset")
-		}
+	if err := s.createOrUpdateProjectAssets(tx, project.ID, projectTreData); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -343,132 +298,66 @@ func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	return nil
 }
 
-func (s *Service) updateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, assetIDStrs []string) error {
+func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {
+	requestedAssetIDs, err := project.AssetUUIDs()
+	if err != nil {
+		return err
+	}
+
 	// Get all existing project assets (including soft-deleted)
-	existingAssets := []types.ProjectAsset{}
-	if err := tx.Unscoped().Where("project_id = ?", projectUUID).Find(&existingAssets).Error; err != nil {
+	existingProjectAssets := []types.ProjectAsset{}
+	if err := tx.Unscoped().Where("project_id = ?", projectUUID).Find(&existingProjectAssets).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list project assets")
 	}
 
-	// Parse requested asset IDs to compare against existing assets and determine which to add, remove, or restore
-	requestedAssetIDs := []uuid.UUID{}
-	for _, assetIDStr := range assetIDStrs {
-		assetUUID, err := uuid.Parse(assetIDStr)
-		if err != nil {
-			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
-		}
-		requestedAssetIDs = append(requestedAssetIDs, assetUUID)
-	}
-
-	// Process existing assets
-	for _, existingAsset := range existingAssets {
-		assetInRequested := slices.Contains(requestedAssetIDs, existingAsset.AssetID)
-		if !assetInRequested && !existingAsset.DeletedAt.Valid {
-			// Asset not in requested list and not already deleted - soft delete it
-			if err := tx.Delete(&existingAsset).Error; err != nil {
-				return types.NewErrFromGorm(err, "failed to delete project asset")
-			}
-		}
-		if assetInRequested && existingAsset.DeletedAt.Valid {
-			// Asset in requested list but currently soft-deleted - un-delete it
-			if err := tx.Unscoped().Model(&existingAsset).Update("deleted_at", nil).Error; err != nil {
-				return types.NewErrFromGorm(err, "failed to undelete project asset")
-			}
-		}
-	}
-
-	// Ensure all requested assets have project asset records, reusing existing records (including soft-deleted ones)
-	for _, assetUUID := range requestedAssetIDs {
-		projectAsset := types.ProjectAsset{
+	requestedAssets := []types.ProjectAsset{}
+	for _, assetId := range requestedAssetIDs {
+		requestedAssets = append(requestedAssets, types.ProjectAsset{
 			ProjectID: projectUUID,
-			AssetID:   assetUUID,
-		}
-		if err := tx.Unscoped().Where("project_id = ? AND asset_id = ?", projectUUID, assetUUID).FirstOrCreate(&projectAsset).Error; err != nil {
-			return types.NewErrFromGorm(err, "failed to create project asset")
-		}
+			AssetID:   assetId,
+		})
 	}
 
-	return nil
+	return graceful.UpdateManyExisting(tx, existingProjectAssets, requestedAssets)
 }
 
-func (s *Service) updateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
 	// Get all existing role bindings (including soft-deleted)
 	existingBindings := []types.ProjectTRERoleBinding{}
-	if err := tx.Unscoped().Preload("User").Where("project_tre_id = ?", projectTREID).Find(&existingBindings).Error; err != nil {
+	if err := tx.Unscoped().Where("project_tre_id = ?", projectTREID).Find(&existingBindings).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list role bindings")
 	}
 
-	// Build map of requested user+role combinations to compare against existing bindings and determine which to add, remove, or restore
-	type userRoleKey struct {
-		userID uuid.UUID
-		role   types.ProjectTRERoleName
+	userIds, err := s.users.UserIds(treProjectMemberUsernames(members)...)
+	if err != nil {
+		return err
 	}
-	requestedBindings := make(map[userRoleKey]bool)
+
+	requestedBindings := []types.ProjectTRERoleBinding{}
 	for _, member := range members {
-		user, err := s.users.UserByUsername(types.Username(member.Username))
-		if err != nil {
-			return err
-		}
-		for _, role := range member.Roles {
-			key := userRoleKey{userID: user.ID, role: types.ProjectTRERoleName(role)}
-			requestedBindings[key] = true
-		}
-	}
-
-	// Process existing bindings
-	for _, existingBinding := range existingBindings {
-		key := userRoleKey{userID: existingBinding.UserID, role: existingBinding.Role}
-		bindingInRequested := requestedBindings[key]
-		if !bindingInRequested && !existingBinding.DeletedAt.Valid {
-			// Binding not in requested list and not already deleted - soft delete it
-			if err := tx.Delete(&existingBinding).Error; err != nil {
-				return types.NewErrFromGorm(err, "failed to delete role binding")
-			}
-		}
-		if bindingInRequested && existingBinding.DeletedAt.Valid {
-			// Binding in requested list but currently soft-deleted - un-delete it
-			if err := tx.Unscoped().Model(&existingBinding).Update("deleted_at", nil).Error; err != nil {
-				return types.NewErrFromGorm(err, "failed to undelete role binding")
-			}
-		}
-	}
-
-	// Ensure all requested role bindings have records, reusing existing records (including soft-deleted ones)
-	for _, member := range members {
-		user, err := s.users.UserByUsername(types.Username(member.Username))
-		if err != nil {
-			return err
-		}
-
 		for _, role := range member.Roles {
 			roleBinding := types.ProjectTRERoleBinding{
 				ProjectTREID: projectTREID,
-				UserID:       user.ID,
+				UserID:       userIds[types.Username(member.Username)],
 				Role:         types.ProjectTRERoleName(role),
 			}
-			if err := tx.Unscoped().Where("project_tre_id = ? AND user_id = ? AND role = ?", projectTREID, user.ID, role).FirstOrCreate(&roleBinding).Error; err != nil {
-				return types.NewErrFromGorm(err, fmt.Sprintf("failed to create role binding for user %s", member.Username))
-			}
+			requestedBindings = append(requestedBindings, roleBinding)
 		}
 	}
 
-	return nil
+	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
 }
 
 func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateData openapi.ProjectTREUpdate) error {
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
-	if err := s.updateProjectAssets(tx, projectTRE.ProjectID, projectUpdateData.AssetIds); err != nil {
+	if err := s.createOrUpdateProjectAssets(tx, projectTRE.ProjectID, projectUpdateData); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := s.updateProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -478,4 +367,12 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateDa
 	}
 
 	return nil
+}
+
+func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
+	usernames := []types.Username{}
+	for _, member := range members {
+		usernames = append(usernames, types.Username(member.Username))
+	}
+	return usernames
 }

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -57,6 +58,14 @@ type StudyAdmin struct {
 	// Relationships
 	Study Study `gorm:"foreignKey:StudyID"`
 	User  User  `gorm:"foreignKey:UserID"`
+}
+
+func (p StudyAdmin) UniqueKey() string {
+	return fmt.Sprintf("%v%v", p.StudyID, p.UserID)
+}
+
+func (p StudyAdmin) IsDeleted() bool {
+	return p.DeletedAt.Valid
 }
 
 type Asset struct {
