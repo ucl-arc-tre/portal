@@ -367,9 +367,19 @@ export type ProjectTreRequest = {
      */
     study_id: string;
     /**
-     * Whether this is a draft submission (true) or final submission (false)
+     * List of asset identifiers to link to this project (can be empty)
      */
-    is_draft: boolean;
+    asset_ids: Array<string>;
+    /**
+     * List of project members with their roles (can be empty)
+     */
+    members: Array<ProjectTreMember>;
+};
+
+/**
+ * Request payload for updating an existing TRE project (members and assets only)
+ */
+export type ProjectTreUpdate = {
     /**
      * List of asset identifiers to link to this project (can be empty)
      */
@@ -465,6 +475,10 @@ export type ProjectTre = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
+    /**
+     * Title of the study to which the project belongs
+     */
+    study_title: string;
     /**
      * Username of the user who created the project
      */
@@ -1306,6 +1320,50 @@ export type GetProjectsTreByProjectIdResponses = {
 };
 
 export type GetProjectsTreByProjectIdResponse = GetProjectsTreByProjectIdResponses[keyof GetProjectsTreByProjectIdResponses];
+
+export type PutProjectsTreByProjectIdData = {
+    body: ProjectTreUpdate;
+    path: {
+        /**
+         * ID of the TRE project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}';
+};
+
+export type PutProjectsTreByProjectIdErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutProjectsTreByProjectIdError = PutProjectsTreByProjectIdErrors[keyof PutProjectsTreByProjectIdErrors];
+
+export type PutProjectsTreByProjectIdResponses = {
+    /**
+     * Project updated successfully
+     */
+    200: unknown;
+};
 
 export type PatchProjectsTreByProjectIdPendingData = {
     body?: never;

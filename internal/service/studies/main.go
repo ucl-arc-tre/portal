@@ -276,7 +276,7 @@ func createStudyAdmins(users []types.User, tx *gorm.DB, study *types.Study) erro
 func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) error {
 	// Start a transaction
 	tx := s.db.Begin()
-	defer rollbackTransactionOnPanic(tx)
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	study := types.Study{
 		OwnerUserID:    owner.ID,
@@ -320,7 +320,7 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
 
 	tx := s.db.Begin()
-	defer rollbackTransactionOnPanic(tx)
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	studies, err := s.StudiesById(id)
 	if err != nil {
@@ -371,10 +371,4 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 		return err
 	}
 	return nil
-}
-
-func rollbackTransactionOnPanic(tx *gorm.DB) {
-	if r := recover(); r != nil {
-		tx.Rollback()
-	}
 }

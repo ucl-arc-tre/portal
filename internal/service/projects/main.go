@@ -28,37 +28,42 @@ func New() *Service {
 	}
 }
 
-func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID, creator types.User, isUpdate bool) (*openapi.ValidationError, error) {
+func (s *Service) ValidateProjectTREData(projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
 		return &openapi.ValidationError{ErrorMessage: "Project name must be 4-14 characters long and contain only lowercase letters and numbers"}, nil
 	}
 
-	// Note: No need to validate study exists - handler already checks user is study owner
-	// Note: No need to validate environment exists - environment is determined by the endpoint (TRE in this case)
-
-	validationError, err := s.validateProjectNameUniqueness(projectTreData.Name, isUpdate)
+	validationError, err := s.validateProjectNameUniqueness(projectTreData.Name)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
 
+	return s.validateProjectTREAssetsAndMembers(projectTreData.AssetIds, projectTreData.Members, studyUUID)
+}
+
+func (s *Service) ValidateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+	return s.validateProjectTREAssetsAndMembers(projectUpdateData.AssetIds, projectUpdateData.Members, studyUUID)
+}
+
+func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
 	// Validate assets belong to study and are compatible with TRE environment tier
-	if len(projectTreData.AssetIds) > 0 {
+	if len(assetIds) > 0 {
 		// Get TRE environment tier
 		var treEnvironment types.Environment
-		err = s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
+		err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
 		if err != nil {
 			return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
 		}
 
-		validationError, err := s.validateAssets(projectTreData.AssetIds, studyUUID, treEnvironment.Tier)
+		validationError, err := s.validateAssets(assetIds, studyUUID, treEnvironment.Tier)
 		if err != nil || validationError != nil {
 			return validationError, err
 		}
 	}
 
-	// only validate members if not in draft mode
-	if !projectTreData.IsDraft && len(projectTreData.Members) > 0 {
-		validationError, err := s.validateProjectMembers(projectTreData.Members)
+	// Validate members
+	if len(members) > 0 {
+		validationError, err := s.validateProjectMembers(members)
 		if err != nil || validationError != nil {
 			return validationError, err
 		}
@@ -67,11 +72,8 @@ func (s *Service) ValidateProjectTREData(ctx context.Context, projectTreData ope
 	return nil, nil
 }
 
-func (s *Service) validateProjectNameUniqueness(projectName string, isUpdate bool) (*openapi.ValidationError, error) {
-	maxExpectedProjects := 0 // For new projects, expect zero existing projects with the same name
-	if isUpdate {
-		maxExpectedProjects = 1
-	}
+func (s *Service) validateProjectNameUniqueness(projectName string) (*openapi.ValidationError, error) {
+	maxExpectedProjects := 0 // only one project with a given name should exist
 
 	// Check if project name already exists
 	var count int64
@@ -161,29 +163,6 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 	return nil, nil
 }
 
-func (s *Service) createProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
-	for _, member := range members {
-		user, err := s.users.UserByUsername(types.Username(member.Username))
-		if err != nil {
-			return err
-		}
-
-		// Create a role binding for each role assigned to this member
-		for _, role := range member.Roles {
-			roleBinding := types.ProjectTRERoleBinding{
-				ProjectTREID: projectTREID,
-				UserID:       user.ID,
-				Role:         types.ProjectTRERoleName(role),
-			}
-
-			if err := tx.Create(&roleBinding).Error; err != nil {
-				return types.NewErrFromGorm(err, fmt.Sprintf("failed to create role binding for user %s", member.Username))
-			}
-		}
-	}
-	return nil
-}
-
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
 	// Get TRE environment
 	var treEnvironment types.Environment
@@ -194,22 +173,15 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 
 	// Start a transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// Create Project record
-	// TODO: discuss how each project status should be set on creation
-	approvalStatus := string(openapi.Incomplete)
-
 	project := types.Project{
 		Name:           projectTreData.Name,
 		CreatorUserID:  creator.ID,
 		StudyID:        studyUUID,
 		EnvironmentID:  treEnvironment.ID,
-		ApprovalStatus: approvalStatus,
+		ApprovalStatus: string(openapi.Incomplete),
 	}
 
 	if err := tx.Create(&project).Error; err != nil {
@@ -228,27 +200,13 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return types.NewErrFromGorm(err, "failed to create project TRE")
 	}
 
-	// Create ProjectAsset records for each asset
-	for _, assetIDStr := range projectTreData.AssetIds {
-		assetUUID, err := uuid.Parse(assetIDStr)
-		if err != nil {
-			tx.Rollback()
-			return types.NewErrInvalidObject(fmt.Errorf("invalid asset ID format: %s", assetIDStr))
-		}
-
-		projectAsset := types.ProjectAsset{
-			ProjectID: project.ID,
-			AssetID:   assetUUID,
-		}
-
-		if err := tx.Create(&projectAsset).Error; err != nil {
-			tx.Rollback()
-			return types.NewErrFromGorm(err, "failed to create project asset")
-		}
+	if err := s.createOrUpdateProjectAssets(tx, project.ID, projectTreData); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -298,6 +256,7 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 	err := s.db.
 		Preload("Project.CreatorUser").
 		Preload("Project.Environment").
+		Preload("Project.Study").
 		Preload("Project.ProjectAssets.Asset").
 		Preload("TRERoleBindings.User").
 		Where("project_id = ?", projectId).
@@ -337,4 +296,83 @@ func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {
+	requestedAssetIDs, err := project.AssetUUIDs()
+	if err != nil {
+		return err
+	}
+
+	// Get all existing project assets (including soft-deleted)
+	existingProjectAssets := []types.ProjectAsset{}
+	if err := tx.Unscoped().Where("project_id = ?", projectUUID).Find(&existingProjectAssets).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to list project assets")
+	}
+
+	requestedAssets := []types.ProjectAsset{}
+	for _, assetId := range requestedAssetIDs {
+		requestedAssets = append(requestedAssets, types.ProjectAsset{
+			ProjectID: projectUUID,
+			AssetID:   assetId,
+		})
+	}
+
+	return graceful.UpdateManyExisting(tx, existingProjectAssets, requestedAssets)
+}
+
+func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+	// Get all existing role bindings (including soft-deleted)
+	existingBindings := []types.ProjectTRERoleBinding{}
+	if err := tx.Unscoped().Where("project_tre_id = ?", projectTREID).Find(&existingBindings).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to list role bindings")
+	}
+
+	userIds, err := s.users.UserIds(treProjectMemberUsernames(members)...)
+	if err != nil {
+		return err
+	}
+
+	requestedBindings := []types.ProjectTRERoleBinding{}
+	for _, member := range members {
+		for _, role := range member.Roles {
+			roleBinding := types.ProjectTRERoleBinding{
+				ProjectTREID: projectTREID,
+				UserID:       userIds[types.Username(member.Username)],
+				Role:         types.ProjectTRERoleName(role),
+			}
+			requestedBindings = append(requestedBindings, roleBinding)
+		}
+	}
+
+	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
+}
+
+func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateData openapi.ProjectTREUpdate) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	if err := s.createOrUpdateProjectAssets(tx, projectTRE.ProjectID, projectUpdateData); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit update project transaction")
+	}
+
+	return nil
+}
+
+func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
+	usernames := []types.Username{}
+	for _, member := range members {
+		usernames = append(usernames, types.Username(member.Username))
+	}
+	return usernames
 }

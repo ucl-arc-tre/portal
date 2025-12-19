@@ -109,10 +109,7 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: Allow additional study admins to create projects (need to add StudyAdmin RBAC role)
-
-	isUpdate := false
-	validationError, err := h.projects.ValidateProjectTREData(ctx, projectTreData, studyUUID, user, isUpdate)
+	validationError, err := h.projects.ValidateProjectTREData(projectTreData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to validate project")
 		return
@@ -159,6 +156,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		Id:              projectTRE.Project.ID.String(),
 		Name:            projectTRE.Project.Name,
 		StudyId:         projectTRE.Project.StudyID.String(),
+		StudyTitle:      projectTRE.Project.Study.Title,
 		CreatorUsername: string(projectTRE.Project.CreatorUser.Username),
 		ApprovalStatus:  openapi.ApprovalStatus(projectTRE.Project.ApprovalStatus),
 		CreatedAt:       projectTRE.Project.CreatedAt.Format(config.TimeFormat),
@@ -169,6 +167,42 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	}
 
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	projectUpdateData := openapi.ProjectTREUpdate{}
+	if err := bindJSONOrSetError(ctx, &projectUpdateData); err != nil {
+		return
+	}
+
+	projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get project")
+		return
+	}
+
+	studyUUID := projectTRE.Project.StudyID
+
+	validationError, err := h.projects.ValidateProjectTREUpdate(projectUpdateData, studyUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to validate project update")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	if err := h.projects.UpdateProjectTRE(projectTRE, projectUpdateData); err != nil {
+		setError(ctx, err, "Failed to update project")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
 
 func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {

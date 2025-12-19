@@ -90,11 +90,21 @@ func (s *Service) UserByUsername(username types.Username) (*types.User, error) {
 	return s.findUser(&types.User{Username: username})
 }
 
-func (s *Service) findUser(user *types.User) (*types.User, error) {
-	result := s.db.Where(user).Limit(1).Find(user)
-	if result.RowsAffected == 0 {
-		return nil, types.NewNotFoundError("user not found")
+func (s *Service) UserIds(usernames ...types.Username) (map[types.Username]uuid.UUID, error) {
+	users := []types.User{}
+	result := s.db.Where("username in ?", usernames).Find(&users)
+	if result.Error != nil {
+		return map[types.Username]uuid.UUID{}, types.NewErrFromGorm(result.Error)
 	}
+	userIds := map[types.Username]uuid.UUID{}
+	for _, user := range users {
+		userIds[user.Username] = user.ID
+	}
+	return userIds, nil
+}
+
+func (s *Service) findUser(user *types.User) (*types.User, error) {
+	result := s.db.Where(user).First(user)
 	return user, types.NewErrFromGorm(result.Error)
 }
 
