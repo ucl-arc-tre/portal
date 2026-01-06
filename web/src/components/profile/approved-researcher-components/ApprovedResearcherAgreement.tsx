@@ -75,6 +75,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
             agreementId={agreement.id}
             setAgreementCompleted={setAgreementCompleted}
             handleAgreementSubmit={handleAgreementSubmit}
+            timerSeconds={Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER_SECONDS)}
             confirmationText="I confirm that I have read and agree to the terms of the above agreement."
           />
         </Box>
