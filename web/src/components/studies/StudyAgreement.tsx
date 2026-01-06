@@ -103,7 +103,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
         agreementId={studyAgreementText.id}
         setAgreementCompleted={setAgreementCompleted}
         handleAgreementSubmit={handleAgreementSubmit}
-        timerSeconds={isIAO ? 0 : Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER_SECONDS)}
+        timerSeconds={isIAO ? 1 : Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER_SECONDS)}
         confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset Owner in UCL of the following study: ${studyTitle}`}
       />
     </section>

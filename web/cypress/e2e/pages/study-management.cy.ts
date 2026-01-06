@@ -38,8 +38,7 @@ describe("Study Management Workflow", () => {
     cy.wait("@getStudyAgreementsEmpty");
 
     cy.get('[data-cy="agreement-agree"]').should("be.disabled");
-    const buttonTimeoutSeconds = 120;
-    cy.get('[data-cy="agreement-agree"]').click({ timeout: buttonTimeoutSeconds * 1000 });
+    cy.get('[data-cy="agreement-agree"]').click();
 
     cy.wait("@confirmStudyAgreement");
     cy.wait("@getAssetsEmpty");
