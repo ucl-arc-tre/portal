@@ -25,7 +25,7 @@ export default function AgreementForm(props: AgreementFormProps) {
 
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER));
+  const [secondsRemaining, setSecondsRemaining] = useState(Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER_SECONDS));
   const canAgree = secondsRemaining === 0;
 
   useEffect(() => {
