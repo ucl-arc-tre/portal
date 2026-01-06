@@ -24,6 +24,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { refreshAuth, userData } = useAuth();
+  const isIAO = userData?.roles.includes("information-asset-owner");
 
   useEffect(() => {
     const fetchStudyAgreementData = async () => {
@@ -102,6 +103,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
         agreementId={studyAgreementText.id}
         setAgreementCompleted={setAgreementCompleted}
         handleAgreementSubmit={handleAgreementSubmit}
+        timerSeconds={isIAO ? 1 : Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER_SECONDS)}
         confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset Owner in UCL of the following study: ${studyTitle}`}
       />
     </section>

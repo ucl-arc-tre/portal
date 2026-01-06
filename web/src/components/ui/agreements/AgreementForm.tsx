@@ -13,6 +13,7 @@ type AgreementFormProps = {
   setAgreementCompleted: (completed: boolean) => void;
   handleAgreementSubmit: (agreementId: string) => Promise<void>;
   confirmationText?: string;
+  timerSeconds: number;
 };
 
 export default function AgreementForm(props: AgreementFormProps) {
@@ -21,11 +22,12 @@ export default function AgreementForm(props: AgreementFormProps) {
     setAgreementCompleted,
     handleAgreementSubmit,
     confirmationText = confirmationTextDefault,
+    timerSeconds,
   } = props;
 
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER));
+  const [secondsRemaining, setSecondsRemaining] = useState(timerSeconds);
   const canAgree = secondsRemaining === 0;
 
   useEffect(() => {
