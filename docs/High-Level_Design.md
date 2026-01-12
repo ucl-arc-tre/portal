@@ -94,7 +94,7 @@ This model represents an overview of the current understanding of the target mai
 
 ```mermaid
 erDiagram
-User
+User }o--o{ Contract:"associated with"
 Study {
     URL dpoRegistration
     URL ethics
@@ -106,12 +106,14 @@ Asset {
     enum requiredTier
 }
 Study ||--o{ Asset : "IG for"
-Asset }o--|| Asset : parent
-Contract {
+Study ||--o{ Contract : "contains"
+Contract{
     URL *contract
-    boolean hasExternalUsers
+    user *User
 }
-Asset }o--o{ Contract : "used under"
+
+
+Asset }o--o{ Contract : "can be linked to"
 Study ||--o{ Project : "IG boundary for"
 Project }o--o{ Asset : uses
 Environment {
