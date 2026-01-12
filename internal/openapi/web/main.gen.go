@@ -308,6 +308,9 @@ type AssetBaseStatus string
 
 // Auth defines model for Auth.
 type Auth struct {
+	// Roles List of roles assigned to the user. This array can contain both:
+	// - Global roles (see below enum values): System-wide roles like admin, staff, approved-researcher
+	// - Additional dynamic resource-specific roles: Runtime roles like project_{id}_owner, study_{id}_admin
 	Roles    []AuthRoles `json:"roles"`
 	Username string      `json:"username"`
 }
