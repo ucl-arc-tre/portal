@@ -35,7 +35,7 @@ export default function ManageProjectPage() {
   const isAdmin = userData?.roles.includes("admin");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const canApprove = isAdmin || isTreOpsStaff;
-  const canEdit = true; // Backend enforces permissions via RBAC
+  const canEdit = (userData?.roles as string[]).includes(`project_${projectId}_owner`);
 
   // prepare the approved study for edit form
   const approvedStudy = project ? [{ id: project.study_id, title: project.study_title } as Study] : [];
