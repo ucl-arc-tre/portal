@@ -114,6 +114,8 @@ Contract{
 
 
 Asset }o--o{ Contract : "can be linked to"
+Asset }o--|| Asset : parent
+
 Study ||--o{ Project : "IG boundary for"
 Project }o--o{ Asset : uses
 Environment {
