@@ -94,7 +94,7 @@ This model represents an overview of the current understanding of the target mai
 
 ```mermaid
 erDiagram
-User
+User }o--o{ Contract:"associated with"
 Study {
     URL dpoRegistration
     URL ethics
@@ -106,12 +106,16 @@ Asset {
     enum requiredTier
 }
 Study ||--o{ Asset : "IG for"
-Asset }o--|| Asset : parent
-Contract {
+Study ||--o{ Contract : "contains"
+Contract{
     URL *contract
-    boolean hasExternalUsers
+    user *User
 }
-Asset }o--o{ Contract : "used under"
+
+
+Asset }o--o{ Contract : "can be linked to"
+Asset }o--|| Asset : parent
+
 Study ||--o{ Project : "IG boundary for"
 Project }o--o{ Asset : uses
 Environment {
@@ -132,7 +136,11 @@ A **Study** is an abstract Information Governance boundary which is interpreted 
 
 ### Asset
 
-An **Asset** belongs strictly to one **Study**. If the Study transfers an Asset to another Study, a new Asset is created. This should reference the original Asset through the `parent` relationship, so that provenance can be established. This relationship can carry additional information such as what derivation was used, e.g. anonymisation.
+An **Asset** belongs strictly to one **Study**. If the Study transfers an Asset to another Study, a new Asset is created. This should reference the original Asset through the `parent` relationship, so that provenance can be established. This relationship can carry additional information such as what derivation was used, e.g. anonymisation. An Asset can also belong to a Project within the same Study. If an Asset exists within a Project, it exists within that Project's Study.
+
+### Contract
+
+A **Contract** is a document that outlines the relationship a[n external] user has to the Study. This can be linked to an Asset.
 
 ### Project
 
