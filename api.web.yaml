@@ -1645,6 +1645,7 @@ components:
             - filename
             - created_at
             - updated_at
+            - study_id
           properties:
             id:
               type: string
@@ -1658,5 +1659,8 @@ components:
             updated_at:
               type: string
               description: Time in RFC3339 format when the contract was last updated
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the contract belongs
 
       description: A contract associated with a study asset

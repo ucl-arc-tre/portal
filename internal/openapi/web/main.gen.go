@@ -349,6 +349,9 @@ type Contract struct {
 	// Status Current status of the contract
 	Status ContractStatus `json:"status"`
 
+	// StudyId Unique identifier of the study to which the contract belongs
+	StudyId string `json:"study_id"`
+
 	// ThirdPartyName Name of the third party organization
 	ThirdPartyName string `json:"third_party_name"`
 

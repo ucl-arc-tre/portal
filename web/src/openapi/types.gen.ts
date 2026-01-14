@@ -569,6 +569,10 @@ export type Contract = ContractBase & {
      * Time in RFC3339 format when the contract was last updated
      */
     updated_at: string;
+    /**
+     * Unique identifier of the study to which the contract belongs
+     */
+    study_id: string;
 };
 
 export type GetAuthData = {
