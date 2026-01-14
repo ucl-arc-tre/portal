@@ -95,7 +95,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 
 	// Create the final contract record for storage
 	contractData := types.Contract{
-		AssetID:               uuids[1],
+		StudyID:               uuids[0],
 		Filename:              fileHeader.Filename,
 		CreatorUserID:         user.ID,
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
@@ -167,7 +167,7 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 
 	contractUpdateData := types.Contract{
 		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[2]}},
-		AssetID:               uuids[1],
+		StudyID:               uuids[0],
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
@@ -209,7 +209,7 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx 
 	if err != nil {
 		return
 	}
-	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1], uuids[2])
+	object, err := h.studies.GetContract(ctx, uuids[0], uuids[2])
 	if err != nil {
 		setError(ctx, err, "Failed get contract")
 		return

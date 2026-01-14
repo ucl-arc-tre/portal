@@ -88,7 +88,7 @@ func (s *Service) StoreContract(
 ) error {
 	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
 
-	if assetExists, err := s.assetExists(studyID, contractMetadata.AssetID); err != nil {
+	if assetExists, err := s.assetExists(studyID, contractMetadata.StudyID); err != nil {
 		return err
 	} else if !assetExists {
 		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
@@ -130,12 +130,11 @@ func (s *Service) StoreContract(
 
 func (s *Service) GetContract(ctx context.Context,
 	studyID uuid.UUID,
-	assetID uuid.UUID,
 	contractID uuid.UUID,
 ) (types.S3Object, error) {
 	log.Debug().Any("contractID", contractID).Msg("Getting contract")
 
-	if exists, err := s.contractExists(studyID, assetID, contractID); err != nil {
+	if exists, err := s.contractExists(studyID, contractID); err != nil {
 		return types.S3Object{}, err
 	} else if !exists {
 		return types.S3Object{}, types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
@@ -157,7 +156,7 @@ func (s *Service) UpdateContract(
 ) error {
 	log.Debug().Any("contractId", contractID).Msg("Updating contract")
 
-	if exists, err := s.contractExists(studyID, contractMetadata.AssetID, contractID); err != nil {
+	if exists, err := s.contractExists(studyID, contractID); err != nil {
 		return err
 	} else if !exists {
 		return types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
@@ -185,7 +184,7 @@ func (s *Service) UpdateContract(
 
 	// Update the database record
 	result := tx.Model(&types.Contract{}).
-		Where("id = ? AND asset_id = ?", contractID, contractMetadata.AssetID).
+		Where("id = ? AND study_id = ?", contractID, contractMetadata.StudyID).
 		Updates(contractMetadata)
 
 	if result.Error != nil {
