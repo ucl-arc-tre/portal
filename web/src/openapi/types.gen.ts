@@ -6,6 +6,12 @@ export type ClientOptions = {
 
 export type Auth = {
     username: string;
+    /**
+     * List of roles assigned to the user. This array can contain both:
+     * - Global roles (see below enum values): System-wide roles like admin, staff, approved-researcher
+     * - Additional dynamic resource-specific roles: Runtime roles like project_{id}_owner, study_{id}_admin
+     *
+     */
     roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff'>;
 };
 
