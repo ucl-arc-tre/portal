@@ -153,7 +153,7 @@ describe("Project submission flow", () => {
     cy.waitForAuth();
     cy.wait("@getProjectTre");
 
-    cy.contains("Submit Project for Approval").should("be.visible");
+    cy.contains("Create Project").should("be.visible");
     cy.contains("Please review your project details below").should("be.visible");
   });
 });
