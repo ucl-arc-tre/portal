@@ -382,7 +382,7 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	}
 
 	// Soft delete all ProjectTRERoleBindings for this project
-	err = tx.Where("project_tre_id = ?", 123).Delete(&types.ProjectTRERoleBinding{}).Error
+	err = tx.Where("project_tre_id = ?", projectTRE.ID).Delete(&types.ProjectTRERoleBinding{}).Error
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to delete project TRE role bindings")
