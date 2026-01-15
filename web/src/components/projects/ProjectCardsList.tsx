@@ -119,12 +119,16 @@ export default function ProjectCardsList(props: Props) {
             <p>
               Are you sure you want to delete project <strong>{projectToDelete.name}</strong>?
             </p>
-            <p>This action will soft delete the project and all its associated data including:</p>
+            <p>This action will delete the project and remove the links to its associated data including:</p>
             <ul>
               <li>Project members and their roles</li>
               <li>Linked assets</li>
               <li>Project configuration</li>
             </ul>
+            <p>
+              Note that the original data associated with this project will not be deleted, only the link between the
+              data and the project will be affected.
+            </p>
 
             {deleteError && (
               <Alert type="error">
