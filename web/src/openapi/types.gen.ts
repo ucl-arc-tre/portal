@@ -533,6 +533,10 @@ export type ContractBase = {
      * Contract expiry date in YYYY-MM-DD format
      */
     expiry_date: string;
+    /**
+     * List of assets associated with this contract
+     */
+    assets?: Array<Asset>;
 };
 
 export type ContractUploadObject = ContractBase & {
@@ -550,7 +554,7 @@ export type ContractUpdate = ContractBase & {
 };
 
 /**
- * A contract associated with a study asset
+ * A contract associated with a study
  */
 export type Contract = ContractBase & {
     /**
@@ -1671,17 +1675,16 @@ export type PostStudiesByStudyIdAgreementsResponses = {
     200: unknown;
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
+export type GetStudiesByStudyIdContractsData = {
     body?: never;
     path: {
         studyId: string;
-        assetId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/assets/{assetId}/contracts';
+    url: '/studies/{studyId}/contracts';
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsErrors = {
+export type GetStudiesByStudyIdContractsErrors = {
     /**
      * Forbidden
      */
@@ -1700,26 +1703,25 @@ export type GetStudiesByStudyIdAssetsByAssetIdContractsErrors = {
     default: unknown;
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsResponses = {
+export type GetStudiesByStudyIdContractsResponses = {
     /**
-     * List of contracts for the asset
+     * List of contracts for the study
      */
     200: Array<Contract>;
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsResponse = GetStudiesByStudyIdAssetsByAssetIdContractsResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsResponses];
+export type GetStudiesByStudyIdContractsResponse = GetStudiesByStudyIdContractsResponses[keyof GetStudiesByStudyIdContractsResponses];
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadData = {
+export type PostStudiesByStudyIdContractsUploadData = {
     body: ContractUploadObject;
     path: {
         studyId: string;
-        assetId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/assets/{assetId}/contracts/upload';
+    url: '/studies/{studyId}/contracts/upload';
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
+export type PostStudiesByStudyIdContractsUploadErrors = {
     /**
      * Validation error
      */
@@ -1738,29 +1740,28 @@ export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadError = PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadErrors];
+export type PostStudiesByStudyIdContractsUploadError = PostStudiesByStudyIdContractsUploadErrors[keyof PostStudiesByStudyIdContractsUploadErrors];
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses = {
+export type PostStudiesByStudyIdContractsUploadResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponse = PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses[keyof PostStudiesByStudyIdAssetsByAssetIdContractsUploadResponses];
+export type PostStudiesByStudyIdContractsUploadResponse = PostStudiesByStudyIdContractsUploadResponses[keyof PostStudiesByStudyIdContractsUploadResponses];
 
-export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdData = {
+export type PutStudiesByStudyIdContractsByContractIdData = {
     body: ContractUpdate;
     path: {
         studyId: string;
-        assetId: string;
         contractId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}';
+    url: '/studies/{studyId}/contracts/{contractId}';
 };
 
-export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors = {
+export type PutStudiesByStudyIdContractsByContractIdErrors = {
     /**
      * Validation error
      */
@@ -1783,29 +1784,28 @@ export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors = {
     default: unknown;
 };
 
-export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdError = PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors[keyof PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdErrors];
+export type PutStudiesByStudyIdContractsByContractIdError = PutStudiesByStudyIdContractsByContractIdErrors[keyof PutStudiesByStudyIdContractsByContractIdErrors];
 
-export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses = {
+export type PutStudiesByStudyIdContractsByContractIdResponses = {
     /**
      * Contract updated successfully
      */
     200: Contract;
 };
 
-export type PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponse = PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses[keyof PutStudiesByStudyIdAssetsByAssetIdContractsByContractIdResponses];
+export type PutStudiesByStudyIdContractsByContractIdResponse = PutStudiesByStudyIdContractsByContractIdResponses[keyof PutStudiesByStudyIdContractsByContractIdResponses];
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadData = {
+export type GetStudiesByStudyIdContractsByContractIdDownloadData = {
     body?: never;
     path: {
         studyId: string;
-        assetId: string;
         contractId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/assets/{assetId}/contracts/{contractId}/download';
+    url: '/studies/{studyId}/contracts/{contractId}/download';
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadErrors = {
+export type GetStudiesByStudyIdContractsByContractIdDownloadErrors = {
     /**
      * Forbidden
      */
@@ -1820,11 +1820,11 @@ export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadError
     default: unknown;
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses = {
+export type GetStudiesByStudyIdContractsByContractIdDownloadResponses = {
     /**
      * OK
      */
     200: Blob | File;
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponse = GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownloadResponses];
+export type GetStudiesByStudyIdContractsByContractIdDownloadResponse = GetStudiesByStudyIdContractsByContractIdDownloadResponses[keyof GetStudiesByStudyIdContractsByContractIdDownloadResponses];

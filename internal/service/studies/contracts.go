@@ -198,3 +198,21 @@ func (s *Service) UpdateContract(
 
 	return nil
 }
+
+func (s *Service) contractExists(studyID uuid.UUID, contractID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Model(&types.Contract{}).
+		Select("count(*) > 0").
+		Where("study_id = ? AND id = ?", studyID, contractID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
+}
+
+// retrieves all contracts within a study
+func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
+	contracts := []types.Contract{}
+	err := s.db.Where("contracts.study_id = ?", studyID).
+		Order("created_at DESC").
+		Find(&contracts).Error
+	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
+}

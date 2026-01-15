@@ -187,6 +187,7 @@ func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (ty
 // retrieves all contracts for a specific asset within a study
 func (s *Service) AssetContracts(studyID uuid.UUID, assetID uuid.UUID) ([]types.Contract, error) {
 	// TODO: best to check contract.asset_id or just check shared study id?
+	// also when might we use this
 	contracts := []types.Contract{}
 	err := s.db.Joins("left join assets on contracts.asset_id = assets.id").
 		Where("assets.study_id = ? AND contracts.asset_id = ?", studyID, assetID).
@@ -202,13 +203,4 @@ func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error
 		Where("study_id = ? AND id = ?", studyID, assetID).
 		Find(&exists).Error
 	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
-}
-
-func (s *Service) contractExists(studyID uuid.UUID, contractID uuid.UUID) (bool, error) {
-	exists := false
-	err := s.db.Model(&types.Contract{}).
-		Select("count(*) > 0").
-		Where("study_id = ? AND id = ?", studyID, contractID).
-		Find(&exists).Error
-	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
 }

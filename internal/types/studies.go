@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -112,7 +113,25 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Study       Study `gorm:"foreignKey:StudyID"`
-	Asset       Asset `gorm:"foreignKey:AssetID"`
-	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
+	Study          Study           `gorm:"foreignKey:StudyID"`
+	CreatorUser    User            `gorm:"foreignKey:CreatorUserID"`
+	ContractAssets []ContractAsset `gorm:"foreignKey:AssetID"` // or should be contractid?
+}
+
+type ContractAsset struct {
+	ModelAuditable
+	ContractID uuid.UUID `gorm:"not null;index"`
+	AssetID    uuid.UUID `gorm:"not null;index"`
+
+	// Relationships
+	Contract Contract `gorm:"foreignKey:ContractID"`
+	Asset    Asset    `gorm:"foreignKey:AssetID"`
+}
+
+func (p ContractAsset) UniqueKey() string {
+	return fmt.Sprintf("%v%v", p.ContractID, p.AssetID)
+}
+
+func (p ContractAsset) IsDeleted() bool {
+	return p.DeletedAt.Valid
 }

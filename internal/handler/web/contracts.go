@@ -50,8 +50,8 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 // Handler methods
 
-func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
@@ -104,6 +104,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 	}
+	// TODO: add asset connection
 
 	contractObj := types.S3Object{
 		Content: file,
@@ -117,8 +118,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
 		return
 	}
@@ -131,6 +132,7 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 	}
 
 	contractMetadata := extractContractFormData(ctx)
+	// TODO: check allow asset connection
 
 	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
 	if validationError != nil {
@@ -185,13 +187,13 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
 
-	contracts, err := h.studies.AssetContracts(uuids[0], uuids[1])
+	contracts, err := h.studies.StudyContracts(uuids[0])
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve contracts")
 		return
@@ -204,8 +206,8 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 	ctx.JSON(http.StatusOK, apiContracts)
 }
 
-func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
 		return
 	}
