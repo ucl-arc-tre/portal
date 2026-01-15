@@ -719,7 +719,7 @@ export default function CreateProjectForm({
                     : "Creating..."
                   : editingProject
                     ? "Update Project"
-                    : "Create Project"}
+                    : "Save Draft"}
               </Button>
             )}
           </div>
