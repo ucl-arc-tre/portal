@@ -1290,6 +1290,46 @@ export type PostProjectsTreResponses = {
 
 export type PostProjectsTreResponse = PostProjectsTreResponses[keyof PostProjectsTreResponses];
 
+export type DeleteProjectsTreByProjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the TRE project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}';
+};
+
+export type DeleteProjectsTreByProjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type DeleteProjectsTreByProjectIdResponses = {
+    /**
+     * Project deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteProjectsTreByProjectIdResponse = DeleteProjectsTreByProjectIdResponses[keyof DeleteProjectsTreByProjectIdResponses];
+
 export type GetProjectsTreByProjectIdData = {
     body?: never;
     path: {

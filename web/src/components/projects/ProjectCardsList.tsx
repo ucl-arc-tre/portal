@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
-import { ApprovalStatus, Project } from "@/openapi";
+import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
+import Dialog from "@/components/ui/Dialog";
+import { Alert, AlertMessage } from "../shared/exports";
 
 import styles from "./ProjectCardsList.module.css";
 
 type Props = {
   projects: Project[];
   isOpsStaff: boolean;
+  fetchData?: () => void;
 };
 
 const projectSortOrder: Record<ApprovalStatus, number> = {
@@ -18,8 +22,52 @@ const projectSortOrder: Record<ApprovalStatus, number> = {
 };
 
 export default function ProjectCardsList(props: Props) {
-  const { projects, isOpsStaff = false } = props;
+  const { projects, isOpsStaff = false, fetchData } = props;
   const router = useRouter();
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteClick = (project: Project) => {
+    setProjectToDelete(project);
+    setShowDeleteConfirm(true);
+    setDeleteError(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+
+    setDeletingProjectId(projectToDelete.id);
+    setDeleteError(null);
+
+    try {
+      const response = await deleteProjectsTreByProjectId({
+        path: { projectId: projectToDelete.id },
+      });
+
+      if (response.response.ok) {
+        setShowDeleteConfirm(false);
+        setProjectToDelete(null);
+        if (fetchData) {
+          fetchData();
+        }
+      } else {
+        throw new Error(`Failed to delete project: ${response.response.status} ${response.response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      setDeleteError("Failed to delete project. Please try again.");
+    } finally {
+      setDeletingProjectId(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setProjectToDelete(null);
+    setDeleteError(null);
+  };
 
   return (
     <div className={styles["project-selection"]}>
@@ -49,10 +97,52 @@ export default function ProjectCardsList(props: Props) {
                 >
                   {`Manage Project ${isOpsStaff ? "Approval" : ""}`}
                 </Button>
+                {!isOpsStaff && (
+                  <Button
+                    onClick={() => handleDeleteClick(project)}
+                    size="small"
+                    variant="secondary"
+                    disabled={deletingProjectId === project.id}
+                  >
+                    {deletingProjectId === project.id ? "Deleting..." : "Delete"}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
       </div>
+
+      {showDeleteConfirm && projectToDelete && (
+        <Dialog setDialogOpen={handleCancelDelete}>
+          <div className={styles["delete-dialog"]}>
+            <h2>Delete Project</h2>
+            <p>
+              Are you sure you want to delete project <strong>{projectToDelete.name}</strong>?
+            </p>
+            <p>This action will soft delete the project and all its associated data including:</p>
+            <ul>
+              <li>Project members and their roles</li>
+              <li>Linked assets</li>
+              <li>Project configuration</li>
+            </ul>
+
+            {deleteError && (
+              <Alert type="error">
+                <AlertMessage>{deleteError}</AlertMessage>
+              </Alert>
+            )}
+
+            <div className={styles["delete-actions"]}>
+              <Button onClick={handleCancelDelete} variant="secondary" disabled={!!deletingProjectId}>
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmDelete} variant="primary" disabled={!!deletingProjectId}>
+                {deletingProjectId ? "Deleting..." : "Delete Project"}
+              </Button>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 }
