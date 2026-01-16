@@ -707,6 +707,39 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/{studyId}/assets/{assetId}/contracts:
+    get:
+      description: Get contracts associated with a specific asset within a study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+        - in: path
+          name: assetId
+          required: true
+          description: ID of the asset
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contract"
+        "403":
+          description: Forbidden - no access to study or asset
+        "404":
+          description: Study or asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /logout:
     get:
       description: Log the user out
@@ -1574,6 +1607,7 @@ components:
         - status
         - start_date
         - expiry_date
+        - asset_ids
       properties:
         organisation_signatory:
           type: string
@@ -1593,11 +1627,11 @@ components:
           type: string
           description: Contract expiry date in YYYY-MM-DD format
           example: "2025-12-31"
-        assets:
+        asset_ids:
           type: array
           description: List of assets associated with this contract
           items:
-            $ref: "#/components/schemas/Asset"
+            type: string
 
     ContractUploadObject:
       allOf:

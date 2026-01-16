@@ -536,7 +536,7 @@ export type ContractBase = {
     /**
      * List of assets associated with this contract
      */
-    assets?: Array<Asset>;
+    asset_ids: Array<string>;
 };
 
 export type ContractUploadObject = ContractBase & {
@@ -1574,6 +1574,47 @@ export type GetStudiesByStudyIdAssetsByAssetIdResponses = {
 };
 
 export type GetStudiesByStudyIdAssetsByAssetIdResponse = GetStudiesByStudyIdAssetsByAssetIdResponses[keyof GetStudiesByStudyIdAssetsByAssetIdResponses];
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+        /**
+         * ID of the asset
+         */
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}/contracts';
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsErrors = {
+    /**
+     * Forbidden - no access to study or asset
+     */
+    403: unknown;
+    /**
+     * Study or asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsResponses = {
+    200: Array<Contract>;
+};
+
+export type GetStudiesByStudyIdAssetsByAssetIdContractsResponse = GetStudiesByStudyIdAssetsByAssetIdContractsResponses[keyof GetStudiesByStudyIdAssetsByAssetIdContractsResponses];
 
 export type GetLogoutData = {
     body?: never;

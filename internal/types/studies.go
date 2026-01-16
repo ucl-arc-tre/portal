@@ -115,7 +115,7 @@ type Contract struct {
 	// Relationships
 	Study          Study           `gorm:"foreignKey:StudyID"`
 	CreatorUser    User            `gorm:"foreignKey:CreatorUserID"`
-	ContractAssets []ContractAsset `gorm:"foreignKey:AssetID"` // or should be contractid?
+	ContractAssets []ContractAsset `gorm:"foreignKey:ContractID"` // or should be contractid?
 }
 
 type ContractAsset struct {

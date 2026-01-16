@@ -187,7 +187,6 @@ func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (ty
 // retrieves all contracts for a specific asset within a study
 func (s *Service) AssetContracts(studyID uuid.UUID, assetID uuid.UUID) ([]types.Contract, error) {
 	// TODO: best to check contract.asset_id or just check shared study id?
-	// also when might we use this
 	contracts := []types.Contract{}
 	err := s.db.Joins("left join assets on contracts.asset_id = assets.id").
 		Where("assets.study_id = ? AND contracts.asset_id = ?", studyID, assetID).

@@ -328,8 +328,8 @@ type ConfirmedAgreement struct {
 
 // Contract defines model for Contract.
 type Contract struct {
-	// Assets List of assets associated with this contract
-	Assets *[]Asset `json:"assets,omitempty"`
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
 
 	// CreatedAt Time in RFC3339 format when the contract was created
 	CreatedAt string `json:"created_at"`
@@ -367,8 +367,8 @@ type ContractStatus string
 
 // ContractBase defines model for ContractBase.
 type ContractBase struct {
-	// Assets List of assets associated with this contract
-	Assets *[]Asset `json:"assets,omitempty"`
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
@@ -391,8 +391,8 @@ type ContractBaseStatus string
 
 // ContractUpdate defines model for ContractUpdate.
 type ContractUpdate struct {
-	// Assets List of assets associated with this contract
-	Assets *[]Asset `json:"assets,omitempty"`
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
@@ -418,8 +418,8 @@ type ContractUpdateStatus string
 
 // ContractUploadObject defines model for ContractUploadObject.
 type ContractUploadObject struct {
-	// Assets List of assets associated with this contract
-	Assets *[]Asset `json:"assets,omitempty"`
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
@@ -972,6 +972,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId}/assets/{assetId})
 	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId string, assetId string)
+
+	// (GET /studies/{studyId}/assets/{assetId}/contracts)
+	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId string, assetId string)
 
 	// (GET /studies/{studyId}/contracts)
 	GetStudiesStudyIdContracts(c *gin.Context, studyId string)
@@ -1529,6 +1532,39 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	siw.Handler.GetStudiesStudyIdAssetsAssetId(c, studyId, assetId)
 }
 
+// GetStudiesStudyIdAssetsAssetIdContracts operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdAssetsAssetIdContracts(c, studyId, assetId)
+}
+
 // GetStudiesStudyIdContracts operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContracts(c *gin.Context) {
 
@@ -1828,6 +1864,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
+	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts/upload", wrapper.PostStudiesStudyIdContractsUpload)
 	router.PUT(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.PutStudiesStudyIdContractsContractId)

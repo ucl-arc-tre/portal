@@ -206,6 +206,25 @@ func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
 	ctx.JSON(http.StatusOK, apiContracts)
 }
 
+func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	contracts, err := h.studies.AssetContracts(uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve contracts")
+		return
+	}
+
+	apiContracts := []openapi.Contract{}
+	for _, contract := range contracts {
+		apiContracts = append(apiContracts, contractToOpenApiContract(contract))
+	}
+	ctx.JSON(http.StatusOK, apiContracts)
+}
+
 func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context, studyId string, contractId string) {
 	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
