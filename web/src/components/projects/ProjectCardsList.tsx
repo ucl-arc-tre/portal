@@ -103,6 +103,7 @@ export default function ProjectCardsList(props: Props) {
                     size="small"
                     variant="secondary"
                     disabled={deletingProjectId === project.id}
+                    className={styles["delete-button"]}
                   >
                     {deletingProjectId === project.id ? "Deleting..." : "Delete"}
                   </Button>
@@ -125,10 +126,6 @@ export default function ProjectCardsList(props: Props) {
               <li>Linked assets</li>
               <li>Project configuration</li>
             </ul>
-            <p>
-              Note that the original data associated with this project will not be deleted, only the link between the
-              data and the project will be affected.
-            </p>
 
             {deleteError && (
               <Alert type="error">
@@ -140,7 +137,12 @@ export default function ProjectCardsList(props: Props) {
               <Button onClick={handleCancelDelete} variant="secondary" disabled={!!deletingProjectId}>
                 Cancel
               </Button>
-              <Button onClick={handleConfirmDelete} variant="primary" disabled={!!deletingProjectId}>
+              <Button
+                onClick={handleConfirmDelete}
+                variant="primary"
+                disabled={!!deletingProjectId}
+                className={styles["delete-button-confirm"]}
+              >
                 {deletingProjectId ? "Deleting..." : "Delete Project"}
               </Button>
             </div>
