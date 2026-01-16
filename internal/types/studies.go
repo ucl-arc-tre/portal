@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -102,7 +103,7 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	AssetID               uuid.UUID `gorm:"not null;index"`
+	StudyID               uuid.UUID `gorm:"not null;index"`
 	Filename              string    `gorm:"not null"`
 	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
 	OrganisationSignatory string
@@ -112,6 +113,25 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Asset       Asset `gorm:"foreignKey:AssetID"`
-	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
+	Study          Study           `gorm:"foreignKey:StudyID"`
+	CreatorUser    User            `gorm:"foreignKey:CreatorUserID"`
+	ContractAssets []ContractAsset `gorm:"foreignKey:ContractID"` // or should be contractid?
+}
+
+type ContractAsset struct {
+	ModelAuditable
+	ContractID uuid.UUID `gorm:"not null;index"`
+	AssetID    uuid.UUID `gorm:"not null;index"`
+
+	// Relationships
+	Contract Contract `gorm:"foreignKey:ContractID"`
+	Asset    Asset    `gorm:"foreignKey:AssetID"`
+}
+
+func (p ContractAsset) UniqueKey() string {
+	return fmt.Sprintf("%v%v", p.ContractID, p.AssetID)
+}
+
+func (p ContractAsset) IsDeleted() bool {
+	return p.DeletedAt.Valid
 }

@@ -50,8 +50,8 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 // Handler methods
 
-func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 
 	// Create the final contract record for storage
 	contractData := types.Contract{
-		AssetID:               uuids[1],
+		StudyID:               uuids[0],
 		Filename:              fileHeader.Filename,
 		CreatorUserID:         user.ID,
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
@@ -104,6 +104,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 	}
+	// TODO: add asset connection
 
 	contractObj := types.S3Object{
 		Content: file,
@@ -117,8 +118,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
 		return
 	}
@@ -131,6 +132,7 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 	}
 
 	contractMetadata := extractContractFormData(ctx)
+	// TODO: check allow asset connection
 
 	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
 	if validationError != nil {
@@ -167,7 +169,7 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 
 	contractUpdateData := types.Contract{
 		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[2]}},
-		AssetID:               uuids[1],
+		StudyID:               uuids[0],
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
@@ -185,8 +187,27 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 	ctx.Status(http.StatusNoContent)
 }
 
+func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	contracts, err := h.studies.StudyContracts(uuids[0])
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve contracts")
+		return
+	}
+
+	apiContracts := []openapi.Contract{}
+	for _, contract := range contracts {
+		apiContracts = append(apiContracts, contractToOpenApiContract(contract))
+	}
+	ctx.JSON(http.StatusOK, apiContracts)
+}
+
 func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
@@ -204,12 +225,12 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 	ctx.JSON(http.StatusOK, apiContracts)
 }
 
-func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
 		return
 	}
-	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1], uuids[2])
+	object, err := h.studies.GetContract(ctx, uuids[0], uuids[2])
 	if err != nil {
 		setError(ctx, err, "Failed get contract")
 		return

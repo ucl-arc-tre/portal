@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdAssetsByAssetIdContracts, Contract, Study, Asset } from "@/openapi";
+import { getStudiesByStudyIdContracts, Contract, Study, Asset } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
 
 type ContractManagementProps = {
   study: Study;
-  asset: Asset;
+  asset?: Asset;
   canModify: boolean;
 };
 
@@ -24,8 +24,8 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     setError(null);
 
     try {
-      const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
-        path: { studyId: study.id, assetId: asset.id },
+      const response = await getStudiesByStudyIdContracts({
+        path: { studyId: study.id },
       });
 
       if (response.response.ok && response.data) {
@@ -39,7 +39,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, asset.id]);
+  }, [study.id]);
 
   useEffect(() => {
     fetchContracts();
@@ -71,7 +71,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
             </Button>
           </div>
           <p className={styles.description}>
-            Manage contract documents for this asset. Upload PDF contracts and track their status.
+            Manage contract documents for this study. Upload PDF contracts and track their status.
           </p>
         </>
       ) : (
@@ -81,13 +81,13 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       )}
 
       {contracts.length === 0 &&
-        (asset.requires_contract || study.involves_external_users || study.involves_third_party) && (
+        (asset?.requires_contract || study.involves_external_users || study.involves_third_party) && (
           <div className={styles["contract-requirement-notice"]}>
             <div>
               Based on your responses while making your Study and Asset, uploading a contract is required. This is
               because you said:
               <ul>
-                {asset.requires_contract && <li>This asset requires a contract.</li>}
+                {asset?.requires_contract && <li>This asset requires a contract.</li>}
                 {study.involves_external_users && <li>Your study involves external users.</li>}
                 {study.involves_third_party && <li>Your study involves third parties.</li>}
               </ul>
@@ -116,7 +116,6 @@ export default function ContractManagement({ study, asset, canModify }: Contract
               key={contract.id}
               contract={contract}
               studyId={study.id}
-              assetId={asset.id}
               onEdit={() => handleEditContract(contract)}
               canModify={canModify}
             />
@@ -127,7 +126,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       {canModify && (
         <ContractUploadForm
           study={study}
-          asset={asset}
+          assetIds={asset ? [asset.id] : []} //TODO: Add support for multiple assets
           isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);
