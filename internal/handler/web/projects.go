@@ -205,6 +205,21 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	ctx.Status(http.StatusOK)
 }
 
+func (h *Handler) DeleteProjectsTreProjectId(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	err = h.projects.DeleteProjectTRE(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to delete project")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
 func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
 	rolesMap := map[types.Username][]openapi.ProjectTRERoleName{}
 
