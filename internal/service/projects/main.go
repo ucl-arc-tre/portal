@@ -369,6 +369,53 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateDa
 	return nil
 }
 
+func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	// Retrieve the ProjectTRE
+	var projectTRE types.ProjectTRE
+	err := tx.Where("project_id = ?", projectId).First(&projectTRE).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to find project TRE")
+	}
+
+	// Soft delete all ProjectTRERoleBindings for this project
+	err = tx.Where("project_tre_id = ?", projectTRE.ID).Delete(&types.ProjectTRERoleBinding{}).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete project TRE role bindings")
+	}
+
+	// Soft delete all ProjectAssets for this project
+	err = tx.Where("project_id = ?", projectId).Delete(&types.ProjectAsset{}).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete project assets")
+	}
+
+	// Soft delete the ProjectTRE record
+	err = tx.Delete(&projectTRE).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete project TRE")
+	}
+
+	// Soft delete the base Project record
+	err = tx.Where("id = ?", projectId).Delete(&types.Project{}).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete project")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit delete project transaction")
+	}
+
+	return nil
+}
+
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
 	usernames := []types.Username{}
 	for _, member := range members {
