@@ -47,6 +47,7 @@ func InitDB() {
 	}
 
 	migrateDPNValues(db)
+	migrateContracts(db)
 
 	log.Debug().Msg("Initalised database")
 }
@@ -85,6 +86,29 @@ func migrateDPNValues(db *gorm.DB) {
 			log.Err(err).Msg("Failed to update data_protection_number")
 		}
 	}
+}
+
+func migrateContracts(db *gorm.DB) {
+	// migration from asset-bound contracts to study-bound contracts
+
+	contract := types.Contract{}
+	migrator := db.Migrator()
+
+	err := migrator.DropConstraint("contracts", "contracts_asset_id_fkey")
+	if err != nil {
+		log.Err(err).Msg("failed to drop asset foreign key constraint on 'contracts' table: %w")
+	}
+
+	err = migrator.DropColumn(&contract, "asset_id")
+	if err != nil {
+		log.Err(err).Msg("failed to drop 'asset_id' field from 'contracts' table: %w")
+	}
+
+	err = migrator.DropIndex(&contract, "contracts_asset_id_index")
+	if err != nil {
+		log.Err(err).Msg("failed to drop index on 'contracts' table: %w")
+	}
+
 }
 
 type UpdateObject interface {
