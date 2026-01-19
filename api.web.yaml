@@ -569,6 +569,26 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    delete:
+      description: Delete a TRE project (soft delete with cascading to related tables)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          description: ID of the TRE project
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Project deleted successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /projects/tre/{projectId}/pending:
     patch:

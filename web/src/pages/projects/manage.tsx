@@ -218,16 +218,16 @@ export default function ManageProjectPage() {
           <div className={styles["approval-section"]}>
             <p className={styles["approval-info"]}>
               Please review your project details below. Once you are satisfied with the information provided, submit
-              your project for approval by an administrator.
+              your project and an administrator will review it.
             </p>
             <div className={styles["approval-actions"]}>
               {canEdit && (
                 <Button onClick={() => setShowEditForm(true)} size="large">
-                  Edit Project
+                  Edit
                 </Button>
               )}
               <Button onClick={handleSubmit} disabled={isSubmitting} size="large">
-                {isSubmitting ? "Submitting..." : "Submit Project for Approval"}
+                {isSubmitting ? "Submitting..." : "Create Project"}
               </Button>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function ManageProjectPage() {
         {canEdit && project.approval_status !== "Incomplete" && (
           <div className={styles["approval-section"]}>
             <Button onClick={() => setShowEditForm(true)} size="large">
-              Edit Project
+              Edit
             </Button>
           </div>
         )}
@@ -248,7 +248,7 @@ export default function ManageProjectPage() {
             </p>
             <div className={styles["approval-actions"]}>
               <Button onClick={handleApprove} disabled={isApproving} size="large">
-                {isApproving ? "Approving..." : "Approve Project"}
+                {isApproving ? "Approving..." : "Accept Project"}
               </Button>
             </div>
           </div>

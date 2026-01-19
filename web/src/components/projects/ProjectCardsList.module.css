@@ -82,6 +82,84 @@
   align-items: center;
 }
 
+.delete-button {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+.delete-button:hover:not(:disabled) {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+.delete-button:disabled {
+  opacity: 0.6 !important;
+}
+
+.delete-button-confirm {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+.delete-button-confirm:hover:not(:disabled) {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+.delete-button-confirm:disabled {
+  opacity: 0.6 !important;
+}
+
+.delete-dialog {
+  padding: 1rem 0.5rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.delete-dialog h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.delete-dialog p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+}
+
+.delete-dialog ul {
+  margin: 1rem 0 1.5rem 1.5rem;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.delete-dialog li {
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.delete-dialog strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e1e5e9;
+}
+
 @media (max-width: 768px) {
   .project-selection {
     width: 100%;
@@ -89,5 +167,17 @@
 
   .project-actions {
     flex-direction: column;
+  }
+
+  .delete-dialog {
+    max-width: 100%;
+  }
+
+  .delete-actions {
+    flex-direction: column-reverse;
+  }
+
+  .delete-actions button {
+    width: 100%;
   }
 }
