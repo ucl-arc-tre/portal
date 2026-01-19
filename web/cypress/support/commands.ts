@@ -656,31 +656,31 @@ Cypress.Commands.add("mockStudyAgreementConfirmation", () => {
 });
 
 Cypress.Commands.add("mockContractsEmpty", () => {
-  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+  cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-empty.json",
   }).as("getContractsEmpty");
 });
 
 Cypress.Commands.add("mockContractsWithSample", () => {
-  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+  cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-with-sample.json",
   }).as("getContractsWithSample");
 });
 
 Cypress.Commands.add("mockContractUpload", () => {
-  cy.intercept("POST", "/web/api/v0/studies/*/assets/*/contracts/upload", {
+  cy.intercept("POST", "/web/api/v0/studies/*/contracts/upload", {
     statusCode: 204,
   }).as("uploadContract");
 });
 
 Cypress.Commands.add("mockContractDownload", () => {
-  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts/*/download", {
+  cy.intercept("GET", "/web/api/v0/studies/*/contracts/*/download", {
     fixture: "valid_nhsd_certificate.pdf", // mocking with an available sample PDF for now, can add a sample contract PDF later
   }).as("downloadContract");
 });
 
 Cypress.Commands.add("mockContractEdit", () => {
-  cy.intercept("PUT", "/web/api/v0/studies/*/assets/*/contracts/*", {
+  cy.intercept("PUT", "/web/api/v0/studies/*/contracts/*", {
     statusCode: 204,
   }).as("editContract");
 });
