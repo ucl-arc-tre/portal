@@ -6,6 +6,7 @@ import {
   getProjectsTreByProjectId,
   postProjectsTreAdminByProjectIdApprove,
   patchProjectsTreByProjectIdPending,
+  patchProjectsTreByProjectIdArchive,
   Study,
 } from "@/openapi";
 
@@ -15,6 +16,8 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 import CreateProjectForm from "@/components/projects/CreateProjectForm";
+import Dialog from "@/components/ui/Dialog";
+import { Alert, AlertMessage } from "@/components/shared/exports";
 
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
@@ -30,6 +33,8 @@ export default function ManageProjectPage() {
   const [isApproving, setIsApproving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
@@ -135,6 +140,31 @@ export default function ManageProjectPage() {
     }
   };
 
+  const handleArchive = async () => {
+    if (!projectId || typeof projectId !== "string") return;
+
+    setIsArchiving(true);
+    setError(null);
+
+    try {
+      const response = await patchProjectsTreByProjectIdArchive({
+        path: { projectId },
+      });
+
+      if (response.response.ok) {
+        setShowArchiveModal(false);
+        await fetchData(projectId, environment as string);
+      } else {
+        throw new Error(`Failed to archive project: ${response.response.status} ${response.response.statusText}`);
+      }
+    } catch (err) {
+      console.error("Failed to archive project:", err);
+      setError("Failed to archive project. Please try again.");
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
   const handleProjectCreated = () => {
     setShowEditForm(false);
     if (projectId && typeof projectId === "string" && environment && typeof environment === "string") {
@@ -233,11 +263,16 @@ export default function ManageProjectPage() {
           </div>
         )}
 
-        {canEdit && project.approval_status !== "Incomplete" && (
+        {canEdit && project.approval_status !== "Incomplete" && project.approval_status !== "Archived" && (
           <div className={styles["approval-section"]}>
-            <Button onClick={() => setShowEditForm(true)} size="large">
-              Edit
-            </Button>
+            <div className={styles["approval-actions"]}>
+              <Button onClick={() => setShowEditForm(true)} size="large">
+                Edit
+              </Button>
+              <Button onClick={() => setShowArchiveModal(true)} size="large" variant="secondary">
+                Archive
+              </Button>
+            </div>
           </div>
         )}
 
@@ -330,6 +365,45 @@ export default function ManageProjectPage() {
             handleProjectCreated={() => handleProjectCreated()}
             handleCancelCreate={() => handleCancelCreate()}
           />
+        )}
+
+        {showArchiveModal && (
+          <Dialog setDialogOpen={() => setShowArchiveModal(false)}>
+            <div className={styles["archive-dialog"]}>
+              <h2>Archive Project</h2>
+              <p>
+                Are you sure you want to archive project <strong>{project?.name}</strong>?
+              </p>
+              <p>Archiving this project will:</p>
+              <ul>
+                <li>
+                  Make the project <strong>read-only</strong> - no further edits will be allowed
+                </li>
+                <li>Keep all project data and configuration intact</li>
+                <li>Remove it from active project lists (but it will still be visible at the bottom)</li>
+                <li>Require administrator approval to unarchive in the future</li>
+              </ul>
+              <p>
+                <strong>Note:</strong> This is different from deleting - archived projects can be restored later if
+                needed.
+              </p>
+
+              {error && (
+                <Alert type="error">
+                  <AlertMessage>{error}</AlertMessage>
+                </Alert>
+              )}
+
+              <div className={styles["archive-actions"]}>
+                <Button onClick={() => setShowArchiveModal(false)} variant="secondary" disabled={isArchiving}>
+                  Cancel
+                </Button>
+                <Button onClick={handleArchive} variant="primary" disabled={isArchiving}>
+                  {isArchiving ? "Archiving..." : "Archive Project"}
+                </Button>
+              </div>
+            </div>
+          </Dialog>
         )}
       </div>
     </>

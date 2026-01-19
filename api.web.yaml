@@ -634,6 +634,28 @@ paths:
         default:
           description: Unexpected error
 
+  /projects/tre/{projectId}/archive:
+    patch:
+      description: Archive a TRE project (changes status to Archived, makes project read-only)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          description: ID of the TRE project
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project archived successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -1406,6 +1428,7 @@ components:
         - Pending
         - Approved
         - Rejected
+        - Archived
       description: Current approval status (used for studies, projects, etc.)
 
     StudyReview:

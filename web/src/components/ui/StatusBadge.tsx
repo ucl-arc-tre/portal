@@ -29,6 +29,8 @@ export default function StatusBadge(props: BadgeProps) {
         return "This study has been approved.";
       case "Rejected":
         return "This study has been rejected. Please review feedback and make necessary changes.";
+      case "Archived":
+        return "This study has been archived and is now read-only. Contact an administrator to unarchive.";
       default:
         return "Status information not available.";
     }
@@ -52,6 +54,8 @@ export default function StatusBadge(props: BadgeProps) {
         return "This project has been approved and is awaiting deployment.";
       case "Rejected":
         return "This project has been rejected. Please contact support for more information.";
+      case "Archived":
+        return "This project has been archived and is now read-only. Contact an administrator to unarchive.";
       default:
         return "Status information not available.";
     }

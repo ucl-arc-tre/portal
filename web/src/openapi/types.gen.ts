@@ -343,7 +343,7 @@ export type Study = StudyBase & {
 /**
  * Current approval status (used for studies, projects, etc.)
  */
-export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected' | 'Archived';
 
 export type StudyReview = {
     status: ApprovalStatus;
@@ -1483,6 +1483,44 @@ export type PostProjectsTreAdminByProjectIdApproveErrors = {
 export type PostProjectsTreAdminByProjectIdApproveResponses = {
     /**
      * Project approved successfully
+     */
+    200: unknown;
+};
+
+export type PatchProjectsTreByProjectIdArchiveData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the TRE project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}/archive';
+};
+
+export type PatchProjectsTreByProjectIdArchiveErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PatchProjectsTreByProjectIdArchiveResponses = {
+    /**
+     * Project archived successfully
      */
     200: unknown;
 };

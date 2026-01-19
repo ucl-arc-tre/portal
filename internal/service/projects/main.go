@@ -298,6 +298,18 @@ func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	return nil
 }
 
+func (s *Service) ArchiveProject(projectId uuid.UUID) error {
+	err := s.db.Model(&types.Project{}).
+		Where("id = ?", projectId).
+		Update("approval_status", openapi.Archived).Error
+
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to archive project")
+	}
+
+	return nil
+}
+
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {
 	requestedAssetIDs, err := project.AssetUUIDs()
 	if err != nil {

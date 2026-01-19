@@ -269,3 +269,18 @@ func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, project
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) PatchProjectsTreProjectIdArchive(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	err = h.projects.ArchiveProject(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to archive project")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
