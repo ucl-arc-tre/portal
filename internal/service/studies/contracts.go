@@ -88,12 +88,6 @@ func (s *Service) StoreContract(
 ) error {
 	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
 
-	if assetExists, err := s.assetExists(studyID, contractMetadata.StudyID); err != nil {
-		return err
-	} else if !assetExists {
-		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
-	}
-
 	// Start a database transaction
 	tx := s.db.Begin()
 	defer func() {
