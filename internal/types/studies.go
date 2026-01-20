@@ -80,6 +80,7 @@ type Asset struct {
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
 	Study       Study           `gorm:"foreignKey:StudyID"`
 	Locations   []AssetLocation `gorm:"foreignKey:AssetID"`
+	Contracts   []Contract      `gorm:"many2many:contract_assets;"`
 }
 
 func (a Asset) LocationStrings() []string {
@@ -112,7 +113,7 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Study          Study   `gorm:"foreignKey:StudyID"`
-	CreatorUser    User    `gorm:"foreignKey:CreatorUserID"`
-	ContractAssets []Asset `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
+	Study       Study   `gorm:"foreignKey:StudyID"`
+	CreatorUser User    `gorm:"foreignKey:CreatorUserID"`
+	Assets      []Asset `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
 }

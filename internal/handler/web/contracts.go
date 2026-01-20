@@ -207,7 +207,7 @@ func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
 }
 
 func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId)
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
 	if err != nil {
 		return
 	}
