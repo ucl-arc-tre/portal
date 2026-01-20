@@ -6,7 +6,7 @@ import {
   getProjectsTreByProjectId,
   postProjectsTreAdminByProjectIdApprove,
   patchProjectsTreByProjectIdPending,
-  patchProjectsTreByProjectIdArchive,
+  patchProjectsDshByProjectIdArchive,
   Study,
 } from "@/openapi";
 
@@ -147,7 +147,11 @@ export default function ManageProjectPage() {
     setError(null);
 
     try {
-      const response = await patchProjectsTreByProjectIdArchive({
+      if (environment !== "Data Safe Haven") {
+        throw new Error("Only Data Safe Haven projects can be archived");
+      }
+
+      const response = await patchProjectsDshByProjectIdArchive({
         path: { projectId },
       });
 
@@ -269,9 +273,12 @@ export default function ManageProjectPage() {
               <Button onClick={() => setShowEditForm(true)} size="large">
                 Edit
               </Button>
-              <Button onClick={() => setShowArchiveModal(true)} size="large" variant="secondary">
-                Archive
-              </Button>
+
+              {project.environment_name === "Data Safe Haven" && (
+                <Button onClick={() => setShowArchiveModal(true)} size="large" variant="secondary">
+                  Archive
+                </Button>
+              )}
             </div>
           </div>
         )}

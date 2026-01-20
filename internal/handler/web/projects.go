@@ -270,7 +270,7 @@ func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, project
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) PatchProjectsTreProjectIdArchive(ctx *gin.Context, projectId string) {
+func (h *Handler) PatchProjectsDshProjectIdArchive(ctx *gin.Context, projectId string) {
 	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
 	if err != nil {
 		return

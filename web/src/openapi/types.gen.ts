@@ -1487,19 +1487,19 @@ export type PostProjectsTreAdminByProjectIdApproveResponses = {
     200: unknown;
 };
 
-export type PatchProjectsTreByProjectIdArchiveData = {
+export type PatchProjectsDshByProjectIdArchiveData = {
     body?: never;
     path: {
         /**
-         * ID of the TRE project
+         * ID of the DSH project
          */
         projectId: string;
     };
     query?: never;
-    url: '/projects/tre/{projectId}/archive';
+    url: '/projects/dsh/{projectId}/archive';
 };
 
-export type PatchProjectsTreByProjectIdArchiveErrors = {
+export type PatchProjectsDshByProjectIdArchiveErrors = {
     /**
      * Forbidden
      */
@@ -1518,7 +1518,7 @@ export type PatchProjectsTreByProjectIdArchiveErrors = {
     default: unknown;
 };
 
-export type PatchProjectsTreByProjectIdArchiveResponses = {
+export type PatchProjectsDshByProjectIdArchiveResponses = {
     /**
      * Project archived successfully
      */

@@ -634,14 +634,15 @@ paths:
         default:
           description: Unexpected error
 
-  /projects/tre/{projectId}/archive:
+  # Project Management - DSH Environment
+  /projects/dsh/{projectId}/archive:
     patch:
-      description: Archive a TRE project (changes status to Archived, makes project read-only)
+      description: Archive a DSH project (changes status to Archived, makes project read-only)
       parameters:
         - in: path
           name: projectId
           required: true
-          description: ID of the TRE project
+          description: ID of the DSH project
           schema:
             type: string
       responses:
