@@ -77,6 +77,8 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
+	// TODO: do we want some sort of validation for the assets?
+
 	return nil
 }
 

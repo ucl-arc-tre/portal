@@ -93,6 +93,16 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 		return
 	}
 
+	assets := []types.Asset{}
+	if contractMetadata.AssetIds != nil {
+		assetUuids, err := parseUUIDsOrSetError(ctx, contractMetadata.AssetIds...)
+		if err != nil {
+			return
+		}
+		for _, assetUuid := range assetUuids {
+			assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
+		}
+	}
 	// Create the final contract record for storage
 	contractData := types.Contract{
 		StudyID:               uuids[0],
@@ -103,9 +113,9 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 		Status:                string(contractMetadata.Status),
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
-	}
-	// TODO: add asset connection
 
+		Assets: assets,
+	}
 	contractObj := types.S3Object{
 		Content: file,
 	}
@@ -132,7 +142,6 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 	}
 
 	contractMetadata := extractContractFormData(ctx)
-	// TODO: check allow asset connection
 
 	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
 	if validationError != nil {
@@ -167,8 +176,19 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		}
 	}
 
+	assets := []types.Asset{}
+	if contractMetadata.AssetIds != nil {
+		assetUuids, err := parseUUIDsOrSetError(ctx, contractMetadata.AssetIds...)
+		if err != nil {
+			return
+		}
+		for _, assetUuid := range assetUuids {
+			assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
+		}
+	}
+
 	contractUpdateData := types.Contract{
-		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[2]}},
+		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[1]}},
 		StudyID:               uuids[0],
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
@@ -176,9 +196,11 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 		Filename:              filename,
+
+		Assets: assets,
 	}
 
-	err = h.studies.UpdateContract(ctx, uuids[0], uuids[2], contractUpdateData, contractObj)
+	err = h.studies.UpdateContract(ctx, uuids[0], uuids[1], contractUpdateData, contractObj)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
@@ -217,6 +239,8 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 		setError(ctx, err, "Failed to retrieve contracts")
 		return
 	}
+
+	log.Debug().Int("num_contracts", len(contracts)).Msg("Retrieved contracts for asset")
 
 	apiContracts := []openapi.Contract{}
 	for _, contract := range contracts {
