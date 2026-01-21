@@ -38,6 +38,7 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 	assetIds := []string{}
+	log.Debug().Any("contract", contract).Int("numAssets", len(contract.Assets)).Msg("within contractToOpenApiContract")
 	for _, asset := range contract.Assets {
 		assetIds = append(assetIds, asset.ID.String())
 	}
@@ -54,6 +55,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
 		AssetIds:              assetIds,
+		StudyId:               contract.StudyID.String(),
 	}
 }
 
