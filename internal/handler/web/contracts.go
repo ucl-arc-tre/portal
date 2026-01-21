@@ -31,10 +31,18 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
 		StartDate:             ctx.PostForm("start_date"),
 		ExpiryDate:            ctx.PostForm("expiry_date"),
+		AssetIds:              ctx.PostFormArray("asset_ids"),
 	}
 }
 
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
+
+	assetIds := []string{}
+	for _, asset := range contract.Assets {
+		assetIds = append(assetIds, asset.ID.String())
+	}
+
+	log.Debug().Any("assetIds", assetIds).Msg("within contractToOpenApiContract")
 	return openapi.Contract{
 		Id:                    contract.ID.String(),
 		Filename:              contract.Filename,
@@ -45,6 +53,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
 		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
+		AssetIds:              assetIds,
 	}
 }
 
@@ -116,6 +125,7 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 
 		Assets: assets,
 	}
+
 	contractObj := types.S3Object{
 		Content: file,
 	}
@@ -177,16 +187,18 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 	}
 
 	assets := []types.Asset{}
+
 	if contractMetadata.AssetIds != nil {
 		assetUuids, err := parseUUIDsOrSetError(ctx, contractMetadata.AssetIds...)
+
 		if err != nil {
 			return
 		}
 		for _, assetUuid := range assetUuids {
 			assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
 		}
-	}
 
+	}
 	contractUpdateData := types.Contract{
 		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[1]}},
 		StudyID:               uuids[0],
