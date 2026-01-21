@@ -1429,8 +1429,14 @@ components:
         - Pending
         - Approved
         - Rejected
-        - Archived
       description: Current approval status (used for studies, projects, etc.)
+
+    ProjectStatus:
+      type: string
+      enum:
+        - Active
+        - Archived
+      description: Environment-specific project lifecycle status (currently only used for DSH projects)
 
     StudyReview:
       type: object

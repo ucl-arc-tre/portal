@@ -19,7 +19,6 @@ const projectSortOrder: Record<ApprovalStatus, number> = {
   Incomplete: 2,
   Rejected: 3,
   Approved: 4,
-  Archived: 5,
 };
 
 export default function ProjectCardsList(props: Props) {

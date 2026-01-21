@@ -21,7 +21,6 @@ const (
 // Defines values for ApprovalStatus.
 const (
 	Approved   ApprovalStatus = "Approved"
-	Archived   ApprovalStatus = "Archived"
 	Incomplete ApprovalStatus = "Incomplete"
 	Pending    ApprovalStatus = "Pending"
 	Rejected   ApprovalStatus = "Rejected"

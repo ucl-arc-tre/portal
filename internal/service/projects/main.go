@@ -299,15 +299,10 @@ func (s *Service) ApproveProject(projectId uuid.UUID) error {
 }
 
 func (s *Service) ArchiveProject(projectId uuid.UUID) error {
-	err := s.db.Model(&types.Project{}).
-		Where("id = ?", projectId).
-		Update("approval_status", openapi.Archived).Error
-
-	if err != nil {
-		return types.NewErrFromGorm(err, "failed to archive project")
-	}
-
-	return nil
+	// TODO: Implement when DSH projects are active
+	// This will update the Status field in the ProjectDSH table to "Archived"
+	// For now, return not implemented error
+	return fmt.Errorf("archiving projects is not yet implemented")
 }
 
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {

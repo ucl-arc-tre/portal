@@ -267,7 +267,7 @@ export default function ManageProjectPage() {
           </div>
         )}
 
-        {canEdit && project.approval_status !== "Incomplete" && project.approval_status !== "Archived" && (
+        {canEdit && project.approval_status !== "Incomplete" && (
           <div className={styles["approval-section"]}>
             <div className={styles["approval-actions"]}>
               <Button onClick={() => setShowEditForm(true)} size="large">

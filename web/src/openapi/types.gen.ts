@@ -343,7 +343,12 @@ export type Study = StudyBase & {
 /**
  * Current approval status (used for studies, projects, etc.)
  */
-export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected' | 'Archived';
+export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+
+/**
+ * Environment-specific project lifecycle status (currently only used for DSH projects)
+ */
+export type ProjectStatus = 'Active' | 'Archived';
 
 export type StudyReview = {
     status: ApprovalStatus;
