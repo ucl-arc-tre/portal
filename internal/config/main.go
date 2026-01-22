@@ -130,6 +130,13 @@ func IGOpsStaffUsernames() []types.Username {
 	return usernames("ig_ops_staff_usernames")
 }
 
+// Map of paths to strictly rate limit, so they are 'slow'
+func RateLimitSlowPaths() map[string]bool {
+	return map[string]bool{
+		BaseWebURL + "/users/invite": true,
+	}
+}
+
 func usernames(key string) []types.Username {
 	usernames := []types.Username{}
 	for _, username := range k.Strings(key) {

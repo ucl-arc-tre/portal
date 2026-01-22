@@ -33,7 +33,12 @@ func initialise() {
 
 // Add the web API defined by its OpenAPI spec with suitable middleware
 func addWeb(router gin.IRouter) {
-	router.Use(middleware.NewSecure(), middleware.NewSetUser(), middleware.NewAuthz())
+	router.Use(
+		middleware.NewSecure(),
+		middleware.NewSetUser(),
+		middleware.NewAuthz(),
+		middleware.NewWebRateLimit(),
+	)
 	apiweb.RegisterHandlers(router, web.New())
 }
 
