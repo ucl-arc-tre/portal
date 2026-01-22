@@ -186,6 +186,17 @@ func (s *Service) UpdateContract(
 		return types.NewErrFromGorm(result.Error, "failed to update contract")
 	}
 
+	if len(contractMetadata.Assets) > 0 {
+		contract := types.Contract{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: contractID}}, StudyID: contractMetadata.StudyID}
+
+		assoc := tx.Model(&contract).Association("Assets")
+		err := assoc.Append(contractMetadata.Assets)
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to update contract assets")
+		}
+	}
+
 	if err := tx.Commit().Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to commit contract update transaction")
 	}
