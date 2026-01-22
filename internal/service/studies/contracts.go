@@ -104,8 +104,6 @@ func (s *Service) StoreContract(
 		return types.NewErrFromGorm(err, "failed to save contract metadata")
 	}
 
-	log.Debug().Any("contractId", contractMetadata.ID).Msg("Contract metadata saved, proceeding with S3 storage")
-
 	// Store the PDF file in S3 using the generated primary key ID from the database
 	metadata := s3.ObjectMetadata{
 		Id:   contractMetadata.ID,
@@ -207,8 +205,9 @@ func (s *Service) contractExists(studyID uuid.UUID, contractID uuid.UUID) (bool,
 // retrieves all contracts within a study
 func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
 	contracts := []types.Contract{}
-	err := s.db.Where("contracts.study_id = ?", studyID).
+	err := s.db.Preload("Assets").Where("contracts.study_id = ?", studyID).
 		Order("created_at DESC").
 		Find(&contracts).Error
 	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
+
 }

@@ -38,12 +38,10 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 	assetIds := []string{}
-	log.Debug().Any("contract", contract).Int("numAssets", len(contract.Assets)).Msg("within contractToOpenApiContract")
 	for _, asset := range contract.Assets {
 		assetIds = append(assetIds, asset.ID.String())
 	}
 
-	log.Debug().Any("assetIds", assetIds).Msg("within contractToOpenApiContract")
 	return openapi.Contract{
 		Id:                    contract.ID.String(),
 		Filename:              contract.Filename,
@@ -253,8 +251,6 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 		setError(ctx, err, "Failed to retrieve contracts")
 		return
 	}
-
-	log.Debug().Int("num_contracts", len(contracts)).Msg("Retrieved contracts for asset")
 
 	apiContracts := []openapi.Contract{}
 	for _, contract := range contracts {
