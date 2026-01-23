@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import CreateProjectForm from "./CreateProjectForm";
 import ProjectCardsList from "./ProjectCardsList";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
@@ -26,29 +27,26 @@ export default function Projects({ userData }: Props) {
 
   const fetchData = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
 
-      if (projectsResponse.response.ok && projectsResponse.data) {
-        setProjects(projectsResponse.data);
-      } else {
-        throw new Error(
-          `Failed to fetch projects: ${projectsResponse.response.status} ${projectsResponse.response.statusText}`
-        );
+      if (!projectsResponse.response.ok) {
+        const errorMsg = extractErrorMessage(projectsResponse);
+        throw new Error(`Failed to fetch projects: ${errorMsg}`);
       }
 
-      if (studiesResponse.response.ok && studiesResponse.data) {
-        setStudies(studiesResponse.data);
-      } else {
-        throw new Error(
-          `Failed to fetch studies: ${studiesResponse.response.status} ${studiesResponse.response.statusText}`
-        );
+      if (!studiesResponse.response.ok) {
+        const errorMsg = extractErrorMessage(studiesResponse);
+        throw new Error(`Failed to fetch studies: ${errorMsg}`);
       }
 
-      setError(null);
+      setProjects(projectsResponse.data || []);
+      setStudies(studiesResponse.data || []);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      setError("Failed to load projects and studies");
+      const errorMessage = error instanceof Error ? error.message : "Failed to load projects and studies";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
