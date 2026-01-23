@@ -100,8 +100,6 @@ export default function Assets(props: InformationAssetsProps) {
       body: assetData as AssetBase,
     });
 
-    console.log(response);
-
     if (!response.response.ok) {
       const errorMsg = extractErrorMessage(response);
       throw new Error(errorMsg);
