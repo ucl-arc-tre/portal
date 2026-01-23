@@ -267,10 +267,16 @@ declare global {
       mockContractsEmpty(): Chainable<any>;
 
       /**
-       * Mock contracts list with sample contracts
-       * @example cy.mockContractsWithSample()
+       * Mock study contracts list with sample contracts
+       * @example cy.mockStudyContractsWtihSample()
        */
-      mockContractsWithSample(): Chainable<any>;
+      mockStudyContractsWtihSample(): Chainable<any>;
+
+      /**
+       * Mock asset contracts list with sample contracts
+       * @example cy.mockStudyContractsWtihSample()
+       */
+      mockAssetContractsWtihSample(): Chainable<any>;
 
       /**
        * Mock successful contract upload
@@ -661,10 +667,16 @@ Cypress.Commands.add("mockContractsEmpty", () => {
   }).as("getContractsEmpty");
 });
 
-Cypress.Commands.add("mockContractsWithSample", () => {
+Cypress.Commands.add("mockStudyContractsWtihSample", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-with-sample.json",
-  }).as("getContractsWithSample");
+  }).as("getStudyContractsWithSample");
+});
+
+Cypress.Commands.add("mockAssetContractsWtihSample", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+    fixture: "contracts-with-sample.json",
+  }).as("getAssetContractsWithSample");
 });
 
 Cypress.Commands.add("mockContractUpload", () => {

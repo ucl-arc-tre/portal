@@ -169,6 +169,7 @@ describe("Study Updates", () => {
     cy.mockStudyAgreementsConfirmed();
     cy.mockAssetCreation();
     cy.mockInformationAssetsWithSample();
+    cy.mockAssetContractsWtihSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -176,6 +177,7 @@ describe("Study Updates", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait("@getAssetContractsWithSample");
   });
 
   it("should successfully update a study as its owner", () => {
