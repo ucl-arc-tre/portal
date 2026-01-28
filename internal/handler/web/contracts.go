@@ -264,7 +264,7 @@ func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context,
 	if err != nil {
 		return
 	}
-	object, err := h.studies.GetContract(ctx, uuids[0], uuids[2])
+	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed get contract")
 		return
