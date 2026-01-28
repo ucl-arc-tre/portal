@@ -104,14 +104,14 @@ func migrateContracts(db *gorm.DB) {
 	if migrator.HasColumn(&contract, "asset_id") {
 		err := migrator.DropColumn(&contract, "asset_id")
 		if err != nil {
-			log.Err(err).Msg("failed to drop 'asset_id' field from 'contracts' table: %w")
+			log.Err(err).Msg("failed to drop 'asset_id' field from 'contracts' table")
 		}
 	}
 
 	if migrator.HasIndex(&contract, "contracts_asset_id_index") {
 		err := migrator.DropIndex(&contract, "contracts_asset_id_index")
 		if err != nil {
-			log.Err(err).Msg("failed to drop index on 'contracts' table: %w")
+			log.Err(err).Msg("failed to drop index on 'contracts' table")
 		}
 	}
 
