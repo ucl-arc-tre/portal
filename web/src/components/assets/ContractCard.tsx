@@ -1,17 +1,16 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
-import { Contract, getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload } from "@/openapi";
+import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import styles from "./ContractCard.module.css";
 
 type ContractCardProps = {
   contract: Contract;
   studyId: string;
-  assetId: string;
   onEdit: () => void;
   canModify: boolean;
 };
 
-export default function ContractCard({ contract, studyId, assetId, onEdit, canModify }: ContractCardProps) {
+export default function ContractCard({ contract, studyId, onEdit, canModify }: ContractCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,10 +19,9 @@ export default function ContractCard({ contract, studyId, assetId, onEdit, canMo
     setError(null);
 
     try {
-      const response = await getStudiesByStudyIdAssetsByAssetIdContractsByContractIdDownload({
+      const response = await getStudiesByStudyIdContractsByContractIdDownload({
         path: {
           studyId,
-          assetId,
           contractId: contract.id,
         },
       });

@@ -3,13 +3,12 @@ import { useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
-  postStudiesByStudyIdAssetsByAssetIdContractsUpload,
-  putStudiesByStudyIdAssetsByAssetIdContractsByContractId,
+  postStudiesByStudyIdContractsUpload,
+  putStudiesByStudyIdContractsByContractId,
   ValidationError,
   ContractUploadObject,
   ContractUpdate,
   Study,
-  Asset,
   Contract,
 } from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
@@ -21,11 +20,12 @@ type ContractFormData = {
   status: "proposed" | "active" | "expired";
   startDate: string;
   expiryDate: string;
+  assetIds: string[];
 };
 
 type ContractUploadModalProps = {
   study: Study;
-  asset: Asset;
+  assetIds: string[];
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -34,7 +34,7 @@ type ContractUploadModalProps = {
 
 export default function ContractUploadModal({
   study,
-  asset,
+  assetIds,
   isOpen,
   onClose,
   onSuccess,
@@ -68,6 +68,7 @@ export default function ContractUploadModal({
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
+        assetIds: editingContract.asset_ids,
       });
     } else {
       // reset to defaults when not editing
@@ -77,6 +78,7 @@ export default function ContractUploadModal({
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
+        assetIds: [],
       });
     }
   }, [editingContract, reset]);
@@ -122,6 +124,7 @@ export default function ContractUploadModal({
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
+      asset_ids: assetIds,
     };
 
     let response;
@@ -133,10 +136,9 @@ export default function ContractUploadModal({
           file: uploadFile || undefined,
         };
 
-        response = await putStudiesByStudyIdAssetsByAssetIdContractsByContractId({
+        response = await putStudiesByStudyIdContractsByContractId({
           path: {
             studyId: study.id,
-            assetId: asset.id,
             contractId: editingContract.id,
           },
           body: contractUpdateData,
@@ -148,10 +150,9 @@ export default function ContractUploadModal({
           file: uploadFile!,
         };
 
-        response = await postStudiesByStudyIdAssetsByAssetIdContractsUpload({
+        response = await postStudiesByStudyIdContractsUpload({
           path: {
             studyId: study.id,
-            assetId: asset.id,
           },
           body: contractUploadData,
         });
@@ -209,6 +210,7 @@ export default function ContractUploadModal({
 
   if (!isOpen) return null;
 
+  // TODO: when coming from asset flow, prefill the asset ID, otherwise allow selection of assets
   return (
     <Dialog setDialogOpen={handleClose}>
       <h2>{editingContract ? "Edit Contract" : "Upload Contract"}</h2>

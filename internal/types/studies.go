@@ -80,6 +80,7 @@ type Asset struct {
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
 	Study       Study           `gorm:"foreignKey:StudyID"`
 	Locations   []AssetLocation `gorm:"foreignKey:AssetID"`
+	Contracts   []Contract      `gorm:"many2many:contract_assets;"`
 }
 
 func (a Asset) LocationStrings() []string {
@@ -102,7 +103,7 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	AssetID               uuid.UUID `gorm:"not null;index"`
+	StudyID               uuid.UUID `gorm:"not null;index"`
 	Filename              string    `gorm:"not null"`
 	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
 	OrganisationSignatory string
@@ -112,6 +113,7 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Asset       Asset `gorm:"foreignKey:AssetID"`
-	CreatorUser User  `gorm:"foreignKey:CreatorUserID"`
+	Study       Study   `gorm:"foreignKey:StudyID"`
+	CreatorUser User    `gorm:"foreignKey:CreatorUserID"`
+	Assets      []Asset `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
 }
