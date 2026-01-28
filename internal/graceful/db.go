@@ -94,10 +94,10 @@ func migrateContracts(db *gorm.DB) {
 	contract := types.Contract{}
 	migrator := db.Migrator()
 
-	if migrator.HasConstraint("contracts", "contracts_asset_id_fkey") {
+	if migrator.HasConstraint(&contract, "contracts_asset_id_fkey") {
 		err := migrator.DropConstraint("contracts", "contracts_asset_id_fkey")
 		if err != nil {
-			log.Err(err).Msg("failed to drop asset foreign key constraint on 'contracts' table: %w")
+			log.Err(err).Msg("failed to drop asset foreign key constraint on 'contracts' table")
 		}
 	}
 
