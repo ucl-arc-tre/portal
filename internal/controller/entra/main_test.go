@@ -14,17 +14,9 @@ func TestEntraUsernameForExternalEmail(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testTenantDomain := config.EntraTenantPrimaryDomain()
-
 	username := types.Username("hello@example.com")
 	assert.True(t, usernameIsExternal(username))
 	assert.False(t, usernameIsExternal(types.Username("hello@testTenant.com")))
-
-	expectedUserPrincipalName := UserPrincipalName("hello_example.com#EXT#@" + testTenantDomain)
-
-	extFormatUserId, err := userPrincipalNameForExternal(username)
-	assert.NoError(t, err, "EntraUsernameForExternalEmail returned an error")
-	assert.Equal(t, expectedUserPrincipalName, extFormatUserId)
 }
 
 func TestEmployeeTypeStaffRegex(t *testing.T) {

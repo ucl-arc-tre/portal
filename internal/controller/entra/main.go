@@ -27,6 +27,7 @@ const (
 
 var (
 	employeeTypeStaffPattern = regexp.MustCompile(`(?i)(?:^|\s|,)staff(?:,|$)`)
+	userDataProperties       = []string{"mail", "employeeType", "id"}
 )
 
 var controller *Controller
@@ -76,61 +77,83 @@ func New() *Controller {
 	return controller
 }
 
-func userPrincipalNameForExternal(username types.Username) (UserPrincipalName, error) {
-	if config.EntraTenantPrimaryDomain() == "" {
-		return "", types.NewErrServerError("Entra tenant primary domain is not set")
-	}
-
-	parts := strings.Split(string(username), "@")
-	if len(parts) != 2 {
-		return "", types.NewErrInvalidObject("invalid email")
-	}
-
-	email := parts[0]
-	domain := parts[1]
-	upn := fmt.Sprintf("%s_%s#EXT#@%s", email, domain, config.EntraTenantPrimaryDomain())
-
-	return UserPrincipalName(upn), nil
-}
-
 // Get the cached user data for a user
 func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
-	userPrincipalName := UserPrincipalName("")
-	if usernameIsExternal(username) {
-		externalUserPrincipalName, err := userPrincipalNameForExternal(username)
-		if err != nil {
-			return nil, err
-		}
-		userPrincipalName = externalUserPrincipalName
-	} else {
-		userPrincipalName = UserPrincipalName(username)
-	}
-
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
 	}
-	configuration := &graphusers.UserItemRequestBuilderGetRequestConfiguration{
-		QueryParameters: &graphusers.UserItemRequestBuilderGetQueryParameters{
-			Select: []string{"mail", "employeeType", "id"},
-		},
-	}
-	data, err := c.client.Users().ByUserId(string(userPrincipalName)).Get(ctx, configuration)
-	if err != nil && errContains(err, "does not exist") {
-		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] not found in entra directory", username))
-	} else if err != nil {
-		return nil, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
-	} else if data.GetId() == nil {
+
+	user, err := c.findUser(ctx, username)
+	if err != nil {
+		return nil, err
+	} else if user.GetId() == nil {
 		return nil, types.NewNotFoundError(fmt.Errorf("user [%v] had no entra id", username))
 	}
 
 	userData := UserData{
-		Id:           mustParseUserObjectId(data),
-		Email:        data.GetMail(),
-		EmployeeType: data.GetEmployeeType(),
+		Id:           mustParseUserObjectId(user),
+		Email:        user.GetMail(),
+		EmployeeType: user.GetEmployeeType(),
 	}
 	_ = c.userDataCache.Add(username, userData)
 
 	return &userData, nil
+}
+
+func (c *Controller) findUser(ctx context.Context, username types.Username) (graphmodels.Userable, error) {
+	if !username.IsValid() {
+		return nil, types.NewErrInvalidObject(fmt.Errorf("username [%v] was not valid", username))
+	}
+	if usernameIsExternal(username) {
+		return c.findUserExternal(ctx, Email(username))
+	} else {
+		return c.findUserInternal(ctx, UserPrincipalName(username))
+	}
+}
+
+// Get the user data for an internal user
+func (c *Controller) findUserInternal(ctx context.Context, upn UserPrincipalName) (graphmodels.Userable, error) {
+	configuration := &graphusers.UserItemRequestBuilderGetRequestConfiguration{
+		QueryParameters: &graphusers.UserItemRequestBuilderGetQueryParameters{
+			Select: userDataProperties,
+		},
+	}
+	data, err := c.client.Users().ByUserId(string(upn)).Get(ctx, configuration)
+
+	if err != nil && errContains(err, "does not exist") {
+		return nil, types.NewNotFoundError(fmt.Errorf("internal user [%v] not found in entra directory", upn))
+	} else if err != nil {
+		return nil, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
+	}
+	return data, nil
+}
+
+// Get the user data for an external user
+func (c *Controller) findUserExternal(ctx context.Context, email Email) (graphmodels.Userable, error) {
+	filterQuery := fmt.Sprintf(`mail eq '%s'`, email)
+	maxResults := int32(1)
+	configuration := &graphusers.UsersRequestBuilderGetRequestConfiguration{
+		Headers: abstractions.NewRequestHeaders(),
+		QueryParameters: &graphusers.UsersRequestBuilderGetQueryParameters{
+			Filter: &filterQuery,
+			Top:    &maxResults,
+			Select: userDataProperties,
+		},
+	}
+
+	data, err := c.client.Users().Get(ctx, configuration)
+	if err != nil && errContains(err, "does not exist") {
+		return nil, types.NewNotFoundError(fmt.Errorf("external user [%v] not found in entra directory", email))
+	} else if err != nil {
+		return nil, types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
+	}
+
+	users := data.GetValue()
+	if len(users) == 0 {
+		return nil, types.NewNotFoundError(fmt.Sprintf("external user [%v] not found", email))
+	}
+
+	return users[0], nil
 }
 
 // checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type. Returns a cached response
@@ -156,7 +179,7 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
 	user, err := c.userData(ctx, types.Username(email))
 	if err == nil {
-		log.Debug().Any("user", user).Msg("User already exists in entra")
+		log.Debug().Any("userEmail", user.Email).Msg("User already exists in entra")
 		return c.sendInviteExistingEntraUser(ctx, email, sponsor)
 	} else if errors.Is(err, types.ErrNotFound) {
 		return c.sendInviteNewEntraUser(ctx, email, sponsor)
@@ -217,7 +240,6 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 	response, err := c.client.Invitations().Post(ctx, requestBody, nil)
 	if err != nil {
 		if errContains(err, "already exists") || errContains(err, "existing user") {
-			// bit of a mystery how this ends up being triggered, will investigate on other deployments
 			log.Warn().Any("email", email).Msg("user supposedly didn't exist but invitation thinks otherwise")
 			return nil, types.NewErrServerError("attempted to invite existing entra user")
 		}
@@ -232,6 +254,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 	return &InvitedUserData{Id: id}, nil
 }
 
+// Idempotent add user to Entra invited users security group
 func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
 	log.Debug().Str("objectId", user.Id.String()).Msg("Adding invited user to invited user group")
 
@@ -241,7 +264,13 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUser
 	requestBody.SetOdataId(&odataId)
 
 	err := c.client.Groups().ByGroupId(groupId).Members().Ref().Post(ctx, requestBody, nil)
-	return types.NewErrServerError(err)
+	if errContains(err, "One or more added object references already exist") {
+		log.Debug().Str("objectId", user.Id.String()).Msg("User already exists in group")
+		return nil
+	} else if err != nil {
+		return types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
+	}
+	return nil
 }
 
 func employeeTypeIsStaff(employeeType string) bool {

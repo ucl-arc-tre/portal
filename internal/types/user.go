@@ -1,8 +1,16 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"strings"
+
+	"github.com/google/uuid"
+)
 
 type Username string // e.g. ccxyz@ucl.ac.uk
+
+func (u Username) IsValid() bool {
+	return strings.Contains(string(u), "@")
+}
 
 type ChosenName string // e.g. Alice Smith
 
