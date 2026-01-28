@@ -10,34 +10,42 @@ const botStaffUsername = Cypress.env("botStaffUsername") as string;
 const botStaffPassword = Cypress.env("botStaffPassword") as string;
 const botIGOpsUsername = Cypress.env("botIGUsername") as string;
 const botIGOpsPassword = Cypress.env("botIGPassword") as string;
+const botTREOpsUsername = Cypress.env("botTREUsername") as string;
+const botTREOpsPassword = Cypress.env("botTREPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       /**
-       * Custom command to login as as admin
+       * Custom command to login as an admin
        * @example cy.loginAsAdmin()
        */
       loginAsAdmin(): Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Custom command to login as as as base user
+       * Custom command to login as a base user
        * @example cy.loginAsBase()
        */
       loginAsBase(): Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Custom command to login as as as staff user
+       * Custom command to login as a staff user
        * @example cy.loginAsStaff()
        */
       loginAsStaff(): Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Custom command to login as as as staff user
+       * Custom command to login as a IG operations user
        * @example cy.loginAsIGOps()
        */
       loginAsIGOps(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as a TRE operations user
+       * @example cy.loginAsTREOps()
+       */
+      loginAsTREOps(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Clears the chosen name
@@ -386,6 +394,22 @@ Cypress.Commands.add("loginAsIGOps", () => {
     log.end();
   });
 });
+
+Cypress.Commands.add("loginAsTREOps", () => {
+  cy.session(`login-tre-ops`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID TRE operations user Login",
+      message: [`🔐 Authenticating TRE ops user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botTREOpsUsername, botTREOpsPassword);
+    log.snapshot("after");
+    log.end();
+  });
+});
+
 Cypress.Commands.add("clearChosenName", () => {
   cy.request({
     method: "POST",
