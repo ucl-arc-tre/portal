@@ -17,6 +17,7 @@
     "next": "16.1.5",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "react-google-charts": "^5.2.1",
     "react-hook-form": "^7.69.0",
     "react-markdown": "^10.1.0",
     "uikit-react-public": "^0.14.21"
