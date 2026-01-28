@@ -13,6 +13,7 @@ import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
+import Metrics from "@/components/people/Metrics";
 
 export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
   ssr: false,
@@ -32,9 +33,11 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
+  const isIGOps = userData?.roles.includes("ig-ops-staff");
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
-  const canSearch = isTreOpsStaff || isAdmin;
+  const canSearch = isTreOpsStaff || isAdmin || isIGOps;
+  const canSeeMetrics = isIGOps || isAdmin;
 
   const handleUserSearch = async (query: string) => {
     setIsLoading(true);
@@ -184,6 +187,7 @@ export default function PeoplePage() {
             <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
           </>
         ))}
+      {canSeeMetrics && <Metrics />}
     </>
   );
 }

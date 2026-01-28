@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/users/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -135,6 +136,28 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 	}
 	expiresAt := record.CompletedAt.Add(config.TrainingValidity)
 	return &expiresAt, nil
+}
+
+func (s *Service) NumApprovedResearchersValidTraining() (int, error) {
+	var count int64
+	result := s.db.Model(&types.User{}).
+		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
+		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
+		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
+		Where("agreements.type = ? AND user_training_records.kind = ? AND user_training_records.completed_at > now() - interval '1 year'", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+		Count(&count)
+	return int(count), types.NewErrFromGorm(result.Error, "failed to count valid users")
+}
+
+func (s *Service) NumApprovedResearchersExpiredTraining() (int, error) {
+	var count int64
+	result := s.db.Model(&types.User{}).
+		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
+		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
+		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
+		Where("agreements.type = ? AND user_training_records.kind = ? AND user_training_records.completed_at < now() - interval '1 year'", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+		Count(&count)
+	return int(count), types.NewErrFromGorm(result.Error, "failed to count expired users")
 }
 
 func NHSDTrainingIsValid(completedAt time.Time) bool {

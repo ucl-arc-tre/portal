@@ -170,3 +170,30 @@ func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) GetUsersMetrics(ctx *gin.Context) {
+	response := openapi.UserMetrics{}
+
+	if n, err := h.users.Total(); err != nil {
+		setError(ctx, err, "Failed to get total number of users")
+		return
+	} else {
+		response.Total = n
+	}
+
+	if n, err := h.users.NumApprovedResearchersValidTraining(); err != nil {
+		setError(ctx, err, "Failed to get number of approved researchers")
+		return
+	} else {
+		response.NumApprovedResearchersValidTraining = n
+	}
+
+	if n, err := h.users.NumApprovedResearchersExpiredTraining(); err != nil {
+		setError(ctx, err, "Failed to get number of approved researchers with expired training")
+		return
+	} else {
+		response.NumApprovedResearcherExpiredTraining = n
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
