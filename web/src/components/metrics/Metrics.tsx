@@ -1,6 +1,7 @@
 import { getUsersMetrics, UserMetrics } from "@/openapi";
 import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
+import Box from "../ui/Box";
 
 export default function Metrics() {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +39,7 @@ export default function Metrics() {
   if (isLoading) return null;
 
   return (
-    <>
+    <Box>
       <Chart
         chartType="PieChart"
         data={data}
@@ -48,6 +49,6 @@ export default function Metrics() {
         width={"100%"}
         height={"400px"}
       />
-    </>
+    </Box>
   );
 }
