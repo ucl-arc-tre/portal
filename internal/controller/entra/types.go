@@ -8,8 +8,10 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+type Email = string
+
 type UserData struct {
-	Email        *string
+	Email        *Email
 	EmployeeType *string
 	Id           ObjectId
 }
