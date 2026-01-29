@@ -32,14 +32,22 @@ export default function Metrics() {
     ["Type", "Number"],
     ["Approved valid", num_valid_training],
     ["Approved expired", num_expired_training],
-    ["Other", num_other],
+    ["Not approved", num_other],
   ];
 
   if (isLoading) return null;
 
   return (
     <>
-      <Chart chartType="PieChart" data={data} options={{}} width={"100%"} height={"400px"} />
+      <Chart
+        chartType="PieChart"
+        data={data}
+        options={{
+          title: "Number of users approved researchers with valid and invalid training",
+        }}
+        width={"100%"}
+        height={"400px"}
+      />
     </>
   );
 }
