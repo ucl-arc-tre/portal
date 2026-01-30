@@ -27,6 +27,9 @@ const UsersIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.I
 const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.LogOut), {
   ssr: false,
 });
+const MetricsIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Disc), {
+  ssr: false,
+});
 
 type NavItemProps = {
   href: string;
@@ -63,6 +66,7 @@ export default function Nav() {
   const canSeeProjects = isApprovedResearcher || isTreOpsStaff || isAdmin;
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin;
   const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;
+  const canSeeMetrics = isAdmin || isIGOpsStaff;
 
   return (
     <aside className={styles.sidebar}>
@@ -81,6 +85,8 @@ export default function Nav() {
           {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
 
           {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
+
+          {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </ul>
