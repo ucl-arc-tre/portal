@@ -41,7 +41,7 @@ describe("Contract Management", () => {
   it("should successfully upload a contract", () => {
     cy.mockContractsEmpty();
     cy.mockContractUpload();
-    cy.mockContractsWithSample();
+    cy.mockStudyContractsWtihSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -82,7 +82,7 @@ describe("Contract Management", () => {
     cy.get("button[type='submit']").click();
 
     cy.wait("@uploadContract");
-    cy.wait("@getContractsWithSample");
+    cy.wait("@getStudyContractsWithSample");
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
@@ -90,7 +90,7 @@ describe("Contract Management", () => {
   });
 
   it("should allow downloading contracts", () => {
-    cy.mockContractsWithSample();
+    cy.mockStudyContractsWtihSample();
     cy.mockContractDownload();
 
     cy.visit("/studies/manage?studyId=123456789");
@@ -106,7 +106,7 @@ describe("Contract Management", () => {
 
     // Wait for asset and contracts to load
     cy.wait("@getAssetById");
-    cy.wait("@getContractsWithSample");
+    cy.wait("@getStudyContractsWithSample");
 
     // Verify contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
@@ -119,7 +119,7 @@ describe("Contract Management", () => {
   });
 
   it("should prepopulate form fields when editing a contract", () => {
-    cy.mockContractsWithSample();
+    cy.mockStudyContractsWtihSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -132,7 +132,7 @@ describe("Contract Management", () => {
     cy.contains("Manage Asset").click();
 
     cy.wait("@getAssetById");
-    cy.wait("@getContractsWithSample");
+    cy.wait("@getStudyContractsWithSample");
 
     cy.contains("Edit").first().click();
 
@@ -151,7 +151,7 @@ describe("Contract Management", () => {
 
   it("should successfully submit edited contract data", () => {
     cy.mockContractEdit();
-    cy.mockContractsWithSample();
+    cy.mockStudyContractsWtihSample();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -164,7 +164,7 @@ describe("Contract Management", () => {
     cy.contains("Manage Asset").click();
 
     cy.wait("@getAssetById");
-    cy.wait("@getContractsWithSample");
+    cy.wait("@getStudyContractsWithSample");
 
     cy.contains("Edit").first().click();
 
@@ -175,7 +175,7 @@ describe("Contract Management", () => {
     cy.contains("Update Contract").click();
 
     cy.wait("@editContract");
-    cy.wait("@getContractsWithSample");
+    cy.wait("@getStudyContractsWithSample");
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");

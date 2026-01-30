@@ -2,7 +2,6 @@ package graceful
 
 import (
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -46,7 +45,7 @@ func InitDB() {
 		}
 	}
 
-	migrateDPNValues(db)
+	migrateContracts(db)
 
 	log.Debug().Msg("Initalised database")
 }
@@ -69,22 +68,33 @@ func NewDB() *gorm.DB {
 	}
 }
 
-func migrateDPNValues(db *gorm.DB) {
-	studies := []types.Study{}
-	if err := db.Find(&studies).Error; err != nil {
-		log.Err(err).Msg("Failed to migrate DPN values")
-		return
-	}
-	for _, study := range studies {
-		if study.DataProtectionNumber == nil {
-			continue
-		}
-		dpn := strings.ReplaceAll(*study.DataProtectionNumber, "-", "/")
-		err := db.Model(&study).Update("data_protection_number", dpn).Error
+func migrateContracts(db *gorm.DB) {
+	// migration from asset-bound contracts to study-bound contracts
+
+	contract := types.Contract{}
+	migrator := db.Migrator()
+
+	if migrator.HasConstraint(&contract, "contracts_asset_id_fkey") {
+		err := migrator.DropConstraint("contracts", "contracts_asset_id_fkey")
 		if err != nil {
-			log.Err(err).Msg("Failed to update data_protection_number")
+			log.Err(err).Msg("failed to drop asset foreign key constraint on 'contracts' table")
 		}
 	}
+
+	if migrator.HasColumn(&contract, "asset_id") {
+		err := migrator.DropColumn(&contract, "asset_id")
+		if err != nil {
+			log.Err(err).Msg("failed to drop 'asset_id' field from 'contracts' table")
+		}
+	}
+
+	if migrator.HasIndex(&contract, "contracts_asset_id_index") {
+		err := migrator.DropIndex(&contract, "contracts_asset_id_index")
+		if err != nil {
+			log.Err(err).Msg("failed to drop index on 'contracts' table")
+		}
+	}
+
 }
 
 type UpdateObject interface {

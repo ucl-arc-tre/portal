@@ -62,7 +62,7 @@ npm run cypress:headless
 The easiest way to run the full e2e testing suite is with the following command from the project root directory:
 
 ```
-make test-e2e-dev
+make test-e2e-cypress-dev
 ```
 
 This will run all frontend tests in headless mode against the dockerised dev server running on `localhost:8000`.
