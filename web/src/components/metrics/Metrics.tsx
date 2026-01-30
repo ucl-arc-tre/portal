@@ -31,8 +31,8 @@ export default function Metrics() {
 
   const data = [
     ["Type", "Number"],
-    ["Approved valid", num_valid_training],
-    ["Approved expired", num_expired_training],
+    ["Has valid training", num_valid_training],
+    ["Does not have valid training", num_expired_training],
     ["Not approved", num_other],
   ];
 

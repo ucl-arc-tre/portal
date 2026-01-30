@@ -1,39 +1,42 @@
 package users
 
 import (
+	"fmt"
+
+	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
 
-// openapi.UserMetrics{}
-
 func (s *Service) Metrics() (*openapi.UserMetrics, error) {
-	var total int64
-	result := s.db.Model(&types.User{}).Count(&total)
+	var countTotal int64
+	result := s.db.Model(&types.User{}).Count(&countTotal)
 	if result.Error != nil {
 		return nil, types.NewErrFromGorm(result.Error, "failed to count users")
 	}
 
 	var countValid int64
+	validCondition := fmt.Sprintf("user_training_records.completed_at > now() - interval '%d year'", config.TrainingValidityYears)
 	result = s.txUserJoinsAgreementsTraining().
-		Where("agreements.type = ? AND user_training_records.kind = ? AND user_training_records.completed_at > now() - interval '1 year'", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+		Where("agreements.type = ? AND user_training_records.kind = ? AND "+validCondition, agreements.ApprovedResearcherType, types.TrainingKindNHSD).
 		Count(&countValid)
 	if result.Error != nil {
 		return nil, types.NewErrFromGorm(result.Error, "failed to count valid AR users")
 	}
 
 	var countInValid int64
+	invalidCondition := fmt.Sprintf("user_training_records.completed_at < now() - interval '%d year'", config.TrainingValidityYears)
 	result = s.txUserJoinsAgreementsTraining().
-		Where("agreements.type = ? AND user_training_records.kind = ? AND user_training_records.completed_at < now() - interval '1 year'", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+		Where("agreements.type = ? AND user_training_records.kind = ? AND "+invalidCondition, agreements.ApprovedResearcherType, types.TrainingKindNHSD).
 		Count(&countInValid)
 	if result.Error != nil {
 		return nil, types.NewErrFromGorm(result.Error, "failed to count invalid AR users")
 	}
 
 	metrics := openapi.UserMetrics{
-		Total:                                int(total),
+		Total:                                int(countTotal),
 		NumApprovedResearchersValidTraining:  int(countValid),
 		NumApprovedResearcherExpiredTraining: int(countInValid),
 	}
