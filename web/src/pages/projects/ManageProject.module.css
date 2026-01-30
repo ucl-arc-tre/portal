@@ -202,6 +202,54 @@
   gap: 1rem;
 }
 
+.archive-dialog {
+  padding: 1rem 0.5rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.archive-dialog h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.archive-dialog p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+}
+
+.archive-dialog ul {
+  margin: 1rem 0 1.5rem 1.5rem;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.archive-dialog li {
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.archive-dialog strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.archive-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e1e5e9;
+}
+
 @media (max-width: 768px) {
   .field {
     grid-template-columns: 1fr;
@@ -210,5 +258,25 @@
 
   .section {
     padding: 1.5rem;
+  }
+
+  .archive-dialog {
+    max-width: 100%;
+  }
+
+  .archive-actions {
+    flex-direction: column-reverse;
+  }
+
+  .archive-actions button {
+    width: 100%;
+  }
+
+  .approval-actions {
+    flex-direction: column;
+  }
+
+  .approval-actions button {
+    width: 100%;
   }
 }

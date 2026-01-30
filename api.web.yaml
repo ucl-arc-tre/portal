@@ -634,6 +634,29 @@ paths:
         default:
           description: Unexpected error
 
+  # Project Management - DSH Environment
+  /projects/dsh/{projectId}/archive:
+    patch:
+      description: Archive a DSH project (changes status to Archived, makes project read-only)
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          description: ID of the DSH project
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project archived successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -1407,6 +1430,13 @@ components:
         - Approved
         - Rejected
       description: Current approval status (used for studies, projects, etc.)
+
+    ProjectStatus:
+      type: string
+      enum:
+        - Active
+        - Archived
+      description: Environment-specific project lifecycle status (currently only used for DSH projects)
 
     StudyReview:
       type: object

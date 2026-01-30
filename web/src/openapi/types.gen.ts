@@ -345,6 +345,11 @@ export type Study = StudyBase & {
  */
 export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
+/**
+ * Environment-specific project lifecycle status (currently only used for DSH projects)
+ */
+export type ProjectStatus = 'Active' | 'Archived';
+
 export type StudyReview = {
     status: ApprovalStatus;
     /**
@@ -1483,6 +1488,44 @@ export type PostProjectsTreAdminByProjectIdApproveErrors = {
 export type PostProjectsTreAdminByProjectIdApproveResponses = {
     /**
      * Project approved successfully
+     */
+    200: unknown;
+};
+
+export type PatchProjectsDshByProjectIdArchiveData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the DSH project
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/dsh/{projectId}/archive';
+};
+
+export type PatchProjectsDshByProjectIdArchiveErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PatchProjectsDshByProjectIdArchiveResponses = {
+    /**
+     * Project archived successfully
      */
     200: unknown;
 };
