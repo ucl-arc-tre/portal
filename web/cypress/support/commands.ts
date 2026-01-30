@@ -8,10 +8,10 @@ export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
 const botStaffUsername = Cypress.env("botStaffUsername") as string;
 const botStaffPassword = Cypress.env("botStaffPassword") as string;
-const botIGOpsUsername = Cypress.env("botIGUsername") as string;
-const botIGOpsPassword = Cypress.env("botIGPassword") as string;
-const botTREOpsUsername = Cypress.env("botTREUsername") as string;
-const botTREOpsPassword = Cypress.env("botTREPassword") as string;
+const botIGUsername = Cypress.env("botIGUsername") as string;
+const botIGPassword = Cypress.env("botIGPassword") as string;
+const botTREUsername = Cypress.env("botTREUsername") as string;
+const botTREPassword = Cypress.env("botTREPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -389,7 +389,7 @@ Cypress.Commands.add("loginAsIGOps", () => {
     });
 
     log.snapshot("before");
-    login(botIGOpsUsername, botIGOpsPassword);
+    login(botIGUsername, botIGPassword);
     log.snapshot("after");
     log.end();
   });
@@ -404,7 +404,7 @@ Cypress.Commands.add("loginAsTREOps", () => {
     });
 
     log.snapshot("before");
-    login(botTREOpsUsername, botTREOpsPassword);
+    login(botTREUsername, botTREPassword);
     log.snapshot("after");
     log.end();
   });
