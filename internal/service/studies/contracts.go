@@ -189,9 +189,37 @@ func (s *Service) UpdateContract(
 	if len(contractMetadata.Assets) > 0 {
 		contract := types.Contract{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: contractID}}, StudyID: contractMetadata.StudyID}
 
+		currentAssets := []types.Asset{}
 		assoc := tx.Model(&contract).Association("Assets")
-		err := assoc.Append(contractMetadata.Assets)
-		if err != nil {
+		if err := assoc.Find(&currentAssets); err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to get current contract assets")
+		}
+		existingAssets := []types.Asset{}
+		for _, asset := range currentAssets {
+			exists, err := s.assetExists(studyID, asset.ID)
+			if err != nil {
+				tx.Rollback()
+				return types.NewErrFromGorm(err, "failed to check if asset exists")
+			}
+
+			if exists {
+				existingAssets = append(existingAssets, asset)
+			}
+		}
+		combinedAssets := append(existingAssets, contractMetadata.Assets...)
+
+		// not entirely sure if this is necessary
+		assetMap := make(map[uuid.UUID]bool)
+		uniqueAssets := []types.Asset{}
+
+		for _, asset := range combinedAssets {
+			if !assetMap[asset.ID] {
+				uniqueAssets = append(uniqueAssets, asset)
+				assetMap[asset.ID] = true
+			}
+		}
+		if err := assoc.Replace(uniqueAssets); err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to update contract assets")
 		}
@@ -213,10 +241,19 @@ func (s *Service) contractExists(studyID uuid.UUID, contractID uuid.UUID) (bool,
 	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
 }
 
+func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Model(&types.Asset{}).
+		Select("count(*) > 0").
+		Where("study_id = ? AND id = ?", studyID, assetID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
+}
+
 // retrieves all contracts within a study
 func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
 	contracts := []types.Contract{}
-	err := s.db.Preload("Assets").Where("study_id = ?", studyID).
+	err := s.db.Preload("Assets").Where("contracts.study_id = ?", studyID).
 		Order("created_at DESC").
 		Find(&contracts).Error
 	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
