@@ -4,6 +4,7 @@ import StudyForm from "./StudyForm";
 import StudyCardsList from "./StudyCardsList";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 import styles from "./Studies.module.css";
 import Loading from "../ui/Loading";
@@ -31,9 +32,16 @@ export default function Studies(props: Props) {
   useEffect(() => {
     const fetchPendingStudies = async () => {
       setStudiesLoading(true);
+      setErrorMessage(null);
       try {
         const response = await getStudies({ query: { status: "Pending" } });
-        if (response.response.ok && response.data) {
+        if (!response.response.ok) {
+          const errorMsg = extractErrorMessage(response);
+          setErrorMessage(`Failed to fetch pending studies: ${errorMsg}`);
+          setPendingStudies([]);
+          return;
+        }
+        if (response.data) {
           setPendingStudies(response.data);
         }
       } catch (error) {
@@ -62,8 +70,15 @@ export default function Studies(props: Props) {
 
   const fetchAllStudies = async () => {
     setStudiesLoading(true);
+    setErrorMessage(null);
     try {
       const response = await getStudies();
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setErrorMessage(`Failed to fetch studies: ${errorMsg}`);
+        setStudies([]);
+        return;
+      }
       setStudies(response.data || []);
     } catch (error) {
       console.error("Failed to fetch studies:", error);
