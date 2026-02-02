@@ -44,7 +44,7 @@ export default function Metrics() {
         chartType="PieChart"
         data={data}
         options={{
-          title: "Number of users approved researchers with valid and invalid training",
+          title: "Number of approved researchers with valid and invalid training",
         }}
         width={"100%"}
         height={"400px"}
