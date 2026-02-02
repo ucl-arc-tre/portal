@@ -31,6 +31,24 @@ type ProjectTRE struct {
 	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
 }
 
+// TODO: Uncomment when DSH projects are implemented
+// ProjectStatus represents the lifecycle status of a DSH project
+// type ProjectStatus string
+//
+// const (
+// 	ProjectStatusActive   ProjectStatus = "Active"
+// 	ProjectStatusArchived ProjectStatus = "Archived"
+// )
+//
+// type ProjectDSH struct {
+// 	ModelAuditable
+// 	ProjectID uuid.UUID     `gorm:"not null;index;uniqueIndex"`
+// 	Status    ProjectStatus `gorm:"type:text;not null;default:'Active'"`
+//
+// 	// Relationships
+// 	Project Project `gorm:"foreignKey:ProjectID"`
+// }
+
 type ProjectTRERoleName string
 
 const (

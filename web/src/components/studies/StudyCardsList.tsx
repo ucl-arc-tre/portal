@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { Study } from "@/openapi";
+import { Study, ApprovalStatus } from "@/openapi";
 import StudyStatusBadge from "../ui/StatusBadge";
 import Button from "@/components/ui/Button";
 
@@ -11,7 +11,7 @@ type Props = {
   canSeeAll: boolean;
 };
 
-const studySortOrder = {
+const studySortOrder: Record<ApprovalStatus, number> = {
   Pending: 1,
   Incomplete: 2,
   Rejected: 3,

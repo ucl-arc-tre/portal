@@ -910,6 +910,9 @@ type ServerInterface interface {
 	// (GET /projects)
 	GetProjects(c *gin.Context)
 
+	// (PATCH /projects/dsh/{projectId}/archive)
+	PatchProjectsDshProjectIdArchive(c *gin.Context, projectId string)
+
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
 
@@ -1153,6 +1156,30 @@ func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
 	}
 
 	siw.Handler.GetProjects(c)
+}
+
+// PatchProjectsDshProjectIdArchive operation middleware
+func (siw *ServerInterfaceWrapper) PatchProjectsDshProjectIdArchive(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PatchProjectsDshProjectIdArchive(c, projectId)
 }
 
 // GetProjectsTre operation middleware
@@ -1860,6 +1887,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)
+	router.PATCH(options.BaseURL+"/projects/dsh/:projectId/archive", wrapper.PatchProjectsDshProjectIdArchive)
 	router.GET(options.BaseURL+"/projects/tre", wrapper.GetProjectsTre)
 	router.POST(options.BaseURL+"/projects/tre", wrapper.PostProjectsTre)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
