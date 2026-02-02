@@ -795,9 +795,9 @@ type UserData struct {
 
 // UserMetrics defines model for UserMetrics.
 type UserMetrics struct {
-	NumApprovedResearcherExpiredTraining int `json:"num_approved_researcher_expired_training"`
-	NumApprovedResearchersValidTraining  int `json:"num_approved_researchers_valid_training"`
-	Total                                int `json:"total"`
+	NumApprovedResearchersExpiredTraining int `json:"num_approved_researchers_expired_training"`
+	NumApprovedResearchersValidTraining   int `json:"num_approved_researchers_valid_training"`
+	Total                                 int `json:"total"`
 }
 
 // UserTrainingUpdate defines model for UserTrainingUpdate.

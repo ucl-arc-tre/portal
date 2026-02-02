@@ -26,7 +26,7 @@ export default function Metrics() {
   }, [setMetrics]);
 
   const num_valid_training = metrics?.num_approved_researchers_valid_training || 0;
-  const num_expired_training = metrics?.num_approved_researcher_expired_training || 0;
+  const num_expired_training = metrics?.num_approved_researchers_expired_training || 0;
   const num_other = (metrics?.total || 0) - num_valid_training - num_expired_training;
 
   const data = [

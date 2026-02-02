@@ -128,7 +128,7 @@ export type UserTrainingUpdate = {
 export type UserMetrics = {
     total: number;
     num_approved_researchers_valid_training: number;
-    num_approved_researcher_expired_training: number;
+    num_approved_researchers_expired_training: number;
 };
 
 /**

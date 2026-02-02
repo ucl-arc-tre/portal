@@ -1163,13 +1163,13 @@ components:
       required:
         - total
         - num_approved_researchers_valid_training
-        - num_approved_researcher_expired_training
+        - num_approved_researchers_expired_training
       properties:
         total:
           type: integer
         num_approved_researchers_valid_training:
           type: integer
-        num_approved_researcher_expired_training:
+        num_approved_researchers_expired_training:
           type: integer
 
     AssetBase:
