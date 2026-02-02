@@ -808,6 +808,13 @@ type UserData struct {
 	User           User            `json:"user"`
 }
 
+// UserMetrics defines model for UserMetrics.
+type UserMetrics struct {
+	NumApprovedResearchersExpiredTraining int `json:"num_approved_researchers_expired_training"`
+	NumApprovedResearchersValidTraining   int `json:"num_approved_researchers_valid_training"`
+	Total                                 int `json:"total"`
+}
+
 // UserTrainingUpdate defines model for UserTrainingUpdate.
 type UserTrainingUpdate struct {
 	// TrainingDate Time in RFC3339 format at which the the certificate was issued
@@ -1002,6 +1009,9 @@ type ServerInterface interface {
 
 	// (POST /users/invite)
 	PostUsersInvite(c *gin.Context)
+
+	// (GET /users/metrics)
+	GetUsersMetrics(c *gin.Context)
 
 	// (PUT /users/{userId}/attributes)
 	PutUsersUserIdAttributes(c *gin.Context, userId string)
@@ -1789,6 +1799,19 @@ func (siw *ServerInterfaceWrapper) PostUsersInvite(c *gin.Context) {
 	siw.Handler.PostUsersInvite(c)
 }
 
+// GetUsersMetrics operation middleware
+func (siw *ServerInterfaceWrapper) GetUsersMetrics(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUsersMetrics(c)
+}
+
 // PutUsersUserIdAttributes operation middleware
 func (siw *ServerInterfaceWrapper) PutUsersUserIdAttributes(c *gin.Context) {
 
@@ -1901,6 +1924,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
+	router.GET(options.BaseURL+"/users/metrics", wrapper.GetUsersMetrics)
 	router.PUT(options.BaseURL+"/users/:userId/attributes", wrapper.PutUsersUserIdAttributes)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
 }

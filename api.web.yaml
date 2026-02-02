@@ -277,6 +277,16 @@ paths:
         default:
           description: Unexpected error
 
+  /users/metrics:
+    get:
+      description: Get summary metrics about all users
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserMetrics"
+
   # Study Management
   /studies:
     get:
@@ -1160,6 +1170,20 @@ components:
         training_date:
           type: string
           description: Time in RFC3339 format at which the the certificate was issued
+
+    UserMetrics:
+      type: object
+      required:
+        - total
+        - num_approved_researchers_valid_training
+        - num_approved_researchers_expired_training
+      properties:
+        total:
+          type: integer
+        num_approved_researchers_valid_training:
+          type: integer
+        num_approved_researchers_expired_training:
+          type: integer
 
     AssetBase:
       type: object

@@ -14,7 +14,10 @@ type TrainingKind string
 
 type UserTrainingRecord struct {
 	Model
-	UserID      uuid.UUID
+	UserID      uuid.UUID    `gorm:"not null;index"`
 	Kind        TrainingKind `gorm:"index"`
 	CompletedAt time.Time
+
+	// Relationships
+	User User `gorm:"foreignKey:UserID"`
 }

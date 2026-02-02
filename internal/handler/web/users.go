@@ -170,3 +170,12 @@ func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) GetUsersMetrics(ctx *gin.Context) {
+	metrics, err := h.users.Metrics()
+	if err != nil {
+		setError(ctx, err, "Failed to get user metrics")
+		return
+	}
+	ctx.JSON(http.StatusOK, metrics)
+}
