@@ -59,6 +59,19 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 // Handler methods
 
+func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) []types.Asset {
+	assets := []types.Asset{}
+	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
+	if err != nil {
+		return nil
+	}
+	for _, assetUuid := range assetUuids {
+		assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
+	}
+
+	return assets
+}
+
 func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
 	uuids, err := parseUUIDsOrSetError(ctx, studyId)
 	if err != nil {
@@ -102,16 +115,7 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 		return
 	}
 
-	assets := []types.Asset{}
-	if contractMetadata.AssetIds != nil {
-		assetUuids, err := parseUUIDsOrSetError(ctx, contractMetadata.AssetIds...)
-		if err != nil {
-			return
-		}
-		for _, assetUuid := range assetUuids {
-			assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
-		}
-	}
+	assets := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
 	// Create the final contract record for storage
 	contractData := types.Contract{
 		StudyID:               uuids[0],
@@ -186,19 +190,7 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		}
 	}
 
-	assets := []types.Asset{}
-
-	if contractMetadata.AssetIds != nil {
-		assetUuids, err := parseUUIDsOrSetError(ctx, contractMetadata.AssetIds...)
-
-		if err != nil {
-			return
-		}
-		for _, assetUuid := range assetUuids {
-			assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
-		}
-
-	}
+	assets := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
 	contractUpdateData := types.Contract{
 		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[1]}},
 		StudyID:               uuids[0],
