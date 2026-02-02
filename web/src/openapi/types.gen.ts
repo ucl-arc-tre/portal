@@ -125,6 +125,12 @@ export type UserTrainingUpdate = {
     training_date: string;
 };
 
+export type UserMetrics = {
+    total: number;
+    num_approved_researchers_valid_training: number;
+    num_approved_researchers_expired_training: number;
+};
+
 /**
  * A data asset representing a set of related data entities
  */
@@ -951,6 +957,19 @@ export type PostUsersInviteResponses = {
      */
     200: unknown;
 };
+
+export type GetUsersMetricsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/metrics';
+};
+
+export type GetUsersMetricsResponses = {
+    200: UserMetrics;
+};
+
+export type GetUsersMetricsResponse = GetUsersMetricsResponses[keyof GetUsersMetricsResponses];
 
 export type GetStudiesData = {
     body?: never;

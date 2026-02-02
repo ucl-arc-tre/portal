@@ -74,6 +74,7 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 
 func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
+		Policy{RoleName: IGOpsStaff, Resource: "/users/metrics", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},

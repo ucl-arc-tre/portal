@@ -32,9 +32,10 @@ export default function PeoplePage() {
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
+  const isIGOps = userData?.roles.includes("ig-ops-staff");
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
-  const canSearch = isTreOpsStaff || isAdmin;
+  const canSearch = isTreOpsStaff || isAdmin || isIGOps;
 
   const handleUserSearch = async (query: string) => {
     setIsLoading(true);
