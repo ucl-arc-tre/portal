@@ -186,39 +186,8 @@ func (s *Service) UpdateContract(
 		return types.NewErrFromGorm(result.Error, "failed to update contract")
 	}
 
-	contract := types.Contract{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: contractID}}, StudyID: contractMetadata.StudyID}
-
-	currentAssets := []types.Asset{}
-	assoc := tx.Model(&contract).Association("Assets")
-	if err := assoc.Find(&currentAssets); err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to get current contract assets")
-	}
-	existingAssets := []types.Asset{}
-	for _, asset := range currentAssets {
-		exists, err := s.assetExists(studyID, asset.ID)
-		if err != nil {
-			tx.Rollback()
-			return types.NewErrFromGorm(err, "failed to check if asset exists")
-		}
-
-		if exists {
-			existingAssets = append(existingAssets, asset)
-		}
-	}
-	combinedAssets := append(existingAssets, contractMetadata.Assets...)
-
-	// not entirely sure if this is necessary
-	assetMap := make(map[uuid.UUID]bool)
-	uniqueAssets := []types.Asset{}
-
-	for _, asset := range combinedAssets {
-		if !assetMap[asset.ID] {
-			uniqueAssets = append(uniqueAssets, asset)
-			assetMap[asset.ID] = true
-		}
-	}
-	if err := assoc.Replace(uniqueAssets); err != nil {
+	assoc := tx.Model(&contractMetadata).Association("Assets")
+	if err := assoc.Replace(contractMetadata.Assets); err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update contract assets")
 	}
