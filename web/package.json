@@ -18,8 +18,9 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.1",
-    "react-google-charts": "^5.2.1",
+    "react-is": "^19.2.4",
     "react-markdown": "^10.1.0",
+    "recharts": "^3.7.0",
     "uikit-react-public": "^0.14.21"
   },
   "devDependencies": {
