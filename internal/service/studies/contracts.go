@@ -15,7 +15,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
+func (s *Service) ValidateContractMetadata(studyId uuid.UUID, contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
 	// Only validate file extension if a filename is provided (for an updated contract, file is optional)
 	if filename != "" && !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
 		return &openapi.ValidationError{
@@ -77,7 +77,18 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
-	// TODO: do we want some sort of validation for the assets?
+	var numExistingAssets int64
+	err = s.db.Model(types.Asset{}).Where("study_id = ? AND id in ?", studyId, contractData.AssetIds).Count(&numExistingAssets).Error
+	if err != nil {
+		log.Err(err).Msg("Failed to find matching assets")
+		return &openapi.ValidationError{
+			ErrorMessage: "Failed to find matching assets",
+		}
+	} else if numExistingAssets != int64(len(contractData.AssetIds)) {
+		return &openapi.ValidationError{
+			ErrorMessage: "Did not find existing study assets",
+		}
+	}
 
 	return nil
 }

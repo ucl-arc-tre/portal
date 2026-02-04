@@ -87,7 +87,7 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 
 	contractMetadata := extractContractFormData(ctx)
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
+	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
@@ -157,7 +157,7 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 
 	contractMetadata := extractContractFormData(ctx)
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
+	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
