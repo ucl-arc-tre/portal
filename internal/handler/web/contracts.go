@@ -59,11 +59,11 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 // Handler methods
 
-func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) []types.Asset {
+func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]types.Asset, error) {
 	assets := []types.Asset{}
 	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
 	if err != nil {
-		return nil
+		return err
 	}
 	for _, assetUuid := range assetUuids {
 		assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
