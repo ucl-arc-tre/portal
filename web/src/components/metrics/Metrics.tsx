@@ -1,7 +1,7 @@
 import { getUsersMetrics, UserMetrics } from "@/openapi";
 import { useEffect, useState } from "react";
-import { Chart } from "react-google-charts";
-import Box from "../ui/Box";
+import { Label, Pie, PieChart, Tooltip } from "recharts";
+import styles from "./Metrics.module.css";
 
 export default function Metrics() {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,30 +25,37 @@ export default function Metrics() {
     fetchUserMetrics();
   }, [setMetrics]);
 
+  const num_total = metrics?.total || 0;
   const num_valid_training = metrics?.num_approved_researchers_valid_training || 0;
   const num_expired_training = metrics?.num_approved_researchers_expired_training || 0;
-  const num_other = (metrics?.total || 0) - num_valid_training - num_expired_training;
+  const num_other = num_total - num_valid_training - num_expired_training;
 
   const data = [
-    ["Type", "Number"],
-    ["Has valid training", num_valid_training],
-    ["Does not have valid training", num_expired_training],
-    ["Not approved", num_other],
+    { name: "Has valid training", value: num_valid_training, fill: "#0088FE" },
+    { name: "Does not have valid training", value: num_expired_training, fill: "#00C49F" },
+    { name: "Not completed agreement and/or training", value: num_other, fill: "#FFBB28" },
   ];
 
   if (isLoading) return null;
 
   return (
-    <Box>
-      <Chart
-        chartType="PieChart"
-        data={data}
-        options={{
-          title: "Number of approved researchers with valid and invalid training",
-        }}
-        width={"100%"}
-        height={"400px"}
-      />
-    </Box>
+    <div className={styles.container}>
+      <PieChart className={styles.chart} responsive>
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          innerRadius="50%"
+          outerRadius="80%"
+          label
+          isAnimationActive={true}
+        />
+        <Label position="center">{`Total: ${num_total} `}</Label>
+        <Tooltip />
+      </PieChart>
+      <p>Number of approved researchers with valid and invalid training</p>
+    </div>
   );
 }
