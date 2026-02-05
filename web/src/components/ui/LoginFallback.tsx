@@ -10,6 +10,7 @@ export default function LoginFallback({
   message?: string;
 }) {
   const router = useRouter();
+  console.log(router);
   return (
     <div className={styles.wrapper}>
       <h1>{title}</h1>
@@ -18,7 +19,7 @@ export default function LoginFallback({
       <Button
         className={styles.button}
         size="large"
-        href={`/oauth2/start?rd=${encodeURIComponent(router.route)}`}
+        href={`/oauth2/start?rd=${encodeURIComponent(router.asPath)}`}
         cy="login"
       >
         Login with UCL SSO
