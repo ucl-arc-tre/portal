@@ -31,10 +31,17 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
 		StartDate:             ctx.PostForm("start_date"),
 		ExpiryDate:            ctx.PostForm("expiry_date"),
+		AssetIds:              ctx.PostFormArray("asset_ids"),
 	}
 }
 
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
+
+	assetIds := []string{}
+	for _, asset := range contract.Assets {
+		assetIds = append(assetIds, asset.ID.String())
+	}
+
 	return openapi.Contract{
 		Id:                    contract.ID.String(),
 		Filename:              contract.Filename,
@@ -45,13 +52,28 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
 		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
+		AssetIds:              assetIds,
+		StudyId:               contract.StudyID.String(),
 	}
 }
 
 // Handler methods
 
-func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]types.Asset, error) {
+	assets := []types.Asset{}
+	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
+	if err != nil {
+		return nil, err
+	}
+	for _, assetUuid := range assetUuids {
+		assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
+	}
+
+	return assets, nil
+}
+
+func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
@@ -65,7 +87,7 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 
 	contractMetadata := extractContractFormData(ctx)
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata, fileHeader.Filename)
+	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, fileHeader.Filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
@@ -93,9 +115,14 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		return
 	}
 
+	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
+	if err != nil {
+		setError(ctx, err, "Failed to prepare assets for contract linkage")
+		return
+	}
 	// Create the final contract record for storage
 	contractData := types.Contract{
-		AssetID:               uuids[1],
+		StudyID:               uuids[0],
 		Filename:              fileHeader.Filename,
 		CreatorUserID:         user.ID,
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
@@ -103,6 +130,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 		Status:                string(contractMetadata.Status),
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
+
+		Assets: assets,
 	}
 
 	contractObj := types.S3Object{
@@ -117,8 +146,8 @@ func (h *Handler) PostStudiesStudyIdAssetsAssetIdContractsUpload(ctx *gin.Contex
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
 		return
 	}
@@ -132,7 +161,7 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 
 	contractMetadata := extractContractFormData(ctx)
 
-	validationError := h.studies.ValidateContractMetadata(contractMetadata, filename)
+	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, filename)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
@@ -165,24 +194,50 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetIdContractsContractId(ctx *gin.Con
 		}
 	}
 
+	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
+	if err != nil {
+		setError(ctx, err, "Failed to prepare assets for contract linkage")
+		return
+	}
 	contractUpdateData := types.Contract{
-		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[2]}},
-		AssetID:               uuids[1],
+		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[1]}},
+		StudyID:               uuids[0],
 		OrganisationSignatory: contractMetadata.OrganisationSignatory,
 		ThirdPartyName:        contractMetadata.ThirdPartyName,
 		Status:                string(contractMetadata.Status),
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 		Filename:              filename,
+
+		Assets: assets,
 	}
 
-	err = h.studies.UpdateContract(ctx, uuids[0], uuids[2], contractUpdateData, contractObj)
+	err = h.studies.UpdateContract(ctx, uuids[0], uuids[1], contractUpdateData, contractObj)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
 	}
 
 	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	contracts, err := h.studies.StudyContracts(uuids[0])
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve contracts")
+		return
+	}
+
+	apiContracts := []openapi.Contract{}
+	for _, contract := range contracts {
+		apiContracts = append(apiContracts, contractToOpenApiContract(contract))
+	}
+	ctx.JSON(http.StatusOK, apiContracts)
 }
 
 func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
@@ -204,12 +259,12 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 	ctx.JSON(http.StatusOK, apiContracts)
 }
 
-func (h *Handler) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(ctx *gin.Context, studyId string, assetId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId, contractId)
+func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
 		return
 	}
-	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1], uuids[2])
+	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed get contract")
 		return

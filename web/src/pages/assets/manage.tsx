@@ -8,7 +8,6 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
-import ContractManagement from "@/components/assets/ContractManagement";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -23,9 +22,9 @@ export default function ManageAssetPage() {
   const [error, setError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
-  const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
+  // const isStudyOwner =
+  //   (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
+  // const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
 
   const fetchData = async (studyIdParam: string, assetIdParam: string) => {
     setLoading(true);
@@ -186,8 +185,6 @@ export default function ManageAssetPage() {
               </div>
             )}
           </div>
-
-          <ContractManagement study={study} asset={asset} canModify={isStudyOwner || isStudyAdmin} />
         </div>
       </div>
     </>

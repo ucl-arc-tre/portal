@@ -737,6 +737,39 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/{studyId}/assets/{assetId}/contracts:
+    get:
+      description: Get contracts associated with a specific asset within a study
+      parameters:
+        - in: path
+          name: studyId
+          required: true
+          description: ID of the study
+          schema:
+            type: string
+        - in: path
+          name: assetId
+          required: true
+          description: ID of the asset
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contract"
+        "403":
+          description: Forbidden - no access to study or asset
+        "404":
+          description: Study or asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /logout:
     get:
       description: Log the user out
@@ -800,23 +833,18 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/assets/{assetId}/contracts:
+  /studies/{studyId}/contracts:
     get:
-      description: Get all contracts for a specific asset
+      description: Get all contracts for a specific study
       parameters:
         - in: path
           name: studyId
           required: true
           schema:
             type: string
-        - in: path
-          name: assetId
-          required: true
-          schema:
-            type: string
       responses:
         "200":
-          description: List of contracts for the asset
+          description: List of contracts for the study
           content:
             application/json:
               schema:
@@ -832,17 +860,12 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/assets/{assetId}/contracts/upload:
+  /studies/{studyId}/contracts/upload:
     post:
       description: Upload a contract object e.g. PDF
       parameters:
         - in: path
           name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: assetId
           required: true
           schema:
             type: string
@@ -868,17 +891,12 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/assets/{assetId}/contracts/{contractId}:
+  /studies/{studyId}/contracts/{contractId}:
     put:
       description: Update contract metadata and optionally replace file
       parameters:
         - in: path
           name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: assetId
           required: true
           schema:
             type: string
@@ -915,17 +933,12 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download:
+  /studies/{studyId}/contracts/{contractId}/download:
     get:
       description: Get a contract object e.g. PDF
       parameters:
         - in: path
           name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: assetId
           required: true
           schema:
             type: string
@@ -1638,6 +1651,7 @@ components:
         - status
         - start_date
         - expiry_date
+        - asset_ids
       properties:
         organisation_signatory:
           type: string
@@ -1657,6 +1671,11 @@ components:
           type: string
           description: Contract expiry date in YYYY-MM-DD format
           example: "2025-12-31"
+        asset_ids:
+          type: array
+          description: List of assets associated with this contract
+          items:
+            type: string
 
     ContractUploadObject:
       allOf:
@@ -1689,6 +1708,7 @@ components:
             - filename
             - created_at
             - updated_at
+            - study_id
           properties:
             id:
               type: string
@@ -1702,5 +1722,8 @@ components:
             updated_at:
               type: string
               description: Time in RFC3339 format when the contract was last updated
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the contract belongs
 
-      description: A contract associated with a study asset
+      description: A contract associated with a study

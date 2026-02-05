@@ -173,7 +173,7 @@ func (s *Service) createInformationAsset(user types.User, assetData openapi.Asse
 // retrieves all assets for a study
 func (s *Service) InformationAssets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
-	err := s.db.Preload("Locations").Where("study_id = ?", studyID).Find(&assets).Error
+	err := s.db.Preload("Locations").Preload("Contracts").Where("study_id = ?", studyID).Find(&assets).Error
 	return assets, types.NewErrFromGorm(err, "failed to get Information Assets")
 }
 
@@ -186,29 +186,10 @@ func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (ty
 
 // retrieves all contracts for a specific asset within a study
 func (s *Service) AssetContracts(studyID uuid.UUID, assetID uuid.UUID) ([]types.Contract, error) {
-	contracts := []types.Contract{}
-	err := s.db.Joins("left join assets on contracts.asset_id = assets.id").
-		Where("assets.study_id = ? AND contracts.asset_id = ?", studyID, assetID).
+	asset := types.Asset{}
+	err := s.db.Preload("Contracts").
+		Where("id = ? AND study_id = ?", assetID, studyID).
 		Order("created_at DESC").
-		Find(&contracts).Error
-	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
-}
-
-func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error) {
-	exists := false
-	err := s.db.Model(&types.Asset{}).
-		Select("count(*) > 0").
-		Where("study_id = ? AND id = ?", studyID, assetID).
-		Find(&exists).Error
-	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
-}
-
-func (s *Service) contractExists(studyID uuid.UUID, assetID uuid.UUID, contractID uuid.UUID) (bool, error) {
-	exists := false
-	err := s.db.Joins("left join assets on contracts.asset_id = assets.id").
-		Model(&types.Contract{}).
-		Select("count(*) > 0").
-		Where("assets.study_id = ? AND contracts.asset_id = ? AND contracts.id = ?", studyID, assetID, contractID).
-		Find(&exists).Error
-	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
+		Find(&asset).Error
+	return asset.Contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
 }
