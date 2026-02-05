@@ -8,7 +8,6 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
-import ContractManagement from "@/components/assets/ContractManagement";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -186,8 +185,6 @@ export default function ManageAssetPage() {
               </div>
             )}
           </div>
-
-          <ContractManagement study={study} asset={asset} canModify={isStudyOwner || isStudyAdmin} />
         </div>
       </div>
     </>

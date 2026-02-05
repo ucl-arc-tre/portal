@@ -10,6 +10,7 @@ import StudyDetails from "./StudyDetails";
 import { useAuth } from "@/hooks/useAuth";
 import StudyForm from "./StudyForm";
 import StudyAdminsAgreements from "./StudyAdminsAgreements";
+import ContractManagement from "../assets/ContractManagement";
 
 type ManageStudyProps = {
   study: Study;
@@ -130,6 +131,9 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <>
           <div className={styles["completed-section"]}>
             <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
+          </div>
+          <div className={styles["completed-section"]}>
+            <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} />
           </div>
         </>
       )}
