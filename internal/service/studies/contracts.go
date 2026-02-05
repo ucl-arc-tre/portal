@@ -231,7 +231,7 @@ func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error
 // retrieves all contracts within a study
 func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
 	contracts := []types.Contract{}
-	err := s.db.Preload("Assets").Where("contracts.study_id = ?", studyID).
+	err := s.db.Preload("Assets").Where("study_id = ?", studyID).
 		Order("created_at DESC").
 		Find(&contracts).Error
 	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
