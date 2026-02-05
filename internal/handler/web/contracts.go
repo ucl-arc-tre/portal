@@ -63,13 +63,13 @@ func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]typ
 	assets := []types.Asset{}
 	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, assetUuid := range assetUuids {
 		assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
 	}
 
-	return assets
+	return assets, nil
 }
 
 func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
@@ -115,7 +115,11 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 		return
 	}
 
-	assets := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
+	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
+	if err != nil {
+		setError(ctx, err, "Failed to prepare assets for contract linkage")
+		return
+	}
 	// Create the final contract record for storage
 	contractData := types.Contract{
 		StudyID:               uuids[0],
@@ -190,7 +194,11 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		}
 	}
 
-	assets := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
+	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
+	if err != nil {
+		setError(ctx, err, "Failed to prepare assets for contract linkage")
+		return
+	}
 	contractUpdateData := types.Contract{
 		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[1]}},
 		StudyID:               uuids[0],
