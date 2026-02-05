@@ -10,7 +10,6 @@ export default function LoginFallback({
   message?: string;
 }) {
   const router = useRouter();
-  console.log(router);
   return (
     <div className={styles.wrapper}>
       <h1>{title}</h1>
