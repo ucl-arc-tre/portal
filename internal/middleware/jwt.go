@@ -7,11 +7,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/service/tokens"
+	"github.com/ucl-arc-tre/portal/internal/service/tokens/verify"
 )
 
 func NewJWT() func(*gin.Context) {
-	tokens := tokens.New()
+	verify := verify.New()
 	return func(ctx *gin.Context) {
 		rawToken, err := extractTokenFromHeader(ctx.GetHeader("Authorization"))
 		if err != nil {
@@ -19,7 +19,8 @@ func NewJWT() func(*gin.Context) {
 			ctx.AbortWithStatus(http.StatusNotAcceptable)
 			return
 		}
-		claims, err := tokens.ParseClaims(rawToken)
+
+		claims, err := verify.ParseClaims(rawToken)
 		if err != nil {
 			log.Warn().Err(err).Msg("Failed to validate token")
 			ctx.AbortWithStatus(http.StatusUnauthorized)

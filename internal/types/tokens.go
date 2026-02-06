@@ -1,23 +1,34 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"time"
 
-const (
-	VerificationKeyKindEd25519 = "ed25519"
+	"github.com/google/uuid"
 )
 
-type VerificationKeyKind = string
+const (
+	VerificationKeyKindEd25519 = VerificationKeyKind("ed25519")
+)
+
+type VerificationKeyKind string
 
 type Token struct {
 	ModelAuditable
+	Name      string    `gorm:"not null"`
+	ExpiresAt time.Time `gorm:"not null"`
+
+	EnvironmentID     uuid.UUID
 	VerificationKeyID uuid.UUID `gorm:"not null;index"`
+	CreatorUserID     uuid.UUID `gorm:"not null;index"`
 
 	// Relationships
-	VerificationKey VerificationKey `gorm:"foreignKey:VerificationKeyID"`
+	CreatorUser     User                 `gorm:"foreignKey:CreatorUserID"`
+	VerificationKey TokenVerificationKey `gorm:"foreignKey:VerificationKeyID"`
+	Environment     Environment          `gorm:"foreignKey:EnvironmentID"`
 }
 
-type VerificationKey struct {
+type TokenVerificationKey struct {
 	ModelAuditable
-	Kind  VerificationKeyKind `gorm:"not null;index"`
-	Value []byte              `gorm:"not null"`
+	Kind        VerificationKeyKind `gorm:"not null;index"`
+	ValueBase64 string              `gorm:"not null"`
 }

@@ -38,14 +38,14 @@ func (h *Handler) GetApprovedResearchers(ctx *gin.Context) {
 		trainingExpires := r.NHSDTrainingCompletedAt.Add(config.TrainingValidity)
 		fmt.Fprintf(&b, "%v,%v,%v\n",
 			r.Username,
-			mashalTime(r.AgreedToAgreementAt),
-			mashalTime(trainingExpires),
+			marshalTime(r.AgreedToAgreementAt),
+			marshalTime(trainingExpires),
 		)
 	}
 
 	ctx.Data(http.StatusOK, "text/csv", b.Bytes())
 }
 
-func mashalTime(t time.Time) string {
+func marshalTime(t time.Time) string {
 	return t.Format(time.DateOnly) // e.g. "2006-01-02"
 }

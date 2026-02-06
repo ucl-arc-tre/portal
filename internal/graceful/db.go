@@ -36,7 +36,7 @@ func InitDB() {
 		&types.ProjectTRERoleBinding{},
 		&types.ProjectAsset{},
 		&types.Token{},
-		&types.VerificationKey{},
+		&types.TokenVerificationKey{},
 	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)

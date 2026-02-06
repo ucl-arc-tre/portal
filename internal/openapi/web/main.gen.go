@@ -108,6 +108,7 @@ const (
 	AuthRolesApprovedResearcher            AuthRoles = "approved-researcher"
 	AuthRolesApprovedStaffResearcher       AuthRoles = "approved-staff-researcher"
 	AuthRolesBase                          AuthRoles = "base"
+	AuthRolesDshOpsStaff                   AuthRoles = "dsh-ops-staff"
 	AuthRolesIgOpsStaff                    AuthRoles = "ig-ops-staff"
 	AuthRolesInformationAssetAdministrator AuthRoles = "information-asset-administrator"
 	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
@@ -775,6 +776,29 @@ type StudyReview struct {
 	Status ApprovalStatus `json:"status"`
 }
 
+// Token defines model for Token.
+type Token struct {
+	// ExpiresAt Time in RFC3339 at which the token expires
+	ExpiresAt string `json:"expires_at"`
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+}
+
+// TokenRequest defines model for TokenRequest.
+type TokenRequest struct {
+	Name         string `json:"name"`
+	ValidForDays int    `json:"valid_for_days"`
+}
+
+// TokenWithValue defines model for TokenWithValue.
+type TokenWithValue struct {
+	// ExpiresAt Time in RFC3339 at which the token expires
+	ExpiresAt string `json:"expires_at"`
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	Value     string `json:"value"`
+}
+
 // TrainingKind defines model for TrainingKind.
 type TrainingKind string
 
@@ -886,6 +910,9 @@ type PostStudiesStudyIdContractsUploadMultipartRequestBody = ContractUploadObjec
 
 // PutStudiesStudyIdContractsContractIdMultipartRequestBody defines body for PutStudiesStudyIdContractsContractId for multipart/form-data ContentType.
 type PutStudiesStudyIdContractsContractIdMultipartRequestBody = ContractUpdate
+
+// PostTokensDshJSONRequestBody defines body for PostTokensDsh for application/json ContentType.
+type PostTokensDshJSONRequestBody = TokenRequest
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -1000,6 +1027,15 @@ type ServerInterface interface {
 
 	// (PATCH /studies/{studyId}/pending)
 	PatchStudiesStudyIdPending(c *gin.Context, studyId string)
+
+	// (GET /tokens/dsh)
+	GetTokensDsh(c *gin.Context)
+
+	// (POST /tokens/dsh)
+	PostTokensDsh(c *gin.Context)
+
+	// (DELETE /tokens/dsh/{tokenId})
+	DeleteTokensDshTokenId(c *gin.Context, tokenId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -1740,6 +1776,56 @@ func (siw *ServerInterfaceWrapper) PatchStudiesStudyIdPending(c *gin.Context) {
 	siw.Handler.PatchStudiesStudyIdPending(c, studyId)
 }
 
+// GetTokensDsh operation middleware
+func (siw *ServerInterfaceWrapper) GetTokensDsh(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetTokensDsh(c)
+}
+
+// PostTokensDsh operation middleware
+func (siw *ServerInterfaceWrapper) PostTokensDsh(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostTokensDsh(c)
+}
+
+// DeleteTokensDshTokenId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTokensDshTokenId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "tokenId" -------------
+	var tokenId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tokenId", c.Param("tokenId"), &tokenId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tokenId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteTokensDshTokenId(c, tokenId)
+}
+
 // GetUsers operation middleware
 func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 
@@ -1921,6 +2007,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PUT(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.PutStudiesStudyIdContractsContractId)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/download", wrapper.GetStudiesStudyIdContractsContractIdDownload)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
+	router.GET(options.BaseURL+"/tokens/dsh", wrapper.GetTokensDsh)
+	router.POST(options.BaseURL+"/tokens/dsh", wrapper.PostTokensDsh)
+	router.DELETE(options.BaseURL+"/tokens/dsh/:tokenId", wrapper.DeleteTokensDshTokenId)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

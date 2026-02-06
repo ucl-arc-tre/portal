@@ -60,9 +60,12 @@ jobs:
           debug: true
           admin_usernames:
             - portal-e2e-admin@arctretest.onmicrosoft.com
-          tre_ops_staff_usernames: []
+          tre_ops_staff_usernames:
+            - portal-e2e-tre@arctretest.onmicrosoft.com
           ig_ops_staff_usernames:
             - portal-e2e-ig@arctretest.onmicrosoft.com
+          dsh_ops_staff_usernames:
+            - portal-e2e-dsh@arctretest.onmicrosoft.com
           db:
             dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC
           s3:
