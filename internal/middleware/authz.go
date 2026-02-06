@@ -16,7 +16,7 @@ type Authorizer struct {
 }
 
 // New authorization middleware. Assumes user has been set
-func NewAuthz() gin.HandlerFunc {
+func NewWebAuthz() gin.HandlerFunc {
 	authorizer := &Authorizer{rbac.NewEnforcer()}
 	return authorizer.eval
 }

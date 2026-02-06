@@ -38,8 +38,8 @@ func initialise() {
 func addWeb(router gin.IRouter) {
 	router.Use(
 		middleware.NewSecure(),
-		middleware.NewSetUser(),
-		middleware.NewAuthz(),
+		middleware.NewWebSetUser(),
+		middleware.NewWebAuthz(),
 		middleware.NewWebRateLimit(),
 	)
 	apiweb.RegisterHandlers(router, web.New())
@@ -53,6 +53,10 @@ func addTRE(router gin.IRouter) {
 
 // Add the DSH API defined by its OpenAPI spec with suitable middleware
 func addDSH(router gin.IRouter) {
-	router.Use()
-	apidsh.RegisterHandlers(router, dsh.New())
+	apidsh.RegisterHandlersWithOptions(router, dsh.New(), apidsh.GinServerOptions{
+		Middlewares: []apidsh.MiddlewareFunc{
+			middleware.LimitBodySize,
+			middleware.NewJWT(),
+		},
+	})
 }
