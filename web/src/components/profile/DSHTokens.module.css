@@ -1,0 +1,90 @@
+.error {
+  border-color: #dc3545 !important;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field label {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 1rem;
+  display: block;
+  line-height: 1.4;
+}
+
+.field input,
+.field textarea,
+.field select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--form-blue--light);
+  box-shadow: 0 0 0 2px var(--form-blue--shadow);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  margin-block: 1rem;
+  font-size: 110%;
+  border-collapse: collapse;
+
+  th {
+    padding-inline: 0.5rem;
+  }
+
+  .tbody {
+    border-top: 2px solid var(--foreground);
+  }
+
+  .row {
+    border-bottom: 1px solid var(--text--secondary);
+    margin-bottom: 0.8rem;
+
+    td {
+      padding-block: 0.6rem;
+      padding-inline: 0.5rem;
+    }
+  }
+}
+
+.add {
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  button {
+    align-self: end;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 24px !important;
+}

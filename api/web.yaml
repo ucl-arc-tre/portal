@@ -119,6 +119,56 @@ paths:
         default:
           description: Unexpected error
 
+  /tokens/dsh:
+    get:
+      description: List tokens for the DSH API
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Token"
+      "500":
+        description: Internal server error
+      default:
+        description: Unexpected error
+    post:
+      description: Create an token for the DSH API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenWithValue"
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /tokens/dsh/{tokenId}:
+    delete:
+      description: Revoke a tokens for the DSH API
+      parameters:
+        - in: path
+          name: tokenId
+          required: true
+          description: ID of the token to be updated
+          schema:
+            type: string
+      "204":
+        description: OK
+      "500":
+        description: Internal server error
+      default:
+        description: Unexpected error
+
   /agreements/{agreementType}:
     get:
       description: Get the latest approved researcher agreement
@@ -990,6 +1040,7 @@ components:
               - information-asset-administrator
               - tre-ops-staff
               - ig-ops-staff
+              - dsh-ops-staff
 
     Profile:
       type: object
@@ -1727,3 +1778,38 @@ components:
               description: Unique identifier of the study to which the contract belongs
 
       description: A contract associated with a study
+
+    TokenRequest:
+      type: object
+      required:
+        - name
+        - valid_for_days
+      properties:
+        name:
+          type: string
+        valid_for_days:
+          type: integer
+    Token:
+      type: object
+      required:
+        - id
+        - name
+        - expires_at
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        expires_at:
+          type: string
+          description: Time in RFC3339 at which the token expires
+
+    TokenWithValue:
+      allOf:
+        - $ref: "#/components/schemas/Token"
+        - type: object
+          required:
+            - value
+          properties:
+            value:
+              type: string

@@ -8,6 +8,7 @@ import Title from "@/components/ui/Title";
 import Loading from "@/components/ui/Loading";
 import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard";
 import styles from "./ProfilePage.module.css";
+import DSHTokens from "@/components/profile/DSHTokens";
 
 export default function ProfilePage() {
   const { authInProgress, isAuthed, userData, refreshAuth } = useAuth();
@@ -16,6 +17,7 @@ export default function ProfilePage() {
   const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(false);
   const [expiryUrgency, setExpiryUrgency] = useState<ExpiryUrgency | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const canSeeDSHTokens = userData?.roles.includes("dsh-ops-staff") || userData?.roles.includes("admin");
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -113,6 +115,8 @@ export default function ProfilePage() {
             refreshAuth={refreshAuth}
           />
         </div>
+
+        {canSeeDSHTokens && <DSHTokens />}
       </div>
     </>
   );

@@ -12,7 +12,7 @@ export type Auth = {
      * - Additional dynamic resource-specific roles: Runtime roles like project_{id}_owner, study_{id}_admin
      *
      */
-    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff'>;
+    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff' | 'dsh-ops-staff'>;
 };
 
 export type Profile = {
@@ -585,6 +585,24 @@ export type Contract = ContractBase & {
     study_id: string;
 };
 
+export type TokenRequest = {
+    name: string;
+    valid_for_days: number;
+};
+
+export type Token = {
+    id: string;
+    name: string;
+    /**
+     * Time in RFC3339 at which the token expires
+     */
+    expires_at: string;
+};
+
+export type TokenWithValue = Token & {
+    value: string;
+};
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -758,6 +776,55 @@ export type PostProfileTrainingResponses = {
 };
 
 export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
+
+export type GetTokensDshData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/tokens/dsh';
+};
+
+export type GetTokensDshResponses = {
+    200: Array<Token>;
+};
+
+export type GetTokensDshResponse = GetTokensDshResponses[keyof GetTokensDshResponses];
+
+export type PostTokensDshData = {
+    body: TokenRequest;
+    path?: never;
+    query?: never;
+    url: '/tokens/dsh';
+};
+
+export type PostTokensDshErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostTokensDshResponses = {
+    200: TokenWithValue;
+};
+
+export type PostTokensDshResponse = PostTokensDshResponses[keyof PostTokensDshResponses];
+
+export type DeleteTokensDshByTokenIdData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the token to be updated
+         */
+        tokenId: string;
+    };
+    query?: never;
+    url: '/tokens/dsh/{tokenId}';
+};
 
 export type GetAgreementsByAgreementTypeData = {
     body?: never;
