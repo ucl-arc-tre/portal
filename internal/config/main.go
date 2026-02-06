@@ -16,6 +16,7 @@ import (
 const (
 	BaseWebURL = "/web/api/v0"
 	BaseTREURL = "/tre/api/v0"
+	BaseDSHURL = "/dsh/api/v0"
 
 	configPath = "/etc/portal/config.yaml"
 

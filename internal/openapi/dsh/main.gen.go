@@ -11,6 +11,11 @@ const (
 	JWTScopes = "JWT.Scopes"
 )
 
+// Ping defines model for Ping.
+type Ping struct {
+	Message string `json:"message"`
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get all approved researchers

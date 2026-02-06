@@ -4,9 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	"github.com/ucl-arc-tre/portal/internal/handler/dsh"
 	"github.com/ucl-arc-tre/portal/internal/handler/tre"
 	"github.com/ucl-arc-tre/portal/internal/handler/web"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
+	apidsh "github.com/ucl-arc-tre/portal/internal/openapi/dsh"
 	apitre "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	apiweb "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -20,6 +22,7 @@ func main() {
 	router := router.New()
 	addWeb(router.Group(config.BaseWebURL))
 	addTRE(router.Group(config.BaseTREURL))
+	addDSH(router.Group(config.BaseDSHURL))
 	graceful.Serve(router.Handler())
 }
 
@@ -46,4 +49,10 @@ func addWeb(router gin.IRouter) {
 func addTRE(router gin.IRouter) {
 	router.Use(gin.BasicAuth(config.TREUserAccounts()))
 	apitre.RegisterHandlers(router, tre.New())
+}
+
+// Add the DSH API defined by its OpenAPI spec with suitable middleware
+func addDSH(router gin.IRouter) {
+	router.Use()
+	apidsh.RegisterHandlers(router, dsh.New())
 }

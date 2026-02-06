@@ -94,6 +94,8 @@ jobs:
             "botIGPassword": "${{ secrets.CYPRESS_BOT_IG_PASSWORD }}",
             "botTREUsername": "portal-e2e-tre@arctretest.onmicrosoft.com",
             "botTREPassword": "${{ secrets.CYPRESS_BOT_TRE_PASSWORD }}"
+            "botDSHUsername": "portal-e2e-dsh@arctretest.onmicrosoft.com",
+            "botDSHPassword": "${{ secrets.CYPRESS_BOT_DSH_PASSWORD }}"
           }
           EOF
 
