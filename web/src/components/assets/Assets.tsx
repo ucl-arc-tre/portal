@@ -119,6 +119,7 @@ export default function Assets(props: InformationAssetsProps) {
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
+      {/* TODO: update this so we don't use studytitle */}
       <h2 className="subtitle">Assets for Study: {studyTitle}</h2>
 
       {error && (

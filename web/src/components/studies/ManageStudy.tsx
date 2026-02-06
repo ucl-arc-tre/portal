@@ -10,6 +10,8 @@ import StudyDetails from "./StudyDetails";
 import { useAuth } from "@/hooks/useAuth";
 import StudyForm from "./StudyForm";
 import StudyAdminsAgreements from "./StudyAdminsAgreements";
+import Button from "../ui/Button";
+import ContractManagement from "../contracts/ContractManagement";
 
 type ManageStudyProps = {
   study: Study;
@@ -29,6 +31,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted && adminsAgreementsCompleted;
+
+  const [tab, setTab] = useState("overview");
 
   const studySteps: Step[] = [
     {
@@ -102,14 +106,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           fetchStudyData={fetchStudy}
         />
       )}
-      <StudyDetails
-        studyStepsCompleted={studyStepsCompleted}
-        study={study}
-        isIGOpsStaff={false}
-        isStudyOwner={isStudyOwner}
-        isStudyAdmin={isStudyAdmin}
-        setStudyFormOpen={setStudyFormOpen}
-      />
 
       {!studyStepsCompleted && (
         <>
@@ -129,10 +125,43 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
-          </div>
-          <div className={styles["completed-section"]}>
-            {/* <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} /> */}
+            <div className={styles["study-tabs"]}>
+              <Button
+                onClick={() => setTab("overview")}
+                variant="secondary"
+                className={`${styles.tab} ${styles["overview-tab"]} ${tab === "overview" ? styles.active : ""}`}
+              >
+                Overview
+              </Button>
+              <Button
+                onClick={() => setTab("assets")}
+                variant="secondary"
+                className={`${styles.tab} ${styles["assets-tab"]} ${tab === "assets" ? styles.active : ""}`}
+              >
+                Assets
+              </Button>
+              <Button
+                onClick={() => setTab("contracts")}
+                variant="secondary"
+                className={`${styles.tab} ${styles["contracts-tab"]} ${tab === "contracts" ? styles.active : ""}`}
+              >
+                Contracts
+              </Button>
+              {/* TODO: add projects */}
+            </div>
+            {tab === "overview" && (
+              <StudyDetails
+                studyStepsCompleted={studyStepsCompleted}
+                study={study}
+                isIGOpsStaff={false}
+                isStudyOwner={isStudyOwner}
+                isStudyAdmin={isStudyAdmin}
+                setStudyFormOpen={setStudyFormOpen}
+              />
+              //TODO: add summary of num of assets, contracts & projects
+            )}
+            {tab === "assets" && <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />}
+            {tab === "contracts" && <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} />}
           </div>
         </>
       )}
