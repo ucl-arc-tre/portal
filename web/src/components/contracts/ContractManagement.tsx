@@ -2,7 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdContracts, Contract, Study, Asset } from "@/openapi";
+import {
+  getStudiesByStudyIdContracts,
+  Contract,
+  Study,
+  Asset,
+  getStudiesByStudyIdAssetsByAssetIdContracts,
+} from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
 
@@ -24,9 +30,17 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     setError(null);
 
     try {
-      const response = await getStudiesByStudyIdContracts({
-        path: { studyId: study.id },
-      });
+      let response;
+      // if asset given, only collect contracts for that asset, not the study
+      if (asset) {
+        response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+          path: { studyId: study.id, assetId: asset.id },
+        });
+      } else {
+        response = await getStudiesByStudyIdContracts({
+          path: { studyId: study.id },
+        });
+      }
 
       if (response.response.ok && response.data) {
         setContracts(response.data);
@@ -39,7 +53,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     } finally {
       setIsLoading(false);
     }
-  }, [study.id]);
+  }, [study.id, asset]);
 
   useEffect(() => {
     fetchContracts();
@@ -56,8 +70,12 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       return;
     }
     setEditingContract(contract);
+
     setShowUploadModal(true);
   };
+
+  // if asset given, need to create list of assets which is all existing ones for the contract + the new one if it's not there
+  // if asset not given, still retain asset list that exists
 
   return (
     <Box>
@@ -71,7 +89,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
             </Button>
           </div>
           <p className={styles.description}>
-            Manage contract documents for this study. Upload PDF contracts and track their status.
+            Manage contract documents for this {asset ? "asset" : "study"}. Upload PDF contracts and track their status.
           </p>
         </>
       ) : (
@@ -126,7 +144,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       {canModify && (
         <ContractUploadForm
           study={study}
-          assetIds={asset ? [asset.id] : []} //TODO: Add support for multiple assets
+          throughAsset={asset?.id}
           isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);

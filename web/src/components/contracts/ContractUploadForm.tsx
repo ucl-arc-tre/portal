@@ -25,7 +25,7 @@ type ContractFormData = {
 
 type ContractUploadModalProps = {
   study: Study;
-  assetIds: string[];
+  throughAsset?: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -34,7 +34,7 @@ type ContractUploadModalProps = {
 
 export default function ContractUploadModal({
   study,
-  assetIds,
+  throughAsset,
   isOpen,
   onClose,
   onSuccess,
@@ -44,6 +44,7 @@ export default function ContractUploadModal({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [assetIds, setAssetIds] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const organisationName = process.env.NEXT_PUBLIC_ORGANISATION_NAME;
@@ -62,13 +63,18 @@ export default function ContractUploadModal({
   useEffect(() => {
     // populate form with existing data when editing
     if (editingContract) {
+      const combinedAssetIds = [...editingContract.asset_ids];
+      if (throughAsset && !combinedAssetIds.includes(throughAsset)) {
+        combinedAssetIds.push(throughAsset);
+      }
+      setAssetIds(combinedAssetIds);
       reset({
         organisationSignatory: editingContract.organisation_signatory,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
-        assetIds: editingContract.asset_ids,
+        assetIds: combinedAssetIds,
       });
     } else {
       // reset to defaults when not editing
@@ -81,7 +87,7 @@ export default function ContractUploadModal({
         assetIds: [],
       });
     }
-  }, [editingContract, reset]);
+  }, [editingContract, reset, throughAsset]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -211,6 +217,7 @@ export default function ContractUploadModal({
   if (!isOpen) return null;
 
   // TODO: when coming from asset flow, prefill the asset ID, otherwise allow selection of assets
+  //TODO: Add support for multiple assets
   return (
     <Dialog setDialogOpen={handleClose}>
       <h2>{editingContract ? "Edit Contract" : "Upload Contract"}</h2>
@@ -345,6 +352,7 @@ export default function ContractUploadModal({
             {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
           </div>
         </div>
+        {/* TODO: asset field here */}
 
         <div className={styles.actions}>
           <Button type="submit" disabled={uploading} size="large">
