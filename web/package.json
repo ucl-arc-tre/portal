@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api.web.yaml --output ./src/openapi",
+    "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api/web.yaml --output ./src/openapi",
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome",
     "cypress:ui": "cypress run --headless --browser chrome --spec 'cypress/e2e/ui/**/*'",
