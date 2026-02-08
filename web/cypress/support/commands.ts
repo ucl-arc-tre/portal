@@ -12,6 +12,8 @@ const botIGUsername = Cypress.env("botIGUsername") as string;
 const botIGPassword = Cypress.env("botIGPassword") as string;
 const botTREUsername = Cypress.env("botTREUsername") as string;
 const botTREPassword = Cypress.env("botTREPassword") as string;
+const botDSHUsername = Cypress.env("botDSHUsername") as string;
+const botDSHPassword = Cypress.env("botDSHPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -46,6 +48,12 @@ declare global {
        * @example cy.loginAsTREOps()
        */
       loginAsTREOps(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as a DSH operations user
+       * @example cy.loginAsDSHOps()
+       */
+      loginAsDSHOps(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Clears the chosen name
@@ -411,6 +419,21 @@ Cypress.Commands.add("loginAsTREOps", () => {
 
     log.snapshot("before");
     login(botTREUsername, botTREPassword);
+    log.snapshot("after");
+    log.end();
+  });
+});
+
+Cypress.Commands.add("loginAsDSHOps", () => {
+  cy.session(`login-dsh-ops`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID DSH operations user Login",
+      message: [`🔐 Authenticating DSH ops user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botDSHUsername, botDSHPassword);
     log.snapshot("after");
     log.end();
   });

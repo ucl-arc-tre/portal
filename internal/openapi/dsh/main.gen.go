@@ -38,7 +38,7 @@ type MiddlewareFunc func(c *gin.Context)
 // GetApprovedResearchers operation middleware
 func (siw *ServerInterfaceWrapper) GetApprovedResearchers(c *gin.Context) {
 
-	c.Set(JWTScopes, []string{"r"})
+	c.Set(JWTScopes, []string{"dsh:r"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -53,7 +53,7 @@ func (siw *ServerInterfaceWrapper) GetApprovedResearchers(c *gin.Context) {
 // GetPing operation middleware
 func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 
-	c.Set(JWTScopes, []string{})
+	c.Set(JWTScopes, []string{"dsh:r"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)

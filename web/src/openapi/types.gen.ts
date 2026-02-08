@@ -784,6 +784,17 @@ export type GetTokensDshData = {
     url: '/tokens/dsh';
 };
 
+export type GetTokensDshErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
 export type GetTokensDshResponses = {
     200: Array<Token>;
 };
@@ -825,6 +836,26 @@ export type DeleteTokensDshByTokenIdData = {
     query?: never;
     url: '/tokens/dsh/{tokenId}';
 };
+
+export type DeleteTokensDshByTokenIdErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type DeleteTokensDshByTokenIdResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type DeleteTokensDshByTokenIdResponse = DeleteTokensDshByTokenIdResponses[keyof DeleteTokensDshByTokenIdResponses];
 
 export type GetAgreementsByAgreementTypeData = {
     body?: never;

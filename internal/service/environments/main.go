@@ -41,7 +41,7 @@ func (s *Service) EnvironmentId(name types.EnvironmentName) (uuid.UUID, error) {
 		return environment.ID, nil
 	}
 	environment := types.Environment{Name: name}
-	if err := s.db.Find(&environment, "name = ?", name).Error; err != nil {
+	if err := s.db.First(&environment, "name = ?", name).Error; err != nil {
 		return uuid.UUID{}, types.NewErrFromGorm(err)
 	}
 	_ = s.cache.Add(name, environment)

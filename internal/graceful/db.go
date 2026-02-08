@@ -35,16 +35,14 @@ func InitDB() {
 		&types.ProjectTRE{},
 		&types.ProjectTRERoleBinding{},
 		&types.ProjectAsset{},
-		&types.Token{},
 		&types.TokenVerificationKey{},
+		&types.Token{},
 	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
 
-	for _, t := range models {
-		if err := db.AutoMigrate(t); err != nil {
-			panic(err)
-		}
+	if err := db.AutoMigrate(models...); err != nil {
+		panic(err)
 	}
 
 	migrateContracts(db)

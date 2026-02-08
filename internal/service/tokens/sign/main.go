@@ -53,13 +53,16 @@ func (s *Service) AllDSH() ([]types.Token, error) {
 
 // CreateDSH a DSH API token with the default scopes
 func (s *Service) CreateDSH(token types.Token) (*TokenWithValue, error) {
+	if time.Now().After(token.ExpiresAt) {
+		return nil, types.NewErrInvalidObject("cannot create an already expired token")
+	}
 	if token.ExpiresAt.After(time.Now().Add(config.MaxTokenValidity)) {
 		return nil, types.NewErrInvalidObject(fmt.Errorf("token had a expiry [%s] beyond the max", token.ExpiresAt))
 	}
 
 	token.VerificationKeyID = s.key.Id()
 	claims := tokens.Claims{
-		Scopes: []string{"r", "w"},
+		Scopes: []string{"dsh:r", "dsh:w"}, // defined by the OpenAPI schema
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        token.ID.String(),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

@@ -11,7 +11,7 @@ paths:
     get:
       summary: Ping to check connectivity and auth
       security:
-        - JWT: []
+        - JWT: ["dsh:r"]
       responses:
         "200":
           content:
@@ -30,16 +30,17 @@ paths:
     get:
       summary: Get all approved researchers
       security:
-        - JWT: [r]
+        - JWT: ["dsh:r"]
       responses:
         "200":
           description: OK
-          text/csv:
-            schema:
-              type: string
-            example: |
-              username,agreed_at,training_expires
-              ccxyz@ucl.ac.uk,2026-02-04,2027-02-06
+          content:
+            text/csv:
+              schema:
+                type: string
+              example: |
+                username,agreed_at,training_expires
+                ccxyz@ucl.ac.uk,2026-02-04,2027-02-06
         "401":
           description: Unauthorized
         "406":

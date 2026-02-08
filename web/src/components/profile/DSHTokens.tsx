@@ -9,30 +9,35 @@ import { Alert, AlertMessage, Label } from "../shared/exports";
 
 type FormData = {
   name: string;
+  expiryDays: string;
 };
 
 export default function DSHTokens() {
   const [formOpen, setFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null);
-  const [successFormMessage, setFormSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tokens, setTokens] = useState<Array<Token>>([]);
   const [tokenValue, setTokenValue] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTokens = async () => {
-      const response = await getTokensDsh();
-      if (!response.response.ok || !response.data) {
-        // todo
-        throw new Error(`Failed to get tokens`);
+      try {
+        const response = await getTokensDsh();
+        if (!response.response.ok || !response.data) {
+          throw new Error(`Failed to get tokens`);
+        }
+        setTokens(response.data);
+      } catch {
+        setErrorMessage("Failed to load tokens.");
       }
-      setTokens(response.data);
     };
     fetchTokens();
   }, [setTokens]);
 
   const handleCloseForm = () => {
     setFormOpen(false);
+    setTokenValue(null);
   };
 
   const handleCreateClick = () => {
@@ -40,48 +45,56 @@ export default function DSHTokens() {
   };
 
   const handleDelete = async (id: string) => {
-    const response = await deleteTokensDshByTokenId({
-      path: {
-        tokenId: id,
-      },
-    });
+    const userConfirmed = window.confirm("Are you sure you want to revoke this token?");
+    if (!userConfirmed) {
+      return;
+    }
 
-    setTokens(tokens.filter((token) => token.id !== id));
-    console.log(response); // todo
+    setErrorMessage(null);
+    const response = await deleteTokensDshByTokenId({
+      path: { tokenId: id },
+    });
+    if (response.response.ok) {
+      setTokens(tokens.filter((token) => token.id !== id));
+    } else {
+      setErrorMessage("Failed to delete token");
+    }
   };
 
   const onFormSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
       setFormErrorMessage(null);
-      setFormSuccessMessage(null);
 
       const response = await postTokensDsh({
         body: {
           name: data.name,
-          valid_for_days: 90, // todo - make configurable?
+          valid_for_days: parseInt(data.expiryDays),
         },
       });
-      if (!response.response.ok) {
+      if (!response.response.ok || !response.data) {
         throw new Error(`Failed to create token`);
       }
-      setFormSuccessMessage("Token created successfully!");
-      setTokenValue(response.data?.value || null);
-      reset();
+
+      setTokenValue(response.data.value);
+      const newToken: Token = {
+        id: response.data.id,
+        name: data.name,
+        expires_at: response.data.expires_at,
+      };
+      setTokens([...tokens, newToken]);
     } catch (error) {
       console.error("Error creating token:", error);
       setFormErrorMessage("Error: " + String((error as Error).message));
     } finally {
       setIsSubmitting(false);
     }
-    setFormOpen(false);
   };
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<FormData>({
     defaultValues: {
       name: "",
@@ -91,14 +104,14 @@ export default function DSHTokens() {
   return (
     <>
       <Box>
-        <h4>DSH API Tokens</h4>
-        <div className={styles.add}>
+        <div className={styles["title-container"]}>
+          <h3>DSH API Tokens</h3>
           <Button onClick={handleCreateClick} data-cy="create-dsh-token-button">
-            Add token
+            Create
           </Button>
         </div>
 
-        {tokens.length == 0 && <p> No items to display</p>}
+        {tokens.length == 0 && !tokenValue && <p> No items to display</p>}
 
         {tokens.length > 0 && (
           <div>
@@ -120,6 +133,8 @@ export default function DSHTokens() {
                         onClick={() => handleDelete(token.id)}
                         aria-label={`Delete ${token.name}`}
                         variant="secondary"
+                        size="small"
+                        className="delete-button"
                       >
                         Delete
                       </Button>
@@ -131,55 +146,72 @@ export default function DSHTokens() {
           </div>
         )}
 
-        {tokenValue && (
-          <div>
-            <p>Copy this token now. It will not be shown again</p>
-            <span>{tokenValue}</span>
-          </div>
+        {errorMessage && (
+          <Alert type="error" className={styles.alert}>
+            <AlertMessage>{errorMessage}</AlertMessage>
+          </Alert>
         )}
       </Box>
 
       {formOpen && (
         <Dialog setDialogOpen={handleCloseForm} cy="create-dsh-token-form">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="form">
-            <div className={styles.field}>
-              <Label htmlFor="name">Name *</Label>
-              <input
-                id="name"
-                type="text"
-                {...register("name", {
-                  required: "Name is required",
-                  minLength: { value: 1, message: "Name must be at least 1 characters" },
-                  maxLength: { value: 50, message: "Title must be less than 50 characters" },
-                })}
-                aria-invalid={!!errors.name}
-                className={errors.name ? styles.error : ""}
-              />
-              {errors.name && (
-                <Alert type="error">
-                  <AlertMessage>{errors.name.message}</AlertMessage>
+          {!tokenValue && (
+            <form onSubmit={handleSubmit(onFormSubmit)} className="form">
+              <div className={styles.field}>
+                <Label htmlFor="name">Name *</Label>
+                <input
+                  id="name"
+                  type="text"
+                  {...register("name", {
+                    required: "Name is required",
+                    minLength: { value: 1, message: "Name must be at least 1 characters" },
+                    maxLength: { value: 50, message: "Title must be less than 50 characters" },
+                  })}
+                  aria-invalid={!!errors.name}
+                  className={errors.name ? styles.error : ""}
+                />
+                {errors.name && (
+                  <Alert type="error">
+                    <AlertMessage>{errors.name.message}</AlertMessage>
+                  </Alert>
+                )}
+              </div>
+
+              <div className={styles.field}>
+                <Label htmlFor="expiryDays">Expires after *</Label>
+                <select {...register("expiryDays")}>
+                  <option value="7">7 Days</option>
+                  <option value="30">1 Month</option>
+                  <option value="90">3 Months</option>
+                  <option value="180">6 Months</option>
+                  <option value="365">1 Year</option>
+                </select>
+              </div>
+
+              {formErrorMessage && (
+                <Alert type="error" className={styles.alert}>
+                  <AlertMessage>{formErrorMessage}</AlertMessage>
                 </Alert>
               )}
-            </div>
 
-            {formErrorMessage && (
-              <Alert type="error" className={styles.alert}>
-                <AlertMessage>{formErrorMessage}</AlertMessage>
+              <div className={styles.actions}>
+                <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
+                  {isSubmitting ? "Creating..." : "Create"}
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {tokenValue && (
+            <div className={styles["token-container"]}>
+              <div className={styles["token-display"]} data-cy="dsh-token-value">
+                {tokenValue}
+              </div>
+              <Alert type="warning">
+                <AlertMessage>Save this token securely now. It will not be shown again</AlertMessage>
               </Alert>
-            )}
-
-            {successFormMessage && (
-              <Alert type="success" className={styles.alert}>
-                <AlertMessage>{successFormMessage}</AlertMessage>
-              </Alert>
-            )}
-
-            <div className={styles.actions}>
-              <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
-                {isSubmitting ? "Creating..." : "Create"}
-              </Button>
             </div>
-          </form>
+          )}
         </Dialog>
       )}
     </>

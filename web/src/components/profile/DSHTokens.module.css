@@ -67,18 +67,22 @@
     td {
       padding-block: 0.6rem;
       padding-inline: 0.5rem;
+      text-align: center;
     }
   }
 }
 
-.add {
-  border-radius: 0.5rem;
+.title-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
 
   button {
     align-self: end;
+  }
+
+  h3 {
+    width: 100%;
   }
 }
 
@@ -87,4 +91,20 @@
   color: #999;
   font-style: italic;
   padding: 24px !important;
+}
+
+.token-container {
+  padding: 0.5rem;
+}
+
+.token-display {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 0.8rem;
+  margin-bottom: 0.6rem;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  color: #1f2937;
+  word-break: break-all;
+  line-height: 1.5;
 }

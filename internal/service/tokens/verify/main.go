@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/hashicorp/golang-lru/v2/expirable"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/service/tokens"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -16,11 +17,12 @@ import (
 )
 
 const (
-	cacheTTL      = 60 * time.Second
+	cacheTTL      = 10 * time.Second
 	cacheElements = 10000
 )
 
 type Service struct {
+	parser               *jwt.Parser
 	db                   *gorm.DB
 	verificationKeyCache *expirable.LRU[tokens.TokenId, ed25519.PublicKey]
 	isRevokedCache       *expirable.LRU[tokens.TokenId, bool]
@@ -28,6 +30,7 @@ type Service struct {
 
 func New() *Service {
 	service := Service{
+		parser:               jwt.NewParser(jwt.WithIssuer(config.JWTIssuer())),
 		db:                   graceful.NewDB(),
 		verificationKeyCache: newTokenLRU[ed25519.PublicKey](),
 		isRevokedCache:       newTokenLRU[bool](),
@@ -39,7 +42,7 @@ func New() *Service {
 // parse the claims within
 func (s *Service) ParseClaims(rawToken string) (*tokens.Claims, error) {
 	claims := tokens.Claims{}
-	_, err := jwt.ParseWithClaims(rawToken, &claims, s.verificationKeyForToken)
+	_, err := s.parser.ParseWithClaims(rawToken, &claims, s.verificationKeyForToken)
 	if err != nil {
 		return nil, err
 	}

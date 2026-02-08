@@ -30,6 +30,7 @@ func (h *Handler) GetApprovedResearchers(ctx *gin.Context) {
 	approvedResearchers, err := h.users.AllApprovedResearchers()
 	if err != nil {
 		setError(ctx, err, "Failed to get approved researchers")
+		return
 	}
 
 	var b bytes.Buffer

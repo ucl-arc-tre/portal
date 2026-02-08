@@ -130,10 +130,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Token"
-      "500":
-        description: Internal server error
-      default:
-        description: Unexpected error
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
     post:
       description: Create an token for the DSH API
       requestBody:
@@ -162,12 +162,13 @@ paths:
           description: ID of the token to be updated
           schema:
             type: string
-      "204":
-        description: OK
-      "500":
-        description: Internal server error
-      default:
-        description: Unexpected error
+      responses:
+        "204":
+          description: OK
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /agreements/{agreementType}:
     get:
@@ -1789,6 +1790,7 @@ components:
           type: string
         valid_for_days:
           type: integer
+          minimum: 1
     Token:
       type: object
       required:
