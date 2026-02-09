@@ -25,7 +25,7 @@ const (
 	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
 	TreOpsStaff                   = RoleName(openapi.AuthRolesTreOpsStaff)                   // Lesser admin role for tre ops staff
 	IGOpsStaff                    = RoleName(openapi.AuthRolesIgOpsStaff)                    // Information governance operations staff
-	DSHOpsStaff                   = RoleName(openapi.AuthRolesDshOpsStaff)                   // Information governance operations staff
+	DSHOpsStaff                   = RoleName(openapi.AuthRolesDshOpsStaff)                   // IData Safe Haven operations staff
 
 	ReadAction  = Action("read")
 	WriteAction = Action("write")

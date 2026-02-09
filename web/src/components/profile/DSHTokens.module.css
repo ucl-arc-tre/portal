@@ -56,7 +56,7 @@
     padding-inline: 0.5rem;
   }
 
-  .tbody {
+  tbody {
     border-top: 2px solid var(--foreground);
   }
 

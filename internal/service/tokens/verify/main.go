@@ -53,20 +53,20 @@ func (s *Service) verificationKeyForToken(token *jwt.Token) (any, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
 		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
-	if claims, ok := token.Claims.(*tokens.Claims); ok {
-		id, err := parseTokenId(claims.ID)
-		if err != nil {
-			return nil, err
-		}
-		if isRevoked, err := s.isRevoked(id); err != nil {
-			return nil, err
-		} else if isRevoked {
-			return nil, fmt.Errorf("token has been deleted: %v", claims.ID)
-		}
-		return s.verificationKey(id)
-	} else {
+	claims, ok := token.Claims.(*tokens.Claims)
+	if !ok {
 		return nil, fmt.Errorf("failed to parse claims: %v", token.Header)
 	}
+	id, err := parseTokenId(claims.ID)
+	if err != nil {
+		return nil, err
+	}
+	if isRevoked, err := s.isRevoked(id); err != nil {
+		return nil, err
+	} else if isRevoked {
+		return nil, fmt.Errorf("token has been deleted: %v", claims.ID)
+	}
+	return s.verificationKey(id)
 }
 
 func (s *Service) isRevoked(id tokens.TokenId) (bool, error) {

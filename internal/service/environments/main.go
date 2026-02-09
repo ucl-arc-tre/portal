@@ -36,7 +36,12 @@ func (s *Service) GetAll() ([]types.Environment, error) {
 	return environments, nil
 }
 
-func (s *Service) EnvironmentId(name types.EnvironmentName) (uuid.UUID, error) {
+// Get the Id of the DSH environment. Cached
+func (s *Service) DSHId() (uuid.UUID, error) {
+	return s.environmentId(DSH)
+}
+
+func (s *Service) environmentId(name types.EnvironmentName) (uuid.UUID, error) {
 	if environment, exists := s.cache.Get(name); exists {
 		return environment.ID, nil
 	}

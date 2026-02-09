@@ -39,11 +39,10 @@ func (s *Service) mustStoreVerificationKey() {
 	}
 }
 
-func (s *Service) AllDSH() ([]types.Token, error) {
+func (s *Service) AllEnvironment(environmentId uuid.UUID) ([]types.Token, error) {
 	tokens := []types.Token{}
 	result := s.db.Model(&types.Token{}).
-		Joins("left join environments on tokens.environment_id = environments.id").
-		Where("environments.name = ?", environments.DSH).
+		Where("environment_id = ?", environmentId).
 		Find(&tokens)
 	if result.Error != nil {
 		return tokens, types.NewErrFromGorm(result.Error, "failed to get dsh tokens")

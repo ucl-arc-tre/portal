@@ -9,12 +9,16 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (h *Handler) GetTokensDsh(ctx *gin.Context) {
-	tokens, err := h.tokens.AllDSH()
+	dshId, err := h.environments.DSHId()
+	if err != nil {
+		setError(ctx, err, "Failed to get envrionment")
+		return
+	}
+	tokens, err := h.tokens.AllEnvironment(dshId)
 	if err != nil {
 		setError(ctx, err, "Failed to get DSH API tokens")
 		return
@@ -37,7 +41,7 @@ func (h *Handler) PostTokensDsh(ctx *gin.Context) {
 	if err := bindJSONOrSetError(ctx, &request); err != nil {
 		return
 	}
-	dshId, err := h.environments.EnvironmentId(environments.DSH)
+	dshId, err := h.environments.DSHId()
 	if err != nil {
 		setError(ctx, err, "Failed to get envrionment")
 		return
@@ -67,7 +71,7 @@ func (h *Handler) DeleteTokensDshTokenId(ctx *gin.Context, tokenId string) {
 	if err != nil {
 		return
 	}
-	dshId, err := h.environments.EnvironmentId(environments.DSH)
+	dshId, err := h.environments.DSHId()
 	if err != nil {
 		setError(ctx, err, "Failed to get envrionment")
 		return
