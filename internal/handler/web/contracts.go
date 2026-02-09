@@ -36,7 +36,6 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 }
 
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
-
 	assetIds := []string{}
 	for _, asset := range contract.Assets {
 		assetIds = append(assetIds, asset.ID.String())
