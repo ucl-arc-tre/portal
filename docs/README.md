@@ -82,7 +82,8 @@ All environments are dockerised for a self-contained service that builds all ver
 The API is a monolith which is the sole interface to the database. Services have their own top-level
 paths. The web API called by the web frontend is defined in [api/web.yaml](../api/web.yaml) and must
 be run behind an authentication proxy which forwards user identities. The TRE API consumed by the
-TRE is defined [api/tre.yaml](../api/tre.yaml) and uses basic authentication with service accounts.
+TRE is defined [api/tre.yaml](../api/tre.yaml) and uses basic authentication with service accounts. The DSH API consumed by the
+Data Safe Haven is defined [api/dsh.yaml](../api/dsh.yaml) and uses JWT bearer token authentication. Tokens can be created in the UI by DSH operations staff.
 
 ### RBAC
 

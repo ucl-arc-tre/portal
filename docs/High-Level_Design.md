@@ -43,7 +43,7 @@ As a target architecture, the diagram below shows how in the future, in addition
 ![C2-Portal_Containers](./c4/C2-Portal_Containers.png)
 
 > [!NOTE]
-> The `/tre/api` endpoint is not currently exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal access. External access will be added in future updates to support integration with other consumers and TREs.
+> The `/tre/api` endpoint is not exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal (east-west) access.
 
 | Component            | Resource Type                 |
 | -------------------- | ----------------------------- |
@@ -163,7 +163,8 @@ The portal superimposes additional roles to the roles defined in the [Research D
 | Approved Staff Researcher | Approved Researcher who is eligible to create Studies                                         | - Access to specific Projects<br>- Access to Study creation                            | Is an Approved Researcher and UCL Staff                            |
 | Information Asset Owner   | Creates and manages Studies and Projects                                                      | - Access to specific Projects<br>- Access to Study creation <br>- Can invite externals | Is an Approved Staff Researcher and has signed one Study Agreement |
 | IG Ops staff              | Manage Information Governance via Study reviews and approvals, training certification reviews | - Write Study data<br>- Write Study status                                             | Is an ARC Info Gov Advisory Team member                            |
-| TRE Ops staff             | TRE service member, view Project and role data                                                | - Read Project and Role data<br>- Write Project status                                 | Is a UCL TRE service member                                        |
+| TRE Ops staff             | TRE service member, view TRE Project, and role data                                           | - Read Project and Role data<br>- Write Project status                                 | Is a UCL TRE service member                                        |
+| DSH Ops staff             | DSH service member, view DSH Project, and role data                                           | - Read Project and Role data<br>- Write Project status                                 | Is a UCL DSH service member                                        |
 | Global Admin              | Full control over portal                                                                      | - Assign roles<br>- Read/write everything                                              | Is an ARC Services Portal Admin                                    |
 
 ## Application, database and integration design
