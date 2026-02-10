@@ -74,9 +74,11 @@
 }
 
 .study-tabs {
+  width: 100%;
   display: flex;
-  justify-content: space-around;
-  width: 60%;
+  justify-content: space-evenly;
+  border-bottom: 2px solid var(--grey-border--light);
+  position: relative;
   margin-block: 0.8rem;
 }
 
@@ -87,15 +89,20 @@
   &.active {
     font-weight: 600 !important;
   }
+
+  &:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 20%;
+    right: -50;
+    height: 60%;
+    width: 2px;
+    background-color: var(--grey-border--light);
+  }
 }
 
 .pending-studies-tab {
   color: #1e40af !important;
-  border-bottom: 2px solid #60a5fa !important;
-
-  &.active {
-    background-color: #dbeafe !important;
-  }
 
   &:hover {
     color: #60a5fa !important;
@@ -104,11 +111,6 @@
 
 .all-studies-tab {
   color: var(--green-300) !important;
-  border-bottom: 2px solid var(--green-100) !important;
-
-  &.active {
-    background-color: #ddeee0 !important;
-  }
 
   &:hover {
     color: var(--green-100) !important;
