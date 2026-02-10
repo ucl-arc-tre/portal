@@ -144,7 +144,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       {canModify && (
         <ContractUploadForm
           study={study}
-          throughAsset={asset?.id}
+          throughAsset={asset}
           isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);
