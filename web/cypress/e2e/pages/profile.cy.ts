@@ -22,7 +22,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("[aria-label='Profile setup progress'] li").should("have.length", 3);
 
     // Step titles should be visible
-    cy.contains("Set Your Chosen Name").should("be.visible");
+    cy.contains("Set Your Name").should("be.visible");
     cy.contains("Approved Researcher Agreement").should("be.visible");
     cy.contains("Training Certificate").should("be.visible");
   });
