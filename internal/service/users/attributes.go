@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	chosenNamePattern = regexp.MustCompile(`^.+\s.+$`)
+	chosenNamePattern = regexp.MustCompile(`^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$`)
 )
 
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
@@ -20,7 +20,7 @@ func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 }
 
 func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
-	if isValid := chosenNamePattern.MatchString(string(chosenName)); !isValid {
+	if isValid := chosenNamePattern.MatchString(string(chosenName)) || chosenName == ""; !isValid {
 		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", chosenName))
 	}
 	attrs := types.UserAttributes{UserID: user.ID}

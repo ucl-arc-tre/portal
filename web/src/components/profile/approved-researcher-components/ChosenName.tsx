@@ -8,31 +8,31 @@ import { Alert, AlertMessage, Input } from "@/components/shared/exports";
 
 type ProfileChosenNameProps = {
   currentName?: string;
-  setChosenName: (name: string) => void;
+  setName: (name: string) => void;
 };
 
 export default function ProfileChosenName(props: ProfileChosenNameProps) {
-  const { currentName, setChosenName } = props;
+  const { currentName, setName: setName } = props;
 
   const [inputNameValue, setInputNameValue] = useState(currentName || "");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const regex = /^.+\s.+$/u;
+  const regex = /^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$/u;
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const name = inputNameValue.trim();
 
     if (!name) return setErrorMessage("Please enter a name.");
-    if (!regex.test(name)) return setErrorMessage("Please enter both your first and last names.");
+    if (!regex.test(name)) return setErrorMessage("Please enter a valid full name.");
 
     setIsSubmitting(true);
     try {
       const response = await postProfile({ body: { chosen_name: name } });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
-      setChosenName(name);
+      setName(name);
       setErrorMessage(null);
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
@@ -56,13 +56,13 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles["input-group"]}>
-          <label htmlFor="chosenNameInput" className={styles.label}>
+          <label htmlFor="nameInput" className={styles.label}>
             Full Name
           </label>
           <Input
-            id="chosenNameInput"
+            id="nameInput"
             type="text"
-            name="chosenName"
+            name="name"
             value={inputNameValue}
             placeholder="e.g. Alice Smith"
             minLength={3}
@@ -72,7 +72,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
               if (errorMessage) setErrorMessage(null);
             }}
             aria-invalid={!!errorMessage}
-            aria-describedby="chosenNameError"
+            aria-describedby="nameError"
             className={styles.input}
             required
           />
