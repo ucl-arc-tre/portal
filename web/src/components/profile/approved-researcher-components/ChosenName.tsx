@@ -8,11 +8,11 @@ import { Alert, AlertMessage, Input } from "@/components/shared/exports";
 
 type ProfileChosenNameProps = {
   currentName?: string;
-  setName: (name: string) => void;
+  setChosenName: (name: string) => void;
 };
 
 export default function ProfileChosenName(props: ProfileChosenNameProps) {
-  const { currentName, setName: setName } = props;
+  const { currentName, setChosenName } = props;
 
   const [inputNameValue, setInputNameValue] = useState(currentName || "");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
       const response = await postProfile({ body: { chosen_name: name } });
       if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
 
-      setName(name);
+      setChosenName(name);
       setErrorMessage(null);
     } catch (error) {
       console.error("There was a problem submitting your request:", error);

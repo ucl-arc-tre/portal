@@ -73,7 +73,7 @@ export default function ProfileSetup(props: Props) {
 
   const getCurrentStepComponent = () => {
     if (!hasChosenName) {
-      return <ProfileChosenName currentName={chosenName} setName={setChosenName} />;
+      return <ProfileChosenName currentName={chosenName} setChosenName={setChosenName} />;
     }
 
     if (hasChosenName && !(agreementCompleted && trainingCertificateCompleted)) {
