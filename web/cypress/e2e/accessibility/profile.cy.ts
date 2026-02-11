@@ -19,7 +19,7 @@ describe("Accessibility - Profile Page", () => {
       cy.visit("/profile");
       cy.waitForProfileData();
 
-      cy.contains("Set Your Chosen Name").should("be.visible");
+      cy.contains("Set Your Name").should("be.visible");
 
       cy.checkAccessibility();
     });

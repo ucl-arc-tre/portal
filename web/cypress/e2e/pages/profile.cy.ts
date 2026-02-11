@@ -22,7 +22,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("[aria-label='Profile setup progress'] li").should("have.length", 3);
 
     // Step titles should be visible
-    cy.contains("Set Your Chosen Name").should("be.visible");
+    cy.contains("Set Your Name").should("be.visible");
     cy.contains("Approved Researcher Agreement").should("be.visible");
     cy.contains("Training Certificate").should("be.visible");
   });
@@ -52,7 +52,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("[data-cy='chosen-name-form'] input").type("123");
     cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
 
-    cy.contains("Please enter a valid name").should("be.visible");
+    cy.contains("Please enter a valid full name").should("be.visible");
 
     // Should still be on step 1
     cy.get("[data-cy='chosen-name-form']").should("be.visible");
