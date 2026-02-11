@@ -15,36 +15,4 @@
 .completed-section {
   width: 100%;
   margin-top: 2rem;
-
-  .study-tabs {
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
-    border-bottom: 2px solid var(--grey-border--light);
-    position: relative;
-    margin-block: 1.8rem;
-
-    .tab {
-      border: none;
-      transition: all 0.3s ease;
-
-      &:hover {
-        color: #60a5fa;
-      }
-
-      &.active {
-        font-weight: 600;
-      }
-
-      &:not(:last-child)::before {
-        content: "";
-        position: absolute;
-        top: 20%;
-        right: -50;
-        height: 60%;
-        width: 2px;
-        background-color: var(--grey-border--light);
-      }
-    }
-  }
 }

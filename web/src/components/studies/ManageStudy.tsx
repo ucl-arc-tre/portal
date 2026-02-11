@@ -125,25 +125,25 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <div className={styles["study-tabs"]}>
+            <div className={"tab-collection"}>
               <Button
                 onClick={() => setTab("overview")}
                 variant="secondary"
-                className={`${styles.tab} ${styles["overview-tab"]} ${tab === "overview" ? styles.active : ""}`}
+                className={`tab ${tab === "overview" ? "active" : ""}`}
               >
                 Overview
               </Button>
               <Button
                 onClick={() => setTab("assets")}
                 variant="secondary"
-                className={`${styles.tab} ${styles["assets-tab"]} ${tab === "assets" ? styles.active : ""}`}
+                className={`tab ${tab === "assets" ? "active" : ""}`}
               >
                 Assets
               </Button>
               <Button
                 onClick={() => setTab("contracts")}
                 variant="secondary"
-                className={`${styles.tab} ${styles["contracts-tab"]} ${tab === "contracts" ? styles.active : ""}`}
+                className={`tab ${tab === "contracts" ? "active" : ""}`}
               >
                 Contracts
               </Button>
