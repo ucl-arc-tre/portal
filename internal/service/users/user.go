@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -67,42 +68,47 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 		}).
 		FirstOrCreate(&user)
 	if result.Error != nil {
-		return user, types.NewErrFromGorm(result.Error)
+		return user, types.NewErrFromGorm(result.Error, "failed to get or create user")
 	}
 	return user, nil
 }
 
 // Get or create an external user that is guested into the IdP. They may
-// have already been created, in which case we need to merge identities
-// otherwise we set the email as an attribute of that user
+// have already been created, in which case we need to merge identities,
+// otherwise set the email as an attribute of that user
 func (s *Service) PersistedExternalUser(username types.Username, email Email) (types.User, error) {
 	tx := s.db.Begin()
 
 	user := types.User{}
+
 	findResult := tx.Where("username = ?", email).Find(&user)
 	if err := findResult.Error; err != nil {
 		tx.Rollback()
 		return types.User{}, types.NewErrFromGorm(err, "failed to find existing user")
 	}
-	if findResult.RowsAffected > 0 {
-		log.Debug().Str("email", email).Msg("External user already existed with username == email")
+	userExists := findResult.RowsAffected > 0
+
+	if userExists && string(username) != email {
+		log.Debug().Str("email", email).
+			Msg("External user already existed with username == email but their email and username are different")
+		if entra.IsInternalUsername(user.Username) {
+			return types.User{}, types.NewErrInvalidObject("cannot overwrite user with internal username")
+		}
+		log.Info().Any("currentUsername", user.Username).Any("newUsername", username).Msg("Merging identities")
 		user.Username = username
 		if err := tx.Save(&user).Error; err != nil {
 			tx.Rollback()
 			return types.User{}, types.NewErrFromGorm(err, "failed to update existing user username")
 		}
-		return user, nil
-	} else {
+	} else if !userExists {
 		createResult := s.db.Where("username = ?", username).
 			Attrs(types.User{Username: username}).
 			FirstOrCreate(&user)
-		if createResult.RowsAffected > 0 {
-			log.Info().Str("email", email).Any("username", username).Msg("External user created")
-		}
 		if err := createResult.Error; err != nil {
 			tx.Rollback()
 			return types.User{}, types.NewErrFromGorm(err, "failed to create new user")
 		}
+		log.Info().Str("email", email).Any("username", username).Msg("External user created")
 	}
 
 	attrs := types.UserAttributes{UserID: user.ID}

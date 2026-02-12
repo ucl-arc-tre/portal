@@ -16,7 +16,9 @@ func TestEntraUsernameForExternalEmail(t *testing.T) {
 
 	username := types.Username("hello@example.com")
 	assert.True(t, IsExternalUsername(username))
+	assert.False(t, IsInternalUsername(username))
 	assert.False(t, IsExternalUsername(types.Username("hello@testTenant.com")))
+	assert.True(t, IsInternalUsername(types.Username("hello@testTenant.com")))
 }
 
 func TestEmployeeTypeStaffRegex(t *testing.T) {

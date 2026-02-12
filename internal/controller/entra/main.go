@@ -324,6 +324,10 @@ func IsExternalUsername(username types.Username) bool {
 	return !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain())
 }
 
+func IsInternalUsername(username types.Username) bool {
+	return strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain())
+}
+
 func mustParseUserObjectId(model graphmodels.Userable) ObjectId {
 	return ObjectId(uuid.MustParse(*model.GetId()))
 }
