@@ -30,9 +30,8 @@ export function extractErrorMessage(response: ApiResponse): string {
     case 429:
       return "Too many requests. Please wait a moment before trying again.";
     case 500:
-      return "A server error occurred. Please try again later.";
     case 520:
-      return "An unexpected error occurred. Please try again.";
+      return "A server error occurred. Please try again later.";
     default:
       return `Request failed with status ${status}. Please try again.`;
   }
