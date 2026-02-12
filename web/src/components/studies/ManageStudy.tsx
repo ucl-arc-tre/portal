@@ -109,6 +109,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
       {!studyStepsCompleted && (
         <>
+          <StudyDetails
+            studyStepsCompleted={studyStepsCompleted}
+            study={study}
+            isIGOpsStaff={false}
+            isStudyOwner={isStudyOwner}
+            isStudyAdmin={isStudyAdmin}
+            setStudyFormOpen={setStudyFormOpen}
+          />
           <StepProgress
             steps={studySteps}
             isComplete={studyStepsCompleted}
