@@ -33,20 +33,21 @@ export default function Projects({ userData }: Props) {
 
       if (!projectsResponse.response.ok) {
         const errorMsg = extractErrorMessage(projectsResponse);
-        throw new Error(`Failed to fetch projects: ${errorMsg}`);
+        setError(`Failed to fetch projects: ${errorMsg}`);
+        return;
       }
 
       if (!studiesResponse.response.ok) {
         const errorMsg = extractErrorMessage(studiesResponse);
-        throw new Error(`Failed to fetch studies: ${errorMsg}`);
+        setError(`Failed to fetch studies: ${errorMsg}`);
+        return;
       }
 
       setProjects(projectsResponse.data || []);
       setStudies(studiesResponse.data || []);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to load projects and studies";
-      setError(errorMessage);
+      setError("Failed to load projects and studies. Please try again later.");
     } finally {
       setIsLoading(false);
     }
