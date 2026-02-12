@@ -8,36 +8,44 @@ export const botBaseUsername = Cypress.env("botBaseUsername") as string;
 const botBasePassword = Cypress.env("botBasePassword") as string;
 const botStaffUsername = Cypress.env("botStaffUsername") as string;
 const botStaffPassword = Cypress.env("botStaffPassword") as string;
-const botIGOpsUsername = Cypress.env("botIGUsername") as string;
-const botIGOpsPassword = Cypress.env("botIGPassword") as string;
+const botIGUsername = Cypress.env("botIGUsername") as string;
+const botIGPassword = Cypress.env("botIGPassword") as string;
+const botTREUsername = Cypress.env("botTREUsername") as string;
+const botTREPassword = Cypress.env("botTREPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       /**
-       * Custom command to login as as admin
+       * Custom command to login as an admin
        * @example cy.loginAsAdmin()
        */
       loginAsAdmin(): Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Custom command to login as as as base user
+       * Custom command to login as a base user
        * @example cy.loginAsBase()
        */
       loginAsBase(): Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Custom command to login as as as staff user
+       * Custom command to login as a staff user
        * @example cy.loginAsStaff()
        */
       loginAsStaff(): Chainable<JQuery<HTMLElement>>;
 
       /**
-       * Custom command to login as as as staff user
+       * Custom command to login as a IG operations user
        * @example cy.loginAsIGOps()
        */
       loginAsIGOps(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as a TRE operations user
+       * @example cy.loginAsTREOps()
+       */
+      loginAsTREOps(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Clears the chosen name
@@ -267,10 +275,16 @@ declare global {
       mockContractsEmpty(): Chainable<any>;
 
       /**
-       * Mock contracts list with sample contracts
-       * @example cy.mockContractsWithSample()
+       * Mock study contracts list with sample contracts
+       * @example cy.mockStudyContractsWtihSample()
        */
-      mockContractsWithSample(): Chainable<any>;
+      mockStudyContractsWtihSample(): Chainable<any>;
+
+      /**
+       * Mock asset contracts list with sample contracts
+       * @example cy.mockStudyContractsWtihSample()
+       */
+      mockAssetContractsWtihSample(): Chainable<any>;
 
       /**
        * Mock successful contract upload
@@ -381,11 +395,27 @@ Cypress.Commands.add("loginAsIGOps", () => {
     });
 
     log.snapshot("before");
-    login(botIGOpsUsername, botIGOpsPassword);
+    login(botIGUsername, botIGPassword);
     log.snapshot("after");
     log.end();
   });
 });
+
+Cypress.Commands.add("loginAsTREOps", () => {
+  cy.session(`login-tre-ops`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID TRE operations user Login",
+      message: [`🔐 Authenticating TRE ops user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botTREUsername, botTREPassword);
+    log.snapshot("after");
+    log.end();
+  });
+});
+
 Cypress.Commands.add("clearChosenName", () => {
   cy.request({
     method: "POST",
@@ -656,31 +686,37 @@ Cypress.Commands.add("mockStudyAgreementConfirmation", () => {
 });
 
 Cypress.Commands.add("mockContractsEmpty", () => {
-  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+  cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-empty.json",
   }).as("getContractsEmpty");
 });
 
-Cypress.Commands.add("mockContractsWithSample", () => {
+Cypress.Commands.add("mockStudyContractsWtihSample", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
+    fixture: "contracts-with-sample.json",
+  }).as("getStudyContractsWithSample");
+});
+
+Cypress.Commands.add("mockAssetContractsWtihSample", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
     fixture: "contracts-with-sample.json",
-  }).as("getContractsWithSample");
+  }).as("getAssetContractsWithSample");
 });
 
 Cypress.Commands.add("mockContractUpload", () => {
-  cy.intercept("POST", "/web/api/v0/studies/*/assets/*/contracts/upload", {
+  cy.intercept("POST", "/web/api/v0/studies/*/contracts/upload", {
     statusCode: 204,
   }).as("uploadContract");
 });
 
 Cypress.Commands.add("mockContractDownload", () => {
-  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts/*/download", {
+  cy.intercept("GET", "/web/api/v0/studies/*/contracts/*/download", {
     fixture: "valid_nhsd_certificate.pdf", // mocking with an available sample PDF for now, can add a sample contract PDF later
   }).as("downloadContract");
 });
 
 Cypress.Commands.add("mockContractEdit", () => {
-  cy.intercept("PUT", "/web/api/v0/studies/*/assets/*/contracts/*", {
+  cy.intercept("PUT", "/web/api/v0/studies/*/contracts/*", {
     statusCode: 204,
   }).as("editContract");
 });

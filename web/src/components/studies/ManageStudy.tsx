@@ -131,6 +131,9 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           <div className={styles["completed-section"]}>
             <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
           </div>
+          <div className={styles["completed-section"]}>
+            {/* <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} /> */}
+          </div>
         </>
       )}
     </>

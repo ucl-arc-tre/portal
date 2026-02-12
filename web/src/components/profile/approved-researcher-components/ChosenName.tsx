@@ -1,20 +1,10 @@
-import { FormEvent, useState } from "react";
+import { SubmitEvent, useState } from "react";
 import { postProfile } from "@/openapi";
-import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Button from "../../ui/Button";
 
 import styles from "./ChosenName.module.css";
-
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
-const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
-  ssr: false,
-});
+import { Alert, AlertMessage, Input } from "@/components/shared/exports";
 
 type ProfileChosenNameProps = {
   currentName?: string;
@@ -28,14 +18,14 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const regex = /^[A-Za-z\s\-'’]+(\p{M}\p{L}*)*$/u;
+  const regex = /^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$/u;
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     const name = inputNameValue.trim();
 
     if (!name) return setErrorMessage("Please enter a name.");
-    if (!regex.test(name)) return setErrorMessage("Please enter a valid name. Only letters and hyphens are allowed.");
+    if (!regex.test(name)) return setErrorMessage("Please enter a valid full name.");
 
     setIsSubmitting(true);
     try {
@@ -55,7 +45,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
   return (
     <section className={styles["chosen-name-container"]} data-cy="chosen-name-form">
-      <h3 className={styles.title}>Set Your Chosen Name</h3>
+      <h3 className={styles.title}>Set Your Name</h3>
       <div className={styles.description}>
         Please enter your name as you would choose to have it appear on forms related to our services.
         <div>
@@ -64,15 +54,15 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} noValidate className={styles.form}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles["input-group"]}>
-          <label htmlFor="chosenNameInput" className={styles.label}>
-            Chosen Name
+          <label htmlFor="nameInput" className={styles.label}>
+            Full Name
           </label>
           <Input
-            id="chosenNameInput"
+            id="nameInput"
             type="text"
-            name="chosenName"
+            name="name"
             value={inputNameValue}
             placeholder="e.g. Alice Smith"
             minLength={3}
@@ -82,8 +72,9 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
               if (errorMessage) setErrorMessage(null);
             }}
             aria-invalid={!!errorMessage}
-            aria-describedby="chosenNameError"
+            aria-describedby="nameError"
             className={styles.input}
+            required
           />
         </div>
 

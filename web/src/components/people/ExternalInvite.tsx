@@ -17,6 +17,8 @@ export default function ExternalInvite() {
     e.preventDefault();
     try {
       setIsLoading(true);
+      setErrorMessage("");
+      setShowSuccessMessage(false);
       const response = await postUsersInvite({ body: { email } });
       if (response.response.ok) {
         setShowSuccessMessage(true);

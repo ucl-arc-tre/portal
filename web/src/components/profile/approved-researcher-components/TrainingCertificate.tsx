@@ -19,7 +19,7 @@ const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input
   ssr: false,
 });
 
-interface FormEvent extends React.FormEvent<HTMLFormElement> {
+interface SubmitEvent extends React.SubmitEvent<HTMLFormElement> {
   target: HTMLFormElement & {
     certificate: HTMLInputElement;
   };
@@ -54,7 +54,7 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
     });
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage(undefined);

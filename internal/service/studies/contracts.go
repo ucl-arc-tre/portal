@@ -15,7 +15,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
+func (s *Service) ValidateContractMetadata(studyId uuid.UUID, contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
 	// Only validate file extension if a filename is provided (for an updated contract, file is optional)
 	if filename != "" && !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
 		return &openapi.ValidationError{
@@ -77,6 +77,19 @@ func (s *Service) ValidateContractMetadata(contractData openapi.ContractUploadOb
 		}
 	}
 
+	var numExistingAssets int64
+	err = s.db.Model(types.Asset{}).Where("study_id = ? AND id in ?", studyId, contractData.AssetIds).Count(&numExistingAssets).Error
+	if err != nil {
+		log.Err(err).Msg("Failed to find matching assets")
+		return &openapi.ValidationError{
+			ErrorMessage: "Failed to find matching assets",
+		}
+	} else if numExistingAssets != int64(len(contractData.AssetIds)) {
+		return &openapi.ValidationError{
+			ErrorMessage: "Did not find existing study assets",
+		}
+	}
+
 	return nil
 }
 
@@ -87,12 +100,6 @@ func (s *Service) StoreContract(
 	contractMetadata types.Contract,
 ) error {
 	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
-
-	if assetExists, err := s.assetExists(studyID, contractMetadata.AssetID); err != nil {
-		return err
-	} else if !assetExists {
-		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
-	}
 
 	// Start a database transaction
 	tx := s.db.Begin()
@@ -107,8 +114,6 @@ func (s *Service) StoreContract(
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to save contract metadata")
 	}
-
-	log.Debug().Any("contractId", contractMetadata.ID).Msg("Contract metadata saved, proceeding with S3 storage")
 
 	// Store the PDF file in S3 using the generated primary key ID from the database
 	metadata := s3.ObjectMetadata{
@@ -130,12 +135,11 @@ func (s *Service) StoreContract(
 
 func (s *Service) GetContract(ctx context.Context,
 	studyID uuid.UUID,
-	assetID uuid.UUID,
 	contractID uuid.UUID,
 ) (types.S3Object, error) {
 	log.Debug().Any("contractID", contractID).Msg("Getting contract")
 
-	if exists, err := s.contractExists(studyID, assetID, contractID); err != nil {
+	if exists, err := s.contractExists(studyID, contractID); err != nil {
 		return types.S3Object{}, err
 	} else if !exists {
 		return types.S3Object{}, types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
@@ -157,7 +161,7 @@ func (s *Service) UpdateContract(
 ) error {
 	log.Debug().Any("contractId", contractID).Msg("Updating contract")
 
-	if exists, err := s.contractExists(studyID, contractMetadata.AssetID, contractID); err != nil {
+	if exists, err := s.contractExists(studyID, contractID); err != nil {
 		return err
 	} else if !exists {
 		return types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
@@ -185,7 +189,7 @@ func (s *Service) UpdateContract(
 
 	// Update the database record
 	result := tx.Model(&types.Contract{}).
-		Where("id = ? AND asset_id = ?", contractID, contractMetadata.AssetID).
+		Where("id = ? AND study_id = ?", contractID, contractMetadata.StudyID).
 		Updates(contractMetadata)
 
 	if result.Error != nil {
@@ -193,9 +197,43 @@ func (s *Service) UpdateContract(
 		return types.NewErrFromGorm(result.Error, "failed to update contract")
 	}
 
+	assoc := tx.Model(&contractMetadata).Association("Assets")
+	if err := assoc.Replace(contractMetadata.Assets); err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to update contract assets")
+	}
+
 	if err := tx.Commit().Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to commit contract update transaction")
 	}
 
 	return nil
+}
+
+func (s *Service) contractExists(studyID uuid.UUID, contractID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Model(&types.Contract{}).
+		Select("count(*) > 0").
+		Where("study_id = ? AND id = ?", studyID, contractID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
+}
+
+func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Model(&types.Asset{}).
+		Select("count(*) > 0").
+		Where("study_id = ? AND id = ?", studyID, assetID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
+}
+
+// retrieves all contracts within a study
+func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
+	contracts := []types.Contract{}
+	err := s.db.Preload("Assets").Where("study_id = ?", studyID).
+		Order("created_at DESC").
+		Find(&contracts).Error
+	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
+
 }

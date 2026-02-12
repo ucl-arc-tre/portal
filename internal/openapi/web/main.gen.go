@@ -328,6 +328,9 @@ type ConfirmedAgreement struct {
 
 // Contract defines model for Contract.
 type Contract struct {
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
+
 	// CreatedAt Time in RFC3339 format when the contract was created
 	CreatedAt string `json:"created_at"`
 
@@ -349,6 +352,9 @@ type Contract struct {
 	// Status Current status of the contract
 	Status ContractStatus `json:"status"`
 
+	// StudyId Unique identifier of the study to which the contract belongs
+	StudyId string `json:"study_id"`
+
 	// ThirdPartyName Name of the third party organization
 	ThirdPartyName string `json:"third_party_name"`
 
@@ -361,6 +367,9 @@ type ContractStatus string
 
 // ContractBase defines model for ContractBase.
 type ContractBase struct {
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
+
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
@@ -382,6 +391,9 @@ type ContractBaseStatus string
 
 // ContractUpdate defines model for ContractUpdate.
 type ContractUpdate struct {
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
+
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
@@ -406,6 +418,9 @@ type ContractUpdateStatus string
 
 // ContractUploadObject defines model for ContractUploadObject.
 type ContractUploadObject struct {
+	// AssetIds List of assets associated with this contract
+	AssetIds []string `json:"asset_ids"`
+
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
@@ -793,6 +808,13 @@ type UserData struct {
 	User           User            `json:"user"`
 }
 
+// UserMetrics defines model for UserMetrics.
+type UserMetrics struct {
+	NumApprovedResearchersExpiredTraining int `json:"num_approved_researchers_expired_training"`
+	NumApprovedResearchersValidTraining   int `json:"num_approved_researchers_valid_training"`
+	Total                                 int `json:"total"`
+}
+
 // UserTrainingUpdate defines model for UserTrainingUpdate.
 type UserTrainingUpdate struct {
 	// TrainingDate Time in RFC3339 format at which the the certificate was issued
@@ -859,11 +881,11 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
-// PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdAssetsAssetIdContractsUpload for multipart/form-data ContentType.
-type PostStudiesStudyIdAssetsAssetIdContractsUploadMultipartRequestBody = ContractUploadObject
+// PostStudiesStudyIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdContractsUpload for multipart/form-data ContentType.
+type PostStudiesStudyIdContractsUploadMultipartRequestBody = ContractUploadObject
 
-// PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody defines body for PutStudiesStudyIdAssetsAssetIdContractsContractId for multipart/form-data ContentType.
-type PutStudiesStudyIdAssetsAssetIdContractsContractIdMultipartRequestBody = ContractUpdate
+// PutStudiesStudyIdContractsContractIdMultipartRequestBody defines body for PutStudiesStudyIdContractsContractId for multipart/form-data ContentType.
+type PutStudiesStudyIdContractsContractIdMultipartRequestBody = ContractUpdate
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -964,14 +986,17 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/assets/{assetId}/contracts)
 	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId string, assetId string)
 
-	// (POST /studies/{studyId}/assets/{assetId}/contracts/upload)
-	PostStudiesStudyIdAssetsAssetIdContractsUpload(c *gin.Context, studyId string, assetId string)
+	// (GET /studies/{studyId}/contracts)
+	GetStudiesStudyIdContracts(c *gin.Context, studyId string)
 
-	// (PUT /studies/{studyId}/assets/{assetId}/contracts/{contractId})
-	PutStudiesStudyIdAssetsAssetIdContractsContractId(c *gin.Context, studyId string, assetId string, contractId string)
+	// (POST /studies/{studyId}/contracts/upload)
+	PostStudiesStudyIdContractsUpload(c *gin.Context, studyId string)
 
-	// (GET /studies/{studyId}/assets/{assetId}/contracts/{contractId}/download)
-	GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context, studyId string, assetId string, contractId string)
+	// (PUT /studies/{studyId}/contracts/{contractId})
+	PutStudiesStudyIdContractsContractId(c *gin.Context, studyId string, contractId string)
+
+	// (GET /studies/{studyId}/contracts/{contractId}/download)
+	GetStudiesStudyIdContractsContractIdDownload(c *gin.Context, studyId string, contractId string)
 
 	// (PATCH /studies/{studyId}/pending)
 	PatchStudiesStudyIdPending(c *gin.Context, studyId string)
@@ -984,6 +1009,9 @@ type ServerInterface interface {
 
 	// (POST /users/invite)
 	PostUsersInvite(c *gin.Context)
+
+	// (GET /users/metrics)
+	GetUsersMetrics(c *gin.Context)
 
 	// (PUT /users/{userId}/attributes)
 	PutUsersUserIdAttributes(c *gin.Context, userId string)
@@ -1574,8 +1602,8 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gi
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContracts(c, studyId, assetId)
 }
 
-// PostStudiesStudyIdAssetsAssetIdContractsUpload operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsUpload(c *gin.Context) {
+// GetStudiesStudyIdContracts operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContracts(c *gin.Context) {
 
 	var err error
 
@@ -1585,15 +1613,6 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsUploa
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Path parameter "assetId" -------------
-	var assetId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1604,11 +1623,11 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssetsAssetIdContractsUploa
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdAssetsAssetIdContractsUpload(c, studyId, assetId)
+	siw.Handler.GetStudiesStudyIdContracts(c, studyId)
 }
 
-// PutStudiesStudyIdAssetsAssetIdContractsContractId operation middleware
-func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetIdContractsContractId(c *gin.Context) {
+// PostStudiesStudyIdContractsUpload operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsUpload(c *gin.Context) {
 
 	var err error
 
@@ -1621,12 +1640,27 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetIdContractsContra
 		return
 	}
 
-	// ------------- Path parameter "assetId" -------------
-	var assetId string
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
 
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	siw.Handler.PostStudiesStudyIdContractsUpload(c, studyId)
+}
+
+// PutStudiesStudyIdContractsContractId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1646,11 +1680,11 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetIdContractsContra
 		}
 	}
 
-	siw.Handler.PutStudiesStudyIdAssetsAssetIdContractsContractId(c, studyId, assetId, contractId)
+	siw.Handler.PutStudiesStudyIdContractsContractId(c, studyId, contractId)
 }
 
-// GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload operation middleware
-func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c *gin.Context) {
+// GetStudiesStudyIdContractsContractIdDownload operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdDownload(c *gin.Context) {
 
 	var err error
 
@@ -1660,15 +1694,6 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Path parameter "assetId" -------------
-	var assetId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1688,7 +1713,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContractsContra
 		}
 	}
 
-	siw.Handler.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload(c, studyId, assetId, contractId)
+	siw.Handler.GetStudiesStudyIdContractsContractIdDownload(c, studyId, contractId)
 }
 
 // PatchStudiesStudyIdPending operation middleware
@@ -1772,6 +1797,19 @@ func (siw *ServerInterfaceWrapper) PostUsersInvite(c *gin.Context) {
 	}
 
 	siw.Handler.PostUsersInvite(c)
+}
+
+// GetUsersMetrics operation middleware
+func (siw *ServerInterfaceWrapper) GetUsersMetrics(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUsersMetrics(c)
 }
 
 // PutUsersUserIdAttributes operation middleware
@@ -1878,13 +1916,15 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
-	router.POST(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/upload", wrapper.PostStudiesStudyIdAssetsAssetIdContractsUpload)
-	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId", wrapper.PutStudiesStudyIdAssetsAssetIdContractsContractId)
-	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts/:contractId/download", wrapper.GetStudiesStudyIdAssetsAssetIdContractsContractIdDownload)
+	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
+	router.POST(options.BaseURL+"/studies/:studyId/contracts/upload", wrapper.PostStudiesStudyIdContractsUpload)
+	router.PUT(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.PutStudiesStudyIdContractsContractId)
+	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/download", wrapper.GetStudiesStudyIdContractsContractIdDownload)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
+	router.GET(options.BaseURL+"/users/metrics", wrapper.GetUsersMetrics)
 	router.PUT(options.BaseURL+"/users/:userId/attributes", wrapper.PutUsersUserIdAttributes)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
 }

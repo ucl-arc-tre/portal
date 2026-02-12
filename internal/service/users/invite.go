@@ -2,11 +2,9 @@ package users
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -18,14 +16,9 @@ func (s *Service) InviteUser(ctx context.Context, email string, sponsor types.Sp
 	}
 
 	if err := s.entra.AddtoInvitedUserGroup(ctx, *user); err != nil {
-		if strings.Contains(err.Error(), "One or more added object references already exist for the following modified properties") {
-			log.Warn().Msg("User is already in group")
-			return nil
-		}
-
 		return err
-
 	}
+
 	return nil
 }
 
