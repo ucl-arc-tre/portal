@@ -87,7 +87,7 @@ func EntraCredentials() EntraCredentialBundle {
 	return EntraCredentialBundle{
 		TenantID:     k.String("entra.tenant_id"),
 		ClientID:     k.String("entra.client_id"),
-		ClientSecret: k.String("entra.client_secret"),
+		ClientSecret: k.String("entra.client_secret"), // #nosec G117
 	}
 }
 
@@ -95,7 +95,7 @@ func EntraMailCredentials() EntraCredentialBundle {
 	return EntraCredentialBundle{
 		TenantID:     k.String("entra.mail_tenant_id"),
 		ClientID:     k.String("entra.mail_client_id"),
-		ClientSecret: k.String("entra.mail_client_secret"),
+		ClientSecret: k.String("entra.mail_client_secret"), // #nosec G117
 	}
 }
 
