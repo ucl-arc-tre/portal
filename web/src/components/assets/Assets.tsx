@@ -21,10 +21,11 @@ type InformationAssetsProps = {
   studyTitle: string;
   setAssetManagementCompleted?: (completed: boolean) => void;
   canModify: boolean;
+  setNumAssets?: (numAssets: number) => void;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, studyTitle, setAssetManagementCompleted, canModify } = props;
+  const { studyId, studyTitle, setAssetManagementCompleted, canModify, setNumAssets } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +66,9 @@ export default function Assets(props: InformationAssetsProps) {
 
         if (informationAssetResult.response.status === 200 && informationAssetResult.data) {
           setInformationAssets(informationAssetResult.data);
-
+          if (setNumAssets) {
+            setNumAssets(informationAssetResult.data.length);
+          }
           if (informationAssetResult.data.length > 0) {
             const assets = informationAssetResult.data;
             const assetsComplete = await checkAssetManagementCompleted(assets);
@@ -84,7 +87,7 @@ export default function Assets(props: InformationAssetsProps) {
     };
 
     fetchInformationAssetData();
-  }, [studyId, setAssetManagementCompleted, checkAssetManagementCompleted]);
+  }, [studyId, setAssetManagementCompleted, checkAssetManagementCompleted, setNumAssets]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);

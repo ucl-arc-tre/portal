@@ -19,6 +19,8 @@ type StudyOverviewProps = {
   approvalStatus: ApprovalStatus | undefined;
   handleUpdateStudyStatus: (status: ApprovalStatus) => void;
   feedback?: string;
+  numAssets: number;
+  numContracts: number;
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
@@ -34,6 +36,8 @@ export default function StudyOverview(props: StudyOverviewProps) {
     riskScoreLoading,
     handleUpdateStudyStatus,
     feedback,
+    numAssets,
+    numContracts,
   } = props;
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
@@ -214,7 +218,19 @@ export default function StudyOverview(props: StudyOverviewProps) {
             </Alert>
           )}
 
-          {/*//TODO: add summary of num of assets, contracts & projects*/}
+          {/*//TODO: add summary of num of projects*/}
+
+          <div>
+            <h4>Summary of related entities:</h4>
+            <dl className={styles.grouping}>
+              <dd>
+                Assets: <span className={styles["grey-value"]}>{numAssets}</span>
+              </dd>
+              <dd>
+                Contracts: <span className={styles["grey-value"]}>{numContracts}</span>
+              </dd>
+            </dl>
+          </div>
         </div>
       </Box>
     </>

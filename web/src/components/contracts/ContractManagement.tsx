@@ -16,9 +16,11 @@ type ContractManagementProps = {
   study: Study;
   asset?: Asset;
   canModify: boolean;
+  setNumContracts?: (numContracts: number) => void;
 };
 
-export default function ContractManagement({ study, asset, canModify }: ContractManagementProps) {
+export default function ContractManagement(props: ContractManagementProps) {
+  const { study, asset, canModify, setNumContracts } = props;
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +46,9 @@ export default function ContractManagement({ study, asset, canModify }: Contract
 
       if (response.response.ok && response.data) {
         setContracts(response.data);
+        if (setNumContracts) {
+          setNumContracts(response.data.length);
+        }
       } else {
         throw new Error(`Failed to fetch contracts: ${response.response.status} ${response.response.statusText}`);
       }
@@ -53,7 +58,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, asset]);
+  }, [study.id, asset, setNumContracts]);
 
   useEffect(() => {
     fetchContracts();

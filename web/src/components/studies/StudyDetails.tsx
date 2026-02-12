@@ -13,6 +13,7 @@ import AdminFeedbackSection from "./AdminFeedbackSection";
 import { storageDefinitions } from "../shared/storageDefinitions";
 import Assets from "../assets/Assets";
 import StudyOverview from "./StudyOverview";
+import ContractManagement from "../contracts/ContractManagement";
 
 type StudyDetailsProps = {
   study: Study;
@@ -90,7 +91,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
+
   const [tab, setTab] = useState("overview");
+  const [numAssets, setNumAssets] = useState(0);
+  const [numContracts, setNumContracts] = useState(0);
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
@@ -187,52 +191,66 @@ export default function StudyDetails(props: StudyDetailsProps) {
         {/* TODO: add projects */}
       </div>
 
-      {isStudyOwnerOrAdmin && setStudyFormOpen && (
-        <div className={styles["study-actions"]}>
-          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
-            {study.feedback ? "Respond to Feedback" : "Edit Study"}
-          </Button>
+      <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
+        {isStudyOwnerOrAdmin && setStudyFormOpen && (
+          <div className={styles["study-actions"]}>
+            <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
+              {study.feedback ? "Respond to Feedback" : "Edit Study"}
+            </Button>
 
-          {studyStepsCompleted &&
-            approvalStatus !== "Approved" &&
-            (approvalStatus !== "Pending" ? (
-              <Button
-                onClick={() => handleUpdateStudyStatus("Pending")}
-                size="small"
-                data-cy="study-ready-for-review-button"
-              >
-                Mark Ready for Review
-              </Button>
-            ) : (
-              <Button disabled size="small">
-                Submitted for Review
-              </Button>
-            ))}
-        </div>
-      )}
-      <StudyOverview
-        study={study}
-        riskScore={riskScore}
-        riskScoreLoading={riskScoreLoading}
-        handleUpdateStudyStatus={handleUpdateStudyStatus}
-        approvalStatus={approvalStatus}
-        isIGOpsStaff={isIGOpsStaff}
-        isStudyOwner={isStudyOwner}
-        isStudyAdmin={isStudyAdmin}
-        feedback={feedback}
-      />
+            {studyStepsCompleted &&
+              approvalStatus !== "Approved" &&
+              (approvalStatus !== "Pending" ? (
+                <Button
+                  onClick={() => handleUpdateStudyStatus("Pending")}
+                  size="small"
+                  data-cy="study-ready-for-review-button"
+                >
+                  Mark Ready for Review
+                </Button>
+              ) : (
+                <Button disabled size="small">
+                  Submitted for Review
+                </Button>
+              ))}
+          </div>
+        )}
 
-      {isIGOpsStaff && (
-        <>
-          <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
+        <StudyOverview
+          study={study}
+          riskScore={riskScore}
+          riskScoreLoading={riskScoreLoading}
+          handleUpdateStudyStatus={handleUpdateStudyStatus}
+          approvalStatus={approvalStatus}
+          isIGOpsStaff={isIGOpsStaff}
+          isStudyOwner={isStudyOwner}
+          isStudyAdmin={isStudyAdmin}
+          feedback={feedback}
+          numAssets={numAssets}
+          numContracts={numContracts}
+        />
 
+        {isIGOpsStaff && (
           <AdminFeedbackSection
             status={study.approval_status}
             feedbackFromStudy={feedback}
             handleUpdateStudyStatus={handleUpdateStudyStatus}
           />
-        </>
-      )}
+        )}
+      </div>
+
+      <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
+        <Assets
+          studyId={study.id}
+          studyTitle={study.title}
+          canModify={isStudyOwnerOrAdmin}
+          setNumAssets={setNumAssets}
+        />
+      </div>
+
+      <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
+        <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} setNumContracts={setNumContracts} />
+      </div>
     </>
   );
 }

@@ -27,6 +27,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted && adminsAgreementsCompleted;
 
@@ -108,7 +109,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           <StudyDetails
             studyStepsCompleted={studyStepsCompleted}
             study={study}
-            isIGOpsStaff={false}
+            isIGOpsStaff={isIGOpsStaff}
             isStudyOwner={isStudyOwner}
             isStudyAdmin={isStudyAdmin}
             setStudyFormOpen={setStudyFormOpen}
@@ -132,7 +133,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
             <StudyDetails
               studyStepsCompleted={studyStepsCompleted}
               study={study}
-              isIGOpsStaff={false}
+              isIGOpsStaff={isIGOpsStaff}
               isStudyOwner={isStudyOwner}
               isStudyAdmin={isStudyAdmin}
               setStudyFormOpen={setStudyFormOpen}
