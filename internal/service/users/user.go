@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -57,7 +58,6 @@ func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 
 // Get or create a user for a unique username. Returns the user, whether
 // they were created or not and an error
-// If they do not exist then they will be created with the base role
 func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	user := types.User{}
 	result := s.db.Where("username = ?", username).
@@ -69,13 +69,51 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	if result.Error != nil {
 		return user, types.NewErrFromGorm(result.Error)
 	}
-	userWasCreated := result.RowsAffected > 0
-	if userWasCreated {
-		if _, err := rbac.AddRole(user, rbac.Base); err != nil {
-			return user, types.NewErrServerError(fmt.Errorf("failed assign user base role: %v", err))
+	return user, nil
+}
+
+// Get or create an external user that is guested into the IdP. They may
+// have already been created, in which case we need to merge identities
+// otherwise we set the email as an attribute of that user
+func (s *Service) PersistedExternalUser(username types.Username, email Email) (types.User, error) {
+	tx := s.db.Begin()
+
+	user := types.User{}
+	findResult := tx.Where("username = ?", email).Find(&user)
+	if err := findResult.Error; err != nil {
+		tx.Rollback()
+		return types.User{}, types.NewErrFromGorm(err, "failed to find existing user")
+	}
+	if findResult.RowsAffected > 0 {
+		log.Debug().Str("email", email).Msg("External user already existed with username == email")
+		user.Username = username
+		if err := tx.Save(&user).Error; err != nil {
+			tx.Rollback()
+			return types.User{}, types.NewErrFromGorm(err, "failed to update existing user username")
+		}
+		return user, nil
+	} else {
+		createResult := s.db.Where("username = ?", username).
+			Attrs(types.User{Username: username}).
+			FirstOrCreate(&user)
+		if createResult.RowsAffected > 0 {
+			log.Info().Str("email", email).Any("username", username).Msg("External user created")
+		}
+		if err := createResult.Error; err != nil {
+			tx.Rollback()
+			return types.User{}, types.NewErrFromGorm(err, "failed to create new user")
 		}
 	}
-	return user, nil
+
+	attrs := types.UserAttributes{UserID: user.ID}
+	attrsResult := tx.Where(&attrs).Assign(types.UserAttributes{Email: email}).FirstOrCreate(&attrs)
+	if err := attrsResult.Error; err != nil {
+		tx.Rollback()
+		return types.User{}, types.NewErrFromGorm(err, "failed to set email for existing user")
+	}
+
+	err := tx.Commit().Error
+	return user, types.NewErrFromGorm(err, "failed to create external user")
 }
 
 func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {

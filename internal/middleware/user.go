@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -15,6 +16,7 @@ import (
 const (
 	userCacheTTL      = 1 * time.Hour
 	userContextKey    = "user"
+	emailHeaderKey    = "X-Forwarded-Email"
 	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
 
@@ -45,7 +47,13 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		ctx.Set(userContextKey, user)
 		return
 	}
-	user, err := u.users.PersistedUser(username)
+	var user types.User
+	var err error
+	if entra.IsExternalUsername(username) {
+		user, err = u.users.PersistedExternalUser(username, ctx.GetHeader(emailHeaderKey))
+	} else {
+		user, err = u.users.PersistedUser(username)
+	}
 	if err != nil {
 		log.Err(err).Msg("Failed to get user")
 		ctx.AbortWithStatus(http.StatusInternalServerError)

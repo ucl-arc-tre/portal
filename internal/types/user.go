@@ -21,9 +21,12 @@ type User struct {
 
 type UserAttributes struct {
 	Model
-	User       User
 	UserID     uuid.UUID
 	ChosenName ChosenName
+	Email      string // Should be set for external users
+
+	// Relationships
+	User User `gorm:"foreignKey:UserID"`
 }
 
 type Sponsor struct {
