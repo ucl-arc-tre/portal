@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Asset,
   AssetBase,
-  ValidationError,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdAssetsByAssetIdContracts,
   postStudiesByStudyIdAssets,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -35,15 +35,15 @@ export default function Assets(props: InformationAssetsProps) {
     async (assets: Asset[]) => {
       // for each asset, check if it requires a contract and if it does, that there is one
 
-      const checkContractsForAsset = async (assetId: string) => {
+      const checkContractsForAsset = async (assetId: string): Promise<boolean> => {
         const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
           path: { studyId: studyId, assetId: assetId },
         });
         if (!response.response.ok) {
-          console.error("Failed to get contracts for asset:", response.error);
-        } else if (response.response.ok && response.data) {
-          return response.data.length > 0;
+          console.error("Failed to get contracts for asset:", extractErrorMessage(response));
+          return false;
         }
+        return response.data ? response.data.length > 0 : false;
       };
 
       const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
@@ -57,13 +57,18 @@ export default function Assets(props: InformationAssetsProps) {
   useEffect(() => {
     const fetchInformationAssetData = async () => {
       setIsLoading(true);
+      setError(null);
 
       try {
-        setError(null);
-
         const informationAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
 
-        if (informationAssetResult.response.status === 200 && informationAssetResult.data) {
+        if (!informationAssetResult.response.ok) {
+          const errorMsg = extractErrorMessage(informationAssetResult);
+          setError(`Failed to load Information Assets: ${errorMsg}`);
+          return;
+        }
+
+        if (informationAssetResult.data) {
           setInformationAssets(informationAssetResult.data);
 
           if (informationAssetResult.data.length > 0) {
@@ -94,16 +99,20 @@ export default function Assets(props: InformationAssetsProps) {
       body: assetData as AssetBase,
     });
 
-    if (response.error) {
-      const errorData = response.error as ValidationError;
-      if (errorData?.error_message) {
-        throw new Error(errorData.error_message);
-      }
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      throw new Error(errorMsg);
     }
 
     // Refresh assets list after successful creation
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-    if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
+    if (!updatedAssetsResult.response.ok) {
+      const errorMsg = extractErrorMessage(updatedAssetsResult);
+      setError(`Failed to refresh asset list: ${errorMsg}`);
+      return;
+    }
+
+    if (updatedAssetsResult.data) {
       setInformationAssets(updatedAssetsResult.data);
       const assets = updatedAssetsResult.data;
       const assetsComplete = await checkAssetManagementCompleted(assets);
