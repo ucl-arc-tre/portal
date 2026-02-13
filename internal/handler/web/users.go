@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -111,6 +112,15 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	var invite openapi.PostUsersInviteJSONRequestBody
 	if err := bindJSONOrSetError(ctx, &invite); err != nil {
+		return
+	}
+
+	if exists, err := h.users.UserExistsWithEmailOrUsername(invite.Email); err != nil {
+		setError(ctx, err, "Failed to check user existance")
+		return
+	} else if exists {
+		log.Debug().Any("email", invite.Email).Msg("User already exists - not inviting")
+		ctx.Status(http.StatusNoContent)
 		return
 	}
 
