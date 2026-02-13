@@ -22,14 +22,14 @@ describe("Contract Management via Study", () => {
     cy.waitForAuth();
 
     //study should be valid from initial setup
-    cy.wait("@getStudyById");
+    cy.wait(["@getStudyById"]);
+
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSampleNoContracts");
 
-    cy.contains("Contracts").should("be.visible").click();
-
     // Should show empty contract state
+    cy.get('button[data-cy="contracts-tab"').should("be.visible").click();
     cy.contains("No contracts uploaded").should("be.visible");
     cy.contains("Add Contract").should("be.visible");
   });
@@ -44,7 +44,7 @@ describe("Contract Management via Study", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.contains("Contracts").should("be.visible").click();
+    cy.get('button[data-cy="contracts-tab"').should("be.visible").click();
 
     // Open upload form
     cy.contains("Add Contract").click();
@@ -249,11 +249,11 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.get("button").contains("Assets").should("be.visible").click();
-    cy.wait("@getAssetsWithSample");
 
     // Navigate to asset contracts
-    cy.contains("Sample Asset Title 1").should("be.visible");
+    cy.get('button[data-cy="assets-tab"').should("be.visible").click();
+    cy.wait("@getAssetsWithSample");
+    cy.contains("Sample Asset Title").should("be.visible");
     cy.contains("Manage Asset").click();
 
     // Wait for asset and contracts to load
@@ -300,7 +300,7 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.get("button").contains("Assets").should("be.visible").click();
+    cy.get('button[data-cy="assets-tab"').should("be.visible").click();
     cy.wait("@getAssetsWithSample");
 
     // Navigate to asset contracts
