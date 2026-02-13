@@ -29,7 +29,8 @@ describe("Contract Management via Study", () => {
     cy.wait("@getAssetsWithSampleNoContracts");
 
     // Should show empty contract state
-    cy.get('button[data-cy="contracts-tab"').should("be.visible").click();
+    cy.wait(1000);
+    cy.contains("Contracts").should("be.visible").click();
     cy.contains("No contracts uploaded").should("be.visible");
     cy.contains("Add Contract").should("be.visible");
   });
@@ -44,7 +45,8 @@ describe("Contract Management via Study", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.get('button[data-cy="contracts-tab"').should("be.visible").click();
+    cy.wait(1000);
+    cy.contains("Contracts").should("be.visible").click();
 
     // Open upload form
     cy.contains("Add Contract").click();
@@ -87,8 +89,9 @@ describe("Contract Management via Study", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.contains("Contracts").should("be.visible").click();
     cy.wait("@getStudyContractsWithSample");
+    cy.wait(1000);
+    cy.contains("Contracts").should("be.visible").click();
 
     // Verify contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
@@ -108,10 +111,11 @@ describe("Contract Management via Study", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.contains("Contracts").should("be.visible").click();
     cy.wait("@getStudyContractsWithSample");
+    cy.wait(1000);
+    cy.contains("Contracts").should("be.visible").click();
 
-    cy.contains("Edit").first().click();
+    cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Verify form is prepopulated with existing values
     cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organization");
@@ -135,10 +139,11 @@ describe("Contract Management via Study", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.contains("Contracts").should("be.visible").click();
     cy.wait("@getStudyContractsWithSample");
+    cy.wait(1000);
+    cy.contains("Contracts").should("be.visible").click();
 
-    cy.contains("Edit").first().click();
+    cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Modify a form field
     cy.get("select[name='status']").select("expired");
@@ -163,10 +168,11 @@ describe("Contract Management via Study", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.contains("Contracts").should("be.visible").click();
     cy.wait("@getStudyContractsWithSample");
+    cy.wait(1000);
+    cy.contains("Contracts").should("be.visible").click();
 
-    cy.contains("Edit").first().click();
+    cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Modify a form field
     //TODO; get assets and then select
@@ -207,6 +213,7 @@ describe("Contract Management via Asset", () => {
 
     // Wait for contracts to load
     cy.wait("@getAssetContractsEmpty");
+    cy.wait(1000);
 
     cy.contains("This asset requires a contract that has not yet been added").should("be.visible");
     cy.contains("Manage Asset").click();
@@ -225,6 +232,7 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait(1000);
 
     // Navigate to asset management page
     cy.contains("Sample Asset Title 1").should("be.visible");
@@ -249,6 +257,7 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
+    cy.wait(1000);
 
     // Navigate to asset contracts
     cy.get('button[data-cy="assets-tab"').should("be.visible").click();
@@ -300,8 +309,9 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.get('button[data-cy="assets-tab"').should("be.visible").click();
     cy.wait("@getAssetsWithSample");
+    cy.wait(1000);
+    cy.contains("Assets").should("be.visible").click();
 
     // Navigate to asset contracts
     cy.contains("Sample Asset Title 1").should("be.visible");
@@ -329,8 +339,9 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.get("button").contains("Assets").should("be.visible").click();
     cy.wait("@getAssetsWithSample");
+    cy.wait(1000);
+    cy.get("button").contains("Assets").should("be.visible").click();
 
     cy.contains("Sample Asset Title 1").should("be.visible");
     cy.contains("Manage Asset").click();
@@ -338,7 +349,7 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getAssetById");
     cy.wait("@getAssetContractsWithSample");
 
-    cy.contains("Edit").first().click();
+    cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Verify form is prepopulated with existing values
     cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organization");
@@ -362,8 +373,9 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.get("button").contains("Assets").should("be.visible").click();
     cy.wait("@getAssetsWithSample");
+    cy.wait(1000);
+    cy.get("button").contains("Assets").should("be.visible").click();
 
     cy.contains("Sample Asset Title 1").should("be.visible");
     cy.contains("Manage Asset").click();
@@ -371,7 +383,7 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getAssetById");
     cy.wait("@getAssetContractsWithSample");
 
-    cy.contains("Edit").first().click();
+    cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Modify a form field
     cy.get("select[name='status']").select("expired");

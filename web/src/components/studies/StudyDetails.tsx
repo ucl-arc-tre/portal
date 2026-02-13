@@ -164,7 +164,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
     if (study.feedback) setFeedback(study.feedback);
   }, [study]);
 
-  console.log("studystepscompleted", studyStepsCompleted);
   return (
     <>
       <div className={"tab-collection"}>
@@ -172,7 +171,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
           onClick={() => setTab("overview")}
           variant="secondary"
           className={`tab ${tab === "overview" ? "active" : ""}`}
-          data-cy="overview-tab"
         >
           Overview
         </Button>
@@ -180,7 +178,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
           onClick={() => setTab("assets")}
           variant="secondary"
           className={`tab ${tab === "assets" ? "active" : ""}`}
-          data-cy="assets-tab"
         >
           Assets
         </Button>
@@ -188,7 +185,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
           onClick={() => setTab("contracts")}
           variant="secondary"
           className={`tab ${tab === "contracts" ? "active" : ""}`}
-          data-cy="contracts-tab"
         >
           Contracts
         </Button>
