@@ -82,36 +82,6 @@
   align-items: center;
 }
 
-.delete-button {
-  background-color: #dc3545 !important;
-  border-color: #dc3545 !important;
-  color: white !important;
-}
-
-.delete-button:hover:not(:disabled) {
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
-}
-
-.delete-button:disabled {
-  opacity: 0.6 !important;
-}
-
-.delete-button-confirm {
-  background-color: #dc3545 !important;
-  border-color: #dc3545 !important;
-  color: white !important;
-}
-
-.delete-button-confirm:hover:not(:disabled) {
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
-}
-
-.delete-button-confirm:disabled {
-  opacity: 0.6 !important;
-}
-
 .delete-dialog {
   padding: 1rem 0.5rem;
   width: 100%;

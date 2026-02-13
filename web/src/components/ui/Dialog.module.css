@@ -4,6 +4,7 @@
   display: flex;
   width: 100%;
   z-index: 1000;
+  max-width: 1000px;
 
   align-items: center;
   align-content: center;

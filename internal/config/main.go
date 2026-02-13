@@ -16,6 +16,7 @@ import (
 const (
 	BaseWebURL = "/web/api/v0"
 	BaseTREURL = "/tre/api/v0"
+	BaseDSHURL = "/dsh/api/v0"
 
 	configPath = "/etc/portal/config.yaml"
 
@@ -25,6 +26,9 @@ const (
 
 	TrainingValidityYears = 1
 	TrainingValidity      = TrainingValidityYears * 365 * 24 * time.Hour
+
+	MaxTokenValidForDays = 365
+	MaxTokenValidity     = MaxTokenValidForDays * 24 * time.Hour
 
 	ServerShutdownGraceDuration = 10 * time.Second
 )
@@ -78,6 +82,10 @@ func S3DevHost() string {
 	return k.String("s3.dev.host")
 }
 
+func JWTIssuer() string {
+	return PortalUrl()
+}
+
 // TREUserAccounts are the username:password pairs used to access the TRE API
 func TREUserAccounts() map[string]string {
 	return k.StringMap("tre.users")
@@ -128,6 +136,10 @@ func TreOpsStaffUsernames() []types.Username {
 
 func IGOpsStaffUsernames() []types.Username {
 	return usernames("ig_ops_staff_usernames")
+}
+
+func DSHOpsStaffUsernames() []types.Username {
+	return usernames("dsh_ops_staff_usernames")
 }
 
 // Map of paths to strictly rate limit, so they are 'slow'

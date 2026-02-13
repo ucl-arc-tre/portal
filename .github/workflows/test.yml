@@ -60,9 +60,12 @@ jobs:
           debug: true
           admin_usernames:
             - portal-e2e-admin@arctretest.onmicrosoft.com
-          tre_ops_staff_usernames: []
+          tre_ops_staff_usernames:
+            - portal-e2e-tre@arctretest.onmicrosoft.com
           ig_ops_staff_usernames:
             - portal-e2e-ig@arctretest.onmicrosoft.com
+          dsh_ops_staff_usernames:
+            - portal-e2e-dsh@arctretest.onmicrosoft.com
           db:
             dsn: host=postgres user=postgres password=postgres dbname=dev sslmode=disable TimeZone=UTC
           s3:
@@ -93,7 +96,9 @@ jobs:
             "botIGUsername": "portal-e2e-ig@arctretest.onmicrosoft.com",
             "botIGPassword": "${{ secrets.CYPRESS_BOT_IG_PASSWORD }}",
             "botTREUsername": "portal-e2e-tre@arctretest.onmicrosoft.com",
-            "botTREPassword": "${{ secrets.CYPRESS_BOT_TRE_PASSWORD }}"
+            "botTREPassword": "${{ secrets.CYPRESS_BOT_TRE_PASSWORD }}",
+            "botDSHUsername": "portal-e2e-dsh@arctretest.onmicrosoft.com",
+            "botDSHPassword": "${{ secrets.CYPRESS_BOT_DSH_PASSWORD }}"
           }
           EOF
 
