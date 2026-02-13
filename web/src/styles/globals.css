@@ -85,3 +85,36 @@ dialog {
   padding: 12px;
   margin-bottom: 16px;
 }
+
+.tab-collection {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  position: relative;
+  margin-block: 1.8rem;
+
+  .tab {
+    border: none;
+    border-bottom: 2px solid var(--grey-border--light);
+    transition: all 0.3s ease;
+    height: 2.5rem;
+
+    &:hover {
+      color: var(--form-blue--light);
+      border-bottom-color: var(--form-blue--light);
+    }
+
+    &:focus-visible {
+      box-shadow: none;
+    }
+
+    &.active {
+      font-weight: 600;
+      border: 1px solid var(--grey-border--light);
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      border-block: 2px solid #5fa7f5;
+      border-bottom: none;
+    }
+  }
+}

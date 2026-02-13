@@ -227,6 +227,12 @@ declare global {
       mockInformationAssetsWithSample(): Chainable<any>;
 
       /**
+       * Mock assets list with sample assets that don't require contracts
+       * @example cy.mockInformationAssetsWithSampleNoContracts()
+       */
+      mockInformationAssetsWithSampleNoContracts(): Chainable<any>;
+
+      /**
        * Mock successful asset creation
        * @example cy.mockAssetCreation()
        */
@@ -269,10 +275,16 @@ declare global {
       mockStudyAgreementConfirmation(): Chainable<any>;
 
       /**
+       * Mock empty contracts list for a study
+       * @example cy.mockContractsEmpty()
+       */
+      mockStudyContractsEmpty(): Chainable<any>;
+
+      /**
        * Mock empty contracts list for an asset
        * @example cy.mockContractsEmpty()
        */
-      mockContractsEmpty(): Chainable<any>;
+      mockAssetContractsEmpty(): Chainable<any>;
 
       /**
        * Mock study contracts list with sample contracts
@@ -645,6 +657,12 @@ Cypress.Commands.add("mockInformationAssetsWithSample", () => {
   }).as("getAssetsWithSample");
 });
 
+Cypress.Commands.add("mockInformationAssetsWithSampleNoContracts", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets", {
+    fixture: "assets-with-sample-no-contracts.json",
+  }).as("getAssetsWithSampleNoContracts");
+});
+
 Cypress.Commands.add("mockAssetCreation", () => {
   cy.intercept("POST", "/web/api/v0/studies/*/assets", {
     statusCode: 201,
@@ -685,10 +703,15 @@ Cypress.Commands.add("mockStudyAgreementConfirmation", () => {
   }).as("confirmStudyAgreement");
 });
 
-Cypress.Commands.add("mockContractsEmpty", () => {
+Cypress.Commands.add("mockStudyContractsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-empty.json",
-  }).as("getContractsEmpty");
+  }).as("getStudyContractsEmpty");
+});
+Cypress.Commands.add("mockAssetContractsEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {
+    fixture: "contracts-empty.json",
+  }).as("getAssetContractsEmpty");
 });
 
 Cypress.Commands.add("mockStudyContractsWtihSample", () => {

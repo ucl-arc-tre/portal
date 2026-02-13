@@ -105,7 +105,7 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
         </Button>
 
         {canModify && (
-          <Button onClick={onEdit} size="small">
+          <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
             Edit
           </Button>
         )}

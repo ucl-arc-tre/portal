@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
@@ -10,9 +10,11 @@ import {
   ContractUpdate,
   Study,
   Contract,
+  Asset,
+  getStudiesByStudyIdAssets,
 } from "@/openapi";
 import styles from "./ContractUploadForm.module.css";
-import { Label } from "../shared/exports";
+import { HelperText, Label } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -20,12 +22,12 @@ type ContractFormData = {
   status: "proposed" | "active" | "expired";
   startDate: string;
   expiryDate: string;
-  assetIds: string[];
+  assetIds: { value: string }[];
 };
 
 type ContractUploadModalProps = {
   study: Study;
-  assetIds: string[];
+  throughAsset?: Asset;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -34,7 +36,7 @@ type ContractUploadModalProps = {
 
 export default function ContractUploadModal({
   study,
-  assetIds,
+  throughAsset,
   isOpen,
   onClose,
   onSuccess,
@@ -44,6 +46,11 @@ export default function ContractUploadModal({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [assetIds, setAssetIds] = useState<string[]>(throughAsset ? [throughAsset.id] : []);
+  const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const organisationName = process.env.NEXT_PUBLIC_ORGANISATION_NAME;
@@ -53,22 +60,41 @@ export default function ContractUploadModal({
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    control,
   } = useForm<ContractFormData>({
     defaultValues: {
       status: "proposed",
+      assetIds: assetIds.map((id) => ({ value: id })),
     },
+  });
+
+  const selectedAssetIds = watch("assetIds");
+  const {
+    fields: assetFields,
+    append: appendAsset,
+    remove: removeAsset,
+  } = useFieldArray({
+    control,
+    name: "assetIds",
   });
 
   useEffect(() => {
     // populate form with existing data when editing
     if (editingContract) {
+      // get the existing kinked asset ids and add the throughAsset id if it's not already there
+      const combinedAssetIds = [...editingContract.asset_ids];
+      if (throughAsset && !combinedAssetIds.includes(throughAsset.id)) {
+        combinedAssetIds.push(throughAsset.id);
+      }
+      setAssetIds(combinedAssetIds as string[]);
       reset({
         organisationSignatory: editingContract.organisation_signatory,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
-        assetIds: editingContract.asset_ids,
+        assetIds: combinedAssetIds.map((id) => ({ value: id })),
       });
     } else {
       // reset to defaults when not editing
@@ -81,7 +107,26 @@ export default function ContractUploadModal({
         assetIds: [],
       });
     }
-  }, [editingContract, reset]);
+
+    const fetchAssets = async () => {
+      setIsLoadingAssets(true);
+      try {
+        const response = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
+        if (response.response.ok && response.data) {
+          setStudyAssets(response.data);
+        } else {
+          throw new Error(`Failed to fetch assets: ${response.response.status} ${response.response.statusText}`);
+        }
+      } catch (err) {
+        console.error("Failed to load assets for contract form:", err);
+        setError("Failed to load assets. Please try again later.");
+      } finally {
+        setIsLoadingAssets(false);
+      }
+    };
+
+    fetchAssets();
+  }, [editingContract, reset, throughAsset, study.id]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -116,6 +161,7 @@ export default function ContractUploadModal({
     }
 
     setUploading(true);
+    setIsSubmitting(true);
     setError(null);
 
     const contractData: ContractUpdate | ContractUploadObject = {
@@ -185,6 +231,7 @@ export default function ContractUploadModal({
       setError("Error: " + String((error as Error).message));
     } finally {
       setUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -210,7 +257,6 @@ export default function ContractUploadModal({
 
   if (!isOpen) return null;
 
-  // TODO: when coming from asset flow, prefill the asset ID, otherwise allow selection of assets
   return (
     <Dialog setDialogOpen={handleClose}>
       <h2>{editingContract ? "Edit Contract" : "Upload Contract"}</h2>
@@ -343,6 +389,74 @@ export default function ContractUploadModal({
               className={styles["form-input"]}
             />
             {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
+          </div>
+        </div>
+
+        <div className={styles["form-section"]}>
+          <h4>Link Assets (optional)</h4>
+          <div className={styles["form-group"]}>
+            <fieldset className={styles["dynamic-fieldset"]}>
+              {assetFields.map((field, index) => (
+                <div key={field.id} className={styles["item-wrapper"]}>
+                  <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                    Asset {index + 1}:
+                  </label>
+
+                  <Controller
+                    name={`assetIds.${index}.value` as const}
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        id={`asset-${index}`}
+                        className={styles.select}
+                        disabled={isSubmitting || isLoadingAssets}
+                      >
+                        <option value="">
+                          {isLoadingAssets
+                            ? "Loading assets..."
+                            : studyAssets.length === 0
+                              ? "No assets available for this study"
+                              : "Select an asset (optional)..."}
+                        </option>
+                        {studyAssets.map((asset) => {
+                          const isAlreadySelected = selectedAssetIds.some(
+                            (selected, selectedIndex) => selected.value === asset.id && selectedIndex !== index
+                          );
+
+                          return (
+                            <option key={asset.id} value={asset.id} disabled={isAlreadySelected}>
+                              {asset.title}
+                              {isAlreadySelected ? " - Already selected" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    )}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeAsset(index)}
+                    className={styles["remove-button"]}
+                    aria-label={`Remove asset ${index + 1}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                className={styles["add-button"]}
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => appendAsset({ value: "" })}
+              >
+                Add Asset
+              </Button>
+            </fieldset>
+            <HelperText>Optionally link this contract to one or more existing assets from this study</HelperText>
           </div>
         </div>
 

@@ -6,17 +6,14 @@ import {
   getStudiesByStudyIdAssets,
   ApprovalStatus,
 } from "@/openapi";
-import Box from "../ui/Box";
-import { Alert, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
-import StatusBadge from "../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
-import InfoTooltip from "../ui/InfoTooltip";
 import AdminFeedbackSection from "./AdminFeedbackSection";
 import { storageDefinitions } from "../shared/storageDefinitions";
-import Loading from "../ui/Loading";
 import Assets from "../assets/Assets";
+import StudyOverview from "./StudyOverview";
+import ContractManagement from "../contracts/ContractManagement";
 
 type StudyDetailsProps = {
   study: Study;
@@ -95,6 +92,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [feedback, setFeedback] = useState("");
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
+  const [tab, setTab] = useState("overview");
+  const [numAssets, setNumAssets] = useState(0);
+  const [numContracts, setNumContracts] = useState(0);
+
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
@@ -163,195 +164,101 @@ export default function StudyDetails(props: StudyDetailsProps) {
     if (study.feedback) setFeedback(study.feedback);
   }, [study]);
 
-  const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
-      {isStudyOwnerOrAdmin && setStudyFormOpen && (
-        <div className={styles["study-actions"]}>
-          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
-            {study.feedback ? "Respond to Feedback" : "Edit Study"}
-          </Button>
+      <div className={"tab-collection"}>
+        <Button
+          onClick={() => setTab("overview")}
+          variant="secondary"
+          className={`tab ${tab === "overview" ? "active" : ""}`}
+        >
+          Overview
+        </Button>
+        <Button
+          onClick={() => setTab("assets")}
+          variant="secondary"
+          className={`tab ${tab === "assets" ? "active" : ""}`}
+        >
+          Assets
+        </Button>
+        <Button
+          onClick={() => setTab("contracts")}
+          variant="secondary"
+          className={`tab ${tab === "contracts" ? "active" : ""}`}
+        >
+          Contracts
+        </Button>
+        {/* TODO: add projects */}
+      </div>
 
-          {studyStepsCompleted &&
-            approvalStatus !== "Approved" &&
-            (approvalStatus !== "Pending" ? (
-              <Button
-                onClick={() => handleUpdateStudyStatus("Pending")}
-                size="small"
-                data-cy="study-ready-for-review-button"
-              >
-                Mark Ready for Review
-              </Button>
-            ) : (
-              <Button disabled size="small">
-                Submitted for Review
-              </Button>
-            ))}
-        </div>
-      )}
+      <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
+        {isStudyOwnerOrAdmin && setStudyFormOpen && (
+          <div className={styles["study-actions"]}>
+            <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
+              {study.feedback ? "Respond to Feedback" : "Edit Study"}
+            </Button>
 
-      <Box>
-        <div className={styles["pre-description"]}>
-          <span>
-            Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
-          </span>
-          <span>
-            Risk Score:{" "}
-            <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
-          </span>
-          <StatusBadge status={approvalStatus} isOpsStaff={isIGOpsStaff} type="study" />{" "}
-        </div>
-        <h3 className={styles.description}>{study.description}</h3>
-        <div>
-          <dl className={styles.ownership}>
-            <dd>
-              Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
-            </dd>
-            <dd>
-              Admins:
-              {study.additional_study_admin_usernames.map((username) => (
-                <li key={username}>
-                  <span className={styles["grey-value"]}>{username}</span>
-                </li>
+            {studyStepsCompleted &&
+              approvalStatus !== "Approved" &&
+              (approvalStatus !== "Pending" ? (
+                <Button
+                  onClick={() => handleUpdateStudyStatus("Pending")}
+                  size="small"
+                  data-cy="study-ready-for-review-button"
+                >
+                  Mark Ready for Review
+                </Button>
+              ) : (
+                <Button disabled size="small">
+                  Submitted for Review
+                </Button>
               ))}
-            </dd>
-            <dd>
-              Data Controller:{" "}
-              <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
-            </dd>
-          </dl>
+          </div>
+        )}
 
-          <h3>Additional Information</h3>
-          <hr />
-          <dl className={styles.grouping}>
-            <h4>Sponsorships & Approvals</h4>
-            {study.involves_ucl_sponsorship && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>UCL Sponsorship</dd>
-            )}
-            {study.involves_cag && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                CAG approval
-                <InfoTooltip text="increases risk score by 5" />
-              </dd>
-            )}
-            {study.involves_ethics_approval && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>Ethics approval</dd>
-            )}
-            {study.involves_hra_approval && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>HRA approval</dd>
-            )}
-            {!study.involves_ucl_sponsorship &&
-              !study.involves_cag &&
-              !study.involves_ethics_approval &&
-              !study.involves_hra_approval && (
-                <dd>
-                  {" "}
-                  <em>No sponsorship or approval information given</em>
-                </dd>
-              )}
-          </dl>
-          <dl className={styles.grouping}>
-            <h4>NHS</h4>
-            {study.is_nhs_associated && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is NHS associated</dd>
-            )}
-            {study.involves_nhs_england && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                NHS England involvement
-                <InfoTooltip text={standardRiskScoreStatement} />
-              </dd>
-            )}
-            {study.involves_mnca && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>involves MNCA</dd>
-            )}
-            {study.requires_dspt && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                requires DSPT
-                <InfoTooltip text={standardRiskScoreStatement} />
-              </dd>
-            )}
-            {!study.is_nhs_associated &&
-              !study.involves_nhs_england &&
-              !study.involves_mnca &&
-              !study.requires_dspt && (
-                <dd>
-                  <em> No NHS information given</em>
-                </dd>
-              )}
-          </dl>
-          <dl className={styles.grouping}>
-            <h4>Data</h4>
-            {study.requires_dbs && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                requires DBS
-                <InfoTooltip text={standardRiskScoreStatement} />
-              </dd>
-            )}
-            {study.is_data_protection_office_registered && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is registered with DPO</dd>
-            )}
-            {study.involves_third_party && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                third party
-                <InfoTooltip text="increases risk score by 5 if no mNCA" />
-              </dd>
-            )}
-            {study.involves_external_users && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>external users</dd>
-            )}
-            {study.involves_participant_consent && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>participant consent</dd>
-            )}
-            {study.involves_indirect_data_collection && (
-              <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>indirect data collection</dd>
-            )}
-            {study.involves_data_processing_outside_eea && (
-              <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-                data processing outside EEA
-                <InfoTooltip text="increases risk score by 10" />
-              </dd>
-            )}
-            {!study.requires_dbs &&
-              !study.is_data_protection_office_registered &&
-              !study.involves_third_party &&
-              !study.involves_external_users &&
-              !study.involves_participant_consent &&
-              !study.involves_indirect_data_collection &&
-              !study.involves_data_processing_outside_eea && (
-                <dd>
-                  <em>No data information given</em>
-                </dd>
-              )}
-          </dl>
+        <StudyOverview
+          study={study}
+          riskScore={riskScore}
+          riskScoreLoading={riskScoreLoading}
+          handleUpdateStudyStatus={handleUpdateStudyStatus}
+          approvalStatus={approvalStatus}
+          isIGOpsStaff={isIGOpsStaff}
+          isStudyOwner={isStudyOwner}
+          isStudyAdmin={isStudyAdmin}
+          feedback={feedback}
+          numAssets={numAssets}
+          numContracts={numContracts}
+        />
 
-          {feedback && (
-            <Alert type={approvalStatus === "Approved" ? "info" : "warning"} className={styles["feedback-alert"]}>
-              <h4>This study has been given the following feedback:</h4>
-              <p>{feedback}</p>
-              {approvalStatus !== "Approved" && (
-                <>
-                  <hr></hr>
-                  <small>
-                    <em>Please adjust as appropriate and request another review.</em>
-                  </small>
-                </>
-              )}
-            </Alert>
-          )}
-        </div>
-      </Box>
-
-      {isIGOpsStaff && (
-        <>
-          <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
-
+        {isIGOpsStaff && (
           <AdminFeedbackSection
             status={study.approval_status}
             feedbackFromStudy={feedback}
             handleUpdateStudyStatus={handleUpdateStudyStatus}
           />
-        </>
-      )}
+        )}
+      </div>
+
+      <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
+        {studyStepsCompleted && (
+          <Assets
+            studyId={study.id}
+            studyTitle={study.title}
+            canModify={isStudyOwnerOrAdmin}
+            setNumAssets={setNumAssets}
+          />
+        )}
+      </div>
+
+      <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
+        {studyStepsCompleted && (
+          <ContractManagement
+            study={study}
+            canModify={isStudyOwner || isStudyAdmin}
+            setNumContracts={setNumContracts}
+          />
+        )}
+      </div>
     </>
   );
 }

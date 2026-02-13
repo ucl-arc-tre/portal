@@ -2,7 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdContracts, Contract, Study, Asset } from "@/openapi";
+import {
+  getStudiesByStudyIdContracts,
+  Contract,
+  Study,
+  Asset,
+  getStudiesByStudyIdAssetsByAssetIdContracts,
+} from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
 
@@ -10,9 +16,11 @@ type ContractManagementProps = {
   study: Study;
   asset?: Asset;
   canModify: boolean;
+  setNumContracts?: (numContracts: number) => void;
 };
 
-export default function ContractManagement({ study, asset, canModify }: ContractManagementProps) {
+export default function ContractManagement(props: ContractManagementProps) {
+  const { study, asset, canModify, setNumContracts } = props;
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,12 +32,23 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     setError(null);
 
     try {
-      const response = await getStudiesByStudyIdContracts({
-        path: { studyId: study.id },
-      });
+      let response;
+      // if asset given, only collect contracts for that asset, not the study
+      if (asset) {
+        response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+          path: { studyId: study.id, assetId: asset.id },
+        });
+      } else {
+        response = await getStudiesByStudyIdContracts({
+          path: { studyId: study.id },
+        });
+      }
 
       if (response.response.ok && response.data) {
         setContracts(response.data);
+        if (setNumContracts) {
+          setNumContracts(response.data.length);
+        }
       } else {
         throw new Error(`Failed to fetch contracts: ${response.response.status} ${response.response.statusText}`);
       }
@@ -39,7 +58,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
     } finally {
       setIsLoading(false);
     }
-  }, [study.id]);
+  }, [study.id, asset, setNumContracts]);
 
   useEffect(() => {
     fetchContracts();
@@ -56,6 +75,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       return;
     }
     setEditingContract(contract);
+
     setShowUploadModal(true);
   };
 
@@ -71,7 +91,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
             </Button>
           </div>
           <p className={styles.description}>
-            Manage contract documents for this study. Upload PDF contracts and track their status.
+            Manage contract documents for this {asset ? "asset" : "study"}. Upload PDF contracts and track their status.
           </p>
         </>
       ) : (
@@ -126,7 +146,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       {canModify && (
         <ContractUploadForm
           study={study}
-          assetIds={asset ? [asset.id] : []} //TODO: Add support for multiple assets
+          throughAsset={asset}
           isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);

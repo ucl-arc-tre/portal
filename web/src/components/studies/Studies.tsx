@@ -114,18 +114,18 @@ export default function Studies(props: Props) {
         {tab === "pending" && <h2>Studies to Review</h2>}
         {tab === "all" && <h2>All Studies</h2>}
 
-        <div className={styles["study-tabs"]}>
+        <div className={"tab-collection"}>
           <Button
             onClick={handlePendingStudiesClick}
             variant="secondary"
-            className={`${styles.tab} ${styles["pending-studies-tab"]} ${tab === "pending" ? styles.active : ""}`}
+            className={`tab ${tab === "pending" ? "active" : ""}`}
           >
             Pending Studies
           </Button>
           <Button
             onClick={handleAllStudiesClick}
             variant="secondary"
-            className={`${styles.tab} ${styles["all-studies-tab"]} ${tab === "all" ? styles.active : ""}`}
+            className={`tab ${tab === "all" ? "active" : ""}`}
             data-cy="all-studies-tab-button"
           >
             All Studies

@@ -27,6 +27,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
   const studyStepsCompleted = agreementCompleted && assetManagementCompleted && adminsAgreementsCompleted;
 
@@ -102,17 +103,17 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           fetchStudyData={fetchStudy}
         />
       )}
-      <StudyDetails
-        studyStepsCompleted={studyStepsCompleted}
-        study={study}
-        isIGOpsStaff={false}
-        isStudyOwner={isStudyOwner}
-        isStudyAdmin={isStudyAdmin}
-        setStudyFormOpen={setStudyFormOpen}
-      />
 
       {!studyStepsCompleted && (
         <>
+          <StudyDetails
+            studyStepsCompleted={studyStepsCompleted}
+            study={study}
+            isIGOpsStaff={isIGOpsStaff}
+            isStudyOwner={isStudyOwner}
+            isStudyAdmin={isStudyAdmin}
+            setStudyFormOpen={setStudyFormOpen}
+          />
           <StepProgress
             steps={studySteps}
             isComplete={studyStepsCompleted}
@@ -129,10 +130,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
-          </div>
-          <div className={styles["completed-section"]}>
-            {/* <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} /> */}
+            <StudyDetails
+              studyStepsCompleted={studyStepsCompleted}
+              study={study}
+              isIGOpsStaff={isIGOpsStaff}
+              isStudyOwner={isStudyOwner}
+              isStudyAdmin={isStudyAdmin}
+              setStudyFormOpen={setStudyFormOpen}
+            />
           </div>
         </>
       )}
