@@ -76,7 +76,7 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	return user, nil
 }
 
-// Get or create an external user that is guested into the IdP. They may
+// Get or create an external user that is guested into the IdP (e.g. Entra). They may
 // have already been created with a username equal to their email,
 // which might not be correct
 func (s *Service) PersistedExternalUser(username types.Username, email Email) (types.User, error) {
