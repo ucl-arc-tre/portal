@@ -153,6 +153,35 @@ describe("Contract Management via Study", () => {
     cy.contains("sample-contract.pdf").should("be.visible");
     cy.contains("Sample Organization").should("be.visible");
   });
+
+  it("should successfully link to an asset", () => {
+    cy.mockContractEdit();
+    cy.mockStudyContractsWtihSample();
+
+    cy.visit("/studies/manage?studyId=123456789");
+    cy.waitForAuth();
+    cy.wait("@getStudyById");
+    cy.wait("@getStudyAgreementText");
+    cy.wait("@getStudyAgreementsConfirmed");
+    cy.contains("Contracts").should("be.visible").click();
+    cy.wait("@getStudyContractsWithSample");
+
+    cy.contains("Edit").first().click();
+
+    // Modify a form field
+    //TODO; get assets and then select
+    cy.get("select[name='assetIds.0.value']").select("asset-467");
+
+    // Submit the form
+    cy.contains("Update Contract").click();
+
+    cy.wait("@editContract");
+    cy.wait("@getStudyContractsWithSample");
+
+    // Verify the mock contract is displayed
+    cy.contains("sample-contract.pdf").should("be.visible");
+    cy.contains("Sample Organization").should("be.visible");
+  });
 });
 
 describe("Contract Management via Asset", () => {

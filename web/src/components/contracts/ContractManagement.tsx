@@ -79,9 +79,6 @@ export default function ContractManagement(props: ContractManagementProps) {
     setShowUploadModal(true);
   };
 
-  // if asset given, need to create list of assets which is all existing ones for the contract + the new one if it's not there
-  // if asset not given, still retain asset list that exists
-
   return (
     <Box>
       {canModify ? (

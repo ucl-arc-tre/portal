@@ -240,16 +240,24 @@ export default function StudyDetails(props: StudyDetailsProps) {
       </div>
 
       <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
-        <Assets
-          studyId={study.id}
-          studyTitle={study.title}
-          canModify={isStudyOwnerOrAdmin}
-          setNumAssets={setNumAssets}
-        />
+        {studyStepsCompleted && (
+          <Assets
+            studyId={study.id}
+            studyTitle={study.title}
+            canModify={isStudyOwnerOrAdmin}
+            setNumAssets={setNumAssets}
+          />
+        )}
       </div>
 
       <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
-        <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} setNumContracts={setNumContracts} />
+        {studyStepsCompleted && (
+          <ContractManagement
+            study={study}
+            canModify={isStudyOwner || isStudyAdmin}
+            setNumContracts={setNumContracts}
+          />
+        )}
       </div>
     </>
   );

@@ -82,6 +82,7 @@ export default function ContractUploadModal({
   useEffect(() => {
     // populate form with existing data when editing
     if (editingContract) {
+      // get the existing kinked asset ids and add the throughAsset id if it's not already there
       const combinedAssetIds = [...editingContract.asset_ids];
       if (throughAsset && !combinedAssetIds.includes(throughAsset.id)) {
         combinedAssetIds.push(throughAsset.id);
