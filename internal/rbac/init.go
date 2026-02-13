@@ -2,7 +2,6 @@ package rbac
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/rs/zerolog/log"
@@ -103,16 +102,18 @@ func persistedUsers(usernames []types.Username) []types.User {
 	db := graceful.NewDB()
 	users := []types.User{}
 	for _, username := range usernames {
+		if !username.IsValid() {
+			log.Error().Any("username", username).Msg("Cannot create a user with an invalid username")
+			continue
+		}
 		user := types.User{}
 		result := db.Clauses(clause.OnConflict{DoNothing: true}).
 			Where("username = ?", username).
-			Attrs(types.User{
-				Username: username,
-				Model:    types.Model{CreatedAt: time.Now()},
-			}).
+			Attrs(types.User{Username: username}).
 			FirstOrCreate(&user)
-		if result.RowsAffected > 0 {
-		} else if result.RowsAffected == 0 {
+		if result.Error != nil {
+			log.Err(result.Error).Any("username", username).Msg("Failed to create user")
+			continue
 		}
 		users = append(users, user)
 	}

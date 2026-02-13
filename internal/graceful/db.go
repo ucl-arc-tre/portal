@@ -46,6 +46,7 @@ func InitDB() {
 	}
 
 	migrateContracts(db)
+	migrateExternals(db)
 
 	log.Debug().Msg("Initalised database")
 }
@@ -95,6 +96,41 @@ func migrateContracts(db *gorm.DB) {
 		}
 	}
 
+}
+
+func migrateExternals(db *gorm.DB) {
+	tx := db.Begin()
+	defer RollbackTransactionOnPanic(tx)
+
+	externalUsers := []types.User{}
+	err := tx.Where("username NOT LIKE ?", "%"+config.EntraTenantPrimaryDomain()).
+		Find(&externalUsers).Error
+	if err != nil {
+		panic(err)
+	}
+
+	// Set all emails equal to usernames for externals
+	for _, user := range externalUsers {
+		attrs := types.UserAttributes{UserID: user.ID}
+		err := tx.Where("user_id = ?", user.ID).
+			Assign(types.UserAttributes{Email: string(user.Username)}).
+			FirstOrCreate(&attrs).Error
+		if err != nil {
+			panic(err)
+		}
+
+		if attrs.Email == "" {
+			attrs.Email = string(user.Username)
+			err := tx.Where("id = ?", attrs.ID).Save(&attrs).Error
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		log.Err(err).Msg("Failed to commit migration")
+	}
 }
 
 type UpdateObject interface {

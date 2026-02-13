@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -114,6 +115,15 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
+	if exists, err := h.users.UserExistsWithEmailOrUsername(invite.Email); err != nil {
+		setError(ctx, err, "Failed to check user existance")
+		return
+	} else if exists {
+		log.Debug().Any("email", invite.Email).Msg("User already exists - not inviting")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
+
 	user := middleware.GetUser(ctx)
 	attributes, err := h.users.Attributes(user)
 	if err != nil {
@@ -126,7 +136,11 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	invitedUser, err := h.users.PersistedUser(types.Username(invite.Email))
+	// An external user may have a different username to their email when they
+	// login to the portal e.g. email: "alice@example.com" and
+	// username: "xyz@example.comm" and we don't yet know it
+	assumedUsername := types.Username(invite.Email)
+	invitedUser, err := h.users.PersistedExternalUser(assumedUsername, invite.Email)
 	if err != nil {
 		setError(ctx, err, "Failed to get or create invitee")
 		return

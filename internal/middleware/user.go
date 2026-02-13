@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -15,6 +16,7 @@ import (
 const (
 	userCacheTTL      = 1 * time.Hour
 	userContextKey    = "user"
+	emailHeaderKey    = "X-Forwarded-Email"
 	usernameHeaderKey = "X-Forwarded-Preferred-Username" // See: https://oauth2-proxy.github.io/oauth2-proxy/configuration/overview
 )
 
@@ -45,22 +47,36 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 		ctx.Set(userContextKey, user)
 		return
 	}
-	user, err := u.users.PersistedUser(username)
+	var user types.User
+	var err error
+	if entra.IsExternalUsername(username) {
+		email := ctx.GetHeader(emailHeaderKey)
+		user, err = u.users.PersistedExternalUser(username, email)
+	} else {
+		user, err = u.users.PersistedUser(username)
+	}
 	if err != nil {
-		log.Err(err).Msg("Failed to get user")
+		log.Err(err).Any("username", username).Msg("Failed to get user")
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	if hasBaseRole, err := rbac.HasRole(user, rbac.Base); err == nil && !hasBaseRole {
-		_, _ = rbac.AddRole(user, rbac.Base)
+	if _, err = rbac.AddRole(user, rbac.Base); err != nil {
+		log.Err(err).Any("user", user).Msg("Failed to add base role")
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
 	if err := u.setDynamicRoles(ctx, user); err != nil {
-		log.Err(err).Msg("Failed to set dynamic roles")
+		log.Err(err).Any("user", user).Msg("Failed to set dynamic roles")
 	}
+	_ = u.cache.Add(username, user)
 	ctx.Set(userContextKey, user)
 }
 
 func (u *UserSetter) setDynamicRoles(ctx *gin.Context, user types.User) error {
+	if entra.IsExternalUsername(user.Username) {
+		log.Debug().Msg("Not setting dynamic roles for external users")
+		return nil
+	}
 	isStaff, err := u.users.IsStaff(ctx, user)
 	if err != nil {
 		return err
