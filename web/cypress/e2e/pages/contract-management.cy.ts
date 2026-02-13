@@ -257,11 +257,11 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
+    cy.wait("@getAssetsWithSample");
     cy.wait(1000);
 
     // Navigate to asset contracts
-    cy.get('button[data-cy="assets-tab"').should("be.visible").click();
-    cy.wait("@getAssetsWithSample");
+    cy.contains("Assets").should("be.visible").click();
     cy.contains("Sample Asset Title").should("be.visible");
     cy.contains("Manage Asset").click();
 
