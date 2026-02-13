@@ -126,7 +126,11 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		ChosenName: attributes.ChosenName,
 	}
 
-	invitedUser, err := h.users.PersistedUser(types.Username(invite.Email))
+	// An external user may have a different username to their email when they
+	// login to the portal e.g. email: "alice@example.com" and
+	// username: "xyz@example.comm" and we don't yet know it
+	assumedUsername := types.Username(invite.Email)
+	invitedUser, err := h.users.PersistedExternalUser(assumedUsername, invite.Email)
 	if err != nil {
 		setError(ctx, err, "Failed to get or create invitee")
 		return

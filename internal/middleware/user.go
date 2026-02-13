@@ -50,17 +50,20 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	var user types.User
 	var err error
 	if entra.IsExternalUsername(username) {
-		user, err = u.users.PersistedExternalUser(username, ctx.GetHeader(emailHeaderKey))
+		email := ctx.GetHeader(emailHeaderKey)
+		user, err = u.users.PersistedExternalUser(username, email)
 	} else {
 		user, err = u.users.PersistedUser(username)
 	}
 	if err != nil {
-		log.Err(err).Msg("Failed to get user")
+		log.Err(err).Any("username", username).Msg("Failed to get user")
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	if hasBaseRole, err := rbac.HasRole(user, rbac.Base); err == nil && !hasBaseRole {
-		_, _ = rbac.AddRole(user, rbac.Base)
+	if _, err = rbac.AddRole(user, rbac.Base); err != nil {
+		log.Err(err).Any("user", user).Msg("Failed to add base role")
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
 	if err := u.setDynamicRoles(ctx, user); err != nil {
 		log.Err(err).Msg("Failed to set dynamic roles")
