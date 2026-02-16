@@ -31,20 +31,20 @@ export default function Projects({ userData }: Props) {
     try {
       const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
 
-      if (!projectsResponse.response.ok) {
+      if (!projectsResponse.response.ok || !projectsResponse.data) {
         const errorMsg = extractErrorMessage(projectsResponse);
         setError(`Failed to fetch projects: ${errorMsg}`);
         return;
       }
 
-      if (!studiesResponse.response.ok) {
+      if (!studiesResponse.response.ok || !studiesResponse.data) {
         const errorMsg = extractErrorMessage(studiesResponse);
         setError(`Failed to fetch studies: ${errorMsg}`);
         return;
       }
 
-      setProjects(projectsResponse.data || []);
-      setStudies(studiesResponse.data || []);
+      setProjects(projectsResponse.data);
+      setStudies(studiesResponse.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setError("Failed to load projects and studies. Please try again later.");

@@ -35,15 +35,13 @@ export default function Studies(props: Props) {
       setErrorMessage(null);
       try {
         const response = await getStudies({ query: { status: "Pending" } });
-        if (!response.response.ok) {
+        if (!response.response.ok || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setErrorMessage(`Failed to fetch pending studies: ${errorMsg}`);
           setPendingStudies([]);
           return;
         }
-        if (response.data) {
-          setPendingStudies(response.data);
-        }
+        setPendingStudies(response.data);
       } catch (error) {
         console.error("Failed to get pending studies:", error);
         setErrorMessage("Failed to get pending studies. Please try again.");
@@ -73,13 +71,13 @@ export default function Studies(props: Props) {
     setErrorMessage(null);
     try {
       const response = await getStudies();
-      if (!response.response.ok) {
+      if (!response.response.ok || !response.data) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(`Failed to fetch studies: ${errorMsg}`);
         setStudies([]);
         return;
       }
-      setStudies(response.data || []);
+      setStudies(response.data);
     } catch (error) {
       console.error("Failed to fetch studies:", error);
       setErrorMessage("Failed to fetch studies. Please try again.");

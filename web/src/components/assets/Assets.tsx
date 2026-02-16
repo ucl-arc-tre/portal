@@ -62,22 +62,20 @@ export default function Assets(props: InformationAssetsProps) {
       try {
         const informationAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
 
-        if (!informationAssetResult.response.ok) {
+        if (!informationAssetResult.response.ok || !informationAssetResult.data) {
           const errorMsg = extractErrorMessage(informationAssetResult);
           setError(`Failed to load Information Assets: ${errorMsg}`);
           return;
         }
 
-        if (informationAssetResult.data) {
-          setInformationAssets(informationAssetResult.data);
+        setInformationAssets(informationAssetResult.data);
 
-          if (informationAssetResult.data.length > 0) {
-            const assets = informationAssetResult.data;
-            const assetsComplete = await checkAssetManagementCompleted(assets);
+        if (informationAssetResult.data.length > 0) {
+          const assets = informationAssetResult.data;
+          const assetsComplete = await checkAssetManagementCompleted(assets);
 
-            if (setAssetManagementCompleted && assetsComplete) {
-              setAssetManagementCompleted(true);
-            }
+          if (setAssetManagementCompleted && assetsComplete) {
+            setAssetManagementCompleted(true);
           }
         }
       } catch (err) {
@@ -106,22 +104,20 @@ export default function Assets(props: InformationAssetsProps) {
 
     // Refresh assets list after successful creation
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-    if (!updatedAssetsResult.response.ok) {
+    if (!updatedAssetsResult.response.ok || !updatedAssetsResult.data) {
       const errorMsg = extractErrorMessage(updatedAssetsResult);
       setError(`Failed to refresh asset list: ${errorMsg}`);
       return;
     }
 
-    if (updatedAssetsResult.data) {
-      setInformationAssets(updatedAssetsResult.data);
-      const assets = updatedAssetsResult.data;
-      const assetsComplete = await checkAssetManagementCompleted(assets);
+    setInformationAssets(updatedAssetsResult.data);
+    const assets = updatedAssetsResult.data;
+    const assetsComplete = await checkAssetManagementCompleted(assets);
 
-      if (setAssetManagementCompleted && assetsComplete) {
-        setAssetManagementCompleted(true);
-      }
-      setShowAssetForm(false);
+    if (setAssetManagementCompleted && assetsComplete) {
+      setAssetManagementCompleted(true);
     }
+    setShowAssetForm(false);
   };
 
   if (isLoading) return null;
