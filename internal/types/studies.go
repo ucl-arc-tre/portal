@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// for descriptions of the Study fields, see /api.web.yaml
+// for descriptions of the Study fields, see /api/web.yaml
 type Study struct {
 	ModelAuditable
 	OwnerUserID                      uuid.UUID `gorm:"not null;index"`

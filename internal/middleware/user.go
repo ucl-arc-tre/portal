@@ -28,7 +28,7 @@ type UserSetter struct {
 	cache *expirable.LRU[types.Username, types.User]
 }
 
-func NewSetUser() gin.HandlerFunc {
+func NewWebSetUser() gin.HandlerFunc {
 	setter := &UserSetter{
 		users: users.New(),
 		cache: expirable.NewLRU[types.Username, types.User](1000, nil, userCacheTTL),

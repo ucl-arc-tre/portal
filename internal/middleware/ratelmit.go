@@ -10,7 +10,7 @@ import (
 )
 
 func NewWebRateLimit() gin.HandlerFunc {
-	defaultLimiter := httprate.NewRateLimiter(100, time.Minute)
+	defaultLimiter := httprate.NewRateLimiter(300, time.Minute)
 	slowLimiter := httprate.NewRateLimiter(5, time.Minute)
 	slowPaths := config.RateLimitSlowPaths()
 

@@ -12,6 +12,8 @@ const botIGUsername = Cypress.env("botIGUsername") as string;
 const botIGPassword = Cypress.env("botIGPassword") as string;
 const botTREUsername = Cypress.env("botTREUsername") as string;
 const botTREPassword = Cypress.env("botTREPassword") as string;
+const botDSHUsername = Cypress.env("botDSHUsername") as string;
+const botDSHPassword = Cypress.env("botDSHPassword") as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -46,6 +48,12 @@ declare global {
        * @example cy.loginAsTREOps()
        */
       loginAsTREOps(): Chainable<JQuery<HTMLElement>>;
+
+      /**
+       * Custom command to login as a DSH operations user
+       * @example cy.loginAsDSHOps()
+       */
+      loginAsDSHOps(): Chainable<JQuery<HTMLElement>>;
 
       /**
        * Clears the chosen name
@@ -359,6 +367,12 @@ declare global {
        * @example cy.checkAccessibility('[data-cy="profile-form"]')
        */
       checkAccessibility(selector?: string): Chainable<any>;
+
+      /**
+       * Visit the profile page and become an approved researcher
+       * @example cy.becomeApprovedResearcher()
+       */
+      becomeApprovedResearcher(): Chainable<any>;
     }
   }
 }
@@ -435,6 +449,21 @@ Cypress.Commands.add("loginAsTREOps", () => {
 
     log.snapshot("before");
     login(botTREUsername, botTREPassword);
+    log.snapshot("after");
+    log.end();
+  });
+});
+
+Cypress.Commands.add("loginAsDSHOps", () => {
+  cy.session(`login-dsh-ops`, () => {
+    const log = Cypress.log({
+      displayName: "Entra ID DSH operations user Login",
+      message: [`🔐 Authenticating DSH ops user`],
+      autoEnd: false,
+    });
+
+    log.snapshot("before");
+    login(botDSHUsername, botDSHPassword);
     log.snapshot("after");
     log.end();
   });
@@ -818,4 +847,24 @@ Cypress.Commands.add("mockEnvironmentsTre", () => {
   cy.intercept("GET", "/web/api/v0/environments", {
     fixture: "environments-tre.json",
   }).as("getEnvironments");
+});
+
+Cypress.Commands.add("becomeApprovedResearcher", () => {
+  cy.visit("/profile");
+
+  cy.contains("Profile Information").should("be.visible");
+
+  cy.get("body").then(($body) => {
+    if ($body.text().includes("Save Name")) {
+      cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
+      cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
+    }
+
+    if (!$body.text().includes("Profile Complete")) {
+      cy.get("[data-cy='agreement-agree']").click();
+
+      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
+      cy.get("[data-cy='training-certificate-sumbit']").click();
+    }
+  });
 });
