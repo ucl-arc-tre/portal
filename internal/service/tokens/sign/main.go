@@ -11,6 +11,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/tokens"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
 )
 
@@ -57,6 +58,9 @@ func (s *Service) CreateDSH(token types.Token) (*TokenWithValue, error) {
 	}
 	if token.ExpiresAt.After(time.Now().Add(config.MaxTokenValidity)) {
 		return nil, types.NewErrInvalidObject(fmt.Errorf("token had a expiry [%s] beyond the max", token.ExpiresAt))
+	}
+	if !validation.TokenNamePattern.MatchString(token.Name) {
+		return nil, types.NewErrInvalidObject("token had invalid name")
 	}
 
 	token.VerificationKeyID = s.key.Id()

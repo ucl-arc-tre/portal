@@ -174,7 +174,7 @@ export default function DSHTokens() {
                   {...register("name", {
                     required: "Name is required",
                     minLength: { value: 1, message: "Name must be at least 1 characters" },
-                    maxLength: { value: 50, message: "Title must be less than 50 characters" },
+                    maxLength: { value: 50, message: "Name must be less than 50 characters" },
                   })}
                   aria-invalid={!!errors.name}
                   className={errors.name ? styles.error : ""}
