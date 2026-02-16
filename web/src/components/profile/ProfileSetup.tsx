@@ -49,7 +49,7 @@ export default function ProfileSetup(props: Props) {
   const profileSetupSteps: Step[] = [
     {
       id: "chosen-name",
-      title: "Set Your Chosen Name",
+      title: "Set Your Name",
       description: "Enter your preferred name - this must match the name on your training certificate",
       completed: hasChosenName,
       current: !hasChosenName,
