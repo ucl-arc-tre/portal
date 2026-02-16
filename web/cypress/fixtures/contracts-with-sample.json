@@ -2,7 +2,7 @@
   {
     "id": "contract-123",
     "filename": "sample-contract.pdf",
-    "organisation_signatory": "Sample Organization",
+    "organisation_signatory": "Sample Organisation",
     "third_party_name": "Sample Third Party",
     "status": "active",
     "start_date": "2024-01-01",
@@ -15,7 +15,7 @@
   {
     "id": "contract-173",
     "filename": "sample-contract.pdf",
-    "organisation_signatory": "Sample Organization",
+    "organisation_signatory": "Sample Organisation",
     "third_party_name": "Sample Third Party",
     "status": "active",
     "start_date": "2024-01-01",

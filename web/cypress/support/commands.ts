@@ -160,6 +160,18 @@ declare global {
       mockAssetAccess(): Chainable<any>;
 
       /**
+       * Mock individual contract access via asset for testing
+       * @example cy.mockAssetContractAccess()
+       */
+      mockAssetContractAccess(): Chainable<any>;
+
+      /**
+       * Mock individual contract access via asset for testing
+       * @example cy.mockStudyContractAccess()
+       */
+      mockStudyContractAccess(): Chainable<any>;
+
+      /**
        * Mock successful study creation
        * @example cy.mockStudyCreation()
        */
@@ -621,6 +633,45 @@ Cypress.Commands.add("mockAssetAccess", () => {
       updated_at: "2024-01-01T10:00:00Z",
     },
   }).as("getAssetById");
+});
+
+Cypress.Commands.add("mockAssetContractAccess", () => {
+  cy.intercept("GET", "/web/api/v0/studies/123456789/assets/asset-123/contracts", {
+    body: [
+      {
+        asset_ids: ["asset-123"],
+        created_at: "2026-02-13T15:59:21Z",
+        expiry_date: "2026-02-26",
+        filename: "sample-contract.pdf",
+        id: "contract-2",
+        organisation_signatory: "Sample Organisation 2",
+        start_date: "2026-02-22",
+        status: "active",
+        study_id: "123456789",
+        third_party_name: "Sample Third Party",
+        updated_at: "2026-02-13T15:59:21Z",
+      },
+    ],
+  }).as("getContractsForAsset");
+});
+Cypress.Commands.add("mockStudyContractAccess", () => {
+  cy.intercept("GET", "/web/api/v0/studies/123456789/contracts", {
+    body: [
+      {
+        asset_ids: ["asset-123"],
+        created_at: "2026-02-13T15:59:21Z",
+        expiry_date: "2026-02-26",
+        filename: "sample-contract.pdf",
+        id: "contract-1",
+        organisation_signatory: "Sample Organisation 3",
+        start_date: "2026-02-22",
+        status: "active",
+        study_id: "123456789",
+        third_party_name: "Sample Third Party",
+        updated_at: "2026-02-13T15:59:21Z",
+      },
+    ],
+  }).as("getContractsForStudy");
 });
 
 Cypress.Commands.add("mockStudyCreation", () => {

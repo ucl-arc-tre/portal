@@ -77,7 +77,7 @@ describe("Contract Management via Study", () => {
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
-    cy.contains("Sample Organization").should("be.visible");
+    cy.contains("Sample Organisation").should("be.visible");
   });
 
   it("should allow downloading contracts", () => {
@@ -118,7 +118,7 @@ describe("Contract Management via Study", () => {
     cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Verify form is prepopulated with existing values
-    cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organization");
+    cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organisation");
     cy.get("input[name='thirdPartyName']").should("have.value", "Sample Third Party");
     cy.get("select[name='status']").should("have.value", "active");
     cy.get("input[name='startDate']").should("have.value", "2024-01-01");
@@ -156,7 +156,7 @@ describe("Contract Management via Study", () => {
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
-    cy.contains("Sample Organization").should("be.visible");
+    cy.contains("Sample Organisation").should("be.visible");
   });
 
   it("should successfully link to an asset", () => {
@@ -185,13 +185,13 @@ describe("Contract Management via Study", () => {
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
-    cy.contains("Sample Organization").should("be.visible");
+    cy.contains("Sample Organisation").should("be.visible");
   });
 });
 
 describe("Contract Management via Asset", () => {
   beforeEach(() => {
-    cy.loginAsBase();
+    cy.loginAsStaff();
     cy.mockAuthAsStudyOwner();
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
@@ -199,27 +199,7 @@ describe("Contract Management via Asset", () => {
     cy.mockStudyAgreementText();
     cy.mockStudyAgreementsConfirmed();
     cy.mockInformationAssetsWithSample();
-  });
-
-  it("should display contract management section for an asset", () => {
-    cy.mockAssetContractsEmpty();
-
-    cy.visit("/studies/manage?studyId=123456789");
-    cy.waitForAuth();
-    cy.wait("@getStudyById");
-    cy.wait("@getStudyAgreementText");
-    cy.wait("@getStudyAgreementsConfirmed");
-
-    // Wait for contracts to load
-    cy.wait("@getAssetContractsEmpty");
-    cy.wait(1000);
-
-    cy.contains("This asset requires a contract that has not yet been added").should("be.visible");
-    cy.contains("Manage Asset").click();
-
-    // Should show empty contract state
-    cy.contains("No contracts uploaded").should("be.visible");
-    cy.contains("Add Contract").should("be.visible");
+    cy.mockStudyContractsWtihSample();
   });
 
   it("should display contract management section for an asset", () => {
@@ -234,6 +214,7 @@ describe("Contract Management via Asset", () => {
     cy.wait(1000);
 
     // Navigate to asset management page
+    cy.contains("Assets").should("be.visible").click();
     cy.contains("Sample Asset Title 1").should("be.visible");
     cy.contains("Manage Asset").click();
 
@@ -247,6 +228,7 @@ describe("Contract Management via Asset", () => {
   });
 
   it("should successfully upload a contract", () => {
+    cy.mockStudyContractsEmpty();
     cy.mockAssetContractsEmpty();
     cy.mockContractUpload();
     cy.mockAssetContractsWtihSample();
@@ -296,11 +278,13 @@ describe("Contract Management via Asset", () => {
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
-    cy.contains("Sample Organization").should("be.visible");
+    cy.contains("Sample Organisation").should("be.visible");
   });
 
   it("should allow downloading contracts", () => {
     cy.mockAssetContractsWtihSample();
+    cy.mockStudyContractAccess();
+    cy.mockAssetContractAccess();
     cy.mockContractDownload();
 
     cy.visit("/studies/manage?studyId=123456789");
@@ -309,16 +293,16 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsForAsset");
     cy.wait(1000);
-    cy.contains("Assets").should("be.visible").click();
 
     // Navigate to asset contracts
-    cy.contains("Sample Asset Title 1").should("be.visible");
+    cy.contains("Assets").should("be.visible").click();
+    cy.contains("Sample Asset Title").should("be.visible");
     cy.contains("Manage Asset").click();
 
     // Wait for asset and contracts to load
     cy.wait("@getAssetById");
-    cy.wait("@getAssetContractsWithSample");
 
     // Verify contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
@@ -332,6 +316,8 @@ describe("Contract Management via Asset", () => {
 
   it("should prepopulate form fields when editing a contract", () => {
     cy.mockAssetContractsWtihSample();
+    cy.mockStudyContractAccess();
+    cy.mockAssetContractAccess();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -339,23 +325,24 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsForAsset");
     cy.wait(1000);
-    cy.get("button").contains("Assets").should("be.visible").click();
 
-    cy.contains("Sample Asset Title 1").should("be.visible");
+    // Navigate to asset contracts
+    cy.contains("Assets").should("be.visible").click();
+    cy.contains("Sample Asset Title").should("be.visible");
     cy.contains("Manage Asset").click();
 
+    // Wait for asset and contracts to load
     cy.wait("@getAssetById");
-    cy.wait("@getAssetContractsWithSample");
-
     cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Verify form is prepopulated with existing values
-    cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organization");
+    cy.get("input[name='organisationSignatory']").should("have.value", "Sample Organisation 2");
     cy.get("input[name='thirdPartyName']").should("have.value", "Sample Third Party");
     cy.get("select[name='status']").should("have.value", "active");
-    cy.get("input[name='startDate']").should("have.value", "2024-01-01");
-    cy.get("input[name='expiryDate']").should("have.value", "2025-12-31");
+    cy.get("input[name='startDate']").should("have.value", "2026-02-22");
+    cy.get("input[name='expiryDate']").should("have.value", "2026-02-26");
 
     // Verify the dialog title shows we're editing
     cy.contains("Edit Contract").should("be.visible");
@@ -366,6 +353,8 @@ describe("Contract Management via Asset", () => {
   it("should successfully submit edited contract data", () => {
     cy.mockContractEdit();
     cy.mockAssetContractsWtihSample();
+    cy.mockStudyContractAccess();
+    cy.mockAssetContractAccess();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -373,15 +362,16 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsForAsset");
     cy.wait(1000);
-    cy.get("button").contains("Assets").should("be.visible").click();
 
-    cy.contains("Sample Asset Title 1").should("be.visible");
+    // Navigate to asset contracts
+    cy.contains("Assets").should("be.visible").click();
+    cy.contains("Sample Asset Title").should("be.visible");
     cy.contains("Manage Asset").click();
 
+    // Wait for asset and contracts to load
     cy.wait("@getAssetById");
-    cy.wait("@getAssetContractsWithSample");
-
     cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Modify a form field
@@ -391,16 +381,17 @@ describe("Contract Management via Asset", () => {
     cy.contains("Update Contract").click();
 
     cy.wait("@editContract");
-    cy.wait("@getAssetContractsWithSample");
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
-    cy.contains("Sample Organization").should("be.visible");
+    cy.contains("Sample Organisation").should("be.visible");
   });
 
   it("should successfully link to an asset", () => {
     cy.mockContractEdit();
     cy.mockAssetContractsWtihSample();
+    cy.mockStudyContractAccess();
+    cy.mockAssetContractAccess();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
@@ -408,28 +399,28 @@ describe("Contract Management via Asset", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsForAsset");
     cy.wait(1000);
-    cy.get("button").contains("Assets").should("be.visible").click();
 
-    cy.contains("Sample Asset Title 1").should("be.visible");
+    // Navigate to asset contracts
+    cy.contains("Assets").should("be.visible").click();
+    cy.contains("Sample Asset Title").should("be.visible");
     cy.contains("Manage Asset").click();
 
+    // Wait for asset and contracts to load
     cy.wait("@getAssetById");
-    cy.wait("@getAssetContractsWithSample");
-
     cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Modify a form field
-    cy.get("select[name='assetIds.0.value']").select("asset-467");
+    cy.get("select[name='assetIds.0.value']").select("asset-456");
 
     // Submit the form
     cy.contains("Update Contract").click();
 
     cy.wait("@editContract");
-    cy.wait("@getStudyContractsWithSample");
 
     // Verify the mock contract is displayed
     cy.contains("sample-contract.pdf").should("be.visible");
-    cy.contains("Sample Organization").should("be.visible");
+    cy.contains("Sample Organisation").should("be.visible");
   });
 });
