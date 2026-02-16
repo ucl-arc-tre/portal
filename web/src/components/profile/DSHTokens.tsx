@@ -5,7 +5,7 @@ import Button from "../ui/Button";
 import { useForm } from "react-hook-form";
 import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
 import styles from "./DSHTokens.module.css";
-import { Alert, AlertMessage, Label } from "../shared/exports";
+import { Alert, AlertMessage, HelperText, Label } from "../shared/exports";
 
 type FormData = {
   name: string;
@@ -111,7 +111,15 @@ export default function DSHTokens() {
           </Button>
         </div>
 
-        {tokens.length == 0 && !tokenValue && <p> No items to display</p>}
+        {tokens.length == 0 && !tokenValue && (
+          <div className={styles.list}>
+            <p>No items to display</p>
+            <HelperText>
+              <a href="https://github.com/ucl-arc-tre/portal/blob/main/api/dsh.yaml">DSH API</a> tokens can be used to
+              query the state of approved researchers and studies from the portal.
+            </HelperText>
+          </div>
+        )}
 
         {tokens.length > 0 && (
           <div>
@@ -158,11 +166,6 @@ export default function DSHTokens() {
           {!tokenValue && (
             <form onSubmit={handleSubmit(onFormSubmit)} className="form">
               <h3>DSH API Tokens</h3>
-              <p>
-                Create a bearer token for the{" "}
-                <a href="https://github.com/ucl-arc-tre/portal/blob/main/api/dsh.yaml">DSH API</a>. These can be used to
-                query the state of approved researchers and studies from the portal.
-              </p>
               <div className={styles.field}>
                 <Label htmlFor="name">Name *</Label>
                 <input
@@ -210,6 +213,13 @@ export default function DSHTokens() {
 
           {tokenValue && (
             <div className={styles["token-container"]}>
+              <Alert type="info">
+                Use this bearer token for the{" "}
+                <a href="https://github.com/ucl-arc-tre/portal/blob/main/api/dsh.yaml">DSH API</a> with e.g.
+                <p className={styles.code}>
+                  {`curl -H "Authorization: Bearer <token>" \ https://portal.arc.ucl.ac.uk/dsh/api/v0/approved-researchers`}
+                </p>
+              </Alert>
               <div className={styles["token-display"]} data-cy="dsh-token-value">
                 {tokenValue}
               </div>
