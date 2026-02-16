@@ -1,5 +1,6 @@
 import { SubmitEvent, useState } from "react";
 import { postProfile } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Button from "../../ui/Button";
 
@@ -30,7 +31,14 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
     setIsSubmitting(true);
     try {
       const response = await postProfile({ body: { chosen_name: name } });
-      if (!response.response.ok) throw new Error(`HTTP error! status: ${response.response.status}`);
+      console.log(response);
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        console.log("Error response:", errorMsg);
+        setErrorMessage(errorMsg);
+        setErrorType("error");
+        return;
+      }
 
       setChosenName(name);
       setErrorMessage(null);

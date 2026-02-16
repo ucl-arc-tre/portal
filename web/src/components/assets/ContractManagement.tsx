@@ -3,6 +3,7 @@ import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
 import { getStudiesByStudyIdContracts, Contract, Study, Asset } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
 
@@ -28,11 +29,12 @@ export default function ContractManagement({ study, asset, canModify }: Contract
         path: { studyId: study.id },
       });
 
-      if (response.response.ok && response.data) {
-        setContracts(response.data);
-      } else {
-        throw new Error(`Failed to fetch contracts: ${response.response.status} ${response.response.statusText}`);
+      if (!response.response.ok || !response.data) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to load contracts: ${errorMsg}`);
+        return;
       }
+      setContracts(response.data);
     } catch (err) {
       console.error("Failed to load contracts:", err);
       setError("Failed to load contracts. Please try again later.");

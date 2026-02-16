@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractCard.module.css";
 
 type ContractCardProps = {
@@ -27,7 +28,9 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
       });
 
       if (!response.response.ok || !response.data) {
-        throw new Error(`Download failed: ${response.response.status} ${response.response.statusText}`);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Download failed: ${errorMsg}`);
+        return;
       }
 
       const blob = new Blob([response.data], { type: "application/pdf" });

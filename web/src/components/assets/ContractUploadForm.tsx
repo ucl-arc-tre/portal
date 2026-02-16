@@ -5,12 +5,12 @@ import Dialog from "@/components/ui/Dialog";
 import {
   postStudiesByStudyIdContractsUpload,
   putStudiesByStudyIdContractsByContractId,
-  ValidationError,
   ContractUploadObject,
   ContractUpdate,
   Study,
   Contract,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
 import { Label } from "../shared/exports";
 
@@ -158,15 +158,10 @@ export default function ContractUploadModal({
         });
       }
 
-      if (response.error) {
-        const errorData = response.error as ValidationError;
-        if (errorData?.error_message) {
-          throw new Error(errorData.error_message);
-        }
-      }
-
       if (!response.response.ok) {
-        throw new Error(`Update failed: ${response.response.status} ${response.response.statusText}`);
+        const errorMsg = extractErrorMessage(response);
+        setError(errorMsg);
+        return;
       }
 
       setUploadSuccess(true);
