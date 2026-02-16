@@ -15,7 +15,7 @@ import (
 func (h *Handler) GetTokensDsh(ctx *gin.Context) {
 	dshId, err := h.environments.DSHId()
 	if err != nil {
-		setError(ctx, err, "Failed to get envrionment")
+		setError(ctx, err, "Failed to get environment")
 		return
 	}
 	tokens, err := h.tokens.AllEnvironment(dshId)
@@ -43,7 +43,7 @@ func (h *Handler) PostTokensDsh(ctx *gin.Context) {
 	}
 	dshId, err := h.environments.DSHId()
 	if err != nil {
-		setError(ctx, err, "Failed to get envrionment")
+		setError(ctx, err, "Failed to get environment")
 		return
 	}
 	token := types.Token{
@@ -73,7 +73,7 @@ func (h *Handler) DeleteTokensDshTokenId(ctx *gin.Context, tokenId string) {
 	}
 	dshId, err := h.environments.DSHId()
 	if err != nil {
-		setError(ctx, err, "Failed to get envrionment")
+		setError(ctx, err, "Failed to get environment")
 		return
 	}
 	if err := h.tokens.Delete(tokenUUID, dshId); err != nil {

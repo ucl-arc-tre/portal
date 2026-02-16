@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
 import styles from "./DSHTokens.module.css";
 import { Alert, AlertMessage, Label } from "../shared/exports";
+import Callout from "../ui/Callout";
 
 type FormData = {
   name: string;
@@ -154,52 +155,58 @@ export default function DSHTokens() {
       </Box>
 
       {formOpen && (
-        <Dialog setDialogOpen={handleCloseForm} cy="create-dsh-token-form">
+        <Dialog setDialogOpen={handleCloseForm} data-cy="create-dsh-token-form">
           {!tokenValue && (
-            <form onSubmit={handleSubmit(onFormSubmit)} className="form">
-              <div className={styles.field}>
-                <Label htmlFor="name">Name *</Label>
-                <input
-                  id="name"
-                  type="text"
-                  {...register("name", {
-                    required: "Name is required",
-                    minLength: { value: 1, message: "Name must be at least 1 characters" },
-                    maxLength: { value: 50, message: "Title must be less than 50 characters" },
-                  })}
-                  aria-invalid={!!errors.name}
-                  className={errors.name ? styles.error : ""}
-                />
-                {errors.name && (
-                  <Alert type="error">
-                    <AlertMessage>{errors.name.message}</AlertMessage>
+            <>
+              <Callout definition>
+                Create a bearer token for the{" "}
+                <a href="https://github.com/ucl-arc-tre/portal/blob/main/api/dsh.yaml">DSH API</a>
+              </Callout>
+              <form onSubmit={handleSubmit(onFormSubmit)} className="form">
+                <div className={styles.field}>
+                  <Label htmlFor="name">Name *</Label>
+                  <input
+                    id="name"
+                    type="text"
+                    {...register("name", {
+                      required: "Name is required",
+                      minLength: { value: 1, message: "Name must be at least 1 characters" },
+                      maxLength: { value: 50, message: "Title must be less than 50 characters" },
+                    })}
+                    aria-invalid={!!errors.name}
+                    className={errors.name ? styles.error : ""}
+                  />
+                  {errors.name && (
+                    <Alert type="error">
+                      <AlertMessage>{errors.name.message}</AlertMessage>
+                    </Alert>
+                  )}
+                </div>
+
+                <div className={styles.field}>
+                  <Label htmlFor="expiryDays">Expires after *</Label>
+                  <select {...register("expiryDays")}>
+                    <option value="7">7 Days</option>
+                    <option value="30">1 Month</option>
+                    <option value="90">3 Months</option>
+                    <option value="180">6 Months</option>
+                    <option value="365">1 Year</option>
+                  </select>
+                </div>
+
+                {formErrorMessage && (
+                  <Alert type="error" className={styles.alert}>
+                    <AlertMessage>{formErrorMessage}</AlertMessage>
                   </Alert>
                 )}
-              </div>
 
-              <div className={styles.field}>
-                <Label htmlFor="expiryDays">Expires after *</Label>
-                <select {...register("expiryDays")}>
-                  <option value="7">7 Days</option>
-                  <option value="30">1 Month</option>
-                  <option value="90">3 Months</option>
-                  <option value="180">6 Months</option>
-                  <option value="365">1 Year</option>
-                </select>
-              </div>
-
-              {formErrorMessage && (
-                <Alert type="error" className={styles.alert}>
-                  <AlertMessage>{formErrorMessage}</AlertMessage>
-                </Alert>
-              )}
-
-              <div className={styles.actions}>
-                <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
-                  {isSubmitting ? "Creating..." : "Create"}
-                </Button>
-              </div>
-            </form>
+                <div className={styles.actions}>
+                  <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
+                    {isSubmitting ? "Creating..." : "Create"}
+                  </Button>
+                </div>
+              </form>
+            </>
           )}
 
           {tokenValue && (

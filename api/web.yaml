@@ -135,7 +135,7 @@ paths:
         default:
           description: Unexpected error
     post:
-      description: Create an token for the DSH API
+      description: Create a token for the DSH API
       requestBody:
         required: true
         content:
@@ -154,7 +154,7 @@ paths:
           description: Unexpected error
   /tokens/dsh/{tokenId}:
     delete:
-      description: Revoke a tokens for the DSH API
+      description: Revoke a token for the DSH API
       parameters:
         - in: path
           name: tokenId

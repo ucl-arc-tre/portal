@@ -80,7 +80,7 @@ export const postProfileTraining = <ThrowOnError extends boolean = false>(option
 export const getTokensDsh = <ThrowOnError extends boolean = false>(options?: Options<GetTokensDshData, ThrowOnError>) => (options?.client ?? client).get<GetTokensDshResponses, GetTokensDshErrors, ThrowOnError>({ url: '/tokens/dsh', ...options });
 
 /**
- * Create an token for the DSH API
+ * Create a token for the DSH API
  */
 export const postTokensDsh = <ThrowOnError extends boolean = false>(options: Options<PostTokensDshData, ThrowOnError>) => (options.client ?? client).post<PostTokensDshResponses, PostTokensDshErrors, ThrowOnError>({
     url: '/tokens/dsh',
@@ -92,7 +92,7 @@ export const postTokensDsh = <ThrowOnError extends boolean = false>(options: Opt
 });
 
 /**
- * Revoke a tokens for the DSH API
+ * Revoke a token for the DSH API
  */
 export const deleteTokensDshByTokenId = <ThrowOnError extends boolean = false>(options: Options<DeleteTokensDshByTokenIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteTokensDshByTokenIdResponses, DeleteTokensDshByTokenIdErrors, ThrowOnError>({ url: '/tokens/dsh/{tokenId}', ...options });
 
