@@ -103,7 +103,7 @@ export default function ProjectCardsList(props: Props) {
                     size="small"
                     variant="secondary"
                     disabled={deletingProjectId === project.id}
-                    className={styles["delete-button"]}
+                    className="delete-button"
                   >
                     {deletingProjectId === project.id ? "Deleting..." : "Delete"}
                   </Button>
