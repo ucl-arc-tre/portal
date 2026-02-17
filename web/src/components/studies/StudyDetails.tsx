@@ -166,16 +166,16 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   return (
     <>
-      <div className={"tab-collection"}>
-        <Button
-          onClick={() => setTab("overview")}
-          variant="secondary"
-          className={`tab ${tab === "overview" ? "active" : ""}`}
-        >
-          Overview
-        </Button>
-        {studyStepsCompleted && (
-          <>
+      {studyStepsCompleted && (
+        <>
+          <div className={"tab-collection"}>
+            <Button
+              onClick={() => setTab("overview")}
+              variant="secondary"
+              className={`tab ${tab === "overview" ? "active" : ""}`}
+            >
+              Overview
+            </Button>
             <Button
               onClick={() => setTab("assets")}
               variant="secondary"
@@ -190,10 +190,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
             >
               Contracts
             </Button>
-          </>
-        )}
-        {/* TODO: add projects */}
-      </div>
+            {/* TODO: add projects */}
+          </div>
+        </>
+      )}
 
       <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
         {isStudyOwnerOrAdmin && setStudyFormOpen && (
