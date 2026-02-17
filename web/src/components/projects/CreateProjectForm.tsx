@@ -140,9 +140,6 @@ export default function CreateProjectForm({
           return;
         }
         setEnvironments(response.data);
-        if (response.data.length === 0) {
-          setEnvironmentsError("No environments available. Please contact your administrator.");
-        }
       } catch (error) {
         console.error("Failed to fetch environments:", error);
         setEnvironmentsError("Failed to load environments. Please try again later.");
