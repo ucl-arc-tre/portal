@@ -174,20 +174,24 @@ export default function StudyDetails(props: StudyDetailsProps) {
         >
           Overview
         </Button>
-        <Button
-          onClick={() => setTab("assets")}
-          variant="secondary"
-          className={`tab ${tab === "assets" ? "active" : ""}`}
-        >
-          Assets
-        </Button>
-        <Button
-          onClick={() => setTab("contracts")}
-          variant="secondary"
-          className={`tab ${tab === "contracts" ? "active" : ""}`}
-        >
-          Contracts
-        </Button>
+        {studyStepsCompleted && (
+          <>
+            <Button
+              onClick={() => setTab("assets")}
+              variant="secondary"
+              className={`tab ${tab === "assets" ? "active" : ""}`}
+            >
+              Assets
+            </Button>
+            <Button
+              onClick={() => setTab("contracts")}
+              variant="secondary"
+              className={`tab ${tab === "contracts" ? "active" : ""}`}
+            >
+              Contracts
+            </Button>
+          </>
+        )}
         {/* TODO: add projects */}
       </div>
 
