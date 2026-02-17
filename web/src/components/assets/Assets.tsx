@@ -41,8 +41,7 @@ export default function Assets(props: InformationAssetsProps) {
         });
         if (!response.response.ok || !response.data) {
           const errorMsg = extractErrorMessage(response);
-          setError(`Failed to load contracts for asset: ${errorMsg}`);
-          return false;
+          throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
         }
         return response.data.length > 0;
       };
