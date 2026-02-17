@@ -22,7 +22,7 @@ type ContractFormData = {
   status: "proposed" | "active" | "expired";
   startDate: string;
   expiryDate: string;
-  assetIds: { value: string }[];
+  assets: { value: string }[];
 };
 
 type ContractUploadModalProps = {
@@ -65,18 +65,18 @@ export default function ContractUploadModal({
   } = useForm<ContractFormData>({
     defaultValues: {
       status: "proposed",
-      assetIds: assetIds.map((id) => ({ value: id })),
+      assets: assetIds.map((id) => ({ value: id })),
     },
   });
 
-  const selectedAssetIds = watch("assetIds");
+  const selectedAssetIds = watch("assets");
   const {
     fields: assetFields,
     append: appendAsset,
     remove: removeAsset,
   } = useFieldArray({
     control,
-    name: "assetIds",
+    name: "assets",
   });
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function ContractUploadModal({
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
-        assetIds: combinedAssetIds.map((id) => ({ value: id })),
+        assets: combinedAssetIds.map((id) => ({ value: id })),
       });
     } else {
       // reset to defaults when not editing
@@ -104,7 +104,7 @@ export default function ContractUploadModal({
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
-        assetIds: [],
+        assets: [],
       });
     }
 
@@ -170,7 +170,7 @@ export default function ContractUploadModal({
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
-      asset_ids: formData.assetIds.map((asset) => asset.value).filter((id) => id !== "") as string[],
+      asset_ids: formData.assets.map((asset) => asset.value).filter((id) => id !== "") as string[],
     };
 
     let response;
@@ -403,7 +403,7 @@ export default function ContractUploadModal({
                   </label>
 
                   <Controller
-                    name={`assetIds.${index}.value` as const}
+                    name={`assets.${index}.value` as const}
                     control={control}
                     render={({ field }) => (
                       <select
