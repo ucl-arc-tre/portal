@@ -73,7 +73,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <>
           <Assets
             studyId={study.id}
-            studyTitle={study.title}
             setAssetManagementCompleted={setAssetManagementCompleted}
             canModify={isStudyOwnerOrAdmin}
           />

@@ -18,14 +18,13 @@ import InfoTooltip from "../ui/InfoTooltip";
 
 type InformationAssetsProps = {
   studyId: string;
-  studyTitle: string;
   setAssetManagementCompleted?: (completed: boolean) => void;
   canModify: boolean;
   setNumAssets?: (numAssets: number) => void;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, studyTitle, setAssetManagementCompleted, canModify, setNumAssets } = props;
+  const { studyId, setAssetManagementCompleted, canModify, setNumAssets } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,8 +121,7 @@ export default function Assets(props: InformationAssetsProps) {
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
-      {/* TODO: update this so we don't use studytitle */}
-      <h2 className="subtitle">Assets for Study: {studyTitle}</h2>
+      <h2 className="subtitle">Asset Management</h2>
 
       {error && (
         <div className={styles["error-message"]}>

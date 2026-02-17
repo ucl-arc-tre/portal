@@ -241,12 +241,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
       <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
         {studyStepsCompleted && (
-          <Assets
-            studyId={study.id}
-            studyTitle={study.title}
-            canModify={isStudyOwnerOrAdmin}
-            setNumAssets={setNumAssets}
-          />
+          <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
         )}
       </div>
 
