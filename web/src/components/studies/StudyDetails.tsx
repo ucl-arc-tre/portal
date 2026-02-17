@@ -31,7 +31,8 @@ type StudyDetailsProps = {
 const fetchAssets = async (studyId: string) => {
   const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
   if (!assetResponse.response.ok || !assetResponse.data) {
-    return [];
+    const errorMsg = extractErrorMessage(assetResponse);
+    throw new Error(`Failed to load assets: ${errorMsg}`);
   }
   return assetResponse.data;
 };
@@ -144,8 +145,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
       try {
         const score = await calculateRiskScore(study);
         setRiskScore(score);
-      } catch (error) {
-        console.error("Failed to calculate risk score:", error);
+      } catch (err) {
+        setError(`Failed to calculate risk score.`);
       } finally {
         setRiskScoreLoading(false);
       }
