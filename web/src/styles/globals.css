@@ -113,7 +113,7 @@ dialog {
     }
 
     &.active {
-      font-weight: 600;
+      color: #004499;
       border: 1px solid var(--grey-border--light);
       border-top-left-radius: 5px;
       border-top-right-radius: 5px;
