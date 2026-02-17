@@ -29,11 +29,17 @@ export default function AssetCard(props: AssetCardProps) {
   const { studyId, asset, checkCompleted, canModify } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const isAssetCompleted = async () => {
-      const response = await checkCompleted([asset]);
-      return setIsCompleted(response);
+      try {
+        const response = await checkCompleted([asset]);
+        setIsCompleted(response);
+      } catch (err) {
+        console.error("Failed to check asset completion:", err);
+        setError("Failed to check contract status.");
+      }
     };
     isAssetCompleted();
   });
@@ -93,6 +99,12 @@ export default function AssetCard(props: AssetCardProps) {
           </div>
         )}
       </div>
+
+      {error && (
+        <div className="error-message">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
 
       <div className={styles["asset-actions"]}>
         {!isCompleted && (

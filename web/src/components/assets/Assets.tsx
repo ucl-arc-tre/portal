@@ -39,6 +39,7 @@ export default function Assets(props: InformationAssetsProps) {
         const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
           path: { studyId: studyId, assetId: assetId },
         });
+
         if (!response.response.ok || !response.data) {
           const errorMsg = extractErrorMessage(response);
           throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
