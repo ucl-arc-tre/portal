@@ -175,7 +175,7 @@ describe("Contract Management via Study", () => {
     cy.get('button[data-cy="edit-contract-button"]').first().click();
 
     // Modify a form field
-    cy.get("select[name='assetIds.0.value']").select("asset-467");
+    cy.get("select[name='assets.0.value']").select("asset-467");
 
     // Submit the form
     cy.contains("Update Contract").click();
