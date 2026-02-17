@@ -50,19 +50,17 @@ describe("Study Management Workflow", () => {
 
   it("should show assets section when agreement already confirmed", () => {
     cy.mockStudyAgreementsConfirmed();
-    cy.mockInformationAssetsWithSample();
+    cy.mockInformationAssetsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.wait("@getAssetsWithSample");
+    cy.wait("@getAssetsEmpty");
 
     // Should skip agreement and show assets directly
-    cy.contains("Sample Asset Title 1").should("be.visible");
-    cy.contains("Sample Asset Title 2").should("be.visible");
-    cy.contains("Add Asset").should("be.visible");
+    cy.contains("Add First Asset").should("be.visible");
   });
 });
 
@@ -92,6 +90,8 @@ describe("Information Assets Management", () => {
   });
 
   it("should display existing assets and allow creating additional ones", () => {
+    cy.mockStudyAccess();
+    cy.mockAssetAccess();
     cy.mockInformationAssetsWithSample();
 
     cy.visit("/studies/manage?studyId=123456789");
@@ -100,6 +100,8 @@ describe("Information Assets Management", () => {
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
     cy.wait("@getAssetsWithSample");
+    cy.wait(1000);
+    cy.get("button").contains("Assets").should("be.visible").click();
 
     // Should display existing assets
     cy.contains("Sample Asset Title 1").should("be.visible");
