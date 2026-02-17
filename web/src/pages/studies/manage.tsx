@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { Study, getStudiesByStudyId } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import ManageStudy from "@/components/studies/ManageStudy";
@@ -35,19 +36,12 @@ export default function ManageStudyPage() {
           path: { studyId: id },
         });
 
-        if (response.response.ok && response.data) {
-          setStudy(response.data);
-        } else {
-          if (response.response.status === 404) {
-            setStudyError("Study not found or you don't have access to it.");
-          } else if (response.response.status === 403) {
-            setStudyError("You don't have permission to access this study.");
-          } else if (response.response.status === 406) {
-            setStudyError("The study ID is not valid. Please check and try again.");
-          } else {
-            setStudyError("Failed to load study. Please try again later.");
-          }
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setStudyError(errorMsg);
+          return;
         }
+        setStudy(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch study:", error);

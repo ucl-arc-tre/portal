@@ -4,7 +4,8 @@ import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/exports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
-import { postStudies, putStudiesByStudyId, Study, StudyRequest, ValidationError } from "@/openapi";
+import { postStudies, putStudiesByStudyId, Study, StudyRequest } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 export type StudyFormData = {
   title: string;
@@ -293,25 +294,18 @@ export default function StudyForm(StudyProps: StudyProps) {
           body: studyData,
         });
       }
-      if (response.data) {
-        setStudyFormOpen(false);
-        if (studyId) {
-          fetchStudyData(studyId);
-        } else {
-          fetchStudyData();
-        }
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setSubmitError(errorMsg);
         return;
       }
 
-      if (response.error) {
-        const errorData = response.error as ValidationError;
-        if (errorData?.error_message) {
-          setSubmitError(errorData.error_message);
-          return;
-        }
+      setStudyFormOpen(false);
+      if (studyId) {
+        fetchStudyData(studyId);
+      } else {
+        fetchStudyData();
       }
-
-      setSubmitError("An unknown error occurred.");
     } catch (error) {
       console.error(`Failed to ${studyId ? "update" : "create"} study:`, error);
       setSubmitError(`Failed to ${studyId ? "update" : "create"} study Please try again.`);

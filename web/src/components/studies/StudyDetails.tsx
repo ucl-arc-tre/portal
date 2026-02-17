@@ -6,6 +6,7 @@ import {
   getStudiesByStudyIdAssets,
   ApprovalStatus,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import Box from "../ui/Box";
 import { Alert, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
@@ -29,13 +30,10 @@ type StudyDetailsProps = {
 
 const fetchAssets = async (studyId: string) => {
   const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
-  if (assetResponse.response.ok && assetResponse.data) {
-    if (assetResponse.data.length > 0) {
-      return assetResponse.data;
-    } else {
-      return [];
-    }
+  if (!assetResponse.response.ok || !assetResponse.data) {
+    return [];
   }
+  return assetResponse.data;
 };
 
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
@@ -88,17 +86,20 @@ const calculateRiskScore = async (study: Study) => {
   if (!assets || assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
+
 export default function StudyDetails(props: StudyDetailsProps) {
   const { study, isIGOpsStaff, isStudyOwner, isStudyAdmin, setStudyFormOpen, studyStepsCompleted } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
+    setError(null);
 
     if (status === "Approved") {
       const response = await postStudiesAdminByStudyIdReview({
@@ -106,41 +107,34 @@ export default function StudyDetails(props: StudyDetailsProps) {
         body: { status: "Approved", feedback: feedbackContent },
       });
       if (!response.response.ok) {
-        console.error("Failed to update study status:", response.error);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
         return response;
-      } else {
-        setApprovalStatus("Approved");
-        if (feedbackContent) setFeedback(feedbackContent);
       }
+      setApprovalStatus("Approved");
+      if (feedbackContent) setFeedback(feedbackContent);
     } else if (status === "Rejected") {
       const response = await postStudiesAdminByStudyIdReview({
         path: { studyId },
         body: { status: "Rejected", feedback: feedbackContent },
       });
       if (!response.response.ok) {
-        console.error("Failed to update study status:", response.error);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
         return response;
-      } else {
-        setApprovalStatus("Rejected");
-        if (feedbackContent) setFeedback(feedbackContent);
       }
+      setApprovalStatus("Rejected");
+      if (feedbackContent) setFeedback(feedbackContent);
     } else if (status === "Pending") {
       const response = await patchStudiesByStudyIdPending({
         path: { studyId },
       });
       if (!response.response.ok) {
-        console.error("Failed to update study status:", response.error);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
         return response;
-      } else {
-        setApprovalStatus("Pending");
       }
-    } else if (status === "Pending") {
-      const response = await patchStudiesByStudyIdPending({
-        path: { studyId },
-      });
-      if (response.response.ok) {
-        setApprovalStatus("Pending");
-      }
+      setApprovalStatus("Pending");
     }
   };
 
@@ -166,6 +160,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
+      {error && <Alert type="error">{error}</Alert>}
+
       {isStudyOwnerOrAdmin && setStudyFormOpen && (
         <div className={styles["study-actions"]}>
           <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
