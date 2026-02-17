@@ -39,11 +39,12 @@ export default function Assets(props: InformationAssetsProps) {
         const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
           path: { studyId: studyId, assetId: assetId },
         });
-        if (!response.response.ok) {
-          console.error("Failed to get contracts for asset:", extractErrorMessage(response));
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Failed to load contracts for asset: ${errorMsg}`);
           return false;
         }
-        return response.data ? response.data.length > 0 : false;
+        return response.data.length > 0;
       };
 
       const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
