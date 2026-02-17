@@ -82,7 +82,7 @@ export default function ContractUploadModal({
   useEffect(() => {
     // populate form with existing data when editing
     if (editingContract) {
-      // get the existing kinked asset ids and add the throughAsset id if it's not already there
+      // get the existing linked asset ids and add the throughAsset id if it's not already there
       const combinedAssetIds = [...editingContract.asset_ids];
       if (throughAsset && !combinedAssetIds.includes(throughAsset.id)) {
         combinedAssetIds.push(throughAsset.id);
@@ -170,7 +170,7 @@ export default function ContractUploadModal({
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
-      asset_ids: assetIds,
+      asset_ids: formData.assetIds.map((asset) => asset.value).filter((id) => id !== "") as string[],
     };
 
     let response;

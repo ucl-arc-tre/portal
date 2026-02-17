@@ -60,7 +60,6 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 
 func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]types.Asset, error) {
 
-	// or is it better we just pass the asset objects from the frontend?
 	assets := []types.Asset{}
 	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
 	if err != nil {
