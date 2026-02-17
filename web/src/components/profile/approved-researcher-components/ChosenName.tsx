@@ -31,10 +31,8 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
     setIsSubmitting(true);
     try {
       const response = await postProfile({ body: { chosen_name: name } });
-      console.log(response);
       if (!response.response.ok) {
         const errorMsg = extractErrorMessage(response);
-        console.log("Error response:", errorMsg);
         setErrorMessage(errorMsg);
         setErrorType("error");
         return;
