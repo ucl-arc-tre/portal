@@ -22,6 +22,7 @@ type StudyDetailsProps = {
   isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
+  assetContractsCompleted?: boolean;
 };
 
 const fetchAssets = async (studyId: string) => {
@@ -86,7 +87,15 @@ const calculateRiskScore = async (study: Study) => {
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 export default function StudyDetails(props: StudyDetailsProps) {
-  const { study, isIGOpsStaff, isStudyOwner, isStudyAdmin, setStudyFormOpen, studyStepsCompleted } = props;
+  const {
+    study,
+    isIGOpsStaff,
+    isStudyOwner,
+    isStudyAdmin,
+    setStudyFormOpen,
+    studyStepsCompleted,
+    assetContractsCompleted,
+  } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -203,6 +212,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
             </Button>
 
             {studyStepsCompleted &&
+              assetContractsCompleted &&
               approvalStatus !== "Approved" &&
               (approvalStatus !== "Pending" ? (
                 <Button

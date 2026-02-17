@@ -18,13 +18,14 @@ import InfoTooltip from "../ui/InfoTooltip";
 
 type InformationAssetsProps = {
   studyId: string;
-  setAssetManagementCompleted?: (completed: boolean) => void;
+  setAssetContractsCompleted?: (completed: boolean) => void;
+  setHasAsset?: (hasAsset: boolean) => void;
   canModify: boolean;
   setNumAssets?: (numAssets: number) => void;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, setAssetManagementCompleted, canModify, setNumAssets } = props;
+  const { studyId, setAssetContractsCompleted, setHasAsset, canModify, setNumAssets } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,12 +69,16 @@ export default function Assets(props: InformationAssetsProps) {
           if (setNumAssets) {
             setNumAssets(informationAssetResult.data.length);
           }
+
+          if (setHasAsset && informationAssetResult.data.length > 0) {
+            setHasAsset(true);
+          }
           if (informationAssetResult.data.length > 0) {
             const assets = informationAssetResult.data;
             const assetsComplete = await checkAssetManagementCompleted(assets);
 
-            if (setAssetManagementCompleted && assetsComplete) {
-              setAssetManagementCompleted(true);
+            if (setAssetContractsCompleted && assetsComplete) {
+              setAssetContractsCompleted(true);
             }
           }
         }
@@ -86,7 +91,7 @@ export default function Assets(props: InformationAssetsProps) {
     };
 
     fetchInformationAssetData();
-  }, [studyId, setAssetManagementCompleted, checkAssetManagementCompleted, setNumAssets]);
+  }, [studyId, setAssetContractsCompleted, setHasAsset, checkAssetManagementCompleted, setNumAssets]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);
@@ -110,8 +115,8 @@ export default function Assets(props: InformationAssetsProps) {
       const assets = updatedAssetsResult.data;
       const assetsComplete = await checkAssetManagementCompleted(assets);
 
-      if (setAssetManagementCompleted && assetsComplete) {
-        setAssetManagementCompleted(true);
+      if (setAssetContractsCompleted && assetsComplete) {
+        setAssetContractsCompleted(true);
       }
       setShowAssetForm(false);
     }
