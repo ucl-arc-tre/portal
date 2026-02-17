@@ -117,9 +117,9 @@ export default function Assets(props: InformationAssetsProps) {
 
       if (setAssetContractsCompleted && assetsComplete) {
         setAssetContractsCompleted(true);
-        if (setHasAsset) {
-          setHasAsset(true);
-        }
+      }
+      if (setHasAsset) {
+        setHasAsset(true);
       }
       setShowAssetForm(false);
     }

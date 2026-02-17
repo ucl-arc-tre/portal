@@ -30,7 +30,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted;
+  const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && assetContractsCompleted;
 
   const studySteps: Step[] = [
     {
@@ -46,14 +46,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       description:
         "Create and manage at least one information asset. You can create more assets at any time. Note that contracts can also be attached to assets, in some cases this is required.",
       completed: hasAsset,
-      current: agreementCompleted && !hasAsset,
+      current: !hasAsset || !assetContractsCompleted,
     },
     {
       id: "study-agreements",
       title: "Study Agreements",
       description: "Ensure all administrators have agreed to the study agreement",
       completed: adminsAgreementsCompleted,
-      current: assetContractsCompleted && !adminsAgreementsCompleted,
+      current: hasAsset && !adminsAgreementsCompleted,
     },
   ];
 
@@ -134,6 +134,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           <div className={styles["completed-section"]}>
             <StudyDetails
               studyStepsCompleted={studyStepsCompleted}
+              assetContractsCompleted={assetContractsCompleted}
               study={study}
               isIGOpsStaff={isIGOpsStaff}
               isStudyOwner={isStudyOwner}

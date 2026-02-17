@@ -44,13 +44,12 @@ describe("Study creation end-to-end", () => {
     cy.get('[name="additionalStudyAdminUsernames.0.value"]').type(additionalAdminUsernamePrefix);
     cy.get('[data-cy="next"]').click();
     cy.get('[data-cy="next"]').click();
-    cy.get("button[type='submit']").click();
+    cy.get("button[type='submit']").contains("Update Study").click();
 
     cy.contains("Incomplete").should("be.visible"); // status is incomplete
 
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
-    cy.contains("Add First Asset").should("be.visible");
-    cy.get('[name="title"]').first().type("Thing");
+    cy.get("input#title").type("Thing");
     cy.get('[name="description"]').type("Unknown");
     cy.get('[name="classification_impact"]').select("public");
     cy.get('[name="protection"]').select("anonymisation");

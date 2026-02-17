@@ -22,7 +22,7 @@ type StudyDetailsProps = {
   isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
-  assetContractsCompleted?: boolean;
+  assetContractsCompleted: boolean;
 };
 
 const fetchAssets = async (studyId: string) => {
