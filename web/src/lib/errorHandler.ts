@@ -18,7 +18,7 @@ export function extractErrorMessage(response: ApiResponse): string {
   }
 
   // If there is no error_message in the body, fall back to status-code-specific generic messages.
-  // Most error status codes (403, 404, 406, 429, 500, 520) don't return a body from the backend (400 being the exception which is captured above).
+  // Most error status codes (403, 404, 406, 429, 500, 520) don't return a body from the backend (400 being the exception which is captured above e.g. for form validation errors).
   const status = response.response.status;
   switch (status) {
     case 403:
