@@ -48,9 +48,8 @@ describe("Study creation end-to-end", () => {
 
     cy.contains("Incomplete").should("be.visible"); // status is incomplete
 
-    cy.get("button").contains("Assets").click();
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
-    cy.contains("Create New Asset").should("be.visible");
+    cy.contains("Add First Asset").should("be.visible");
     cy.get('[name="title"]').first().type("Thing");
     cy.get('[name="description"]').type("Unknown");
     cy.get('[name="classification_impact"]').select("public");
@@ -69,7 +68,6 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="study-admins-agreement-prompt"]').contains(additionalAdminUsernamePrefix).should("be.visible");
 
     // remove added study admin
-    cy.get("button").contains("Overview").click();
     cy.get('[data-cy="edit-study-button"]').click();
     cy.get('[data-cy="remove-study-admin-button"]').click();
     cy.get('[data-cy="next"]').click();
