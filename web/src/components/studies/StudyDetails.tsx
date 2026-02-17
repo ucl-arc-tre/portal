@@ -22,7 +22,7 @@ type StudyDetailsProps = {
   isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
-  assetContractsCompleted: boolean;
+  assetContractsCompleted?: boolean;
 };
 
 const fetchAssets = async (studyId: string) => {
@@ -175,34 +175,35 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   return (
     <>
-      {studyStepsCompleted && (
-        <>
-          <div className={"tab-collection"}>
-            <Button
-              onClick={() => setTab("overview")}
-              variant="secondary"
-              className={`tab ${tab === "overview" ? "active" : ""}`}
-            >
-              Overview
-            </Button>
-            <Button
-              onClick={() => setTab("assets")}
-              variant="secondary"
-              className={`tab ${tab === "assets" ? "active" : ""}`}
-            >
-              Assets
-            </Button>
-            <Button
-              onClick={() => setTab("contracts")}
-              variant="secondary"
-              className={`tab ${tab === "contracts" ? "active" : ""}`}
-            >
-              Contracts
-            </Button>
-            {/* TODO: add projects */}
-          </div>
-        </>
-      )}
+      {studyStepsCompleted ||
+        (isIGOpsStaff && (
+          <>
+            <div className={"tab-collection"}>
+              <Button
+                onClick={() => setTab("overview")}
+                variant="secondary"
+                className={`tab ${tab === "overview" ? "active" : ""}`}
+              >
+                Overview
+              </Button>
+              <Button
+                onClick={() => setTab("assets")}
+                variant="secondary"
+                className={`tab ${tab === "assets" ? "active" : ""}`}
+              >
+                Assets
+              </Button>
+              <Button
+                onClick={() => setTab("contracts")}
+                variant="secondary"
+                className={`tab ${tab === "contracts" ? "active" : ""}`}
+              >
+                Contracts
+              </Button>
+              {/* TODO: add projects */}
+            </div>
+          </>
+        ))}
 
       <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
         {isStudyOwnerOrAdmin && setStudyFormOpen && (
@@ -254,19 +255,19 @@ export default function StudyDetails(props: StudyDetailsProps) {
       </div>
 
       <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
-        {studyStepsCompleted && (
-          <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
-        )}
+        {studyStepsCompleted ||
+          (isIGOpsStaff && <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />)}
       </div>
 
       <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
-        {studyStepsCompleted && (
-          <ContractManagement
-            study={study}
-            canModify={isStudyOwner || isStudyAdmin}
-            setNumContracts={setNumContracts}
-          />
-        )}
+        {studyStepsCompleted ||
+          (isIGOpsStaff && (
+            <ContractManagement
+              study={study}
+              canModify={isStudyOwner || isStudyAdmin}
+              setNumContracts={setNumContracts}
+            />
+          ))}
       </div>
     </>
   );
