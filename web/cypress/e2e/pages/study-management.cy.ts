@@ -159,6 +159,7 @@ describe("Information Assets Management", () => {
 
     cy.mockInformationAssetsWithSample();
     cy.wait("@getAssetsWithSample");
+    cy.wait(1000);
 
     cy.get("button").contains("Assets").should("be.visible").click();
     cy.contains("Sample Asset Title 1").should("be.visible");
