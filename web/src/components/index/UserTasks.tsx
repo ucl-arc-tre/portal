@@ -6,6 +6,7 @@ import { getProfile, getStudies } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
+import { AlertMessage, Alert } from "../shared/exports";
 
 export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -80,7 +81,11 @@ export default function UserTasks() {
     <div className={styles.container}>
       <h2>Your Tasks</h2>
 
-      {error && <p>{error}</p>}
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
 
       {!chosenName ? (
         <div className={styles["setup-prompt"]}>

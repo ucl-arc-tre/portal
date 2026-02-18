@@ -2,7 +2,7 @@ import { Asset } from "@/openapi";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
-import { formatDate } from "../shared/exports";
+import { Alert, AlertMessage, formatDate } from "../shared/exports";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
@@ -101,9 +101,9 @@ export default function AssetCard(props: AssetCardProps) {
       </div>
 
       {error && (
-        <div className="error-message">
-          <strong>Error:</strong> {error}
-        </div>
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
       )}
 
       <div className={styles["asset-actions"]}>

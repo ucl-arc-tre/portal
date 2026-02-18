@@ -3,6 +3,7 @@ import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractCard.module.css";
+import { AlertMessage, Alert } from "../shared/exports";
 
 type ContractCardProps = {
   contract: Contract;
@@ -100,7 +101,11 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
         </div>
       </div>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
 
       <div className={styles.actions}>
         <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">

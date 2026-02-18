@@ -10,6 +10,7 @@ import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
 import { useAuth } from "@/hooks/useAuth";
+import { AlertMessage, Alert } from "../shared/exports";
 
 type StudyAgreementProps = {
   studyId: string;
@@ -96,9 +97,9 @@ export default function StudyAgreement(props: StudyAgreementProps) {
       <h2 className="subtitle">Study Owner Agreement for study: {studyTitle}</h2>
 
       {error && (
-        <div className={"error-message"}>
-          <strong>Error:</strong> {error}
-        </div>
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
       )}
 
       <AgreementText text={studyAgreementText.text} />

@@ -12,7 +12,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { Label } from "../shared/exports";
+import { AlertMessage, Alert, Label } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -252,7 +252,11 @@ export default function ContractUploadModal({
             </div>
           )}
 
-          {error && <div className={styles.error}>{error}</div>}
+          {error && (
+            <Alert type="error">
+              <AlertMessage>{error}</AlertMessage>
+            </Alert>
+          )}
 
           {uploadSuccess && (
             <div className={styles.success}>

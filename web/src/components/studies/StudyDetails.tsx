@@ -8,7 +8,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Box from "../ui/Box";
-import { Alert, formatDate } from "../shared/exports";
+import { Alert, AlertMessage, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
 import StatusBadge from "../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
@@ -159,9 +159,14 @@ export default function StudyDetails(props: StudyDetailsProps) {
   }, [study]);
 
   const standardRiskScoreStatement = "increases risk score by 5";
+
   return (
     <>
-      {error && <Alert type="error">{error}</Alert>}
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
 
       {isStudyOwnerOrAdmin && setStudyFormOpen && (
         <div className={styles["study-actions"]}>

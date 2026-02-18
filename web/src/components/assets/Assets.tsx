@@ -15,6 +15,7 @@ import AssetCard from "./AssetCard";
 import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
+import { AlertMessage, Alert } from "../shared/exports";
 
 type InformationAssetsProps = {
   studyId: string;
@@ -128,9 +129,9 @@ export default function Assets(props: InformationAssetsProps) {
       <h2 className="subtitle">Assets for Study: {studyTitle}</h2>
 
       {error && (
-        <div className={styles["error-message"]}>
-          <strong>Error:</strong> {error}
-        </div>
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
       )}
 
       {canModify && (
