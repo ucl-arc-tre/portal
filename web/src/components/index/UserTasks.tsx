@@ -3,14 +3,17 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
 import { getProfile, getStudies } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
+import { AlertMessage, Alert } from "../shared/exports";
 
 export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [hasPendingStudies, setHasPendingStudies] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
@@ -21,13 +24,16 @@ export default function UserTasks() {
       try {
         const response = await getProfile();
 
-        if (response.response.ok && response.data?.chosen_name) {
-          setChosenName(response.data.chosen_name);
-        } else {
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Failed to load profile: ${errorMsg}`);
           setChosenName("");
+          return;
         }
+        setChosenName(response.data.chosen_name || "");
       } catch (error) {
         console.error("Failed to get profile:", error);
+        setError("Failed to load profile. Please try again later.");
         setChosenName("");
       } finally {
         setIsLoading(false);
@@ -42,13 +48,17 @@ export default function UserTasks() {
     const fetchPendingStudies = async () => {
       try {
         const response = await getStudies({ query: { status: "Pending" } });
-        if (response.response.ok) {
-          if (response.data && response.data.length > 0) {
-            setHasPendingStudies(true);
-          }
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Failed to load pending studies: ${errorMsg}`);
+          return;
+        }
+        if (response.data.length > 0) {
+          setHasPendingStudies(true);
         }
       } catch (error) {
         console.error("Failed to get pending studies:", error);
+        setError("Failed to load pending studies. Please try again later.");
       }
     };
     if (isIGOpsStaff) fetchPendingStudies();
@@ -70,6 +80,12 @@ export default function UserTasks() {
   return (
     <div className={styles.container}>
       <h2>Your Tasks</h2>
+
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
 
       {!chosenName ? (
         <div className={styles["setup-prompt"]}>

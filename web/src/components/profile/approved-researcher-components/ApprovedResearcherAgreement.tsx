@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Agreement, getAgreementsByAgreementType, getProfileAgreements, postProfileAgreements } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "../../ui/agreements/AgreementForm";
@@ -17,30 +18,38 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   const { authInProgress, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
   const [isLoadingAgreement, setIsLoadingAgreement] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoadingAgreement(true);
       try {
-        const agreementResult = await getAgreementsByAgreementType({ path: { agreementType: "approved-researcher" } });
-        const profileAgreementsResult = await getProfileAgreements();
+        setError(null);
 
-        if (agreementResult.response.status === 200 && agreementResult.data) {
-          setAgreement(agreementResult.data);
+        const agreementResult = await getAgreementsByAgreementType({ path: { agreementType: "approved-researcher" } });
+        if (!agreementResult.response.ok || !agreementResult.data) {
+          const errorMsg = extractErrorMessage(agreementResult);
+          setError(`Failed to load agreement: ${errorMsg}`);
+          return;
+        }
+        setAgreement(agreementResult.data);
+
+        const profileAgreementsResult = await getProfileAgreements();
+        if (!profileAgreementsResult.response.ok || !profileAgreementsResult.data) {
+          const errorMsg = extractErrorMessage(profileAgreementsResult);
+          setError(`Failed to load profile agreements: ${errorMsg}`);
+          return;
         }
 
-        if (profileAgreementsResult.response.status == 200 && profileAgreementsResult.data) {
-          const confirmedAgreements = profileAgreementsResult.data.confirmed_agreements;
-          const isConfirmed = confirmedAgreements.some(
-            (agreement) => agreement.agreement_type == "approved-researcher"
-          );
+        const confirmedAgreements = profileAgreementsResult.data.confirmed_agreements;
+        const isConfirmed = confirmedAgreements.some((agreement) => agreement.agreement_type == "approved-researcher");
 
-          if (isConfirmed) {
-            setAgreementCompleted(true);
-          }
+        if (isConfirmed) {
+          setAgreementCompleted(true);
         }
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Failed to load agreement data:", err);
+        setError("Failed to load agreement data. Please try again later.");
       } finally {
         setIsLoadingAgreement(false);
       }
@@ -53,6 +62,13 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
 
   if (authInProgress || isLoadingAgreement) return null;
 
+  if (error)
+    return (
+      <div className="error-message">
+        <strong>Error:</strong> {error}
+      </div>
+    );
+
   if (!agreement) return <div>No agreements could be found.</div>;
 
   if (!isAuthed) return <LoginFallback />;
@@ -61,7 +77,11 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
   if (agreementCompleted) return null;
 
   const handleAgreementSubmit = async (agreementId: string) => {
-    await postProfileAgreements({ body: { agreement_id: agreementId } });
+    const response = await postProfileAgreements({ body: { agreement_id: agreementId } });
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      throw new Error(errorMsg);
+    }
   };
 
   return (
