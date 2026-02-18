@@ -120,6 +120,7 @@ describe("Information Assets Management", () => {
     cy.mockAssetContractAccess();
     cy.mockInformationAssetsEmpty();
     cy.mockAssetCreation();
+    cy.mockAssetContractsEmpty();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();

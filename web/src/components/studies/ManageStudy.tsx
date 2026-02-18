@@ -30,7 +30,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && assetContractsCompleted;
+  const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && hasAsset;
 
   const studySteps: Step[] = [
     {

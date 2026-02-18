@@ -31,8 +31,6 @@ export default function ContractManagement(props: ContractManagementProps) {
     setIsLoading(true);
     setError(null);
 
-    console.log("contract mgmt", asset);
-
     try {
       let response;
       // if asset given, only collect contracts for that asset, not the study
