@@ -106,6 +106,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [numContracts, setNumContracts] = useState(0);
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const canRequestReview =
+    studyStepsCompleted && assetContractsCompleted && !isIGOpsStaff && approvalStatus !== "Approved";
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
@@ -175,35 +177,34 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   return (
     <>
-      {studyStepsCompleted ||
-        (isIGOpsStaff && (
-          <>
-            <div className={"tab-collection"}>
-              <Button
-                onClick={() => setTab("overview")}
-                variant="secondary"
-                className={`tab ${tab === "overview" ? "active" : ""}`}
-              >
-                Overview
-              </Button>
-              <Button
-                onClick={() => setTab("assets")}
-                variant="secondary"
-                className={`tab ${tab === "assets" ? "active" : ""}`}
-              >
-                Assets
-              </Button>
-              <Button
-                onClick={() => setTab("contracts")}
-                variant="secondary"
-                className={`tab ${tab === "contracts" ? "active" : ""}`}
-              >
-                Contracts
-              </Button>
-              {/* TODO: add projects */}
-            </div>
-          </>
-        ))}
+      {(isIGOpsStaff || studyStepsCompleted) && (
+        <>
+          <div className={"tab-collection"}>
+            <Button
+              onClick={() => setTab("overview")}
+              variant="secondary"
+              className={`tab ${tab === "overview" ? "active" : ""}`}
+            >
+              Overview
+            </Button>
+            <Button
+              onClick={() => setTab("assets")}
+              variant="secondary"
+              className={`tab ${tab === "assets" ? "active" : ""}`}
+            >
+              Assets
+            </Button>
+            <Button
+              onClick={() => setTab("contracts")}
+              variant="secondary"
+              className={`tab ${tab === "contracts" ? "active" : ""}`}
+            >
+              Contracts
+            </Button>
+            {/* TODO: add projects */}
+          </div>
+        </>
+      )}
 
       <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
         {isStudyOwnerOrAdmin && setStudyFormOpen && (
@@ -212,9 +213,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
               {study.feedback ? "Respond to Feedback" : "Edit Study"}
             </Button>
 
-            {studyStepsCompleted &&
-              assetContractsCompleted &&
-              approvalStatus !== "Approved" &&
+            {canRequestReview &&
               (approvalStatus !== "Pending" ? (
                 <Button
                   onClick={() => handleUpdateStudyStatus("Pending")}
@@ -254,21 +253,21 @@ export default function StudyDetails(props: StudyDetailsProps) {
         )}
       </div>
 
-      <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
-        {studyStepsCompleted ||
-          (isIGOpsStaff && <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />)}
-      </div>
+      {(studyStepsCompleted || isIGOpsStaff) && (
+        <>
+          <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
+            <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
+          </div>
 
-      <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
-        {studyStepsCompleted ||
-          (isIGOpsStaff && (
+          <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
             <ContractManagement
               study={study}
               canModify={isStudyOwner || isStudyAdmin}
               setNumContracts={setNumContracts}
             />
-          ))}
-      </div>
+          </div>
+        </>
+      )}
     </>
   );
 }

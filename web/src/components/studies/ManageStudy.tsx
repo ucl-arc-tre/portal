@@ -126,7 +126,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           <StepArrow />
         </>
       )}
-
       {getCurrentStepComponent()}
 
       {studyStepsCompleted && (

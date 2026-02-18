@@ -92,20 +92,21 @@ describe("Information Assets Management", () => {
   it("should display existing assets and allow creating additional ones", () => {
     cy.mockStudyAccess();
     cy.mockAssetAccess();
-    cy.mockInformationAssetsWithSample();
+    cy.mockStudyContractAccess();
+    cy.mockInformationAssetsWithSampleNoContracts();
 
     cy.visit("/studies/manage?studyId=123456789");
     cy.waitForAuth();
     cy.wait("@getStudyById");
     cy.wait("@getStudyAgreementText");
     cy.wait("@getStudyAgreementsConfirmed");
-    cy.wait("@getAssetsWithSample");
+    cy.wait("@getAssetsWithSampleNoContracts");
+    cy.wait("@getContractsForStudy");
     cy.wait(1000);
     cy.get("button").contains("Assets").should("be.visible").click();
 
     // Should display existing assets
-    cy.contains("Sample Asset Title 1").should("be.visible");
-    cy.contains("Sample Asset Title 2").should("be.visible");
+    cy.contains("Sample Asset Title 3").should("be.visible");
 
     // Should show button to add another asset
     cy.contains("Add Asset").should("be.visible").click();
@@ -115,6 +116,8 @@ describe("Information Assets Management", () => {
   });
 
   it("should successfully create a new asset", () => {
+    cy.mockStudyContractAccess();
+    cy.mockAssetContractAccess();
     cy.mockInformationAssetsEmpty();
     cy.mockAssetCreation();
 
@@ -156,6 +159,9 @@ describe("Information Assets Management", () => {
 
     cy.mockInformationAssetsWithSample();
     cy.wait("@getAssetsWithSample");
+    cy.wait("@getContractsForAsset");
+
+    cy.get("button").contains("Assets").should("be.visible").click();
     cy.contains("Sample Asset Title 1").should("be.visible");
     cy.contains("requires a contract").should("be.visible");
   });
@@ -167,6 +173,7 @@ describe("Study Updates", () => {
 
     cy.mockStudiesWithNewStudy();
     cy.mockStudyAccess();
+
     cy.mockStudyAgreementText();
     cy.mockStudyAgreementsConfirmed();
     cy.mockAssetCreation();
@@ -183,6 +190,7 @@ describe("Study Updates", () => {
   });
 
   it("should successfully update a study as its owner", () => {
+    cy.mockStudyContractAccess();
     cy.mockStudyUpdate();
     cy.contains("My New Test Study").should("be.visible");
     cy.contains("Manage Study").click();
@@ -200,5 +208,6 @@ describe("Study Updates", () => {
     cy.get("button[type='submit']").click();
 
     cy.wait("@updateStudy");
+    cy.wait("@getContractsForStudy");
   });
 });
