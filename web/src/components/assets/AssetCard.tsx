@@ -2,7 +2,7 @@ import { Asset } from "@/openapi";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
-import { formatDate } from "../shared/exports";
+import { Alert, AlertMessage, formatDate } from "../shared/exports";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
@@ -29,11 +29,17 @@ export default function AssetCard(props: AssetCardProps) {
   const { studyId, asset, checkCompleted, canModify } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const isAssetCompleted = async () => {
-      const response = await checkCompleted([asset]);
-      return setIsCompleted(response);
+      try {
+        const response = await checkCompleted([asset]);
+        setIsCompleted(response);
+      } catch (err) {
+        console.error("Failed to check asset completion:", err);
+        setError("Failed to check contract status.");
+      }
     };
     isAssetCompleted();
   });
@@ -93,6 +99,12 @@ export default function AssetCard(props: AssetCardProps) {
           </div>
         )}
       </div>
+
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
 
       <div className={styles["asset-actions"]}>
         {!isCompleted && (

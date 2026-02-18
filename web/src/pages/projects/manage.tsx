@@ -8,6 +8,7 @@ import {
   patchProjectsTreByProjectIdPending,
   Study,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -59,19 +60,12 @@ export default function ManageProjectPage() {
         return;
       }
 
-      if (projectResponse.response.ok && projectResponse.data) {
-        setProject(projectResponse.data);
-      } else {
-        if (projectResponse.response.status === 404) {
-          setError("Project not found or you don't have access to it.");
-        } else if (projectResponse.response.status === 403) {
-          setError("You don't have permission to access this project.");
-        } else if (projectResponse.response.status === 406) {
-          setError("The project ID is not valid. Please check and try again.");
-        } else {
-          setError("Failed to load project. Please try again later.");
-        }
+      if (!projectResponse.response.ok || !projectResponse.data) {
+        const errorMsg = extractErrorMessage(projectResponse);
+        setError(`Failed to load project: ${errorMsg}`);
+        return;
       }
+      setProject(projectResponse.data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError("Failed to load project details");
@@ -97,11 +91,12 @@ export default function ManageProjectPage() {
         path: { projectId },
       });
 
-      if (response.response.ok) {
-        await fetchData(projectId, environment as string);
-      } else {
-        setError("Failed to submit project. Please try again.");
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to submit project: ${errorMsg}`);
+        return;
       }
+      await fetchData(projectId, environment as string);
     } catch (err) {
       console.error("Failed to submit project:", err);
       setError("Failed to submit project. Please try again.");
@@ -121,12 +116,12 @@ export default function ManageProjectPage() {
         path: { projectId },
       });
 
-      if (response.response.ok) {
-        // Refresh project data to show updated status
-        await fetchData(projectId, environment as string);
-      } else {
-        setError("Failed to approve project. Please try again.");
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to approve project: ${errorMsg}`);
+        return;
       }
+      await fetchData(projectId, environment as string);
     } catch (err) {
       console.error("Failed to approve project:", err);
       setError("Failed to approve project. Please try again.");

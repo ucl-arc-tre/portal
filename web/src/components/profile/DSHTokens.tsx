@@ -4,6 +4,7 @@ import Dialog from "../ui/Dialog";
 import Button from "../ui/Button";
 import { useForm } from "react-hook-form";
 import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./DSHTokens.module.css";
 import { Alert, AlertMessage, HelperText, Label } from "../shared/exports";
 
@@ -25,11 +26,13 @@ export default function DSHTokens() {
       try {
         const response = await getTokensDsh();
         if (!response.response.ok || !response.data) {
-          throw new Error(`Failed to get tokens`);
+          const errorMsg = extractErrorMessage(response);
+          setErrorMessage(`Failed to load tokens: ${errorMsg}`);
+          return;
         }
         setTokens(response.data);
       } catch {
-        setErrorMessage("Failed to load tokens.");
+        setErrorMessage("Failed to load tokens. Please try again later.");
       }
     };
     fetchTokens();
@@ -54,11 +57,12 @@ export default function DSHTokens() {
     const response = await deleteTokensDshByTokenId({
       path: { tokenId: id },
     });
-    if (response.response.ok) {
-      setTokens(tokens.filter((token) => token.id !== id));
-    } else {
-      setErrorMessage("Failed to delete token");
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      setErrorMessage(`Failed to delete token: ${errorMsg}`);
+      return;
     }
+    setTokens(tokens.filter((token) => token.id !== id));
   };
 
   const onFormSubmit = async (data: FormData) => {
@@ -73,7 +77,9 @@ export default function DSHTokens() {
         },
       });
       if (!response.response.ok || !response.data) {
-        throw new Error(`Failed to create token`);
+        const errorMsg = extractErrorMessage(response);
+        setFormErrorMessage(errorMsg);
+        return;
       }
 
       setTokenValue(response.data.value);
