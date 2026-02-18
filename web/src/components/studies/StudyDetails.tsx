@@ -159,7 +159,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
         const score = await calculateRiskScore(study);
         setRiskScore(score);
       } catch (err) {
-        setError(`Failed to calculate risk score.`);
+        setError(`Failed to calculate risk score. ${err}`);
       } finally {
         setRiskScoreLoading(false);
       }
