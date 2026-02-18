@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
 import { useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
@@ -57,18 +58,24 @@ export default function PeoplePage() {
       return;
     }
 
-    const response = await getUsers({ query: { find: query } });
+    try {
+      const response = await getUsers({ query: { find: query } });
 
-    if (!response.response.ok || !response.data) {
-      setErrorMessage("Oops, something went wrong when trying to complete your search. Refresh and try again");
+      if (!response.response.ok || !response.data) {
+        const errorMsg = extractErrorMessage(response);
+        setErrorMessage(`Failed to search users: ${errorMsg}`);
+        return;
+      }
+      setSearchTerm(query);
+      setUsers(response.data);
+      setSearchErrorMessage("");
+      setErrorMessage("");
+    } catch (err) {
+      console.error("Failed to search users:", err);
+      setErrorMessage("Failed to search users. Please try again.");
+    } finally {
       setIsLoading(false);
-      return;
     }
-    setSearchTerm(query);
-    setUsers(response.data);
-    setSearchErrorMessage("");
-    setErrorMessage("");
-    setIsLoading(false);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -9,8 +9,10 @@ import {
   Asset,
   getStudiesByStudyIdAssetsByAssetIdContracts,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
+import { AlertMessage, Alert } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
@@ -44,13 +46,14 @@ export default function ContractManagement(props: ContractManagementProps) {
         });
       }
 
-      if (response.response.ok && response.data) {
-        setContracts(response.data);
-        if (setNumContracts) {
-          setNumContracts(response.data.length);
-        }
-      } else {
-        throw new Error(`Failed to fetch contracts: ${response.response.status} ${response.response.statusText}`);
+      if (!response.response.ok || !response.data) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to load contracts: ${errorMsg}`);
+        return;
+      }
+      setContracts(response.data);
+      if (setNumContracts) {
+        setNumContracts(response.data.length);
       }
     } catch (err) {
       console.error("Failed to load contracts:", err);
@@ -117,9 +120,9 @@ export default function ContractManagement(props: ContractManagementProps) {
         )}
 
       {error && (
-        <div className={styles.error}>
-          <strong>Error:</strong> {error}
-        </div>
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
       )}
 
       {isLoading ? (

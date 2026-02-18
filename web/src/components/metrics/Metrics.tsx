@@ -1,4 +1,5 @@
 import { getUsersMetrics, UserMetrics } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import { useEffect, useState } from "react";
 import { Label, Pie, PieChart, Tooltip } from "recharts";
 import styles from "./Metrics.module.css";
@@ -6,18 +7,22 @@ import styles from "./Metrics.module.css";
 export default function Metrics() {
   const [isLoading, setIsLoading] = useState(false);
   const [metrics, setMetrics] = useState<UserMetrics | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserMetrics = async () => {
       setIsLoading(true);
       try {
         const res = await getUsersMetrics();
-        if (!res.response.ok) {
-          throw new Error(`${res.response.status} response`);
+        if (!res.response.ok || !res.data) {
+          const errorMsg = extractErrorMessage(res);
+          setError(`Failed to load metrics: ${errorMsg}`);
+          return;
         }
         setMetrics(res.data);
       } catch (err) {
         console.error("Failed to load metrics:", err);
+        setError("Failed to load metrics. Please try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -37,6 +42,7 @@ export default function Metrics() {
   ];
 
   if (isLoading) return null;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className={styles.container}>

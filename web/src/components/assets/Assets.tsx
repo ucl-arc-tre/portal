@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Asset,
   AssetBase,
-  ValidationError,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdAssetsByAssetIdContracts,
   postStudiesByStudyIdAssets,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -15,6 +15,7 @@ import AssetCard from "./AssetCard";
 import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
+import { AlertMessage, Alert } from "../shared/exports";
 
 type InformationAssetsProps = {
   studyId: string;
@@ -36,15 +37,16 @@ export default function Assets(props: InformationAssetsProps) {
     async (assets: Asset[]) => {
       // for each asset, check if it requires a contract and if it does, that there is one
 
-      const checkContractsForAsset = async (assetId: string) => {
+      const checkContractsForAsset = async (assetId: string): Promise<boolean> => {
         const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
           path: { studyId: studyId, assetId: assetId },
         });
-        if (!response.response.ok) {
-          console.error("Failed to get contracts for asset:", response.error);
-        } else if (response.response.ok && response.data) {
-          return response.data.length > 0;
+
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
         }
+        return response.data.length > 0;
       };
 
       const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
@@ -58,28 +60,31 @@ export default function Assets(props: InformationAssetsProps) {
   useEffect(() => {
     const fetchInformationAssetData = async () => {
       setIsLoading(true);
+      setError(null);
 
       try {
-        setError(null);
-
         const informationAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
 
-        if (informationAssetResult.response.status === 200 && informationAssetResult.data) {
-          setInformationAssets(informationAssetResult.data);
-          if (setNumAssets) {
-            setNumAssets(informationAssetResult.data.length);
-          }
+        if (!informationAssetResult.response.ok || !informationAssetResult.data) {
+          const errorMsg = extractErrorMessage(informationAssetResult);
+          setError(`Failed to load Information Assets: ${errorMsg}`);
+          return;
+        }
 
-          if (setHasAsset && informationAssetResult.data.length > 0) {
-            setHasAsset(true);
-          }
-          if (informationAssetResult.data.length > 0) {
-            const assets = informationAssetResult.data;
-            const assetsComplete = await checkAssetManagementCompleted(assets);
+        setInformationAssets(informationAssetResult.data);
+        if (setNumAssets) {
+          setNumAssets(informationAssetResult.data.length);
+        }
 
-            if (setAssetContractsCompleted && assetsComplete) {
-              setAssetContractsCompleted(true);
-            }
+        if (setHasAsset && informationAssetResult.data.length > 0) {
+          setHasAsset(true);
+        }
+        if (informationAssetResult.data.length > 0) {
+          const assets = informationAssetResult.data;
+          const assetsComplete = await checkAssetManagementCompleted(assets);
+
+          if (setAssetContractsCompleted && assetsComplete) {
+            setAssetContractsCompleted(true);
           }
         }
       } catch (err) {
@@ -101,28 +106,30 @@ export default function Assets(props: InformationAssetsProps) {
       body: assetData as AssetBase,
     });
 
-    if (response.error) {
-      const errorData = response.error as ValidationError;
-      if (errorData?.error_message) {
-        throw new Error(errorData.error_message);
-      }
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      throw new Error(errorMsg);
     }
 
     // Refresh assets list after successful creation
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-    if (updatedAssetsResult.response.status === 200 && updatedAssetsResult.data) {
-      setInformationAssets(updatedAssetsResult.data);
-      const assets = updatedAssetsResult.data;
-      const assetsComplete = await checkAssetManagementCompleted(assets);
-
-      if (setAssetContractsCompleted && assetsComplete) {
-        setAssetContractsCompleted(true);
-      }
-      if (setHasAsset) {
-        setHasAsset(true);
-      }
-      setShowAssetForm(false);
+    if (!updatedAssetsResult.response.ok || !updatedAssetsResult.data) {
+      const errorMsg = extractErrorMessage(updatedAssetsResult);
+      setError(`Failed to refresh asset list: ${errorMsg}`);
+      return;
     }
+
+    setInformationAssets(updatedAssetsResult.data);
+    const assets = updatedAssetsResult.data;
+    const assetsComplete = await checkAssetManagementCompleted(assets);
+
+    if (setAssetContractsCompleted && assetsComplete) {
+      setAssetContractsCompleted(true);
+    }
+    if (setHasAsset) {
+      setHasAsset(true);
+    }
+    setShowAssetForm(false);
   };
 
   if (isLoading) return null;
@@ -132,9 +139,9 @@ export default function Assets(props: InformationAssetsProps) {
       <h2 className="subtitle">Asset Management</h2>
 
       {error && (
-        <div className={styles["error-message"]}>
-          <strong>Error:</strong> {error}
-        </div>
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
       )}
 
       {canModify && (

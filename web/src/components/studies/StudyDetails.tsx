@@ -6,6 +6,8 @@ import {
   getStudiesByStudyIdAssets,
   ApprovalStatus,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
+import { Alert, AlertMessage } from "../shared/exports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
@@ -27,13 +29,11 @@ type StudyDetailsProps = {
 
 const fetchAssets = async (studyId: string) => {
   const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
-  if (assetResponse.response.ok && assetResponse.data) {
-    if (assetResponse.data.length > 0) {
-      return assetResponse.data;
-    } else {
-      return [];
-    }
+  if (!assetResponse.response.ok || !assetResponse.data) {
+    const errorMsg = extractErrorMessage(assetResponse);
+    throw new Error(`Failed to load assets: ${errorMsg}`);
   }
+  return assetResponse.data;
 };
 
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
@@ -86,6 +86,7 @@ const calculateRiskScore = async (study: Study) => {
   if (!assets || assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
+
 export default function StudyDetails(props: StudyDetailsProps) {
   const {
     study,
@@ -99,6 +100,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
   const [tab, setTab] = useState("overview");
@@ -111,6 +113,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
+    setError(null);
 
     if (status === "Approved") {
       const response = await postStudiesAdminByStudyIdReview({
@@ -118,41 +121,34 @@ export default function StudyDetails(props: StudyDetailsProps) {
         body: { status: "Approved", feedback: feedbackContent },
       });
       if (!response.response.ok) {
-        console.error("Failed to update study status:", response.error);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
         return response;
-      } else {
-        setApprovalStatus("Approved");
-        if (feedbackContent) setFeedback(feedbackContent);
       }
+      setApprovalStatus("Approved");
+      if (feedbackContent) setFeedback(feedbackContent);
     } else if (status === "Rejected") {
       const response = await postStudiesAdminByStudyIdReview({
         path: { studyId },
         body: { status: "Rejected", feedback: feedbackContent },
       });
       if (!response.response.ok) {
-        console.error("Failed to update study status:", response.error);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
         return response;
-      } else {
-        setApprovalStatus("Rejected");
-        if (feedbackContent) setFeedback(feedbackContent);
       }
+      setApprovalStatus("Rejected");
+      if (feedbackContent) setFeedback(feedbackContent);
     } else if (status === "Pending") {
       const response = await patchStudiesByStudyIdPending({
         path: { studyId },
       });
       if (!response.response.ok) {
-        console.error("Failed to update study status:", response.error);
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
         return response;
-      } else {
-        setApprovalStatus("Pending");
       }
-    } else if (status === "Pending") {
-      const response = await patchStudiesByStudyIdPending({
-        path: { studyId },
-      });
-      if (response.response.ok) {
-        setApprovalStatus("Pending");
-      }
+      setApprovalStatus("Pending");
     }
   };
 
@@ -162,8 +158,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
       try {
         const score = await calculateRiskScore(study);
         setRiskScore(score);
-      } catch (error) {
-        console.error("Failed to calculate risk score:", error);
+      } catch (err) {
+        setError(`Failed to calculate risk score.`);
       } finally {
         setRiskScoreLoading(false);
       }
@@ -177,6 +173,11 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   return (
     <>
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
       {(isIGOpsStaff || studyStepsCompleted) && (
         <>
           <div className={"tab-collection"}>
