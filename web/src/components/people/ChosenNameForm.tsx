@@ -2,6 +2,7 @@ import { useState } from "react";
 import Dialog from "@/components/ui/Dialog";
 import Button from "@/components/ui/Button";
 import { putUsersByUserIdAttributes } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";
 
 type Props = {
@@ -32,12 +33,13 @@ export default function ChosenNameForm(props: Props) {
         },
       });
 
-      if (response.response.ok) {
-        updateChosenNameCell(userId, chosenName);
-        setChosenNameDialogOpen(false);
-      } else {
-        setErrorMessage("Failed to update chosen name");
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setErrorMessage(errorMsg);
+        return;
       }
+      updateChosenNameCell(userId, chosenName);
+      setChosenNameDialogOpen(false);
     } catch (error) {
       console.error("Failed to update chosen name:", error);
       setErrorMessage("Failed to update chosen name. Please try again.");

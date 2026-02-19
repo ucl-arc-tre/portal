@@ -5,7 +5,6 @@ import {
   putProjectsTreByProjectId,
   ProjectTreRequest,
   ProjectTreRoleName,
-  ValidationError,
   Study,
   Asset,
   Environment,
@@ -13,6 +12,7 @@ import {
   getEnvironments,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName } from "@/types/projects";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
@@ -134,14 +134,12 @@ export default function CreateProjectForm({
       setEnvironmentsError(null);
       try {
         const response = await getEnvironments();
-        if (response.response.ok && response.data) {
-          setEnvironments(response.data);
-          if (response.data.length === 0) {
-            setEnvironmentsError("No environments available. Please contact your administrator.");
-          }
-        } else {
-          throw new Error(`Failed to fetch environments: ${response.response.status} ${response.response.statusText}`);
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setEnvironmentsError(`Failed to load environments: ${errorMsg}`);
+          return;
         }
+        setEnvironments(response.data);
       } catch (error) {
         console.error("Failed to fetch environments:", error);
         setEnvironmentsError("Failed to load environments. Please try again later.");
@@ -167,13 +165,16 @@ export default function CreateProjectForm({
           path: { studyId: selectedStudyId },
         });
 
-        if (response.response.ok && response.data) {
-          setAssets(response.data);
-        } else {
-          throw new Error(`Failed to fetch assets: ${response.response.status} ${response.response.statusText}`);
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Failed to fetch assets: ${errorMsg}`);
+          setAssets([]);
+          return;
         }
+        setAssets(response.data);
       } catch (error) {
         console.error("Failed to fetch assets:", error);
+        setError("Failed to fetch assets. Please try again.");
         setAssets([]);
       } finally {
         setIsLoadingAssets(false);
@@ -247,16 +248,15 @@ export default function CreateProjectForm({
           throw new Error(`Unknown environment: ${selectedEnvironment.name}`);
       }
 
-      if (response.error) {
-        const errorData = response.error as ValidationError;
-        throw new Error(
-          errorData?.error_message || (editingProject ? "Failed to update project" : "Failed to create project")
-        );
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(errorMsg);
+        return;
       }
 
       handleProjectCreated();
     } catch (error) {
-      setError("Error: " + String((error as Error).message));
+      setError("Something went wrong. Failed to create or update project.");
     } finally {
       setIsSubmitting(false);
     }

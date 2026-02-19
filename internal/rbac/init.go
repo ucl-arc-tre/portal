@@ -21,10 +21,12 @@ func Init() {
 	addAdminPolicy(enforcer)
 	addTreOpsStaffPolicy(enforcer)
 	addIgOpsStaffPolicy(enforcer)
+	addDSHOpsStaffPolicy(enforcer)
 
 	addUserRoleBindings(config.AdminUsernames(), Admin)
 	addUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
 	addUserRoleBindings(config.IGOpsStaffUsernames(), IGOpsStaff)
+	addUserRoleBindings(config.DSHOpsStaffUsernames(), DSHOpsStaff)
 
 	runMigrations()
 }
@@ -78,6 +80,15 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: WriteAction},
+	)
+}
+
+func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
+	mustAddPolicies(enforcer,
+		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: WriteAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: WriteAction},
 	)
 }
 
