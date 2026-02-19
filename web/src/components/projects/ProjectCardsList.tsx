@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
 import Dialog from "@/components/ui/Dialog";
@@ -46,14 +47,16 @@ export default function ProjectCardsList(props: Props) {
         path: { projectId: projectToDelete.id },
       });
 
-      if (response.response.ok) {
-        setShowDeleteConfirm(false);
-        setProjectToDelete(null);
-        if (fetchData) {
-          fetchData();
-        }
-      } else {
-        throw new Error(`Failed to delete project: ${response.response.status} ${response.response.statusText}`);
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setDeleteError(`Failed to delete project: ${errorMsg}`);
+        return;
+      }
+
+      setShowDeleteConfirm(false);
+      setProjectToDelete(null);
+      if (fetchData) {
+        fetchData();
       }
     } catch (error) {
       console.error("Failed to delete project:", error);
@@ -103,7 +106,7 @@ export default function ProjectCardsList(props: Props) {
                     size="small"
                     variant="secondary"
                     disabled={deletingProjectId === project.id}
-                    className={styles["delete-button"]}
+                    className="delete-button"
                   >
                     {deletingProjectId === project.id ? "Deleting..." : "Delete"}
                   </Button>

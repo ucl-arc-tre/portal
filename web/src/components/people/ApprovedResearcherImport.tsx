@@ -1,5 +1,6 @@
 import Button from "@/components/ui/Button";
 import { postUsersApprovedResearchersImportCsv } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import { useRef, useState } from "react";
 import styles from "./ApprovedResearcherImport.module.css";
 import Loading from "../ui/Loading";
@@ -28,15 +29,15 @@ export default function ApprovedResearcherImport() {
           return b; // noop serialisation for blob
         },
       });
-      if (response.error) {
-        console.error(response.error);
-        setErrorMessage(`Failed with a ${response.response.status}`);
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setErrorMessage(errorMsg);
       } else {
         setButtonText("Imported ✔");
       }
     } catch (error) {
       console.error(error);
-      setErrorMessage("Failed");
+      setErrorMessage("Failed to upload approved researchers. Please try again.");
     }
     setIsLoading(false);
   }

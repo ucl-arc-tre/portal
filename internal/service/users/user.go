@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -185,4 +186,25 @@ func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string)
 	}
 
 	return s.usersData(users)
+}
+
+func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error) {
+	records := []ApprovedResearcherExportRecord{}
+
+	result := s.db.Model(&types.User{}).
+		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
+		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
+		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
+		Where("agreements.type = ? AND user_training_records.kind = ?", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+		Select(
+			"users.username, " +
+				"MAX(user_training_records.completed_at) as training_complete_at, " +
+				"MAX(user_agreement_confirmations.created_at) as agreed_at",
+		).
+		Group("users.username").
+		Scan(&records)
+	if result.Error != nil {
+		return nil, types.NewErrFromGorm(result.Error, "failed to count approved researchers")
+	}
+	return records, nil
 }

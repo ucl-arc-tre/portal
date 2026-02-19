@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Input, Alert, AlertMessage, Label } from "../shared/exports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import Loading from "@/components/ui/Loading";
 import Dialog from "../ui/Dialog";
 
@@ -20,22 +21,16 @@ export default function ExternalInvite() {
       setErrorMessage("");
       setShowSuccessMessage(false);
       const response = await postUsersInvite({ body: { email } });
-      if (response.response.ok) {
-        setShowSuccessMessage(true);
-        setEmail("");
-      } else {
-        let errMessage;
-        if (response.response.status === 406) {
-          errMessage = "Sorry, your request wasn't valid. Please try again.";
-        } else if (response.response.status === 500) {
-          errMessage = "Sorry, something went wrong. Please try again.";
-        } else {
-          errMessage = "An unknown error occurred. Please refresh and try again.";
-        }
-        setErrorMessage(errMessage);
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setErrorMessage(errorMsg);
+        return;
       }
+      setShowSuccessMessage(true);
+      setEmail("");
     } catch (err) {
       console.error("Invite post error:", err);
+      setErrorMessage("Failed to send invitation. Please try again.");
     } finally {
       setIsLoading(false);
     }

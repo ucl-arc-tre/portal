@@ -9,4 +9,5 @@ var (
 	TextField500Pattern     = regexp.MustCompile(`^.{1,500}$`)           // 1-500 characters, any content
 	ContractNamePattern     = regexp.MustCompile(`^.{2,100}$`)           // 2-100 characters, any content
 	TREProjectNamePattern   = regexp.MustCompile(`^[0-9a-z]{4,14}$`)     // 4-14 lowercase alphanumeric characters only
+	TokenNamePattern        = regexp.MustCompile(`^.{1,50}$`)            // 1-50 characters, any content
 )

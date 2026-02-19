@@ -35,6 +35,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -84,4 +88,34 @@ dialog {
   border-radius: 4px;
   padding: 12px;
   margin-bottom: 16px;
+}
+
+.delete-button {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+.delete-button:hover:not(:disabled) {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+.delete-button:disabled {
+  opacity: 0.6 !important;
+}
+
+.delete-button-confirm {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+.delete-button-confirm:hover:not(:disabled) {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+.delete-button-confirm:disabled {
+  opacity: 0.6 !important;
 }

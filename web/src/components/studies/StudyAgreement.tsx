@@ -5,10 +5,12 @@ import {
   getStudiesByStudyIdAgreements,
   postStudiesByStudyIdAgreements,
 } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
 import { useAuth } from "@/hooks/useAuth";
+import { AlertMessage, Alert } from "../shared/exports";
 
 type StudyAgreementProps = {
   studyId: string;
@@ -33,25 +35,25 @@ export default function StudyAgreement(props: StudyAgreementProps) {
       try {
         setError(null);
         const agreementTextResult = await getAgreementsByAgreementType({ path: { agreementType: "study-owner" } });
-        if (agreementTextResult.response.status === 200 && agreementTextResult.data) {
-          setStudyAgreementText(agreementTextResult.data);
-        } else {
-          setError("Failed to load study agreement text. Please try again later.");
+        if (!agreementTextResult.response.ok || !agreementTextResult.data) {
+          const errorMsg = extractErrorMessage(agreementTextResult);
+          setError(`Failed to load study agreement text: ${errorMsg}`);
           return;
         }
+        setStudyAgreementText(agreementTextResult.data);
 
         // Check if the user has already accepted the study agreement
         const studyAgreementsResult = await getStudiesByStudyIdAgreements({ path: { studyId } });
-        if (studyAgreementsResult.response.status == 200 && studyAgreementsResult.data) {
-          const confirmedAgreements = studyAgreementsResult.data.usernames;
-          const isConfirmed = userData?.username && confirmedAgreements.includes(userData?.username);
-
-          if (isConfirmed) {
-            setAgreementCompleted(true);
-          }
-        } else {
-          setError("Failed to load study agreements. Please try again later.");
+        if (!studyAgreementsResult.response.ok || !studyAgreementsResult.data) {
+          const errorMsg = extractErrorMessage(studyAgreementsResult);
+          setError(`Failed to load study agreements: ${errorMsg}`);
           return;
+        }
+        const confirmedAgreements = studyAgreementsResult.data.usernames;
+        const isConfirmed = userData?.username && confirmedAgreements.includes(userData?.username);
+
+        if (isConfirmed) {
+          setAgreementCompleted(true);
         }
       } catch (err) {
         console.error("Failed to load study agreement:", err);
@@ -79,9 +81,11 @@ export default function StudyAgreement(props: StudyAgreementProps) {
         body: { agreement_id: agreementId },
       });
 
-      if (response.response.status !== 200) {
-        throw new Error("Failed to submit study agreement");
-      } else refreshAuth();
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        throw new Error(errorMsg);
+      }
+      refreshAuth();
     } catch (err) {
       setError("Failed to submit agreement. Please try again.");
       throw err;
@@ -93,9 +97,9 @@ export default function StudyAgreement(props: StudyAgreementProps) {
       <h2 className="subtitle">Study Owner Agreement for study: {studyTitle}</h2>
 
       {error && (
-        <div className={"error-message"}>
-          <strong>Error:</strong> {error}
-        </div>
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
       )}
 
       <AgreementText text={studyAgreementText.text} />

@@ -12,6 +12,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
+	"github.com/ucl-arc-tre/portal/internal/service/tokens/sign"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
 
@@ -22,6 +23,7 @@ type Handler struct {
 	auth         *auth.Service
 	environments *environments.Service
 	projects     *projects.Service
+	tokens       *sign.Service
 }
 
 func New() *Handler {
@@ -33,6 +35,7 @@ func New() *Handler {
 		auth:         auth.New(),
 		environments: environments.New(),
 		projects:     projects.New(),
+		tokens:       sign.New(),
 	}
 }
 
