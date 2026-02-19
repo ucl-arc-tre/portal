@@ -116,7 +116,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	}
 
 	if exists, err := h.users.UserExistsWithEmailOrUsername(invite.Email); err != nil {
-		setError(ctx, err, "Failed to check user existance")
+		setError(ctx, err, "Failed to check user existence")
 		return
 	} else if exists {
 		log.Debug().Any("email", invite.Email).Msg("User already exists - not inviting")

@@ -9,6 +9,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -102,29 +103,21 @@ func migrateExternals(db *gorm.DB) {
 	tx := db.Begin()
 	defer RollbackTransactionOnPanic(tx)
 
-	externalUsers := []types.User{}
-	err := tx.Where("username NOT LIKE ?", "%"+config.EntraTenantPrimaryDomain()).
-		Find(&externalUsers).Error
+	externalUsersWithoutEmail := []types.User{}
+	err := tx.Model(&types.User{}).
+		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
+		Where("COALESCE(user_attributes.email, '') = '' AND username NOT LIKE ?", "%"+config.EntraTenantPrimaryDomain()).
+		Find(&externalUsersWithoutEmail).Error
 	if err != nil {
 		panic(err)
 	}
 
-	// Set all emails equal to usernames for externals
-	for _, user := range externalUsers {
-		attrs := types.UserAttributes{UserID: user.ID}
-		err := tx.Where("user_id = ?", user.ID).
-			Assign(types.UserAttributes{Email: string(user.Username)}).
-			FirstOrCreate(&attrs).Error
+	// All external users without a set email need to be dropped as they may have two identities
+	// prior to #486
+	for _, user := range externalUsersWithoutEmail {
+		err := tx.Select(clause.Associations).Delete(&user).Error
 		if err != nil {
 			panic(err)
-		}
-
-		if attrs.Email == "" {
-			attrs.Email = string(user.Username)
-			err := tx.Where("id = ?", attrs.ID).Save(&attrs).Error
-			if err != nil {
-				panic(err)
-			}
 		}
 	}
 

@@ -134,10 +134,10 @@ func (s *Service) PersistedExternalUser(username types.Username, email Email) (t
 func (s *Service) UserExistsWithEmailOrUsername(value string) (bool, error) {
 	var count int64
 	result := s.db.Model(&types.User{}).
-		Joins("JOIN user_attributes ON user_attributes.user_id = users.id").
+		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
 		Where("user_attributes.email = ? OR username = ?", value, value).
 		Count(&count)
-	return count == 1, types.NewErrFromGorm(result.Error, "failed to get user")
+	return count > 0, types.NewErrFromGorm(result.Error, "failed to get user")
 }
 
 func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {

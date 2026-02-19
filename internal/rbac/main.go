@@ -45,7 +45,7 @@ func NewEnforcer() *casbin.Enforcer {
 	return enforcer
 }
 
-// Add a role for a user
+// Add a role for a user. Returns if the role was added
 func AddRole(user types.User, role RoleName) (bool, error) {
 	roleAdded, err := enforcer.AddRoleForUser(user.ID.String(), string(role))
 	return roleAdded, types.NewErrServerError(err)
