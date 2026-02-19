@@ -149,7 +149,6 @@ export default function ContractManagement(props: ContractManagementProps) {
       {canModify && (
         <ContractUploadForm
           study={study}
-          throughAsset={asset}
           isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);

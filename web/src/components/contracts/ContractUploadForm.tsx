@@ -27,7 +27,6 @@ type ContractFormData = {
 
 type ContractUploadModalProps = {
   study: Study;
-  throughAsset?: Asset;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -36,7 +35,6 @@ type ContractUploadModalProps = {
 
 export default function ContractUploadModal({
   study,
-  throughAsset,
   isOpen,
   onClose,
   onSuccess,
@@ -46,7 +44,6 @@ export default function ContractUploadModal({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [assetIds, setAssetIds] = useState<string[]>(throughAsset ? [throughAsset.id] : []);
   const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,7 +62,6 @@ export default function ContractUploadModal({
   } = useForm<ContractFormData>({
     defaultValues: {
       status: "proposed",
-      assets: assetIds.map((id) => ({ value: id })),
     },
   });
 
@@ -82,19 +78,13 @@ export default function ContractUploadModal({
   useEffect(() => {
     // populate form with existing data when editing
     if (editingContract) {
-      // get the existing linked asset ids and add the throughAsset id if it's not already there
-      const combinedAssetIds = [...editingContract.asset_ids];
-      if (throughAsset && !combinedAssetIds.includes(throughAsset.id)) {
-        combinedAssetIds.push(throughAsset.id);
-      }
-      setAssetIds(combinedAssetIds as string[]);
       reset({
         organisationSignatory: editingContract.organisation_signatory,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
-        assets: combinedAssetIds.map((id) => ({ value: id })),
+        assets: editingContract.asset_ids.map((id) => ({ value: id })),
       });
     } else {
       // reset to defaults when not editing
@@ -126,7 +116,7 @@ export default function ContractUploadModal({
     };
 
     fetchAssets();
-  }, [editingContract, reset, throughAsset, study.id]);
+  }, [editingContract, reset, study.id]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
