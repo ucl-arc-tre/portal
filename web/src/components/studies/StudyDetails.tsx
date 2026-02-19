@@ -265,6 +265,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
               study={study}
               canModify={isStudyOwner || isStudyAdmin}
               setNumContracts={setNumContracts}
+              assetContractsCompleted={assetContractsCompleted ? assetContractsCompleted : false}
             />
           </div>
         </>

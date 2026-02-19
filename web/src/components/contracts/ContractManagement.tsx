@@ -2,13 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import {
-  getStudiesByStudyIdContracts,
-  Contract,
-  Study,
-  Asset,
-  getStudiesByStudyIdAssetsByAssetIdContracts,
-} from "@/openapi";
+import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
@@ -16,13 +10,13 @@ import { AlertMessage, Alert } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
-  asset?: Asset;
   canModify: boolean;
   setNumContracts?: (numContracts: number) => void;
+  assetContractsCompleted: boolean;
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const { study, asset, canModify, setNumContracts } = props;
+  const { study, canModify, setNumContracts, assetContractsCompleted } = props;
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,17 +28,9 @@ export default function ContractManagement(props: ContractManagementProps) {
     setError(null);
 
     try {
-      let response;
-      // if asset given, only collect contracts for that asset, not the study
-      if (asset) {
-        response = await getStudiesByStudyIdAssetsByAssetIdContracts({
-          path: { studyId: study.id, assetId: asset.id },
-        });
-      } else {
-        response = await getStudiesByStudyIdContracts({
-          path: { studyId: study.id },
-        });
-      }
+      const response = await getStudiesByStudyIdContracts({
+        path: { studyId: study.id },
+      });
 
       if (!response.response.ok || !response.data) {
         const errorMsg = extractErrorMessage(response);
@@ -61,7 +47,7 @@ export default function ContractManagement(props: ContractManagementProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, asset, setNumContracts]);
+  }, [study.id, setNumContracts]);
 
   useEffect(() => {
     fetchContracts();
@@ -94,7 +80,7 @@ export default function ContractManagement(props: ContractManagementProps) {
             </Button>
           </div>
           <p className={styles.description}>
-            Manage contract documents for this {asset ? "asset" : "study"}. Upload PDF contracts and track their status.
+            Manage contract documents for this study. Upload PDF contracts and track their status.
           </p>
         </>
       ) : (
@@ -104,13 +90,13 @@ export default function ContractManagement(props: ContractManagementProps) {
       )}
 
       {contracts.length === 0 &&
-        (asset?.requires_contract || study.involves_external_users || study.involves_third_party) && (
+        (!assetContractsCompleted || study.involves_external_users || study.involves_third_party) && (
           <div className={styles["contract-requirement-notice"]}>
             <div>
               Based on your responses while making your Study and Asset, uploading a contract is required. This is
               because you said:
               <ul>
-                {asset?.requires_contract && <li>This asset requires a contract.</li>}
+                {!assetContractsCompleted && <li>An asset in this study requires a contract.</li>}
                 {study.involves_external_users && <li>Your study involves external users.</li>}
                 {study.involves_third_party && <li>Your study involves third parties.</li>}
               </ul>
