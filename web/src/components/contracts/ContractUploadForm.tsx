@@ -102,14 +102,12 @@ export default function ContractUploadModal({
       setIsLoadingAssets(true);
       try {
         const response = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
-        if (response.response.ok && response.data) {
-          setStudyAssets(response.data);
-        } else {
-          throw new Error(`Failed to fetch assets: ${response.response.status} ${response.response.statusText}`);
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Something went wrong: ${errorMsg}`);
+          return;
         }
-      } catch (err) {
-        console.error("Failed to load assets for contract form:", err);
-        setError("Failed to load assets. Please try again later.");
+        setStudyAssets(response.data);
       } finally {
         setIsLoadingAssets(false);
       }
