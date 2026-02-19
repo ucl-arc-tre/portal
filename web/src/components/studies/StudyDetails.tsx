@@ -186,7 +186,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
               variant="secondary"
               className={`tab ${tab === "overview" ? "active" : ""}`}
             >
-              Overview
+              Study Overview
             </Button>
             <Button
               onClick={() => setTab("assets")}
@@ -238,11 +238,9 @@ export default function StudyDetails(props: StudyDetailsProps) {
           handleUpdateStudyStatus={handleUpdateStudyStatus}
           approvalStatus={approvalStatus}
           isIGOpsStaff={isIGOpsStaff}
-          isStudyOwner={isStudyOwner}
-          isStudyAdmin={isStudyAdmin}
+          isStudyOwnerOrAdmin={isStudyOwnerOrAdmin}
           feedback={feedback}
-          numAssets={numAssets}
-          numContracts={numContracts}
+          numEntities={{ assets: numAssets, contracts: numContracts }}
         />
 
         {isIGOpsStaff && (

@@ -10,8 +10,7 @@ import Loading from "../ui/Loading";
 type StudyOverviewProps = {
   study: Study;
   isIGOpsStaff: boolean;
-  isStudyOwner: boolean;
-  isStudyAdmin: boolean;
+  isStudyOwnerOrAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
   riskScore: number;
@@ -19,16 +18,14 @@ type StudyOverviewProps = {
   approvalStatus: ApprovalStatus | undefined;
   handleUpdateStudyStatus: (status: ApprovalStatus) => void;
   feedback?: string;
-  numAssets: number;
-  numContracts: number;
+  numEntities: { assets: number; contracts: number };
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
   const {
     study,
     isIGOpsStaff,
-    isStudyOwner,
-    isStudyAdmin,
+    isStudyOwnerOrAdmin,
     setStudyFormOpen,
     studyStepsCompleted,
     approvalStatus,
@@ -36,11 +33,8 @@ export default function StudyOverview(props: StudyOverviewProps) {
     riskScoreLoading,
     handleUpdateStudyStatus,
     feedback,
-    numAssets,
-    numContracts,
+    numEntities,
   } = props;
-
-  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
@@ -224,10 +218,10 @@ export default function StudyOverview(props: StudyOverviewProps) {
             <h4>Summary of related entities:</h4>
             <dl className={styles.grouping}>
               <dd>
-                Assets: <span className={styles["grey-value"]}>{numAssets}</span>
+                Assets: <span className={styles["grey-value"]}>{numEntities.assets}</span>
               </dd>
               <dd>
-                Contracts: <span className={styles["grey-value"]}>{numContracts}</span>
+                Contracts: <span className={styles["grey-value"]}>{numEntities.contracts}</span>
               </dd>
             </dl>
           </div>
