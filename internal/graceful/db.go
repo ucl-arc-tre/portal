@@ -4,6 +4,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -41,6 +42,8 @@ func InitDB() {
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
 
+	migrateContractStudyIds(db)
+
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
 	}
@@ -64,6 +67,47 @@ func NewDB() *gorm.DB {
 			log.Debug().Msg("Waiting for DB connection...")
 			time.Sleep(connectRetryDelay)
 			connectRetryDelay *= 2
+		}
+	}
+}
+
+// Set a study id column of contracts using their existing values
+// set in the associated asset
+func migrateContractStudyIds(db *gorm.DB) {
+	migrator := db.Migrator()
+
+	contract := types.Contract{}
+	if !migrator.HasTable(&contract) {
+		log.Info().Msg("Contract table did not exist")
+		return
+	}
+	if migrator.HasColumn(&contract, "study_id") {
+		log.Info().Msg("Contract study_id already migrated")
+		return
+	}
+
+	links := []struct {
+		StudyId    uuid.UUID `gorm:"study_id"`
+		ContractId uuid.UUID `gorm:"contract_id"`
+	}{}
+
+	err := db.Table("contracts").
+		Joins("INNER JOIN assets ON assets.id = contracts.asset_id").
+		Select("contracts.id AS contract_id, assets.study_id AS study_id").
+		Scan(&links).Error
+	if err != nil {
+		panic(err)
+	}
+
+	if err := migrator.AddColumn(&contract, "study_id"); err != nil {
+		panic(err)
+	}
+	for _, link := range links {
+		err := db.Model(&contract).
+			Where("id = ?", link.ContractId).
+			Update("study_id", link.StudyId).Error
+		if err != nil {
+			log.Err(err).Any("contractId", link.ContractId).Msg("Failed to set study id for contract")
 		}
 	}
 }
