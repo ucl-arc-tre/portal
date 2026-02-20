@@ -70,7 +70,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   useEffect(() => {
     // populate form with existing data when editing
-    console.log("useffect");
     if (editingContract) {
       reset({
         organisationSignatory: editingContract.organisation_signatory,
@@ -141,7 +140,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       setError("Please select a PDF file before uploading.");
       return;
     }
-    console.log("submitting");
     setUploading(true);
     setIsSubmitting(true);
     setError(null);
