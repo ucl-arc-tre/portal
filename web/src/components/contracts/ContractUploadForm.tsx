@@ -70,6 +70,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   useEffect(() => {
     // populate form with existing data when editing
+    console.log("useffect");
     if (editingContract) {
       reset({
         organisationSignatory: editingContract.organisation_signatory,
@@ -140,7 +141,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       setError("Please select a PDF file before uploading.");
       return;
     }
-
+    console.log("submitting");
     setUploading(true);
     setIsSubmitting(true);
     setError(null);
@@ -188,6 +189,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       if (!response.response.ok) {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
+        setUploadSuccess(false);
         return;
       }
 
@@ -198,13 +200,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         fileInputRef.current.value = "";
       }
       onSuccess();
-      setTimeout(() => {
-        onClose();
-        setUploadSuccess(false);
-      }, 1500);
     } catch (error) {
       console.error(editingContract ? "Update failed:" : "Upload failed:", error);
       setError("Error: " + String((error as Error).message));
+      setUploadSuccess(false);
     } finally {
       setUploading(false);
       setIsSubmitting(false);
