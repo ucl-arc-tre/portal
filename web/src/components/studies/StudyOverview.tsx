@@ -3,7 +3,6 @@ import Box from "../ui/Box";
 import { Alert, formatDate } from "../shared/exports";
 import StatusBadge from "../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
-import Button from "../ui/Button";
 import InfoTooltip from "../ui/InfoTooltip";
 import Loading from "../ui/Loading";
 
@@ -22,47 +21,11 @@ type StudyOverviewProps = {
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
-  const {
-    study,
-    isIGOpsStaff,
-    isStudyOwnerOrAdmin,
-    setStudyFormOpen,
-    canRequestReview,
-    approvalStatus,
-    riskScore,
-    riskScoreLoading,
-    handleUpdateStudyStatus,
-    feedback,
-    numEntities,
-  } = props;
+  const { study, isIGOpsStaff, approvalStatus, riskScore, riskScoreLoading, feedback, numEntities } = props;
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
     <>
-      {isStudyOwnerOrAdmin && setStudyFormOpen && (
-        <div className={styles["study-actions"]}>
-          <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
-            {study.feedback ? "Respond to Feedback" : "Edit Study"}
-          </Button>
-
-          {canRequestReview &&
-            approvalStatus !== "Approved" &&
-            (approvalStatus !== "Pending" ? (
-              <Button
-                onClick={() => handleUpdateStudyStatus("Pending")}
-                size="small"
-                data-cy="study-ready-for-review-button"
-              >
-                Mark Ready for Review
-              </Button>
-            ) : (
-              <Button disabled size="small">
-                Submitted for Review
-              </Button>
-            ))}
-        </div>
-      )}
-
       <Box>
         <div className={styles["pre-description"]}>
           <span>
