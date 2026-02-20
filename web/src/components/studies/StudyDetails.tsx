@@ -109,7 +109,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const canRequestReview =
-    studyStepsCompleted && assetContractsCompleted && !isIGOpsStaff && approvalStatus !== "Approved";
+    (studyStepsCompleted && assetContractsCompleted && !isIGOpsStaff && approvalStatus !== "Approved") || false;
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
@@ -238,6 +238,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           handleUpdateStudyStatus={handleUpdateStudyStatus}
           approvalStatus={approvalStatus}
           isIGOpsStaff={isIGOpsStaff}
+          canRequestReview={canRequestReview}
           isStudyOwnerOrAdmin={isStudyOwnerOrAdmin}
           feedback={feedback}
           numEntities={{ assets: numAssets, contracts: numContracts }}

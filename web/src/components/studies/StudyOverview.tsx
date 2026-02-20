@@ -12,7 +12,7 @@ type StudyOverviewProps = {
   isIGOpsStaff: boolean;
   isStudyOwnerOrAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
-  studyStepsCompleted?: boolean;
+  canRequestReview: boolean;
   riskScore: number;
   riskScoreLoading: boolean;
   approvalStatus: ApprovalStatus | undefined;
@@ -27,7 +27,7 @@ export default function StudyOverview(props: StudyOverviewProps) {
     isIGOpsStaff,
     isStudyOwnerOrAdmin,
     setStudyFormOpen,
-    studyStepsCompleted,
+    canRequestReview,
     approvalStatus,
     riskScore,
     riskScoreLoading,
@@ -45,7 +45,7 @@ export default function StudyOverview(props: StudyOverviewProps) {
             {study.feedback ? "Respond to Feedback" : "Edit Study"}
           </Button>
 
-          {studyStepsCompleted &&
+          {canRequestReview &&
             approvalStatus !== "Approved" &&
             (approvalStatus !== "Pending" ? (
               <Button
