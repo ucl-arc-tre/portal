@@ -13,4 +13,5 @@ You may find it helpful to review the [project structure](../README.md)
 - Create deploy/dev/oauth2-proxy.cfg from [deploy/dev/oauth2-proxy.sample.cfg](../deploy/dev/oauth2-proxy.sample.cfg)
 - Create deploy/dev/config.yaml from [deploy/dev/config.sample.yaml](../deploy/dev/config.sample.yaml)
 - Spin up the dev environment with `make dev`. You can find other commands in the [docs](../README.md)
+- Note that you may need entra credentials, speak to the Project Owner
 - Modify, commit, push and open a pull request against `main` for review.
