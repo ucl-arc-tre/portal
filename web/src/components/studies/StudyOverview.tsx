@@ -17,7 +17,7 @@ type StudyOverviewProps = {
   approvalStatus: ApprovalStatus | undefined;
   handleUpdateStudyStatus: (status: ApprovalStatus) => void;
   feedback?: string;
-  numEntities: { assets: number; contracts: number };
+  numEntities: { assets: number | undefined; contracts: number | undefined };
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
@@ -179,14 +179,16 @@ export default function StudyOverview(props: StudyOverviewProps) {
 
           <div>
             <h4>Summary of related entities:</h4>
-            <dl className={styles.grouping}>
-              <dd>
-                Assets: <span className={styles["grey-value"]}>{numEntities.assets}</span>
-              </dd>
-              <dd>
-                Contracts: <span className={styles["grey-value"]}>{numEntities.contracts}</span>
-              </dd>
-            </dl>
+            {numEntities.assets !== undefined && numEntities.contracts !== undefined && (
+              <dl className={styles.grouping}>
+                <dd>
+                  Assets: <span className={styles["grey-value"]}>{numEntities.assets}</span>
+                </dd>
+                <dd>
+                  Contracts: <span className={styles["grey-value"]}>{numEntities.contracts}</span>
+                </dd>
+              </dl>
+            )}
           </div>
         </div>
       </Box>

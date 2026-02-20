@@ -241,7 +241,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           canRequestReview={canRequestReview}
           isStudyOwnerOrAdmin={isStudyOwnerOrAdmin}
           feedback={feedback}
-          numEntities={{ assets: numAssets!, contracts: numContracts! }}
+          numEntities={{ assets: numAssets, contracts: numContracts }}
         />
 
         {isIGOpsStaff && (
