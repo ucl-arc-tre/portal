@@ -11,7 +11,6 @@ type StudyOverviewProps = {
   isIGOpsStaff: boolean;
   isStudyOwnerOrAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
-  canRequestReview: boolean;
   riskScore: number;
   riskScoreLoading: boolean;
   approvalStatus: ApprovalStatus | undefined;
