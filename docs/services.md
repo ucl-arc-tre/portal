@@ -6,7 +6,7 @@ We encourage service teams to maintain their portions of code within the codebas
 
 You may find it helpful to review the [project structure](../README.md)
 
-- Clone this repository and create a branch, or Fork it if you're an external collaborator.
+- Fork this repository and create a branch, or Clone it if you're on the project team.
 - Run `pre-commit install` to install [pre-commit](https://pre-commit.com/).
 - If not already present, install the <a id='dev-prerequisites'>prerequisites</a>: [node](https://nodejs.org/en/download), [go](https://go.dev/doc/install) and [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`.
 - If not already present, install Docker Desktop. Then open Docker Desktop app and make sure the app is running.
