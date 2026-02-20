@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
@@ -9,10 +9,12 @@ import {
   ContractUpdate,
   Study,
   Contract,
+  Asset,
+  getStudiesByStudyIdAssets,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { AlertMessage, Alert, Label } from "../shared/exports";
+import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -20,30 +22,25 @@ type ContractFormData = {
   status: "proposed" | "active" | "expired";
   startDate: string;
   expiryDate: string;
-  assetIds: string[];
+  assets: { value: string }[];
 };
 
 type ContractUploadModalProps = {
   study: Study;
-  assetIds: string[];
-  isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   editingContract?: Contract | null;
 };
 
-export default function ContractUploadModal({
-  study,
-  assetIds,
-  isOpen,
-  onClose,
-  onSuccess,
-  editingContract,
-}: ContractUploadModalProps) {
+export default function ContractUploadModal({ study, onClose, onSuccess, editingContract }: ContractUploadModalProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const organisationName = process.env.NEXT_PUBLIC_ORGANISATION_NAME;
@@ -53,10 +50,22 @@ export default function ContractUploadModal({
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    control,
   } = useForm<ContractFormData>({
     defaultValues: {
       status: "proposed",
     },
+  });
+
+  const selectedAssetIds = watch("assets");
+  const {
+    fields: assetFields,
+    append: appendAsset,
+    remove: removeAsset,
+  } = useFieldArray({
+    control,
+    name: "assets",
   });
 
   useEffect(() => {
@@ -68,7 +77,7 @@ export default function ContractUploadModal({
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
-        assetIds: editingContract.asset_ids,
+        assets: editingContract.asset_ids.map((id) => ({ value: id })),
       });
     } else {
       // reset to defaults when not editing
@@ -78,10 +87,27 @@ export default function ContractUploadModal({
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
-        assetIds: [],
+        assets: [],
       });
     }
-  }, [editingContract, reset]);
+
+    const fetchAssets = async () => {
+      setIsLoadingAssets(true);
+      try {
+        const response = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Something went wrong: ${errorMsg}`);
+          return;
+        }
+        setStudyAssets(response.data);
+      } finally {
+        setIsLoadingAssets(false);
+      }
+    };
+
+    fetchAssets();
+  }, [editingContract, reset, study.id]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -114,8 +140,8 @@ export default function ContractUploadModal({
       setError("Please select a PDF file before uploading.");
       return;
     }
-
     setUploading(true);
+    setIsSubmitting(true);
     setError(null);
 
     const contractData: ContractUpdate | ContractUploadObject = {
@@ -124,7 +150,7 @@ export default function ContractUploadModal({
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
-      asset_ids: assetIds,
+      asset_ids: formData.assets.map((asset) => asset.value).filter((id) => id !== "") as string[],
     };
 
     let response;
@@ -161,6 +187,7 @@ export default function ContractUploadModal({
       if (!response.response.ok) {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
+        setUploadSuccess(false);
         return;
       }
 
@@ -171,15 +198,13 @@ export default function ContractUploadModal({
         fileInputRef.current.value = "";
       }
       onSuccess();
-      setTimeout(() => {
-        onClose();
-        setUploadSuccess(false);
-      }, 1500);
     } catch (error) {
       console.error(editingContract ? "Update failed:" : "Upload failed:", error);
       setError("Error: " + String((error as Error).message));
+      setUploadSuccess(false);
     } finally {
       setUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -203,9 +228,6 @@ export default function ContractUploadModal({
     onClose();
   };
 
-  if (!isOpen) return null;
-
-  // TODO: when coming from asset flow, prefill the asset ID, otherwise allow selection of assets
   return (
     <Dialog setDialogOpen={handleClose}>
       <h2>{editingContract ? "Edit Contract" : "Upload Contract"}</h2>
@@ -342,6 +364,74 @@ export default function ContractUploadModal({
               className={styles["form-input"]}
             />
             {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
+          </div>
+        </div>
+
+        <div className={styles["form-section"]}>
+          <h4>Link Assets (optional)</h4>
+          <div className={styles["form-group"]}>
+            <fieldset className={styles["dynamic-fieldset"]}>
+              {assetFields.map((field, index) => (
+                <div key={field.id} className={styles["item-wrapper"]}>
+                  <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                    Asset {index + 1}:
+                  </label>
+
+                  <Controller
+                    name={`assets.${index}.value` as const}
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        id={`asset-${index}`}
+                        className={styles.select}
+                        disabled={isSubmitting || isLoadingAssets}
+                      >
+                        <option value="">
+                          {isLoadingAssets
+                            ? "Loading assets..."
+                            : studyAssets.length === 0
+                              ? "No assets available for this study"
+                              : "Select an asset (optional)..."}
+                        </option>
+                        {studyAssets.map((asset) => {
+                          const isAlreadySelected = selectedAssetIds.some(
+                            (selected, selectedIndex) => selected.value === asset.id && selectedIndex !== index
+                          );
+
+                          return (
+                            <option key={asset.id} value={asset.id} disabled={isAlreadySelected}>
+                              {asset.title}
+                              {isAlreadySelected ? " - Already selected" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    )}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeAsset(index)}
+                    className={styles["remove-button"]}
+                    aria-label={`Remove asset ${index + 1}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                className={styles["add-button"]}
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => appendAsset({ value: "" })}
+              >
+                Add Asset
+              </Button>
+            </fieldset>
+            <HelperText>Optionally link this contract to one or more existing assets from this study</HelperText>
           </div>
         </div>
 

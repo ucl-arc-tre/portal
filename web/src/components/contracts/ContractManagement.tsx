@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdContracts, Contract, Study, Asset } from "@/openapi";
+import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
@@ -10,11 +10,13 @@ import { AlertMessage, Alert } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
-  asset?: Asset;
   canModify: boolean;
+  setNumContracts?: (numContracts: number) => void;
+  assetContractsCompleted: boolean;
 };
 
-export default function ContractManagement({ study, asset, canModify }: ContractManagementProps) {
+export default function ContractManagement(props: ContractManagementProps) {
+  const { study, canModify, setNumContracts, assetContractsCompleted } = props;
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,13 +38,16 @@ export default function ContractManagement({ study, asset, canModify }: Contract
         return;
       }
       setContracts(response.data);
+      if (setNumContracts) {
+        setNumContracts(response.data.length);
+      }
     } catch (err) {
       console.error("Failed to load contracts:", err);
       setError("Failed to load contracts. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  }, [study.id]);
+  }, [study.id, setNumContracts]);
 
   useEffect(() => {
     fetchContracts();
@@ -59,6 +64,7 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       return;
     }
     setEditingContract(contract);
+
     setShowUploadModal(true);
   };
 
@@ -84,13 +90,13 @@ export default function ContractManagement({ study, asset, canModify }: Contract
       )}
 
       {contracts.length === 0 &&
-        (asset?.requires_contract || study.involves_external_users || study.involves_third_party) && (
+        (!assetContractsCompleted || study.involves_external_users || study.involves_third_party) && (
           <div className={styles["contract-requirement-notice"]}>
             <div>
               Based on your responses while making your Study and Asset, uploading a contract is required. This is
               because you said:
               <ul>
-                {asset?.requires_contract && <li>This asset requires a contract.</li>}
+                {!assetContractsCompleted && <li>An asset in this study requires a contract.</li>}
                 {study.involves_external_users && <li>Your study involves external users.</li>}
                 {study.involves_third_party && <li>Your study involves third parties.</li>}
               </ul>
@@ -126,11 +132,9 @@ export default function ContractManagement({ study, asset, canModify }: Contract
         </div>
       )}
 
-      {canModify && (
+      {canModify && showUploadModal && (
         <ContractUploadForm
           study={study}
-          assetIds={asset ? [asset.id] : []} //TODO: Add support for multiple assets
-          isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);
             setEditingContract(null);

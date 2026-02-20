@@ -8,6 +8,10 @@
   background: var(--background);
   border-radius: 8px;
   border: 1px solid #e5e7eb;
+
+  h2 {
+    text-align: center;
+  }
 }
 
 .no-assets-message {
