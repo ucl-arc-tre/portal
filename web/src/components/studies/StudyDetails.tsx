@@ -254,7 +254,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
       {(studyStepsCompleted || isIGOpsStaff) && (
         <>
           <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
-            <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
+            {tab === "assets" && (
+              // we want to check the assets have required contracts more regularly
+              <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
+            )}
           </div>
 
           <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
