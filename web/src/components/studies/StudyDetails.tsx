@@ -104,8 +104,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
   const [tab, setTab] = useState("overview");
-  const [numAssets, setNumAssets] = useState(0);
-  const [numContracts, setNumContracts] = useState(0);
+  const [numAssets, setNumAssets] = useState<number | undefined>(undefined);
+  const [numContracts, setNumContracts] = useState<number | undefined>(undefined);
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const canRequestReview =
@@ -241,7 +241,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           canRequestReview={canRequestReview}
           isStudyOwnerOrAdmin={isStudyOwnerOrAdmin}
           feedback={feedback}
-          numEntities={{ assets: numAssets, contracts: numContracts }}
+          numEntities={{ assets: numAssets!, contracts: numContracts! }}
         />
 
         {isIGOpsStaff && (
