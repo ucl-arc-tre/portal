@@ -132,10 +132,9 @@ export default function ContractManagement(props: ContractManagementProps) {
         </div>
       )}
 
-      {canModify && (
+      {canModify && showUploadModal && (
         <ContractUploadForm
           study={study}
-          isOpen={showUploadModal}
           onClose={() => {
             setShowUploadModal(false);
             setEditingContract(null);

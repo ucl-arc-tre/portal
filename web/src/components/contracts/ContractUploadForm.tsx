@@ -27,19 +27,12 @@ type ContractFormData = {
 
 type ContractUploadModalProps = {
   study: Study;
-  isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   editingContract?: Contract | null;
 };
 
-export default function ContractUploadModal({
-  study,
-  isOpen,
-  onClose,
-  onSuccess,
-  editingContract,
-}: ContractUploadModalProps) {
+export default function ContractUploadModal({ study, onClose, onSuccess, editingContract }: ContractUploadModalProps) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -237,8 +230,6 @@ export default function ContractUploadModal({
     }
     onClose();
   };
-
-  if (!isOpen) return null;
 
   return (
     <Dialog setDialogOpen={handleClose}>
