@@ -36,7 +36,6 @@ func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
 }
 
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
-
 	assetIds := []string{}
 	for _, asset := range contract.Assets {
 		assetIds = append(assetIds, asset.ID.String())
@@ -60,6 +59,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 // Handler methods
 
 func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]types.Asset, error) {
+
 	assets := []types.Asset{}
 	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
 	if err != nil {

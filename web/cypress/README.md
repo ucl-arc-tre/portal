@@ -103,6 +103,7 @@ The CI tests are run against the full release version of the dockerised setup to
 
 ### Common Issues
 
+- **Auth timing out**: This usually happens if the env variables haven't been updated with the correct credentials; check `./cypress.env.json` and compare it to `./cypress.sample.env.json` to see if you're missing a set of auth credentials.
 - **State pollution**: This can happen when integration tests modify the database. To avoid this, make sure to use proper cleanup in `beforeEach` hooks.
 - **Timing issues**: Use `cy.wait()` for API calls, `cy.contains()` for text verification
 

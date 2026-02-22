@@ -23,9 +23,6 @@ export default function ManageAssetPage() {
   const [error, setError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  // const isStudyOwner =
-  //   (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
-  // const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
 
   const fetchData = async (studyIdParam: string, assetIdParam: string) => {
     setLoading(true);
@@ -167,6 +164,7 @@ export default function ManageAssetPage() {
                 <span>Yes</span>
               </div>
             )}
+            {/* TODO: add contract linkage and list of contracts linked */}
           </div>
         </div>
       </div>

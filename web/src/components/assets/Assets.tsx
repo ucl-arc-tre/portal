@@ -19,13 +19,14 @@ import { AlertMessage, Alert } from "../shared/exports";
 
 type InformationAssetsProps = {
   studyId: string;
-  studyTitle: string;
-  setAssetManagementCompleted?: (completed: boolean) => void;
+  setAssetContractsCompleted?: (completed: boolean) => void;
+  setHasAsset?: (hasAsset: boolean) => void;
   canModify: boolean;
+  setNumAssets?: (numAssets: number) => void;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, studyTitle, setAssetManagementCompleted, canModify } = props;
+  const { studyId, setAssetContractsCompleted, setHasAsset, canModify, setNumAssets } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,13 +72,19 @@ export default function Assets(props: InformationAssetsProps) {
         }
 
         setInformationAssets(informationAssetResult.data);
+        if (setNumAssets) {
+          setNumAssets(informationAssetResult.data.length);
+        }
 
+        if (setHasAsset && informationAssetResult.data.length > 0) {
+          setHasAsset(true);
+        }
         if (informationAssetResult.data.length > 0) {
           const assets = informationAssetResult.data;
           const assetsComplete = await checkAssetManagementCompleted(assets);
 
-          if (setAssetManagementCompleted && assetsComplete) {
-            setAssetManagementCompleted(true);
+          if (setAssetContractsCompleted && assetsComplete) {
+            setAssetContractsCompleted(true);
           }
         }
       } catch (err) {
@@ -89,7 +96,7 @@ export default function Assets(props: InformationAssetsProps) {
     };
 
     fetchInformationAssetData();
-  }, [studyId, setAssetManagementCompleted, checkAssetManagementCompleted]);
+  }, [studyId, setAssetContractsCompleted, setHasAsset, checkAssetManagementCompleted, setNumAssets]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);
@@ -116,8 +123,11 @@ export default function Assets(props: InformationAssetsProps) {
     const assets = updatedAssetsResult.data;
     const assetsComplete = await checkAssetManagementCompleted(assets);
 
-    if (setAssetManagementCompleted && assetsComplete) {
-      setAssetManagementCompleted(true);
+    if (setAssetContractsCompleted && assetsComplete) {
+      setAssetContractsCompleted(true);
+    }
+    if (setHasAsset) {
+      setHasAsset(true);
     }
     setShowAssetForm(false);
   };
@@ -126,7 +136,7 @@ export default function Assets(props: InformationAssetsProps) {
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
-      <h2 className="subtitle">Assets for Study: {studyTitle}</h2>
+      <h2 className="subtitle">Asset Management</h2>
 
       {error && (
         <Alert type="error">
