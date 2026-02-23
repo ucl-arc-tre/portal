@@ -1,15 +1,19 @@
 package types
 
 import (
-	"strings"
+	"regexp"
 
 	"github.com/google/uuid"
+)
+
+var (
+	usernameRegex = regexp.MustCompile(`^[^@]+@[^@]+\.[^@]+$`)
 )
 
 type Username string // e.g. ccxyz@ucl.ac.uk
 
 func (u Username) IsValid() bool {
-	return strings.Contains(string(u), "@")
+	return usernameRegex.MatchString(string(u))
 }
 
 type ChosenName string // e.g. Alice Smith
@@ -21,9 +25,12 @@ type User struct {
 
 type UserAttributes struct {
 	Model
-	User       User
 	UserID     uuid.UUID
 	ChosenName ChosenName
+	Email      string // Should be set for external users
+
+	// Relationships
+	User User `gorm:"foreignKey:UserID"`
 }
 
 type Sponsor struct {

@@ -104,7 +104,7 @@ func (c *Controller) findUser(ctx context.Context, username types.Username) (gra
 	if !username.IsValid() {
 		return nil, types.NewErrInvalidObject(fmt.Errorf("username [%v] was not valid", username))
 	}
-	if usernameIsExternal(username) {
+	if IsExternalUsername(username) {
 		return c.findUserExternal(ctx, Email(username))
 	} else {
 		return c.findUserInternal(ctx, UserPrincipalName(username))
@@ -320,7 +320,7 @@ func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.U
 	return usernames, nil
 }
 
-func usernameIsExternal(username types.Username) bool {
+func IsExternalUsername(username types.Username) bool {
 	return !strings.HasSuffix(string(username), config.EntraTenantPrimaryDomain())
 }
 
