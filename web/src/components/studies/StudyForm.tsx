@@ -163,13 +163,14 @@ export default function StudyForm(StudyProps: StudyProps) {
     if (currentStep === 1) {
       const titleValid = await trigger("title");
       const controllerValid = await trigger("dataControllerOrganisation");
+      const descriptionValid = await trigger("description");
 
       // Validate admin fields if they exist
       const adminValidResults = await Promise.all(
         fields.map((_, index) => trigger(`additionalStudyAdminUsernames.${index}.value` as const))
       );
 
-      if (!titleValid || !controllerValid || !adminValidResults.every((valid) => valid)) {
+      if (!titleValid || !descriptionValid || !controllerValid || !adminValidResults.every((valid) => valid)) {
         setStepValidationError("Please fix the validation errors before proceeding.");
         return;
       }
@@ -380,9 +381,19 @@ export default function StudyForm(StudyProps: StudyProps) {
             <Controller
               name="description"
               control={control}
-              rules={{ maxLength: 255 }}
+              rules={{
+                pattern: {
+                  value: /^[\s\S]{0,255}$/,
+                  message: "Description must be at most 255 characters",
+                },
+              }}
               render={({ field }) => <Textarea {...field} id="description" />}
             />
+            {errors.description && (
+              <Alert type="error">
+                <AlertMessage>{errors.description.message}</AlertMessage>
+              </Alert>
+            )}
           </Label>
         </fieldset>
 
