@@ -15,7 +15,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.ValidationError, error) {
+func (s *Service) ValidateAssetData(assetData openapi.AssetBase) (*openapi.ValidationError, error) {
 	// Validate title
 	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
@@ -101,13 +101,21 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
 	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
 
-	validationError, err := s.validateAssetData(assetData)
+	validationError, err := s.ValidateAssetData(assetData)
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
 
 	_, err = s.createInformationAsset(user, assetData, studyID)
 	return nil, err
+}
+
+func formatExpiry(expiry string) time.Time {
+	expiryDate, err := time.Parse(config.DateFormat, expiry)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", expiry, err))
+	}
+	return expiryDate
 }
 
 // handles the database transaction for creating a study asset
@@ -121,10 +129,7 @@ func (s *Service) createInformationAsset(user types.User, assetData openapi.Asse
 	}()
 
 	// Parse the expiry date string (already validated in validateAssetData)
-	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
-	if err != nil {
-		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
-	}
+	expiryDate := formatExpiry(assetData.ExpiresAt)
 
 	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
@@ -193,4 +198,64 @@ func (s *Service) AssetContracts(studyID uuid.UUID, assetID uuid.UUID) ([]types.
 		Find(&asset).Error
 
 	return asset.Contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
+}
+
+func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error) {
+	exists := false
+	err := s.db.Model(&types.Asset{}).
+		Select("count(*) > 0").
+		Where("study_id = ? AND id = ?", studyID, assetID).
+		Find(&exists).Error
+	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
+}
+
+func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData openapi.AssetBase) error {
+
+	if exists, err := s.assetExists(studyID, assetID); err != nil {
+		return err
+	} else if !exists {
+		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
+	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	expiryDate := formatExpiry(assetData.ExpiresAt)
+	asset := types.Asset{
+		Title:                assetData.Title,
+		Description:          assetData.Description,
+		ClassificationImpact: string(assetData.ClassificationImpact),
+		Tier:                 assetData.Tier,
+		Protection:           string(assetData.Protection),
+		LegalBasis:           string(assetData.LegalBasis),
+		Format:               string(assetData.Format),
+		ExpiresAt:            expiryDate,
+		Status:               string(assetData.Status),
+		Contracts:            []types.Contract{},
+	}
+
+	result := tx.Model(&types.Asset{}).
+		Where("id = ? AND study_id = ?", assetID, studyID).
+		Updates(asset)
+
+	if result.Error != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(result.Error, "failed to update asset")
+	}
+
+	assoc := tx.Model(&asset).Association("Contracts")
+	if err := assoc.Replace(asset.Contracts); err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to update contract assets")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit asset update transaction")
+	}
+
+	return nil
 }

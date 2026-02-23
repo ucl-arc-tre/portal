@@ -183,6 +183,9 @@ type Asset struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
 
+	// ContractIds List of contract IDs associated with the asset
+	ContractIds *[]string `json:"contract_ids,omitempty"`
+
 	// CreatedAt Time in RFC3339 format when the asset was created
 	CreatedAt string `json:"created_at"`
 
@@ -254,6 +257,9 @@ type AssetStatus string
 type AssetBase struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
+
+	// ContractIds List of contract IDs associated with the asset
+	ContractIds *[]string `json:"contract_ids,omitempty"`
 
 	// Description Description of the asset
 	Description string `json:"description"`
@@ -905,6 +911,9 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
+// PutStudiesStudyIdAssetsAssetIdJSONRequestBody defines body for PutStudiesStudyIdAssetsAssetId for application/json ContentType.
+type PutStudiesStudyIdAssetsAssetIdJSONRequestBody = AssetBase
+
 // PostStudiesStudyIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdContractsUpload for multipart/form-data ContentType.
 type PostStudiesStudyIdContractsUploadMultipartRequestBody = ContractUploadObject
 
@@ -1009,6 +1018,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId}/assets/{assetId})
 	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId string, assetId string)
+
+	// (PUT /studies/{studyId}/assets/{assetId})
+	PutStudiesStudyIdAssetsAssetId(c *gin.Context, studyId string, assetId string)
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts)
 	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId string, assetId string)
@@ -1605,6 +1617,39 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	siw.Handler.GetStudiesStudyIdAssetsAssetId(c, studyId, assetId)
 }
 
+// PutStudiesStudyIdAssetsAssetId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutStudiesStudyIdAssetsAssetId(c, studyId, assetId)
+}
+
 // GetStudiesStudyIdAssetsAssetIdContracts operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context) {
 
@@ -2001,6 +2046,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
+	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.PutStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts/upload", wrapper.PostStudiesStudyIdContractsUpload)

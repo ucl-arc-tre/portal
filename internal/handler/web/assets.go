@@ -95,3 +95,30 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
 }
+
+func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	if err != nil {
+		return
+	}
+
+	assetData := openapi.AssetBase{}
+	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
+		return
+	}
+	validationError, err := h.studies.ValidateAssetData(assetData)
+	if err != nil {
+		setError(ctx, err, "Failed to validate asset data")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+	err = h.studies.UpdateAsset(uuids[0], uuids[1], assetData)
+	if err != nil {
+		setError(ctx, err, "Failed to update asset")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

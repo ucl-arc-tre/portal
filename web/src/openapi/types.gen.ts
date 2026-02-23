@@ -187,6 +187,10 @@ export type AssetBase = {
      * Status of the asset
      */
     status: 'active' | 'awaiting' | 'destroyed';
+    /**
+     * List of contract IDs associated with the asset
+     */
+    contract_ids?: Array<string>;
 };
 
 /**
@@ -1731,6 +1735,56 @@ export type GetStudiesByStudyIdAssetsByAssetIdResponses = {
 };
 
 export type GetStudiesByStudyIdAssetsByAssetIdResponse = GetStudiesByStudyIdAssetsByAssetIdResponses[keyof GetStudiesByStudyIdAssetsByAssetIdResponses];
+
+export type PutStudiesByStudyIdAssetsByAssetIdData = {
+    body: AssetBase;
+    path: {
+        /**
+         * ID of the study
+         */
+        studyId: string;
+        /**
+         * ID of the asset
+         */
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}';
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden - no access to study or asset
+     */
+    403: unknown;
+    /**
+     * Study or asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdError = PutStudiesByStudyIdAssetsByAssetIdErrors[keyof PutStudiesByStudyIdAssetsByAssetIdErrors];
+
+export type PutStudiesByStudyIdAssetsByAssetIdResponses = {
+    /**
+     * Asset updated successfully
+     */
+    200: Asset;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdResponse = PutStudiesByStudyIdAssetsByAssetIdResponses[keyof PutStudiesByStudyIdAssetsByAssetIdResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
     body?: never;
