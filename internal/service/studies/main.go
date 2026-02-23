@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 	"slices"
 	"strings"
 
@@ -17,18 +16,12 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
 )
 
 const (
 	maxNumberStudyAdmins = 5
-)
-
-var (
-	titlePattern                = regexp.MustCompile(`^\w[\w\s\-]{2,48}\w$`)
-	dataProtectionNumberPattern = regexp.MustCompile(`^\w+\/\d{4}\/\d{2}\/(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$`)
-	cagPattern                  = regexp.MustCompile(`^\d{2}/CAG/\d{4}$`)
-	nhsePattern                 = regexp.MustCompile(`^DARS-NIC-\d{6}-\d{5}-\d{2}$`)
 )
 
 type Service struct {
@@ -83,7 +76,7 @@ func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types
 }
 
 func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) (*openapi.ValidationError, error) {
-	if !titlePattern.MatchString(studyData.Title) {
+	if !validation.StudyTitlePattern.MatchString(studyData.Title) {
 		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
 	}
 
@@ -91,7 +84,7 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		return &openapi.ValidationError{ErrorMessage: "data_controller_organisation is required"}, nil
 	}
 
-	if studyData.Description != nil && len(*studyData.Description) > 255 {
+	if studyData.Description != nil && !validation.StudyDescriptionPattern.MatchString(*studyData.Description) {
 		return &openapi.ValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
 	}
 
@@ -99,18 +92,18 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 		if studyData.DataProtectionNumber == nil {
 			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
 		}
-		if !dataProtectionNumberPattern.MatchString(*studyData.DataProtectionNumber) {
+		if !validation.DataProtectionNumberPattern.MatchString(*studyData.DataProtectionNumber) {
 			return &openapi.ValidationError{ErrorMessage: "data protection ID invalid format"}, nil
 		}
 	}
 
-	if studyData.CagReference != nil && !cagPattern.MatchString(*studyData.CagReference) {
-		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
+	if studyData.CagReference != nil && !validation.CagPattern.MatchString(*studyData.CagReference) {
+		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG reference format"}, nil
 
 	}
 
-	if studyData.NhsEnglandReference != nil && !nhsePattern.MatchString(*studyData.NhsEnglandReference) {
-		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG Reference format"}, nil
+	if studyData.NhsEnglandReference != nil && !validation.NhsePattern.MatchString(*studyData.NhsEnglandReference) {
+		return &openapi.ValidationError{ErrorMessage: "please adhere to the NHS England reference format"}, nil
 	}
 
 	if len(studyData.AdditionalStudyAdminUsernames) > maxNumberStudyAdmins {
