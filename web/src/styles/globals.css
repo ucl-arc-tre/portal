@@ -1,3 +1,5 @@
+@import url(./form-globals.css);
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -67,14 +69,6 @@ dialog {
   font-size: 0.875rem;
   font-weight: 500;
   margin-inline: 0.2rem;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1rem;
-  padding-inline: 4%;
-  gap: 1.5rem;
 }
 
 .content {

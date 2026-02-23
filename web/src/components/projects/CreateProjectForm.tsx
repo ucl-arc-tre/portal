@@ -436,10 +436,10 @@ export default function CreateProjectForm({
 
               <div className={styles["form-field"]}>
                 <span className={styles["section-label"]}>Add assets (optional):</span>
-                <fieldset className={styles["dynamic-fieldset"]}>
+                <fieldset className="linkage-fieldset">
                   {assetFields.map((field, index) => (
-                    <div key={field.id} className={styles["item-wrapper"]}>
-                      <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                    <div key={field.id} className="item-wrapper">
+                      <label htmlFor={`asset-${index}`} className="item-label">
                         Asset {index + 1}:
                       </label>
 
@@ -520,7 +520,7 @@ export default function CreateProjectForm({
             <>
               <div className={styles["form-field"]}>
                 <span className={styles["section-label"]}>Additional Approved Researchers (optional):</span>
-                <fieldset className={styles["dynamic-fieldset"]}>
+                <fieldset className="linkage-fieldset">
                   {researcherFields.map((field, index) => {
                     const researcher = watch(`additionalApprovedResearchers.${index}`);
                     const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
@@ -528,7 +528,7 @@ export default function CreateProjectForm({
                     const availableRolesToAdd = availableRoles.filter((role) => !researcher?.roles?.includes(role));
 
                     return (
-                      <div key={field.id} className={styles["item-wrapper"]}>
+                      <div key={field.id} className="item-wrapper">
                         <div className={styles["researcher-content"]}>
                           <div>
                             <label htmlFor={`researcher-${index}`} className={styles["field-label"]}>

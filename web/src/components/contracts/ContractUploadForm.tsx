@@ -370,10 +370,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         <div className={styles["form-section"]}>
           <h4>Link Assets (optional)</h4>
           <div className={styles["form-group"]}>
-            <fieldset className={styles["dynamic-fieldset"]}>
+            <fieldset className="linkage-fieldset">
               {assetFields.map((field, index) => (
-                <div key={field.id} className={styles["item-wrapper"]}>
-                  <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                <div key={field.id} className="item-wrapper">
+                  <label htmlFor={`asset-${index}`} className="item-label">
                     Asset {index + 1}:
                   </label>
 
