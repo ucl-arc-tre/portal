@@ -491,7 +491,7 @@ export default function CreateProjectForm({
                       <button
                         type="button"
                         onClick={() => removeAsset(index)}
-                        className={styles["remove-button"]}
+                        className="remove-button"
                         aria-label={`Remove asset ${index + 1}`}
                       >
                         ×
@@ -669,7 +669,7 @@ export default function CreateProjectForm({
                         <button
                           type="button"
                           onClick={() => removeResearcher(index)}
-                          className={styles["remove-button"]}
+                          className="remove-button"
                           aria-label={`Remove researcher ${index + 1}`}
                         >
                           ×

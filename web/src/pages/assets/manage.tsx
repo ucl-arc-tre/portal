@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { Study, Asset, getStudiesByStudyId, getStudiesByStudyIdAssetsByAssetId } from "@/openapi";
+import {
+  Study,
+  Asset,
+  getStudiesByStudyId,
+  getStudiesByStudyIdAssetsByAssetId,
+  getStudiesByStudyIdContracts,
+  Contract,
+  putStudiesByStudyIdAssetsByAssetId,
+  AssetBase,
+} from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
@@ -12,6 +21,8 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import { HelperText } from "@/components/shared/exports";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -19,10 +30,23 @@ export default function ManageAssetPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
   const [asset, setAsset] = useState<Asset | null>(null);
+  const [contracts, setContracts] = useState<Contract[] | null>([]);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+
+  const { handleSubmit, watch, control } = useForm<AssetFormData>({});
+  const selectedContractIds = watch("contracts");
+  const {
+    fields: contractFields,
+    append: appendContract,
+    remove: removeContract,
+  } = useFieldArray({
+    control,
+    name: "contracts",
+  });
 
   const fetchData = async (studyIdParam: string, assetIdParam: string) => {
     setLoading(true);
@@ -50,6 +74,17 @@ export default function ManageAssetPage() {
         return;
       }
       setAsset(assetResponse.data);
+
+      const contractsResponse = await getStudiesByStudyIdContracts({
+        path: { studyId: studyIdParam },
+      });
+
+      if (!contractsResponse.response.ok || !contractsResponse.data) {
+        const errorMsg = extractErrorMessage(contractsResponse);
+        setError(`Failed to load contracts: ${errorMsg}`);
+        return;
+      }
+      setContracts(contractsResponse.data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError("Failed to load asset details");
@@ -112,6 +147,50 @@ export default function ManageAssetPage() {
     );
   }
 
+  const onSubmit = async (formData: AssetFormData) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    const assetData: AssetBase = {
+      //TODO: update when enabling asset editing #401
+      title: asset.title,
+      description: asset.description,
+      classification_impact: asset.classification_impact,
+      tier: asset.tier,
+      protection: asset.protection,
+      legal_basis: asset.legal_basis,
+      format: asset.format,
+      expires_at: asset.expires_at,
+      locations: asset.locations,
+      requires_contract: asset.requires_contract,
+      has_dspt: asset.has_dspt,
+      stored_outside_uk_eea: asset.stored_outside_uk_eea,
+      status: asset.status,
+      contract_ids: formData.contracts.map((contract) => contract.value).filter((id) => id !== "") as string[],
+    };
+
+    try {
+      const response = await putStudiesByStudyIdAssetsByAssetId({
+        path: {
+          studyId: study.id,
+          assetId: asset.id,
+        },
+        body: assetData,
+      });
+
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(errorMsg);
+        return;
+      } //TODO: add success msg?
+      console.log("Form submitted with data:", assetData);
+    } catch (error) {
+      setError("Error: " + String((error as Error).message));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
@@ -164,8 +243,75 @@ export default function ManageAssetPage() {
                 <span>Yes</span>
               </div>
             )}
-            {/* TODO: add contract linkage and list of contracts linked */}
           </div>
+        </div>
+
+        <div className={`${styles["asset-linkage"]} ${styles.section}`}>
+          <h3>Link Asset to Contracts within this Study</h3>
+          <HelperText>You can link this asset to one or more contracts within this study. This is optional.</HelperText>
+          <form onSubmit={handleSubmit(onSubmit)} className="form">
+            <fieldset className="linkage-fieldset">
+              {contractFields.map((field, index) => (
+                <div key={field.id} className="item-wrapper">
+                  <label htmlFor={`asset-${index}`} className="item-label">
+                    Contract {index + 1}:
+                  </label>
+
+                  <Controller
+                    name={`contracts.${index}.value` as const}
+                    control={control}
+                    render={({ field }) => (
+                      <select
+                        {...field}
+                        id={`contract-${index}`}
+                        className={styles.select}
+                        disabled={isSubmitting || loading}
+                      >
+                        <option value="">
+                          {loading
+                            ? "Loading contracts..."
+                            : contracts?.length === 0
+                              ? "No contracts available for this study"
+                              : "Select a contract (optional)..."}
+                        </option>
+                        {contracts?.map((contract) => {
+                          const isAlreadySelected = selectedContractIds.some(
+                            (selected, selectedIndex) => selected.value === contract.id && selectedIndex !== index
+                          );
+
+                          return (
+                            <option key={contract.id} value={contract.id} disabled={isAlreadySelected}>
+                              {contract.filename}
+                              {isAlreadySelected ? " - Already selected" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    )}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => removeContract(index)}
+                    className="remove-button"
+                    aria-label={`Remove contract ${index + 1}`}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <Button
+                className={styles["add-button"]}
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => appendContract({ value: "" })}
+              >
+                Add Contract
+              </Button>
+            </fieldset>
+          </form>
         </div>
       </div>
     </>

@@ -12,4 +12,5 @@ type AssetFormData = {
   has_dspt: boolean | string; // Can be string from form, converted to boolean
   stored_outside_uk_eea: boolean | string; // Can be string from form, converted to boolean
   status: string;
+  contracts: { value: string }[];
 };

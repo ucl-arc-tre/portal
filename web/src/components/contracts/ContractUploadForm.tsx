@@ -413,7 +413,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                   <button
                     type="button"
                     onClick={() => removeAsset(index)}
-                    className={styles["remove-button"]}
+                    className="remove-button"
                     aria-label={`Remove asset ${index + 1}`}
                   >
                     ×
