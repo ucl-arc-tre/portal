@@ -56,6 +56,7 @@ func addDSH(router gin.IRouter) {
 	apidsh.RegisterHandlersWithOptions(router, dsh.New(), apidsh.GinServerOptions{
 		Middlewares: []apidsh.MiddlewareFunc{
 			middleware.LimitBodySize,
+			middleware.NewDSHRateLimit(),
 			middleware.NewJWT(),
 		},
 	})
