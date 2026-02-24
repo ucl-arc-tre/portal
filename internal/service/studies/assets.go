@@ -209,7 +209,7 @@ func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error
 	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
 }
 
-func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData openapi.AssetBase) error {
+func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData openapi.AssetBase, contracts []types.Contract) error {
 
 	if exists, err := s.assetExists(studyID, assetID); err != nil {
 		return err
@@ -217,15 +217,10 @@ func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData op
 		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
 	}
 
-	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
 	expiryDate := formatExpiry(assetData.ExpiresAt)
 	asset := types.Asset{
+		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetID}},
+
 		Title:                assetData.Title,
 		Description:          assetData.Description,
 		ClassificationImpact: string(assetData.ClassificationImpact),
@@ -235,8 +230,15 @@ func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData op
 		Format:               string(assetData.Format),
 		ExpiresAt:            expiryDate,
 		Status:               string(assetData.Status),
-		Contracts:            []types.Contract{},
+		Contracts:            contracts,
 	}
+
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
 	result := tx.Model(&types.Asset{}).
 		Where("id = ? AND study_id = ?", assetID, studyID).
@@ -250,7 +252,7 @@ func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData op
 	assoc := tx.Model(&asset).Association("Contracts")
 	if err := assoc.Replace(asset.Contracts); err != nil {
 		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to update contract assets")
+		return types.NewErrFromGorm(err, "failed to update asset contracts")
 	}
 
 	if err := tx.Commit().Error; err != nil {

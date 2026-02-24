@@ -96,6 +96,20 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
 }
 
+func prepareContractsForAssetLinkage(ctx *gin.Context, contractIds []string) ([]types.Contract, error) {
+
+	contracts := []types.Contract{}
+	contractUuids, err := parseUUIDsOrSetError(ctx, contractIds...)
+	if err != nil {
+		return nil, err
+	}
+	for _, contractUuid := range contractUuids {
+		contracts = append(contracts, types.Contract{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: contractUuid}}})
+	}
+
+	return contracts, nil
+}
+
 func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
 	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
 	if err != nil {
@@ -114,7 +128,14 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
-	err = h.studies.UpdateAsset(uuids[0], uuids[1], assetData)
+
+	contracts, err := prepareContractsForAssetLinkage(ctx, *assetData.ContractIds)
+	if err != nil {
+		setError(ctx, err, "Failed to prepare contracts for asset linkage")
+		return
+	}
+
+	err = h.studies.UpdateAsset(uuids[0], uuids[1], assetData, contracts)
 	if err != nil {
 		setError(ctx, err, "Failed to update asset")
 		return
