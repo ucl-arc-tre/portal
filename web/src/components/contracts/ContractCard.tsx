@@ -99,6 +99,10 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
           <span className={styles.label}>Uploaded: </span>
           <span className={styles.value}>{formatDate(contract.created_at)}</span>
         </div>
+        <div className={styles["detail-item"]}>
+          <span className={styles.label}>No. linked Assets: </span>
+          <span className={styles.value}>{contract.asset_ids.length}</span>
+        </div>
       </div>
 
       {error && (

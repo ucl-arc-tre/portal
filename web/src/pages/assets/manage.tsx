@@ -21,7 +21,7 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { HelperText } from "@/components/shared/exports";
+import { Alert, AlertMessage, convertRFC3339ToYYYYMMDD, HelperText } from "@/components/shared/exports";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
 export default function ManageAssetPage() {
@@ -34,10 +34,13 @@ export default function ManageAssetPage() {
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
-  const { handleSubmit, watch, control } = useForm<AssetFormData>({});
+  const { handleSubmit, watch, control, setValue } = useForm<AssetFormData>({
+    defaultValues: { contracts: [{ value: "" }] },
+  });
   const selectedContractIds = watch("contracts");
   const {
     fields: contractFields,
@@ -92,12 +95,26 @@ export default function ManageAssetPage() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     if (studyId && assetId && typeof studyId === "string" && typeof assetId === "string") {
       fetchData(studyId, assetId);
     }
   }, [studyId, assetId]);
+
+  useEffect(() => {
+    if (asset && contracts && !loading) {
+      // Find contracts that are linked to this asset
+      const linkedContractIds = contracts
+        .filter((contract) => contract.asset_ids.includes(asset.id))
+        .map((contract) => ({ value: contract.id }));
+
+      // prefill the field array with the linked contracts
+      if (linkedContractIds.length > 0) {
+        // Use setValue instead of manipulating the field array directly
+        setValue("contracts", linkedContractIds);
+      }
+    }
+  }, [asset, contracts, loading, setValue]);
 
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
@@ -160,7 +177,7 @@ export default function ManageAssetPage() {
       protection: asset.protection,
       legal_basis: asset.legal_basis,
       format: asset.format,
-      expires_at: asset.expires_at,
+      expires_at: convertRFC3339ToYYYYMMDD(asset.expires_at),
       locations: asset.locations,
       requires_contract: asset.requires_contract,
       has_dspt: asset.has_dspt,
@@ -182,8 +199,8 @@ export default function ManageAssetPage() {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
         return;
-      } //TODO: add success msg?
-      console.log("Form submitted with data:", assetData);
+      }
+      setSuccessMessage("Asset updated successfully");
     } catch (error) {
       setError("Error: " + String((error as Error).message));
     } finally {
@@ -247,13 +264,14 @@ export default function ManageAssetPage() {
         </div>
 
         <div className={`${styles["asset-linkage"]} ${styles.section}`}>
-          <h3>Link Asset to Contracts within this Study</h3>
+          <h3>Contracts linked to this Asset</h3>
           <HelperText>You can link this asset to one or more contracts within this study. This is optional.</HelperText>
           <form onSubmit={handleSubmit(onSubmit)} className="form">
             <fieldset className="linkage-fieldset">
               {contractFields.map((field, index) => (
+                // todo: how to prefill select with existing links
                 <div key={field.id} className="item-wrapper">
-                  <label htmlFor={`asset-${index}`} className="item-label">
+                  <label htmlFor={`contract-${index}`} className="item-label">
                     Contract {index + 1}:
                   </label>
 
@@ -261,12 +279,7 @@ export default function ManageAssetPage() {
                     name={`contracts.${index}.value` as const}
                     control={control}
                     render={({ field }) => (
-                      <select
-                        {...field}
-                        id={`contract-${index}`}
-                        className={styles.select}
-                        disabled={isSubmitting || loading}
-                      >
+                      <select {...field} id={`contract-${index}`} disabled={isSubmitting || loading}>
                         <option value="">
                           {loading
                             ? "Loading contracts..."
@@ -311,6 +324,14 @@ export default function ManageAssetPage() {
                 Add Contract
               </Button>
             </fieldset>
+            {successMessage && (
+              <Alert type="success" className={styles.alert}>
+                <AlertMessage>{successMessage}</AlertMessage>
+              </Alert>
+            )}
+            <Button type="submit" disabled={isSubmitting || loading} size="large">
+              {isSubmitting ? "Updating..." : "Update"}
+            </Button>
           </form>
         </div>
       </div>
