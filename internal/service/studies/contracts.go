@@ -219,15 +219,6 @@ func (s *Service) contractExists(studyID uuid.UUID, contractID uuid.UUID) (bool,
 	return exists, types.NewErrFromGorm(err, "failed check if contract exists")
 }
 
-func (s *Service) assetExists(studyID uuid.UUID, assetID uuid.UUID) (bool, error) {
-	exists := false
-	err := s.db.Model(&types.Asset{}).
-		Select("count(*) > 0").
-		Where("study_id = ? AND id = ?", studyID, assetID).
-		Find(&exists).Error
-	return exists, types.NewErrFromGorm(err, "failed check if asset exists")
-}
-
 // retrieves all contracts within a study
 func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
 	contracts := []types.Contract{}

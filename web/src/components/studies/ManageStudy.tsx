@@ -18,7 +18,8 @@ type ManageStudyProps = {
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
-  const [assetManagementCompleted, setAssetManagementCompleted] = useState(false);
+  const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
+  const [hasAsset, setHasAsset] = useState(false);
   const [adminsAgreementsCompleted, setAdminsAgreementsCompleted] = useState(false);
   const [studyFormOpen, setStudyFormOpen] = useState(false);
 
@@ -27,8 +28,9 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const studyStepsCompleted = agreementCompleted && assetManagementCompleted && adminsAgreementsCompleted;
+  const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && hasAsset;
 
   const studySteps: Step[] = [
     {
@@ -43,15 +45,15 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       title: "Information Assets",
       description:
         "Create and manage at least one information asset. You can create more assets at any time. Note that contracts can also be attached to assets, in some cases this is required.",
-      completed: assetManagementCompleted,
-      current: agreementCompleted && !assetManagementCompleted,
+      completed: hasAsset,
+      current: !hasAsset || !assetContractsCompleted,
     },
     {
       id: "study-agreements",
       title: "Study Agreements",
       description: "Ensure all administrators have agreed to the study agreement",
       completed: adminsAgreementsCompleted,
-      current: assetManagementCompleted && !adminsAgreementsCompleted,
+      current: hasAsset && !adminsAgreementsCompleted,
     },
   ];
 
@@ -67,13 +69,13 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       );
     }
 
-    if (!assetManagementCompleted) {
+    if (!hasAsset) {
       return (
         <>
           <Assets
             studyId={study.id}
-            studyTitle={study.title}
-            setAssetManagementCompleted={setAssetManagementCompleted}
+            setAssetContractsCompleted={setAssetContractsCompleted}
+            setHasAsset={setHasAsset}
             canModify={isStudyOwnerOrAdmin}
           />
         </>
@@ -102,17 +104,18 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           fetchStudyData={fetchStudy}
         />
       )}
-      <StudyDetails
-        studyStepsCompleted={studyStepsCompleted}
-        study={study}
-        isIGOpsStaff={false}
-        isStudyOwner={isStudyOwner}
-        isStudyAdmin={isStudyAdmin}
-        setStudyFormOpen={setStudyFormOpen}
-      />
 
       {!studyStepsCompleted && (
         <>
+          <StudyDetails
+            studyStepsCompleted={studyStepsCompleted}
+            assetContractsCompleted={assetContractsCompleted}
+            study={study}
+            isIGOpsStaff={isIGOpsStaff}
+            isStudyOwner={isStudyOwner}
+            isStudyAdmin={isStudyAdmin}
+            setStudyFormOpen={setStudyFormOpen}
+          />
           <StepProgress
             steps={studySteps}
             isComplete={studyStepsCompleted}
@@ -123,16 +126,20 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           <StepArrow />
         </>
       )}
-
       {getCurrentStepComponent()}
 
       {studyStepsCompleted && (
         <>
           <div className={styles["completed-section"]}>
-            <Assets studyId={study.id} studyTitle={study.title} canModify={isStudyOwnerOrAdmin} />
-          </div>
-          <div className={styles["completed-section"]}>
-            {/* <ContractManagement study={study} canModify={isStudyOwner || isStudyAdmin} /> */}
+            <StudyDetails
+              studyStepsCompleted={studyStepsCompleted}
+              assetContractsCompleted={assetContractsCompleted}
+              study={study}
+              isIGOpsStaff={isIGOpsStaff}
+              isStudyOwner={isStudyOwner}
+              isStudyAdmin={isStudyAdmin}
+              setStudyFormOpen={setStudyFormOpen}
+            />
           </div>
         </>
       )}
