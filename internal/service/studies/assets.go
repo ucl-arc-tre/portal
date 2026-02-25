@@ -119,7 +119,7 @@ func (s *Service) createInformationAsset(user types.User, assetData openapi.Asse
 
 	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
 	if err != nil {
-		return nil, types.NewErrFromGorm(err, "failed to parse expiry date")
+		return nil, types.NewErrInvalidObject(err)
 	}
 
 	asset := types.Asset{
