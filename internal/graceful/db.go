@@ -10,7 +10,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 const (
@@ -48,9 +47,6 @@ func InitDB() {
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
 	}
-
-	migrateContracts(db)
-	migrateExternals(db)
 
 	log.Debug().Msg("Initalised database")
 }
@@ -111,62 +107,6 @@ func migrateContractStudyIds(db *gorm.DB) {
 		if err != nil {
 			log.Err(err).Any("contractId", link.ContractId).Msg("Failed to set study id for contract")
 		}
-	}
-}
-
-func migrateContracts(db *gorm.DB) {
-	// migration from asset-bound contracts to study-bound contracts
-
-	contract := types.Contract{}
-	migrator := db.Migrator()
-
-	if migrator.HasConstraint(&contract, "contracts_asset_id_fkey") {
-		err := migrator.DropConstraint("contracts", "contracts_asset_id_fkey")
-		if err != nil {
-			log.Err(err).Msg("failed to drop asset foreign key constraint on 'contracts' table")
-		}
-	}
-
-	if migrator.HasColumn(&contract, "asset_id") {
-		err := migrator.DropColumn(&contract, "asset_id")
-		if err != nil {
-			log.Err(err).Msg("failed to drop 'asset_id' field from 'contracts' table")
-		}
-	}
-
-	if migrator.HasIndex(&contract, "contracts_asset_id_index") {
-		err := migrator.DropIndex(&contract, "contracts_asset_id_index")
-		if err != nil {
-			log.Err(err).Msg("failed to drop index on 'contracts' table")
-		}
-	}
-
-}
-
-func migrateExternals(db *gorm.DB) {
-	tx := db.Begin()
-	defer RollbackTransactionOnPanic(tx)
-
-	externalUsersWithoutEmail := []types.User{}
-	err := tx.Model(&types.User{}).
-		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
-		Where("COALESCE(user_attributes.email, '') = '' AND username NOT LIKE ?", "%"+config.EntraTenantPrimaryDomain()).
-		Find(&externalUsersWithoutEmail).Error
-	if err != nil {
-		panic(err)
-	}
-
-	// All external users without a set email need to be dropped as they may have two identities
-	// prior to #486
-	for _, user := range externalUsersWithoutEmail {
-		err := tx.Select(clause.Associations).Delete(&user).Error
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		log.Err(err).Msg("Failed to commit migration")
 	}
 }
 
