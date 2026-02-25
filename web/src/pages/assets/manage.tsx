@@ -21,9 +21,15 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { Alert, AlertMessage, convertRFC3339ToYYYYMMDD, HelperText } from "@/components/shared/exports";
+import {
+  AddLinkButton,
+  Alert,
+  AlertMessage,
+  convertRFC3339ToYYYYMMDD,
+  HelperText,
+  RemoveLinkButton,
+} from "@/components/shared/exports";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { RemoveLinkButton } from "@/components/shared/exports";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -306,16 +312,7 @@ export default function ManageAssetPage() {
                   <RemoveLinkButton onClick={removeContract} index={index}></RemoveLinkButton>
                 </div>
               ))}
-
-              <Button
-                className={styles["add-button"]}
-                type="button"
-                variant="secondary"
-                size="small"
-                onClick={() => appendContract({ value: "" })}
-              >
-                Add Contract
-              </Button>
+              <AddLinkButton onClick={() => appendContract({ value: "" })} entity="Contract" />
             </fieldset>
             {successMessage && (
               <Alert type="success" className={styles.alert}>

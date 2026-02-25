@@ -68,20 +68,6 @@
   font-weight: bold;
 }
 
-.item-wrapper .select,
-.item-wrapper input {
-  max-width: 400px;
-}
-
-.add-button {
-  margin-top: 0.5rem;
-}
-
-.item-label {
-  font-weight: 600;
-  min-width: 100px;
-}
-
 .username-input-wrapper {
   display: flex;
   flex-direction: column;

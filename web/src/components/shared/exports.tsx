@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import Button from "../ui/Button";
 
 export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.X), {
   ssr: false,
@@ -93,5 +94,20 @@ export const RemoveLinkButton = ({ onClick, index }: { onClick: (index: number) 
     >
       ×
     </button>
+  );
+};
+
+export const AddLinkButton = ({ onClick, entity }: { onClick: () => void; entity: string }) => {
+  return (
+    <Button
+      type="button"
+      onClick={() => onClick()}
+      className="add-button"
+      variant="secondary"
+      size="small"
+      aria-label={`Add ${entity}`}
+    >
+      Add {entity}
+    </Button>
   );
 };

@@ -14,8 +14,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
-import { RemoveLinkButton } from "../shared/exports";
+import { HelperText, AlertMessage, Alert, Label, AddLinkButton, RemoveLinkButton } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -415,15 +414,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                 </div>
               ))}
 
-              <Button
-                className={styles["add-button"]}
-                type="button"
-                variant="secondary"
-                size="small"
-                onClick={() => appendAsset({ value: "" })}
-              >
-                Add Asset
-              </Button>
+              <AddLinkButton onClick={() => appendAsset({ value: "" })} entity="Asset" />
             </fieldset>
             <HelperText>Optionally link this contract to one or more existing assets from this study</HelperText>
           </div>

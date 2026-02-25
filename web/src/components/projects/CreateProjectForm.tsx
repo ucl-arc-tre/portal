@@ -16,7 +16,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage, RemoveLinkButton } from "../shared/exports";
+import { HelperText, Alert, AlertMessage, RemoveLinkButton, AddLinkButton } from "../shared/exports";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";
@@ -450,7 +450,6 @@ export default function CreateProjectForm({
                           <select
                             {...field}
                             id={`asset-${index}`}
-                            className={styles.select}
                             disabled={isSubmitting || !selectedStudyId || !selectedEnvironmentId || isLoadingAssets}
                           >
                             <option value="">
@@ -491,16 +490,7 @@ export default function CreateProjectForm({
                       <RemoveLinkButton onClick={removeAsset} index={index}></RemoveLinkButton>
                     </div>
                   ))}
-
-                  <Button
-                    className={styles["add-button"]}
-                    type="button"
-                    variant="secondary"
-                    size="small"
-                    onClick={() => appendAsset({ value: "" })}
-                  >
-                    Add Asset
-                  </Button>
+                  <AddLinkButton onClick={() => appendAsset({ value: "" })} entity="Asset" />
                 </fieldset>
                 <HelperText>
                   Optionally link this project to one or more existing assets from the selected study

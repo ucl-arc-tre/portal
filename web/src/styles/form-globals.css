@@ -20,7 +20,8 @@
       border-radius: 8px;
       background-color: #fafafa;
 
-      select {
+      select,
+      input {
         padding: 0.75rem;
         border: 1px solid #ddd;
         border-radius: 4px;
@@ -63,6 +64,10 @@
           outline: 2px solid #dc3545;
           outline-offset: 2px;
         }
+      }
+
+      .add-button {
+        margin-top: 0.5rem;
       }
     }
   }
