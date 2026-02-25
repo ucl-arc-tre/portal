@@ -8,7 +8,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 
-import AssetCreationForm from "./AssetCreationForm";
+import AssetCreationForm, { calculateTier } from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
@@ -98,12 +98,36 @@ export default function Assets(props: InformationAssetsProps) {
     fetchInformationAssetData();
   }, [studyId, setAssetContractsCompleted, setHasAsset, checkAssetManagementCompleted, setNumAssets]);
 
-  const handleAssetSubmit = async (assetData: AssetFormData) => {
+  const handleAssetSubmit = async (assetFormData: AssetFormData) => {
     setError(null);
+    const tier = calculateTier(assetFormData);
+    const assetData: AssetBase = {
+      ...assetFormData,
+      tier,
+      classification_impact: assetFormData.classification_impact as "public" | "confidential" | "highly_confidential",
+      protection: assetFormData.protection as
+        | "anonymisation"
+        | "pseudonymisation"
+        | "identifiable_low_confidence_pseudonymisation",
+      legal_basis: assetFormData.legal_basis as
+        | "consent"
+        | "public_task"
+        | "contract"
+        | "legal_obligation"
+        | "vital_interests"
+        | "legitimate_interests",
+      format: assetFormData.format as "electronic" | "paper" | "other",
+      status: assetFormData.status as "active" | "awaiting" | "destroyed",
+      requires_contract: assetFormData.requires_contract === "true" || assetFormData.requires_contract === true,
+      has_dspt: assetFormData.has_dspt === "true" || assetFormData.has_dspt === true,
+      stored_outside_uk_eea:
+        assetFormData.stored_outside_uk_eea === "true" || assetFormData.stored_outside_uk_eea === true,
+      contract_ids: assetFormData.contracts.map((contract) => contract.value).filter((id) => id !== "") as string[],
+    };
 
     const response = await postStudiesByStudyIdAssets({
       path: { studyId },
-      body: assetData as AssetBase,
+      body: assetData,
     });
 
     if (!response.response.ok) {

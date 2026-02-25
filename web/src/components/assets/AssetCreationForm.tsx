@@ -14,6 +14,20 @@ type AssetFormProps = {
   closeModal: () => void;
 };
 
+export const calculateTier = (data: AssetFormData): number => {
+  let tier: number;
+  if (data.classification_impact === "public") {
+    tier = 0;
+  } else if (data.classification_impact === "confidential") {
+    tier = 1;
+  } else {
+    // For highly_confidential, convert the user-selected tier to number (2, 3, or 4)
+    tier = typeof data.tier === "string" ? parseInt(data.tier, 10) : data.tier;
+  }
+
+  return tier;
+};
+
 export default function AssetCreationForm(props: AssetFormProps) {
   const { handleAssetSubmit, isSubmitting = false, closeModal } = props;
 
@@ -41,6 +55,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       has_dspt: false,
       stored_outside_uk_eea: false,
       status: "",
+      contracts: [],
     },
   });
 
@@ -55,15 +70,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       setSuccessMessage(null);
 
       // Set tier based on classification_impact
-      let tier: number;
-      if (data.classification_impact === "public") {
-        tier = 0;
-      } else if (data.classification_impact === "confidential") {
-        tier = 1;
-      } else {
-        // For highly_confidential, convert the user-selected tier to number (2, 3, or 4)
-        tier = typeof data.tier === "string" ? parseInt(data.tier, 10) : data.tier;
-      }
+      const tier = calculateTier(data);
 
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {

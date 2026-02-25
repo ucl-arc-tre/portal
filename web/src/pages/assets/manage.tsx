@@ -39,7 +39,7 @@ export default function ManageAssetPage() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   const { handleSubmit, watch, control, setValue } = useForm<AssetFormData>({
-    defaultValues: { contracts: [{ value: "" }] },
+    defaultValues: { contracts: [] },
   });
   const selectedContractIds = watch("contracts");
   const {
@@ -269,7 +269,6 @@ export default function ManageAssetPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="form">
             <fieldset className="linkage-fieldset">
               {contractFields.map((field, index) => (
-                // todo: how to prefill select with existing links
                 <div key={field.id} className="item-wrapper">
                   <label htmlFor={`contract-${index}`} className="item-label">
                     Contract {index + 1}:
