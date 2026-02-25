@@ -104,20 +104,11 @@ export default function Assets(props: InformationAssetsProps) {
     const assetData: AssetBase = {
       ...assetFormData,
       tier,
-      classification_impact: assetFormData.classification_impact as "public" | "confidential" | "highly_confidential",
-      protection: assetFormData.protection as
-        | "anonymisation"
-        | "pseudonymisation"
-        | "identifiable_low_confidence_pseudonymisation",
-      legal_basis: assetFormData.legal_basis as
-        | "consent"
-        | "public_task"
-        | "contract"
-        | "legal_obligation"
-        | "vital_interests"
-        | "legitimate_interests",
-      format: assetFormData.format as "electronic" | "paper" | "other",
-      status: assetFormData.status as "active" | "awaiting" | "destroyed",
+      classification_impact: assetFormData.classification_impact as AssetClassificationImpact,
+      protection: assetFormData.protection as AssetProtection,
+      legal_basis: assetFormData.legal_basis as AssetLegalBasis,
+      format: assetFormData.format as AssetFormat,
+      status: assetFormData.status as AssetStatus,
       requires_contract: assetFormData.requires_contract === "true" || assetFormData.requires_contract === true,
       has_dspt: assetFormData.has_dspt === "true" || assetFormData.has_dspt === true,
       stored_outside_uk_eea:
