@@ -16,7 +16,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage } from "../shared/exports";
+import { HelperText, Alert, AlertMessage, RemoveLinkButton } from "../shared/exports";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";
@@ -488,14 +488,7 @@ export default function CreateProjectForm({
                         )}
                       />
 
-                      <button
-                        type="button"
-                        onClick={() => removeAsset(index)}
-                        className="remove-button"
-                        aria-label={`Remove asset ${index + 1}`}
-                      >
-                        ×
-                      </button>
+                      <RemoveLinkButton onClick={removeAsset} index={index}></RemoveLinkButton>
                     </div>
                   ))}
 

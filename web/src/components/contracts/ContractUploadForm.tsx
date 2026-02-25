@@ -15,6 +15,7 @@ import {
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
 import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
+import { RemoveLinkButton } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -410,14 +411,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                     )}
                   />
 
-                  <button
-                    type="button"
-                    onClick={() => removeAsset(index)}
-                    className="remove-button"
-                    aria-label={`Remove asset ${index + 1}`}
-                  >
-                    ×
-                  </button>
+                  <RemoveLinkButton onClick={removeAsset} index={index}></RemoveLinkButton>
                 </div>
               ))}
 

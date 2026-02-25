@@ -82,3 +82,16 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
 
   return humanReadableTrainingKind;
 }
+
+export const RemoveLinkButton = ({ onClick, index }: { onClick: (index: number) => void; index: number }) => {
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(index)}
+      className="remove-button"
+      aria-label={`Remove contract ${index + 1}`}
+    >
+      ×
+    </button>
+  );
+};

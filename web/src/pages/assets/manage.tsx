@@ -23,6 +23,7 @@ import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { Alert, AlertMessage, convertRFC3339ToYYYYMMDD, HelperText } from "@/components/shared/exports";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { RemoveLinkButton } from "@/components/shared/exports";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -302,14 +303,7 @@ export default function ManageAssetPage() {
                     )}
                   />
 
-                  <button
-                    type="button"
-                    onClick={() => removeContract(index)}
-                    className="remove-button"
-                    aria-label={`Remove contract ${index + 1}`}
-                  >
-                    ×
-                  </button>
+                  <RemoveLinkButton onClick={removeContract} index={index}></RemoveLinkButton>
                 </div>
               ))}
 
