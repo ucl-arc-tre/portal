@@ -10,7 +10,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 const (
@@ -48,8 +47,6 @@ func InitDB() {
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
 	}
-
-	migrateExternals(db)
 
 	log.Debug().Msg("Initalised database")
 }
@@ -110,33 +107,6 @@ func migrateContractStudyIds(db *gorm.DB) {
 		if err != nil {
 			log.Err(err).Any("contractId", link.ContractId).Msg("Failed to set study id for contract")
 		}
-	}
-}
-
-func migrateExternals(db *gorm.DB) {
-	tx := db.Begin()
-	defer RollbackTransactionOnPanic(tx)
-
-	externalUsersWithoutEmail := []types.User{}
-	err := tx.Model(&types.User{}).
-		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
-		Where("COALESCE(user_attributes.email, '') = '' AND username NOT LIKE ?", "%"+config.EntraTenantPrimaryDomain()).
-		Find(&externalUsersWithoutEmail).Error
-	if err != nil {
-		panic(err)
-	}
-
-	// All external users without a set email need to be dropped as they may have two identities
-	// prior to #486
-	for _, user := range externalUsersWithoutEmail {
-		err := tx.Select(clause.Associations).Delete(&user).Error
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		log.Err(err).Msg("Failed to commit migration")
 	}
 }
 
