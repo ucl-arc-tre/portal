@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -110,28 +111,17 @@ func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, stud
 	return nil, err
 }
 
-func formatExpiry(expiry string) time.Time {
-	expiryDate, err := time.Parse(config.DateFormat, expiry)
-	if err != nil {
-		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", expiry, err))
-	}
-	return expiryDate
-}
-
 // handles the database transaction for creating a study asset
 func (s *Service) createInformationAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
 	// Start a transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
-	// Parse the expiry date string (already validated in validateAssetData)
-	expiryDate := formatExpiry(assetData.ExpiresAt)
+	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
+	if err != nil {
+		return nil, types.NewErrFromGorm(err, "failed to parse expiry date")
+	}
 
-	// Create the Asset with proper fields from AssetBase
 	asset := types.Asset{
 		CreatorUserID:        user.ID,
 		StudyID:              studyID,
@@ -217,7 +207,10 @@ func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData op
 		return types.NewNotFoundError(fmt.Errorf("asset did not exist for study [%v]", studyID))
 	}
 
-	expiryDate := formatExpiry(assetData.ExpiresAt)
+	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to parse expiry date")
+	}
 	asset := types.Asset{
 		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetID}},
 
@@ -234,11 +227,7 @@ func (s *Service) UpdateAsset(studyID uuid.UUID, assetID uuid.UUID, assetData op
 	}
 
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	result := tx.Model(&types.Asset{}).
 		Where("id = ? AND study_id = ?", assetID, studyID).
