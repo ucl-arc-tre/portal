@@ -49,7 +49,6 @@ func InitDB() {
 		panic(err)
 	}
 
-	migrateContracts(db)
 	migrateExternals(db)
 
 	log.Debug().Msg("Initalised database")
@@ -112,35 +111,6 @@ func migrateContractStudyIds(db *gorm.DB) {
 			log.Err(err).Any("contractId", link.ContractId).Msg("Failed to set study id for contract")
 		}
 	}
-}
-
-func migrateContracts(db *gorm.DB) {
-	// migration from asset-bound contracts to study-bound contracts
-
-	contract := types.Contract{}
-	migrator := db.Migrator()
-
-	if migrator.HasConstraint(&contract, "contracts_asset_id_fkey") {
-		err := migrator.DropConstraint("contracts", "contracts_asset_id_fkey")
-		if err != nil {
-			log.Err(err).Msg("failed to drop asset foreign key constraint on 'contracts' table")
-		}
-	}
-
-	if migrator.HasColumn(&contract, "asset_id") {
-		err := migrator.DropColumn(&contract, "asset_id")
-		if err != nil {
-			log.Err(err).Msg("failed to drop 'asset_id' field from 'contracts' table")
-		}
-	}
-
-	if migrator.HasIndex(&contract, "contracts_asset_id_index") {
-		err := migrator.DropIndex(&contract, "contracts_asset_id_index")
-		if err != nil {
-			log.Err(err).Msg("failed to drop index on 'contracts' table")
-		}
-	}
-
 }
 
 func migrateExternals(db *gorm.DB) {
