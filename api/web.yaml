@@ -811,10 +811,6 @@ paths:
       responses:
         "200":
           description: Asset updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Asset"
         "400":
           description: Validation error
           content:
@@ -1298,6 +1294,7 @@ components:
         - accessed_by_third_parties
         - third_party_agreement
         - status
+        - contract_ids
       properties:
         title:
           type: string

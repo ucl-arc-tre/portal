@@ -129,7 +129,7 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 		return
 	}
 
-	contracts, err := prepareContractsForAssetLinkage(ctx, *assetData.ContractIds)
+	contracts, err := prepareContractsForAssetLinkage(ctx, assetData.ContractIds)
 	if err != nil {
 		setError(ctx, err, "Failed to prepare contracts for asset linkage")
 		return

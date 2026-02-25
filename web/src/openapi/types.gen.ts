@@ -190,7 +190,7 @@ export type AssetBase = {
     /**
      * List of contract IDs associated with the asset
      */
-    contract_ids?: Array<string>;
+    contract_ids: Array<string>;
 };
 
 /**
@@ -1781,10 +1781,8 @@ export type PutStudiesByStudyIdAssetsByAssetIdResponses = {
     /**
      * Asset updated successfully
      */
-    200: Asset;
+    200: unknown;
 };
-
-export type PutStudiesByStudyIdAssetsByAssetIdResponse = PutStudiesByStudyIdAssetsByAssetIdResponses[keyof PutStudiesByStudyIdAssetsByAssetIdResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
     body?: never;

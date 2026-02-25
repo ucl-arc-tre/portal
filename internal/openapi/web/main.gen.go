@@ -184,7 +184,7 @@ type Asset struct {
 	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
 
 	// ContractIds List of contract IDs associated with the asset
-	ContractIds *[]string `json:"contract_ids,omitempty"`
+	ContractIds []string `json:"contract_ids"`
 
 	// CreatedAt Time in RFC3339 format when the asset was created
 	CreatedAt string `json:"created_at"`
@@ -259,7 +259,7 @@ type AssetBase struct {
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
 
 	// ContractIds List of contract IDs associated with the asset
-	ContractIds *[]string `json:"contract_ids,omitempty"`
+	ContractIds []string `json:"contract_ids"`
 
 	// Description Description of the asset
 	Description string `json:"description"`
