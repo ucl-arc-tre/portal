@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 
+// UIKIT ICONS
 export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.X), {
   ssr: false,
 });
@@ -8,6 +9,11 @@ export const InfoIcon = dynamic(() => import("uikit-react-public").then((mod) =>
   ssr: false,
 });
 
+export const AlertCircleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertCircle), {
+  ssr: false,
+});
+
+// UIKIT COMPONENTS
 export const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
   ssr: false,
 });
@@ -41,6 +47,7 @@ export const TrainingKindOptions = {
   nhsd: "training_kind_nhsd",
 };
 
+// UTILITY FUNCTIONS
 export function convertRFC3339ToDDMMYYYY(dateString: string) {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
@@ -50,7 +57,7 @@ export function convertRFC3339ToDDMMYYYY(dateString: string) {
   return `${day}/${month}/${year}`;
 }
 
-export const formatDate = (dateString: string) => {
+export function formatDate(dateString: string) {
   try {
     return new Date(dateString).toLocaleDateString("en-GB", {
       year: "numeric",
@@ -62,7 +69,7 @@ export const formatDate = (dateString: string) => {
   } catch {
     return dateString;
   }
-};
+}
 
 export function getHumanReadableTrainingKind(trainingKind: string) {
   // getting the key from the value
@@ -71,4 +78,22 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
   )?.[0];
 
   return humanReadableTrainingKind;
+}
+
+export function calculateExpiryUrgency(completedDate: Date): ExpiryUrgency | null {
+  const today = new Date();
+
+  const diffTime = today.getTime() - completedDate.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  // high: less than 30 days; medium: 30 days or more but less than 60 days; low: 60 days or less
+  if (diffDays > 60) {
+    return null;
+  } else if (diffDays <= 60) {
+    return { level: "low" };
+  } else if (diffDays >= 30 && diffDays < 60) {
+    return { level: "medium" };
+  } else {
+    return { level: "high" };
+  }
 }

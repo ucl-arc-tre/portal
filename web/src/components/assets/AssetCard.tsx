@@ -2,13 +2,8 @@ import { Asset } from "@/openapi";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
-import { Alert, AlertMessage, formatDate } from "../shared/exports";
-import dynamic from "next/dynamic";
+import { Alert, AlertCircleIcon, AlertMessage, formatDate } from "../shared/exports";
 import { useEffect, useState } from "react";
-
-const AlertCircleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertCircle), {
-  ssr: false,
-});
 
 type AssetCardProps = {
   asset: Asset;

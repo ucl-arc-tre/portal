@@ -1,3 +1,5 @@
+@import url(./form-globals.css);
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -69,14 +71,6 @@ dialog {
   margin-inline: 0.2rem;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1rem;
-  padding-inline: 4%;
-  gap: 1.5rem;
-}
-
 .content {
   width: clamp(50vw, 60vw, 70vw);
 }
@@ -127,28 +121,42 @@ dialog {
   background-color: #dc3545 !important;
   border-color: #dc3545 !important;
   color: white !important;
-}
 
-.delete-button:hover:not(:disabled) {
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
-}
+  &:hover:not(:disabled) {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+  }
 
-.delete-button:disabled {
-  opacity: 0.6 !important;
+  &:disabled {
+    opacity: 0.6 !important;
+  }
 }
 
 .delete-button-confirm {
   background-color: #dc3545 !important;
   border-color: #dc3545 !important;
   color: white !important;
+
+  &hover:not(:disabled) {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+  }
+
+  &:disabled {
+    opacity: 0.6 !important;
+  }
 }
 
-.delete-button-confirm:hover:not(:disabled) {
-  background-color: #c82333 !important;
-  border-color: #bd2130 !important;
+.expiry-urgency--high {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #b80f0f;
 }
 
-.delete-button-confirm:disabled {
-  opacity: 0.6 !important;
+.expiry-urgency--medium {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #b75301;
 }

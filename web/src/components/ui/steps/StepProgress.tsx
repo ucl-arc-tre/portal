@@ -100,7 +100,7 @@ export default function StepProgress(props: StepProgressProps) {
     ariaLabel = "Progress steps",
   } = props;
 
-  const urgencyLevel = steps.filter((step) => step.expiryUrgency).map((step) => step.expiryUrgency?.level);
+  const urgencyLevel = steps.filter((step) => step.expiryUrgency).map((step) => step.expiryUrgency?.level || null);
 
   return (
     <div className={styles["step-progress-container"]}>
@@ -109,11 +109,9 @@ export default function StepProgress(props: StepProgressProps) {
           <summary className={styles["completion-header"]}>
             <h3
               className={
-                urgencyLevel.includes("medium")
-                  ? styles["expiring-title-urgency-medium"]
-                  : urgencyLevel.includes("high")
-                    ? styles["expiring-title-urgency-high"]
-                    : styles["completion-title"]
+                urgencyLevel.includes("medium") || urgencyLevel.includes("high")
+                  ? `expiry-urgency--${urgencyLevel[0]}`
+                  : styles["completion-title"]
               }
             >
               {completionTitle}
