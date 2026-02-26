@@ -86,14 +86,17 @@ export function calculateExpiryUrgency(completedDate: Date): ExpiryUrgency | nul
   const diffTime = today.getTime() - completedDate.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+  let expiryUrgency: ExpiryUrgency | null = null;
   // high: less than 30 days; medium: 30 days or more but less than 60 days; low: 60 days or less
   if (diffDays > 60) {
-    return null;
+    expiryUrgency = null;
   } else if (diffDays <= 60) {
-    return { level: "low" };
+    expiryUrgency = { level: "low" };
   } else if (diffDays >= 30 && diffDays < 60) {
-    return { level: "medium" };
-  } else {
-    return { level: "high" };
+    expiryUrgency = { level: "medium" };
+  } else if (diffDays < 30) {
+    expiryUrgency = { level: "high" };
   }
+
+  return expiryUrgency;
 }
