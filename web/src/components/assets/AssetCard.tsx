@@ -104,7 +104,7 @@ export default function AssetCard(props: AssetCardProps) {
       <div className={styles["asset-actions"]}>
         {!isCompleted && (
           <small className={styles["asset-incomplete__message"]}>
-            <AlertCircleIcon className={styles["asset-incomplete__icon"]} />
+            <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
             This asset requires a contract that has not yet been added
           </small>
         )}

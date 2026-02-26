@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractCard.module.css";
-import { AlertMessage, Alert } from "../shared/exports";
+import { AlertMessage, Alert, AlertCircleIcon, calculateExpiryUrgency } from "../shared/exports";
 
 type ContractCardProps = {
   contract: Contract;
@@ -15,6 +15,7 @@ type ContractCardProps = {
 export default function ContractCard({ contract, studyId, onEdit, canModify }: ContractCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expiryUrgency, setExpiryUrgency] = useState<ExpiryUrgency | null>(null);
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -68,8 +69,14 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
     return new Date(dateString).toLocaleDateString();
   };
 
+  useEffect(() => {
+    setExpiryUrgency(calculateExpiryUrgency(new Date(contract.expiry_date)));
+  }, [contract.expiry_date]);
+
   return (
-    <div className={styles.card}>
+    <div
+      className={`${styles.card} ${expiryUrgency ? `${styles[`card__expiry-urgency--${expiryUrgency.level}`]}` : ""}`}
+    >
       <div className={styles.header}>
         <div className={styles["file-info"]}>
           <h4 className={styles.filename}>{contract.filename}</h4>
@@ -108,6 +115,13 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
       )}
 
       <div className={styles.actions}>
+        {expiryUrgency && (
+          <small className={styles["expiry-message"]}>
+            <AlertCircleIcon className={`expiry-urgency--${expiryUrgency.level} actions-icon`} />
+            This contract is expiring soon, please review and update if necessary
+          </small>
+        )}
+
         <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
           {downloading ? "Downloading..." : "Download PDF"}
         </Button>

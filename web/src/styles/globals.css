@@ -17,6 +17,10 @@
   --form-blue--shadow: rgba(0, 123, 255, 0.25);
 
   --grey-border--light: #ced1d7;
+
+  --expiry-urgency--high: #b80f0f;
+  --expiry-urgency--medium: #b75301;
+  --expiry-urgency--low: #457100;
 }
 
 html,
@@ -151,12 +155,16 @@ dialog {
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #b80f0f;
+  color: var(--expiry-urgency--high);
 }
 
 .expiry-urgency--medium {
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #b75301;
+  color: var(--expiry-urgency--medium);
+}
+
+.actions-icon {
+  height: 1rem;
 }
