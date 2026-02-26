@@ -173,19 +173,23 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.contains("Verify another certificate").should("be.visible");
   });
 
-  const getDateMonthsAgo = (months: number) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() - months);
+  const getDateWithDaysRemaining = (days: number) => {
+    const yearAgo = new Date();
+    yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+
+    const date = new Date(yearAgo);
+    date.setDate(date.getDate() - days);
+
     return date.toISOString();
   };
 
-  it("should show low urgency when training has 2 months left", () => {
+  it("should show low urgency when training has more than 60 days left", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, getDateMonthsAgo(10)); // Training completed 10 months ago
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(61));
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -193,16 +197,16 @@ describe(`Profile Page Step Workflow UI`, () => {
 
     cy.contains("Your certificate is expiring soon!")
       .should("be.visible")
-      .should("have.css", "color", "rgb(22, 163, 74)");
+      .should("have.css", "color", "rgb(69, 113, 0)");
   });
 
-  it("should show medium urgency when training has 1 month left", () => {
+  it("should show medium urgency when training has more than 1 month left", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, getDateMonthsAgo(11)); // Training completed 11 months ago
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(30));
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -219,7 +223,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, getDateMonthsAgo(12)); // Training completed 12 months ago
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(12));
     cy.visit("/profile");
     cy.waitForAuth();
     cy.waitForProfileData();
