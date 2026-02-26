@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import Dialog from "@/components/ui/Dialog";
 import {
   postStudiesByStudyIdContractsUpload,
@@ -14,7 +14,8 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label, RemoveLinkButton, AddLinkButton } from "../shared/exports";
+import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
+import { RemoveLinkButton, AddLinkButton } from "../ui/Buttons";
 
 type ContractFormData = {
   organisationSignatory: string;

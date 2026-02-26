@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import styles from "./Dialog.module.css";
-import Button from "./Button";
+import Button from "./Buttons";
 import dynamic from "next/dynamic";
 import { XIcon } from "../shared/exports";
 

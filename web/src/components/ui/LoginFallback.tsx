@@ -1,4 +1,4 @@
-import Button from "./Button";
+import Button from "./Buttons";
 import { useRouter } from "next/router";
 import styles from "./LoginFallback.module.css";
 

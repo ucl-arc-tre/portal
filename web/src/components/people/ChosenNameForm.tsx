@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Dialog from "@/components/ui/Dialog";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import { putUsersByUserIdAttributes } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";

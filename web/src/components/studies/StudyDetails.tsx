@@ -10,7 +10,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/exports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
-import Button from "../ui/Button";
+import Button from "../ui/Buttons";
 import AdminFeedbackSection from "./AdminFeedbackSection";
 import { storageDefinitions } from "../shared/storageDefinitions";
 import Assets from "../assets/Assets";

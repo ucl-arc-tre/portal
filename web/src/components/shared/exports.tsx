@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic";
-import Button from "../ui/Button";
 
 // UIKIT ICONS
 export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.X), {
@@ -101,31 +100,3 @@ export function calculateExpiryUrgency(completedDate: Date): ExpiryUrgency | nul
 
   return expiryUrgency;
 }
-
-export const RemoveLinkButton = ({ onClick, index }: { onClick: (index: number) => void; index: number }) => {
-  return (
-    <button
-      type="button"
-      onClick={() => onClick(index)}
-      className="remove-button"
-      aria-label={`Remove contract ${index + 1}`}
-    >
-      ×
-    </button>
-  );
-};
-
-export const AddLinkButton = ({ onClick, entity }: { onClick: () => void; entity: string }) => {
-  return (
-    <Button
-      type="button"
-      onClick={() => onClick()}
-      className="add-button"
-      variant="secondary"
-      size="small"
-      aria-label={`Add ${entity}`}
-    >
-      Add {entity}
-    </Button>
-  );
-};

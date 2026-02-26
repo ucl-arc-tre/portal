@@ -9,7 +9,7 @@ import ManageStudy from "@/components/studies/ManageStudy";
 import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 
 import styles from "./ManageStudyPage.module.css";
 import StudyDetails from "@/components/studies/StudyDetails";

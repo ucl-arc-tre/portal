@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Box from "../ui/Box";
 import Dialog from "../ui/Dialog";
-import Button from "../ui/Button";
+import Button from "../ui/Buttons";
 import { useForm } from "react-hook-form";
 import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";

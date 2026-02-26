@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import StatusBadge from "../ui/StatusBadge";
 import Dialog from "@/components/ui/Dialog";
 import { Alert, AlertMessage } from "../shared/exports";

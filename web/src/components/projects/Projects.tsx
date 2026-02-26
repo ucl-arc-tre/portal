@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Auth, Study, Project, getProjects, getStudies } from "@/openapi";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import Loading from "@/components/ui/Loading";
 import CreateProjectForm from "./CreateProjectForm";
 import ProjectCardsList from "./ProjectCardsList";

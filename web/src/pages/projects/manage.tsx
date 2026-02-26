@@ -14,7 +14,7 @@ import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import CreateProjectForm from "@/components/projects/CreateProjectForm";
 
 import styles from "./ManageProject.module.css";

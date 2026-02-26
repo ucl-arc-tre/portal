@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Button from "../ui/Button";
+import Button from "../ui/Buttons";
 import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 

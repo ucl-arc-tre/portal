@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
 import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";

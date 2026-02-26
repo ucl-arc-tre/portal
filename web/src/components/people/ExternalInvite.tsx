@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import { useEffect, useState } from "react";
 import { Input, Alert, AlertMessage, Label } from "../shared/exports";
 import styles from "./ExternalInvite.module.css";

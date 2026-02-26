@@ -1,7 +1,7 @@
 import Box from "../ui/Box";
 import { Alert, AlertMessage, Textarea } from "../shared/exports";
 import styles from "./AdminFeedbackSection.module.css";
-import Button from "../ui/Button";
+import Button from "../ui/Buttons";
 import { useState } from "react";
 import { ApprovalStatus } from "@/openapi";
 type FeedbackProps = {

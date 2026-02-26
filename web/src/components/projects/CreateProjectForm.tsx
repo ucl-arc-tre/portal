@@ -13,10 +13,11 @@ import {
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName } from "@/types/projects";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import Button from "../ui/Button";
+import Button from "../ui/Buttons";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage, AddLinkButton, RemoveLinkButton } from "../shared/exports";
+import { HelperText, Alert, AlertMessage } from "../shared/exports";
+import { RemoveLinkButton, AddLinkButton } from "../ui/Buttons";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";

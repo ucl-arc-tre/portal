@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Button from "../ui/Button";
+import Button from "../ui/Buttons";
 import Dialog from "../ui/Dialog";
 import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/exports";
 import styles from "./StudyForm.module.css";

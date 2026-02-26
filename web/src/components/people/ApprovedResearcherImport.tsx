@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Buttons";
 import { postUsersApprovedResearchersImportCsv } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { useRef, useState } from "react";
