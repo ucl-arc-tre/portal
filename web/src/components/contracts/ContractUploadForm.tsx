@@ -14,7 +14,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
+import { HelperText, AlertMessage, Alert, Label, RemoveLinkButton, AddLinkButton } from "../shared/exports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -370,10 +370,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         <div className={styles["form-section"]}>
           <h4>Link Assets (optional)</h4>
           <div className={styles["form-group"]}>
-            <fieldset className={styles["dynamic-fieldset"]}>
+            <fieldset className="linkage-fieldset">
               {assetFields.map((field, index) => (
-                <div key={field.id} className={styles["item-wrapper"]}>
-                  <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                <div key={field.id} className="item-wrapper">
+                  <label htmlFor={`asset-${index}`} className="item-label">
                     Asset {index + 1}:
                   </label>
 
@@ -410,26 +410,11 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                     )}
                   />
 
-                  <button
-                    type="button"
-                    onClick={() => removeAsset(index)}
-                    className={styles["remove-button"]}
-                    aria-label={`Remove asset ${index + 1}`}
-                  >
-                    ×
-                  </button>
+                  <RemoveLinkButton onClick={removeAsset} index={index}></RemoveLinkButton>
                 </div>
               ))}
 
-              <Button
-                className={styles["add-button"]}
-                type="button"
-                variant="secondary"
-                size="small"
-                onClick={() => appendAsset({ value: "" })}
-              >
-                Add Asset
-              </Button>
+              <AddLinkButton onClick={() => appendAsset({ value: "" })} entity="Asset" />
             </fieldset>
             <HelperText>Optionally link this contract to one or more existing assets from this study</HelperText>
           </div>
