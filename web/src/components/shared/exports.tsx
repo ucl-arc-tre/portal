@@ -90,12 +90,12 @@ export function calculateExpiryUrgency(completedDate: Date): ExpiryUrgency | nul
   // high: less than 30 days; medium: 30 days or more but less than 60 days; low: 60 days or less
   if (diffDays > 60) {
     expiryUrgency = null;
-  } else if (diffDays <= 60) {
-    expiryUrgency = { level: "low" };
-  } else if (diffDays >= 30 && diffDays < 60) {
-    expiryUrgency = { level: "medium" };
   } else if (diffDays < 30) {
     expiryUrgency = { level: "high" };
+  } else if (diffDays >= 30 && diffDays < 60) {
+    expiryUrgency = { level: "medium" };
+  } else if (diffDays <= 60) {
+    expiryUrgency = { level: "low" };
   }
 
   return expiryUrgency;
