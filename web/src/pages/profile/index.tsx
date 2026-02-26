@@ -51,6 +51,7 @@ export default function ProfilePage() {
           setTrainingCertificateCompleted(nhsdTraining?.is_valid || false);
           if (nhsdTraining?.is_valid) {
             const completedDate = new Date(nhsdTraining.completed_at!);
+            // training valid for a year from completion
             const expiryDate = new Date(completedDate);
             expiryDate.setFullYear(completedDate.getFullYear() + 1);
             setExpiryUrgency(calculateExpiryUrgency(expiryDate));
