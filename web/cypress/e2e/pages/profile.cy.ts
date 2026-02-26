@@ -174,6 +174,7 @@ describe(`Profile Page Step Workflow UI`, () => {
   });
 
   const getDateWithDaysRemaining = (days: number) => {
+    // should return a date with the specified number of days remaining until expiry
     const yearAgo = new Date();
     yearAgo.setFullYear(yearAgo.getFullYear() - 1);
 
