@@ -6,6 +6,11 @@
   }
 }
 
+.needs-attention {
+  height: 1rem;
+  color: var(--expiry-urgency--medium);
+}
+
 .study-actions {
   margin-block: 1rem;
   display: flex;
