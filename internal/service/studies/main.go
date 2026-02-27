@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -304,10 +305,15 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 }
 
 func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
-	result := s.db.Model(&types.Study{}).Where("id = ?", id).
+	db := s.db.Model(&types.Study{}).Where("id = ?", id).
 		Update("approval_status", review.Status).
 		Update("feedback", review.Feedback)
-	return types.NewErrFromGorm(result.Error, "failed to update study review")
+
+	if review.Status == openapi.Approved {
+		db = db.Update("last_signoff", time.Now())
+	}
+
+	return types.NewErrFromGorm(db.Error, "failed to update study review")
 }
 
 func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {

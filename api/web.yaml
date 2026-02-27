@@ -1486,6 +1486,10 @@ components:
               $ref: "#/components/schemas/ApprovalStatus"
             feedback:
               type: string
+            last_signoff:
+              type: string
+              nullable: true
+              description: Time in RFC3339 format when the study was last signed off
       description: A research study
 
     ApprovalStatus:

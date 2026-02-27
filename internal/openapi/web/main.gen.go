@@ -658,6 +658,9 @@ type Study struct {
 	// IsNhsAssociated Whether the research is associated with NHS
 	IsNhsAssociated *bool `json:"is_nhs_associated"`
 
+	// LastSignoff Time in RFC3339 format when the study was last signed off
+	LastSignoff *string `json:"last_signoff"`
+
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string `json:"nhs_england_reference"`
 

@@ -344,6 +344,10 @@ export type Study = StudyBase & {
     updated_at: string;
     approval_status: ApprovalStatus;
     feedback?: string;
+    /**
+     * Time in RFC3339 format when the study was last signed off
+     */
+    last_signoff?: string | null;
 };
 
 /**
