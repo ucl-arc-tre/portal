@@ -107,13 +107,7 @@ export default function StepProgress(props: StepProgressProps) {
       {isComplete ? (
         <details className={styles["completion-container"]}>
           <summary className={styles["completion-header"]}>
-            <h3
-              className={
-                urgencyLevel.includes("medium") || urgencyLevel.includes("high")
-                  ? `expiry-urgency--${urgencyLevel[0]}`
-                  : styles["completion-title"]
-              }
-            >
+            <h3 className={urgencyLevel.length > 0 ? `expiry-urgency--${urgencyLevel[0]}` : styles["completion-title"]}>
               {completionTitle}
             </h3>
             <p className={styles["completion-subtitle"]}>{completionSubtitle}</p>
