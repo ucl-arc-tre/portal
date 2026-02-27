@@ -345,7 +345,7 @@ export type Study = StudyBase & {
     approval_status: ApprovalStatus;
     feedback?: string;
     /**
-     * Time in RFC3339 format when the study was last signed off
+     * Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
      */
     last_signoff?: string | null;
 };

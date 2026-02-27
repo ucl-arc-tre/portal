@@ -952,7 +952,7 @@ type Study struct {
 	// IsNhsAssociated Whether the research is associated with NHS
 	IsNhsAssociated *bool `json:"is_nhs_associated,omitempty"`
 
-	// LastSignoff Time in RFC3339 format when the study was last signed off
+	// LastSignoff Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
 	// NhsEnglandReference NHS England DARS NIC number

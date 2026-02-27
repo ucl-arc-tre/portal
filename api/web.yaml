@@ -1489,7 +1489,7 @@ components:
             last_signoff:
               type: string
               nullable: true
-              description: Time in RFC3339 format when the study was last signed off
+              description: Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
       description: A research study
 
     ApprovalStatus:
