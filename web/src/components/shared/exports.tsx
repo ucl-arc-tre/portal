@@ -83,20 +83,19 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
 export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
   const today = new Date();
 
-  const diffTime = today.getTime() - expiryDate.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const timeUntilExpiry = expiryDate.getTime() - today.getTime();
+  const daysUntilExpiry = Math.ceil(timeUntilExpiry / (1000 * 60 * 60 * 24));
 
   let expiryUrgency: ExpiryUrgency | null = null;
   // high: less than 30 days; medium: 30 days or more but less than 60 days; low: 60 days or more
-  if (diffDays > 60) {
+  if (daysUntilExpiry > 60) {
     expiryUrgency = null;
-  } else if (diffDays < 30) {
+  } else if (daysUntilExpiry < 30) {
     expiryUrgency = { level: "high" };
-  } else if (diffDays >= 30 && diffDays < 60) {
+  } else if (daysUntilExpiry >= 30 && daysUntilExpiry < 60) {
     expiryUrgency = { level: "medium" };
-  } else if (diffDays <= 60) {
+  } else if (daysUntilExpiry <= 60) {
     expiryUrgency = { level: "low" };
   }
-
   return expiryUrgency;
 }
