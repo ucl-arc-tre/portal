@@ -92,6 +92,13 @@ describe("Study creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.contains(studyTitle).parent().parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
+
+    cy.contains(studyTitle)
+      .parent()
+      .parent()
+      .within(() => {
+        cy.get('[data-cy="manage-study-button"]').click();
+      });
     cy.contains("Last signed off").should("exist");
   });
 });
