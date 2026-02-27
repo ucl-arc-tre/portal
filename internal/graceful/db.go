@@ -43,6 +43,7 @@ func InitDB() {
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
 
 	migrateContractStudyIds(db)
+	migrateStudyLastSignoff(db)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
@@ -107,6 +108,32 @@ func migrateContractStudyIds(db *gorm.DB) {
 		if err != nil {
 			log.Err(err).Any("contractId", link.ContractId).Msg("Failed to set study id for contract")
 		}
+	}
+}
+
+// populate last_signoff for existing studies.
+// approved studies get updated_at as an approximation; all others get NULL.
+func migrateStudyLastSignoff(db *gorm.DB) {
+	migrator := db.Migrator()
+
+	study := types.Study{}
+	if !migrator.HasTable(&study) {
+		log.Info().Msg("Study table did not exist")
+		return
+	}
+	if migrator.HasColumn(&study, "last_signoff") {
+		log.Info().Msg("Study last_signoff already migrated")
+		return
+	}
+
+	if err := migrator.AddColumn(&study, "last_signoff"); err != nil {
+		panic(err)
+	}
+
+	if err := db.Model(&study).
+		Where("approval_status = ?", "Approved").
+		Update("last_signoff", gorm.Expr("updated_at")).Error; err != nil {
+		panic(err)
 	}
 }
 
