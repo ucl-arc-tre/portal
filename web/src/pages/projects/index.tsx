@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import MetaHead from "@/components/meta/Head";
 import Projects from "@/components/projects/Projects";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import Callout from "@/components/ui/Callout";
 import Title from "@/components/ui/Title";
 

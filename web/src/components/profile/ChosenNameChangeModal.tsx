@@ -1,5 +1,5 @@
 import Dialog from "@/components/ui/Dialog";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import styles from "./ChosenNameChangeModal.module.css";
 
 type ChosenNameChangeModalProps = {

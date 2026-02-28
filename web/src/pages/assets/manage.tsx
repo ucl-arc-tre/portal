@@ -15,7 +15,7 @@ import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";

@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import styles from "./TrainingForm.module.css";
-import Button from "../ui/Buttons";
+import Button from "../ui/Button";
 import { postUsersByUserIdTraining, TrainingKind, TrainingRecord } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import dynamic from "next/dynamic";

@@ -9,7 +9,7 @@ import {
 import { extractErrorMessage } from "@/lib/errorHandler";
 
 import AssetCreationForm from "./AssetCreationForm";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";

@@ -1,7 +1,7 @@
 import { ConfirmedAgreement, TrainingRecord, UserData } from "@/openapi";
 import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/exports";
 import Loading from "../ui/Loading";
-import Button from "../ui/Buttons";
+import Button from "../ui/Button";
 
 import styles from "./UserDataTable.module.css";
 import { useState } from "react";

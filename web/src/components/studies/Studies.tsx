@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Study, Auth, getStudies } from "@/openapi";
 import StudyForm from "./StudyForm";
 import StudyCardsList from "./StudyCardsList";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import { extractErrorMessage } from "@/lib/errorHandler";
 

@@ -80,23 +80,24 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
   return humanReadableTrainingKind;
 }
 
-export function calculateExpiryUrgency(completedDate: Date): ExpiryUrgency | null {
+export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
+  // needs to work for expiration in the future, used by assets and contracts,  and also account for complation date + 1yr being expiry for certificates
+
   const today = new Date();
 
-  const diffTime = today.getTime() - completedDate.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const timeUntilExpiry = expiryDate.getTime() - today.getTime();
+  const daysUntilExpiry = Math.ceil(timeUntilExpiry / (1000 * 60 * 60 * 24));
 
   let expiryUrgency: ExpiryUrgency | null = null;
-  // high: less than 30 days; medium: 30 days or more but less than 60 days; low: 60 days or less
-  if (diffDays > 60) {
+  // high: less than 30 days; medium: 30-60 days; low: 60-90 days ; no urgency: more than 90 days
+  if (daysUntilExpiry > 90) {
     expiryUrgency = null;
-  } else if (diffDays < 30) {
+  } else if (daysUntilExpiry < 30) {
     expiryUrgency = { level: "high" };
-  } else if (diffDays >= 30 && diffDays < 60) {
+  } else if (daysUntilExpiry >= 30 && daysUntilExpiry < 60) {
     expiryUrgency = { level: "medium" };
-  } else if (diffDays <= 60) {
+  } else if (daysUntilExpiry >= 60 && daysUntilExpiry <= 90) {
     expiryUrgency = { level: "low" };
   }
-
   return expiryUrgency;
 }

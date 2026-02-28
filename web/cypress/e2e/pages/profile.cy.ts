@@ -173,60 +173,76 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.contains("Verify another certificate").should("be.visible");
   });
 
-  const getDateMonthsAgo = (months: number) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() - months);
+  const getDateWithDaysRemaining = (days: number) => {
+    // should return a date with the specified number of days remaining until expiry
+    const yearAgo = new Date();
+    yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+
+    const date = new Date(yearAgo);
+    date.setDate(date.getDate() + days);
+
     return date.toISOString();
   };
 
-  it("should show low urgency when training has 2 months left", () => {
+  it("should show not show urgency when more than 90 days left", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, getDateMonthsAgo(10)); // Training completed 10 months ago
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(91));
 
     cy.visit("/profile");
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    cy.contains("Your certificate is expiring soon!")
-      .should("be.visible")
-      .should("have.css", "color", "rgb(22, 163, 74)");
+    cy.contains("Your certificate is expiring soon!").should("not.exist");
   });
 
-  it("should show medium urgency when training has 1 month left", () => {
+  it("should show low urgency when training has more than 60 but less than 90 days left", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, getDateMonthsAgo(11)); // Training completed 11 months ago
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(80));
 
     cy.visit("/profile");
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    cy.contains("Your certificate is expiring soon!")
-      .should("be.visible")
-      .should("have.css", "color", "rgb(183, 83, 1)");
+    cy.contains("Your certificate is expiring soon!").should("be.visible").should("have.class", "expiry-urgency--low");
   });
 
-  it("should show high urgency when training has less than 1 month left", () => {
+  it("should show medium urgency when training has more than 30 days left but fewer than 60", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
-    cy.mockProfileTraining(true, getDateMonthsAgo(12)); // Training completed 12 months ago
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(31));
+
     cy.visit("/profile");
     cy.waitForAuth();
     cy.waitForProfileData();
 
     cy.contains("Your certificate is expiring soon!")
       .should("be.visible")
-      .should("have.css", "color", "rgb(184, 15, 15)");
+      .should("have.class", "expiry-urgency--medium");
+  });
+
+  it("should show high urgency when training has fewer than 30 days left", () => {
+    // Mock auth as approved researcher (complete profile)
+    cy.mockAuthAsBaseStaffApprovedResearcher();
+
+    cy.mockProfileChosenName("Complete User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(12));
+    cy.visit("/profile");
+    cy.waitForAuth();
+    cy.waitForProfileData();
+
+    cy.contains("Your certificate is expiring soon!").should("be.visible").should("have.class", "expiry-urgency--high");
   });
 
   it("approved researcher agreement can be agreed to", () => {

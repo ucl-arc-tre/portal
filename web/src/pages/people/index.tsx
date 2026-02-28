@@ -13,7 +13,7 @@ import { Alert, AlertMessage, HelperText } from "@/components/shared/exports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 
 export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
   ssr: false,
