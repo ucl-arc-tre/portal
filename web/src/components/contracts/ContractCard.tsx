@@ -106,6 +106,11 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
           <span className={styles.label}>Uploaded: </span>
           <span className={styles.value}>{formatDate(contract.created_at)}</span>
         </div>
+
+        <div className={styles["detail-item"]}>
+          <span className={styles.label}>No. Linked Assets: </span>
+          <span className={styles.value}>{contract.asset_ids.length || 0}</span>
+        </div>
       </div>
 
       {error && (
@@ -121,16 +126,17 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
             This contract is expiring soon, please review and update if necessary
           </small>
         )}
-
-        <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
-          {downloading ? "Downloading..." : "Download PDF"}
-        </Button>
-
-        {canModify && (
-          <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
-            Edit
+        <div className={styles["button-wrapper"]}>
+          <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
+            {downloading ? "Downloading..." : "Download PDF"}
           </Button>
-        )}
+
+          {canModify && (
+            <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
+              Edit
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
