@@ -4,6 +4,7 @@ import (
 	"slices"
 	"time"
 
+	gormlock "github.com/go-co-op/gocron-gorm-lock/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -19,6 +20,7 @@ const (
 // Initialise the database and migrate required types
 func InitDB() {
 	models := []any{
+		&gormlock.CronJobLock{},
 		&types.User{},
 		&types.Agreement{},
 		&types.UserAgreementConfirmation{},

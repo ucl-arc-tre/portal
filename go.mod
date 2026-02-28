@@ -15,6 +15,8 @@ require (
 	github.com/gin-contrib/secure v1.1.2
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-chi/httprate v0.15.0
+	github.com/go-co-op/gocron-gorm-lock/v2 v2.1.0
+	github.com/go-co-op/gocron/v2 v2.19.1
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
@@ -84,6 +86,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jolestar/go-commons-pool/v2 v2.1.2 // indirect
+	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
@@ -111,6 +114,7 @@ require (
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.57.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/std-uritemplate/std-uritemplate/go/v2 v2.0.5 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
