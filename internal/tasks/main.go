@@ -40,6 +40,7 @@ func (m *Manager) mustEvery(delay time.Duration, f func() error, name string) {
 	job, err := m.scheduler.NewJob(
 		gocron.DurationJob(delay),
 		gocron.NewTask(f),
+		gocron.WithStartAt(gocron.WithStartDateTime(timeBoundary(delay))),
 		gocron.WithName(name),
 		gocron.WithSingletonMode(gocron.LimitModeReschedule), // prevent parallel execution
 		gocron.WithEventListeners(
@@ -72,4 +73,10 @@ func newScheduler() gocron.Scheduler {
 		panic(fmt.Errorf("failed to create gocron scheduler: %w", err))
 	}
 	return scheduler
+}
+
+// Get the next time boundary for a time. e.g. if the time is
+// 10:01 and the delay is 5 minutes then the boundary is 10:05
+func timeBoundary(delay time.Duration) time.Time {
+	return time.Now().UTC().Add(delay).Truncate(delay)
 }

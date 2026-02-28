@@ -173,7 +173,11 @@ func PortalUrl() string {
 func ProcessIdentity() string {
 	value := os.Getenv("PROCESS_IDENTITY")
 	if value == "" {
-		return "default-id"
+		hostname, err := os.Hostname()
+		if err != nil {
+			return "unknown-host"
+		}
+		return hostname
 	}
 	return value
 }

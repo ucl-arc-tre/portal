@@ -22,6 +22,7 @@ func TestTaskManager(t *testing.T) {
 	manager.mustEvery(50*time.Millisecond, setCalled, "test")
 	manager.scheduler.Start()
 	time.Sleep(100 * time.Millisecond)
+
 	manager.Shutdown()
 
 	assert.True(t, calledFuncInManager)

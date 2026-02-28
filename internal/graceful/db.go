@@ -2,6 +2,7 @@ package graceful
 
 import (
 	"slices"
+	"sync"
 	"time"
 
 	gormlock "github.com/go-co-op/gocron-gorm-lock/v2"
@@ -15,6 +16,11 @@ import (
 
 const (
 	initConnectRetryDelay = 1 * time.Second
+)
+
+var (
+	db     *gorm.DB // Singleton gorm DB - handles connection pooling
+	dbOnce sync.Once
 )
 
 // Initialise the database and migrate required types
@@ -50,25 +56,28 @@ func InitDB() {
 		panic(err)
 	}
 
-	log.Debug().Msg("Initalised database")
+	log.Debug().Msg("Initialised database")
 }
 
 // Create a new gorm DB, blocking until a connection is made
 func NewDB() *gorm.DB {
-	connectRetryDelay := initConnectRetryDelay
-	for {
-		db, err := gorm.Open(postgres.New(postgres.Config{
-			DSN:                  config.DBDataSourceName(),
-			PreferSimpleProtocol: true,
-		}), &gorm.Config{})
-		if err == nil {
-			return db
-		} else {
+	dbOnce.Do(func() {
+		connectRetryDelay := initConnectRetryDelay
+		var err error
+		for {
+			db, err = gorm.Open(postgres.New(postgres.Config{
+				DSN:                  config.DBDataSourceName(),
+				PreferSimpleProtocol: true,
+			}), &gorm.Config{})
+			if err == nil {
+				return
+			}
 			log.Debug().Msg("Waiting for DB connection...")
 			time.Sleep(connectRetryDelay)
 			connectRetryDelay *= 2
 		}
-	}
+	})
+	return db
 }
 
 // Set a study id column of contracts using their existing values
