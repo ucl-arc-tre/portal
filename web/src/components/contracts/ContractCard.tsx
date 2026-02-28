@@ -8,7 +8,7 @@ import { AlertMessage, Alert, AlertCircleIcon, calculateExpiryUrgency } from "..
 type ContractCardProps = {
   contract: Contract;
   studyId: string;
-  onEdit: () => void;
+  onEdit?: () => void;
   canModify: boolean;
 };
 

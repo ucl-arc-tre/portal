@@ -173,14 +173,14 @@ func (s *Service) createInformationAsset(user types.User, assetData openapi.Asse
 // retrieves all assets for a study
 func (s *Service) InformationAssets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
-	err := s.db.Preload("Locations").Preload("Contracts").Where("study_id = ?", studyID).Find(&assets).Error
+	err := s.db.Preload("Locations").Preload("Contracts.Assets").Where("study_id = ?", studyID).Find(&assets).Error
 	return assets, types.NewErrFromGorm(err, "failed to get Information Assets")
 }
 
 // retrieves a specific asset within a study
 func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
 	asset := types.Asset{}
-	err := s.db.Preload("Locations").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
+	err := s.db.Preload("Locations").Preload("Contracts.Assets").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
 	return asset, types.NewErrFromGorm(err, "failed to get study asset by id")
 }
 
