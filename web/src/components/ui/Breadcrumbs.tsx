@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import styles from "./Breadcrumbs.module.css";
-import Button from "./Buttons";
+import Button from "./Button";
 
 type BreadCrumbLink = {
   url: string;

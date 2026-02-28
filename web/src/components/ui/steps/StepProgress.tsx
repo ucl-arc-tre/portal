@@ -1,5 +1,5 @@
 import { CheckIcon } from "@/components/shared/exports";
-import Button from "../Buttons";
+import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
 

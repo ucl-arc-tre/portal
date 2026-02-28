@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import styles from "./AgreementForm.module.css";
 import dynamic from "next/dynamic";
 const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {

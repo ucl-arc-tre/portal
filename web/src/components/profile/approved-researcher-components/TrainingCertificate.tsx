@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import LoginFallback from "@/components/ui/LoginFallback";
 import { useAuth } from "@/hooks/useAuth";
 import { postProfileTraining } from "@/openapi";

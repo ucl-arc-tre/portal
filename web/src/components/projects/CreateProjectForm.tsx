@@ -13,11 +13,10 @@ import {
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName } from "@/types/projects";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import Button from "../ui/Buttons";
+import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage } from "../shared/exports";
-import { RemoveLinkButton, AddLinkButton } from "../ui/Buttons";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";
@@ -487,11 +486,25 @@ export default function CreateProjectForm({
                           </select>
                         )}
                       />
-                      <RemoveLinkButton onClick={removeAsset} index={index}></RemoveLinkButton>{" "}
+                      <Button
+                        onClick={() => removeAsset(index)}
+                        className="remove-button"
+                        aria-label={`Remove contract ${index + 1}`}
+                        type="button"
+                      >
+                        ×
+                      </Button>
                     </div>
                   ))}
-
-                  <AddLinkButton onClick={() => appendAsset({ value: "" })} entity="Asset" />
+                  <Button
+                    onClick={() => appendAsset({ value: "" })}
+                    type="button"
+                    variant="secondary"
+                    size="small"
+                    aria-label="Add Asset"
+                  >
+                    Add Asset
+                  </Button>
                 </fieldset>
                 <HelperText>
                   Optionally link this project to one or more existing assets from the selected study

@@ -4,7 +4,7 @@ import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
 import { getProfile, getStudies } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 import { AlertMessage, Alert } from "../shared/exports";
 

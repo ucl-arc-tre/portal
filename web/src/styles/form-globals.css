@@ -55,6 +55,8 @@
         align-self: center;
         vertical-align: middle;
         flex-shrink: 0;
+        /* uikit button has set height */
+        height: unset;
 
         &:hover {
           background-color: #c82333;

@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import MetaHead from "@/components/meta/Head";
 import Studies from "@/components/studies/Studies";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import Title from "@/components/ui/Title";
 import InfoTooltip from "@/components/ui/InfoTooltip";
 import LoginFallback from "@/components/ui/LoginFallback";

@@ -1,5 +1,5 @@
 import { Asset } from "@/openapi";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage, formatDate } from "../shared/exports";

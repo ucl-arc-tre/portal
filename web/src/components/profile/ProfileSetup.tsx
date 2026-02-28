@@ -6,7 +6,7 @@ import StepProgress from "../ui/steps/StepProgress";
 import { Auth } from "@/openapi";
 
 import styles from "./ProfileSetup.module.css";
-import Button from "../ui/Buttons";
+import Button from "../ui/Button";
 import { useEffect, useState } from "react";
 
 type Props = {

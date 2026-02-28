@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import Button from "@/components/ui/Buttons";
+import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
   postStudiesByStudyIdContractsUpload,
@@ -15,7 +15,6 @@ import {
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
 import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
-import { RemoveLinkButton, AddLinkButton } from "../ui/Buttons";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -410,12 +409,25 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                       </select>
                     )}
                   />
-
-                  <RemoveLinkButton onClick={removeAsset} index={index}></RemoveLinkButton>
+                  <Button
+                    onClick={() => removeAsset(index)}
+                    className="remove-button"
+                    aria-label={`Remove contract ${index + 1}`}
+                    type="button"
+                  >
+                    ×
+                  </Button>
                 </div>
               ))}
-
-              <AddLinkButton onClick={() => appendAsset({ value: "" })} entity="Asset" />
+              <Button
+                onClick={() => appendAsset({ value: "" })}
+                type="button"
+                variant="secondary"
+                size="small"
+                aria-label="Add Asset"
+              >
+                Add Asset
+              </Button>
             </fieldset>
             <HelperText>Optionally link this contract to one or more existing assets from this study</HelperText>
           </div>
