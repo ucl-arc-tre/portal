@@ -20,6 +20,7 @@ import Button from "@/components/ui/Buttons";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
+import { HelperText } from "@/components/shared/exports";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -186,7 +187,15 @@ export default function ManageAssetPage() {
 
             {contracts?.length > 0 && (
               <div className={styles.field}>
-                <label>Associated Contracts:</label>
+                <label>
+                  Associated Contracts:
+                  <HelperText>
+                    <small>
+                      To manage contracts, please navigate to the{" "}
+                      <a href={`/studies/manage?studyId=${study.id}`}>Study</a> page.
+                    </small>
+                  </HelperText>
+                </label>
                 <ul>
                   {contracts.map((contract) => (
                     <ContractCard key={contract.id} contract={contract} studyId={study.id} canModify={false} />
