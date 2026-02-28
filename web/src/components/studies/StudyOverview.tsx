@@ -181,9 +181,9 @@ export default function StudyOverview(props: StudyOverviewProps) {
 
           {/*//TODO: add summary of num of projects*/}
 
-          <div>
-            <h4>Summary of related entities:</h4>
-            {numEntities.assets !== undefined && numEntities.contracts !== undefined && (
+          {numEntities.assets !== undefined && numEntities.contracts !== undefined && (
+            <div>
+              <h4>Summary of related entities:</h4>
               <dl className={styles.grouping}>
                 <dd>
                   Assets: <span className={styles["grey-value"]}>{numEntities.assets}</span>
@@ -192,8 +192,8 @@ export default function StudyOverview(props: StudyOverviewProps) {
                   Contracts: <span className={styles["grey-value"]}>{numEntities.contracts}</span>
                 </dd>
               </dl>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Box>
     </>
