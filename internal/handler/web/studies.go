@@ -16,6 +16,13 @@ import (
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
 	ownerUsernameStr := string(study.Owner.Username)
+
+	var lastSignoff *string
+	if study.LastSignoff != nil {
+		formatted := study.LastSignoff.Format(config.TimeFormat)
+		lastSignoff = &formatted
+	}
+
 	return openapi.Study{
 		Id:                               study.ID.String(),
 		Title:                            study.Title,
@@ -47,6 +54,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		Feedback:                         study.Feedback,
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
+		LastSignoff:                      lastSignoff,
 	}
 }
 
