@@ -34,6 +34,7 @@ type Study struct {
 	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
 	ApprovalStatus                   string    `gorm:"not null"`
 	Feedback                         *string   `gorm:"type:text"`
+	LastSignoff                      *time.Time
 
 	// Relationships
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`

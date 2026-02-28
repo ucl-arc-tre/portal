@@ -30,6 +30,11 @@ export default function StudyOverview(props: StudyOverviewProps) {
           <span>
             Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
           </span>
+          {study.last_signoff && (
+            <span>
+              Last signed off: <span className={styles["grey-value"]}>{formatDate(study.last_signoff)}</span>
+            </span>
+          )}
           <span>
             Risk Score:{" "}
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
