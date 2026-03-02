@@ -3,8 +3,8 @@ package rbac
 import (
 	"testing"
 
-	"github.com/casbin/casbin/v2"
-	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
+	"github.com/casbin/casbin/v3"
+	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/ucl-arc-tre/portal/internal/types"

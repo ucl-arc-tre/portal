@@ -3,7 +3,7 @@ package rbac
 import (
 	"fmt"
 
-	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// Initalise the RBAC with roles and users
+// Initialise the RBAC with roles and users
 func Init() {
 	log.Info().Msg("Seeding roles and admin users")
 	enforcer := NewEnforcer()
