@@ -89,7 +89,6 @@ export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
   const daysUntilExpiry = Math.ceil(timeUntilExpiry / (1000 * 60 * 60 * 24));
 
   let expiryUrgency: ExpiryUrgency | null = null;
-  // high: less than 30 days; medium: 30-60 days; low: 60-90 days ; no urgency: more than 90 days
   if (daysUntilExpiry > 90) {
     expiryUrgency = null;
   } else if (daysUntilExpiry < 30) {
