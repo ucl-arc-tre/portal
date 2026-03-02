@@ -41,11 +41,10 @@ export default function ContractManagement(props: ContractManagementProps) {
       setContracts(response.data);
       setNumContracts(response.data.length);
       if (response.data.length > 0) {
-        const needsAttention =
-          response.data.some((contract) => {
-            const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-            return expiryUrgency && (expiryUrgency.level === "medium" || expiryUrgency.level === "high");
-          }) || false;
+        const needsAttention = response.data.some((contract) => {
+          const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+          return expiryUrgency && (expiryUrgency.level === "medium" || expiryUrgency.level === "high");
+        });
         setContractsNeedAttention(needsAttention);
       }
     } catch (err) {
