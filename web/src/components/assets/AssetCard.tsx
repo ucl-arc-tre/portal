@@ -2,8 +2,9 @@ import { Asset } from "@/openapi";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
-import { Alert, AlertCircleIcon, AlertMessage, formatDate } from "../shared/exports";
+import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
+import { formatDate } from "../shared/exports";
 
 type AssetCardProps = {
   asset: Asset;

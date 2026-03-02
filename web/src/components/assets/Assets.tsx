@@ -15,7 +15,7 @@ import AssetCard from "./AssetCard";
 import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
-import { AlertMessage, Alert } from "../shared/exports";
+import { AlertMessage, Alert } from "../shared/uikitExports";
 
 type InformationAssetsProps = {
   studyId: string;

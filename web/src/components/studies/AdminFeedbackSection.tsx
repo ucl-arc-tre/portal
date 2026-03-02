@@ -1,5 +1,5 @@
 import Box from "../ui/Box";
-import { Alert, AlertMessage, Textarea } from "../shared/exports";
+import { Alert, AlertMessage, Textarea } from "../shared/uikitExports";
 import styles from "./AdminFeedbackSection.module.css";
 import Button from "../ui/Button";
 import { useState } from "react";

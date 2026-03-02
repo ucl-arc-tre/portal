@@ -3,7 +3,8 @@ import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractCard.module.css";
-import { AlertMessage, Alert, AlertCircleIcon, calculateExpiryUrgency, formatDate } from "../shared/exports";
+import { AlertMessage, Alert, AlertCircleIcon } from "../shared/uikitExports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 
 type ContractCardProps = {
   contract: Contract;

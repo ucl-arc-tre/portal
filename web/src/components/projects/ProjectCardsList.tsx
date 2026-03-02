@@ -5,7 +5,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
 import Dialog from "@/components/ui/Dialog";
-import { Alert, AlertMessage } from "../shared/exports";
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 import styles from "./ProjectCardsList.module.css";
 

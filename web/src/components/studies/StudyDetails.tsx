@@ -7,7 +7,7 @@ import {
   ApprovalStatus,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertCircleIcon, AlertMessage } from "../shared/exports";
+import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";

@@ -1,5 +1,5 @@
 import { ConfirmedAgreement, TrainingRecord, UserData } from "@/openapi";
-import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/exports";
+import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/uikitExports";
 import Loading from "../ui/Loading";
 import Button from "../ui/Button";
 

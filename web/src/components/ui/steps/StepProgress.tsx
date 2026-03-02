@@ -1,4 +1,4 @@
-import { CheckIcon } from "@/components/shared/exports";
+import { CheckIcon } from "@/components/shared/uikitExports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";

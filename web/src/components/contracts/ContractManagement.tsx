@@ -6,7 +6,8 @@ import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { AlertMessage, Alert, calculateExpiryUrgency } from "../shared/exports";
+import { AlertMessage, Alert } from "../shared/uikitExports";
+import { calculateExpiryUrgency } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
