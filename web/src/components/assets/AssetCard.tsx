@@ -10,6 +10,7 @@ type AssetCardProps = {
   studyId: string;
   checkCompleted: (assets: Asset[]) => Promise<boolean>;
   canModify: boolean;
+  setTab?: (tab: string) => void;
 };
 
 const formatClassification = (classification: string) => {
@@ -21,7 +22,7 @@ const formatProtection = (protection: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, checkCompleted, canModify } = props;
+  const { studyId, asset, checkCompleted, canModify, setTab } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,10 +104,25 @@ export default function AssetCard(props: AssetCardProps) {
 
       <div className={styles["asset-actions"]}>
         {!isCompleted && (
-          <small className={styles["asset-incomplete__message"]}>
-            <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
-            This asset requires a contract that has not yet been added
-          </small>
+          <>
+            <small className={styles["asset-incomplete__message"]}>
+              <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
+              This asset requires a contract that has not yet been added. You can manage contracts under the Contracts
+              tab.
+            </small>
+            {setTab && (
+              <Button
+                onClick={() => {
+                  setTab("contracts");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                variant="secondary"
+                size="small"
+              >
+                Contracts{" "}
+              </Button>
+            )}
+          </>
         )}
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
           {canModify ? "Manage Asset" : "View Asset"}

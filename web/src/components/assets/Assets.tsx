@@ -23,10 +23,11 @@ type InformationAssetsProps = {
   setHasAsset?: (hasAsset: boolean) => void;
   canModify: boolean;
   setNumAssets?: (numAssets: number) => void;
+  setTab?: (tab: string) => void;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, setAssetContractsCompleted, setHasAsset, canModify, setNumAssets } = props;
+  const { studyId, setAssetContractsCompleted, setHasAsset, canModify, setNumAssets, setTab } = props;
 
   const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -214,6 +215,7 @@ export default function Assets(props: InformationAssetsProps) {
                 asset={asset}
                 checkCompleted={checkAssetManagementCompleted}
                 canModify={canModify}
+                setTab={setTab}
               />
             ))}
           </div>
