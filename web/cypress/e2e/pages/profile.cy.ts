@@ -184,7 +184,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     return date.toISOString();
   };
 
-  it("should show not show urgency when more than 90 days left", () => {
+  it("should not show urgency when more than 90 days left", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
