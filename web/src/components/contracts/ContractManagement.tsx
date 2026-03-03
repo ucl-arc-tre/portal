@@ -44,7 +44,7 @@ export default function ContractManagement(props: ContractManagementProps) {
       if (response.data.length > 0) {
         const needsAttention = response.data.some((contract) => {
           const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-          return expiryUrgency && (expiryUrgency.level === "medium" || expiryUrgency.level === "high");
+          return expiryUrgency && expiryUrgency.level !== "low";
         });
         setContractsNeedAttention(needsAttention);
       }

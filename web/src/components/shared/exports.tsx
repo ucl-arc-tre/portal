@@ -47,6 +47,8 @@ export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
   let expiryUrgency: ExpiryUrgency | null = null;
   if (daysUntilExpiry > 90) {
     expiryUrgency = null;
+  } else if (daysUntilExpiry <= 0) {
+    expiryUrgency = { level: "critical" };
   } else if (daysUntilExpiry < 30) {
     expiryUrgency = { level: "high" };
   } else if (daysUntilExpiry >= 30 && daysUntilExpiry < 60) {

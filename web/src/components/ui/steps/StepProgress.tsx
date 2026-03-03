@@ -19,7 +19,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
       return styles["step-title-completed"];
     } else if (step.expiryUrgency.level == "medium") {
       return styles["step-title-expiry-urgency-medium"];
-    } else if (step.expiryUrgency.level == "high") {
+    } else if (step.expiryUrgency.level == "high" || step.expiryUrgency.level == "critical") {
       return styles["step-title-pending"];
     }
   };
@@ -33,7 +33,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
                 className={`${styles["step-icon"]} ${
                   step.expiryUrgency?.level == "medium"
                     ? styles["step-icon-expiry-urgency-medium"]
-                    : step.expiryUrgency?.level == "high"
+                    : step.expiryUrgency?.level == "high" || step.expiryUrgency?.level == "critical"
                       ? styles["step-icon-pending"]
                       : step.completed
                         ? styles["step-icon-completed"]
@@ -42,7 +42,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
                           : styles["step-icon-pending"]
                 }`}
               >
-                {step.expiryUrgency?.level == "medium" || step.expiryUrgency?.level == "high" ? (
+                {step.expiryUrgency?.level !== "low" ? (
                   <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
                 ) : step.completed ? (
                   <CheckIcon className={styles["check-icon"]} />
