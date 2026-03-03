@@ -42,7 +42,7 @@ entra:
   mail_tenant_id: <CHANGE_ME>
   mail_client_id: <CHANGE_ME>
   mail_client_secret: <CHANGE_ME>
-  mail_user_principal: <CHANGE_ME> # found in Azure portal: refer to project slck channel for where to find this
+  mail_user_principal: <CHANGE_ME> # found in Azure portal: refer to project slack channel for where to find this
 
 url: <CHANGE_ME> # eg. https://portal.arc.ucl.ac.uk
 tre:
