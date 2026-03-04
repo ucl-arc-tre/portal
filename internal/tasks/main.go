@@ -36,10 +36,11 @@ func (m *Manager) Shutdown() {
 	}
 }
 
-func (m *Manager) mustEvery(delay time.Duration, f func() error, name string) {
+// Schedule a function to run repeatedly with a delay and unique name
+func (m *Manager) mustEvery(delay time.Duration, function func() error, name string) {
 	job, err := m.scheduler.NewJob(
 		gocron.DurationJob(delay),
-		gocron.NewTask(f),
+		gocron.NewTask(function),
 		gocron.WithStartAt(gocron.WithStartDateTime(timeBoundary(delay))),
 		gocron.WithName(name),
 		gocron.WithSingletonMode(gocron.LimitModeReschedule), // prevent parallel execution
