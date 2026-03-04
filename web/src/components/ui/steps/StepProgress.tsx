@@ -42,7 +42,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
                           : styles["step-icon-pending"]
                 }`}
               >
-                {step.expiryUrgency?.level !== "low" ? (
+                {step.expiryUrgency && step.expiryUrgency.level !== "low" ? (
                   <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
                 ) : step.completed ? (
                   <CheckIcon className={styles["check-icon"]} />
