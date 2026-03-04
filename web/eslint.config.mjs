@@ -28,6 +28,12 @@ const eslintConfig = defineConfig([
       "@next/next/no-img-element": "off",
     },
   },
+  {
+    settings: {
+      // Explicitly pinned. See: https://github.com/vercel/next.js/issues/89764
+      react: { version: "19" },
+    },
+  },
 ]);
 
 export default eslintConfig;
