@@ -256,6 +256,7 @@ export default function CreateProjectForm({
 
       handleProjectCreated();
     } catch (error) {
+      console.error(error);
       setError("Something went wrong. Failed to create or update project.");
     } finally {
       setIsSubmitting(false);

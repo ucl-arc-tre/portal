@@ -168,3 +168,16 @@ func env(key string) string {
 func PortalUrl() string {
 	return k.String("url")
 }
+
+// ProcessIdentity of this process e.g. pod name
+func ProcessIdentity() string {
+	value := os.Getenv("PROCESS_IDENTITY")
+	if value == "" {
+		hostname, err := os.Hostname()
+		if err != nil {
+			return "unknown-host"
+		}
+		return hostname
+	}
+	return value
+}

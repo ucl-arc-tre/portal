@@ -15,10 +15,16 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/router"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/tasks"
 )
 
 func main() {
 	initialise()
+
+	tasks := tasks.New()
+	tasks.Start()
+	defer tasks.Shutdown()
+
 	router := router.New()
 	addWeb(router.Group(config.BaseWebURL))
 	addTRE(router.Group(config.BaseTREURL))
