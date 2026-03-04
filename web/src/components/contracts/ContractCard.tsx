@@ -115,7 +115,9 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
         {expiryUrgency && (
           <small className={styles["expiry-message"]}>
             <AlertCircleIcon className={`expiry-urgency--${expiryUrgency.level} actions-icon`} />
-            This contract is expiring soon, please review and update if necessary
+            {expiryUrgency.level !== "critical"
+              ? "This contract is expiring soon, please review and update if necessary"
+              : "This contract has expired, please review and update as soon as possible"}
           </small>
         )}
 

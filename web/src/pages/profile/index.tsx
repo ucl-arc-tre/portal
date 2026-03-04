@@ -56,8 +56,8 @@ export default function ProfilePage() {
             expiryDate.setFullYear(completedDate.getFullYear() + 1);
             setExpiryUrgency(calculateExpiryUrgency(expiryDate));
           } else {
-            // if training not valid, expiry is urgent
-            setExpiryUrgency({ level: "high" });
+            // if training not valid (has expired)
+            setExpiryUrgency({ level: "critical" });
           }
         }
       } catch (error) {
