@@ -104,8 +104,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
   const [tab, setTab] = useState("overview");
-  const [numAssets, setNumAssets] = useState<number | undefined>(undefined);
-  const [numContracts, setNumContracts] = useState<number | undefined>(undefined);
+  const [numAssets, setNumAssets] = useState<number | null>(null);
+  const [numContracts, setNumContracts] = useState<number | null>(null);
 
   const [assetsNeedAttention, setAssetsNeedAttention] = useState(false);
   const [contractsNeedAttention, setContractsNeedAttention] = useState(false);
