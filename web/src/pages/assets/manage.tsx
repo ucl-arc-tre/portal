@@ -20,7 +20,7 @@ import Button from "@/components/ui/Button";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
-import { HelperText } from "@/components/shared/exports";
+import { HelperText } from "@/components/shared/uikitExports";
 
 export default function ManageAssetPage() {
   const router = useRouter();
