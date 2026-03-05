@@ -239,10 +239,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
           study={study}
           riskScore={riskScore}
           riskScoreLoading={riskScoreLoading}
-          handleUpdateStudyStatus={handleUpdateStudyStatus}
           approvalStatus={approvalStatus}
           isIGOpsStaff={isIGOpsStaff}
-          isStudyOwnerOrAdmin={isStudyOwnerOrAdmin}
           feedback={feedback}
           numEntities={{ assets: numAssets, contracts: numContracts }}
         />
