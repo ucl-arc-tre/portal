@@ -16,7 +16,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage } from "../shared/exports";
+import { HelperText, Alert, AlertMessage } from "../shared/uikitExports";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";
@@ -256,6 +256,7 @@ export default function CreateProjectForm({
 
       handleProjectCreated();
     } catch (error) {
+      console.error(error);
       setError("Something went wrong. Failed to create or update project.");
     } finally {
       setIsSubmitting(false);

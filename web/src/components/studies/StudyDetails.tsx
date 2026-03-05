@@ -7,7 +7,7 @@ import {
   ApprovalStatus,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertCircleIcon, AlertMessage } from "../shared/exports";
+import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
@@ -259,7 +259,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
             {tab === "assets" && (
               // we want to check the assets have required contracts more regularly
-              <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
+              <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} setTab={setTab} />
             )}
           </div>
 

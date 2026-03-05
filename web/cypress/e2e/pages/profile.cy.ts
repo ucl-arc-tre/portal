@@ -184,7 +184,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     return date.toISOString();
   };
 
-  it("should show not show urgency when more than 90 days left", () => {
+  it("should not show urgency when more than 90 days left", () => {
     // Mock auth as approved researcher (complete profile)
     cy.mockAuthAsBaseStaffApprovedResearcher();
 
@@ -212,6 +212,21 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForProfileData();
 
     cy.contains("Your certificate is expiring soon!").should("be.visible").should("have.class", "expiry-urgency--low");
+  });
+
+  it("should show message when expired", () => {
+    // Mock auth as approved researcher (complete profile)
+    cy.mockAuthAsBaseStaffApprovedResearcher();
+
+    cy.mockProfileChosenName("Complete User"); // Has chosen name
+    cy.mockProfileAgreements(true); // Agreement completed
+    cy.mockProfileTraining(true, getDateWithDaysRemaining(-1)); // Expired certificate
+
+    cy.visit("/profile");
+    cy.waitForAuth();
+    cy.waitForProfileData();
+
+    cy.contains("Your certificate has expired").should("be.visible").should("have.class", "expiry-urgency--critical");
   });
 
   it("should show medium urgency when training has more than 30 days left but fewer than 60", () => {

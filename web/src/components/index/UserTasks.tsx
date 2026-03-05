@@ -6,7 +6,7 @@ import { getProfile, getStudies } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
-import { AlertMessage, Alert } from "../shared/exports";
+import { AlertMessage, Alert } from "../shared/uikitExports";
 
 export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();

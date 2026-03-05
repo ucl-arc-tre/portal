@@ -3,7 +3,8 @@ import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractCard.module.css";
-import { AlertMessage, Alert, AlertCircleIcon, calculateExpiryUrgency } from "../shared/exports";
+import { AlertMessage, Alert, AlertCircleIcon } from "../shared/uikitExports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 
 type ContractCardProps = {
   contract: Contract;
@@ -65,10 +66,6 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   useEffect(() => {
     setExpiryUrgency(calculateExpiryUrgency(new Date(contract.expiry_date)));
   }, [contract.expiry_date]);
@@ -123,7 +120,9 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
         {expiryUrgency && (
           <small className={styles["expiry-message"]}>
             <AlertCircleIcon className={`expiry-urgency--${expiryUrgency.level} actions-icon`} />
-            This contract is expiring soon, please review and update if necessary
+            {expiryUrgency.level !== "critical"
+              ? "This contract is expiring soon, please review and update if necessary"
+              : "This contract has expired, please review and update as soon as possible"}
           </small>
         )}
         <div className={styles["button-wrapper"]}>

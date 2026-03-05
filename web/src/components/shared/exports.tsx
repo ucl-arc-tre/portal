@@ -1,47 +1,3 @@
-import dynamic from "next/dynamic";
-
-// UIKIT ICONS
-export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.X), {
-  ssr: false,
-});
-
-export const InfoIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Info), {
-  ssr: false,
-});
-
-export const AlertCircleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertCircle), {
-  ssr: false,
-});
-
-// UIKIT COMPONENTS
-export const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
-  ssr: false,
-});
-
-export const Label = dynamic(() => import("uikit-react-public").then((mod) => mod.Label), {
-  ssr: false,
-});
-
-export const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-
-export const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
-
-export const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
-  ssr: false,
-});
-
-export const HelperText = dynamic(() => import("uikit-react-public").then((mod) => mod.Field.HelperText), {
-  ssr: false,
-});
-
-export const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Textarea), {
-  ssr: false,
-});
-
 export const TrainingKindOptions = {
   //  is there a better way of doing this? Won't let me use type as a value
   nhsd: "training_kind_nhsd",
@@ -89,9 +45,10 @@ export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
   const daysUntilExpiry = Math.ceil(timeUntilExpiry / (1000 * 60 * 60 * 24));
 
   let expiryUrgency: ExpiryUrgency | null = null;
-  // high: less than 30 days; medium: 30-60 days; low: 60-90 days ; no urgency: more than 90 days
   if (daysUntilExpiry > 90) {
     expiryUrgency = null;
+  } else if (daysUntilExpiry <= 0) {
+    expiryUrgency = { level: "critical" };
   } else if (daysUntilExpiry < 30) {
     expiryUrgency = { level: "high" };
   } else if (daysUntilExpiry >= 30 && daysUntilExpiry < 60) {

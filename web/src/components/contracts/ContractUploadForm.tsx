@@ -14,7 +14,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
+import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
   organisationSignatory: string;

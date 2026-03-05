@@ -6,7 +6,8 @@ import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { AlertMessage, Alert, calculateExpiryUrgency } from "../shared/exports";
+import { AlertMessage, Alert } from "../shared/uikitExports";
+import { calculateExpiryUrgency } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
@@ -41,11 +42,10 @@ export default function ContractManagement(props: ContractManagementProps) {
       setContracts(response.data);
       setNumContracts(response.data.length);
       if (response.data.length > 0) {
-        const needsAttention =
-          response.data.some((contract) => {
-            const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-            return expiryUrgency && (expiryUrgency.level === "medium" || expiryUrgency.level === "high");
-          }) || false;
+        const needsAttention = response.data.some((contract) => {
+          const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+          return expiryUrgency && expiryUrgency.level !== "low";
+        });
         setContractsNeedAttention(needsAttention);
       }
     } catch (err) {

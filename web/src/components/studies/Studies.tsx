@@ -8,7 +8,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 
 import styles from "./Studies.module.css";
 import Loading from "../ui/Loading";
-import { Alert, AlertMessage } from "../shared/exports";
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type Props = {
   userData: Auth;

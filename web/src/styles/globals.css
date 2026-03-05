@@ -158,7 +158,8 @@ dialog {
   color: var(--expiry-urgency--low);
 }
 
-.expiry-urgency--high {
+.expiry-urgency--high,
+.expiry-urgency--critical {
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
