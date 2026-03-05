@@ -39,9 +39,10 @@ export default function ManageAssetPage() {
     setError(null);
 
     try {
-      const studyResponse = await getStudiesByStudyId({
-        path: { studyId: studyIdParam },
-      });
+      const [studyResponse, assetResponse] = await Promise.all([
+        getStudiesByStudyId({ path: { studyId: studyIdParam } }),
+        getStudiesByStudyIdAssetsByAssetId({ path: { studyId: studyIdParam, assetId: assetIdParam } }),
+      ]);
 
       if (!studyResponse.response.ok || !studyResponse.data) {
         const errorMsg = extractErrorMessage(studyResponse);
@@ -50,17 +51,13 @@ export default function ManageAssetPage() {
       }
       setStudy(studyResponse.data);
 
-      const assetResponse = await getStudiesByStudyIdAssetsByAssetId({
-        path: { studyId: studyIdParam, assetId: assetIdParam },
-      });
-
       if (!assetResponse.response.ok || !assetResponse.data) {
         const errorMsg = extractErrorMessage(assetResponse);
         setError(`Failed to load asset: ${errorMsg}`);
         return;
       }
       setAsset(assetResponse.data);
-      if (assetResponse.data.contract_ids && assetResponse.data.contract_ids.length > 0) {
+      if (assetResponse.data.contract_ids.length > 0) {
         const contractsResponse = await getStudiesByStudyIdAssetsByAssetIdContracts({
           path: { studyId: studyIdParam, assetId: assetIdParam },
         });
@@ -185,7 +182,7 @@ export default function ManageAssetPage() {
               <span>{asset.requires_contract ? "Yes" : "No"}</span>
             </div>
 
-            {contracts?.length > 0 && (
+            {contracts.length > 0 && (
               <div className={styles.field}>
                 <label>
                   Associated Contracts:

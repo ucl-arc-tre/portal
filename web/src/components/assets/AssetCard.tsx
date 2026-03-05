@@ -96,7 +96,7 @@ export default function AssetCard(props: AssetCardProps) {
 
         <div className={styles["asset-detail"]}>
           <span className={styles["asset-detail-label"]}>No. Linked Contracts:</span>
-          <span className={styles["asset-detail-value"]}>{asset.contract_ids?.length || 0}</span>
+          <span className={styles["asset-detail-value"]}>{asset.contract_ids.length}</span>
         </div>
       </div>
 

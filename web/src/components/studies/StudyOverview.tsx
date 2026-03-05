@@ -9,14 +9,11 @@ import Loading from "../ui/Loading";
 type StudyOverviewProps = {
   study: Study;
   isIGOpsStaff: boolean;
-  isStudyOwnerOrAdmin: boolean;
-  setStudyFormOpen?: (name: boolean) => void;
   riskScore: number;
   riskScoreLoading: boolean;
   approvalStatus: ApprovalStatus | undefined;
-  handleUpdateStudyStatus: (status: ApprovalStatus) => void;
   feedback?: string;
-  numEntities: { assets: number | undefined; contracts: number | undefined };
+  numEntities: { assets: number | null; contracts: number | null };
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
@@ -36,10 +33,10 @@ export default function StudyOverview(props: StudyOverviewProps) {
             </span>
           )}
           <span>
-            Risk Score:{" "}
+            Risk Score:
             <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
           </span>
-          <StatusBadge status={approvalStatus} isOpsStaff={isIGOpsStaff} type="study" />{" "}
+          <StatusBadge status={approvalStatus} isOpsStaff={isIGOpsStaff} type="study" />
         </div>
         <h3 className={styles.description}>{study.description}</h3>
         <div>
@@ -56,7 +53,7 @@ export default function StudyOverview(props: StudyOverviewProps) {
               ))}
             </dd>
             <dd>
-              Data Controller:{" "}
+              Data Controller:
               <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
             </dd>
           </dl>
@@ -85,7 +82,6 @@ export default function StudyOverview(props: StudyOverviewProps) {
               !study.involves_ethics_approval &&
               !study.involves_hra_approval && (
                 <dd>
-                  {" "}
                   <em>No sponsorship or approval information given</em>
                 </dd>
               )}
@@ -181,7 +177,7 @@ export default function StudyOverview(props: StudyOverviewProps) {
 
           {/*//TODO: add summary of num of projects*/}
 
-          {numEntities.assets !== undefined && numEntities.contracts !== undefined && (
+          {numEntities.assets !== null && numEntities.contracts !== null && (
             <div>
               <h4>Summary of related entities:</h4>
               <dl className={styles.grouping}>
