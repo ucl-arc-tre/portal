@@ -9,7 +9,7 @@ import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 type ContractCardProps = {
   contract: Contract;
   studyId: string;
-  onEdit: () => void;
+  onEdit?: () => void;
   canModify: boolean;
 };
 
@@ -103,6 +103,11 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
           <span className={styles.label}>Uploaded: </span>
           <span className={styles.value}>{formatDate(contract.created_at)}</span>
         </div>
+
+        <div className={styles["detail-item"]}>
+          <span className={styles.label}>No. Linked Assets: </span>
+          <span className={styles.value}>{contract.asset_ids.length || 0}</span>
+        </div>
       </div>
 
       {error && (
@@ -120,16 +125,17 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
               : "This contract has expired, please review and update as soon as possible"}
           </small>
         )}
-
-        <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
-          {downloading ? "Downloading..." : "Download PDF"}
-        </Button>
-
-        {canModify && (
-          <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
-            Edit
+        <div className={styles["button-wrapper"]}>
+          <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
+            {downloading ? "Downloading..." : "Download PDF"}
           </Button>
-        )}
+
+          {canModify && (
+            <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
+              Edit
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -477,6 +477,9 @@ type Asset struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetClassificationImpact `json:"classification_impact"`
 
+	// ContractIds List of contract IDs associated with the asset (empty array if none)
+	ContractIds []string `json:"contract_ids"`
+
 	// CreatedAt Time in RFC3339 format when the asset was created
 	CreatedAt string `json:"created_at"`
 
@@ -548,6 +551,9 @@ type AssetStatus string
 type AssetBase struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
+
+	// ContractIds List of contract IDs associated with the asset (empty array if none)
+	ContractIds []string `json:"contract_ids"`
 
 	// Description Description of the asset
 	Description string `json:"description"`

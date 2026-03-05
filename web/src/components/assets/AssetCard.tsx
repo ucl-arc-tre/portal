@@ -95,6 +95,11 @@ export default function AssetCard(props: AssetCardProps) {
             <span className={styles["asset-detail-value"]}>{formatDate(asset.updated_at)}</span>
           </div>
         )}
+
+        <div className={styles["asset-detail"]}>
+          <span className={styles["asset-detail-label"]}>No. Linked Contracts:</span>
+          <span className={styles["asset-detail-value"]}>{asset.contract_ids.length}</span>
+        </div>
       </div>
 
       {error && (

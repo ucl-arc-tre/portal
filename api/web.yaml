@@ -1256,6 +1256,7 @@ components:
         - accessed_by_third_parties
         - third_party_agreement
         - status
+        - contract_ids
       properties:
         title:
           type: string
@@ -1323,6 +1324,11 @@ components:
             - awaiting
             - destroyed
           description: Status of the asset
+        contract_ids:
+          type: array
+          description: List of contract IDs associated with the asset (empty array if none)
+          items:
+            type: string
 
     Asset:
       allOf:

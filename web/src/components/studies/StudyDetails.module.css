@@ -116,4 +116,8 @@
   display: flex;
   gap: 0.5rem;
   margin-block: 0.8rem;
+
+  dt {
+    font-weight: 600;
+  }
 }

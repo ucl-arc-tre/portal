@@ -124,16 +124,22 @@
 
 .actions {
   display: flex;
-  justify-content: stretch;
+  justify-content: space-between;
   gap: 0.5rem;
   border-top: 1px solid #e9ecef;
   align-items: center;
   margin-top: 1.5rem;
   padding-top: 1rem;
-}
+  text-align: left;
 
-.actions button {
-  flex: 1;
+  .button-wrapper {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  button {
+    flex: 1;
+  }
 }
 
 @media (width >=768px) {
@@ -150,10 +156,6 @@
 
   .value {
     text-align: right;
-  }
-
-  .actions {
-    justify-content: flex-end;
   }
 
   .actions button {

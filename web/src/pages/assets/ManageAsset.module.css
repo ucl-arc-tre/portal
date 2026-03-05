@@ -9,6 +9,10 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
+  a {
+    color: var(--form-link);
+  }
 }
 
 .section {
