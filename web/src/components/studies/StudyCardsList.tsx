@@ -37,6 +37,10 @@ export default function StudyCardsList(props: Props) {
 
               <div className={styles["study-info"]}>
                 <h3 className={styles["study-title"]}>{study.title}</h3>
+                {/* TODO: caseref will always be defined once migration has run on all envs - remove null check and tighten to non-nullable */}
+                {study.caseref != null && (
+                  <span className={styles["study-caseref"]}>Case ref: {String(study.caseref).padStart(5, "0")}</span>
+                )}
                 <p className={styles["study-description"]}>{study.description}</p>
               </div>
 
