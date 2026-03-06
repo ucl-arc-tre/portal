@@ -52,9 +52,18 @@ func InitDB() {
 
 	migrateContractStudyIds(db)
 
+	// Set up a sequence for the study caseref
+	// this must exist before AutoMigrate is run below, as the Caseref column default references it
+	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
+	if err := db.Exec(`CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`).Error; err != nil {
+		panic(err)
+	}
+
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
 	}
+
+	migrateCaseref(db)
 
 	log.Debug().Msg("Initialised database")
 }
@@ -78,6 +87,15 @@ func NewDB() *gorm.DB {
 		}
 	})
 	return db
+}
+
+// migrateCaseref adds a unique auto-incrementing caseref to each existing study.
+func migrateCaseref(db *gorm.DB) {
+	// Backfill any studies that were created previously (i.e. those that have a NULL caseref).
+	if err := db.Exec(`UPDATE studies SET caseref = nextval('study_caseref_seq') WHERE caseref IS NULL`).Error; err != nil {
+		panic(err)
+	}
+	log.Info().Msg("Study caseref migration complete")
 }
 
 // Set a study id column of contracts using their existing values

@@ -35,6 +35,9 @@ type Study struct {
 	ApprovalStatus                   string    `gorm:"not null"`
 	Feedback                         *string   `gorm:"type:text"`
 	LastSignoff                      *time.Time
+	// caseref sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
+	// study_caseref_seq defined in internal/graceful/db.go
+	Caseref *int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
 
 	// Relationships
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`

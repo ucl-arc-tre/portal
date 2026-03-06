@@ -76,6 +76,7 @@ describe("Study creation end-to-end", () => {
     // mark as ready for review
     cy.get('[data-cy="study-ready-for-review-button"]').click();
 
+    cy.contains("Case ref").should("exist");
     cy.contains("Last signed off").should("not.exist");
   });
 

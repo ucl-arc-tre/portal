@@ -55,6 +55,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
 		LastSignoff:                      lastSignoff,
+		Caseref:                          study.Caseref,
 	}
 }
 

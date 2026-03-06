@@ -352,6 +352,10 @@ export type Study = StudyBase & {
      * Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
      */
     last_signoff?: string | null;
+    /**
+     * Unique 5-digit reference number for the study, assigned on creation
+     */
+    caseref?: number | null;
 };
 
 /**
