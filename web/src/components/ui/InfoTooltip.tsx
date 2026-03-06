@@ -1,4 +1,4 @@
-import { InfoIcon } from "../shared/exports";
+import { InfoIcon } from "../shared/uikitExports";
 import styles from "./InfoTooltip.module.css";
 
 export default function InfoTooltip(props: { text: string }) {

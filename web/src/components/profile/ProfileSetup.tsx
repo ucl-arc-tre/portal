@@ -110,7 +110,9 @@ export default function ProfileSetup(props: Props) {
         <StepProgress
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
-          completionTitle="Your certificate is expiring soon!"
+          completionTitle={
+            expiryUrgency.level === "critical" ? "Your certificate has expired!" : "Your certificate is expiring soon!"
+          }
           completionSubtitle=" To retain access to the portal, please verify a new certificate."
           ariaLabel="Profile setup progress"
         />

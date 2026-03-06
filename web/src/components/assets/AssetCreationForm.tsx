@@ -6,7 +6,7 @@ import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
-import { Alert, AlertMessage, Label } from "../shared/exports";
+import { Alert, AlertMessage, Label } from "../shared/uikitExports";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;

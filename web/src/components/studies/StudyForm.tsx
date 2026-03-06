@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/exports";
+import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/uikitExports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study, StudyRequest } from "@/openapi";

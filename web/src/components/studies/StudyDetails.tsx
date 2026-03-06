@@ -7,7 +7,7 @@ import {
   ApprovalStatus,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "../shared/exports";
+import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../ui/Button";
@@ -104,8 +104,11 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
   const [tab, setTab] = useState("overview");
-  const [numAssets, setNumAssets] = useState<number | undefined>(undefined);
-  const [numContracts, setNumContracts] = useState<number | undefined>(undefined);
+  const [numAssets, setNumAssets] = useState<number | null>(null);
+  const [numContracts, setNumContracts] = useState<number | null>(null);
+
+  const [assetsNeedAttention, setAssetsNeedAttention] = useState(false);
+  const [contractsNeedAttention, setContractsNeedAttention] = useState(false);
 
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const canRequestReview = (studyStepsCompleted && !isIGOpsStaff && approvalStatus !== "Approved") || false;
@@ -168,7 +171,9 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
     setApprovalStatus(study.approval_status);
     if (study.feedback) setFeedback(study.feedback);
-  }, [study]);
+
+    if (!assetContractsCompleted) setAssetsNeedAttention(true);
+  }, [study, assetContractsCompleted]);
 
   return (
     <>
@@ -192,14 +197,14 @@ export default function StudyDetails(props: StudyDetailsProps) {
               variant="secondary"
               className={`tab ${tab === "assets" ? "active" : ""}`}
             >
-              Assets
+              Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
             </Button>
             <Button
               onClick={() => setTab("contracts")}
               variant="secondary"
               className={`tab ${tab === "contracts" ? "active" : ""}`}
             >
-              Contracts
+              Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
             </Button>
             {/* TODO: add projects */}
           </div>
@@ -234,10 +239,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
           study={study}
           riskScore={riskScore}
           riskScoreLoading={riskScoreLoading}
-          handleUpdateStudyStatus={handleUpdateStudyStatus}
           approvalStatus={approvalStatus}
           isIGOpsStaff={isIGOpsStaff}
-          isStudyOwnerOrAdmin={isStudyOwnerOrAdmin}
           feedback={feedback}
           numEntities={{ assets: numAssets, contracts: numContracts }}
         />
@@ -256,7 +259,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
             {tab === "assets" && (
               // we want to check the assets have required contracts more regularly
-              <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} />
+              <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} setTab={setTab} />
             )}
           </div>
 
@@ -266,6 +269,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
               canModify={isStudyOwner || isStudyAdmin}
               setNumContracts={setNumContracts}
               assetContractsCompleted={assetContractsCompleted ? assetContractsCompleted : false}
+              setContractsNeedAttention={setContractsNeedAttention}
             />
           </div>
         </>
