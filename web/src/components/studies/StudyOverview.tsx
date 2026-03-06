@@ -22,16 +22,15 @@ export default function StudyOverview(props: StudyOverviewProps) {
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
-    
-      <Box>
-        <div className={styles["pre-description"]}>
-          {/* TODO: caseref will always be defined once migration has run on all envs - remove null check and tighten to non-nullable */}
-          {study.caseref != null && (
-            <span>
-              Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
-            </span>
-          )}
+    <Box>
+      <div className={styles["pre-description"]}>
+        {/* TODO: caseref will always be defined once migration has run on all envs - remove null check and tighten to non-nullable */}
+        {study.caseref != null && (
           <span>
+            Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
+          </span>
+        )}
+        <span>
           Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
         </span>
         {study.last_signoff && (
