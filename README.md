@@ -12,17 +12,17 @@ Currently, the entities within the portal have the following relationships:
 
 # Local development
 
-1. Fork this repository and create a branch, or Clone it if you're on the project team
-2. Run `pre-commit install` to install [pre-commit](https://pre-commit.com/)
-3. Install the prerequisites: [node](https://nodejs.org/en/download), [go](https://go.dev/doc/install) and [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`
+1. Fork this repository and create a branch, or Clone it if you're on the project team.
+2. Install [pre-commit](https://pre-commit.com/) (e.g. `pip install pre-commit` or `brew install pre-commit`), then run `pre-commit install` to set up the git hooks.
+3. Install the prerequisites: [node](https://nodejs.org/en/download), [go](https://go.dev/doc/install) and [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`.
 4. Install [Docker](https://docs.docker.com/get-started/get-docker/).
-5. Create `deploy/dev/oauth2-proxy.cfg` from [deploy/dev/oauth2-proxy.sample.cfg](./deploy/dev/oauth2-proxy.sample.cfg)
-6. Create `deploy/dev/config.yaml` from [deploy/dev/config.sample.yaml](./deploy/dev/config.sample.yaml)
-7. Spin up a development environment by running `make dev`
+5. Create `deploy/dev/oauth2-proxy.cfg` from [deploy/dev/oauth2-proxy.sample.cfg](./deploy/dev/oauth2-proxy.sample.cfg).
+6. Create `deploy/dev/config.yaml` from [deploy/dev/config.sample.yaml](./deploy/dev/config.sample.yaml).
+7. Spin up a development environment by running `make dev`.
 
 Then go to http://localhost:8000. To destroy it run `make dev-destroy`. To see other commands run `make help`.
 
-Modify, commit, push and open a pull request against `main` for review
+Modify, commit, push and open a pull request against `main` for review.
 
 Note that you will need entra credentials to allow logging in to the portal as different users. Speak to a senior member of the team to set these up.
 
