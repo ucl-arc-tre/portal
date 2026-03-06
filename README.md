@@ -34,7 +34,7 @@ Note that you will need entra credentials to allow logging in to the portal as d
 
 ## Production
 
-[Production](https://portal.arc.ucl.ac.uk) is deployed manually by a senior member of the team. This is done by updating the portal version in the deployment repository to the desired commit. Production deployments are done at the team's discretion — typically once a set of changes has been verified on staging.
+[Production](https://portal.arc.ucl.ac.uk) is deployed manually by a senior member of the team. This is done by updating the portal version in a separate deployment repository to the desired commit. Production deployments are done at the team's discretion — typically once a set of changes has been verified on staging.
 
 For more information on production deployments, refer to the project Slack channel docs.
 
