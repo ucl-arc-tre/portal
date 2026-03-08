@@ -6,18 +6,8 @@ import { ChangeEvent, useState } from "react";
 import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
-import dynamic from "next/dynamic";
 import Box from "@/components/ui/Box";
-
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
-const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
-  ssr: false,
-});
+import { Alert, AlertMessage, Input } from "@/components/shared/uikitExports";
 
 interface SubmitEvent extends React.SubmitEvent<HTMLFormElement> {
   target: HTMLFormElement & {
