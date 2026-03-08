@@ -37,15 +37,13 @@ export default function StudiesPage() {
         </Button>
       </Callout>
 
-      <Callout
-        construction
-        text="Please be aware this site is under development and features may change. This means any data you create may be lost. "
-      >
+      <Callout construction>
         <span>
-          If you require a more stable record of your study, you can fill out the{" "}
+          Studies are still under construction. Please use the existing{" "}
           <a href="https://liveuclac.sharepoint.com/sites/ISD.IGAdvisoryService/Lists/Start%20a%20service%20request/NewForm.aspx">
-            IG form{" "}
-          </a>
+            IG form
+          </a>{" "}
+          to create a study.
         </span>
       </Callout>
 
@@ -62,7 +60,7 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {isApprovedResearcher && <Studies userData={userData!} />}
+      {isApprovedResearcher && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" && <Studies userData={userData!} />}
     </>
   );
 }

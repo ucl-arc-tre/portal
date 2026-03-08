@@ -59,6 +59,10 @@ export default function ManageStudyPage() {
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
 
+  if (process.env.NEXT_PUBLIC_ENABLE_STUDIES !== "true") {
+    return <div>Feature currently under development</div>;
+  }
+
   if (!isApprovedResearcher) {
     return (
       <>
