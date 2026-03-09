@@ -61,7 +61,7 @@ func (h *Handler) GetApprovedStudies(ctx *gin.Context) {
 	b.WriteString("caseref,iao_username,iaa_usernames,status\n")
 	for _, study := range approvedStudies {
 		fmt.Fprintf(&b, "%v,%v,%v,%v\n",
-			*study.Caseref, // todo: once the caseref migration is complete, this can be a non-pointer and the dereference removed
+			*study.Caseref, // todo: once the caseref migration is complete, this can be a non-pointer and the dereference removed (see ticket #509)
 			study.Owner.Username,
 			strings.Join(study.AdminUsernames(), ";"),
 			study.ApprovalStatus,
