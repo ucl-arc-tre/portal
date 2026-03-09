@@ -40,7 +40,7 @@ paths:
               schema:
                 type: string
               example: |
-                caseref,iao_username,iaa_usernames
+                caseref,study_owner_username,study_admin_usernames
                 10000,ccxyz@ucl.ac.uk,admin@ucl.ac.uk
         "401":
           description: Unauthorized
