@@ -161,6 +161,12 @@ func (s *Service) AllStudies() ([]types.Study, error) {
 	return studies, types.NewErrFromGorm(err)
 }
 
+func (s *Service) ApprovedStudies() ([]types.Study, error) {
+	studies := []types.Study{}
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Approved).Find(&studies).Error
+	return studies, types.NewErrFromGorm(err)
+}
+
 func (s *Service) PendingStudies() ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Pending).Find(&studies).Error

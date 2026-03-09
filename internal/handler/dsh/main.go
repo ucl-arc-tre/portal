@@ -4,22 +4,25 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/dsh"
+	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
 
 type Handler struct {
-	users *users.Service
+	users   *users.Service
+	studies *studies.Service
 }
 
 func New() *Handler {
 	log.Info().Msg("Creating DSH handler")
-	return &Handler{users: users.New()}
+	return &Handler{users: users.New(), studies: studies.New()}
 }
 
 func (h *Handler) GetPing(ctx *gin.Context) {
@@ -41,6 +44,27 @@ func (h *Handler) GetApprovedResearchers(ctx *gin.Context) {
 			r.Username,
 			marshalTime(r.AgreedToAgreementAt),
 			marshalTime(trainingExpires),
+		)
+	}
+
+	ctx.Data(http.StatusOK, "text/csv", b.Bytes())
+}
+
+func (h *Handler) GetApprovedStudies(ctx *gin.Context) {
+	approvedStudies, err := h.studies.ApprovedStudies()
+	if err != nil {
+		setError(ctx, err, "Failed to get approved studies")
+		return
+	}
+
+	var b bytes.Buffer
+	b.WriteString("caseref,iao_username,iaa_usernames,status\n")
+	for _, study := range approvedStudies {
+		fmt.Fprintf(&b, "%v,%v,%v,%v\n",
+			*study.Caseref, // todo: once the caseref migration is complete, this can be a non-pointer and the dereference removed
+			study.Owner.Username,
+			strings.Join(study.AdminUsernames(), ";"),
+			study.ApprovalStatus,
 		)
 	}
 

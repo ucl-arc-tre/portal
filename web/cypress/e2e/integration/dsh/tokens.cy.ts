@@ -61,6 +61,14 @@ describe("Create use and delete DSH API tokens end-to-end", () => {
     }).then((response) => {
       expect(response.body).to.have.include("username,agreed_at,training_expires");
     });
+
+    cy.request({
+      method: "GET",
+      url: "/dsh/api/v0/approved-studies",
+      headers: headers,
+    }).then((response) => {
+      expect(response.body).to.have.include("caseref,iao_username,iaa_usernames,status");
+    });
   });
 
   it("dsh should be able to revoke the token", () => {
