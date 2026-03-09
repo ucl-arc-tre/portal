@@ -106,7 +106,7 @@ export default function UserTasks() {
         </div>
       ) : (
         <div className={styles["completed-tasks"]}>
-          {isIGOpsStaff ? (
+          {isIGOpsStaff && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? (
             <>
               {hasPendingStudies ? (
                 <>

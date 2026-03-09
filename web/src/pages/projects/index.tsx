@@ -18,7 +18,7 @@ export default function ProjectsPage() {
   if (authInProgress) return null;
   if (!isAuthed || !userData) return <LoginFallback />;
 
-  if (!process.env.NEXT_PUBLIC_ENABLE_PROJECTS || process.env.NEXT_PUBLIC_ENABLE_PROJECTS === "false") {
+  if (process.env.NEXT_PUBLIC_ENABLE_PROJECTS !== "true") {
     return <div>Feature currently under development</div>;
   }
 
