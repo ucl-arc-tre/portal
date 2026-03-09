@@ -40,8 +40,8 @@ paths:
               schema:
                 type: string
               example: |
-                caseref,iao_username,iaa_usernames,status
-                10000,ccxyz@ucl.ac.uk,admin@ucl.ac.uk,Approved
+                caseref,iao_username,iaa_usernames
+                10000,ccxyz@ucl.ac.uk,admin@ucl.ac.uk
         "401":
           description: Unauthorized
         "406":
