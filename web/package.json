@@ -10,7 +10,7 @@
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api/web.yaml --output ./src/openapi",
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome",
-    "cypress:ui": "cypress run --headless --browser chrome --spec 'cypress/e2e/ui/**/*'",
+    "cypress:pages": "cypress run --headless --browser chrome --spec 'cypress/e2e/pages/**/*'",
     "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
   },
   "dependencies": {
