@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
@@ -16,7 +16,7 @@ type ContractCardProps = {
 export default function ContractCard({ contract, studyId, onEdit, canModify }: ContractCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [expiryUrgency, setExpiryUrgency] = useState<ExpiryUrgency | null>(null);
+  const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -65,10 +65,6 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
         return styles["status-default"];
     }
   };
-
-  useEffect(() => {
-    setExpiryUrgency(calculateExpiryUrgency(new Date(contract.expiry_date)));
-  }, [contract.expiry_date]);
 
   return (
     <div
