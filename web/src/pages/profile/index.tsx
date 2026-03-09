@@ -67,11 +67,10 @@ export default function ProfilePage() {
         setIsLoading(false);
       }
     };
-
     if (isAuthed) {
       fetchProfileData();
     }
-  }, [isAuthed]);
+  }, [isAuthed, trainingCertificateCompleted]);
 
   if (authInProgress) return null;
 
