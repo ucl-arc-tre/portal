@@ -14,7 +14,7 @@ import {
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label } from "../shared/exports";
+import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
   organisationSignatory: string;
@@ -370,10 +370,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         <div className={styles["form-section"]}>
           <h4>Link Assets (optional)</h4>
           <div className={styles["form-group"]}>
-            <fieldset className={styles["dynamic-fieldset"]}>
+            <fieldset className="linkage-fieldset">
               {assetFields.map((field, index) => (
-                <div key={field.id} className={styles["item-wrapper"]}>
-                  <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                <div key={field.id} className="item-wrapper">
+                  <label htmlFor={`asset-${index}`} className="item-label">
                     Asset {index + 1}:
                   </label>
 
@@ -409,24 +409,22 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                       </select>
                     )}
                   />
-
-                  <button
-                    type="button"
+                  <Button
                     onClick={() => removeAsset(index)}
-                    className={styles["remove-button"]}
-                    aria-label={`Remove asset ${index + 1}`}
+                    className="remove-button"
+                    aria-label={`Remove contract ${index + 1}`}
+                    type="button"
                   >
                     ×
-                  </button>
+                  </Button>
                 </div>
               ))}
-
               <Button
-                className={styles["add-button"]}
+                onClick={() => appendAsset({ value: "" })}
                 type="button"
                 variant="secondary"
                 size="small"
-                onClick={() => appendAsset({ value: "" })}
+                aria-label="Add Asset"
               >
                 Add Asset
               </Button>

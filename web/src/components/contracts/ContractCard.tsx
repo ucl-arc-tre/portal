@@ -3,18 +3,20 @@ import Button from "@/components/ui/Button";
 import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractCard.module.css";
-import { AlertMessage, Alert } from "../shared/exports";
+import { AlertMessage, Alert, AlertCircleIcon } from "../shared/uikitExports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 
 type ContractCardProps = {
   contract: Contract;
   studyId: string;
-  onEdit: () => void;
+  onEdit?: () => void;
   canModify: boolean;
 };
 
 export default function ContractCard({ contract, studyId, onEdit, canModify }: ContractCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -64,12 +66,10 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   return (
-    <div className={styles.card}>
+    <div
+      className={`${styles.card} ${expiryUrgency ? `${styles[`card__expiry-urgency--${expiryUrgency.level}`]}` : ""}`}
+    >
       <div className={styles.header}>
         <div className={styles["file-info"]}>
           <h4 className={styles.filename}>{contract.filename}</h4>
@@ -99,6 +99,11 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
           <span className={styles.label}>Uploaded: </span>
           <span className={styles.value}>{formatDate(contract.created_at)}</span>
         </div>
+
+        <div className={styles["detail-item"]}>
+          <span className={styles.label}>No. Linked Assets: </span>
+          <span className={styles.value}>{contract.asset_ids.length || 0}</span>
+        </div>
       </div>
 
       {error && (
@@ -108,15 +113,25 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
       )}
 
       <div className={styles.actions}>
-        <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
-          {downloading ? "Downloading..." : "Download PDF"}
-        </Button>
-
-        {canModify && (
-          <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
-            Edit
-          </Button>
+        {expiryUrgency && (
+          <small className={styles["expiry-message"]}>
+            <AlertCircleIcon className={`expiry-urgency--${expiryUrgency.level} actions-icon`} />
+            {expiryUrgency.level === "critical"
+              ? "This contract has expired, please review and update as soon as possible"
+              : "This contract is expiring soon, please review and update if necessary"}
+          </small>
         )}
+        <div className={styles["button-wrapper"]}>
+          <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
+            {downloading ? "Downloading..." : "Download PDF"}
+          </Button>
+
+          {canModify && (
+            <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
+              Edit
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

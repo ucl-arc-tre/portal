@@ -6,6 +6,18 @@
   background-color: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s ease;
+
+  &.card__expiry-urgency--low {
+    border-color: var(--expiry-urgency--low);
+  }
+
+  &.card__expiry-urgency--medium {
+    border-color: var(--expiry-urgency--medium);
+  }
+
+  &.card__expiry-urgency--high {
+    border-color: var(--expiry-urgency--high);
+  }
 }
 
 .card:hover {
@@ -112,15 +124,25 @@
 
 .actions {
   display: flex;
-  justify-content: stretch;
+  justify-content: space-between;
   gap: 0.5rem;
+  border-top: 1px solid #e9ecef;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  text-align: left;
+
+  .button-wrapper {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  button {
+    flex: 1;
+  }
 }
 
-.actions button {
-  flex: 1;
-}
-
-@media (width >= 768px) {
+@media (width >=768px) {
   .card {
     padding: 1.5rem;
   }
@@ -134,10 +156,6 @@
 
   .value {
     text-align: right;
-  }
-
-  .actions {
-    justify-content: flex-end;
   }
 
   .actions button {

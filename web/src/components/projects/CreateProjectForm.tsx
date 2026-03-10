@@ -16,7 +16,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage } from "../shared/exports";
+import { HelperText, Alert, AlertMessage } from "../shared/uikitExports";
 import { ROLE_LABELS, ROLE_DESCRIPTIONS, getAvailableRoles, getProjectNameValidation } from "./lib/projects";
 
 import styles from "./CreateProjectForm.module.css";
@@ -437,13 +437,12 @@ export default function CreateProjectForm({
 
               <div className={styles["form-field"]}>
                 <span className={styles["section-label"]}>Add assets (optional):</span>
-                <fieldset className={styles["dynamic-fieldset"]}>
+                <fieldset className="linkage-fieldset">
                   {assetFields.map((field, index) => (
-                    <div key={field.id} className={styles["item-wrapper"]}>
-                      <label htmlFor={`asset-${index}`} className={styles["item-label"]}>
+                    <div key={field.id} className="item-wrapper">
+                      <label htmlFor={`asset-${index}`} className="item-label">
                         Asset {index + 1}:
                       </label>
-
                       <Controller
                         name={`assetIds.${index}.value` as const}
                         control={control}
@@ -488,24 +487,22 @@ export default function CreateProjectForm({
                           </select>
                         )}
                       />
-
-                      <button
-                        type="button"
+                      <Button
                         onClick={() => removeAsset(index)}
-                        className={styles["remove-button"]}
-                        aria-label={`Remove asset ${index + 1}`}
+                        className="remove-button"
+                        aria-label={`Remove contract ${index + 1}`}
+                        type="button"
                       >
                         ×
-                      </button>
+                      </Button>
                     </div>
                   ))}
-
                   <Button
-                    className={styles["add-button"]}
+                    onClick={() => appendAsset({ value: "" })}
                     type="button"
                     variant="secondary"
                     size="small"
-                    onClick={() => appendAsset({ value: "" })}
+                    aria-label="Add Asset"
                   >
                     Add Asset
                   </Button>
@@ -521,7 +518,7 @@ export default function CreateProjectForm({
             <>
               <div className={styles["form-field"]}>
                 <span className={styles["section-label"]}>Additional Approved Researchers (optional):</span>
-                <fieldset className={styles["dynamic-fieldset"]}>
+                <fieldset className="linkage-fieldset">
                   {researcherFields.map((field, index) => {
                     const researcher = watch(`additionalApprovedResearchers.${index}`);
                     const selectedEnvironment = environments.find((env) => env.id === selectedEnvironmentId);
@@ -529,7 +526,7 @@ export default function CreateProjectForm({
                     const availableRolesToAdd = availableRoles.filter((role) => !researcher?.roles?.includes(role));
 
                     return (
-                      <div key={field.id} className={styles["item-wrapper"]}>
+                      <div key={field.id} className="item-wrapper">
                         <div className={styles["researcher-content"]}>
                           <div>
                             <label htmlFor={`researcher-${index}`} className={styles["field-label"]}>

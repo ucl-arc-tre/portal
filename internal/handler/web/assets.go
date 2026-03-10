@@ -13,6 +13,10 @@ import (
 // Helper functions
 
 func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
+	contractIds := []string{}
+	for _, contract := range asset.Contracts {
+		contractIds = append(contractIds, contract.ID.String())
+	}
 	return openapi.Asset{
 		Id:                   asset.ID.String(),
 		CreatorUserId:        asset.CreatorUserID.String(),
@@ -32,6 +36,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Status:               openapi.AssetStatus(asset.Status),
 		CreatedAt:            asset.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
+		ContractIds:          contractIds,
 	}
 }
 

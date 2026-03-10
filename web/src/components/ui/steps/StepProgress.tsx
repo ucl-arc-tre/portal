@@ -1,4 +1,4 @@
-import { CheckIcon } from "@/components/shared/exports";
+import { CheckIcon } from "@/components/shared/uikitExports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
@@ -19,7 +19,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
       return styles["step-title-completed"];
     } else if (step.expiryUrgency.level == "medium") {
       return styles["step-title-expiry-urgency-medium"];
-    } else if (step.expiryUrgency.level == "high") {
+    } else if (step.expiryUrgency.level == "high" || step.expiryUrgency.level == "critical") {
       return styles["step-title-pending"];
     }
   };
@@ -33,7 +33,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
                 className={`${styles["step-icon"]} ${
                   step.expiryUrgency?.level == "medium"
                     ? styles["step-icon-expiry-urgency-medium"]
-                    : step.expiryUrgency?.level == "high"
+                    : step.expiryUrgency?.level == "high" || step.expiryUrgency?.level == "critical"
                       ? styles["step-icon-pending"]
                       : step.completed
                         ? styles["step-icon-completed"]
@@ -42,7 +42,7 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
                           : styles["step-icon-pending"]
                 }`}
               >
-                {step.expiryUrgency?.level == "medium" || step.expiryUrgency?.level == "high" ? (
+                {step.expiryUrgency && step.expiryUrgency.level !== "low" ? (
                   <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
                 ) : step.completed ? (
                   <CheckIcon className={styles["check-icon"]} />
@@ -100,22 +100,14 @@ export default function StepProgress(props: StepProgressProps) {
     ariaLabel = "Progress steps",
   } = props;
 
-  const urgencyLevel = steps.filter((step) => step.expiryUrgency).map((step) => step.expiryUrgency?.level);
+  const urgencyLevel = steps.filter((step) => step.expiryUrgency).map((step) => step.expiryUrgency?.level || null);
 
   return (
     <div className={styles["step-progress-container"]}>
       {isComplete ? (
         <details className={styles["completion-container"]}>
           <summary className={styles["completion-header"]}>
-            <h3
-              className={
-                urgencyLevel.includes("medium")
-                  ? styles["expiring-title-urgency-medium"]
-                  : urgencyLevel.includes("high")
-                    ? styles["expiring-title-urgency-high"]
-                    : styles["completion-title"]
-              }
-            >
+            <h3 className={urgencyLevel.length > 0 ? `expiry-urgency--${urgencyLevel[0]}` : styles["completion-title"]}>
               {completionTitle}
             </h3>
             <p className={styles["completion-subtitle"]}>{completionSubtitle}</p>
