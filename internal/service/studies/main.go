@@ -161,6 +161,28 @@ func (s *Service) AllStudies() ([]types.Study, error) {
 	return studies, types.NewErrFromGorm(err)
 }
 
+func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
+	records := []types.DSHStudyExportRecord{}
+
+	result := s.db.Model(&types.Study{}).
+		Joins("INNER JOIN users AS owners ON owners.id = studies.owner_user_id").
+		Joins("LEFT JOIN study_admins ON study_admins.study_id = studies.id AND study_admins.deleted_at IS NULL").
+		Joins("LEFT JOIN users AS admin_users ON admin_users.id = study_admins.user_id").
+		Where("studies.approval_status = ?", openapi.Approved).
+		Select(
+			"studies.caseref, " +
+				"owners.username AS owner_username, " +
+				"COALESCE(STRING_AGG(CAST(admin_users.username AS TEXT), ';'), '') AS admin_usernames",
+		).
+		Group("studies.caseref, owners.username").
+		Scan(&records)
+
+	if result.Error != nil {
+		return nil, types.NewErrFromGorm(result.Error, "failed to get approved studies")
+	}
+	return records, nil
+}
+
 func (s *Service) PendingStudies() ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Pending).Find(&studies).Error

@@ -21,6 +21,9 @@ type ServerInterface interface {
 	// Get all approved researchers
 	// (GET /approved-researchers)
 	GetApprovedResearchers(c *gin.Context)
+	// Get all approved studies
+	// (GET /approved-studies)
+	GetApprovedStudies(c *gin.Context)
 	// Ping to check connectivity and auth
 	// (GET /ping)
 	GetPing(c *gin.Context)
@@ -48,6 +51,21 @@ func (siw *ServerInterfaceWrapper) GetApprovedResearchers(c *gin.Context) {
 	}
 
 	siw.Handler.GetApprovedResearchers(c)
+}
+
+// GetApprovedStudies operation middleware
+func (siw *ServerInterfaceWrapper) GetApprovedStudies(c *gin.Context) {
+
+	c.Set(JWTScopes, []string{"dsh:r"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetApprovedStudies(c)
 }
 
 // GetPing operation middleware
@@ -93,5 +111,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.GET(options.BaseURL+"/approved-researchers", wrapper.GetApprovedResearchers)
+	router.GET(options.BaseURL+"/approved-studies", wrapper.GetApprovedStudies)
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 }
