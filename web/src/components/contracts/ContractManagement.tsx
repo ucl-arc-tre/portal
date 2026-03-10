@@ -6,17 +6,19 @@ import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { AlertMessage, Alert } from "../shared/exports";
+import { AlertMessage, Alert } from "../shared/uikitExports";
+import { calculateExpiryUrgency } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
   canModify: boolean;
-  setNumContracts?: (numContracts: number) => void;
+  setNumContracts: (numContracts: number) => void;
   assetContractsCompleted: boolean;
+  setContractsNeedAttention: (needsAttention: boolean) => void;
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const { study, canModify, setNumContracts, assetContractsCompleted } = props;
+  const { study, canModify, setNumContracts, assetContractsCompleted, setContractsNeedAttention } = props;
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,8 +40,13 @@ export default function ContractManagement(props: ContractManagementProps) {
         return;
       }
       setContracts(response.data);
-      if (setNumContracts) {
-        setNumContracts(response.data.length);
+      setNumContracts(response.data.length);
+      if (response.data.length > 0) {
+        const needsAttention = response.data.some((contract) => {
+          const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+          return expiryUrgency && expiryUrgency.level !== "low";
+        });
+        setContractsNeedAttention(needsAttention);
       }
     } catch (err) {
       console.error("Failed to load contracts:", err);
@@ -47,7 +54,7 @@ export default function ContractManagement(props: ContractManagementProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, setNumContracts]);
+  }, [study.id, setNumContracts, setContractsNeedAttention]);
 
   useEffect(() => {
     fetchContracts();

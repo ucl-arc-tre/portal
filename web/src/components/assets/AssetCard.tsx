@@ -2,19 +2,16 @@ import { Asset } from "@/openapi";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
-import { Alert, AlertMessage, formatDate } from "../shared/exports";
-import dynamic from "next/dynamic";
+import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
-
-const AlertCircleIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.AlertCircle), {
-  ssr: false,
-});
+import { formatDate } from "../shared/exports";
 
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
   checkCompleted: (assets: Asset[]) => Promise<boolean>;
   canModify: boolean;
+  setTab?: (tab: string) => void;
 };
 
 const formatClassification = (classification: string) => {
@@ -26,7 +23,7 @@ const formatProtection = (protection: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, checkCompleted, canModify } = props;
+  const { studyId, asset, checkCompleted, canModify, setTab } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +95,11 @@ export default function AssetCard(props: AssetCardProps) {
             <span className={styles["asset-detail-value"]}>{formatDate(asset.updated_at)}</span>
           </div>
         )}
+
+        <div className={styles["asset-detail"]}>
+          <span className={styles["asset-detail-label"]}>No. Linked Contracts:</span>
+          <span className={styles["asset-detail-value"]}>{asset.contract_ids.length}</span>
+        </div>
       </div>
 
       {error && (
@@ -108,10 +110,25 @@ export default function AssetCard(props: AssetCardProps) {
 
       <div className={styles["asset-actions"]}>
         {!isCompleted && (
-          <small className={styles["asset-incomplete__message"]}>
-            <AlertCircleIcon className={styles["asset-incomplete__icon"]} />
-            This asset requires a contract that has not yet been added
-          </small>
+          <>
+            <small className={styles["asset-incomplete__message"]}>
+              <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
+              This asset requires a contract that has not yet been added. You can manage contracts under the Contracts
+              tab.
+            </small>
+            {setTab && (
+              <Button
+                onClick={() => {
+                  setTab("contracts");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                variant="secondary"
+                size="small"
+              >
+                Contracts{" "}
+              </Button>
+            )}
+          </>
         )}
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
           {canModify ? "Manage Asset" : "View Asset"}

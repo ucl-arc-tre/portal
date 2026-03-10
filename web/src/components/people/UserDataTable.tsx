@@ -1,5 +1,5 @@
 import { ConfirmedAgreement, TrainingRecord, UserData } from "@/openapi";
-import { CheckIcon, convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind, XIcon } from "../shared/exports";
+import { CheckIcon, XIcon } from "../shared/uikitExports";
 import Loading from "../ui/Loading";
 import Button from "../ui/Button";
 
@@ -7,6 +7,7 @@ import styles from "./UserDataTable.module.css";
 import { useState } from "react";
 import TrainingForm from "./TrainingForm";
 import ChosenNameForm from "./ChosenNameForm";
+import { convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind } from "../shared/exports";
 
 type Props = {
   canEdit: boolean;
