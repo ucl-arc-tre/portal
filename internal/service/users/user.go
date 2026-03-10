@@ -132,13 +132,20 @@ func (s *Service) PersistedExternalUser(username types.Username, email Email) (t
 	return user, types.NewErrFromGorm(err, "failed to persist external user transaction")
 }
 
-func (s *Service) UserExistsWithEmailOrUsername(value string) (bool, error) {
+func (s *Service) UserExistsWithEmailOrUsername(ctx context.Context, value string) (bool, error) {
 	var count int64
 	result := s.db.Model(&types.User{}).
 		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
 		Where("user_attributes.email = ? OR username = ?", value, value).
 		Count(&count)
-	return count > 0, types.NewErrFromGorm(result.Error, "failed to get user")
+	if err := result.Error; err != nil {
+		return false, types.NewErrFromGorm(err, "failed to get user")
+	}
+	if count == 0 {
+		return false, nil
+	}
+	exists, err := s.entra.UserExists(ctx, types.Username(value))
+	return exists, err
 }
 
 func (s *Service) IsStaff(ctx context.Context, user types.User) (bool, error) {
