@@ -172,7 +172,7 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 		Select(
 			"studies.caseref, " +
 				"owners.username AS owner_username, " +
-				"STRING_AGG(CAST(admin_users.username AS TEXT), ';') AS admin_usernames",
+				"COALESCE(STRING_AGG(CAST(admin_users.username AS TEXT), ';'), '') AS admin_usernames",
 		).
 		Group("studies.caseref, owners.username").
 		Scan(&records)
