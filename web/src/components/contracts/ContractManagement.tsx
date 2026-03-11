@@ -1,13 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { Contract, Study } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { AlertMessage, Alert } from "../shared/uikitExports";
-import { calculateExpiryUrgency } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
@@ -20,60 +17,13 @@ type ContractManagementProps = {
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const {
-    study,
-    contracts,
-    canModify,
-    setNumContracts,
-    assetContractsCompleted,
-    setContractsNeedAttention,
-    fetchStudyContents,
-  } = props;
-  // const [contracts, setContracts] = useState<Contract[]>([]);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
+  const { study, contracts, canModify, assetContractsCompleted, fetchStudyContents } = props;
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
-
-  // const fetchContracts = useCallback(async () => {
-  //   setIsLoading(true);
-  //   setError(null);
-
-  //   try {
-  //     const response = await getStudiesByStudyIdContracts({
-  //       path: { studyId: study.id },
-  //     });
-
-  //     if (!response.response.ok || !response.data) {
-  //       const errorMsg = extractErrorMessage(response);
-  //       setError(`Failed to load contracts: ${errorMsg}`);
-  //       return;
-  //     }
-  //     setContracts(response.data);
-  //     setNumContracts(response.data.length);
-  //     if (response.data.length > 0) {
-  //       const needsAttention = response.data.some((contract) => {
-  //         const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-  //         return expiryUrgency && expiryUrgency.level !== "low";
-  //       });
-  //       setContractsNeedAttention(needsAttention);
-  //     }
-  //   } catch (err) {
-  //     console.error("Failed to load contracts:", err);
-  //     setError("Failed to load contracts. Please try again later.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, [study.id, setNumContracts, setContractsNeedAttention]);
-
-  // useEffect(() => {
-  //   fetchContracts();
-  // }, [fetchContracts]);
 
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
     setEditingContract(null);
-    // fetchContracts();
     fetchStudyContents();
   };
 
@@ -122,12 +72,6 @@ export default function ContractManagement(props: ContractManagementProps) {
             </div>
           </div>
         )}
-
-      {/* {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )} */}
 
       {contracts.length === 0 ? (
         <div className={styles["empty-state"]}>

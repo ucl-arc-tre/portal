@@ -17,6 +17,7 @@ import { storageDefinitions } from "../shared/storageDefinitions";
 import Assets from "../assets/Assets";
 import StudyOverview from "./StudyOverview";
 import ContractManagement from "../contracts/ContractManagement";
+import { calculateExpiryUrgency } from "../shared/exports";
 
 type StudyDetailsProps = {
   userData: Auth | null;
@@ -31,8 +32,6 @@ type StudyDetailsProps = {
   assetContractsCompleted: boolean;
   checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
   contracts: Contract[];
-  numContracts: number | null;
-  setNumContracts: (numContracts: number) => void;
   setAssetContractsCompleted: (completed: boolean) => void;
   fetchStudyContents: () => Promise<void>;
 };
@@ -101,8 +100,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
     checkAssetManagementCompleted,
     numAssets,
     setNumAssets,
-    numContracts,
-    setNumContracts,
     fetchStudyContents,
     contracts,
   } = props;
@@ -115,6 +112,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [tab, setTab] = useState("overview");
 
   const [assetsNeedAttention, setAssetsNeedAttention] = useState(false);
+
+  const [numContracts, setNumContracts] = useState<number | null>(null);
   const [contractsNeedAttention, setContractsNeedAttention] = useState(false);
 
   const isStudyOwner =
@@ -186,7 +185,16 @@ export default function StudyDetails(props: StudyDetailsProps) {
     if (study.feedback) setFeedback(study.feedback);
 
     if (!assetContractsCompleted) setAssetsNeedAttention(true);
-  }, [study, assetContractsCompleted, assets]);
+
+    setNumContracts(contracts.length);
+    if (contracts.length > 0) {
+      const needsAttention = contracts.some((contract) => {
+        const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+        return expiryUrgency && expiryUrgency.level !== "low";
+      });
+      setContractsNeedAttention(needsAttention);
+    }
+  }, [study, assetContractsCompleted, assets, contracts]);
 
   return (
     <>

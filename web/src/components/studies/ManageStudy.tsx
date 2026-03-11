@@ -18,7 +18,6 @@ import { useAuth } from "@/hooks/useAuth";
 import StudyForm from "./StudyForm";
 import StudyAdminsAgreements from "./StudyAdminsAgreements";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { calculateExpiryUrgency } from "../shared/exports";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type ManageStudyProps = {
@@ -37,13 +36,9 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
 
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [numContracts, setNumContracts] = useState<number | null>(null);
-  const [contractsNeedAttention, setContractsNeedAttention] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [assetError, setAssetError] = useState<string | null>(null);
-  const [contractError, setContractError] = useState<string | null>(null);
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -86,7 +81,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       ]);
       if (!assetsResponse.response.ok || !assetsResponse.data) {
         const errorMsg = extractErrorMessage(assetsResponse);
-        setAssetError(`Failed to load Information Assets: ${errorMsg}`);
+        setError(`Failed to load Information Assets: ${errorMsg}`);
         return;
       }
       setAssets(assetsResponse.data);
@@ -101,18 +96,10 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
       if (!contractsResponse.response.ok || !contractsResponse.data) {
         const errorMsg = extractErrorMessage(contractsResponse);
-        setContractError(`Failed to load contracts: ${errorMsg}`);
+        setError(`Failed to load contracts: ${errorMsg}`);
         return;
       }
       setContracts(contractsResponse.data);
-      setNumContracts(contractsResponse.data.length);
-      if (contractsResponse.data.length > 0) {
-        const needsAttention = contractsResponse.data.some((contract) => {
-          const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-          return expiryUrgency && expiryUrgency.level !== "low";
-        });
-        setContractsNeedAttention(needsAttention);
-      }
     } catch (error) {
       console.error("Failed to get profile data:", error);
       setError("Failed to load study details. Please try again later.");
@@ -227,8 +214,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
             checkAssetManagementCompleted={checkAssetManagementCompleted}
             numAssets={numAssets}
             setNumAssets={setNumAssets}
-            numContracts={numContracts}
-            setNumContracts={setNumContracts}
             fetchStudyContents={fetchStudyContents}
             contracts={contracts}
           />
@@ -260,8 +245,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
               checkAssetManagementCompleted={checkAssetManagementCompleted}
               numAssets={numAssets}
               setNumAssets={setNumAssets}
-              numContracts={numContracts}
-              setNumContracts={setNumContracts}
               fetchStudyContents={fetchStudyContents}
               contracts={contracts}
             />
