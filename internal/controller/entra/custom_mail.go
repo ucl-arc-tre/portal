@@ -16,8 +16,14 @@ import (
 //go:embed ucl-banner.svg
 var uclBannerSVGContent string
 
+//go:embed base_mail_template.html
+var baseMailTemplateContent string
+
+var (
+	baseMailTemplate = template.Must(template.New("baseMailTemplate").Parse(baseMailTemplateContent))
+)
+
 func (c *Controller) createCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
-	// set up the email
 
 	requestBody := graphusers.NewItemSendMailPostRequestBody()
 	message := graphmodels.NewMessage()
@@ -26,25 +32,14 @@ func (c *Controller) createCustomEmail(ctx context.Context, subject string, emai
 	contentType := graphmodels.HTML_BODYTYPE
 	body.SetContentType(&contentType)
 
-	t, err := template.ParseFiles("internal/controller/entra/base_mail_template.html")
-	if err != nil {
-		return err
-	}
-
-	templateReader := new(bytes.Buffer)
-	err = t.Execute(templateReader, struct {
-		Content   string
-		PortalUrl string
-	}{
+	emailContent, err := newTemplatedEmailContent(EmailTemplateParams{
 		Content:   content, // set the content from the args
 		PortalUrl: config.PortalUrl(),
 	})
 	if err != nil {
 		return err
 	}
-	htmlContent := templateReader.String()
-
-	body.SetContent(&htmlContent)
+	body.SetContent(emailContent)
 
 	// has attachments to allow banner to work
 	hasAttachments := true
@@ -125,4 +120,14 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 	}
 
 	return c.createCustomEmail(ctx, subject, emails, content)
+}
+
+func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
+	templateReader := new(bytes.Buffer)
+	err := baseMailTemplate.Execute(templateReader, params)
+	if err != nil {
+		return nil, err
+	}
+	content := templateReader.String()
+	return &content, nil
 }
