@@ -19,6 +19,7 @@ import StudyForm from "./StudyForm";
 import StudyAdminsAgreements from "./StudyAdminsAgreements";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { calculateExpiryUrgency } from "../shared/exports";
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type ManageStudyProps = {
   study: Study;
@@ -32,7 +33,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [numAssets, setNumAssets] = useState<number | null>(null);
-  const [assetsNeedAttention, setAssetsNeedAttention] = useState(false);
   const [hasAsset, setHasAsset] = useState(false);
   const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
 
@@ -42,6 +42,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [assetError, setAssetError] = useState<string | null>(null);
+  const [contractError, setContractError] = useState<string | null>(null);
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -74,55 +76,56 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     [study.id]
   );
 
-  useEffect(() => {
-    const fetchStudyContents = async () => {
-      setIsLoading(true);
+  const fetchStudyContents = useCallback(async () => {
+    setIsLoading(true);
 
-      try {
-        const [assetsResponse, contractsResponse] = await Promise.all([
-          getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
-          getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
-        ]);
-        if (!assetsResponse.response.ok || !assetsResponse.data) {
-          const errorMsg = extractErrorMessage(assetsResponse);
-          setError(`Failed to load Information Assets: ${errorMsg}`);
-          return;
-        }
-        setAssets(assetsResponse.data);
-        setNumAssets(assetsResponse.data.length);
-        if (assetsResponse.data.length > 0) {
-          setHasAsset(true);
-
-          setAssetContractsCompleted(await checkAssetManagementCompleted(assetsResponse.data));
-        } else {
-          setHasAsset(false);
-        }
-
-        if (!contractsResponse.response.ok || !contractsResponse.data) {
-          const errorMsg = extractErrorMessage(contractsResponse);
-          setError(`Failed to load contracts: ${errorMsg}`);
-          return;
-        }
-        setContracts(contractsResponse.data);
-        setNumContracts(contractsResponse.data.length);
-        if (contractsResponse.data.length > 0) {
-          const needsAttention = contractsResponse.data.some((contract) => {
-            const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-            return expiryUrgency && expiryUrgency.level !== "low";
-          });
-          setContractsNeedAttention(needsAttention);
-        }
-      } catch (error) {
-        console.error("Failed to get profile data:", error);
-        setError("Failed to load study details. Please try again later.");
-      } finally {
-        setIsLoading(false);
+    try {
+      const [assetsResponse, contractsResponse] = await Promise.all([
+        getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
+        getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
+      ]);
+      if (!assetsResponse.response.ok || !assetsResponse.data) {
+        const errorMsg = extractErrorMessage(assetsResponse);
+        setAssetError(`Failed to load Information Assets: ${errorMsg}`);
+        return;
       }
-    };
+      setAssets(assetsResponse.data);
+      setNumAssets(assetsResponse.data.length);
+      if (assetsResponse.data.length > 0) {
+        setHasAsset(true);
+
+        setAssetContractsCompleted(await checkAssetManagementCompleted(assetsResponse.data));
+      } else {
+        setHasAsset(false);
+      }
+
+      if (!contractsResponse.response.ok || !contractsResponse.data) {
+        const errorMsg = extractErrorMessage(contractsResponse);
+        setContractError(`Failed to load contracts: ${errorMsg}`);
+        return;
+      }
+      setContracts(contractsResponse.data);
+      setNumContracts(contractsResponse.data.length);
+      if (contractsResponse.data.length > 0) {
+        const needsAttention = contractsResponse.data.some((contract) => {
+          const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+          return expiryUrgency && expiryUrgency.level !== "low";
+        });
+        setContractsNeedAttention(needsAttention);
+      }
+    } catch (error) {
+      console.error("Failed to get profile data:", error);
+      setError("Failed to load study details. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [study.id, checkAssetManagementCompleted]);
+
+  useEffect(() => {
     if (study.id) {
       fetchStudyContents();
     }
-  }, [study.id, checkAssetManagementCompleted]);
+  }, [study.id, checkAssetManagementCompleted, fetchStudyContents]);
 
   const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && hasAsset;
 
@@ -150,7 +153,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       current: hasAsset && !adminsAgreementsCompleted,
     },
   ];
-
+  if (isLoading) return null;
   const getCurrentStepComponent = () => {
     if (!agreementCompleted) {
       return (
@@ -192,19 +195,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     }
   };
 
-  if (isIGOpsStaff)
-    return (
-      <StudyDetails
-        study={study}
-        isIGOpsStaff={isIGOpsStaff}
-        isStudyOwner={false}
-        isStudyAdmin={false}
-        assets={assets}
-        setAssets={setAssets}
-        checkAssetManagementCompleted={checkAssetManagementCompleted}
-      />
-    );
-
   return (
     <>
       {studyFormOpen && userData && (
@@ -216,19 +206,31 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
+
       {!studyStepsCompleted && (
         <>
           <StudyDetails
-            studyStepsCompleted={studyStepsCompleted}
-            assetContractsCompleted={assetContractsCompleted}
+            userData={userData}
             study={study}
-            isIGOpsStaff={isIGOpsStaff}
-            isStudyOwner={isStudyOwner}
-            isStudyAdmin={isStudyAdmin}
             setStudyFormOpen={setStudyFormOpen}
-            checkAssetManagementCompleted={checkAssetManagementCompleted}
+            studyStepsCompleted={studyStepsCompleted}
             assets={assets}
             setAssets={setAssets}
+            setHasAsset={setHasAsset}
+            assetContractsCompleted={assetContractsCompleted}
+            setAssetContractsCompleted={setAssetContractsCompleted}
+            checkAssetManagementCompleted={checkAssetManagementCompleted}
+            numAssets={numAssets}
+            setNumAssets={setNumAssets}
+            numContracts={numContracts}
+            setNumContracts={setNumContracts}
+            fetchStudyContents={fetchStudyContents}
+            contracts={contracts}
           />
           <StepProgress
             steps={studySteps}
@@ -242,20 +244,26 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       )}
       {getCurrentStepComponent()}
 
-      {studyStepsCompleted && (
+      {(studyStepsCompleted || isIGOpsStaff) && (
         <>
           <div className={styles["completed-section"]}>
             <StudyDetails
-              studyStepsCompleted={studyStepsCompleted}
-              assetContractsCompleted={assetContractsCompleted}
+              userData={userData}
               study={study}
-              isIGOpsStaff={isIGOpsStaff}
-              isStudyOwner={isStudyOwner}
-              isStudyAdmin={isStudyAdmin}
               setStudyFormOpen={setStudyFormOpen}
-              checkAssetManagementCompleted={checkAssetManagementCompleted}
+              studyStepsCompleted={studyStepsCompleted}
               assets={assets}
               setAssets={setAssets}
+              setHasAsset={setHasAsset}
+              assetContractsCompleted={assetContractsCompleted}
+              setAssetContractsCompleted={setAssetContractsCompleted}
+              checkAssetManagementCompleted={checkAssetManagementCompleted}
+              numAssets={numAssets}
+              setNumAssets={setNumAssets}
+              numContracts={numContracts}
+              setNumContracts={setNumContracts}
+              fetchStudyContents={fetchStudyContents}
+              contracts={contracts}
             />
           </div>
         </>

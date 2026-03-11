@@ -3,8 +3,9 @@ import {
   patchStudiesByStudyIdPending,
   Study,
   Asset,
-  getStudiesByStudyIdAssets,
   ApprovalStatus,
+  Contract,
+  Auth,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
@@ -18,25 +19,22 @@ import StudyOverview from "./StudyOverview";
 import ContractManagement from "../contracts/ContractManagement";
 
 type StudyDetailsProps = {
+  userData: Auth | null;
   study: Study;
-  assets: Asset[];
-  setAssets: (assets: Asset[]) => void;
-  isIGOpsStaff: boolean;
-  isStudyOwner: boolean;
-  isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
-  assetContractsCompleted?: boolean;
+  assets: Asset[];
+  setAssets: (assets: Asset[]) => void;
+  numAssets: number | null;
+  setNumAssets: (numAssets: number) => void;
+  setHasAsset: (hasAsset: boolean) => void;
+  assetContractsCompleted: boolean;
   checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
-};
-
-const fetchAssets = async (studyId: string) => {
-  const assetResponse = await getStudiesByStudyIdAssets({ path: { studyId } });
-  if (!assetResponse.response.ok || !assetResponse.data) {
-    const errorMsg = extractErrorMessage(assetResponse);
-    throw new Error(`Failed to load assets: ${errorMsg}`);
-  }
-  return assetResponse.data;
+  contracts: Contract[];
+  numContracts: number | null;
+  setNumContracts: (numContracts: number) => void;
+  setAssetContractsCompleted: (completed: boolean) => void;
+  fetchStudyContents: () => Promise<void>;
 };
 
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
@@ -83,25 +81,30 @@ const calculateBaseRiskScore = (study: Study) => {
   return score;
 };
 
-const calculateRiskScore = async (study: Study) => {
+const calculateRiskScore = async (study: Study, assets: Asset[]) => {
   const baseRiskScore = calculateBaseRiskScore(study);
-  const assets = await fetchAssets(study.id);
   if (!assets || assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 
 export default function StudyDetails(props: StudyDetailsProps) {
   const {
+    userData,
     study,
-    assets,
-    setAssets,
-    isIGOpsStaff,
-    isStudyOwner,
-    isStudyAdmin,
     setStudyFormOpen,
     studyStepsCompleted,
+    assets,
+    setAssets,
+    setHasAsset,
     assetContractsCompleted,
+    setAssetContractsCompleted,
     checkAssetManagementCompleted,
+    numAssets,
+    setNumAssets,
+    numContracts,
+    setNumContracts,
+    fetchStudyContents,
+    contracts,
   } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
@@ -110,14 +113,18 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
 
   const [tab, setTab] = useState("overview");
-  const [numAssets, setNumAssets] = useState<number | null>(null);
-  const [numContracts, setNumContracts] = useState<number | null>(null);
 
   const [assetsNeedAttention, setAssetsNeedAttention] = useState(false);
   const [contractsNeedAttention, setContractsNeedAttention] = useState(false);
 
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
+  const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
-  const canRequestReview = (studyStepsCompleted && !isIGOpsStaff && approvalStatus !== "Approved") || false;
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
+
+  const canSeeTabs = isIGOpsStaff || studyStepsCompleted;
+  const canRequestReview = (canSeeTabs && approvalStatus !== "Approved") || false;
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
@@ -164,7 +171,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
     const getRiskScore = async () => {
       setRiskScoreLoading(true);
       try {
-        const score = await calculateRiskScore(study);
+        const score = await calculateRiskScore(study, assets);
         setRiskScore(score);
       } catch (err) {
         setError(`Failed to calculate risk score. ${err}`);
@@ -179,7 +186,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
     if (study.feedback) setFeedback(study.feedback);
 
     if (!assetContractsCompleted) setAssetsNeedAttention(true);
-  }, [study, assetContractsCompleted]);
+  }, [study, assetContractsCompleted, assets]);
 
   return (
     <>
@@ -188,7 +195,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <AlertMessage>{error}</AlertMessage>
         </Alert>
       )}
-      {(isIGOpsStaff || studyStepsCompleted) && (
+      {canSeeTabs && (
         <>
           <div className={"tab-collection"}>
             <Button
@@ -260,19 +267,20 @@ export default function StudyDetails(props: StudyDetailsProps) {
         )}
       </div>
 
-      {(studyStepsCompleted || isIGOpsStaff) && (
+      {canSeeTabs && (
         <>
           <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
             {tab === "assets" && (
-              // we want to check the assets have required contracts more regularly
               <Assets
                 studyId={study.id}
+                assets={assets}
+                setAssets={setAssets}
+                setAssetContractsCompleted={setAssetContractsCompleted}
+                setHasAsset={setHasAsset}
                 canModify={isStudyOwnerOrAdmin}
                 setNumAssets={setNumAssets}
                 setTab={setTab}
                 checkAssetManagementCompleted={checkAssetManagementCompleted}
-                assets={assets}
-                setAssets={setAssets}
               />
             )}
           </div>
@@ -280,10 +288,12 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
             <ContractManagement
               study={study}
+              contracts={contracts}
               canModify={isStudyOwner || isStudyAdmin}
-              setNumContracts={setNumContracts}
-              assetContractsCompleted={assetContractsCompleted ? assetContractsCompleted : false}
+              assetContractsCompleted={assetContractsCompleted}
               setContractsNeedAttention={setContractsNeedAttention}
+              setNumContracts={setNumContracts}
+              fetchStudyContents={fetchStudyContents}
             />
           </div>
         </>

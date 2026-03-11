@@ -11,59 +11,70 @@ import { calculateExpiryUrgency } from "../shared/exports";
 
 type ContractManagementProps = {
   study: Study;
+  contracts: Contract[];
   canModify: boolean;
   setNumContracts: (numContracts: number) => void;
   assetContractsCompleted: boolean;
   setContractsNeedAttention: (needsAttention: boolean) => void;
+  fetchStudyContents: () => Promise<void>;
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const { study, canModify, setNumContracts, assetContractsCompleted, setContractsNeedAttention } = props;
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    study,
+    contracts,
+    canModify,
+    setNumContracts,
+    assetContractsCompleted,
+    setContractsNeedAttention,
+    fetchStudyContents,
+  } = props;
+  // const [contracts, setContracts] = useState<Contract[]>([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
 
-  const fetchContracts = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  // const fetchContracts = useCallback(async () => {
+  //   setIsLoading(true);
+  //   setError(null);
 
-    try {
-      const response = await getStudiesByStudyIdContracts({
-        path: { studyId: study.id },
-      });
+  //   try {
+  //     const response = await getStudiesByStudyIdContracts({
+  //       path: { studyId: study.id },
+  //     });
 
-      if (!response.response.ok || !response.data) {
-        const errorMsg = extractErrorMessage(response);
-        setError(`Failed to load contracts: ${errorMsg}`);
-        return;
-      }
-      setContracts(response.data);
-      setNumContracts(response.data.length);
-      if (response.data.length > 0) {
-        const needsAttention = response.data.some((contract) => {
-          const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-          return expiryUrgency && expiryUrgency.level !== "low";
-        });
-        setContractsNeedAttention(needsAttention);
-      }
-    } catch (err) {
-      console.error("Failed to load contracts:", err);
-      setError("Failed to load contracts. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [study.id, setNumContracts, setContractsNeedAttention]);
+  //     if (!response.response.ok || !response.data) {
+  //       const errorMsg = extractErrorMessage(response);
+  //       setError(`Failed to load contracts: ${errorMsg}`);
+  //       return;
+  //     }
+  //     setContracts(response.data);
+  //     setNumContracts(response.data.length);
+  //     if (response.data.length > 0) {
+  //       const needsAttention = response.data.some((contract) => {
+  //         const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+  //         return expiryUrgency && expiryUrgency.level !== "low";
+  //       });
+  //       setContractsNeedAttention(needsAttention);
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to load contracts:", err);
+  //     setError("Failed to load contracts. Please try again later.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [study.id, setNumContracts, setContractsNeedAttention]);
 
-  useEffect(() => {
-    fetchContracts();
-  }, [fetchContracts]);
+  // useEffect(() => {
+  //   fetchContracts();
+  // }, [fetchContracts]);
 
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
     setEditingContract(null);
-    fetchContracts();
+    // fetchContracts();
+    fetchStudyContents();
   };
 
   const handleEditContract = (contract: Contract) => {
@@ -112,15 +123,13 @@ export default function ContractManagement(props: ContractManagementProps) {
           </div>
         )}
 
-      {error && (
+      {/* {error && (
         <Alert type="error">
           <AlertMessage>{error}</AlertMessage>
         </Alert>
-      )}
+      )} */}
 
-      {isLoading ? (
-        <div className={styles.loading}>Loading contracts...</div>
-      ) : contracts.length === 0 ? (
+      {contracts.length === 0 ? (
         <div className={styles["empty-state"]}>
           <h4>No contracts uploaded</h4>
           {canModify && <p>Upload your first contract document to get started.</p>}
