@@ -179,11 +179,7 @@ export default function ManageStudyPage() {
       <Title text={isIGOpsStaff ? study.title : `Manage Study: ${study.title}`} centered />
 
       <div className="content">
-        {isIGOpsStaff ? (
-          <StudyDetails study={study} isIGOpsStaff={isIGOpsStaff} isStudyOwner={false} isStudyAdmin={false} />
-        ) : (
-          <ManageStudy study={study} fetchStudy={fetchStudy} />
-        )}
+        <ManageStudy study={study} fetchStudy={fetchStudy} />
       </div>
     </>
   );

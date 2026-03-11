@@ -19,12 +19,15 @@ import ContractManagement from "../contracts/ContractManagement";
 
 type StudyDetailsProps = {
   study: Study;
+  assets: Asset[];
+  setAssets: (assets: Asset[]) => void;
   isIGOpsStaff: boolean;
   isStudyOwner: boolean;
   isStudyAdmin: boolean;
   setStudyFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
   assetContractsCompleted?: boolean;
+  checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
 };
 
 const fetchAssets = async (studyId: string) => {
@@ -90,12 +93,15 @@ const calculateRiskScore = async (study: Study) => {
 export default function StudyDetails(props: StudyDetailsProps) {
   const {
     study,
+    assets,
+    setAssets,
     isIGOpsStaff,
     isStudyOwner,
     isStudyAdmin,
     setStudyFormOpen,
     studyStepsCompleted,
     assetContractsCompleted,
+    checkAssetManagementCompleted,
   } = props;
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
@@ -259,7 +265,15 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
             {tab === "assets" && (
               // we want to check the assets have required contracts more regularly
-              <Assets studyId={study.id} canModify={isStudyOwnerOrAdmin} setNumAssets={setNumAssets} setTab={setTab} />
+              <Assets
+                studyId={study.id}
+                canModify={isStudyOwnerOrAdmin}
+                setNumAssets={setNumAssets}
+                setTab={setTab}
+                checkAssetManagementCompleted={checkAssetManagementCompleted}
+                assets={assets}
+                setAssets={setAssets}
+              />
             )}
           </div>
 
