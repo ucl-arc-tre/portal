@@ -88,7 +88,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       setNumAssets(assetsResponse.data.length);
       if (assetsResponse.data.length > 0) {
         setHasAsset(true);
-
         setAssetContractsCompleted(await checkAssetManagementCompleted(assetsResponse.data));
       } else {
         setHasAsset(false);
@@ -101,7 +100,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       }
       setContracts(contractsResponse.data);
     } catch (error) {
-      console.error("Failed to get profile data:", error);
+      console.error("Failed to get study data:", error);
       setError("Failed to load study details. Please try again later.");
     } finally {
       setIsLoading(false);
