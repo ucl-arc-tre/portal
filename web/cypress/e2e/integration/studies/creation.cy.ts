@@ -46,6 +46,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").contains("Update Study").click();
 
+    cy.contains("Update Study").should("not.exist"); // study form has been closed
     cy.contains("Incomplete").should("be.visible"); // status is incomplete
 
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
