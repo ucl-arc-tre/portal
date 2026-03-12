@@ -377,96 +377,127 @@ declare global {
   }
 }
 
+const sessionOptions: Cypress.SessionOptions = {
+  // automatically re-run the full login if the session is not valid
+  validate() {
+    cy.request({ url: "/web/api/v0/auth", failOnStatusCode: false }).its("status").should("eq", 200);
+  },
+};
+
 Cypress.Commands.add("loginAsAdmin", () => {
   // See: https://docs.cypress.io/app/guides/authentication-testing/azure-active-directory-authentication
-  cy.session(`login-admin`, () => {
-    const log = Cypress.log({
-      displayName: "Entra ID Admin Login",
-      message: [`🔐 Authenticating admin`],
-      autoEnd: false,
-    });
+  cy.session(
+    `login-admin`,
+    () => {
+      const log = Cypress.log({
+        displayName: "Entra ID Admin Login",
+        message: [`🔐 Authenticating admin`],
+        autoEnd: false,
+      });
 
-    log.snapshot("before");
-    login(botAdminUsername, botAdminPassword);
+      log.snapshot("before");
+      login(botAdminUsername, botAdminPassword);
 
-    log.snapshot("after");
-    log.end();
-  });
+      log.snapshot("after");
+      log.end();
+    },
+    sessionOptions
+  );
 });
 
 Cypress.Commands.add("loginAsBase", () => {
-  cy.session(`login-base`, () => {
-    const log = Cypress.log({
-      displayName: "Entra ID Base user Login",
-      message: [`🔐 Authenticating base user`],
-      autoEnd: false,
-    });
+  cy.session(
+    `login-base`,
+    () => {
+      const log = Cypress.log({
+        displayName: "Entra ID Base user Login",
+        message: [`🔐 Authenticating base user`],
+        autoEnd: false,
+      });
 
-    log.snapshot("before");
-    login(botBaseUsername, botBasePassword);
-    log.snapshot("after");
-    log.end();
-  });
+      log.snapshot("before");
+      login(botBaseUsername, botBasePassword);
+      log.snapshot("after");
+      log.end();
+    },
+    sessionOptions
+  );
 });
 
 Cypress.Commands.add("loginAsStaff", () => {
-  cy.session(`login-staff`, () => {
-    const log = Cypress.log({
-      displayName: "Entra ID staff user Login",
-      message: [`🔐 Authenticating staff user`],
-      autoEnd: false,
-    });
+  cy.session(
+    `login-staff`,
+    () => {
+      const log = Cypress.log({
+        displayName: "Entra ID staff user Login",
+        message: [`🔐 Authenticating staff user`],
+        autoEnd: false,
+      });
 
-    log.snapshot("before");
-    login(botStaffUsername, botStaffPassword);
-    log.snapshot("after");
-    log.end();
-  });
+      log.snapshot("before");
+      login(botStaffUsername, botStaffPassword);
+      log.snapshot("after");
+      log.end();
+    },
+    sessionOptions
+  );
 });
 
 Cypress.Commands.add("loginAsIGOps", () => {
-  cy.session(`login-ig-ops`, () => {
-    const log = Cypress.log({
-      displayName: "Entra ID IG operations user Login",
-      message: [`🔐 Authenticating IG user`],
-      autoEnd: false,
-    });
+  cy.session(
+    `login-ig-ops`,
+    () => {
+      const log = Cypress.log({
+        displayName: "Entra ID IG operations user Login",
+        message: [`🔐 Authenticating IG user`],
+        autoEnd: false,
+      });
 
-    log.snapshot("before");
-    login(botIGUsername, botIGPassword);
-    log.snapshot("after");
-    log.end();
-  });
+      log.snapshot("before");
+      login(botIGUsername, botIGPassword);
+      log.snapshot("after");
+      log.end();
+    },
+    sessionOptions
+  );
 });
 
 Cypress.Commands.add("loginAsTREOps", () => {
-  cy.session(`login-tre-ops`, () => {
-    const log = Cypress.log({
-      displayName: "Entra ID TRE operations user Login",
-      message: [`🔐 Authenticating TRE ops user`],
-      autoEnd: false,
-    });
+  cy.session(
+    `login-tre-ops`,
+    () => {
+      const log = Cypress.log({
+        displayName: "Entra ID TRE operations user Login",
+        message: [`🔐 Authenticating TRE ops user`],
+        autoEnd: false,
+      });
 
-    log.snapshot("before");
-    login(botTREUsername, botTREPassword);
-    log.snapshot("after");
-    log.end();
-  });
+      log.snapshot("before");
+      login(botTREUsername, botTREPassword);
+      log.snapshot("after");
+      log.end();
+    },
+    sessionOptions
+  );
 });
 
 Cypress.Commands.add("loginAsDSHOps", () => {
-  cy.session(`login-dsh-ops`, () => {
-    const log = Cypress.log({
-      displayName: "Entra ID DSH operations user Login",
-      message: [`🔐 Authenticating DSH ops user`],
-      autoEnd: false,
-    });
+  cy.session(
+    `login-dsh-ops`,
+    () => {
+      const log = Cypress.log({
+        displayName: "Entra ID DSH operations user Login",
+        message: [`🔐 Authenticating DSH ops user`],
+        autoEnd: false,
+      });
 
-    log.snapshot("before");
-    login(botDSHUsername, botDSHPassword);
-    log.snapshot("after");
-    log.end();
-  });
+      log.snapshot("before");
+      login(botDSHUsername, botDSHPassword);
+      log.snapshot("after");
+      log.end();
+    },
+    sessionOptions
+  );
 });
 
 Cypress.Commands.add("clearChosenName", () => {
