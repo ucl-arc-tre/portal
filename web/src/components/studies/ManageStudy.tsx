@@ -1,5 +1,12 @@
-import { useState } from "react";
-import { Study } from "@/openapi";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Asset,
+  Contract,
+  getStudiesByStudyIdAssets,
+  getStudiesByStudyIdAssetsByAssetIdContracts,
+  getStudiesByStudyIdContracts,
+  Study,
+} from "@/openapi";
 import StepProgress from "../ui/steps/StepProgress";
 import StepArrow from "../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
@@ -10,6 +17,8 @@ import StudyDetails from "./StudyDetails";
 import { useAuth } from "@/hooks/useAuth";
 import StudyForm from "./StudyForm";
 import StudyAdminsAgreements from "./StudyAdminsAgreements";
+import { extractErrorMessage } from "@/lib/errorHandler";
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type ManageStudyProps = {
   study: Study;
@@ -18,10 +27,18 @@ type ManageStudyProps = {
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
-  const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
-  const [hasAsset, setHasAsset] = useState(false);
   const [adminsAgreementsCompleted, setAdminsAgreementsCompleted] = useState(false);
   const [studyFormOpen, setStudyFormOpen] = useState(false);
+
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [numAssets, setNumAssets] = useState<number | null>(null);
+  const [hasAsset, setHasAsset] = useState(false);
+  const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
+
+  const [contracts, setContracts] = useState<Contract[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -29,6 +46,72 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
+
+  const checkAssetManagementCompleted = useCallback(
+    async (assets: Asset[]) => {
+      // for each asset, check if it requires a contract and if it does, that there is one
+
+      const checkContractsForAsset = async (assetId: string): Promise<boolean> => {
+        const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
+          path: { studyId: study.id, assetId: assetId },
+        });
+
+        if (!response.response.ok || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
+        }
+        return response.data.length > 0;
+      };
+
+      const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
+      const requiredContractChecks = assetsRequiringContracts.map((asset) => checkContractsForAsset(asset.id));
+      const results = await Promise.all(requiredContractChecks);
+      return results.every((hasContract) => hasContract);
+    },
+    [study.id]
+  );
+
+  const fetchStudyContents = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const [assetsResponse, contractsResponse] = await Promise.all([
+        getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
+        getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
+      ]);
+      if (!assetsResponse.response.ok || !assetsResponse.data) {
+        const errorMsg = extractErrorMessage(assetsResponse);
+        setError(`Failed to load Information Assets: ${errorMsg}`);
+        return;
+      }
+      setAssets(assetsResponse.data);
+      setNumAssets(assetsResponse.data.length);
+      if (assetsResponse.data.length > 0) {
+        setHasAsset(true);
+        setAssetContractsCompleted(await checkAssetManagementCompleted(assetsResponse.data));
+      } else {
+        setHasAsset(false);
+      }
+
+      if (!contractsResponse.response.ok || !contractsResponse.data) {
+        const errorMsg = extractErrorMessage(contractsResponse);
+        setError(`Failed to load contracts: ${errorMsg}`);
+        return;
+      }
+      setContracts(contractsResponse.data);
+    } catch (error) {
+      console.error("Failed to get study data:", error);
+      setError("Failed to load study details. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [study.id, checkAssetManagementCompleted]);
+
+  useEffect(() => {
+    if (study.id) {
+      fetchStudyContents();
+    }
+  }, [study.id, checkAssetManagementCompleted, fetchStudyContents]);
 
   const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && hasAsset;
 
@@ -56,7 +139,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       current: hasAsset && !adminsAgreementsCompleted,
     },
   ];
-
+  if (isLoading) return null;
   const getCurrentStepComponent = () => {
     if (!agreementCompleted) {
       return (
@@ -74,9 +157,13 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <>
           <Assets
             studyId={study.id}
+            assets={assets}
+            setAssets={setAssets}
             setAssetContractsCompleted={setAssetContractsCompleted}
             setHasAsset={setHasAsset}
             canModify={isStudyOwnerOrAdmin}
+            setNumAssets={setNumAssets}
+            checkAssetManagementCompleted={checkAssetManagementCompleted}
           />
         </>
       );
@@ -105,16 +192,29 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
+
       {!studyStepsCompleted && (
         <>
           <StudyDetails
-            studyStepsCompleted={studyStepsCompleted}
-            assetContractsCompleted={assetContractsCompleted}
+            userData={userData}
             study={study}
-            isIGOpsStaff={isIGOpsStaff}
-            isStudyOwner={isStudyOwner}
-            isStudyAdmin={isStudyAdmin}
             setStudyFormOpen={setStudyFormOpen}
+            studyStepsCompleted={studyStepsCompleted}
+            assets={assets}
+            setAssets={setAssets}
+            setHasAsset={setHasAsset}
+            assetContractsCompleted={assetContractsCompleted}
+            setAssetContractsCompleted={setAssetContractsCompleted}
+            checkAssetManagementCompleted={checkAssetManagementCompleted}
+            numAssets={numAssets}
+            setNumAssets={setNumAssets}
+            fetchStudyContents={fetchStudyContents}
+            contracts={contracts}
           />
           <StepProgress
             steps={studySteps}
@@ -128,17 +228,24 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       )}
       {getCurrentStepComponent()}
 
-      {studyStepsCompleted && (
+      {(studyStepsCompleted || isIGOpsStaff) && (
         <>
           <div className={styles["completed-section"]}>
             <StudyDetails
-              studyStepsCompleted={studyStepsCompleted}
-              assetContractsCompleted={assetContractsCompleted}
+              userData={userData}
               study={study}
-              isIGOpsStaff={isIGOpsStaff}
-              isStudyOwner={isStudyOwner}
-              isStudyAdmin={isStudyAdmin}
               setStudyFormOpen={setStudyFormOpen}
+              studyStepsCompleted={studyStepsCompleted}
+              assets={assets}
+              setAssets={setAssets}
+              setHasAsset={setHasAsset}
+              assetContractsCompleted={assetContractsCompleted}
+              setAssetContractsCompleted={setAssetContractsCompleted}
+              checkAssetManagementCompleted={checkAssetManagementCompleted}
+              numAssets={numAssets}
+              setNumAssets={setNumAssets}
+              fetchStudyContents={fetchStudyContents}
+              contracts={contracts}
             />
           </div>
         </>

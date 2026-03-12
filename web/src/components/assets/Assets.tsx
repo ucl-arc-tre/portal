@@ -1,11 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  Asset,
-  AssetBase,
-  getStudiesByStudyIdAssets,
-  getStudiesByStudyIdAssetsByAssetIdContracts,
-  postStudiesByStudyIdAssets,
-} from "@/openapi";
+import { useState } from "react";
+import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 
 import AssetCreationForm from "./AssetCreationForm";
@@ -19,85 +13,30 @@ import { AlertMessage, Alert } from "../shared/uikitExports";
 
 type InformationAssetsProps = {
   studyId: string;
-  setAssetContractsCompleted?: (completed: boolean) => void;
-  setHasAsset?: (hasAsset: boolean) => void;
+  assets: Asset[];
+  setAssets: (assets: Asset[]) => void;
+  setAssetContractsCompleted: (completed: boolean) => void;
+  setHasAsset: (hasAsset: boolean) => void;
   canModify: boolean;
-  setNumAssets?: (numAssets: number) => void;
+  setNumAssets: (numAssets: number) => void;
   setTab?: (tab: string) => void;
+  checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const { studyId, setAssetContractsCompleted, setHasAsset, canModify, setNumAssets, setTab } = props;
+  const {
+    studyId,
+    assets,
+    setAssets,
+    setAssetContractsCompleted,
+    setHasAsset,
+    canModify,
+    setTab,
+    checkAssetManagementCompleted,
+  } = props;
 
-  const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
-
-  const checkAssetManagementCompleted = useCallback(
-    async (assets: Asset[]) => {
-      // for each asset, check if it requires a contract and if it does, that there is one
-
-      const checkContractsForAsset = async (assetId: string): Promise<boolean> => {
-        const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
-          path: { studyId: studyId, assetId: assetId },
-        });
-
-        if (!response.response.ok || !response.data) {
-          const errorMsg = extractErrorMessage(response);
-          throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
-        }
-        return response.data.length > 0;
-      };
-
-      const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
-      const requiredContractChecks = assetsRequiringContracts.map((asset) => checkContractsForAsset(asset.id));
-      const results = await Promise.all(requiredContractChecks);
-      return results.every((hasContract) => hasContract);
-    },
-    [studyId]
-  );
-
-  useEffect(() => {
-    const fetchInformationAssetData = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const informationAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-
-        if (!informationAssetResult.response.ok || !informationAssetResult.data) {
-          const errorMsg = extractErrorMessage(informationAssetResult);
-          setError(`Failed to load Information Assets: ${errorMsg}`);
-          return;
-        }
-
-        setInformationAssets(informationAssetResult.data);
-        if (setNumAssets) {
-          setNumAssets(informationAssetResult.data.length);
-        }
-
-        if (setHasAsset && informationAssetResult.data.length > 0) {
-          setHasAsset(true);
-        }
-        if (informationAssetResult.data.length > 0) {
-          const assets = informationAssetResult.data;
-          const assetsComplete = await checkAssetManagementCompleted(assets);
-
-          if (setAssetContractsCompleted && assetsComplete) {
-            setAssetContractsCompleted(true);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load Information Assets:", err);
-        setError("Failed to load Information Assets. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInformationAssetData();
-  }, [studyId, setAssetContractsCompleted, setHasAsset, checkAssetManagementCompleted, setNumAssets]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);
@@ -120,20 +59,16 @@ export default function Assets(props: InformationAssetsProps) {
       return;
     }
 
-    setInformationAssets(updatedAssetsResult.data);
+    setAssets(updatedAssetsResult.data);
     const assets = updatedAssetsResult.data;
     const assetsComplete = await checkAssetManagementCompleted(assets);
 
-    if (setAssetContractsCompleted && assetsComplete) {
+    if (assetsComplete) {
       setAssetContractsCompleted(true);
     }
-    if (setHasAsset) {
-      setHasAsset(true);
-    }
+    setHasAsset(true);
     setShowAssetForm(false);
   };
-
-  if (isLoading) return null;
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
@@ -173,7 +108,7 @@ export default function Assets(props: InformationAssetsProps) {
         </Callout>
       )}
 
-      {informationAssets.length === 0 && canModify ? (
+      {assets.length === 0 && canModify ? (
         <div>
           <div className={styles["no-assets-message"]}>
             <p>No assets have been created for this study yet.</p>
@@ -190,7 +125,7 @@ export default function Assets(props: InformationAssetsProps) {
         <div>
           <div className={styles["assets-summary"]}>
             <span>Assets for this study:</span>
-            <span className={styles["assets-count-badge"]}>{informationAssets.length}</span>
+            <span className={styles["assets-count-badge"]}>{assets.length}</span>
           </div>
 
           {canModify && (
@@ -208,7 +143,7 @@ export default function Assets(props: InformationAssetsProps) {
           )}
 
           <div className={styles["assets-grid"]}>
-            {informationAssets.map((asset) => (
+            {assets.map((asset) => (
               <AssetCard
                 key={asset.id}
                 studyId={studyId}

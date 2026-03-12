@@ -12,7 +12,6 @@ import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 
 import styles from "./ManageStudyPage.module.css";
-import StudyDetails from "@/components/studies/StudyDetails";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function ManageStudyPage() {
@@ -179,11 +178,7 @@ export default function ManageStudyPage() {
       <Title text={isIGOpsStaff ? study.title : `Manage Study: ${study.title}`} centered />
 
       <div className="content">
-        {isIGOpsStaff ? (
-          <StudyDetails study={study} isIGOpsStaff={isIGOpsStaff} isStudyOwner={false} isStudyAdmin={false} />
-        ) : (
-          <ManageStudy study={study} fetchStudy={fetchStudy} />
-        )}
+        <ManageStudy study={study} fetchStudy={fetchStudy} />
       </div>
     </>
   );
