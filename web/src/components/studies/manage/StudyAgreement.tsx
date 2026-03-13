@@ -15,12 +15,11 @@ import { AlertMessage, Alert } from "../../shared/uikitExports";
 type StudyAgreementProps = {
   studyId: string;
   studyTitle: string;
-  agreementCompleted: boolean;
   setAgreementCompleted: (completed: boolean) => void;
 };
 
 export default function StudyAgreement(props: StudyAgreementProps) {
-  const { studyId, studyTitle, agreementCompleted, setAgreementCompleted } = props;
+  const { studyId, studyTitle, setAgreementCompleted } = props;
 
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,8 +68,6 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   if (isLoading) return null;
 
   if (!studyAgreementText) return <div>No study agreement could be found.</div>;
-
-  if (agreementCompleted) return null;
 
   const handleAgreementSubmit = async (agreementId: string) => {
     try {

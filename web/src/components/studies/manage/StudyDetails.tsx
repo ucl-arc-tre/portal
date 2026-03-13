@@ -5,14 +5,14 @@ import {
   Asset,
   ApprovalStatus,
   Contract,
-  Auth,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
+import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertCircleIcon, AlertMessage } from "../../shared/uikitExports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";
-import AdminFeedbackSection from "./AdminFeedbackSection";
+import AdminFeedback from "./AdminFeedback";
 import { storageDefinitions } from "../../shared/storageDefinitions";
 import Assets from "../../assets/Assets";
 import StudyOverview from "./StudyOverview";
@@ -20,15 +20,9 @@ import ContractManagement from "../../contracts/ContractManagement";
 import { calculateExpiryUrgency } from "../../shared/exports";
 
 type StudyDetailsProps = {
-  userData: Auth | null;
   study: Study;
-  setIsFormOpen?: (name: boolean) => void;
-  studyStepsCompleted?: boolean;
   assets: Asset[];
   setAssets: (assets: Asset[]) => void;
-  numAssets: number | null;
-  setNumAssets: (numAssets: number) => void;
-  setHasAsset: (hasAsset: boolean) => void;
   assetContractsCompleted: boolean;
   checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
   contracts: Contract[];
@@ -88,18 +82,12 @@ const calculateRiskScore = async (study: Study, assets: Asset[]) => {
 
 export default function StudyDetails(props: StudyDetailsProps) {
   const {
-    userData,
     study,
-    setIsFormOpen,
-    studyStepsCompleted,
     assets,
     setAssets,
-    setHasAsset,
     assetContractsCompleted,
     setAssetContractsCompleted,
     checkAssetManagementCompleted,
-    numAssets,
-    setNumAssets,
     fetchStudyContents,
     contracts,
   } = props;
@@ -108,22 +96,17 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
-
   const [tab, setTab] = useState("overview");
-
   const [assetsNeedAttention, setAssetsNeedAttention] = useState(false);
-
-  const [numContracts, setNumContracts] = useState<number | null>(null);
   const [contractsNeedAttention, setContractsNeedAttention] = useState(false);
 
+  const { userData } = useAuth();
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
-  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const canSeeTabs = isIGOpsStaff || studyStepsCompleted;
-  const canRequestReview = (canSeeTabs && approvalStatus !== "Approved") || false;
+  const canRequestReview = approvalStatus !== "Approved";
 
   const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
     const studyId = study.id;
@@ -186,7 +169,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
     if (!assetContractsCompleted) setAssetsNeedAttention(true);
 
-    setNumContracts(contracts.length);
     if (contracts.length > 0) {
       const needsAttention = contracts.some((contract) => {
         const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
@@ -203,56 +185,47 @@ export default function StudyDetails(props: StudyDetailsProps) {
           <AlertMessage>{error}</AlertMessage>
         </Alert>
       )}
-      {canSeeTabs && (
-        <>
-          <div className={"tab-collection"}>
-            <Button
-              onClick={() => setTab("overview")}
-              variant="secondary"
-              className={`tab ${tab === "overview" ? "active" : ""}`}
-            >
-              Study Overview
-            </Button>
-            <Button
-              onClick={() => setTab("assets")}
-              variant="secondary"
-              className={`tab ${tab === "assets" ? "active" : ""}`}
-            >
-              Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
-            </Button>
-            <Button
-              onClick={() => setTab("contracts")}
-              variant="secondary"
-              className={`tab ${tab === "contracts" ? "active" : ""}`}
-            >
-              Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
-            </Button>
-            {/* TODO: add projects */}
-          </div>
-        </>
-      )}
+
+      <div className={"tab-collection"}>
+        <Button
+          onClick={() => setTab("overview")}
+          variant="secondary"
+          className={`tab ${tab === "overview" ? "active" : ""}`}
+        >
+          Study Overview
+        </Button>
+        <Button
+          onClick={() => setTab("assets")}
+          variant="secondary"
+          className={`tab ${tab === "assets" ? "active" : ""}`}
+        >
+          Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
+        </Button>
+        <Button
+          onClick={() => setTab("contracts")}
+          variant="secondary"
+          className={`tab ${tab === "contracts" ? "active" : ""}`}
+        >
+          Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
+        </Button>
+      </div>
 
       <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
-        {isStudyOwnerOrAdmin && setIsFormOpen && (
+        {canRequestReview && (
           <div className={styles["study-actions"]}>
-            <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
-              {study.feedback ? "Respond to Feedback" : "Edit Study"}
-            </Button>
-
-            {canRequestReview &&
-              (approvalStatus !== "Pending" ? (
-                <Button
-                  onClick={() => handleUpdateStudyStatus("Pending")}
-                  size="small"
-                  data-cy="study-ready-for-review-button"
-                >
-                  Mark Ready for Review
-                </Button>
-              ) : (
-                <Button disabled size="small">
-                  Submitted for Review
-                </Button>
-              ))}
+            {approvalStatus !== "Pending" ? (
+              <Button
+                onClick={() => handleUpdateStudyStatus("Pending")}
+                size="small"
+                data-cy="study-ready-for-review-button"
+              >
+                Mark Ready for Review
+              </Button>
+            ) : (
+              <Button disabled size="small">
+                Submitted for Review
+              </Button>
+            )}
           </div>
         )}
 
@@ -262,11 +235,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
           riskScoreLoading={riskScoreLoading}
           approvalStatus={approvalStatus}
           feedback={feedback}
-          numEntities={{ assets: numAssets, contracts: numContracts }}
         />
 
         {isIGOpsStaff && (
-          <AdminFeedbackSection
+          <AdminFeedback
             status={study.approval_status}
             feedbackFromStudy={feedback}
             handleUpdateStudyStatus={handleUpdateStudyStatus}
@@ -274,37 +246,29 @@ export default function StudyDetails(props: StudyDetailsProps) {
         )}
       </div>
 
-      {canSeeTabs && (
-        <>
-          <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
-            {tab === "assets" && (
-              <Assets
-                studyId={study.id}
-                assets={assets}
-                setAssets={setAssets}
-                setAssetContractsCompleted={setAssetContractsCompleted}
-                setHasAsset={setHasAsset}
-                canModify={isStudyOwnerOrAdmin}
-                setNumAssets={setNumAssets}
-                setTab={setTab}
-                checkAssetManagementCompleted={checkAssetManagementCompleted}
-              />
-            )}
-          </div>
+      <div className={`${styles["tab-content"]} ${tab === "assets" ? styles.active : ""}`}>
+        {tab === "assets" && (
+          <Assets
+            study={study}
+            assets={assets}
+            setAssets={setAssets}
+            setAssetContractsCompleted={setAssetContractsCompleted}
+            setTab={setTab}
+            checkAssetManagementCompleted={checkAssetManagementCompleted}
+          />
+        )}
+      </div>
 
-          <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
-            <ContractManagement
-              study={study}
-              contracts={contracts}
-              canModify={isStudyOwner || isStudyAdmin}
-              assetContractsCompleted={assetContractsCompleted}
-              setContractsNeedAttention={setContractsNeedAttention}
-              setNumContracts={setNumContracts}
-              fetchStudyContents={fetchStudyContents}
-            />
-          </div>
-        </>
-      )}
+      <div className={`${styles["tab-content"]} ${tab === "contracts" ? styles.active : ""}`}>
+        <ContractManagement
+          study={study}
+          contracts={contracts}
+          canModify={isStudyOwner || isStudyAdmin}
+          assetContractsCompleted={assetContractsCompleted}
+          setContractsNeedAttention={setContractsNeedAttention}
+          fetchStudyContents={fetchStudyContents}
+        />
+      </div>
     </>
   );
 }

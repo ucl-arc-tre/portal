@@ -2,18 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Asset,
   Contract,
+  getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdAssetsByAssetIdContracts,
   getStudiesByStudyIdContracts,
   Study,
 } from "@/openapi";
-import StepProgress from "../../ui/steps/StepProgress";
-import StepArrow from "../../ui/steps/StepArrow";
-import StudyAgreement from "./StudyAgreement";
-import Assets from "../../assets/Assets";
+import Button from "../../ui/Button";
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
-import StudyAdminsAgreements from "./StudyAdminsAgreements";
+import StudySetupSteps from "./StudySetupSteps";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
@@ -26,17 +24,11 @@ type ManageStudyProps = {
 };
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
-  const [agreementCompleted, setAgreementCompleted] = useState(false);
-  const [adminsAgreementsCompleted, setAdminsAgreementsCompleted] = useState(false);
+  const [studyStepsCompleted, setStudyStepsCompleted] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [numAssets, setNumAssets] = useState<number | null>(null);
-  const [hasAsset, setHasAsset] = useState(false);
   const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
-
   const [contracts, setContracts] = useState<Contract[]>([]);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,22 +67,20 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     setIsLoading(true);
 
     try {
-      const [assetsResponse, contractsResponse] = await Promise.all([
+      const [assetsResponse, contractsResponse, agreementsResponse] = await Promise.all([
         getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
         getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
+        getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
       ]);
+
       if (!assetsResponse.response.ok || !assetsResponse.data) {
         const errorMsg = extractErrorMessage(assetsResponse);
         setError(`Failed to load Information Assets: ${errorMsg}`);
         return;
       }
       setAssets(assetsResponse.data);
-      setNumAssets(assetsResponse.data.length);
       if (assetsResponse.data.length > 0) {
-        setHasAsset(true);
         setAssetContractsCompleted(await checkAssetManagementCompleted(assetsResponse.data));
-      } else {
-        setHasAsset(false);
       }
 
       if (!contractsResponse.response.ok || !contractsResponse.data) {
@@ -99,13 +89,24 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         return;
       }
       setContracts(contractsResponse.data);
+
+      if (agreementsResponse.response.ok && agreementsResponse.data) {
+        const confirmedUsernames = agreementsResponse.data.usernames;
+        const userHasSigned = userData?.username ? confirmedUsernames.includes(userData.username) : false;
+        const allAdminsHaveSigned = study.additional_study_admin_usernames.every((username) =>
+          confirmedUsernames.includes(username)
+        );
+        if (userHasSigned && allAdminsHaveSigned && assetsResponse.data.length > 0) {
+          setStudyStepsCompleted(true);
+        }
+      }
     } catch (error) {
       console.error("Failed to get study data:", error);
       setError("Failed to load study details. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, checkAssetManagementCompleted]);
+  }, [study.id, study.additional_study_admin_usernames, checkAssetManagementCompleted, userData]);
 
   useEffect(() => {
     if (study.id) {
@@ -118,75 +119,9 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     fetchStudy(study.id);
   };
 
-  const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && hasAsset;
-
-  const studySteps: Step[] = [
-    {
-      id: "study-agreement",
-      title: "Study Agreement",
-      description: "Review and accept the study agreement terms.",
-      completed: agreementCompleted,
-      current: !agreementCompleted,
-    },
-    {
-      id: "study-assets",
-      title: "Information Assets",
-      description:
-        "Create and manage at least one information asset. You can create more assets at any time. Note that contracts can also be attached to assets, in some cases this is required.",
-      completed: hasAsset,
-      current: !hasAsset || !assetContractsCompleted,
-    },
-    {
-      id: "study-agreements",
-      title: "Study Agreements",
-      description: "Ensure all administrators have agreed to the study agreement",
-      completed: adminsAgreementsCompleted,
-      current: hasAsset && !adminsAgreementsCompleted,
-    },
-  ];
+  const onStepsComplete = useCallback(() => setStudyStepsCompleted(true), []);
 
   if (isLoading) return null;
-
-  const getCurrentStepComponent = () => {
-    if (!agreementCompleted) {
-      return (
-        <StudyAgreement
-          studyId={study.id}
-          studyTitle={study.title}
-          agreementCompleted={agreementCompleted}
-          setAgreementCompleted={setAgreementCompleted}
-        />
-      );
-    }
-
-    if (!hasAsset) {
-      return (
-        <>
-          <Assets
-            studyId={study.id}
-            assets={assets}
-            setAssets={setAssets}
-            setAssetContractsCompleted={setAssetContractsCompleted}
-            setHasAsset={setHasAsset}
-            canModify={isStudyOwnerOrAdmin}
-            setNumAssets={setNumAssets}
-            checkAssetManagementCompleted={checkAssetManagementCompleted}
-          />
-        </>
-      );
-    }
-
-    if (!adminsAgreementsCompleted) {
-      return (
-        <StudyAdminsAgreements
-          studyId={study.id}
-          studyAdminUsernames={study.additional_study_admin_usernames}
-          completed={adminsAgreementsCompleted}
-          setCompleted={setAdminsAgreementsCompleted}
-        />
-      );
-    }
-  };
 
   return (
     <>
@@ -205,56 +140,37 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         </Alert>
       )}
 
-      {!studyStepsCompleted && (
-        <>
-          <StudyDetails
-            userData={userData}
-            study={study}
-            setIsFormOpen={setIsFormOpen}
-            studyStepsCompleted={studyStepsCompleted}
-            assets={assets}
-            setAssets={setAssets}
-            setHasAsset={setHasAsset}
-            assetContractsCompleted={assetContractsCompleted}
-            setAssetContractsCompleted={setAssetContractsCompleted}
-            checkAssetManagementCompleted={checkAssetManagementCompleted}
-            numAssets={numAssets}
-            setNumAssets={setNumAssets}
-            fetchStudyContents={fetchStudyContents}
-            contracts={contracts}
-          />
-          <StepProgress
-            steps={studySteps}
-            isComplete={studyStepsCompleted}
-            introText="Complete the following steps to set up your study."
-            ariaLabel="Study setup progress"
-          />
-
-          <StepArrow />
-        </>
+      {!studyStepsCompleted && !isIGOpsStaff && (
+        <StudySetupSteps
+          study={study}
+          assets={assets}
+          setAssets={setAssets}
+          setAssetContractsCompleted={setAssetContractsCompleted}
+          checkAssetManagementCompleted={checkAssetManagementCompleted}
+          onStepsComplete={onStepsComplete}
+        />
       )}
-      {getCurrentStepComponent()}
 
       {(studyStepsCompleted || isIGOpsStaff) && (
         <>
-          <div className={styles["completed-section"]}>
-            <StudyDetails
-              userData={userData}
-              study={study}
-              setIsFormOpen={setIsFormOpen}
-              studyStepsCompleted={studyStepsCompleted}
-              assets={assets}
-              setAssets={setAssets}
-              setHasAsset={setHasAsset}
-              assetContractsCompleted={assetContractsCompleted}
-              setAssetContractsCompleted={setAssetContractsCompleted}
-              checkAssetManagementCompleted={checkAssetManagementCompleted}
-              numAssets={numAssets}
-              setNumAssets={setNumAssets}
-              fetchStudyContents={fetchStudyContents}
-              contracts={contracts}
-            />
-          </div>
+          {isStudyOwnerOrAdmin && (
+            <div className={styles["study-actions"]}>
+              <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
+                Edit Study
+              </Button>
+            </div>
+          )}
+
+          <StudyDetails
+            study={study}
+            contracts={contracts}
+            assets={assets}
+            setAssets={setAssets}
+            assetContractsCompleted={assetContractsCompleted}
+            setAssetContractsCompleted={setAssetContractsCompleted}
+            checkAssetManagementCompleted={checkAssetManagementCompleted}
+            fetchStudyContents={fetchStudyContents}
+          />
         </>
       )}
     </>

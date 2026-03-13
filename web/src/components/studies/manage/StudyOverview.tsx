@@ -13,11 +13,10 @@ type StudyOverviewProps = {
   riskScoreLoading: boolean;
   approvalStatus: ApprovalStatus | undefined;
   feedback?: string;
-  numEntities: { assets: number | null; contracts: number | null };
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
-  const { study, approvalStatus, riskScore, riskScoreLoading, feedback, numEntities } = props;
+  const { study, approvalStatus, riskScore, riskScoreLoading, feedback } = props;
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
@@ -175,22 +174,6 @@ export default function StudyOverview(props: StudyOverviewProps) {
               </>
             )}
           </Alert>
-        )}
-
-        {/*//TODO: add summary of num of projects*/}
-
-        {numEntities.assets !== null && numEntities.contracts !== null && (
-          <div>
-            <h4>Summary of related entities:</h4>
-            <dl className={styles.grouping}>
-              <dd>
-                Assets: <span className={styles["grey-value"]}>{numEntities.assets || 0}</span>
-              </dd>
-              <dd>
-                Contracts: <span className={styles["grey-value"]}>{numEntities.contracts || 0}</span>
-              </dd>
-            </dl>
-          </div>
         )}
       </div>
     </Box>

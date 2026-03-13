@@ -1,9 +1,11 @@
 import Box from "../../ui/Box";
 import { Alert, AlertMessage, Textarea } from "../../shared/uikitExports";
-import styles from "./AdminFeedbackSection.module.css";
 import Button from "../../ui/Button";
 import { useState } from "react";
 import { ApprovalStatus } from "@/openapi";
+
+import styles from "./AdminFeedback.module.css";
+
 type FeedbackProps = {
   status: ApprovalStatus;
   feedbackFromStudy: string;
@@ -16,6 +18,7 @@ type FeedbackProps = {
     | undefined
   >;
 };
+
 export default function AdminFeedbackSection(props: FeedbackProps) {
   const { status, feedbackFromStudy, handleUpdateStudyStatus } = props;
   const [feedback, setFeedback] = useState(feedbackFromStudy);

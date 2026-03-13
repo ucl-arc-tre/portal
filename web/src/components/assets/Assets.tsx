@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets } from "@/openapi";
+import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
+import { useAuth } from "@/hooks/useAuth";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -12,28 +13,21 @@ import InfoTooltip from "../ui/InfoTooltip";
 import { AlertMessage, Alert } from "../shared/uikitExports";
 
 type InformationAssetsProps = {
-  studyId: string;
+  study: Study;
   assets: Asset[];
   setAssets: (assets: Asset[]) => void;
   setAssetContractsCompleted: (completed: boolean) => void;
-  setHasAsset: (hasAsset: boolean) => void;
-  canModify: boolean;
-  setNumAssets: (numAssets: number) => void;
   setTab?: (tab: string) => void;
   checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
 };
 
 export default function Assets(props: InformationAssetsProps) {
-  const {
-    studyId,
-    assets,
-    setAssets,
-    setAssetContractsCompleted,
-    setHasAsset,
-    canModify,
-    setTab,
-    checkAssetManagementCompleted,
-  } = props;
+  const { study, assets, setAssets, setAssetContractsCompleted, setTab, checkAssetManagementCompleted } = props;
+  const { userData } = useAuth();
+  const canModify =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
+    (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
+    false;
 
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
@@ -42,7 +36,7 @@ export default function Assets(props: InformationAssetsProps) {
     setError(null);
 
     const response = await postStudiesByStudyIdAssets({
-      path: { studyId },
+      path: { studyId: study.id },
       body: assetData as AssetBase,
     });
 
@@ -52,7 +46,7 @@ export default function Assets(props: InformationAssetsProps) {
     }
 
     // Refresh assets list after successful creation
-    const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
+    const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
     if (!updatedAssetsResult.response.ok || !updatedAssetsResult.data) {
       const errorMsg = extractErrorMessage(updatedAssetsResult);
       setError(`Failed to refresh asset list: ${errorMsg}`);
@@ -66,7 +60,6 @@ export default function Assets(props: InformationAssetsProps) {
     if (assetsComplete) {
       setAssetContractsCompleted(true);
     }
-    setHasAsset(true);
     setShowAssetForm(false);
   };
 
@@ -146,7 +139,7 @@ export default function Assets(props: InformationAssetsProps) {
             {assets.map((asset) => (
               <AssetCard
                 key={asset.id}
-                studyId={studyId}
+                studyId={study.id}
                 asset={asset}
                 checkCompleted={checkAssetManagementCompleted}
                 canModify={canModify}
