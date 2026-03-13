@@ -11,8 +11,3 @@
   color: #666;
   font-size: 1.1rem;
 }
-
-.needs-attention {
-  height: 1rem;
-  color: var(--expiry-urgency--medium);
-}

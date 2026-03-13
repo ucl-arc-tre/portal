@@ -5,11 +5,11 @@ import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import { formatDate } from "../shared/exports";
+import { checkAssetManagementCompleted } from "../studies/manage/lib/assetContracts";
 
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  checkCompleted: (assets: Asset[]) => Promise<boolean>;
   canModify: boolean;
   setTab?: (tab: string) => void;
 };
@@ -23,7 +23,7 @@ const formatProtection = (protection: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, checkCompleted, canModify, setTab } = props;
+  const { studyId, asset, canModify, setTab } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export default function AssetCard(props: AssetCardProps) {
   useEffect(() => {
     const isAssetCompleted = async () => {
       try {
-        const response = await checkCompleted([asset]);
+        const response = await checkAssetManagementCompleted([asset], studyId);
         setIsCompleted(response);
       } catch (err) {
         console.error("Failed to check asset completion:", err);

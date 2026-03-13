@@ -4,21 +4,19 @@ import {
   Contract,
   getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
-  getStudiesByStudyIdAssetsByAssetIdContracts,
   getStudiesByStudyIdContracts,
   Study,
 } from "@/openapi";
-import Button from "../../ui/Button";
-import StudyDetails from "./StudyDetails";
+import StudyOverview from "./StudyOverview";
 import StudySetupSteps from "./StudySetupSteps";
+import StudyTabs from "./StudyTabs";
 import Assets from "../../assets/Assets";
 import ContractManagement from "../../contracts/ContractManagement";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertCircleIcon, AlertMessage } from "../../shared/uikitExports";
+import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { calculateExpiryUrgency } from "../../shared/exports";
-
-import styles from "./ManageStudy.module.css";
+import { checkAssetManagementCompleted } from "./lib/assetContracts";
 
 type ManageStudyProps = {
   study: Study;
@@ -26,13 +24,13 @@ type ManageStudyProps = {
 };
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [studyStepsCompleted, setStudyStepsCompleted] = useState(false);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState("study");
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -41,35 +39,10 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const assetsNeedAttention = !assetContractsCompleted;
   const contractsNeedAttention = contracts.some((contract) => {
     const urgency = calculateExpiryUrgency(new Date(contract.expiry_date));
     return urgency && urgency.level !== "low";
   });
-
-  const checkAssetManagementCompleted = useCallback(
-    async (assets: Asset[]) => {
-      // for each asset, check if it requires a contract and if it does, that there is one
-
-      const checkContractsForAsset = async (assetId: string): Promise<boolean> => {
-        const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
-          path: { studyId: study.id, assetId: assetId },
-        });
-
-        if (!response.response.ok || !response.data) {
-          const errorMsg = extractErrorMessage(response);
-          throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
-        }
-        return response.data.length > 0;
-      };
-
-      const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
-      const requiredContractChecks = assetsRequiringContracts.map((asset) => checkContractsForAsset(asset.id));
-      const results = await Promise.all(requiredContractChecks);
-      return results.every((hasContract) => hasContract);
-    },
-    [study.id]
-  );
 
   const fetchStudyContents = useCallback(async () => {
     setIsLoading(true);
@@ -88,7 +61,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       }
       setAssets(assetsResponse.data);
       if (assetsResponse.data.length > 0) {
-        setAssetContractsCompleted(await checkAssetManagementCompleted(assetsResponse.data));
+        const assetContractsCompleted = await checkAssetManagementCompleted(assetsResponse.data, study.id);
+        setAssetContractsCompleted(assetContractsCompleted);
       }
 
       if (!contractsResponse.response.ok || !contractsResponse.data) {
@@ -104,6 +78,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         const allAdminsHaveSigned = study.additional_study_admin_usernames.every((username) =>
           confirmedUsernames.includes(username)
         );
+
         if (userHasSigned && allAdminsHaveSigned && assetsResponse.data.length > 0) {
           setStudyStepsCompleted(true);
         }
@@ -122,8 +97,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     }
   }, [study.id, checkAssetManagementCompleted, fetchStudyContents]);
 
-  const onStepsComplete = useCallback(() => setStudyStepsCompleted(true), []);
-
   if (!userData) return null;
   if (isLoading) return null;
 
@@ -140,52 +113,23 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           study={study}
           assets={assets}
           setAssets={setAssets}
-          setAssetContractsCompleted={setAssetContractsCompleted}
-          checkAssetManagementCompleted={checkAssetManagementCompleted}
-          onStepsComplete={onStepsComplete}
+          onStepsComplete={() => setStudyStepsCompleted(true)}
         />
       )}
 
       {(studyStepsCompleted || isIGOpsStaff) && (
+        // todo: implement a router and set tabs via query strings
         <>
-          <div className={"tab-collection"}>
-            <Button
-              onClick={() => setTab("overview")}
-              variant="secondary"
-              className={`tab ${tab === "overview" ? "active" : ""}`}
-            >
-              Study Overview
-            </Button>
+          <StudyTabs
+            tab={tab}
+            setTab={setTab}
+            assetsNeedAttention={!assetContractsCompleted}
+            contractsNeedAttention={contractsNeedAttention}
+          />
 
-            <Button
-              onClick={() => setTab("assets")}
-              variant="secondary"
-              className={`tab ${tab === "assets" ? "active" : ""}`}
-            >
-              Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
-            </Button>
+          {tab === "study" && <StudyOverview study={study} assets={assets} fetchStudy={fetchStudy} />}
 
-            <Button
-              onClick={() => setTab("contracts")}
-              variant="secondary"
-              className={`tab ${tab === "contracts" ? "active" : ""}`}
-            >
-              Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
-            </Button>
-          </div>
-
-          {tab === "overview" && <StudyDetails study={study} assets={assets} fetchStudy={fetchStudy} />}
-
-          {tab === "assets" && (
-            <Assets
-              study={study}
-              assets={assets}
-              setAssets={setAssets}
-              setAssetContractsCompleted={setAssetContractsCompleted}
-              setTab={setTab}
-              checkAssetManagementCompleted={checkAssetManagementCompleted}
-            />
-          )}
+          {tab === "assets" && <Assets study={study} assets={assets} setAssets={setAssets} setTab={setTab} />}
 
           {tab === "contracts" && (
             <ContractManagement

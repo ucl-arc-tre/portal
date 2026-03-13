@@ -1,181 +1,202 @@
-import { Study, ApprovalStatus } from "@/openapi";
-import Box from "../../ui/Box";
-import { Alert } from "../../shared/uikitExports";
-import StatusBadge from "../../ui/StatusBadge";
+import { postStudiesAdminByStudyIdReview, patchStudiesByStudyIdPending, Study, Asset, ApprovalStatus } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
+import { useAuth } from "@/hooks/useAuth";
+import { Alert, AlertMessage } from "../../shared/uikitExports";
+import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
-import InfoTooltip from "../../ui/InfoTooltip";
-import Loading from "../../ui/Loading";
-import { formatDate } from "../../shared/exports";
+import Button from "../../ui/Button";
+import AdminFeedback from "./AdminFeedback";
+import { storageDefinitions } from "../../shared/storageDefinitions";
+import StudyDetails from "./StudyDetails";
+import StudyForm from "../study-form/StudyForm";
 
-type StudyOverviewProps = {
+type StudyDetailsProps = {
   study: Study;
-  riskScore: number;
-  riskScoreLoading: boolean;
-  approvalStatus: ApprovalStatus | undefined;
-  feedback?: string;
+  assets: Asset[];
+  fetchStudy: (id: string) => Promise<void>;
 };
 
-export default function StudyOverview(props: StudyOverviewProps) {
-  const { study, approvalStatus, riskScore, riskScoreLoading, feedback } = props;
+const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
+  let assetsRiskScore = 0;
 
-  const standardRiskScoreStatement = "increases risk score by 5";
+  for (const asset of assets) {
+    let assetScore = 0;
+    const NhsMultiplier = 3;
+
+    asset.locations.forEach((loc) => {
+      const location = storageDefinitions.find((def) => def.value === loc);
+      if (!location) return;
+      if (involvesNhsEngland) {
+        assetScore += asset.tier * NhsMultiplier * location!.riskScore;
+      } else {
+        assetScore += asset.tier * location!.riskScore;
+      }
+    });
+
+    assetsRiskScore += assetScore;
+  }
+
+  score += assetsRiskScore;
+  return score;
+};
+
+const calculateBaseRiskScore = (study: Study) => {
+  let score = 0;
+  if (study.involves_data_processing_outside_eea) score += 10;
+  if (study.requires_dbs) score += 5;
+  if (study.requires_dspt) score += 5;
+  if (study.involves_third_party && !study.involves_mnca) score += 5;
+  if (study.involves_nhs_england || study.involves_cag) score += 5;
+  return score;
+};
+
+const calculateRiskScore = async (study: Study, assets: Asset[]) => {
+  const baseRiskScore = calculateBaseRiskScore(study);
+  if (!assets || assets.length === 0) return baseRiskScore;
+  return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
+};
+
+export default function StudyOverview({ study, assets, fetchStudy }: StudyDetailsProps) {
+  const [riskScore, setRiskScore] = useState(0);
+  const [riskScoreLoading, setRiskScoreLoading] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const { userData } = useAuth();
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
+  const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
+  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
+
+  const canRequestReview = approvalStatus !== "Approved";
+
+  const onEditComplete = () => {
+    setIsFormOpen(false);
+    fetchStudy(study.id);
+  };
+
+  const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
+    const studyId = study.id;
+    setError(null);
+
+    if (status === "Approved") {
+      const response = await postStudiesAdminByStudyIdReview({
+        path: { studyId },
+        body: { status: "Approved", feedback: feedbackContent },
+      });
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
+        return response;
+      }
+      setApprovalStatus("Approved");
+      if (feedbackContent) setFeedback(feedbackContent);
+    } else if (status === "Rejected") {
+      const response = await postStudiesAdminByStudyIdReview({
+        path: { studyId },
+        body: { status: "Rejected", feedback: feedbackContent },
+      });
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
+        return response;
+      }
+      setApprovalStatus("Rejected");
+      if (feedbackContent) setFeedback(feedbackContent);
+    } else if (status === "Pending") {
+      const response = await patchStudiesByStudyIdPending({
+        path: { studyId },
+      });
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to update study status: ${errorMsg}`);
+        return response;
+      }
+      setApprovalStatus("Pending");
+    }
+  };
+
+  useEffect(() => {
+    const getRiskScore = async () => {
+      setRiskScoreLoading(true);
+      try {
+        const score = await calculateRiskScore(study, assets);
+        setRiskScore(score);
+      } catch (err) {
+        setError(`Failed to calculate risk score. ${err}`);
+      } finally {
+        setRiskScoreLoading(false);
+      }
+    };
+
+    getRiskScore();
+    setApprovalStatus(study.approval_status);
+    if (study.feedback) setFeedback(study.feedback);
+  }, [study, assets]);
+
   return (
-    <Box>
-      <div className={styles["pre-description"]}>
-        {/* TODO: caseref will always be defined once migration has run on all envs - remove null check and tighten to non-nullable */}
-        {study.caseref != null && (
-          <span>
-            Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
-          </span>
-        )}
-        <span>
-          Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
-        </span>
-        {study.last_signoff && (
-          <span>
-            Last signed off: <span className={styles["grey-value"]}>{formatDate(study.last_signoff)}</span>
-          </span>
-        )}
-        <span>
-          Risk Score:
-          <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
-        </span>
-        <StatusBadge status={approvalStatus} type="study" />
-      </div>
-      <h3 className={styles.description}>{study.description}</h3>
-      <div>
-        <dl className={styles.ownership}>
-          <dd>
-            Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
-          </dd>
-          <dd>
-            Admins:
-            {study.additional_study_admin_usernames.map((username) => (
-              <li key={username}>
-                <span className={styles["grey-value"]}>{username}</span>
-              </li>
-            ))}
-          </dd>
-          <dd>
-            Data Controller:
-            <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
-          </dd>
-        </dl>
+    <>
+      {isFormOpen && userData && (
+        <StudyForm
+          username={userData.username}
+          setIsFormOpen={setIsFormOpen}
+          editingStudy={study}
+          onComplete={onEditComplete}
+        />
+      )}
 
-        <h3>Additional Information</h3>
-        <hr />
-        <dl className={styles.grouping}>
-          <dt>Sponsorships & Approvals</dt>
-          {study.involves_ucl_sponsorship && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>UCL Sponsorship</dd>
-          )}
-          {study.involves_cag && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              CAG approval
-              <InfoTooltip text="increases risk score by 5" />
-            </dd>
-          )}
-          {study.involves_ethics_approval && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>Ethics approval</dd>
-          )}
-          {study.involves_hra_approval && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>HRA approval</dd>
-          )}
-          {!study.involves_ucl_sponsorship &&
-            !study.involves_cag &&
-            !study.involves_ethics_approval &&
-            !study.involves_hra_approval && (
-              <dd>
-                <em>No sponsorship or approval information given</em>
-              </dd>
-            )}
-        </dl>
-        <dl className={styles.grouping}>
-          <dt>NHS</dt>
-          {study.is_nhs_associated && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is NHS associated</dd>
-          )}
-          {study.involves_nhs_england && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              NHS England involvement
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
-          )}
-          {study.involves_mnca && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>involves MNCA</dd>
-          )}
-          {study.requires_dspt && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              requires DSPT
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
-          )}
-          {!study.is_nhs_associated && !study.involves_nhs_england && !study.involves_mnca && !study.requires_dspt && (
-            <dd>
-              <em> No NHS information given</em>
-            </dd>
-          )}
-        </dl>
-        <dl className={styles.grouping}>
-          <dt>Data</dt>
-          {study.requires_dbs && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              requires DBS
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
-          )}
-          {study.is_data_protection_office_registered && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is registered with DPO</dd>
-          )}
-          {study.involves_third_party && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              third party
-              <InfoTooltip text="increases risk score by 5 if no mNCA" />
-            </dd>
-          )}
-          {study.involves_external_users && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>external users</dd>
-          )}
-          {study.involves_participant_consent && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>participant consent</dd>
-          )}
-          {study.involves_indirect_data_collection && (
-            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>indirect data collection</dd>
-          )}
-          {study.involves_data_processing_outside_eea && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              data processing outside EEA
-              <InfoTooltip text="increases risk score by 10" />
-            </dd>
-          )}
-          {!study.requires_dbs &&
-            !study.is_data_protection_office_registered &&
-            !study.involves_third_party &&
-            !study.involves_external_users &&
-            !study.involves_participant_consent &&
-            !study.involves_indirect_data_collection &&
-            !study.involves_data_processing_outside_eea && (
-              <dd>
-                <em>No data information given</em>
-              </dd>
-            )}
-        </dl>
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
 
-        {feedback && (
-          <Alert type={approvalStatus === "Approved" ? "info" : "warning"} className={styles["feedback-alert"]}>
-            <h4>This study has been given the following feedback:</h4>
-            <p>{feedback}</p>
-            {approvalStatus !== "Approved" && (
-              <>
-                <hr></hr>
-                <small>
-                  <em>Please adjust as appropriate and request another review.</em>
-                </small>
-              </>
-            )}
-          </Alert>
-        )}
-      </div>
-    </Box>
+      {(isStudyOwnerOrAdmin || canRequestReview) && (
+        <div className={styles["study-actions"]}>
+          {isStudyOwnerOrAdmin && (
+            <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
+              Edit Study
+            </Button>
+          )}
+
+          {canRequestReview && (
+            <>
+              {approvalStatus !== "Pending" ? (
+                <Button
+                  onClick={() => handleUpdateStudyStatus("Pending")}
+                  size="small"
+                  data-cy="study-ready-for-review-button"
+                >
+                  Mark Ready for Review
+                </Button>
+              ) : (
+                <Button disabled size="small">
+                  Submitted for Review
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      <StudyDetails
+        study={study}
+        riskScore={riskScore}
+        riskScoreLoading={riskScoreLoading}
+        approvalStatus={approvalStatus}
+        feedback={feedback}
+      />
+
+      {isIGOpsStaff && (
+        <AdminFeedback
+          status={study.approval_status}
+          feedbackFromStudy={feedback}
+          handleUpdateStudyStatus={handleUpdateStudyStatus}
+        />
+      )}
+    </>
   );
 }

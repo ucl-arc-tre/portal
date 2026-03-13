@@ -10,19 +10,10 @@ type StudySetupStepsProps = {
   study: Study;
   assets: Asset[];
   setAssets: (assets: Asset[]) => void;
-  setAssetContractsCompleted: (completed: boolean) => void;
-  checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
   onStepsComplete: () => void;
 };
 
-export default function StudySetupSteps({
-  study,
-  assets,
-  setAssets,
-  setAssetContractsCompleted,
-  checkAssetManagementCompleted,
-  onStepsComplete,
-}: StudySetupStepsProps) {
+export default function StudySetupSteps({ study, assets, setAssets, onStepsComplete }: StudySetupStepsProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [adminsAgreementsCompleted, setAdminsAgreementsCompleted] = useState(false);
   const hasAsset = assets.length > 0;
@@ -72,15 +63,7 @@ export default function StudySetupSteps({
         <StudyAgreement studyId={study.id} studyTitle={study.title} setAgreementCompleted={setAgreementCompleted} />
       )}
 
-      {agreementCompleted && !hasAsset && (
-        <Assets
-          study={study}
-          assets={assets}
-          setAssets={setAssets}
-          setAssetContractsCompleted={setAssetContractsCompleted}
-          checkAssetManagementCompleted={checkAssetManagementCompleted}
-        />
-      )}
+      {agreementCompleted && !hasAsset && <Assets study={study} assets={assets} setAssets={setAssets} />}
 
       {agreementCompleted && hasAsset && !adminsAgreementsCompleted && (
         <StudyAdminsAgreements

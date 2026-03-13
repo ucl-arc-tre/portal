@@ -12,17 +12,15 @@ import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
 import { AlertMessage, Alert } from "../shared/uikitExports";
 
-type InformationAssetsProps = {
+type AssetsProps = {
   study: Study;
   assets: Asset[];
   setAssets: (assets: Asset[]) => void;
-  setAssetContractsCompleted: (completed: boolean) => void;
   setTab?: (tab: string) => void;
-  checkAssetManagementCompleted: (assets: Asset[]) => Promise<boolean>;
 };
 
-export default function Assets(props: InformationAssetsProps) {
-  const { study, assets, setAssets, setAssetContractsCompleted, setTab, checkAssetManagementCompleted } = props;
+export default function Assets(props: AssetsProps) {
+  const { study, assets, setAssets, setTab } = props;
   const { userData } = useAuth();
   const canModify =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
@@ -54,12 +52,6 @@ export default function Assets(props: InformationAssetsProps) {
     }
 
     setAssets(updatedAssetsResult.data);
-    const assets = updatedAssetsResult.data;
-    const assetsComplete = await checkAssetManagementCompleted(assets);
-
-    if (assetsComplete) {
-      setAssetContractsCompleted(true);
-    }
     setShowAssetForm(false);
   };
 
@@ -137,14 +129,7 @@ export default function Assets(props: InformationAssetsProps) {
 
           <div className={styles["assets-grid"]}>
             {assets.map((asset) => (
-              <AssetCard
-                key={asset.id}
-                studyId={study.id}
-                asset={asset}
-                checkCompleted={checkAssetManagementCompleted}
-                canModify={canModify}
-                setTab={setTab}
-              />
+              <AssetCard key={asset.id} studyId={study.id} asset={asset} canModify={canModify} setTab={setTab} />
             ))}
           </div>
         </div>
