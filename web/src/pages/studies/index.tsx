@@ -12,11 +12,31 @@ import Callout from "@/components/ui/Callout";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
-
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
+
+  if (process.env.NEXT_PUBLIC_ENABLE_STUDIES !== "true") {
+    return (
+      <>
+        <MetaHead
+          title="Studies | ARC Services Portal"
+          description="View and modify studies in the ARC Services Portal"
+        />
+        <Title text={"Studies"} centered />
+        <Callout construction>
+          <span>
+            Studies are still under construction. Please use the existing{" "}
+            <a href="https://liveuclac.sharepoint.com/sites/ISD.IGAdvisoryService/Lists/Start%20a%20service%20request/NewForm.aspx">
+              IG form
+            </a>{" "}
+            to create a study.
+          </span>
+        </Callout>
+      </>
+    );
+  }
 
   return (
     <>
@@ -37,16 +57,6 @@ export default function StudiesPage() {
         </Button>
       </Callout>
 
-      <Callout construction>
-        <span>
-          Studies are still under construction. Please use the existing{" "}
-          <a href="https://liveuclac.sharepoint.com/sites/ISD.IGAdvisoryService/Lists/Start%20a%20service%20request/NewForm.aspx">
-            IG form
-          </a>{" "}
-          to create a study.
-        </span>
-      </Callout>
-
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>
           <h2>
@@ -60,7 +70,7 @@ export default function StudiesPage() {
         </div>
       )}
 
-      {isApprovedResearcher && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" && <Studies userData={userData!} />}
+      {isApprovedResearcher && <Studies />}
     </>
   );
 }

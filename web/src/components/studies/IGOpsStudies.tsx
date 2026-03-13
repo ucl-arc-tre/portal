@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Study, Auth, getStudies } from "@/openapi";
+import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import Button from "@/components/ui/Button";
 import { extractErrorMessage } from "@/lib/errorHandler";
@@ -7,58 +7,61 @@ import styles from "./IGOpsStudies.module.css";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
-type Props = {
-  userData: Auth;
-};
-
-export default function IGOpsStudies({ userData }: Props) {
-  const [isLoading, setStudiesLoading] = useState(true);
+export default function IGOpsStudies() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setError] = useState<string | null>(null);
   const [studies, setStudies] = useState<Study[]>([]);
   const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tab, setTab] = useState("pending");
 
+  const currentStudies = tab === "pending" ? pendingStudies : studies;
+
   useEffect(() => {
+    // fetch pending studies on load since that's the default tab
     const fetchPendingStudies = async () => {
-      setStudiesLoading(true);
-      setErrorMessage(null);
+      setIsLoading(true);
+      setError(null);
       try {
         const response = await getStudies({ query: { status: "Pending" } });
         if (!response.response.ok || !response.data) {
-          setErrorMessage(`Failed to fetch pending studies: ${extractErrorMessage(response)}`);
+          setError(`Failed to fetch pending studies: ${extractErrorMessage(response)}`);
           return;
         }
         setPendingStudies(response.data);
       } catch (error) {
         console.error("Failed to get pending studies:", error);
-        setErrorMessage("Failed to get pending studies. Please try again.");
+        setError("Failed to get pending studies. Please try again.");
       } finally {
-        setStudiesLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchPendingStudies();
   }, []);
 
+  const getAllStudies = async () => {
+    if (studies.length) return; // if we already have all studies, no need to fetch again
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getStudies();
+      if (!response.response.ok || !response.data) {
+        setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
+        return;
+      }
+      setStudies(response.data);
+    } catch (error) {
+      console.error("Failed to fetch studies:", error);
+      setError("Failed to fetch studies. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAllStudiesClick = async () => {
     setTab("all");
-    if (!studies.length) {
-      setStudiesLoading(true);
-      setErrorMessage(null);
-      try {
-        const response = await getStudies();
-        if (!response.response.ok || !response.data) {
-          setErrorMessage(`Failed to fetch studies: ${extractErrorMessage(response)}`);
-          return;
-        }
-        setStudies(response.data);
-      } catch (error) {
-        console.error("Failed to fetch studies:", error);
-        setErrorMessage("Failed to fetch studies. Please try again.");
-      } finally {
-        setStudiesLoading(false);
-      }
-    }
+    getAllStudies();
   };
 
   if (errorMessage) {
@@ -71,8 +74,7 @@ export default function IGOpsStudies({ userData }: Props) {
 
   return (
     <>
-      {tab === "pending" && <h2>Studies to Review</h2>}
-      {tab === "all" && <h2>All Studies</h2>}
+      <h2>{tab === "pending" ? "Studies to Review" : "All Studies"}</h2>
 
       <div className={"tab-collection"}>
         <Button
@@ -95,17 +97,13 @@ export default function IGOpsStudies({ userData }: Props) {
 
       {isLoading && <Loading message="Loading studies..." />}
 
-      {tab === "pending" && pendingStudies.length === 0 ? (
-        <div className={styles["no-studies-message"]}>
-          <h2>No studies pending approval</h2>
-        </div>
-      ) : tab === "all" && studies.length === 0 ? (
+      {!isLoading && currentStudies.length === 0 && (
         <div className={styles["no-studies-message"]}>
           <h2>No studies found</h2>
         </div>
-      ) : (
-        <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} />
       )}
+
+      {currentStudies.length > 0 && <StudyCardsList studies={currentStudies} />}
     </>
   );
 }

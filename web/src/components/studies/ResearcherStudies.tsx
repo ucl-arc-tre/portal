@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
-import { Study, Auth, getStudies } from "@/openapi";
+import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import StudyForm from "./StudyForm";
 import Button from "@/components/ui/Button";
-import { extractErrorMessage } from "@/lib/errorHandler";
-import styles from "./ResearcherStudies.module.css";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
+import { extractErrorMessage } from "@/lib/errorHandler";
+import { useAuth } from "@/hooks/useAuth";
 
-type Props = {
-  userData: Auth;
-};
+import styles from "./ResearcherStudies.module.css";
 
-export default function ResearcherStudies({ userData }: Props) {
+export default function ResearcherStudies() {
+  const { userData } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [studyFormOpen, setStudyFormOpen] = useState(false);
 
-  const isApprovedStaffResearcher = userData.roles.includes("approved-staff-researcher");
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
 
   const fetchStudies = async () => {
     setIsLoading(true);
@@ -44,6 +43,8 @@ export default function ResearcherStudies({ userData }: Props) {
   useEffect(() => {
     fetchStudies();
   }, []);
+
+  if (!userData) return null;
 
   if (error) {
     return (

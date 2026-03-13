@@ -1,17 +1,14 @@
-import { Auth } from "@/openapi";
+import { useAuth } from "@/hooks/useAuth";
 import IGOpsStudies from "./IGOpsStudies";
 import ResearcherStudies from "./ResearcherStudies";
 
-type Props = {
-  userData: Auth;
-};
+export default function Studies() {
+  const { userData } = useAuth();
+  if (!userData) return null;
 
-export default function Studies({ userData }: Props) {
-  // admin view for IG Ops staff users
   if (userData.roles.includes("ig-ops-staff")) {
-    return <IGOpsStudies userData={userData} />;
+    return <IGOpsStudies />;
   }
 
-  // default studies view for normal researcher users
-  return <ResearcherStudies userData={userData} />;
+  return <ResearcherStudies />;
 }
