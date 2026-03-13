@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input, Alert, AlertMessage, Label } from "../shared/uikitExports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
@@ -11,22 +11,22 @@ export default function ExternalInvite() {
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       setIsLoading(true);
       setErrorMessage("");
-      setShowSuccessMessage(false);
+      setSuccessMessage("");
       const response = await postUsersInvite({ body: { email } });
       if (!response.response.ok) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
         return;
       }
-      setShowSuccessMessage(true);
+      setSuccessMessage("Invite sent");
       setEmail("");
     } catch (err) {
       console.error("Invite post error:", err);
@@ -36,60 +36,46 @@ export default function ExternalInvite() {
     }
   }
 
-  useEffect(() => {
-    if (isDialogVisible === false) {
-      setShowSuccessMessage(false);
-      setErrorMessage("");
-    }
-  }, [isDialogVisible]);
+  function openDialog() {
+    setSuccessMessage("");
+    setErrorMessage("");
+    setDialogVisible(true);
+  }
 
   return (
     <>
       {isDialogVisible && (
-        <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
-          <div className={styles["dialog-content"]}>
-            {showSuccessMessage && (
-              <small onClick={() => setShowSuccessMessage(false)} className={styles["success-message"]}>
-                &times; Invitation sent!
-              </small>
-            )}
-            {errorMessage && (
-              <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
+        <Dialog setDialogOpen={setDialogVisible}>
+          <form onSubmit={handleSubmit} className={styles["invite-form"]}>
+            <Label htmlFor="email">Invite a researcher to the portal</Label>
+            <Input
+              type="email"
+              id="email"
+              placeholder="Email address"
+              name="email"
+              required={true}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+            />
+            <Button disabled={isLoading} type="submit" cy="send-invite" className={styles["send-button"]}>
+              {isLoading && (
+                <span className={styles.loader}>
+                  <Loading message="" size="small" />
+                </span>
+              )}
+              Send Invitation
+            </Button>{" "}
+            {(errorMessage || successMessage) && (
+              <Alert type={errorMessage ? "error" : "success"}>
+                <AlertMessage>{errorMessage || successMessage}</AlertMessage>
               </Alert>
             )}
-            <form onSubmit={handleSubmit} className={styles["invite-form"]}>
-              <Label htmlFor="email">Invite a researcher to the portal</Label>
-              <Input
-                type="email"
-                id="email"
-                placeholder="Email address"
-                name="email"
-                required={true}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoFocus
-              />
-              <Button disabled={isLoading} type="submit" cy="send-invite" className={styles["send-button"]}>
-                {isLoading && (
-                  <span className={styles.loader}>
-                    <Loading message="" size="small" />
-                  </span>
-                )}
-                Send Invitation
-              </Button>{" "}
-            </form>
-          </div>
+          </form>
         </Dialog>
       )}
 
-      <Button
-        onClick={() => setDialogVisible(true)}
-        variant="secondary"
-        cy="show-invite-input"
-        type="button"
-        size="small"
-      >
+      <Button onClick={openDialog} variant="secondary" cy="show-invite-input" type="button" size="small">
         Invite external researcher
       </Button>
     </>
