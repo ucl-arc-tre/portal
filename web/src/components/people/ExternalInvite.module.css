@@ -1,14 +1,3 @@
-.dialog {
-  margin-top: 15vw;
-  width: 60vw;
-}
-
-.dialog-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
 .invite-form {
   padding: 1rem;
 

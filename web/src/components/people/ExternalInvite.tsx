@@ -46,35 +46,33 @@ export default function ExternalInvite() {
   return (
     <>
       {isDialogVisible && (
-        <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
-          <div className={styles["dialog-content"]}>
-            <form onSubmit={handleSubmit} className={styles["invite-form"]}>
-              <Label htmlFor="email">Invite a researcher to the portal</Label>
-              <Input
-                type="email"
-                id="email"
-                placeholder="Email address"
-                name="email"
-                required={true}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoFocus
-              />
-              <Button disabled={isLoading} type="submit" cy="send-invite" className={styles["send-button"]}>
-                {isLoading && (
-                  <span className={styles.loader}>
-                    <Loading message="" size="small" />
-                  </span>
-                )}
-                Send Invitation
-              </Button>{" "}
-              {(errorMessage || successMessage) && (
-                <Alert type={errorMessage ? "error" : "success"}>
-                  <AlertMessage>{errorMessage || successMessage}</AlertMessage>
-                </Alert>
+        <Dialog setDialogOpen={setDialogVisible}>
+          <form onSubmit={handleSubmit} className={styles["invite-form"]}>
+            <Label htmlFor="email">Invite a researcher to the portal</Label>
+            <Input
+              type="email"
+              id="email"
+              placeholder="Email address"
+              name="email"
+              required={true}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+            />
+            <Button disabled={isLoading} type="submit" cy="send-invite" className={styles["send-button"]}>
+              {isLoading && (
+                <span className={styles.loader}>
+                  <Loading message="" size="small" />
+                </span>
               )}
-            </form>
-          </div>
+              Send Invitation
+            </Button>{" "}
+            {(errorMessage || successMessage) && (
+              <Alert type={errorMessage ? "error" : "success"}>
+                <AlertMessage>{errorMessage || successMessage}</AlertMessage>
+              </Alert>
+            )}
+          </form>
         </Dialog>
       )}
 

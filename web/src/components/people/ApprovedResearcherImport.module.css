@@ -11,13 +11,3 @@
 .button {
   min-width: 23rem;
 }
-
-.dialog {
-  width: clamp(40vw, 50vw, 60vw);
-}
-
-.dialog-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}

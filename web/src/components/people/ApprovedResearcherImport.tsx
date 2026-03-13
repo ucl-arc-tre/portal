@@ -52,7 +52,7 @@ export default function ApprovedResearcherImport() {
   return (
     <>
       {isDialogVisible && (
-        <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
+        <Dialog setDialogOpen={setDialogVisible}>
           <div className={styles["dialog-content"]}>
             {errorMessage && (
               <Alert type="error">
