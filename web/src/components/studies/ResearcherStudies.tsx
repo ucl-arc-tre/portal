@@ -5,7 +5,6 @@ import StudyForm from "./StudyForm";
 import Button from "@/components/ui/Button";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ResearcherStudies.module.css";
-import UclStaffRestrictionModal from "./UclStaffRestrictionModal";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
@@ -16,27 +15,26 @@ type Props = {
 export default function ResearcherStudies({ userData }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [studyFormOpen, setStudyFormOpen] = useState(false);
-  const [showUclStaffModal, setShowUclStaffModal] = useState(false);
 
   const isApprovedStaffResearcher = userData.roles.includes("approved-staff-researcher");
 
   const fetchStudies = async () => {
     setIsLoading(true);
-    setErrorMessage(null);
+    setError(null);
 
     try {
       const response = await getStudies();
       if (!response.response.ok || !response.data) {
-        setErrorMessage(`Failed to fetch studies: ${extractErrorMessage(response)}`);
+        setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         setStudies([]);
         return;
       }
       setStudies(response.data);
     } catch (error) {
       console.error("Failed to fetch studies:", error);
-      setErrorMessage("Failed to fetch studies. Please try again.");
+      setError("Failed to fetch studies. Please try again.");
       setStudies([]);
     } finally {
       setIsLoading(false);
@@ -47,18 +45,10 @@ export default function ResearcherStudies({ userData }: Props) {
     fetchStudies();
   }, []);
 
-  const handleCreateStudyClick = () => {
-    if (!isApprovedStaffResearcher) {
-      setShowUclStaffModal(true);
-      return;
-    }
-    setStudyFormOpen(true);
-  };
-
-  if (errorMessage) {
+  if (error) {
     return (
       <Alert type="error">
-        <AlertMessage>{errorMessage}</AlertMessage>
+        <AlertMessage>{error}</AlertMessage>
       </Alert>
     );
   }
@@ -82,13 +72,18 @@ export default function ResearcherStudies({ userData }: Props) {
         <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudyData={fetchStudies} />
       )}
 
-      {showUclStaffModal && <UclStaffRestrictionModal setOpen={setShowUclStaffModal} />}
-
       <div className={styles["create-study-section"]}>
-        <Button onClick={handleCreateStudyClick} size="large" data-cy="create-study-button">
+        <Button onClick={() => setStudyFormOpen(true)} size="large" data-cy="create-study-button">
           Create New Study
         </Button>
       </div>
+
+      {studies.length === 0 && (
+        <div className={styles["no-studies-message"]}>
+          <h2>No studies found</h2>
+          <p>Any studies you are added to will appear here once they have been created.</p>
+        </div>
+      )}
 
       {studies.length > 0 && <StudyCardsList studies={studies} isIGOpsStaff={false} canSeeAll={false} />}
     </>

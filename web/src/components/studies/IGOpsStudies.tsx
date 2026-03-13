@@ -8,17 +8,15 @@ import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type Props = {
-  userData: Auth;
+  isIgOpsStaff: boolean;
 };
 
-export default function IGOpsStudies({ userData }: Props) {
+export default function IGOpsStudies({ isIgOpsStaff }: Props) {
   const [isLoading, setStudiesLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
   const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tab, setTab] = useState("pending");
-
-  const isIgOpsStaff = userData.roles.includes("ig-ops-staff");
 
   useEffect(() => {
     const fetchPendingStudies = async () => {
@@ -84,6 +82,7 @@ export default function IGOpsStudies({ userData }: Props) {
         >
           Pending Studies
         </Button>
+
         <Button
           onClick={handleAllStudiesClick}
           variant="secondary"
