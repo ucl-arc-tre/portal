@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input, Alert, AlertMessage, Label } from "../shared/uikitExports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
@@ -14,7 +14,7 @@ export default function ExternalInvite() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       setIsLoading(true);
@@ -36,12 +36,11 @@ export default function ExternalInvite() {
     }
   }
 
-  useEffect(() => {
-    if (isDialogVisible === false) {
-      setSuccessMessage("");
-      setErrorMessage("");
-    }
-  }, [isDialogVisible]);
+  function openDialog() {
+    setSuccessMessage("");
+    setErrorMessage("");
+    setDialogVisible(true);
+  }
 
   return (
     <>
@@ -76,13 +75,7 @@ export default function ExternalInvite() {
         </Dialog>
       )}
 
-      <Button
-        onClick={() => setDialogVisible(true)}
-        variant="secondary"
-        cy="show-invite-input"
-        type="button"
-        size="small"
-      >
+      <Button onClick={openDialog} variant="secondary" cy="show-invite-input" type="button" size="small">
         Invite external researcher
       </Button>
     </>
