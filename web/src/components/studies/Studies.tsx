@@ -7,10 +7,9 @@ type Props = {
 };
 
 export default function Studies({ userData }: Props) {
-  const isIgOpsStaff = userData.roles.includes("ig-ops-staff");
-
+  // admin view for IG Ops staff users
   if (userData.roles.includes("ig-ops-staff")) {
-    return <IGOpsStudies isIgOpsStaff={isIgOpsStaff} />;
+    return <IGOpsStudies userData={userData} />;
   }
 
   // default studies view for normal researcher users

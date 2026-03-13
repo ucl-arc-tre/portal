@@ -8,10 +8,10 @@ import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type Props = {
-  isIgOpsStaff: boolean;
+  userData: Auth;
 };
 
-export default function IGOpsStudies({ isIgOpsStaff }: Props) {
+export default function IGOpsStudies({ userData }: Props) {
   const [isLoading, setStudiesLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
   const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
@@ -104,11 +104,7 @@ export default function IGOpsStudies({ isIgOpsStaff }: Props) {
           <h2>No studies found</h2>
         </div>
       ) : (
-        <StudyCardsList
-          studies={tab === "pending" ? pendingStudies : studies}
-          isIGOpsStaff={isIgOpsStaff}
-          canSeeAll={true}
-        />
+        <StudyCardsList studies={tab === "pending" ? pendingStudies : studies} />
       )}
     </>
   );

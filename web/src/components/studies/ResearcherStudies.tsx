@@ -85,7 +85,7 @@ export default function ResearcherStudies({ userData }: Props) {
         </div>
       )}
 
-      {studies.length > 0 && <StudyCardsList studies={studies} isIGOpsStaff={false} canSeeAll={false} />}
+      {studies.length > 0 && <StudyCardsList studies={studies} />}
     </>
   );
 }

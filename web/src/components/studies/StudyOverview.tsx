@@ -9,7 +9,6 @@ import { formatDate } from "../shared/exports";
 
 type StudyOverviewProps = {
   study: Study;
-  isIGOpsStaff: boolean;
   riskScore: number;
   riskScoreLoading: boolean;
   approvalStatus: ApprovalStatus | undefined;
@@ -18,7 +17,7 @@ type StudyOverviewProps = {
 };
 
 export default function StudyOverview(props: StudyOverviewProps) {
-  const { study, isIGOpsStaff, approvalStatus, riskScore, riskScoreLoading, feedback, numEntities } = props;
+  const { study, approvalStatus, riskScore, riskScoreLoading, feedback, numEntities } = props;
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
@@ -42,7 +41,7 @@ export default function StudyOverview(props: StudyOverviewProps) {
           Risk Score:
           <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
         </span>
-        <StatusBadge status={approvalStatus} isOpsStaff={isIGOpsStaff} type="study" />
+        <StatusBadge status={approvalStatus} type="study" />
       </div>
       <h3 className={styles.description}>{study.description}</h3>
       <div>
