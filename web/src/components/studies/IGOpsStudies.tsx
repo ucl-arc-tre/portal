@@ -11,41 +11,14 @@ export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
   const [studies, setStudies] = useState<Study[]>([]);
-  const [pendingStudies, setPendingStudies] = useState<Study[]>([]);
   const [tab, setTab] = useState("pending");
 
-  const currentStudies = tab === "pending" ? pendingStudies : studies;
-
-  useEffect(() => {
-    // fetch pending studies on load since that's the default tab
-    const fetchPendingStudies = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await getStudies({ query: { status: "Pending" } });
-        if (!response.response.ok || !response.data) {
-          setError(`Failed to fetch pending studies: ${extractErrorMessage(response)}`);
-          return;
-        }
-        setPendingStudies(response.data);
-      } catch (error) {
-        console.error("Failed to get pending studies:", error);
-        setError("Failed to get pending studies. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPendingStudies();
-  }, []);
-
-  const getAllStudies = async () => {
-    if (studies.length) return; // if we already have all studies, no need to fetch again
-
+  const fetchStudies = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getStudies();
+      const response = tab === "pending" ? await getStudies({ query: { status: "Pending" } }) : await getStudies();
+
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
@@ -59,10 +32,11 @@ export default function IGOpsStudies() {
     }
   };
 
-  const handleAllStudiesClick = async () => {
-    setTab("all");
-    getAllStudies();
-  };
+  useEffect(() => {
+    fetchStudies();
+  }, [tab]);
+
+  const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
 
   if (errorMessage) {
     return (
@@ -86,7 +60,7 @@ export default function IGOpsStudies() {
         </Button>
 
         <Button
-          onClick={handleAllStudiesClick}
+          onClick={() => setTab("all")}
           variant="secondary"
           className={`tab ${tab === "all" ? "active" : ""}`}
           data-cy="all-studies-tab-button"
@@ -97,13 +71,13 @@ export default function IGOpsStudies() {
 
       {isLoading && <Loading message="Loading studies..." />}
 
-      {!isLoading && currentStudies.length === 0 && (
+      {!isLoading && studies.length === 0 && (
         <div className={styles["no-studies-message"]}>
-          <h2>No studies found</h2>
+          <h2>{emptyMessage}</h2>
         </div>
       )}
 
-      {currentStudies.length > 0 && <StudyCardsList studies={currentStudies} />}
+      {studies.length > 0 && <StudyCardsList studies={studies} />}
     </>
   );
 }
