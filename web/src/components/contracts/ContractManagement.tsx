@@ -11,7 +11,6 @@ type ContractManagementProps = {
   contracts: Contract[];
   canModify: boolean;
   assetContractsCompleted: boolean;
-  setContractsNeedAttention: (needsAttention: boolean) => void;
   fetchStudyContents: () => Promise<void>;
 };
 

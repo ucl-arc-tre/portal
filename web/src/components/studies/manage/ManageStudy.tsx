@@ -10,11 +10,13 @@ import {
 } from "@/openapi";
 import Button from "../../ui/Button";
 import StudyDetails from "./StudyDetails";
-import StudyForm from "../study-form/StudyForm";
 import StudySetupSteps from "./StudySetupSteps";
+import Assets from "../../assets/Assets";
+import ContractManagement from "../../contracts/ContractManagement";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import { Alert, AlertCircleIcon, AlertMessage } from "../../shared/uikitExports";
+import { calculateExpiryUrgency } from "../../shared/exports";
 
 import styles from "./ManageStudy.module.css";
 
@@ -25,12 +27,12 @@ type ManageStudyProps = {
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [studyStepsCompleted, setStudyStepsCompleted] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [assetContractsCompleted, setAssetContractsCompleted] = useState(false);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState("overview");
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -38,6 +40,12 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
+
+  const assetsNeedAttention = !assetContractsCompleted;
+  const contractsNeedAttention = contracts.some((contract) => {
+    const urgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+    return urgency && urgency.level !== "low";
+  });
 
   const checkAssetManagementCompleted = useCallback(
     async (assets: Asset[]) => {
@@ -114,26 +122,13 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     }
   }, [study.id, checkAssetManagementCompleted, fetchStudyContents]);
 
-  const onComplete = () => {
-    setIsFormOpen(false);
-    fetchStudy(study.id);
-  };
-
   const onStepsComplete = useCallback(() => setStudyStepsCompleted(true), []);
 
+  if (!userData) return null;
   if (isLoading) return null;
 
   return (
     <>
-      {isFormOpen && userData && (
-        <StudyForm
-          username={userData.username}
-          setIsFormOpen={setIsFormOpen}
-          editingStudy={study}
-          onComplete={onComplete}
-        />
-      )}
-
       {error && (
         <Alert type="error">
           <AlertMessage>{error}</AlertMessage>
@@ -153,24 +148,54 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
       {(studyStepsCompleted || isIGOpsStaff) && (
         <>
-          {isStudyOwnerOrAdmin && (
-            <div className={styles["study-actions"]}>
-              <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
-                Edit Study
-              </Button>
-            </div>
+          <div className={"tab-collection"}>
+            <Button
+              onClick={() => setTab("overview")}
+              variant="secondary"
+              className={`tab ${tab === "overview" ? "active" : ""}`}
+            >
+              Study Overview
+            </Button>
+
+            <Button
+              onClick={() => setTab("assets")}
+              variant="secondary"
+              className={`tab ${tab === "assets" ? "active" : ""}`}
+            >
+              Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
+            </Button>
+
+            <Button
+              onClick={() => setTab("contracts")}
+              variant="secondary"
+              className={`tab ${tab === "contracts" ? "active" : ""}`}
+            >
+              Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
+            </Button>
+          </div>
+
+          {tab === "overview" && <StudyDetails study={study} assets={assets} fetchStudy={fetchStudy} />}
+
+          {tab === "assets" && (
+            <Assets
+              study={study}
+              assets={assets}
+              setAssets={setAssets}
+              setAssetContractsCompleted={setAssetContractsCompleted}
+              setTab={setTab}
+              checkAssetManagementCompleted={checkAssetManagementCompleted}
+            />
           )}
 
-          <StudyDetails
-            study={study}
-            contracts={contracts}
-            assets={assets}
-            setAssets={setAssets}
-            assetContractsCompleted={assetContractsCompleted}
-            setAssetContractsCompleted={setAssetContractsCompleted}
-            checkAssetManagementCompleted={checkAssetManagementCompleted}
-            fetchStudyContents={fetchStudyContents}
-          />
+          {tab === "contracts" && (
+            <ContractManagement
+              study={study}
+              contracts={contracts}
+              canModify={isStudyOwnerOrAdmin}
+              assetContractsCompleted={assetContractsCompleted}
+              fetchStudyContents={fetchStudyContents}
+            />
+          )}
         </>
       )}
     </>
