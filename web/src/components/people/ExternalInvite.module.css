@@ -21,16 +21,7 @@
   width: 100%;
   align-items: center;
   margin-top: 0.5rem;
-}
-
-.success-message {
-  color: var(--green-200);
-  cursor: pointer;
-  text-align: center;
-  justify-self: center;
-  align-self: center;
-  display: block;
-  width: 100%;
+  margin-bottom: 0.1rem;
 }
 
 .loader {

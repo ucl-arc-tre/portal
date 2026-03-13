@@ -11,7 +11,7 @@ export default function ExternalInvite() {
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -19,14 +19,14 @@ export default function ExternalInvite() {
     try {
       setIsLoading(true);
       setErrorMessage("");
-      setShowSuccessMessage(false);
+      setSuccessMessage("");
       const response = await postUsersInvite({ body: { email } });
       if (!response.response.ok) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
         return;
       }
-      setShowSuccessMessage(true);
+      setSuccessMessage("Invite sent");
       setEmail("");
     } catch (err) {
       console.error("Invite post error:", err);
@@ -38,7 +38,7 @@ export default function ExternalInvite() {
 
   useEffect(() => {
     if (isDialogVisible === false) {
-      setShowSuccessMessage(false);
+      setSuccessMessage("");
       setErrorMessage("");
     }
   }, [isDialogVisible]);
@@ -48,16 +48,6 @@ export default function ExternalInvite() {
       {isDialogVisible && (
         <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
           <div className={styles["dialog-content"]}>
-            {showSuccessMessage && (
-              <small onClick={() => setShowSuccessMessage(false)} className={styles["success-message"]}>
-                &times; Invitation sent!
-              </small>
-            )}
-            {errorMessage && (
-              <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
-              </Alert>
-            )}
             <form onSubmit={handleSubmit} className={styles["invite-form"]}>
               <Label htmlFor="email">Invite a researcher to the portal</Label>
               <Input
@@ -78,6 +68,11 @@ export default function ExternalInvite() {
                 )}
                 Send Invitation
               </Button>{" "}
+              {(errorMessage || successMessage) && (
+                <Alert type={errorMessage ? "error" : "success"}>
+                  <AlertMessage>{errorMessage || successMessage}</AlertMessage>
+                </Alert>
+              )}
             </form>
           </div>
         </Dialog>
