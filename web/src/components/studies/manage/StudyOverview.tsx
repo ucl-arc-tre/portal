@@ -1,11 +1,11 @@
 import { Study, ApprovalStatus } from "@/openapi";
-import Box from "../ui/Box";
-import { Alert } from "../shared/uikitExports";
-import StatusBadge from "../ui/StatusBadge";
+import Box from "../../ui/Box";
+import { Alert } from "../../shared/uikitExports";
+import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
-import InfoTooltip from "../ui/InfoTooltip";
-import Loading from "../ui/Loading";
-import { formatDate } from "../shared/exports";
+import InfoTooltip from "../../ui/InfoTooltip";
+import Loading from "../../ui/Loading";
+import { formatDate } from "../../shared/exports";
 
 type StudyOverviewProps = {
   study: Study;

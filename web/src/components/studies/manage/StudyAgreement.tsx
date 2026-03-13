@@ -10,7 +10,7 @@ import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
 import { useAuth } from "@/hooks/useAuth";
-import { AlertMessage, Alert } from "../shared/uikitExports";
+import { AlertMessage, Alert } from "../../shared/uikitExports";
 
 type StudyAgreementProps = {
   studyId: string;

@@ -7,28 +7,28 @@ import {
   getStudiesByStudyIdContracts,
   Study,
 } from "@/openapi";
-import StepProgress from "../ui/steps/StepProgress";
-import StepArrow from "../ui/steps/StepArrow";
+import StepProgress from "../../ui/steps/StepProgress";
+import StepArrow from "../../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
-import Assets from "../assets/Assets";
+import Assets from "../../assets/Assets";
+import StudyDetails from "./StudyDetails";
+import StudyForm from "../study-form/StudyForm";
+import StudyAdminsAgreements from "./StudyAdminsAgreements";
+import { useAuth } from "@/hooks/useAuth";
+import { extractErrorMessage } from "@/lib/errorHandler";
+import { Alert, AlertMessage } from "../../shared/uikitExports";
 
 import styles from "./ManageStudy.module.css";
-import StudyDetails from "./StudyDetails";
-import { useAuth } from "@/hooks/useAuth";
-import StudyForm from "./StudyForm";
-import StudyAdminsAgreements from "./StudyAdminsAgreements";
-import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type ManageStudyProps = {
   study: Study;
-  fetchStudy: (id?: string) => Promise<void>;
+  fetchStudy: (id: string) => Promise<void>;
 };
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
   const [adminsAgreementsCompleted, setAdminsAgreementsCompleted] = useState(false);
-  const [studyFormOpen, setStudyFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [numAssets, setNumAssets] = useState<number | null>(null);
@@ -113,6 +113,11 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     }
   }, [study.id, checkAssetManagementCompleted, fetchStudyContents]);
 
+  const onComplete = () => {
+    setIsFormOpen(false);
+    fetchStudy(study.id);
+  };
+
   const studyStepsCompleted = agreementCompleted && adminsAgreementsCompleted && hasAsset;
 
   const studySteps: Step[] = [
@@ -139,7 +144,9 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       current: hasAsset && !adminsAgreementsCompleted,
     },
   ];
+
   if (isLoading) return null;
+
   const getCurrentStepComponent = () => {
     if (!agreementCompleted) {
       return (
@@ -183,12 +190,12 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
   return (
     <>
-      {studyFormOpen && userData && (
+      {isFormOpen && userData && (
         <StudyForm
           username={userData.username}
-          setStudyFormOpen={setStudyFormOpen}
+          setIsFormOpen={setIsFormOpen}
           editingStudy={study}
-          fetchStudyData={fetchStudy}
+          onComplete={onComplete}
         />
       )}
 
@@ -203,7 +210,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           <StudyDetails
             userData={userData}
             study={study}
-            setStudyFormOpen={setStudyFormOpen}
+            setIsFormOpen={setIsFormOpen}
             studyStepsCompleted={studyStepsCompleted}
             assets={assets}
             setAssets={setAssets}
@@ -234,7 +241,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
             <StudyDetails
               userData={userData}
               study={study}
-              setStudyFormOpen={setStudyFormOpen}
+              setIsFormOpen={setIsFormOpen}
               studyStepsCompleted={studyStepsCompleted}
               assets={assets}
               setAssets={setAssets}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
-import StudyForm from "./StudyForm";
+import StudyForm from "./study-form/StudyForm";
 import Button from "@/components/ui/Button";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
@@ -15,7 +15,7 @@ export default function ResearcherStudies() {
   const [isLoading, setIsLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [studyFormOpen, setStudyFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
 
@@ -44,6 +44,11 @@ export default function ResearcherStudies() {
     fetchStudies();
   }, []);
 
+  const onComplete = () => {
+    setIsFormOpen(false);
+    fetchStudies();
+  };
+
   if (!userData) return null;
 
   if (error) {
@@ -69,12 +74,10 @@ export default function ResearcherStudies() {
 
   return (
     <>
-      {studyFormOpen && (
-        <StudyForm username={userData.username} setStudyFormOpen={setStudyFormOpen} fetchStudyData={fetchStudies} />
-      )}
+      {isFormOpen && <StudyForm username={userData.username} setIsFormOpen={setIsFormOpen} onComplete={onComplete} />}
 
       <div className={styles["create-study-section"]}>
-        <Button onClick={() => setStudyFormOpen(true)} size="large" data-cy="create-study-button">
+        <Button onClick={() => setIsFormOpen(true)} size="large" data-cy="create-study-button">
           Create New Study
         </Button>
       </div>

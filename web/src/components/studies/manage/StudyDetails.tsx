@@ -8,21 +8,21 @@ import {
   Auth,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
+import { Alert, AlertCircleIcon, AlertMessage } from "../../shared/uikitExports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
-import Button from "../ui/Button";
+import Button from "../../ui/Button";
 import AdminFeedbackSection from "./AdminFeedbackSection";
-import { storageDefinitions } from "../shared/storageDefinitions";
-import Assets from "../assets/Assets";
+import { storageDefinitions } from "../../shared/storageDefinitions";
+import Assets from "../../assets/Assets";
 import StudyOverview from "./StudyOverview";
-import ContractManagement from "../contracts/ContractManagement";
-import { calculateExpiryUrgency } from "../shared/exports";
+import ContractManagement from "../../contracts/ContractManagement";
+import { calculateExpiryUrgency } from "../../shared/exports";
 
 type StudyDetailsProps = {
   userData: Auth | null;
   study: Study;
-  setStudyFormOpen?: (name: boolean) => void;
+  setIsFormOpen?: (name: boolean) => void;
   studyStepsCompleted?: boolean;
   assets: Asset[];
   setAssets: (assets: Asset[]) => void;
@@ -90,7 +90,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
   const {
     userData,
     study,
-    setStudyFormOpen,
+    setIsFormOpen,
     studyStepsCompleted,
     assets,
     setAssets,
@@ -233,9 +233,9 @@ export default function StudyDetails(props: StudyDetailsProps) {
       )}
 
       <div className={`${styles["tab-content"]} ${tab === "overview" ? styles.active : ""}`}>
-        {isStudyOwnerOrAdmin && setStudyFormOpen && (
+        {isStudyOwnerOrAdmin && setIsFormOpen && (
           <div className={styles["study-actions"]}>
-            <Button variant="secondary" size="small" onClick={() => setStudyFormOpen(true)} data-cy="edit-study-button">
+            <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
               {study.feedback ? "Respond to Feedback" : "Edit Study"}
             </Button>
 
