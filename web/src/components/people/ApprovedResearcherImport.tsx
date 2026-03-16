@@ -14,7 +14,6 @@ export default function ApprovedResearcherImport() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isButtonVisible, setButtonVisible] = useState(true);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
@@ -42,7 +41,6 @@ export default function ApprovedResearcherImport() {
       setErrorMessage("Failed to upload approved researchers. Please try again.");
     }
     setIsLoading(false);
-    setButtonVisible(false);
   }
 
   function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
@@ -56,7 +54,6 @@ export default function ApprovedResearcherImport() {
     setSuccessMessage("");
     setErrorMessage("");
     setDialogVisible(true);
-    setButtonVisible(true);
   }
 
   return (
@@ -73,16 +70,14 @@ export default function ApprovedResearcherImport() {
                 ) containing approved researchers.
               </p>
               <input ref={inputRef} aria-label="file" type="file" accept=".csv" hidden onChange={handleFileUpload} />
-              {isButtonVisible && (
-                <Button disabled={isLoading} onClick={handleSubmit} type="submit" cy="approved-researcher-upload">
-                  {isLoading && (
-                    <span className={styles.loader}>
-                      <Loading message="" size="small" />
-                    </span>
-                  )}
-                  Upload
-                </Button>
-              )}
+              <Button disabled={isLoading} onClick={handleSubmit} type="submit" cy="approved-researcher-upload">
+                {isLoading && (
+                  <span className={styles.loader}>
+                    <Loading message="" size="small" />
+                  </span>
+                )}
+                Upload
+              </Button>
               {(errorMessage || successMessage) && (
                 <Alert type={errorMessage ? "error" : "success"}>
                   <AlertMessage>{errorMessage || successMessage}</AlertMessage>

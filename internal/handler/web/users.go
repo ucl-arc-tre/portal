@@ -126,7 +126,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	}
 
 	inviter := middleware.GetUser(ctx)
-	if _, err := h.users.InviteUser(ctx, invite.Email, inviter); err != nil {
+	if _, err := h.users.InviteExternalUser(ctx, invite.Email, inviter); err != nil {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}
