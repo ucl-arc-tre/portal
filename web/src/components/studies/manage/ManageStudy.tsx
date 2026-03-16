@@ -53,6 +53,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   );
 
   const fetchStudyContents = useCallback(async () => {
+    setError(null);
     setIsLoading(true);
 
     try {
