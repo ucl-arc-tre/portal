@@ -63,29 +63,31 @@ export default function ResearcherStudies() {
     return <Loading message="Loading studies..." />;
   }
 
-  if (!isApprovedStaffResearcher && studies.length === 0) {
-    return (
-      <div className={styles["no-studies-message"]}>
-        <h2>You haven&apos;t been added to any studies yet</h2>
-        <p>Any studies you are added to will appear here once they have been created by a member of staff.</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      {isFormOpen && <StudyForm username={userData.username} setIsFormOpen={setIsFormOpen} onComplete={onComplete} />}
+      {isApprovedStaffResearcher && isFormOpen && (
+        <StudyForm username={userData.username} setIsFormOpen={setIsFormOpen} onComplete={onComplete} />
+      )}
 
-      <div className={styles["create-study-section"]}>
-        <Button onClick={() => setIsFormOpen(true)} size="large" data-cy="create-study-button">
-          Create New Study
-        </Button>
-      </div>
+      {isApprovedStaffResearcher && (
+        <div className={styles["create-study-section"]}>
+          <Button onClick={() => setIsFormOpen(true)} size="large" data-cy="create-study-button">
+            Create New Study
+          </Button>
+        </div>
+      )}
 
-      {studies.length === 0 && (
+      {studies.length === 0 && isApprovedStaffResearcher && (
         <div className={styles["no-studies-message"]}>
           <h2>No studies found</h2>
-          <p>Any studies you are added to will appear here once they have been created.</p>
+          <p>Any studies you create will appear here.</p>
+        </div>
+      )}
+
+      {studies.length === 0 && !isApprovedStaffResearcher && (
+        <div className={styles["no-studies-message"]}>
+          <h2>You haven&apos;t been added to any studies yet</h2>
+          <p>Any studies you are added to will appear here once they have been created by a member of staff.</p>
         </div>
       )}
 
