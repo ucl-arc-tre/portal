@@ -14,13 +14,14 @@ type AdminReviewProps = {
 };
 
 export default function AdminReview({ study, unagreedAdminUsernames, onReviewComplete }: AdminReviewProps) {
+  const [loadingAction, setLoadingAction] = useState<ApprovalStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState(study.feedback ?? "");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [feedbackRequired, setFeedbackRequired] = useState(false);
+
   const status = study.approval_status;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
-  const [feedback, setFeedback] = useState(study.feedback ?? "");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [feedbackRequired, setFeedbackRequired] = useState(false);
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
@@ -32,24 +33,30 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
       setFeedbackRequired(true);
       return;
     }
-    setSuccessMessage("");
-    setErrorMessage("");
-    setSubmitted(true);
 
-    const response = await postStudiesAdminByStudyIdReview({
-      path: { studyId: study.id },
-      body: { status: newStatus, feedback: feedbackContent },
-    });
+    setSuccessMessage(null);
+    setError(null);
+    setLoadingAction(newStatus);
 
-    if (!response.response.ok) {
-      setErrorMessage(`Failed to update study status: ${extractErrorMessage(response)}`);
-      setSubmitted(false);
-      return;
+    try {
+      const response = await postStudiesAdminByStudyIdReview({
+        path: { studyId: study.id },
+        body: { status: newStatus, feedback: feedbackContent },
+      });
+
+      if (!response.response.ok) {
+        setError(`Failed to update study status: ${extractErrorMessage(response)}`);
+        return;
+      }
+
+      setFeedback("");
+      setSuccessMessage("Updated successfully");
+      await onReviewComplete();
+    } catch {
+      setError("Failed to update study status. Please try again.");
+    } finally {
+      setLoadingAction(null);
     }
-
-    setFeedback("");
-    setSuccessMessage("Updated successfully");
-    await onReviewComplete();
   };
 
   return (
@@ -57,10 +64,12 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
       {(status === "Pending" || status === "Rejected") && (
         <Box>
           <h3 className={styles["heading"]}>Review Study</h3>
+
           <p>
             Review all aspects of the study, including its details, information assets, and contracts, before making a
             decision. You may optionally provide feedback to the study owner, or include a reason if requesting changes.
           </p>
+
           <div className={styles["feedback-container"]}>
             <form className={styles["feedback-form"]}>
               <label htmlFor="feedback">Feedback</label>
@@ -79,10 +88,10 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
               <Alert type="warning">
                 <AlertMessage>
                   The following administrators have not yet agreed to the study agreement:{" "}
-                  {unagreedAdminUsernames.map((u, i) => (
-                    <span key={u}>
-                      <strong>{u}</strong>
-                      {i < unagreedAdminUsernames.length - 1 ? ", " : ""}
+                  {unagreedAdminUsernames.map((username, index) => (
+                    <span key={username}>
+                      <strong>{username}</strong>
+                      {index < unagreedAdminUsernames.length - 1 ? ", " : ""}
                     </span>
                   ))}
                   . The study cannot be approved until all administrators have agreed. Please inform all admins to log
@@ -96,18 +105,18 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
                 className={styles["approve-button"]}
                 onClick={() => handleStudyStatusUpdate("Approved", feedback)}
                 data-cy="study-approve-button"
-                disabled={submitted || hasUnagreedAdmins}
+                disabled={!!loadingAction || hasUnagreedAdmins}
               >
-                Approve Study
+                {loadingAction === "Approved" ? "Approving..." : "Approve Study"}
               </Button>
 
               <Button
                 variant="secondary"
                 className={styles["reject-button"]}
                 onClick={() => handleStudyStatusUpdate("Rejected", feedback)}
-                disabled={submitted}
+                disabled={!!loadingAction}
               >
-                Request Changes
+                {loadingAction === "Rejected" ? "Requesting Changes..." : "Request Changes"}
               </Button>
             </div>
 
@@ -138,10 +147,11 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
             </form>
 
             <div className={styles["buttons-container"]}>
-              <Button onClick={() => handleStudyStatusUpdate("Approved", feedback)}>
-                {feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
+              <Button onClick={() => handleStudyStatusUpdate("Approved", feedback)} disabled={!!loadingAction}>
+                {loadingAction === "Approved" ? "Saving..." : feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
               </Button>
             </div>
+
             {feedbackRequired && (
               <small className={styles["feedback-required"]}>Please provide feedback before submitting.</small>
             )}
@@ -149,9 +159,9 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
         </Box>
       )}
 
-      {(errorMessage || successMessage) && (
-        <Alert type={errorMessage ? "error" : "success"}>
-          <AlertMessage>{errorMessage || successMessage}</AlertMessage>
+      {(error || successMessage) && (
+        <Alert type={error ? "error" : "success"}>
+          <AlertMessage>{error || successMessage}</AlertMessage>
         </Alert>
       )}
     </>

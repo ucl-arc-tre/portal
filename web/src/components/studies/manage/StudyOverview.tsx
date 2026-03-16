@@ -127,10 +127,10 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         <Alert type="warning">
           <AlertMessage>
             The following administrators have not yet agreed to the study agreement:{" "}
-            {unagreedAdminUsernames.map((u, i) => (
-              <span key={u}>
-                <strong>{u}</strong>
-                {i < unagreedAdminUsernames.length - 1 ? ", " : ""}
+            {unagreedAdminUsernames.map((username, index) => (
+              <span key={username}>
+                <strong>{username}</strong>
+                {index < unagreedAdminUsernames.length - 1 ? ", " : ""}
               </span>
             ))}
             . The study cannot be submitted for review until all administrators have agreed. Please inform all admins to
