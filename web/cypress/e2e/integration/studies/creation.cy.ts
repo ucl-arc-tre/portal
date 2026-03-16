@@ -80,11 +80,11 @@ describe("Study creation end-to-end", () => {
     cy.contains("Last signed off").should("not.exist");
   });
 
-  it("ig ops should see a study", () => {
+  it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
-    cy.get('[data-cy="study-card"]').first().contains("View Study").click();
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
     cy.get('[data-cy="study-approve-button"]').click();
   });
 
