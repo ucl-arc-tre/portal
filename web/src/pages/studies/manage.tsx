@@ -49,7 +49,7 @@ export default function ManageStudyPage() {
   };
 
   useEffect(() => {
-    if (!isApprovedResearcher) return;
+    if (studyId == undefined || !isApprovedResearcher) return;
     fetchStudy(studyId as string);
   }, [studyId, isApprovedResearcher]);
 
