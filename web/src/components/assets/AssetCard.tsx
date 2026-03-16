@@ -38,7 +38,7 @@ export default function AssetCard(props: AssetCardProps) {
       }
     };
     isAssetCompleted();
-  }, [asset.id, studyId]);
+  }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
 
   const getClassificationClass = (classification: string) => {
     switch (classification) {
