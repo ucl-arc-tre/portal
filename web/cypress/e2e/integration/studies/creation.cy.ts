@@ -59,7 +59,7 @@ describe("Study creation end-to-end", () => {
     const additionalAdminUsernamePrefix = "portal-e2e-admin";
 
     cy.get('[data-cy="edit-study-button"]').click();
-    cy.get('[data-cy="add-study-admin-button"').click();
+    cy.get('[data-cy="add-study-admin-button"]').click();
     cy.get('[name="additionalStudyAdminUsernames.0.value"]').type(additionalAdminUsernamePrefix);
     cy.get('[data-cy="next"]').click();
     cy.get('[data-cy="next"]').click();
