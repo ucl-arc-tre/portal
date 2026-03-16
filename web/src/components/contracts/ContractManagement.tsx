@@ -10,12 +10,12 @@ type ContractManagementProps = {
   study: Study;
   contracts: Contract[];
   canModify: boolean;
-  assetContractsCompleted: boolean;
+  someAssetsRequireContracts: boolean;
   fetchStudyContents: () => Promise<void>;
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const { study, contracts, canModify, assetContractsCompleted, fetchStudyContents } = props;
+  const { study, contracts, canModify, someAssetsRequireContracts, fetchStudyContents } = props;
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
 
@@ -26,11 +26,8 @@ export default function ContractManagement(props: ContractManagementProps) {
   };
 
   const handleEditContract = (contract: Contract) => {
-    if (!canModify) {
-      return;
-    }
+    if (!canModify) return;
     setEditingContract(contract);
-
     setShowUploadModal(true);
   };
 
@@ -56,13 +53,13 @@ export default function ContractManagement(props: ContractManagementProps) {
       )}
 
       {contracts.length === 0 &&
-        (!assetContractsCompleted || study.involves_external_users || study.involves_third_party) && (
+        (someAssetsRequireContracts || study.involves_external_users || study.involves_third_party) && (
           <div className={styles["contract-requirement-notice"]}>
             <div>
               Based on your responses while making your Study and Asset, uploading a contract is required. This is
               because you said:
               <ul>
-                {!assetContractsCompleted && <li>An asset in this study requires a contract.</li>}
+                {someAssetsRequireContracts && <li>An asset in this study requires a contract.</li>}
                 {study.involves_external_users && <li>Your study involves external users.</li>}
                 {study.involves_third_party && <li>Your study involves third parties.</li>}
               </ul>

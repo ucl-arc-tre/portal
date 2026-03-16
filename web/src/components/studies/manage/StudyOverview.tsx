@@ -10,7 +10,7 @@ import { storageDefinitions } from "../../shared/storageDefinitions";
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
 
-type StudyDetailsProps = {
+type StudyOverviewProps = {
   study: Study;
   assets: Asset[];
   fetchStudy: (id: string) => Promise<void>;
@@ -56,7 +56,7 @@ const calculateRiskScore = async (study: Study, assets: Asset[]) => {
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 
-export default function StudyOverview({ study, assets, fetchStudy }: StudyDetailsProps) {
+export default function StudyOverview({ study, assets, fetchStudy }: StudyOverviewProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [feedback, setFeedback] = useState("");

@@ -5,13 +5,12 @@ import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import { formatDate } from "../shared/exports";
-import { checkAssetManagementCompleted } from "../studies/manage/lib/assetContracts";
+import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
   canModify: boolean;
-  setTab?: (tab: string) => void;
 };
 
 const formatClassification = (classification: string) => {
@@ -23,7 +22,7 @@ const formatProtection = (protection: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, canModify, setTab } = props;
+  const { studyId, asset, canModify } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +30,7 @@ export default function AssetCard(props: AssetCardProps) {
   useEffect(() => {
     const isAssetCompleted = async () => {
       try {
-        const response = await checkAssetManagementCompleted([asset], studyId);
+        const response = await checkAllRequiredAssetContractsLinked([asset], studyId);
         setIsCompleted(response);
       } catch (err) {
         console.error("Failed to check asset completion:", err);
@@ -39,7 +38,7 @@ export default function AssetCard(props: AssetCardProps) {
       }
     };
     isAssetCompleted();
-  });
+  }, [asset.id, studyId]);
 
   const getClassificationClass = (classification: string) => {
     switch (classification) {
@@ -116,20 +115,19 @@ export default function AssetCard(props: AssetCardProps) {
               This asset requires a contract that has not yet been added. You can manage contracts under the Contracts
               tab.
             </small>
-            {setTab && (
-              <Button
-                onClick={() => {
-                  setTab("contracts");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                variant="secondary"
-                size="small"
-              >
-                Contracts{" "}
-              </Button>
-            )}
+            <Button
+              onClick={() => {
+                router.push({ query: { ...router.query, tab: "contracts" } }, undefined, { shallow: true });
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              variant="secondary"
+              size="small"
+            >
+              Contracts
+            </Button>
           </>
         )}
+
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
           {canModify ? "Manage Asset" : "View Asset"}
         </Button>

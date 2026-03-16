@@ -1,8 +1,7 @@
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { Asset, getStudiesByStudyIdAssetsByAssetIdContracts } from "@/openapi";
 
-// need to review if this function is implemented well
-export const checkAssetManagementCompleted = async (assets: Asset[], studyId: string) => {
+export const checkAllRequiredAssetContractsLinked = async (assets: Asset[], studyId: string) => {
   const checkAssetForContracts = async (assetId: string): Promise<boolean> => {
     const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
       path: { studyId, assetId },

@@ -16,11 +16,10 @@ type AssetsProps = {
   study: Study;
   assets: Asset[];
   setAssets: (assets: Asset[]) => void;
-  setTab?: (tab: string) => void;
 };
 
 export default function Assets(props: AssetsProps) {
-  const { study, assets, setAssets, setTab } = props;
+  const { study, assets, setAssets } = props;
   const { userData } = useAuth();
   const canModify =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
@@ -129,7 +128,7 @@ export default function Assets(props: AssetsProps) {
 
           <div className={styles["assets-grid"]}>
             {assets.map((asset) => (
-              <AssetCard key={asset.id} studyId={study.id} asset={asset} canModify={canModify} setTab={setTab} />
+              <AssetCard key={asset.id} studyId={study.id} asset={asset} canModify={canModify} />
             ))}
           </div>
         </div>
