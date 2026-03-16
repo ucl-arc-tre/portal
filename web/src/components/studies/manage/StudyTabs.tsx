@@ -1,18 +1,27 @@
 import { useRouter } from "next/router";
+import { Asset, Contract } from "@/openapi";
 import Button from "../../ui/Button";
 import { AlertCircleIcon } from "../../shared/uikitExports";
+import { calculateExpiryUrgency } from "../../shared/exports";
 import styles from "./StudyTabs.module.css";
 
 type StudyTabsProps = {
-  assetsNeedAttention: boolean;
-  contractsNeedAttention: boolean;
+  assets: Asset[];
+  contracts: Contract[];
 };
 
-export default function StudyTabs({ assetsNeedAttention, contractsNeedAttention }: StudyTabsProps) {
+export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
   const router = useRouter();
   const tab = (router.query.tab as string) ?? "study";
   const setTab = (newTab: string) =>
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
+
+  const assetsNeedAttention = assets.some((asset) => asset.requires_contract && asset.contract_ids.length === 0);
+
+  const contractsNeedAttention = contracts.some((contract) => {
+    const urgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+    return urgency !== null && urgency.level !== "low";
+  });
 
   return (
     <div className={"tab-collection"}>

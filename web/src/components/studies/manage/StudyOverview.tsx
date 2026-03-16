@@ -1,11 +1,10 @@
-import { postStudiesAdminByStudyIdReview, patchStudiesByStudyIdPending, Study, Asset, ApprovalStatus } from "@/openapi";
+import { patchStudiesByStudyIdPending, Study, Asset } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { useEffect, useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";
-import AdminFeedback from "./AdminFeedback";
 import { storageDefinitions } from "../../shared/storageDefinitions";
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
@@ -14,6 +13,7 @@ type StudyOverviewProps = {
   study: Study;
   assets: Asset[];
   fetchStudy: (id: string) => Promise<void>;
+  unagreedAdminUsernames: string[];
 };
 
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
@@ -56,13 +56,12 @@ const calculateRiskScore = async (study: Study, assets: Asset[]) => {
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 
-export default function StudyOverview({ study, assets, fetchStudy }: StudyOverviewProps) {
+export default function StudyOverview({ study, assets, fetchStudy, unagreedAdminUsernames }: StudyOverviewProps) {
   const [riskScore, setRiskScore] = useState(0);
   const [riskScoreLoading, setRiskScoreLoading] = useState(false);
-  const [feedback, setFeedback] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | undefined>(undefined);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -71,52 +70,24 @@ export default function StudyOverview({ study, assets, fetchStudy }: StudyOvervi
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const canRequestReview = approvalStatus !== "Approved";
+  const canRequestReview = study.approval_status !== "Approved" && isStudyOwnerOrAdmin && !isIGOpsStaff;
+  const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const onEditComplete = () => {
     setIsFormOpen(false);
     fetchStudy(study.id);
   };
 
-  const handleUpdateStudyStatus = async (status: string, feedbackContent?: string) => {
-    const studyId = study.id;
+  const handleMarkReadyForReview = async () => {
     setError(null);
-
-    if (status === "Approved") {
-      const response = await postStudiesAdminByStudyIdReview({
-        path: { studyId },
-        body: { status: "Approved", feedback: feedbackContent },
-      });
-      if (!response.response.ok) {
-        const errorMsg = extractErrorMessage(response);
-        setError(`Failed to update study status: ${errorMsg}`);
-        return response;
-      }
-      setApprovalStatus("Approved");
-      if (feedbackContent) setFeedback(feedbackContent);
-    } else if (status === "Rejected") {
-      const response = await postStudiesAdminByStudyIdReview({
-        path: { studyId },
-        body: { status: "Rejected", feedback: feedbackContent },
-      });
-      if (!response.response.ok) {
-        const errorMsg = extractErrorMessage(response);
-        setError(`Failed to update study status: ${errorMsg}`);
-        return response;
-      }
-      setApprovalStatus("Rejected");
-      if (feedbackContent) setFeedback(feedbackContent);
-    } else if (status === "Pending") {
-      const response = await patchStudiesByStudyIdPending({
-        path: { studyId },
-      });
-      if (!response.response.ok) {
-        const errorMsg = extractErrorMessage(response);
-        setError(`Failed to update study status: ${errorMsg}`);
-        return response;
-      }
-      setApprovalStatus("Pending");
+    setIsSubmittingReview(true);
+    const response = await patchStudiesByStudyIdPending({ path: { studyId: study.id } });
+    if (!response.response.ok) {
+      setError(`Failed to update study status: ${extractErrorMessage(response)}`);
+    } else {
+      await fetchStudy(study.id);
     }
+    setIsSubmittingReview(false);
   };
 
   useEffect(() => {
@@ -133,8 +104,6 @@ export default function StudyOverview({ study, assets, fetchStudy }: StudyOvervi
     };
 
     getRiskScore();
-    setApprovalStatus(study.approval_status);
-    if (study.feedback) setFeedback(study.feedback);
   }, [study, assets]);
 
   return (
@@ -154,6 +123,22 @@ export default function StudyOverview({ study, assets, fetchStudy }: StudyOvervi
         </Alert>
       )}
 
+      {hasUnagreedAdmins && isStudyOwnerOrAdmin && (
+        <Alert type="warning">
+          <AlertMessage>
+            The following administrators have not yet agreed to the study agreement:{" "}
+            {unagreedAdminUsernames.map((u, i) => (
+              <span key={u}>
+                <strong>{u}</strong>
+                {i < unagreedAdminUsernames.length - 1 ? ", " : ""}
+              </span>
+            ))}
+            . The study cannot be submitted for review until all administrators have agreed. Please inform all admins to
+            log into the portal to sign the agreement.
+          </AlertMessage>
+        </Alert>
+      )}
+
       {(isStudyOwnerOrAdmin || canRequestReview) && (
         <div className={styles["study-actions"]}>
           {isStudyOwnerOrAdmin && (
@@ -164,13 +149,14 @@ export default function StudyOverview({ study, assets, fetchStudy }: StudyOvervi
 
           {canRequestReview && (
             <>
-              {approvalStatus !== "Pending" ? (
+              {study.approval_status !== "Pending" ? (
                 <Button
-                  onClick={() => handleUpdateStudyStatus("Pending")}
+                  onClick={handleMarkReadyForReview}
+                  disabled={isSubmittingReview || hasUnagreedAdmins}
                   size="small"
                   data-cy="study-ready-for-review-button"
                 >
-                  Mark Ready for Review
+                  {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
                 </Button>
               ) : (
                 <Button disabled size="small">
@@ -186,17 +172,9 @@ export default function StudyOverview({ study, assets, fetchStudy }: StudyOvervi
         study={study}
         riskScore={riskScore}
         riskScoreLoading={riskScoreLoading}
-        approvalStatus={approvalStatus}
-        feedback={feedback}
+        approvalStatus={study.approval_status}
+        feedback={study.feedback}
       />
-
-      {isIGOpsStaff && (
-        <AdminFeedback
-          status={study.approval_status}
-          feedbackFromStudy={feedback}
-          handleUpdateStudyStatus={handleUpdateStudyStatus}
-        />
-      )}
     </>
   );
 }

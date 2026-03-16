@@ -69,6 +69,12 @@ export default function IGOpsStudies() {
         </Button>
       </div>
 
+      {tab === "pending" ? (
+        <p>Studies submitted for review. Approve or request changes for each study.</p>
+      ) : (
+        <p>All studies in the system for visibility and oversight.</p>
+      )}
+
       {isLoading && <Loading message="Loading studies..." />}
 
       {!isLoading && studies.length === 0 && (

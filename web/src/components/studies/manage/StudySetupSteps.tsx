@@ -4,7 +4,6 @@ import StepProgress from "../../ui/steps/StepProgress";
 import StepArrow from "../../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
 import Assets from "../../assets/Assets";
-import StudyAdminsAgreements from "./StudyAdminsAgreements";
 
 type StudySetupStepsProps = {
   study: Study;
@@ -15,9 +14,8 @@ type StudySetupStepsProps = {
 
 export default function StudySetupSteps({ study, assets, setAssets, onStepsComplete }: StudySetupStepsProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
-  const [adminsAgreementsCompleted, setAdminsAgreementsCompleted] = useState(false);
   const hasAsset = assets.length > 0;
-  const isComplete = agreementCompleted && adminsAgreementsCompleted && hasAsset;
+  const isComplete = agreementCompleted && hasAsset;
 
   useEffect(() => {
     if (isComplete) onStepsComplete();
@@ -39,13 +37,6 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
       completed: hasAsset,
       current: !hasAsset,
     },
-    {
-      id: "study-agreements",
-      title: "Study Agreements",
-      description: "Ensure all administrators have agreed to the study agreement",
-      completed: adminsAgreementsCompleted,
-      current: hasAsset && !adminsAgreementsCompleted,
-    },
   ];
 
   return (
@@ -64,15 +55,6 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
       )}
 
       {agreementCompleted && !hasAsset && <Assets study={study} assets={assets} setAssets={setAssets} />}
-
-      {agreementCompleted && hasAsset && !adminsAgreementsCompleted && (
-        <StudyAdminsAgreements
-          studyId={study.id}
-          studyAdminUsernames={study.additional_study_admin_usernames}
-          completed={adminsAgreementsCompleted}
-          setCompleted={setAdminsAgreementsCompleted}
-        />
-      )}
     </>
   );
 }

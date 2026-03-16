@@ -11,13 +11,13 @@ import {
 import StudyOverview from "./StudyOverview";
 import StudySetupSteps from "./StudySetupSteps";
 import StudyTabs from "./StudyTabs";
+import AdminReview from "./AdminReview";
 import Assets from "../../assets/Assets";
 import ContractManagement from "../../contracts/ContractManagement";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
-import { calculateExpiryUrgency } from "../../shared/exports";
-import { checkAllRequiredAssetContractsLinked } from "./lib/assetContractLinks";
+import Loading from "../../ui/Loading";
 
 type ManageStudyProps = {
   study: Study;
@@ -29,7 +29,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [error, setError] = useState<string | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [allRequiredAssetContractsLinked, setAllRequiredAssetContractsLinked] = useState(false);
+  const [unagreedAdminUsernames, setUnagreedAdminUsernames] = useState<string[]>([]);
   const [studyStepsCompleted, setStudyStepsCompleted] = useState(false);
 
   const router = useRouter();
@@ -42,10 +42,15 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const contractsNeedAttention = contracts.some((contract) => {
-    const contractExpiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-    return contractExpiryUrgency !== null && contractExpiryUrgency.level !== "low";
-  });
+  const checkStudyAdminAgreements = useCallback(
+    (studySignatures: string[]) => {
+      const unagreedAdminUsernames = study.additional_study_admin_usernames.filter(
+        (user) => !studySignatures.includes(user)
+      );
+      setUnagreedAdminUsernames(unagreedAdminUsernames);
+    },
+    [study.additional_study_admin_usernames]
+  );
 
   const fetchStudyContents = useCallback(async () => {
     setIsLoading(true);
@@ -69,33 +74,23 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         return;
       }
 
-      const allRequiredAssetContractsLinked =
-        assetsResponse.data.length > 0
-          ? await checkAllRequiredAssetContractsLinked(assetsResponse.data, study.id)
-          : false;
+      if (!agreementsResponse.response.ok || !agreementsResponse.data) {
+        const errorMsg = extractErrorMessage(agreementsResponse);
+        setError(`Failed to load agreements: ${errorMsg}`);
+        return;
+      }
 
       setAssets(assetsResponse.data);
-      setAllRequiredAssetContractsLinked(allRequiredAssetContractsLinked);
       setContracts(contractsResponse.data);
 
-      if (agreementsResponse.response.ok && agreementsResponse.data) {
-        const confirmedUsernames = agreementsResponse.data.usernames;
-        const userHasSigned = userData?.username ? confirmedUsernames.includes(userData.username) : false;
-        const allAdminsHaveSigned = study.additional_study_admin_usernames.every((username) =>
-          confirmedUsernames.includes(username)
-        );
-
-        if (userHasSigned && allAdminsHaveSigned && assetsResponse.data.length > 0) {
-          setStudyStepsCompleted(true);
-        }
-      }
+      checkStudyAdminAgreements(agreementsResponse.data.usernames);
     } catch (error) {
-      console.error("Failed to get study data:", error);
-      setError("Failed to load study details. Please try again later.");
+      console.error("Failed to get study contents:", error);
+      setError("Failed to load study contents. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, study.additional_study_admin_usernames, userData]);
+  }, [study.id, checkStudyAdminAgreements]);
 
   useEffect(() => {
     if (study.id) {
@@ -104,49 +99,61 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   }, [study.id, fetchStudyContents]);
 
   if (!userData) return null;
-  if (isLoading) return null;
+  if (isLoading) return <Loading message="Loading study..." />;
+
+  if (error) {
+    return (
+      <Alert type="error">
+        <AlertMessage>{error}</AlertMessage>
+      </Alert>
+    );
+  }
+
+  if (!studyStepsCompleted && !isIGOpsStaff) {
+    return (
+      <StudySetupSteps
+        study={study}
+        assets={assets}
+        setAssets={setAssets}
+        onStepsComplete={() => {
+          setStudyStepsCompleted(true);
+          fetchStudyContents();
+        }}
+      />
+    );
+  }
 
   return (
     <>
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      <StudyTabs assets={assets} contracts={contracts} />
 
-      {!studyStepsCompleted && !isIGOpsStaff && (
-        <StudySetupSteps
+      {tab === "study" && (
+        <StudyOverview
           study={study}
           assets={assets}
-          setAssets={setAssets}
-          onStepsComplete={() => {
-            setStudyStepsCompleted(true);
-            fetchStudyContents();
-          }}
+          fetchStudy={fetchStudy}
+          unagreedAdminUsernames={unagreedAdminUsernames}
         />
       )}
 
-      {(studyStepsCompleted || isIGOpsStaff) && (
-        <>
-          <StudyTabs
-            assetsNeedAttention={!allRequiredAssetContractsLinked}
-            contractsNeedAttention={contractsNeedAttention}
-          />
+      {tab === "assets" && <Assets study={study} assets={assets} setAssets={setAssets} />}
 
-          {tab === "study" && <StudyOverview study={study} assets={assets} fetchStudy={fetchStudy} />}
+      {tab === "contracts" && (
+        <ContractManagement
+          study={study}
+          contracts={contracts}
+          canModify={isStudyOwnerOrAdmin}
+          someAssetsRequireContracts={assets.some((asset) => asset.requires_contract)}
+          fetchStudyContents={fetchStudyContents}
+        />
+      )}
 
-          {tab === "assets" && <Assets study={study} assets={assets} setAssets={setAssets} />}
-
-          {tab === "contracts" && (
-            <ContractManagement
-              study={study}
-              contracts={contracts}
-              canModify={isStudyOwnerOrAdmin}
-              someAssetsRequireContracts={assets.some((asset) => asset.requires_contract)}
-              fetchStudyContents={fetchStudyContents}
-            />
-          )}
-        </>
+      {isIGOpsStaff && study.approval_status !== "Incomplete" && (
+        <AdminReview
+          study={study}
+          unagreedAdminUsernames={unagreedAdminUsernames}
+          onReviewComplete={() => fetchStudy(study.id)}
+        />
       )}
     </>
   );

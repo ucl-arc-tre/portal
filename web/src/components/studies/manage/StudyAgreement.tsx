@@ -11,6 +11,7 @@ import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertMessage, Alert } from "../../shared/uikitExports";
+import Loading from "../../ui/Loading";
 
 type StudyAgreementProps = {
   studyId: string;
@@ -65,7 +66,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
     fetchStudyAgreementData();
   }, [studyId, setAgreementCompleted, userData]);
 
-  if (isLoading) return null;
+  if (isLoading) return <Loading message="Checking if all study agreements are present..." />;
 
   if (!studyAgreementText) return <div>No study agreement could be found.</div>;
 
