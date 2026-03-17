@@ -82,7 +82,7 @@ export default function ProjectCardsList(props: Props) {
           .map((project) => (
             <div key={project.id} className={styles["project-card"]}>
               <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.approval_status} isOpsStaff={isOpsStaff} type="project" />
+                <StatusBadge status={project.approval_status} type="project" />
               </div>
 
               <div className={styles["project-info"]}>

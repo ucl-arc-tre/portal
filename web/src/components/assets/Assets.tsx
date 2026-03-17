@@ -1,12 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  Asset,
-  AssetBase,
-  getStudiesByStudyIdAssets,
-  getStudiesByStudyIdAssetsByAssetIdContracts,
-  postStudiesByStudyIdAssets,
-} from "@/openapi";
+import { useState } from "react";
+import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
+import { useAuth } from "@/hooks/useAuth";
 
 import AssetCreationForm from "./AssetCreationForm";
 import Button from "@/components/ui/Button";
@@ -17,93 +12,28 @@ import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
 import { AlertMessage, Alert } from "../shared/uikitExports";
 
-type InformationAssetsProps = {
-  studyId: string;
-  setAssetContractsCompleted?: (completed: boolean) => void;
-  setHasAsset?: (hasAsset: boolean) => void;
-  canModify: boolean;
-  setNumAssets?: (numAssets: number) => void;
-  setTab?: (tab: string) => void;
+type AssetsProps = {
+  study: Study;
+  assets: Asset[];
+  setAssets: (assets: Asset[]) => void;
 };
 
-export default function Assets(props: InformationAssetsProps) {
-  const { studyId, setAssetContractsCompleted, setHasAsset, canModify, setNumAssets, setTab } = props;
+export default function Assets(props: AssetsProps) {
+  const { study, assets, setAssets } = props;
+  const { userData } = useAuth();
+  const canModify =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
+    (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
+    false;
 
-  const [informationAssets, setInformationAssets] = useState<Asset[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
-
-  const checkAssetManagementCompleted = useCallback(
-    async (assets: Asset[]) => {
-      // for each asset, check if it requires a contract and if it does, that there is one
-
-      const checkContractsForAsset = async (assetId: string): Promise<boolean> => {
-        const response = await getStudiesByStudyIdAssetsByAssetIdContracts({
-          path: { studyId: studyId, assetId: assetId },
-        });
-
-        if (!response.response.ok || !response.data) {
-          const errorMsg = extractErrorMessage(response);
-          throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
-        }
-        return response.data.length > 0;
-      };
-
-      const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract);
-      const requiredContractChecks = assetsRequiringContracts.map((asset) => checkContractsForAsset(asset.id));
-      const results = await Promise.all(requiredContractChecks);
-      return results.every((hasContract) => hasContract);
-    },
-    [studyId]
-  );
-
-  useEffect(() => {
-    const fetchInformationAssetData = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const informationAssetResult = await getStudiesByStudyIdAssets({ path: { studyId } });
-
-        if (!informationAssetResult.response.ok || !informationAssetResult.data) {
-          const errorMsg = extractErrorMessage(informationAssetResult);
-          setError(`Failed to load Information Assets: ${errorMsg}`);
-          return;
-        }
-
-        setInformationAssets(informationAssetResult.data);
-        if (setNumAssets) {
-          setNumAssets(informationAssetResult.data.length);
-        }
-
-        if (setHasAsset && informationAssetResult.data.length > 0) {
-          setHasAsset(true);
-        }
-        if (informationAssetResult.data.length > 0) {
-          const assets = informationAssetResult.data;
-          const assetsComplete = await checkAssetManagementCompleted(assets);
-
-          if (setAssetContractsCompleted && assetsComplete) {
-            setAssetContractsCompleted(true);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load Information Assets:", err);
-        setError("Failed to load Information Assets. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInformationAssetData();
-  }, [studyId, setAssetContractsCompleted, setHasAsset, checkAssetManagementCompleted, setNumAssets]);
 
   const handleAssetSubmit = async (assetData: AssetFormData) => {
     setError(null);
 
     const response = await postStudiesByStudyIdAssets({
-      path: { studyId },
+      path: { studyId: study.id },
       body: assetData as AssetBase,
     });
 
@@ -113,27 +43,16 @@ export default function Assets(props: InformationAssetsProps) {
     }
 
     // Refresh assets list after successful creation
-    const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId } });
+    const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
     if (!updatedAssetsResult.response.ok || !updatedAssetsResult.data) {
       const errorMsg = extractErrorMessage(updatedAssetsResult);
       setError(`Failed to refresh asset list: ${errorMsg}`);
       return;
     }
 
-    setInformationAssets(updatedAssetsResult.data);
-    const assets = updatedAssetsResult.data;
-    const assetsComplete = await checkAssetManagementCompleted(assets);
-
-    if (setAssetContractsCompleted && assetsComplete) {
-      setAssetContractsCompleted(true);
-    }
-    if (setHasAsset) {
-      setHasAsset(true);
-    }
+    setAssets(updatedAssetsResult.data);
     setShowAssetForm(false);
   };
-
-  if (isLoading) return null;
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
@@ -173,7 +92,7 @@ export default function Assets(props: InformationAssetsProps) {
         </Callout>
       )}
 
-      {informationAssets.length === 0 && canModify ? (
+      {assets.length === 0 && canModify ? (
         <div>
           <div className={styles["no-assets-message"]}>
             <p>No assets have been created for this study yet.</p>
@@ -190,7 +109,7 @@ export default function Assets(props: InformationAssetsProps) {
         <div>
           <div className={styles["assets-summary"]}>
             <span>Assets for this study:</span>
-            <span className={styles["assets-count-badge"]}>{informationAssets.length}</span>
+            <span className={styles["assets-count-badge"]}>{assets.length}</span>
           </div>
 
           {canModify && (
@@ -208,15 +127,8 @@ export default function Assets(props: InformationAssetsProps) {
           )}
 
           <div className={styles["assets-grid"]}>
-            {informationAssets.map((asset) => (
-              <AssetCard
-                key={asset.id}
-                studyId={studyId}
-                asset={asset}
-                checkCompleted={checkAssetManagementCompleted}
-                canModify={canModify}
-                setTab={setTab}
-              />
+            {assets.map((asset) => (
+              <AssetCard key={asset.id} studyId={study.id} asset={asset} canModify={canModify} />
             ))}
           </div>
         </div>

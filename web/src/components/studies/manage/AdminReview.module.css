@@ -1,5 +1,10 @@
 .buttons-container {
-  padding-bottom: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-top: 1rem;
 }
 
 .approve-button {
@@ -25,17 +30,30 @@
   }
 }
 
+.heading {
+  margin-bottom: 0.75rem;
+}
+
 .feedback-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
-  justify-content: center;
+  margin-top: 2rem;
+}
+
+.feedback-required {
+  color: #a50909;
+  display: block;
+  margin-top: 0.25rem;
+  text-align: center;
 }
 
 .feedback-form {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 60%;
 }
