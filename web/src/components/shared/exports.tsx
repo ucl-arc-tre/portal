@@ -37,10 +37,7 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
 }
 
 export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
-  // needs to work for expiration in the future, used by assets and contracts,  and also account for complation date + 1yr being expiry for certificates
-
   const today = new Date();
-
   const timeUntilExpiry = expiryDate.getTime() - today.getTime();
   const daysUntilExpiry = Math.ceil(timeUntilExpiry / (1000 * 60 * 60 * 24));
 

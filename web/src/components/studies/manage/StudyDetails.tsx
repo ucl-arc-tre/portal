@@ -1,24 +1,22 @@
 import { Study, ApprovalStatus } from "@/openapi";
-import Box from "../ui/Box";
-import { Alert } from "../shared/uikitExports";
-import StatusBadge from "../ui/StatusBadge";
+import Box from "../../ui/Box";
+import { Alert } from "../../shared/uikitExports";
+import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
-import InfoTooltip from "../ui/InfoTooltip";
-import Loading from "../ui/Loading";
-import { formatDate } from "../shared/exports";
+import InfoTooltip from "../../ui/InfoTooltip";
+import Loading from "../../ui/Loading";
+import { formatDate } from "../../shared/exports";
 
 type StudyOverviewProps = {
   study: Study;
-  isIGOpsStaff: boolean;
   riskScore: number;
   riskScoreLoading: boolean;
   approvalStatus: ApprovalStatus | undefined;
   feedback?: string;
-  numEntities: { assets: number | null; contracts: number | null };
 };
 
-export default function StudyOverview(props: StudyOverviewProps) {
-  const { study, isIGOpsStaff, approvalStatus, riskScore, riskScoreLoading, feedback, numEntities } = props;
+export default function StudyDetails(props: StudyOverviewProps) {
+  const { study, approvalStatus, riskScore, riskScoreLoading, feedback } = props;
 
   const standardRiskScoreStatement = "increases risk score by 5";
   return (
@@ -42,7 +40,7 @@ export default function StudyOverview(props: StudyOverviewProps) {
           Risk Score:
           <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
         </span>
-        <StatusBadge status={approvalStatus} isOpsStaff={isIGOpsStaff} type="study" />
+        <StatusBadge status={approvalStatus} type="study" />
       </div>
       <h3 className={styles.description}>{study.description}</h3>
       <div>
@@ -176,22 +174,6 @@ export default function StudyOverview(props: StudyOverviewProps) {
               </>
             )}
           </Alert>
-        )}
-
-        {/*//TODO: add summary of num of projects*/}
-
-        {numEntities.assets !== null && numEntities.contracts !== null && (
-          <div>
-            <h4>Summary of related entities:</h4>
-            <dl className={styles.grouping}>
-              <dd>
-                Assets: <span className={styles["grey-value"]}>{numEntities.assets || 0}</span>
-              </dd>
-              <dd>
-                Contracts: <span className={styles["grey-value"]}>{numEntities.contracts || 0}</span>
-              </dd>
-            </dl>
-          </div>
         )}
       </div>
     </Box>
