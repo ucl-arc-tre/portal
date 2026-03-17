@@ -14,6 +14,7 @@ export default function ApprovedResearcherImport() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [buttonIsVisible, setButtonIsVisible] = useState(true);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
@@ -40,6 +41,7 @@ export default function ApprovedResearcherImport() {
       console.error(error);
       setErrorMessage("Failed to upload approved researchers. Please try again.");
     }
+    setButtonIsVisible(false);
     setIsLoading(false);
   }
 
@@ -53,6 +55,7 @@ export default function ApprovedResearcherImport() {
   function openDialog() {
     setSuccessMessage("");
     setErrorMessage("");
+    setButtonIsVisible(true);
     setDialogVisible(true);
   }
 
@@ -70,14 +73,16 @@ export default function ApprovedResearcherImport() {
                 ) containing approved researchers.
               </p>
               <input ref={inputRef} aria-label="file" type="file" accept=".csv" hidden onChange={handleFileUpload} />
-              <Button disabled={isLoading} onClick={handleSubmit} type="submit" cy="approved-researcher-upload">
-                {isLoading && (
-                  <span className={styles.loader}>
-                    <Loading message="" size="small" />
-                  </span>
-                )}
-                Upload
-              </Button>
+              {buttonIsVisible && (
+                <Button disabled={isLoading} onClick={handleSubmit} type="submit" cy="approved-researcher-upload">
+                  {isLoading && (
+                    <span className={styles.loader}>
+                      <Loading message="" size="small" />
+                    </span>
+                  )}
+                  Upload
+                </Button>
+              )}
               {(errorMessage || successMessage) && (
                 <Alert type={errorMessage ? "error" : "success"}>
                   <AlertMessage>{errorMessage || successMessage}</AlertMessage>
