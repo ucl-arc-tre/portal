@@ -46,7 +46,7 @@ codegen:  ## Run the code generation
 
 test:  ## Run all tests
 	$(MAKE) test-unit
-	$(MAKE) test-e2e
+	$(MAKE) test-e2e-release
 
 test-unit:  ## Run unit tests
 	go test ./internal/...

@@ -63,11 +63,23 @@ All environments are dockerised for a self-contained service that builds all ver
 - Static frontend is served by the `web-frontend` Go binary (see `cmd/web-frontend`)
 - S3 is provided by AWS S3
 
-### 🧪 E2E Testing (`make test-e2e-release`)
+### 🧪 Testing
+
+#### Unit (`make test-unit`)
+
+- Uses [go tests](https://go.dev/doc/tutorial/add-a-test) with [testify](https://github.com/stretchr/testify)
+
+#### End-to-end (`make test-e2e-release`)
 
 - Uses Docker Compose from [`e2e/`](../e2e/)
 - Spins up release versions of frontend, backend, database, and nginx (see Release section above for details)
 - Cypress runs tests against the full stack via nginx at `http://localhost:8000`
+
+#### Manual
+
+Some flows are not easily end-to-end testable so rely on manual tests
+
+1. Approved researchers import: (a) Create a dev environment, (b) Login as a role with permission to import approved researchers, (c) Upload [approved-researchers-external.csv](../internal/service/users/testdata/approved-researchers-external.csv). An invite email should be appear in the dev email inbox (see slack docs for access)
 
 ---
 

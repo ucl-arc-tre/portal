@@ -60,8 +60,8 @@ func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 // Get or create a user for a unique username. Returns the user, whether
 // they were created or not and an error
 func (s *Service) PersistedUser(username types.Username) (types.User, error) {
-	if username == "" {
-		return types.User{}, types.NewErrInvalidObject("username unset")
+	if !username.IsValid() {
+		return types.User{}, types.NewErrInvalidObject("username invalid")
 	}
 
 	user := types.User{}

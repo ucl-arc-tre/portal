@@ -2,23 +2,36 @@ package users
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 // Import a CSV file containing usernames, agreement confirmation, nhsd training completed at dates
-func (s *Service) ImportApprovedResearchersCSV(csvContent []byte, agreement types.Agreement) error {
+func (s *Service) ImportApprovedResearchersCSV(
+	ctx context.Context,
+	importer types.User,
+	csvContent []byte,
+	agreement types.Agreement,
+) error {
 	records, err := approvedResearcherImportRecordsFromCSV(csvContent)
 	if err != nil {
 		return types.NewErrInvalidObject(err)
 	}
 	for _, record := range records {
-		user, err := s.PersistedUser(record.Username)
+		var user types.User
+		var err error
+		if entra.IsExternalUsername(record.Username) {
+			user, err = s.InviteExternalUser(ctx, string(record.Username), importer)
+		} else {
+			user, err = s.PersistedUser(record.Username)
+		}
 		if err != nil {
 			return err
 		}
@@ -47,7 +60,6 @@ func approvedResearcherImportRecordsFromCSV(csvContent []byte) ([]ApprovedResear
 		} else if len(raw) != 3 {
 			return records, fmt.Errorf("failed to parse csv line: %v", raw)
 		}
-
 		record := ApprovedResearcherImportRecord{
 			Username:          types.Username(raw[0]),
 			AgreedToAgreement: raw[1] == "true",
