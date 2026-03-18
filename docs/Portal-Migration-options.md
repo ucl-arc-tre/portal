@@ -175,7 +175,43 @@ Or in one big bang:
 
 </div>
 
+### Option 4
 
+TRE guinea pig:
+
+<div align="center">
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark:             |
+| Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
+| Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
+
+</div>
+
+<p align="center">:arrow_down:</p>
+<div align="center">
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark: |
+| Study mgmt.          |     :x: (SharePoint)          |   :white_check_mark:               |
+| Project mgmt.        |     :x: (MyServices)          |   :white_check_mark:               |
+
+</div>
+
+<p align="center">Once this migration of TRE-only users has exposed any large issues or bugs</p>
+
+<p align="center">:arrow_down:</p>
+<div align="center">
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User onboarding   |     :white_check_mark:          |   :white_check_mark: |
+| Study mgmt.          |     :white_check_mark:          |   :white_check_mark:               |
+| Project mgmt.        |     :white_check_mark:          |   :white_check_mark:               |
+
+</div>
 ## 2. Analysis
 
 > [!NOTE]
@@ -190,17 +226,17 @@ Or in one big bang:
 | **Option Description** | - Migrate incrementally, splitting into 3 phases: Users, Studies and Projects<br> - Each phase would have an initial test group (TRE) to check functionality<br> - SP turned read-only after phase 2                                                                                                                                                                         |
 | **Benefits**           | - Agile; smaller chunks are more manageable<br>- Easier to respond to mishaps<br>- Fewer people affected if something goes wrong <br>- Users get better experience more quickly                                                                                                                                              |
 | **Risks & Issues**     | - Users will (continue to, in the case of TRE) have a period of using the Portal (researcher status) + SP (study management) + Env/myservices (project management) concurrently; may be confusing <br>- Will feel the longest to users since development will continue before all phases complete; longest transition period |
-| **UX Impact**          | Users will have the opportunity to become familiar with the Portal whilst still having more familiar SP<br>- users shift from `SP` + `Env` + `MyServices` -> `Portal` + `SP` + `Env` + `MyServices` -> `Portal` + `Env` + `MyServices` -> `Portal` + `Env` (+ `MyServices` optionally)                                                   |
+| **UX Impact**          | - Users will have the opportunity to become familiar with the Portal whilst still having more familiar SP<br>- Users shift from `SP` + `Share Manager` + `MyServices` -> `Portal` + `SP` + `Share Manager` + `MyServices` -> `Portal` + `Share Manager` + `MyServices` -> `Portal` + `Share Manager` (+ `MyServices` optionally)                                                   |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                              |
 
 ## 2.2 Option 2
 
 | **Section**            | **Description**                                                                                                                                                                                                                                                                                       |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Option Description** | Migrate incrementally, splitting into 2 phases: Users, and Studies & Projects. Each phase would have an initial test group (TRE) to check functionality                                                                                                                                                             |
+| **Option Description** | Migrate incrementally, splitting into 2 phases: Users, and Studies & Projects. Each phase would have an initial test group (TRE) to check functionality<br> - SP turned read-only after phase 2                                                                                                                                                             |
 | **Benefits**           | - Agile; smaller chunks are more manageable<br>- Easier to respond to mishaps<br>- Fewer people affected if something goes wrong                                                                                                                                                  |
-| **Risks & Issues**     | - Users will have a period of using the Portal (researcher status) + SP (study management) + Env/myservices (project management) concurrently; may be confusing<br>- Spread of/multiple comms to the same user groups <br>- longest delay between phases to bring Project functionality to completion |
-| **UX Impact**          | Users will have the opportunity to get more used to the Portal whilst still having more familiar flows <br> - SP turned read-only after phase 2 <br>- users shift from SP + Env + MyServices -> Portal + SP + Env + MyServices -> Portal + Env (+ MyServices optionally)                                                            |
+| **Risks & Issues**     | - Users will have a period of using the Portal (researcher status) + SP (study management) + Share Manager/MyServices (project management) concurrently; may be confusing<br>- Spread of/multiple comms to the same user groups<br>- May be long delay after Study phase to bring Project functionality to completion |
+| **UX Impact**          | Users will have the opportunity to get more used to the Portal whilst still having more familiar flows<br>- users shift from `SP` + `Share Manager` + `MyServices` -> `Portal` + `SP` + `Share Manager` + `MyServices` -> `Portal` + `Share Manager` (+ `MyServices` optionally)                                                            |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                       |
 
 
@@ -209,17 +245,17 @@ Or in one big bang:
 | **Section**            | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Option Description** | Migrate in one fell swoop: big bang                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| **Benefits**           | - Shortest transition period for users<br>- Fewest concurrent platforms for users                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| **Risks & Issues**     | - Not as easy to handle mishaps; very few people (~2) to address tickets<br>- Likely to block research in the case of mishaps<br>- Smallest opportunity for live testing <br>- Biggest delay before starting; can fall into the trap of "never being ready" <br>- slightly harder to judge when to send comms out so they feel relevant & have impact without being annoying but also not giving too short notice <br>- highest pressure on good comms <br>- relies more heavily on testing prior to implementation |
-| **UX Impact**          | Users will be given clear indication of where to manage their Researcher status and Studies and Projects but the least amount of time to adjust to the new places <br> - SP turned read-only after completion <br>- users shift from SP + Env + MyServices -> Portal + Env (+ MyServices optionally)                                                                                                                                                                                                                                           |
+| **Benefits**           | - Shortest transition period for users<br>- Fewest concurrent platforms for users<br>- SP turned read-only after completion                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Risks & Issues**     | - Not as easy to handle mishaps; very few people (~2) to address tickets<br>- Likely to block research in the case of mishaps<br>- Smallest opportunity for live testing<br>- Biggest delay before starting; can fall into the trap of "never being ready"<br>- Highest pressure on good comms <br>- Relies more heavily on testing prior to implementation |
+| **UX Impact**          | Users will be given clear indication of where to manage their Researcher status and Studies and Projects but the least amount of time to adjust to the new places<br>- Users shift from `SP` + `Share Manager` + `MyServices` -> `Portal` + `Share Manager` (+ `MyServices` optionally)                                                                                                                                                                                                                                           |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### Other Notes/Considerations
 
-We'll need to do rebranding at some point, when would be a good point?
+We'll need to do rebranding at some point.
 
 Under Options 1 & 2:
-- Existing IAOs/IAAs and DSH share members will not notice a difference during the User phase until their training expires and they have to upload a new certificate.
+- Existing IAOs/IAAs and DSH share members will only notice a difference during the User phase when their training expires and they have to upload a new certificate.
 - Existing IAOs/IAAs will be the only people to notice the second phase (the Studies or Studies & Projects phase), since they are the only people who use the SP for Study Management.
 - In Option 2, the pain of having to use 1) the Portal for user management, 2) the SP for Study Management, and 3) MyServices/TRE forms for project requests will be confined to the time after the User phase is complete but before the Studies & Projects phase is complete.
 - Options 2 and 3 will share MyServices as a route for DSH users to request new shares. Even in the "big bang" approach of Option 3, we will not remove the possibility of managing DSH shares through MyServices.
