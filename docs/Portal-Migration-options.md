@@ -76,7 +76,7 @@ Under Options 1 & 2:
 - Existing IAOs/IAAs and DSH share members will not notice a difference during the User phase until their training expires and they have to upload a new certificate.
 - Existing IAOs/IAAs will be the only people to notice the second phase (the Studies or Studies & Projects phase), since they are the only people who use the SP for Study Management.
 - In Option 2, the pain of having to use 1) the Portal for user management, 2) the SP for Study Management, and 3) MyServices/TRE forms for project requests will be confined to the time after the User phase is complete but before the Studies & Projects phase is complete.
-- Optoins 2 and 3 will share MyServices as a route for DSH users to request new shares. Even in the "big bang" aproach of Option 3, we will not remove the possibility of managing DSH shares through MyServices.
+- Options 2 and 3 will share MyServices as a route for DSH users to request new shares. Even in the "big bang" approach of Option 3, we will not remove the possibility of managing DSH shares through MyServices.
 
 ## 3. Evaluation
 
