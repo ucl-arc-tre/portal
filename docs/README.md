@@ -79,7 +79,7 @@ All environments are dockerised for a self-contained service that builds all ver
 
 Some flows are not easily end-to-end testable so rely on manual tests
 
-1. Approved researchers import: (a) Create a dev environment, (b) Login as a role with permission to import approved researchers, (c) Upload [approved-researchers-external.csv](../internal/service/users/testdata/approved-researchers-external.csv)
+1. Approved researchers import: (a) Create a dev environment, (b) Login as a role with permission to import approved researchers, (c) Upload [approved-researchers-external.csv](../internal/service/users/testdata/approved-researchers-external.csv). An invite email should be appear in the dev email inbox (see slack docs for access)
 
 ---
 
