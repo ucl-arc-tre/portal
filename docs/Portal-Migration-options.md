@@ -2,12 +2,11 @@
 
 1. [Executive Summary](#1-executive-summary)
    - [Context](#11-context)
-2. [Options](#2-options)
+2. [Analysis](#2-options)
    - [Option 1](#21-option-1)
    - [Option 2](#22-option-2)
    - [Option 3](#23-option-3)
 3. [Evaluation](#3-evaluation)
-   - [Analysis and Recommendation](#31-analysis-and-recommendation)
 
 ## 1. Executive Summary
 
@@ -27,17 +26,17 @@ The ARC Services Portal (Portal) aims to replace the Sharepoint portal (SP) for 
 - Studies refers to the top level Study entity and associated Contract and Asset children. Migration of Studies involves recreating the Studies in the Portal with the relevant Asset records and any Contract documents
 - Projects refers to the management of TRE and DSH user access and roles. This varies by the Environment (TRE/DSH) and has different APIs. Migration of this involves reading of user access and roles from the Environment to display in the Portal
 
-## Managing complexity of TRE and DSH
+## Managing the complexity of having one Portal and two TREs 
 
 ### Main issue
 
-In any sentence concerning this data migration, one can reasonable ask the question "are we talking about the DSH or TRE here?". Not only are we talking about three core processes, User onboarding, Study management, and Project management, but we're talking about those three processes across two environments, effectively creating a 2x3 matrix of components:
+In any sentence concerning this data migration, one can reasonably ask the question "are we talking about the DSH or TRE here?". Not only are we talking about three core processes, User onboarding, Study management, and Project management, but we're talking about those three processes across two environments, effectively creating a 2x3 matrix of components:
 
 <div align="center">
 
 | Portal function      |    DSH         |      TRE       |
 |----------------------|----------------|----------------|
-| User profile mgmt.   |                |                |
+| User onboarding   |                |                |
 | Study mgmt.          |                |                |
 | Project mgmt.        |                |                |
 
@@ -45,11 +44,13 @@ In any sentence concerning this data migration, one can reasonable ask the quest
 
 ### Current state
 
+The TRE already uses the Portal for user onboarding:
+
 <div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark: |
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark: |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
@@ -57,13 +58,15 @@ In any sentence concerning this data migration, one can reasonable ask the quest
 
 ### Desired State
 
+Project management for DSH shares will remain possible via MyServices tickets, and also in the DSH directly using the Share Manager tool:
+
 <div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark: |
+| User onboarding   |     :white_check_mark:          |   :white_check_mark: |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:               |
-| Project mgmt.        |     :white_check_mark: (+ MyServices)          |   :white_check_mark:               |
+| Project mgmt.        |     :white_check_mark: (+ MyServices + tool)          |   :white_check_mark:               |
 
 </div>
 
@@ -71,11 +74,13 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 ### Option 1
 
+Three distinct steps:
+
 <div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark:             |
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
@@ -85,7 +90,7 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:        |   :white_check_mark:             |
+| User onboarding   |     :white_check_mark:        |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
@@ -95,7 +100,7 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
+| User onboarding   |     :white_check_mark:          |   :white_check_mark:           |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
 | Project mgmt.        |     :x: (MyServices)            |   :x: (SharePoint)             |
 
@@ -105,7 +110,7 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
+| User onboarding   |     :white_check_mark:          |   :white_check_mark:           |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
 | Project mgmt.        |     :white_check_mark: (+ MyServices)         |   :white_check_mark:           |
 
@@ -113,11 +118,13 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 ### Option 2
 
+Two distinct steps:
+
 <div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark:             |
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
@@ -127,7 +134,7 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:        |   :white_check_mark:             |
+| User onboarding   |     :white_check_mark:        |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
@@ -138,7 +145,7 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
+| User onboarding   |     :white_check_mark:          |   :white_check_mark:           |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
 | Project mgmt.        |     :white_check_mark: (+ MyServices)         |   :white_check_mark:           |
 
@@ -146,11 +153,13 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 ### Option 3
 
+One big bang:
+
 <div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark:             |
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
@@ -161,14 +170,14 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
-| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
+| User onboarding   |     :white_check_mark:          |   :white_check_mark:           |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
 | Project mgmt.        |     :white_check_mark: (+ MyServices)         |   :white_check_mark:           |
 
 </div>
 
 
-## 2. Options
+## 2. Analysis
 
 > [!NOTE]
 >
@@ -179,10 +188,10 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 
 | **Section**            | **Description**                                                                                                                                                                                                                                                                                                              |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Option Description** | Migrate incrementally, splitting into 3 phases: Users, Studies and Projects. Each phase would have an initial test group (TRE) to check functionality                                                                                                                                                                        |
+| **Option Description** | - Migrate incrementally, splitting into 3 phases: Users, Studies and Projects<br> - Each phase would have an initial test group (TRE) to check functionality<br> - SP turned read-only after phase 2                                                                                                                                                                         |
 | **Benefits**           | - Agile; smaller chunks are more manageable<br>- Easier to respond to mishaps<br>- Fewer people affected if something goes wrong <br>- Users get better experience more quickly                                                                                                                                              |
 | **Risks & Issues**     | - Users will (continue to, in the case of TRE) have a period of using the Portal (researcher status) + SP (study management) + Env/myservices (project management) concurrently; may be confusing <br>- Will feel the longest to users since development will continue before all phases complete; longest transition period |
-| **UX Impact**          | Users will have the opportunity to get more used to the Portal whilst still having more familiar flows <br> - SP turned read-only after phase 2 <br>- users shift from SP + Env + MyServices -> Portal + SP + Env + MyServices -> Portal + Env + MyServices -> Portal + Env (+ MyServices optionally)                                                   |
+| **UX Impact**          | Users will have the opportunity to become familiar with the Portal whilst still having more familiar SP<br>- users shift from `SP` + `Env` + `MyServices` -> `Portal` + `SP` + `Env` + `MyServices` -> `Portal` + `Env` + `MyServices` -> `Portal` + `Env` (+ `MyServices` optionally)                                                   |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                              |
 
 ## 2.2 Option 2
@@ -194,9 +203,6 @@ The question is about the sequence in which we turn the :x:s into :white_check_m
 | **Risks & Issues**     | - Users will have a period of using the Portal (researcher status) + SP (study management) + Env/myservices (project management) concurrently; may be confusing<br>- Spread of/multiple comms to the same user groups <br>- longest delay between phases to bring Project functionality to completion |
 | **UX Impact**          | Users will have the opportunity to get more used to the Portal whilst still having more familiar flows <br> - SP turned read-only after phase 2 <br>- users shift from SP + Env + MyServices -> Portal + SP + Env + MyServices -> Portal + Env (+ MyServices optionally)                                                            |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                       |
-
-### Notes
-
 
 
 ## 2.3 Option 3
@@ -220,7 +226,5 @@ Under Options 1 & 2:
 - Options 2 and 3 will share MyServices as a route for DSH users to request new shares. Even in the "big bang" approach of Option 3, we will not remove the possibility of managing DSH shares through MyServices.
 
 ## 3. Evaluation
-
-### 3.1 Analysis and Recommendation
 
 [tbd after some discussion/feedback?]
