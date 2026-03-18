@@ -33,13 +33,19 @@ The ARC Services Portal (Portal) aims to replace the Sharepoint portal (SP) for 
 
 In any sentence concerning this data migration, one can reasonable ask the question "are we talking about the DSH or TRE here?". Not only are we talking about three core processes, User onboarding, Study management, and Project management, but we're talking about those three processes across two environments, effectively creating a 2x3 matrix of components:
 
+<div align="center">
+
 | Portal function      |    DSH         |      TRE       |
 |----------------------|----------------|----------------|
 | User profile mgmt.   |                |                |
 | Study mgmt.          |                |                |
 | Project mgmt.        |                |                |
 
+</div>
+
 ### Current state
+
+<div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
@@ -47,7 +53,11 @@ In any sentence concerning this data migration, one can reasonable ask the quest
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
 
+</div>
+
 ### Desired State
+
+<div align="center">
 
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
@@ -55,7 +65,9 @@ In any sentence concerning this data migration, one can reasonable ask the quest
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:               |
 | Project mgmt.        |     :white_check_mark: (+ MyServices)          |   :white_check_mark:               |
 
-The question is about the which order in which we turn the :x:s into :white_check_mark:s:
+</div>
+
+The question is about the sequence in which we turn the :x:s into :white_check_mark:s:
 
 ### Option 1
 
