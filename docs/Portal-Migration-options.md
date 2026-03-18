@@ -2,6 +2,7 @@
 
 1. [Executive Summary](#1-executive-summary)
    - [Context](#11-context)
+   - [Complexity](#12-managing-the-complexity-of-having-one-portal-and-two-tres)
 2. [Analysis](#2-options)
    - [Option 1](#21-option-1)
    - [Option 2](#22-option-2)
@@ -20,23 +21,21 @@ The ARC Services Portal (Portal) aims to replace the Sharepoint portal (SP) for 
 
 3. **Option 3:** **Big Bang** wherein Users (Approved Researchers), Studies (including Assets and Contracts) and Projects are all done in one phase.
 
-### 1.2 Context
+### 1.1 Context
 
 - Users (Approved Researchers) refers to managing the status of individuals based on valid NHS Data Security Awareness training. Migration of users involves creating accounts for them on the Portal, and adding them to the UCL Entra tenant where necessary (as is the case for external collaborators with DSH accounts)
 - Studies refers to the top level Study entity and associated Contract and Asset children. Migration of Studies involves recreating the Studies in the Portal with the relevant Asset records and any Contract documents
 - Projects refers to the management of TRE and DSH user access and roles. This varies by the Environment (TRE/DSH) and has different APIs. Migration of this involves reading of user access and roles from the Environment to display in the Portal
 
-## Managing the complexity of having one Portal and two TREs 
+### 1.2 Managing the complexity of having one Portal and two TREs 
 
-### Main issue
-
-In any sentence concerning this data migration, one can reasonably ask the question "are we talking about the DSH or TRE here?". Not only are we talking about three core processes, User onboarding, Study management, and Project management, but we're talking about those three processes across two environments, effectively creating a 2x3 matrix of components:
+When you hear or read any sentence concerning this data migration, you can reasonably ask the question "are we talking about the DSH or TRE here?". Not only are we talking about three core processes - User onboarding, Study management, and Project management - we're talking about those three processes across two environments, effectively creating a 2x3 matrix of components:
 
 <div align="center">
 
 | Portal function      |    DSH         |      TRE       |
 |----------------------|----------------|----------------|
-| User onboarding   |                |                |
+| User onboarding      |                |                |
 | Study mgmt.          |                |                |
 | Project mgmt.        |                |                |
 
@@ -44,7 +43,7 @@ In any sentence concerning this data migration, one can reasonably ask the quest
 
 ### Current state
 
-The TRE already uses the Portal for user onboarding:
+Only the TRE already uses the Portal for user onboarding:
 
 <div align="center">
 
@@ -58,7 +57,7 @@ The TRE already uses the Portal for user onboarding:
 
 ### Desired State
 
-Project management for DSH shares will remain possible via MyServices tickets, and also in the DSH directly using the Share Manager tool:
+Project management for DSH shares will remain possible via MyServices tickets, and also inside the DSH directly using the Share Manager tool:
 
 <div align="center">
 
@@ -70,11 +69,11 @@ Project management for DSH shares will remain possible via MyServices tickets, a
 
 </div>
 
-The question is about the sequence in which we turn the :x:s into :white_check_mark:s:
+The key question here is about the sequence in which we turn the :x:s into :white_check_mark:s:
 
 ### Option 1
 
-Three distinct steps:
+In three distinct steps:
 
 <div align="center">
 
@@ -118,7 +117,7 @@ Three distinct steps:
 
 ### Option 2
 
-Two distinct steps:
+In two distinct steps:
 
 <div align="center">
 
@@ -153,7 +152,7 @@ Two distinct steps:
 
 ### Option 3
 
-One big bang:
+Or in one big bang:
 
 <div align="center">
 
