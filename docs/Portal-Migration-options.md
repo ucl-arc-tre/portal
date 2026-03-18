@@ -27,6 +27,68 @@ The ARC Services Portal (Portal) aims to replace the Sharepoint portal (SP) for 
 - Studies refers to the top level Study entity and associated Contract and Asset children. Migration of Studies involves recreating the Studies in the Portal with the relevant Asset records and any Contract documents
 - Projects refers to the management of TRE and DSH user access and roles. This varies by the Environment (TRE/DSH) and has different APIs. Migration of this involves reading of user access and roles from the Environment to display in the Portal
 
+## Managing complexity of TRE and DSH
+
+### Main issue
+
+In any sentence concerning this data migration, one can reasonable ask the question "are we talking about the DSH or TRE here?". Not only are we talking about three core processes, User onboarding, Study management, and Project management, but we're talking about those three processes across two environments, effectively creating a 2x3 matrix of components:
+
+| Portal function      |    DSH         |      TRE       |
+|----------------------|----------------|----------------|
+| User profile mgmt.   |                |                |
+| Study mgmt.          |                |                |
+| Project mgmt.        |                |                |
+
+### Current state
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark: |
+| Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
+| Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
+
+### Desired State
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark: |
+| Study mgmt.          |     :white_check_mark:          |   :white_check_mark:               |
+| Project mgmt.        |     :white_check_mark: (+ MyServices)          |   :white_check_mark:               |
+
+The question is about the which order in which we turn the :x:s into :white_check_mark:s:
+
+### Option 1
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark:             |
+| Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
+| Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
+
+:arrow_down:
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User profile mgmt.   |     :white_check_mark:        |   :white_check_mark:             |
+| Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
+| Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
+
+:arrow_down:
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
+| Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
+| Project mgmt.        |     :x: (MyServices)            |   :x: (SharePoint)             |
+
+:arrow_down:
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
+| Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
+| Project mgmt.        |     :white_check_mark: (+ MyServices)         |   :white_check_mark:           |
+
 ## 2. Options
 
 > [!NOTE]
