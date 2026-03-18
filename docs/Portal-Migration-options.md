@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-The ARC Services Portal (Portal) aims to replace the Sharepoint portal (SP) for IG activities and management of user accounts, i.e. their approved researcher status, management of Studies and their related entities (Contracts & Assets). This management includes adding and maintaining documents as well as housing the process for creating new Studies and user accounts. Once the Portal has the functionality to support the core actions of SP, the data in SP will need to be migrated. This paper outlines the options for this migration with a focus on user experience.
+The ARC Services Portal (the Portal) aims to replace the Information Governance Sharepoint portal (SP) as the primary platform for UCL's research community to conduct Information Goverance activities and management of sensitive research data (and  metadata relating to its storage and processing). These activities include adding and maintaining documents through the creation of "Studies", "Projects", and the creation of "Approved Researchers", which are mostly handled by the SP currently. Once the Portal has the functionality to support the core actions of SP, the data in SP will need to be migrated. This paper outlines the options for this migration with a focus on user experience.
 
 3 options are considered in this paper:
 
@@ -152,7 +152,7 @@ In two distinct steps:
 
 ### Option 3
 
-Or in one big bang:
+Or in one "big bang":
 
 <div align="center">
 
@@ -175,49 +175,11 @@ Or in one big bang:
 
 </div>
 
-### Option 4
-
-TRE guinea pig:
-
-<div align="center">
-
-| Portal function      |    DSH            |      TRE             |
-|----------------------|-------------------|----------------------|
-| User onboarding   |     :x: (SharePoint)          |   :white_check_mark:             |
-| Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
-| Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
-
-</div>
-
-<p align="center">:arrow_down:</p>
-<div align="center">
-
-| Portal function      |    DSH            |      TRE             |
-|----------------------|-------------------|----------------------|
-| User onboarding   |     :x: (SharePoint)          |   :white_check_mark: |
-| Study mgmt.          |     :x: (SharePoint)          |   :white_check_mark:               |
-| Project mgmt.        |     :x: (MyServices)          |   :white_check_mark:               |
-
-</div>
-
-<p align="center">Once this migration of TRE-only users has exposed any large issues or bugs</p>
-
-<p align="center">:arrow_down:</p>
-<div align="center">
-
-| Portal function      |    DSH            |      TRE             |
-|----------------------|-------------------|----------------------|
-| User onboarding   |     :white_check_mark:          |   :white_check_mark: |
-| Study mgmt.          |     :white_check_mark:          |   :white_check_mark:               |
-| Project mgmt.        |     :white_check_mark:          |   :white_check_mark:               |
-
-</div>
 ## 2. Analysis
 
 > [!NOTE]
 >
-> - All options will realistically take the same amount of time, but the perceived amount of time for the migration will vary (for users). Comms should include signposting on MyServices that the functionality will be moving to Portal, regardless of phased or not.
-> - Project management is done in the environments and MyServices, the Portal will not be taking on this management, but will aim to reduce user traffic to MyServices
+> - The sources of truth for project configuration and access control are inside the TREs themselves (i.e. as IaC or Active Directory), and currently projects are managed either inside the TREs or through completing request forms in MyServices or SharePoint. The Portal will not replace the TREs as the source of truth for this data. It will, however, become the source of truth for User and Study data.
 
 ## 2.1 Option 1
 
@@ -225,7 +187,7 @@ TRE guinea pig:
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Option Description** | - Migrate incrementally, splitting into 3 phases: Users, Studies and Projects<br> - Each phase would have an initial test group (TRE) to check functionality<br> - SP turned read-only after phase 2                                                                                                                                                                         |
 | **Benefits**           | - Agile; smaller chunks are more manageable<br>- Easier to respond to mishaps<br>- Fewer people affected if something goes wrong <br>- Users get better experience more quickly                                                                                                                                              |
-| **Risks & Issues**     | - Users will (continue to, in the case of TRE) have a period of using the Portal (researcher status) + SP (study management) + Env/myservices (project management) concurrently; may be confusing <br>- Will feel the longest to users since development will continue before all phases complete; longest transition period |
+| **Risks & Issues**     | - Users will (continue to, in the case of TRE) have a period of using the Portal (researcher status) + SP (study management) + Env/MyServices (project management) concurrently; may be confusing <br>- Will feel the longest to users since development will continue before all phases complete; longest transition period |
 | **UX Impact**          | - Users will have the opportunity to become familiar with the Portal whilst still having more familiar SP<br>- Users shift from `SP` + `Share Manager` + `MyServices` -> `Portal` + `SP` + `Share Manager` + `MyServices` -> `Portal` + `Share Manager` + `MyServices` -> `Portal` + `Share Manager` (+ `MyServices` optionally)                                                   |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                              |
 
