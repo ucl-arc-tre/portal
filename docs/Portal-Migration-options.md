@@ -59,36 +59,37 @@ The question is about the which order in which we turn the :x:s into :white_chec
 
 ### Option 1
 
+<div align="center">
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
 | User profile mgmt.   |     :x: (SharePoint)          |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
-
-:arrow_down:
-
+</div>
+<p align="center">:arrow_down:</p>
+<div align="center">
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
 | User profile mgmt.   |     :white_check_mark:        |   :white_check_mark:             |
 | Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
 | Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
-
-:arrow_down:
-
+</div>
+<p align="center">:arrow_down:</p>
+<div align="center">
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
 | User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
 | Project mgmt.        |     :x: (MyServices)            |   :x: (SharePoint)             |
-
-:arrow_down:
-
+</div>
+<p align="center">:arrow_down:</p>
+<div align="center">
 | Portal function      |    DSH            |      TRE             |
 |----------------------|-------------------|----------------------|
 | User profile mgmt.   |     :white_check_mark:          |   :white_check_mark:           |
 | Study mgmt.          |     :white_check_mark:          |   :white_check_mark:           |
 | Project mgmt.        |     :white_check_mark: (+ MyServices)         |   :white_check_mark:           |
-
+</div>
 ## 2. Options
 
 > [!NOTE]
