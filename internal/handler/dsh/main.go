@@ -10,16 +10,18 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/dsh"
+	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
 
 type Handler struct {
-	users *users.Service
+	users   *users.Service
+	studies *studies.Service
 }
 
 func New() *Handler {
 	log.Info().Msg("Creating DSH handler")
-	return &Handler{users: users.New()}
+	return &Handler{users: users.New(), studies: studies.New()}
 }
 
 func (h *Handler) GetPing(ctx *gin.Context) {
@@ -41,6 +43,31 @@ func (h *Handler) GetApprovedResearchers(ctx *gin.Context) {
 			r.Username,
 			marshalTime(r.AgreedToAgreementAt),
 			marshalTime(trainingExpires),
+		)
+	}
+
+	ctx.Data(http.StatusOK, "text/csv", b.Bytes())
+}
+
+func (h *Handler) GetApprovedStudies(ctx *gin.Context) {
+	approvedStudies, err := h.studies.ApprovedStudies()
+	if err != nil {
+		setError(ctx, err, "Failed to get approved studies")
+		return
+	}
+
+	var b bytes.Buffer
+	b.WriteString("caseref,study_owner_username,study_admin_usernames\n")
+	for _, study := range approvedStudies {
+		caseref := ""
+		if study.Caseref != nil {
+			caseref = fmt.Sprintf("%v", *study.Caseref)
+		}
+
+		fmt.Fprintf(&b, "%v,%v,%v\n",
+			caseref,
+			study.OwnerUsername,
+			study.AdminUsernames,
 		)
 	}
 

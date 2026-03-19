@@ -20,5 +20,5 @@ type StepProgressProps = {
 };
 
 type ExpiryUrgency = {
-  level: "low" | "medium" | "high";
+  level: "low" | "medium" | "high" | "critical";
 };

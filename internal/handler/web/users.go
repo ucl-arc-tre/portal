@@ -102,7 +102,8 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 		setError(ctx, err, "Failed to get approved researcher agreement")
 		return
 	}
-	if err := h.users.ImportApprovedResearchersCSV(content, *agreement); err != nil {
+	user := middleware.GetUser(ctx)
+	if err := h.users.ImportApprovedResearchersCSV(ctx, user, content, *agreement); err != nil {
 		setError(ctx, err, "Failed to import")
 		return
 	}
@@ -115,7 +116,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if exists, err := h.users.UserExistsWithEmailOrUsername(invite.Email); err != nil {
+	if exists, err := h.users.UserExistsWithEmailOrUsername(ctx, invite.Email); err != nil {
 		setError(ctx, err, "Failed to check user existence")
 		return
 	} else if exists {
@@ -124,34 +125,8 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	user := middleware.GetUser(ctx)
-	attributes, err := h.users.Attributes(user)
-	if err != nil {
-		setError(ctx, err, "Failed to get user attributes")
-		return
-	}
-
-	sponsor := types.Sponsor{
-		Username:   user.Username,
-		ChosenName: attributes.ChosenName,
-	}
-
-	// An external user may have a different username to their email when they
-	// login to the portal e.g. email: "alice@example.com" and
-	// username: "xyz@example.comm" and we don't yet know it
-	assumedUsername := types.Username(invite.Email)
-	invitedUser, err := h.users.PersistedExternalUser(assumedUsername, invite.Email)
-	if err != nil {
-		setError(ctx, err, "Failed to get or create invitee")
-		return
-	}
-
-	if _, err := h.users.CreateUserSponsorship(invitedUser.ID, user.ID); err != nil {
-		setError(ctx, err, "Failed to connect sponsorship")
-		return
-	}
-
-	if err := h.users.InviteUser(ctx, invite.Email, sponsor); err != nil {
+	inviter := middleware.GetUser(ctx)
+	if _, err := h.users.InviteExternalUser(ctx, invite.Email, inviter); err != nil {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}

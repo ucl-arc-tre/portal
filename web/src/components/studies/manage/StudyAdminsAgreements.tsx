@@ -12,7 +12,6 @@ type StudyAdminsAgreementsProps = {
 
 export default function StudyAdminsAgreements(props: StudyAdminsAgreementsProps) {
   const { studyId, studyAdminUsernames, completed, setCompleted } = props;
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unagreedUsernames, setUnagreedUsernames] = useState<Array<string>>([]);
@@ -30,8 +29,10 @@ export default function StudyAdminsAgreements(props: StudyAdminsAgreementsProps)
           setError(`Failed to load study agreements: ${errorMsg}`);
           return;
         }
+
         const confirmedAgreementUsernames = studyAgreementsResult.data.usernames;
         const allAgreed = studyAdminUsernames.every((username) => confirmedAgreementUsernames.includes(username));
+
         if (allAgreed) {
           setCompleted(true);
         } else {

@@ -5,7 +5,7 @@ import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
 import Dialog from "@/components/ui/Dialog";
-import { Alert, AlertMessage } from "../shared/exports";
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 import styles from "./ProjectCardsList.module.css";
 
@@ -82,7 +82,7 @@ export default function ProjectCardsList(props: Props) {
           .map((project) => (
             <div key={project.id} className={styles["project-card"]}>
               <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.approval_status} isOpsStaff={isOpsStaff} type="project" />
+                <StatusBadge status={project.approval_status} type="project" />
               </div>
 
               <div className={styles["project-info"]}>

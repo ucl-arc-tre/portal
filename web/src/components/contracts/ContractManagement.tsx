@@ -1,70 +1,34 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import Button from "@/components/ui/Button";
 import ContractUploadForm from "./ContractUploadForm";
 import ContractCard from "./ContractCard";
-import { getStudiesByStudyIdContracts, Contract, Study } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { Contract, Study } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { AlertMessage, Alert } from "../shared/exports";
+import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 
 type ContractManagementProps = {
   study: Study;
+  contracts: Contract[];
   canModify: boolean;
-  setNumContracts?: (numContracts: number) => void;
-  assetContractsCompleted: boolean;
+  someAssetsRequireContracts: boolean;
+  fetchStudyContents: () => Promise<void>;
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const { study, canModify, setNumContracts, assetContractsCompleted } = props;
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { study, contracts, canModify, someAssetsRequireContracts, fetchStudyContents } = props;
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingContract, setEditingContract] = useState<Contract | null>(null);
-
-  const fetchContracts = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await getStudiesByStudyIdContracts({
-        path: { studyId: study.id },
-      });
-
-      if (!response.response.ok || !response.data) {
-        const errorMsg = extractErrorMessage(response);
-        setError(`Failed to load contracts: ${errorMsg}`);
-        return;
-      }
-      setContracts(response.data);
-      if (setNumContracts) {
-        setNumContracts(response.data.length);
-      }
-    } catch (err) {
-      console.error("Failed to load contracts:", err);
-      setError("Failed to load contracts. Please try again later.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [study.id, setNumContracts]);
-
-  useEffect(() => {
-    fetchContracts();
-  }, [fetchContracts]);
 
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
     setEditingContract(null);
-    fetchContracts();
+    fetchStudyContents();
   };
 
   const handleEditContract = (contract: Contract) => {
-    if (!canModify) {
-      return;
-    }
+    if (!canModify) return;
     setEditingContract(contract);
-
     setShowUploadModal(true);
   };
 
@@ -90,30 +54,22 @@ export default function ContractManagement(props: ContractManagementProps) {
       )}
 
       {contracts.length === 0 &&
-        (!assetContractsCompleted || study.involves_external_users || study.involves_third_party) && (
-          <div className={styles["contract-requirement-notice"]}>
-            <div>
+        (someAssetsRequireContracts || study.involves_external_users || study.involves_third_party) && (
+          <Alert type="warning">
+            <AlertMessage>
               Based on your responses while making your Study and Asset, uploading a contract is required. This is
               because you said:
               <ul>
-                {!assetContractsCompleted && <li>An asset in this study requires a contract.</li>}
+                {someAssetsRequireContracts && <li>An asset in this study requires a contract.</li>}
                 {study.involves_external_users && <li>Your study involves external users.</li>}
                 {study.involves_third_party && <li>Your study involves third parties.</li>}
               </ul>
-              <p>Please ensure you upload a valid contract document to comply with our policies.</p>
-            </div>
-          </div>
+              Please ensure you upload a valid contract document to comply with our policies.
+            </AlertMessage>
+          </Alert>
         )}
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
-
-      {isLoading ? (
-        <div className={styles.loading}>Loading contracts...</div>
-      ) : contracts.length === 0 ? (
+      {contracts.length === 0 ? (
         <div className={styles["empty-state"]}>
           <h4>No contracts uploaded</h4>
           {canModify && <p>Upload your first contract document to get started.</p>}

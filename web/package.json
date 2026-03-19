@@ -10,11 +10,11 @@
     "openapi-ts": "openapi-ts --client @hey-api/client-fetch --input ../api/web.yaml --output ./src/openapi",
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome",
-    "cypress:ui": "cypress run --headless --browser chrome --spec 'cypress/e2e/ui/**/*'",
+    "cypress:pages": "cypress run --headless --browser chrome --spec 'cypress/e2e/pages/**/*'",
     "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
   },
   "dependencies": {
-    "next": "16.1.6",
+    "next": "16.1.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.2",

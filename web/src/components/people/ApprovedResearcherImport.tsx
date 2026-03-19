@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import styles from "./ApprovedResearcherImport.module.css";
 import Loading from "../ui/Loading";
 import Dialog from "../ui/Dialog";
-import { Alert, AlertMessage } from "../shared/exports";
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 export default function ApprovedResearcherImport() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -13,12 +13,14 @@ export default function ApprovedResearcherImport() {
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [buttonText, setButtonText] = useState("Upload");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [buttonIsVisible, setButtonIsVisible] = useState(true);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
 
+    setSuccessMessage("");
     setErrorMessage("");
     setIsLoading(true);
 
@@ -33,32 +35,35 @@ export default function ApprovedResearcherImport() {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
       } else {
-        setButtonText("Imported ✔");
+        setSuccessMessage("Imported successfully");
       }
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to upload approved researchers. Please try again.");
     }
+    setButtonIsVisible(false);
     setIsLoading(false);
   }
 
-  function handleSumbit(e: React.MouseEvent<HTMLButtonElement>) {
+  function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     if (inputRef && inputRef.current) {
       inputRef.current.click();
     }
   }
 
+  function openDialog() {
+    setSuccessMessage("");
+    setErrorMessage("");
+    setButtonIsVisible(true);
+    setDialogVisible(true);
+  }
+
   return (
     <>
       {isDialogVisible && (
-        <Dialog setDialogOpen={setDialogVisible} className={styles.dialog}>
+        <Dialog setDialogOpen={setDialogVisible}>
           <div className={styles["dialog-content"]}>
-            {errorMessage && (
-              <Alert type="error">
-                <AlertMessage>{errorMessage}</AlertMessage>
-              </Alert>
-            )}
             <form>
               <p className={styles.helptext}>
                 Upload a .csv file (
@@ -68,26 +73,27 @@ export default function ApprovedResearcherImport() {
                 ) containing approved researchers.
               </p>
               <input ref={inputRef} aria-label="file" type="file" accept=".csv" hidden onChange={handleFileUpload} />
-              <Button disabled={isLoading} onClick={handleSumbit} type="submit" cy="approved-researcher-upload">
-                {isLoading && (
-                  <span className={styles.loader}>
-                    <Loading message="" size="small" />
-                  </span>
-                )}
-                {buttonText}
-              </Button>{" "}
+              {buttonIsVisible && (
+                <Button disabled={isLoading} onClick={handleSubmit} type="submit" cy="approved-researcher-upload">
+                  {isLoading && (
+                    <span className={styles.loader}>
+                      <Loading message="" size="small" />
+                    </span>
+                  )}
+                  Upload
+                </Button>
+              )}
+              {(errorMessage || successMessage) && (
+                <Alert type={errorMessage ? "error" : "success"}>
+                  <AlertMessage>{errorMessage || successMessage}</AlertMessage>
+                </Alert>
+              )}
             </form>
           </div>
         </Dialog>
       )}
 
-      <Button
-        onClick={() => setDialogVisible(true)}
-        variant="secondary"
-        cy="approved-researcher-import"
-        type="button"
-        size="small"
-      >
+      <Button onClick={openDialog} variant="secondary" cy="approved-researcher-import" type="button" size="small">
         Import Approved Researchers
       </Button>
     </>

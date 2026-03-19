@@ -1,0 +1,181 @@
+import { Study, ApprovalStatus } from "@/openapi";
+import Box from "../../ui/Box";
+import { Alert } from "../../shared/uikitExports";
+import StatusBadge from "../../ui/StatusBadge";
+import styles from "./StudyDetails.module.css";
+import InfoTooltip from "../../ui/InfoTooltip";
+import Loading from "../../ui/Loading";
+import { formatDate } from "../../shared/exports";
+
+type StudyOverviewProps = {
+  study: Study;
+  riskScore: number;
+  riskScoreLoading: boolean;
+  approvalStatus: ApprovalStatus | undefined;
+  feedback?: string;
+};
+
+export default function StudyDetails(props: StudyOverviewProps) {
+  const { study, approvalStatus, riskScore, riskScoreLoading, feedback } = props;
+
+  const standardRiskScoreStatement = "increases risk score by 5";
+  return (
+    <Box>
+      <div className={styles["pre-description"]}>
+        {/* TODO: caseref will always be defined once migration has run on all envs - remove null check and tighten to non-nullable */}
+        {study.caseref != null && (
+          <span>
+            Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
+          </span>
+        )}
+        <span>
+          Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
+        </span>
+        {study.last_signoff && (
+          <span>
+            Last signed off: <span className={styles["grey-value"]}>{formatDate(study.last_signoff)}</span>
+          </span>
+        )}
+        <span>
+          Risk Score:
+          <span className={styles["risk-score"]}>{riskScoreLoading ? <Loading message={null} /> : riskScore}</span>
+        </span>
+        <StatusBadge status={approvalStatus} type="study" />
+      </div>
+      <h3 className={styles.description}>{study.description}</h3>
+      <div>
+        <dl className={styles.ownership}>
+          <dd>
+            Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
+          </dd>
+          <dd>
+            Admins:
+            {study.additional_study_admin_usernames.map((username) => (
+              <li key={username}>
+                <span className={styles["grey-value"]}>{username}</span>
+              </li>
+            ))}
+          </dd>
+          <dd>
+            Data Controller:
+            <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
+          </dd>
+        </dl>
+
+        <h3>Additional Information</h3>
+        <hr />
+        <dl className={styles.grouping}>
+          <dt>Sponsorships & Approvals</dt>
+          {study.involves_ucl_sponsorship && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>UCL Sponsorship</dd>
+          )}
+          {study.involves_cag && (
+            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+              CAG approval
+              <InfoTooltip text="increases risk score by 5" />
+            </dd>
+          )}
+          {study.involves_ethics_approval && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>Ethics approval</dd>
+          )}
+          {study.involves_hra_approval && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>HRA approval</dd>
+          )}
+          {!study.involves_ucl_sponsorship &&
+            !study.involves_cag &&
+            !study.involves_ethics_approval &&
+            !study.involves_hra_approval && (
+              <dd>
+                <em>No sponsorship or approval information given</em>
+              </dd>
+            )}
+        </dl>
+        <dl className={styles.grouping}>
+          <dt>NHS</dt>
+          {study.is_nhs_associated && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is NHS associated</dd>
+          )}
+          {study.involves_nhs_england && (
+            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+              NHS England involvement
+              <InfoTooltip text={standardRiskScoreStatement} />
+            </dd>
+          )}
+          {study.involves_mnca && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>involves MNCA</dd>
+          )}
+          {study.requires_dspt && (
+            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+              requires DSPT
+              <InfoTooltip text={standardRiskScoreStatement} />
+            </dd>
+          )}
+          {!study.is_nhs_associated && !study.involves_nhs_england && !study.involves_mnca && !study.requires_dspt && (
+            <dd>
+              <em> No NHS information given</em>
+            </dd>
+          )}
+        </dl>
+        <dl className={styles.grouping}>
+          <dt>Data</dt>
+          {study.requires_dbs && (
+            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+              requires DBS
+              <InfoTooltip text={standardRiskScoreStatement} />
+            </dd>
+          )}
+          {study.is_data_protection_office_registered && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>is registered with DPO</dd>
+          )}
+          {study.involves_third_party && (
+            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+              third party
+              <InfoTooltip text="increases risk score by 5 if no mNCA" />
+            </dd>
+          )}
+          {study.involves_external_users && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>external users</dd>
+          )}
+          {study.involves_participant_consent && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>participant consent</dd>
+          )}
+          {study.involves_indirect_data_collection && (
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>indirect data collection</dd>
+          )}
+          {study.involves_data_processing_outside_eea && (
+            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
+              data processing outside EEA
+              <InfoTooltip text="increases risk score by 10" />
+            </dd>
+          )}
+          {!study.requires_dbs &&
+            !study.is_data_protection_office_registered &&
+            !study.involves_third_party &&
+            !study.involves_external_users &&
+            !study.involves_participant_consent &&
+            !study.involves_indirect_data_collection &&
+            !study.involves_data_processing_outside_eea && (
+              <dd>
+                <em>No data information given</em>
+              </dd>
+            )}
+        </dl>
+
+        {feedback && (
+          <Alert type={approvalStatus === "Approved" ? "info" : "warning"} className={styles["feedback-alert"]}>
+            <h4>This study has been given the following feedback:</h4>
+            <p>{feedback}</p>
+            {approvalStatus !== "Approved" && (
+              <>
+                <hr></hr>
+                <small>
+                  <em>Please adjust as appropriate and request another review.</em>
+                </small>
+              </>
+            )}
+          </Alert>
+        )}
+      </div>
+    </Box>
+  );
+}

@@ -71,32 +71,6 @@
   margin-top: 1.5rem;
 }
 
-.contract-requirement-notice {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-  border-radius: 6px;
-  border-left: 4px solid #f39c12;
-}
-
-.contract-requirement-notice div {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.contract-requirement-notice ul {
-  margin: 0.75rem 0 0.75rem 1.25rem;
-  padding: 0;
-}
-
-.contract-requirement-notice li {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
-}
-
 @media (width >= 768px) {
   .container {
     padding: 1.5rem;

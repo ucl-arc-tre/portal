@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import Button from "../ui/Button";
-import Dialog from "../ui/Dialog";
-import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../shared/exports";
+import Button from "../../ui/Button";
+import Dialog from "../../ui/Dialog";
+import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../../shared/uikitExports";
 import styles from "./StudyForm.module.css";
 import { Controller, SubmitHandler, useForm, useWatch, useFieldArray } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study, StudyRequest } from "@/openapi";
@@ -39,8 +39,8 @@ export type StudyFormData = {
 
 type StudyProps = {
   username: string;
-  setStudyFormOpen: (name: boolean) => void;
-  fetchStudyData: (id?: string) => void;
+  setIsFormOpen: (name: boolean) => void;
+  onComplete: () => void;
   editingStudy?: Study | null;
 };
 
@@ -135,7 +135,7 @@ function YesNoUnsureButtons({
 }
 
 export default function StudyForm(StudyProps: StudyProps) {
-  const { username, setStudyFormOpen, fetchStudyData, editingStudy } = StudyProps;
+  const { username, setIsFormOpen, onComplete, editingStudy } = StudyProps;
   const {
     register,
     handleSubmit,
@@ -301,12 +301,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         return;
       }
 
-      setStudyFormOpen(false);
-      if (studyId) {
-        fetchStudyData(studyId);
-      } else {
-        fetchStudyData();
-      }
+      onComplete();
     } catch (error) {
       console.error(`Failed to ${studyId ? "update" : "create"} study:`, error);
       setSubmitError(`Failed to ${studyId ? "update" : "create"} study Please try again.`);
@@ -314,13 +309,14 @@ export default function StudyForm(StudyProps: StudyProps) {
       setIsSubmitting(false);
     }
   };
+
   const onSubmit: SubmitHandler<StudyFormData> = async (data) => {
     await handleStudySubmit(data, editingStudy);
   };
 
   const handleCloseForm = () => {
     setSubmitError(null);
-    setStudyFormOpen(false);
+    setIsFormOpen(false);
   };
 
   const getFieldsetClass = (step: number) =>
@@ -917,6 +913,7 @@ export default function StudyForm(StudyProps: StudyProps) {
             </Button>
           )}
         </div>
+
         {currentStep === totalSteps && (
           <Button type="submit" disabled={isSubmitting}>
             {editingStudy && isSubmitting ? "Updating study..." : editingStudy && "Update Study"}

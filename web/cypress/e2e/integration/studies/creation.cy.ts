@@ -37,17 +37,7 @@ describe("Study creation end-to-end", () => {
       });
     cy.get('[data-cy="agreement-agree"]').click();
 
-    const additionalAdminUsernamePrefix = "portal-e2e-admin";
-
-    cy.get('[data-cy="edit-study-button"]').click();
-    cy.get('[data-cy="add-study-admin-button"').click();
-    cy.get('[name="additionalStudyAdminUsernames.0.value"]').type(additionalAdminUsernamePrefix);
-    cy.get('[data-cy="next"]').click();
-    cy.get('[data-cy="next"]').click();
-    cy.get("button[type='submit']").contains("Update Study").click();
-
-    cy.contains("Incomplete").should("be.visible"); // status is incomplete
-
+    // step 2: add an asset to complete setup
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
     cy.get("input#title").type("Thing");
     cy.get('[name="description"]').type("Unknown");
@@ -63,8 +53,18 @@ describe("Study creation end-to-end", () => {
     cy.get('[name="status"]').select("active");
     cy.get("button[type='submit']").click();
 
-    cy.contains("Manage Study").should("be.visible");
-    cy.get('[data-cy="study-admins-agreement-prompt"]').contains(additionalAdminUsernamePrefix).should("be.visible");
+    // setup complete — tabs now visible, edit study to add then remove an admin
+    cy.contains("Incomplete").should("be.visible");
+
+    const additionalAdminUsernamePrefix = "portal-e2e-admin";
+
+    cy.get('[data-cy="edit-study-button"]').click();
+    cy.get('[data-cy="add-study-admin-button"]').click();
+    cy.get('[name="additionalStudyAdminUsernames.0.value"]').type(additionalAdminUsernamePrefix);
+    cy.get('[data-cy="next"]').click();
+    cy.get('[data-cy="next"]').click();
+    cy.get("button[type='submit']").contains("Update Study").click();
+    cy.contains("Update Study").should("not.exist");
 
     // remove added study admin
     cy.get('[data-cy="edit-study-button"]').click();
@@ -80,11 +80,11 @@ describe("Study creation end-to-end", () => {
     cy.contains("Last signed off").should("not.exist");
   });
 
-  it("ig ops should see a study", () => {
+  it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
-    cy.get('[data-cy="study-card"]').first().contains("View Study").click();
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
     cy.get('[data-cy="study-approve-button"]').click();
   });
 

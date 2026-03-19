@@ -6,7 +6,7 @@ import { getProfile, getStudies } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
-import { AlertMessage, Alert } from "../shared/exports";
+import { AlertMessage, Alert } from "../shared/uikitExports";
 
 export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -106,7 +106,7 @@ export default function UserTasks() {
         </div>
       ) : (
         <div className={styles["completed-tasks"]}>
-          {isIGOpsStaff ? (
+          {isIGOpsStaff && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? (
             <>
               {hasPendingStudies ? (
                 <>

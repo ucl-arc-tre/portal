@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./DSHTokens.module.css";
-import { Alert, AlertMessage, HelperText, Label } from "../shared/exports";
+import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
 
 type FormData = {
   name: string;

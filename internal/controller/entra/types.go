@@ -41,3 +41,8 @@ func (u UserPrincipalName) Username() types.Username {
 	}
 	return types.Username(u)
 }
+
+type EmailTemplateParams struct {
+	Content   string
+	PortalUrl string
+}

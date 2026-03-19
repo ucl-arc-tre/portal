@@ -23,8 +23,14 @@ export function login(username: string, password: string): void {
       cy.get('input[type="password"]').type(password, {
         log: false,
       });
-      cy.get('input[type="submit"]').click();
+      cy.get('input[type="submit"]').click(); // Click "Sign in" on the password page
+
+      // Wait for "Stay signed in?" page, then click Yes
+      cy.contains("Stay signed in?").should("be.visible");
       cy.get('input[type="submit"]').click();
     }
   );
+
+  // Wait for OAuth redirect chain to complete before returning
+  cy.url().should("not.include", "microsoftonline.com");
 }

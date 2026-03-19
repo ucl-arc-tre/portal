@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { Study, Asset, getStudiesByStudyId, getStudiesByStudyIdAssetsByAssetId } from "@/openapi";
+import {
+  Study,
+  Asset,
+  getStudiesByStudyId,
+  getStudiesByStudyIdAssetsByAssetId,
+  Contract,
+  getStudiesByStudyIdAssetsByAssetIdContracts,
+} from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
@@ -12,6 +19,8 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import ContractCard from "@/components/contracts/ContractCard";
+import { HelperText } from "@/components/shared/uikitExports";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -19,6 +28,7 @@ export default function ManageAssetPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
   const [asset, setAsset] = useState<Asset | null>(null);
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,9 +39,10 @@ export default function ManageAssetPage() {
     setError(null);
 
     try {
-      const studyResponse = await getStudiesByStudyId({
-        path: { studyId: studyIdParam },
-      });
+      const [studyResponse, assetResponse] = await Promise.all([
+        getStudiesByStudyId({ path: { studyId: studyIdParam } }),
+        getStudiesByStudyIdAssetsByAssetId({ path: { studyId: studyIdParam, assetId: assetIdParam } }),
+      ]);
 
       if (!studyResponse.response.ok || !studyResponse.data) {
         const errorMsg = extractErrorMessage(studyResponse);
@@ -40,16 +51,24 @@ export default function ManageAssetPage() {
       }
       setStudy(studyResponse.data);
 
-      const assetResponse = await getStudiesByStudyIdAssetsByAssetId({
-        path: { studyId: studyIdParam, assetId: assetIdParam },
-      });
-
       if (!assetResponse.response.ok || !assetResponse.data) {
         const errorMsg = extractErrorMessage(assetResponse);
         setError(`Failed to load asset: ${errorMsg}`);
         return;
       }
       setAsset(assetResponse.data);
+      if (assetResponse.data.contract_ids.length > 0) {
+        const contractsResponse = await getStudiesByStudyIdAssetsByAssetIdContracts({
+          path: { studyId: studyIdParam, assetId: assetIdParam },
+        });
+
+        if (!contractsResponse.response.ok || !contractsResponse.data) {
+          const errorMsg = extractErrorMessage(contractsResponse);
+          setError(`Failed to load contracts for asset: ${errorMsg}`);
+          return;
+        }
+        setContracts(contractsResponse.data);
+      }
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError("Failed to load asset details");
@@ -158,13 +177,29 @@ export default function ManageAssetPage() {
               <label>Status:</label>
               <span className={styles.status}>{asset.status}</span>
             </div>
-            {asset.requires_contract && (
+            <div className={styles.field}>
+              <label>Contract Required:</label>
+              <span>{asset.requires_contract ? "Yes" : "No"}</span>
+            </div>
+
+            {contracts.length > 0 && (
               <div className={styles.field}>
-                <label>Contract Required:</label>
-                <span>Yes</span>
+                <label>
+                  Associated Contracts:
+                  <HelperText>
+                    <small>
+                      To manage contracts, please navigate to the{" "}
+                      <a href={`/studies/manage?studyId=${study.id}`}>Study</a> page.
+                    </small>
+                  </HelperText>
+                </label>
+                <ul>
+                  {contracts.map((contract) => (
+                    <ContractCard key={contract.id} contract={contract} studyId={study.id} canModify={false} />
+                  ))}
+                </ul>
               </div>
             )}
-            {/* TODO: add contract linkage and list of contracts linked */}
           </div>
         </div>
       </div>

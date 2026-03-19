@@ -187,6 +187,10 @@ export type AssetBase = {
      * Status of the asset
      */
     status: 'active' | 'awaiting' | 'destroyed';
+    /**
+     * List of contract IDs associated with the asset (empty array if none)
+     */
+    contract_ids: Array<string>;
 };
 
 /**

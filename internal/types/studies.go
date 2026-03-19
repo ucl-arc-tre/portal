@@ -37,12 +37,21 @@ type Study struct {
 	LastSignoff                      *time.Time
 	// caseref sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	// study_caseref_seq defined in internal/graceful/db.go
+	// todo: remove the *int after the migration is complete
 	Caseref *int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
 
 	// Relationships
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`
 	Assets      []Asset      `gorm:"foreignKey:StudyID"`
 	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
+}
+
+// Queried via the DSH API
+type DSHStudyExportRecord struct {
+	// todo: remove the *int after the migration is complete
+	Caseref        *int
+	OwnerUsername  Username
+	AdminUsernames string // semicolon-separated in the returned data
 }
 
 func (s Study) AdminUsernames() []string {

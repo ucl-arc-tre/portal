@@ -110,7 +110,9 @@ export default function ProfileSetup(props: Props) {
         <StepProgress
           steps={profileSetupSteps}
           isComplete={profileStepsCompleted}
-          completionTitle="Your certificate is expiring soon!"
+          completionTitle={
+            expiryUrgency.level === "critical" ? "Your certificate has expired!" : "Your certificate is expiring soon!"
+          }
           completionSubtitle=" To retain access to the portal, please verify a new certificate."
           ariaLabel="Profile setup progress"
         />
@@ -121,8 +123,8 @@ export default function ProfileSetup(props: Props) {
             isComplete={profileStepsCompleted}
             completionTitle="Profile Complete!"
             completionSubtitle="You have successfully completed all profile setup steps and are now an approved researcher. You can now create and manage studies."
-            completionButtonText="Go to studies"
-            completionButtonHref="/studies"
+            completionButtonText={process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? "Go to studies" : undefined}
+            completionButtonHref={process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? "/studies" : undefined}
             introText="Complete the following steps to set up your profile and become an approved researcher."
             ariaLabel="Profile setup progress"
           />

@@ -183,17 +183,3 @@
   line-height: 1.5;
   padding-bottom: 1rem;
 }
-
-.expiring-title-urgency-high {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #b80f0f;
-}
-
-.expiring-title-urgency-medium {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #b75301;
-}

@@ -9,6 +9,7 @@ import Loading from "@/components/ui/Loading";
 import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard";
 import styles from "./ProfilePage.module.css";
 import DSHTokens from "@/components/profile/DSHTokens";
+import { calculateExpiryUrgency } from "@/components/shared/exports";
 
 export default function ProfilePage() {
   const { authInProgress, isAuthed, userData, refreshAuth } = useAuth();
@@ -50,19 +51,13 @@ export default function ProfilePage() {
           setTrainingCertificateCompleted(nhsdTraining?.is_valid || false);
           if (nhsdTraining?.is_valid) {
             const completedDate = new Date(nhsdTraining.completed_at!);
-            const today = new Date();
-
-            const diffTime = today.getTime() - completedDate.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            // high: less than 1 month; medium: 1 month remaining; low: 2 months remaining
-            if (diffDays > 11.5 * 30) {
-              setExpiryUrgency({ level: "high" });
-            } else if (diffDays > 11 * 30) {
-              setExpiryUrgency({ level: "medium" });
-            } else if (diffDays > 10 * 30) {
-              setExpiryUrgency({ level: "low" });
-            }
+            // training valid for a year from completion
+            const expiryDate = new Date(completedDate);
+            expiryDate.setFullYear(completedDate.getFullYear() + 1);
+            setExpiryUrgency(calculateExpiryUrgency(expiryDate));
+          } else {
+            // if training not valid (has expired)
+            setExpiryUrgency({ level: "critical" });
           }
         }
       } catch (error) {
@@ -72,11 +67,10 @@ export default function ProfilePage() {
         setIsLoading(false);
       }
     };
-
     if (isAuthed) {
       fetchProfileData();
     }
-  }, [isAuthed]);
+  }, [isAuthed, trainingCertificateCompleted]);
 
   if (authInProgress) return null;
 

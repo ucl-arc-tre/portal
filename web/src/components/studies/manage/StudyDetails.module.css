@@ -1,11 +1,3 @@
-.tab-content {
-  display: none;
-
-  &.active {
-    display: block;
-  }
-}
-
 .study-actions {
   margin-block: 1rem;
   display: flex;
@@ -109,6 +101,13 @@
 
 .grouping {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-block: 0.8rem;
+
+  dt {
+    font-weight: 600;
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
 }

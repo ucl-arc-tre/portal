@@ -176,6 +176,16 @@ func (c *Controller) IsStaffMember(ctx context.Context, username types.Username)
 	return employeeTypeIsStaff(*userData.EmployeeType), nil
 }
 
+func (c *Controller) UserExists(ctx context.Context, username types.Username) (bool, error) {
+	_, err := c.findUser(ctx, username)
+	if errors.Is(err, types.ErrNotFound) {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
 	user, err := c.userData(ctx, types.Username(email))
 	if err == nil {

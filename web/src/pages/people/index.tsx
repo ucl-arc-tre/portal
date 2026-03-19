@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, HelperText } from "@/components/shared/exports";
+import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
