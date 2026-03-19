@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -89,12 +88,13 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	} else if params.Query != nil {
 		queryParams.FuzzyTitle = params.Query
 	}
-	log.Debug().Any("q", queryParams).Msg("tmp") // todo
 	return h.studies.AllStudies(queryParams)
 }
 
 func queryIsCaseref(query *string) bool {
 	if query == nil {
+		return false
+	} else if len(*query) > 5 {
 		return false
 	}
 	return caserefPattern.MatchString(strings.TrimLeft(*query, "0"))

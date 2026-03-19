@@ -165,7 +165,7 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 	if query.OwnerUsername != nil {
 		db = db.Joins("JOIN users ON studies.owner_user_id = users.id AND users.username = ?", *query.OwnerUsername)
 	}
-	if query.FuzzyTitle != nil {
+	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
 		db = db.Where("title % ?", *query.FuzzyTitle)
 	}
 	studies := []types.Study{}
