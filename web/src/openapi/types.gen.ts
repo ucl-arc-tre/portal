@@ -1122,6 +1122,26 @@ export type GetStudiesData = {
          * get studies by status
          */
         status?: ApprovalStatus;
+        /**
+         * Flexible search query. Depending on the structure it will either search:
+         * - caseref: If <= 5 digit number, with optional leading zeros
+         * - study owner email/username: If the query contains an @
+         * - partial study name: If none of the above
+         *
+         */
+        query?: string;
+        /**
+         * Study caseref
+         */
+        caseref?: number;
+        /**
+         * Fuzzy name to match on
+         */
+        name?: string;
+        /**
+         * Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+         */
+        owner_username?: string;
     };
     url: '/studies';
 };

@@ -1177,6 +1177,21 @@ type UserIdParam = string
 type GetStudiesParams struct {
 	// Status get studies by status
 	Status *ApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
+
+	// Query Flexible search query. Depending on the structure it will either search:
+	//   - caseref: If <= 5 digit number, with optional leading zeros
+	//   - study owner email/username: If the query contains an @
+	//   - partial study name: If none of the above
+	Query *string `form:"query,omitempty" json:"query,omitempty"`
+
+	// Caseref Study caseref
+	Caseref *int `form:"caseref,omitempty" json:"caseref,omitempty"`
+
+	// Name Fuzzy name to match on
+	Name *string `form:"name,omitempty" json:"name,omitempty"`
+
+	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1699,6 +1714,38 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", c.Request.URL.Query(), &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", c.Request.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter query: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "caseref" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "caseref", c.Request.URL.Query(), &params.Caseref, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter caseref: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "name" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "name", c.Request.URL.Query(), &params.Name, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "owner_username" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner_username", c.Request.URL.Query(), &params.OwnerUsername, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner_username: %w", err), http.StatusBadRequest)
 		return
 	}
 

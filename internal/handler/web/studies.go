@@ -10,6 +10,7 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
+	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -60,17 +61,20 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 }
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
-	if params.Status != nil && openapi.ApprovalStatus(*params.Status) == openapi.Pending {
-		// admins can see all pending studies
-		return h.studies.PendingStudies()
-
-	} else if params.Status != nil {
+	if params.IsValid() {
 		return []types.Study{}, types.NewErrInvalidObject("Invalid query param")
-	} else {
-		// Admins can see all studies normally
-		return h.studies.AllStudies()
+	}
+	queryParams := studies.QueryParams{
+		ApprovalStatus: params.Status,
+		CaseRef:        params.Caseref,
+	}
+	switch params.Query {
+	// todo - other cases
+	case nil:
+		// no op
 	}
 
+	return h.studies.AllStudies(queryParams)
 }
 
 func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
@@ -92,26 +96,21 @@ func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
 func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) {
 	user := middleware.GetUser(ctx)
 
-	var studies []types.Study
-
 	isAdminOrIGOps, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
 
+	var studies []types.Study
 	if isAdminOrIGOps {
 		studies, err = h.studiesAll(params)
-		if err != nil {
-			setError(ctx, err, "Failed to get studies for admin")
-			return
-		}
 	} else {
 		studies, err = h.studiesStudyOwner(user)
-		if err != nil {
-			setError(ctx, err, "Failed to get studies for study owner")
-			return
-		}
+	}
+	if err != nil {
+		setError(ctx, err, "Failed to get studies")
+		return
 	}
 
 	response := []openapi.Study{}

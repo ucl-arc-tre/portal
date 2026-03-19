@@ -335,10 +335,38 @@ paths:
       parameters:
         - in: query
           name: status
+          description: get studies by status
+          required: false
           schema:
             $ref: "#/components/schemas/ApprovalStatus"
+        - in: query
+          name: query
           required: false
-          description: get studies by status
+          description: |
+            Flexible search query. Depending on the structure it will either search:
+              - caseref: If <= 5 digit number, with optional leading zeros
+              - study owner email/username: If the query contains an @
+              - partial study name: If none of the above
+          schema:
+            type: string
+        - in: query
+          name: caseref
+          required: false
+          description: Study caseref
+          schema:
+            type: integer
+        - in: query
+          name: name
+          required: false
+          description: Fuzzy name to match on
+          schema:
+            type: string
+        - in: query
+          name: owner_username
+          required: false
+          description: Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+          schema:
+            type: string
       responses:
         "200":
           content:

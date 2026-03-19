@@ -154,10 +154,16 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 	return nil, nil
 }
 
-// gets all studies (for admin access)
-func (s *Service) AllStudies() ([]types.Study, error) {
+func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
+	db := s.db.Model(&types.Study{})
+	if query.CaseRef != nil {
+		db = db.Where("caseref = ?", *query.CaseRef)
+	}
+	if query.ApprovalStatus != nil {
+		db = db.Where("approval_status = ?", *query.ApprovalStatus)
+	}
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
+	err := db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 
@@ -181,13 +187,6 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 		return nil, types.NewErrFromGorm(result.Error, "failed to get approved studies")
 	}
 	return records, nil
-}
-
-func (s *Service) PendingStudies() ([]types.Study, error) {
-	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Pending).Find(&studies).Error
-
-	return studies, types.NewErrFromGorm(err)
 }
 
 // StudiesById retrieves all studies that are in a list of ids
