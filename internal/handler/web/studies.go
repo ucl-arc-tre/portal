@@ -3,8 +3,12 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -12,6 +16,10 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
+)
+
+var (
+	caserefPattern = regexp.MustCompile(`^[0-9]{1,5}$`)
 )
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
@@ -61,20 +69,42 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 }
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
-	if params.IsValid() {
-		return []types.Study{}, types.NewErrInvalidObject("Invalid query param")
+	if !params.Valid() {
+		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
 	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,
 		CaseRef:        params.Caseref,
+		FuzzyTitle:     params.FuzzyTitle,
+		OwnerUsername:  params.OwnerUsername,
 	}
-	switch params.Query {
-	// todo - other cases
-	case nil:
-		// no op
+	if queryIsCaseref(params.Query) {
+		caseref, err := strconv.Atoi(*params.Query)
+		if err != nil {
+			return []types.Study{}, types.NewErrInvalidObject("caseref was not int")
+		}
+		queryParams.CaseRef = &caseref
+	} else if queryIsOwnerUsername(params.Query) {
+		queryParams.OwnerUsername = params.Query
+	} else if params.Query != nil {
+		queryParams.FuzzyTitle = params.Query
 	}
-
+	log.Debug().Any("q", queryParams).Msg("tmp") // todo
 	return h.studies.AllStudies(queryParams)
+}
+
+func queryIsCaseref(query *string) bool {
+	if query == nil {
+		return false
+	}
+	return caserefPattern.MatchString(strings.TrimLeft(*query, "0"))
+}
+
+func queryIsOwnerUsername(query *string) bool {
+	if query == nil {
+		return false
+	}
+	return types.Username(*query).IsValid()
 }
 
 func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {

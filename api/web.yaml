@@ -356,9 +356,9 @@ paths:
           schema:
             type: integer
         - in: query
-          name: name
+          name: fuzzy_title
           required: false
-          description: Fuzzy name to match on
+          description: Fuzzy title to match on
           schema:
             type: string
         - in: query
@@ -1790,7 +1790,6 @@ components:
         expires_at:
           type: string
           description: Time in RFC3339 at which the token expires
-
     TokenWithValue:
       allOf:
         - $ref: "#/components/schemas/Token"

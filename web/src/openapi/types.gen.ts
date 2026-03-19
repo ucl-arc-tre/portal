@@ -1135,9 +1135,9 @@ export type GetStudiesData = {
          */
         caseref?: number;
         /**
-         * Fuzzy name to match on
+         * Fuzzy title to match on
          */
-        name?: string;
+        fuzzy_title?: string;
         /**
          * Full username of the study owner. e.g. ccxyz@ucl.ac.uk
          */

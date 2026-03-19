@@ -7,12 +7,12 @@ import (
 )
 
 func TestGetStudiesParamsValid(t *testing.T) {
-	assert.True(t, GetStudiesParams{}.IsValid())
+	assert.True(t, GetStudiesParams{}.Valid())
 	assert.True(t, Approved.Valid())
-	assert.True(t, GetStudiesParams{Status: ptr(Approved)}.IsValid())
-	assert.True(t, GetStudiesParams{Query: ptr("bob")}.IsValid())
-	assert.False(t, GetStudiesParams{Query: ptr("bob"), OwnerUsername: ptr("bob@example.com")}.IsValid())
-	assert.False(t, GetStudiesParams{Status: ptr(ApprovalStatus("not-a-valid-status"))}.IsValid())
+	assert.True(t, GetStudiesParams{Status: ptr(Approved)}.Valid())
+	assert.True(t, GetStudiesParams{Query: ptr("bob")}.Valid())
+	assert.False(t, GetStudiesParams{Query: ptr("bob"), OwnerUsername: ptr("bob@example.com")}.Valid())
+	assert.False(t, GetStudiesParams{Status: ptr(ApprovalStatus("not-a-valid-status"))}.Valid())
 }
 
 func ptr[T any](obj T) *T {

@@ -1187,8 +1187,8 @@ type GetStudiesParams struct {
 	// Caseref Study caseref
 	Caseref *int `form:"caseref,omitempty" json:"caseref,omitempty"`
 
-	// Name Fuzzy name to match on
-	Name *string `form:"name,omitempty" json:"name,omitempty"`
+	// FuzzyTitle Fuzzy title to match on
+	FuzzyTitle *string `form:"fuzzy_title,omitempty" json:"fuzzy_title,omitempty"`
 
 	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
 	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
@@ -1733,11 +1733,11 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "name" -------------
+	// ------------- Optional query parameter "fuzzy_title" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "name", c.Request.URL.Query(), &params.Name, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "fuzzy_title", c.Request.URL.Query(), &params.FuzzyTitle, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter fuzzy_title: %w", err), http.StatusBadRequest)
 		return
 	}
 

@@ -49,6 +49,7 @@ func InitDB() {
 	}
 	db := NewDB()
 	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+	db.Exec(`CREATE EXTENSION IF NOT EXISTS "pg_trgm";`)
 
 	migrateContractStudyIds(db)
 

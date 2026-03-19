@@ -1,7 +1,7 @@
 package openapi
 
-func (s GetStudiesParams) IsValid() bool {
-	if s.Query != nil && (s.Caseref != nil || s.Name != nil || s.OwnerUsername != nil || s.Status != nil) {
+func (s GetStudiesParams) Valid() bool {
+	if s.Query != nil && (s.Caseref != nil || s.FuzzyTitle != nil || s.OwnerUsername != nil || s.Status != nil) {
 		return false
 	}
 	if s.Status != nil && !s.Status.Valid() {

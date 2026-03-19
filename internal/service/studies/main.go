@@ -162,6 +162,12 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 	if query.ApprovalStatus != nil {
 		db = db.Where("approval_status = ?", *query.ApprovalStatus)
 	}
+	if query.OwnerUsername != nil {
+		db = db.Joins("JOIN users ON studies.owner_user_id = users.id AND users.username = ?", *query.OwnerUsername)
+	}
+	if query.FuzzyTitle != nil {
+		db = db.Where("title % ?", *query.FuzzyTitle)
+	}
 	studies := []types.Study{}
 	err := db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
