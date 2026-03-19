@@ -181,6 +181,7 @@ Or in one "big bang":
 >
 > - Project management can't be moved into the portal before Study management, because it relies on lookups of Study data.
 > - The sources of truth for project configuration and access control are inside the TRE systems themselves (i.e. as IaC or Active Directory config). Currently projects are managed by users either inside the TREs or through completing request forms in MyServices or SharePoint. **The Portal will not replace the TREs as the source of truth for this data**. It will, however, become the source of truth for User and Study data, i.e. who is an approved researcher, and what Studies (including assets and contracts) are approved or pending approval.
+> - Whilst this options paper is considering the question of how to sequence the migration of groups of data from one datastore to another, the answers lie as much in the correct functioning of the portal once the data has been successfully migrated into its database. It seems most likely that the reason we may need to rollback would be because of broken portal functionality, rather than issues with getting data into the portal DB i.e. the migration itself.
 
 ## 2.1 Option 1
 
@@ -188,7 +189,7 @@ Or in one "big bang":
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Option Description** | - Migrate incrementally, splitting into 3 phases: Users, Studies and Projects<br> - Each phase would have an initial test group (TRE) to check functionality<br> - SP turned read-only after phase 2                                                                                                                                                                         |
 | **Benefits**           | - Agile; smaller chunks are more manageable for portal team<br>- Easier to respond to mishaps<br>- Fewer people affected if something goes wrong <br>- Users get better experience more quickly                                                                                                                                              |
-| **Risks & Issues**     | - Users will (continue to, in the case of TRE) have a period of using the Portal (researcher status) + SP (study management) + Env/MyServices (project management) concurrently; may be confusing <br>- Will feel the longest to users since development will continue before all phases complete; longest transition period<br>- Using TRE users as the initial test group in each phase may be slightly slighly ineffective: it may test only trivial cases and exclude the complex edge cases where the true migration risk sits i.e. large and complex existing DSH Studies.  |
+| **Risks & Issues**     | - Users will (continue to, in the case of TRE) have a period of using the Portal (researcher status) + SP (study management) + Env/MyServices (project management) concurrently; may be confusing <br>- Will feel the longest to users since development will continue before all phases complete; longest transition period<br>- Using TRE users as the initial test group in each phase may be slightly slightly ineffective: it may test only trivial cases and exclude the complex edge cases where the true migration risk sits i.e. large and complex existing DSH Studies.  |
 | **UX Impact**          | - Users will have the opportunity to become familiar with the Portal whilst still having more familiar SP<br>- Users have multiple steps of small change, increasing the amount of time where they have to use multiple platforms to onboard to any DSH/TRE services                                                  |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                              |
 
@@ -198,7 +199,7 @@ Or in one "big bang":
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Option Description** | Migrate incrementally, splitting into 2 phases: Users (1), and Studies & Projects (2). Each phase would have an initial test group (TRE) to check functionality<br> - SP turned read-only after phase 2                                                                                                                                                             |
 | **Benefits**           | - Agile; smaller chunks are more manageable for Portal team<br>- Easier to respond to mishaps<br>- Fewer people affected if something goes wrong<br>- Allows decoupling of Studies and Projects, giving portal dev team more time to develop the DSH API and project data import functionality                                                                                                                                                 |
-| **Risks & Issues**     | - Users will have a period of using the Portal (researcher status) + SP (study management) + Share Manager/MyServices (project management) concurrently; may be confusing<br>- Spread of/multiple comms to the same user groups<br>- May be long delay after Study phase to bring Project functionality to completion<br>- Using TRE users as the initial test group in each phase may be slightly slighly ineffective: it may test only trivial cases and exclude the complex edge cases where the true migration risk sits i.e. large and complex existing DSH Studies. |
+| **Risks & Issues**     | - Users will have a period of using the Portal (researcher status) + SP (study management) + Share Manager/MyServices (project management) concurrently; may be confusing<br>- Spread of/multiple comms to the same user groups<br>- May be long delay after Study phase to bring Project functionality to completion<br>- Using TRE users as the initial test group in each phase may be slightly slightly ineffective: it may test only trivial cases and exclude the complex edge cases where the true migration risk sits i.e. large and complex existing DSH Studies. |
 | **UX Impact**          | Users will have the opportunity to get more used to the Portal whilst still having more familiar flows<br> - Still split across 3 platforms for a time                                                            |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                       |
 
@@ -228,3 +229,23 @@ Options 2 and 3 will share MyServices as a route for DSH users to request new sh
 ## 3. Evaluation
 
 First thoughts: option 3 is conceptually the cleanest and should be the one we pick in an ideal word. We should start here and moderate down in light of practical limitations.
+
+### What could go wrong?
+
+What could go wrong in Option 3 that wouldn't go wrong in Option 1 or Option 2? 
+1. If Users goes wrong in Option 3, then it would probably also go wrong in Options 1 and 2. This could be:
+  - Major problems with the import such that some (random subset of) approved researchers are not recorded in the portal DB, so then don't show up in the people search or in the lookup when someone is trying to add them to a Project. **We can thoroughly test this.**
+  - Problems with adding external users in particular to the portal. This seems more likely since the process is lengthier and there is more room for things to go wrong i.e. invitations to Entra not being sent, or being sent but not accepted, or being sent and accepted but then not being discoverable, as in the point above. **We can thoroughly test this.**
+
+But whereas in Options 1 and 2, this would be the sole set of problems to triage and fix, in Option 3 the Portal team could also be having to deal with Study and/or Project-related problems:
+
+2. Study problems. As with before, if the import of Study data goes wrong in Option 3, then it would probably also go wrong in Options 1 and 2, but in Option 3 other things might also be going wrong simultaneously, reducing the capacity of the team to fix the Study problems, which could be:
+  - Studies being uneditable (i.e. the form to edit works but submission of it fails, perhaps due to validation issues)
+  - Studies receiving the wrong status on import (we want Studies that are Approved in SP to retain their Approved Status, even if they would not pass muster if they were requested today) such that new Projects can't be created under the Study or existing ones effectively managed.
+  - Studies not being visible to their owners at all (they may in fact exist in the DB, just not visible via the Study page - they may or may not still be visible to the Project form's Study lookup field)
+
+  **We can test all of this thoroughly**
+
+3. Project problems. This is twofold, since projects need to be visible, editable, and creatable in the frontend by users, but the DSH environment team need to be able to GET and PATCH project records via API. As above, if Project functionality breaks, frontend or backend, it will probably also break in Options 1 and 2. Possible problems include:
+  - Project forms not being able to lookup (approved) Studies and Users (Approved Researchers).
+  - 
