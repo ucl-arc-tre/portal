@@ -23,8 +23,6 @@ const getExpiryDate = (completedAt: string) => {
 export default function CertificateReupload({ trainingData, expiryUrgency, onReupload }: Props) {
   const [showCertReupload, setShowCertReupload] = useState(false);
 
-  const toggleShowCertReupload = () => setShowCertReupload((prev) => !prev);
-
   const nhsdTraining = trainingData?.training_records.find((record) => record.kind === "training_kind_nhsd");
 
   return (
@@ -57,7 +55,7 @@ export default function CertificateReupload({ trainingData, expiryUrgency, onReu
         </dl>
       )}
 
-      <Button variant="secondary" size="small" onClick={toggleShowCertReupload}>
+      <Button variant="secondary" size="small" onClick={() => setShowCertReupload((prev) => !prev)}>
         {!showCertReupload ? "Verify another certificate" : "Cancel"}
       </Button>
 
