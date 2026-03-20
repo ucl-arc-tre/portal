@@ -39,7 +39,6 @@ export default function IGOpsStudies() {
   };
 
   const handleSearch = async (query: string) => {
-    console.log("Search query:", query);
     setIsLoading(true);
     setError(null);
     try {
@@ -62,7 +61,6 @@ export default function IGOpsStudies() {
         setError(`Search failed: ${extractErrorMessage(response)}`);
         return;
       }
-      console.log(response.data);
       setStudies(response.data);
     } catch (error) {
       console.error("Search failed:", error);
@@ -72,15 +70,34 @@ export default function IGOpsStudies() {
     }
   };
 
+  const handleKeydown = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch((e.target as HTMLInputElement).value);
+    }
+  };
+
   useEffect(() => {
     fetchStudies();
-    document.getElementById("search")?.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const input = (e.target as HTMLInputElement).value;
-        handleSearch(input);
+
+    const searchInput = document.querySelector("#study-search input");
+
+    if (searchInput) {
+      searchInput.addEventListener("keydown", (e) => {
+        if (e instanceof KeyboardEvent) {
+          handleKeydown(e);
+        }
+      });
+    }
+    return () => {
+      if (searchInput) {
+        searchInput.removeEventListener("keydown", (e) => {
+          if (e instanceof KeyboardEvent) {
+            handleKeydown(e);
+          }
+        });
       }
-    });
-  }, [tab]);
+    };
+  }, [tab, handleKeydown]);
 
   const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
 
@@ -118,19 +135,27 @@ export default function IGOpsStudies() {
       {tab === "pending" ? (
         <p>Studies submitted for review. Approve or request changes for each study.</p>
       ) : (
-        <p>All studies in the system for visibility and oversight.</p>
+        <>
+          <p>All studies in the system for visibility and oversight.</p>
+          <div>
+            <Search
+              placeholder="Search Studies"
+              onSearch={(q) => handleSearch(q)}
+              id="study-search"
+              className={styles.search}
+            />
+            <HelperText>
+              <small>
+                You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
+                <br></br>Note that `iao` will search IAO usernames (emails)
+              </small>
+            </HelperText>
+          </div>
+        </>
       )}
 
       {isLoading && <Loading message="Loading studies..." />}
-      <div>
-        <Search placeholder="Search Studies" onSearch={(q) => handleSearch(q)} id={styles.search} />
-        <HelperText>
-          <small>
-            You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
-            <br></br>Note that `iao` will search IAO usernames (emails)
-          </small>
-        </HelperText>
-      </div>
+
       {!isLoading && studies.length === 0 && (
         <div className={styles["no-studies-message"]}>
           <h2>{emptyMessage}</h2>
