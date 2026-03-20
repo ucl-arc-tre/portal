@@ -21,9 +21,7 @@ import styles from "./Profile.module.css";
 const computeExpiryUrgency = (completedAt: string): ExpiryUrgency | null => {
   const expiryDate = new Date(completedAt);
   expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-  //return calculateExpiryUrgency(expiryDate);
-
-  return { level: "high" };
+  return calculateExpiryUrgency(expiryDate);
 };
 
 type Props = {
