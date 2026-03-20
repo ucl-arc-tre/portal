@@ -69,35 +69,9 @@ export default function IGOpsStudies() {
       setIsLoading(false);
     }
   };
-
-  const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSearch((e.target as HTMLInputElement).value);
-    }
-  };
-
   useEffect(() => {
     fetchStudies();
-
-    const searchInput = document.querySelector("#study-search input");
-
-    if (searchInput) {
-      searchInput.addEventListener("keydown", (e) => {
-        if (e instanceof KeyboardEvent) {
-          handleKeydown(e);
-        }
-      });
-    }
-    return () => {
-      if (searchInput) {
-        searchInput.removeEventListener("keydown", (e) => {
-          if (e instanceof KeyboardEvent) {
-            handleKeydown(e);
-          }
-        });
-      }
-    };
-  }, [tab, handleKeydown]);
+  }, [tab]);
 
   const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
 
