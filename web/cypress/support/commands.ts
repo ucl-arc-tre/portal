@@ -901,4 +901,6 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
       cy.get("[data-cy='training-certificate-sumbit']").click();
     }
   });
+
+  cy.contains("Verify another certificate").should("be.visible");
 });
