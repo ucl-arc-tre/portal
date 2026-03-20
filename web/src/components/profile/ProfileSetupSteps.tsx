@@ -1,29 +1,34 @@
 import { useEffect, useState } from "react";
+import { Profile as ProfileData, UserAgreements, ProfileTraining } from "@/openapi";
 import ProfileChosenName from "./approved-researcher-components/ChosenName";
 import ApprovedResearcherAgreement from "./approved-researcher-components/ApprovedResearcherAgreement";
 import TrainingCertificate from "./approved-researcher-components/TrainingCertificate";
 import StepArrow from "../ui/steps/StepArrow";
 import StepProgress from "../ui/steps/StepProgress";
-import styles from "./Profile.module.css";
+import styles from "./ProfileSetupSteps.module.css";
 
 type Props = {
-  initialChosenName: string;
-  initialAgreementCompleted: boolean;
-  initialTrainingCompleted: boolean;
+  profileData: ProfileData;
+  agreementsData: UserAgreements;
+  trainingData: ProfileTraining;
   expiryUrgency: ExpiryUrgency | null;
   onStepsComplete: (chosenName: string) => void;
 };
 
 export default function ProfileSetupSteps({
-  initialChosenName,
-  initialAgreementCompleted,
-  initialTrainingCompleted,
+  profileData,
+  agreementsData,
+  trainingData,
   expiryUrgency,
   onStepsComplete,
 }: Props) {
-  const [chosenName, setChosenName] = useState(initialChosenName);
-  const [agreementCompleted, setAgreementCompleted] = useState(initialAgreementCompleted);
-  const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(initialTrainingCompleted);
+  const [chosenName, setChosenName] = useState(profileData.chosen_name);
+  const [agreementCompleted, setAgreementCompleted] = useState(
+    agreementsData.confirmed_agreements.some((a) => a.agreement_type === "approved-researcher")
+  );
+  const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(
+    trainingData.training_records.find((r) => r.kind === "training_kind_nhsd")?.is_valid || false
+  );
 
   const hasChosenName = !!chosenName;
   const isComplete = hasChosenName && agreementCompleted && trainingCertificateCompleted && !expiryUrgency;

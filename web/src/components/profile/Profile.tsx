@@ -1,17 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
-import { getProfile, getProfileAgreements, getProfileTraining, Auth } from "@/openapi";
+import {
+  getProfile,
+  getProfileAgreements,
+  getProfileTraining,
+  Profile as ProfileData,
+  UserAgreements,
+  ProfileTraining,
+  Auth,
+} from "@/openapi";
 import { calculateExpiryUrgency } from "@/components/shared/exports";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import ProfileSetupSteps from "./ProfileSetupSteps";
 import ProfileSummaryCard from "./ProfileSummaryCard";
-import TrainingCertificate from "./approved-researcher-components/TrainingCertificate";
+import CertificateReupload from "./CertificateReupload";
 import Loading from "../ui/Loading";
-import Button from "../ui/Button";
 
 import styles from "./Profile.module.css";
 
-const computeExpiryUrgency = (completedAt: string): ExpiryUrgency => {
+const computeExpiryUrgency = (completedAt: string): ExpiryUrgency | null => {
   const expiryDate = new Date(completedAt);
   expiryDate.setFullYear(expiryDate.getFullYear() + 1);
   return calculateExpiryUrgency(expiryDate);
@@ -24,14 +31,13 @@ type Props = {
 
 export default function Profile({ userData, refreshAuth }: Props) {
   const [chosenName, setChosenName] = useState<string>("");
-  const [agreementCompleted, setAgreementCompleted] = useState(false);
-  const [trainingCompleted, setTrainingCompleted] = useState(false);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [agreementsData, setAgreementsData] = useState<UserAgreements | null>(null);
+  const [trainingData, setTrainingData] = useState<ProfileTraining | null>(null);
   const [profileComplete, setProfileComplete] = useState(false);
   const [expiryUrgency, setExpiryUrgency] = useState<ExpiryUrgency | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
-  const [showCertReupload, setShowCertReupload] = useState(false);
-  const [isCollapsing, setIsCollapsing] = useState(false);
 
   const fetchProfileData = useCallback(async () => {
     setIsLoading(true);
@@ -65,16 +71,12 @@ export default function Profile({ userData, refreshAuth }: Props) {
       const nhsdTraining = trainingResponse.data.training_records.find(
         (record) => record.kind === "training_kind_nhsd"
       );
-      const trainingValid = nhsdTraining?.is_valid || false;
 
       setChosenName(profileResponse.data.chosen_name);
-      setAgreementCompleted(
-        agreementsResponse.data.confirmed_agreements.some(
-          (agreement) => agreement.agreement_type === "approved-researcher"
-        )
-      );
-      setTrainingCompleted(trainingValid);
-      if (trainingValid) setExpiryUrgency(computeExpiryUrgency(nhsdTraining!.completed_at!));
+      setProfileData(profileResponse.data);
+      setAgreementsData(agreementsResponse.data);
+      setTrainingData(trainingResponse.data);
+      if (nhsdTraining?.is_valid) setExpiryUrgency(computeExpiryUrgency(nhsdTraining.completed_at!));
     } catch (error) {
       console.error("Failed to get profile data:", error);
       setError("Failed to load profile data. Please try again.");
@@ -87,6 +89,13 @@ export default function Profile({ userData, refreshAuth }: Props) {
     fetchProfileData();
   }, [fetchProfileData]);
 
+  const handleStepsComplete = (name: string) => {
+    setChosenName(name);
+    setProfileComplete(true);
+    setExpiryUrgency(null);
+    refreshAuth();
+  };
+
   if (isLoading) return <Loading message="Loading your profile..." />;
 
   if (errorMessage) {
@@ -97,59 +106,22 @@ export default function Profile({ userData, refreshAuth }: Props) {
     );
   }
 
-  const handleStepsComplete = (name: string) => {
-    setChosenName(name);
-    setProfileComplete(true);
-    setExpiryUrgency(null);
-    refreshAuth();
-  };
-
   if (!profileComplete || expiryUrgency) {
     return (
       <ProfileSetupSteps
-        initialChosenName={chosenName}
-        initialAgreementCompleted={agreementCompleted}
-        initialTrainingCompleted={trainingCompleted}
+        profileData={profileData!}
+        agreementsData={agreementsData!}
+        trainingData={trainingData!}
         expiryUrgency={expiryUrgency}
         onStepsComplete={handleStepsComplete}
       />
     );
   }
 
-  const toggleShowCertReupload = () => {
-    if (showCertReupload) {
-      setIsCollapsing(true);
-      setTimeout(() => {
-        setShowCertReupload(false);
-        setIsCollapsing(false);
-      }, 1900);
-    } else {
-      setShowCertReupload(true);
-    }
-  };
-
   return (
-    <>
+    <div className={styles["profile-content-container"]}>
       <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
-
-      <div className={styles["reupload-option"]}>
-        <p>
-          Your current training certificate is within date, but you may update your certification at any time by
-          uploading a new document.
-        </p>
-
-        <Button variant="secondary" size="small" onClick={toggleShowCertReupload}>
-          {!showCertReupload ? "Verify another certificate" : "Cancel"}
-        </Button>
-
-        <div
-          className={`${styles["certificate-container"]} ${
-            isCollapsing ? styles["cert-collapsing"] : showCertReupload ? styles["cert-visible"] : styles["cert-hidden"]
-          }`}
-        >
-          <TrainingCertificate setTrainingCertificateCompleted={() => fetchProfileData()} />
-        </div>
-      </div>
-    </>
+      <CertificateReupload trainingData={trainingData} onReupload={fetchProfileData} />
+    </div>
   );
 }
