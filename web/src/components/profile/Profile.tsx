@@ -71,8 +71,8 @@ export default function Profile({ userData, refreshAuth }: Props) {
       const nhsdTraining = trainingResponse.data.training_records.find(
         (record) => record.kind === "training_kind_nhsd"
       );
-      const urgency = nhsdTraining?.is_valid ? computeExpiryUrgency(nhsdTraining.completed_at!) : null;
-      setExpiryUrgency(urgency);
+      const trainingExpiryUrgency = nhsdTraining?.is_valid ? computeExpiryUrgency(nhsdTraining.completed_at!) : null;
+      setExpiryUrgency(trainingExpiryUrgency);
 
       setChosenName(profileResponse.data.chosen_name);
       setProfileData(profileResponse.data);
