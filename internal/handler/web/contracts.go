@@ -3,12 +3,12 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
-	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -22,17 +22,6 @@ func mustParseDate(dateStr string) time.Time {
 		panic(fmt.Sprintf("failed to parse date %q: %v", dateStr, err))
 	}
 	return parsedDate
-}
-
-func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
-	return openapi.ContractUploadObject{
-		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
-		ThirdPartyName:        ctx.PostForm("third_party_name"),
-		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
-		StartDate:             ctx.PostForm("start_date"),
-		ExpiryDate:            ctx.PostForm("expiry_date"),
-		AssetIds:              ctx.PostFormArray("asset_ids"),
-	}
 }
 
 func contractToOpenApiContract(contract types.Contract) openapi.Contract {
@@ -57,43 +46,46 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 }
 
 // Handler methods
-
-func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]types.Asset, error) {
-
-	assets := []types.Asset{}
-	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
-	if err != nil {
-		return nil, err
-	}
-	for _, assetUuid := range assetUuids {
-		assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
-	}
-
-	return assets, nil
-}
-
-func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId)
+func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
+	studyUuid, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
 
-	// Get the uploaded file
+	var contract openapi.ContractBase
+	if err := bindJSONOrSetError(ctx, contract); err != nil {
+		return
+	}
+
+	validationError := h.studies.ValidateContractMetadata(studyUuid, contract)
+	if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	if err := h.studies.CreateContract(studyId, contract); err != nil {
+		setError(ctx, err, "Failed to get create contract")
+		return
+	}
+
+}
+
+func (h *Handler) PostStudiesStudyIdContractsContractIdUpload(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
+	if err != nil {
+		return
+	}
+
 	fileHeader, err := ctx.FormFile("file")
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Failed to get uploaded file")
 		return
 	}
 
-	contractMetadata := extractContractFormData(ctx)
-
-	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, fileHeader.Filename)
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
+	if !isPdfFilename(fileHeader.Filename) {
+		setValidationError(ctx, "Only PDF files are allowed")
 		return
 	}
-
-	user := middleware.GetUser(ctx)
 
 	// Open the uploaded file
 	file, err := fileHeader.Open()
@@ -115,29 +107,7 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 		return
 	}
 
-	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
-	if err != nil {
-		setError(ctx, err, "Failed to prepare assets for contract linkage")
-		return
-	}
-	// Create the final contract record for storage
-	contractData := types.Contract{
-		StudyID:               uuids[0],
-		Filename:              fileHeader.Filename,
-		CreatorUserID:         user.ID,
-		OrganisationSignatory: contractMetadata.OrganisationSignatory,
-		ThirdPartyName:        contractMetadata.ThirdPartyName,
-		Status:                string(contractMetadata.Status),
-		StartDate:             mustParseDate(contractMetadata.StartDate),
-		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
-
-		Assets: assets,
-	}
-
-	contractObj := types.S3Object{
-		Content: file,
-	}
-	err = h.studies.StoreContract(ctx, uuids[0], contractObj, contractData)
+	err = h.studies.StoreContract(ctx, uuids[0], uuids[1], types.S3Object{Content: file})
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
 		return
@@ -208,8 +178,7 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		StartDate:             mustParseDate(contractMetadata.StartDate),
 		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
 		Filename:              filename,
-
-		Assets: assets,
+		Assets:                assets,
 	}
 
 	err = h.studies.UpdateContract(ctx, uuids[0], uuids[1], contractUpdateData, contractObj)
@@ -280,4 +249,8 @@ func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context,
 			"Content-Disposition": "attachment",
 		},
 	)
+}
+
+func isPdfFilename(filename string) bool {
+	return len(filename) > 4 && strings.HasSuffix(filename, ".pdf")
 }

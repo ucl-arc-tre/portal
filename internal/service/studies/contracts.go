@@ -3,68 +3,62 @@ package studies
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) ValidateContractMetadata(studyId uuid.UUID, contractData openapi.ContractUploadObject, filename string) *openapi.ValidationError {
+func (s *Service) ValidateContractMetadata(studyId uuid.UUID, data openapi.ContractBase) *openapi.ValidationError {
 	// Only validate file extension if a filename is provided (for an updated contract, file is optional)
-	if filename != "" && !strings.HasSuffix(strings.ToLower(filename), ".pdf") {
-		return &openapi.ValidationError{
-			ErrorMessage: "Only PDF files are allowed",
-		}
-	}
-
-	if !validation.ContractNamePattern.MatchString(contractData.OrganisationSignatory) {
+	if !validation.ContractNamePattern.MatchString(data.OrganisationSignatory) {
 		return &openapi.ValidationError{
 			ErrorMessage: "Organisation signatory must be between 2 and 100 characters",
 		}
 	}
 
-	if !validation.ContractNamePattern.MatchString(contractData.ThirdPartyName) {
+	if !validation.ContractNamePattern.MatchString(data.ThirdPartyName) {
 		return &openapi.ValidationError{
 			ErrorMessage: "Third party name must be between 2 and 100 characters",
 		}
 	}
 
-	if openapi.ContractStatus(contractData.Status) != openapi.ContractStatusProposed &&
-		openapi.ContractStatus(contractData.Status) != openapi.ContractStatusActive &&
-		openapi.ContractStatus(contractData.Status) != openapi.ContractStatusExpired {
+	if openapi.ContractStatus(data.Status) != openapi.ContractStatusProposed &&
+		openapi.ContractStatus(data.Status) != openapi.ContractStatusActive &&
+		openapi.ContractStatus(data.Status) != openapi.ContractStatusExpired {
 		return &openapi.ValidationError{
 			ErrorMessage: "Status must be proposed, active, or expired",
 		}
 	}
 
-	if contractData.StartDate == "" {
+	if data.StartDate == "" {
 		return &openapi.ValidationError{
 			ErrorMessage: "Start date is required",
 		}
 	}
 
 	// Validate start date format
-	startDate, err := time.Parse(config.DateFormat, contractData.StartDate)
+	startDate, err := time.Parse(config.DateFormat, data.StartDate)
 	if err != nil {
 		return &openapi.ValidationError{
 			ErrorMessage: "Invalid start date format",
 		}
 	}
 
-	if contractData.ExpiryDate == "" {
+	if data.ExpiryDate == "" {
 		return &openapi.ValidationError{
 			ErrorMessage: "Expiry date is required",
 		}
 	}
 
 	// Validate expiry date format
-	expiryDate, err := time.Parse(config.DateFormat, contractData.ExpiryDate)
+	expiryDate, err := time.Parse(config.DateFormat, data.ExpiryDate)
 	if err != nil {
 		return &openapi.ValidationError{
 			ErrorMessage: "Invalid expiry date format",
@@ -78,13 +72,13 @@ func (s *Service) ValidateContractMetadata(studyId uuid.UUID, contractData opena
 	}
 
 	var numExistingAssets int64
-	err = s.db.Model(types.Asset{}).Where("study_id = ? AND id in ?", studyId, contractData.AssetIds).Count(&numExistingAssets).Error
+	err = s.db.Model(types.Asset{}).Where("study_id = ? AND id in ?", studyId, data.AssetIds).Count(&numExistingAssets).Error
 	if err != nil {
 		log.Err(err).Msg("Failed to find matching assets")
 		return &openapi.ValidationError{
 			ErrorMessage: "Failed to find matching assets",
 		}
-	} else if numExistingAssets != int64(len(contractData.AssetIds)) {
+	} else if numExistingAssets != int64(len(data.AssetIds)) {
 		return &openapi.ValidationError{
 			ErrorMessage: "Did not find existing study assets",
 		}
@@ -93,21 +87,41 @@ func (s *Service) ValidateContractMetadata(studyId uuid.UUID, contractData opena
 	return nil
 }
 
+func (s *Service) CreateContract(
+	studyID uuid.UUID,
+	contractBase openapi.ContractBase,
+) error {
+	log.Debug().Msg("Storing contract")
+
+	contract := types.Contract{
+		StudyID: studyID,
+	}
+
+	// Store the contract metadata in the database first to generate an ID
+	if err := s.db.Create(&contract).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to create contract metadata")
+	}
+
+	return nil
+}
+
 func (s *Service) StoreContract(
 	ctx context.Context,
 	studyID uuid.UUID,
+	contractID uuid.UUID,
 	pdfContractObj types.S3Object,
-	contractMetadata types.Contract,
 ) error {
-	log.Debug().Str("filename", contractMetadata.Filename).Msg("Storing contract")
+	if exists, err := s.contractExists(studyID, contractID); err != nil {
+		return err
+	} else if !exists {
+		return types.NewErrInvalidObject("cannot store a contract without metadata")
+	}
+
+	log.Debug().Str("contractID", contractID.String()).Msg("Storing contract")
 
 	// Start a database transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// Store the contract metadata in the database first to generate an ID
 	if err := tx.Create(&contractMetadata).Error; err != nil {
@@ -169,11 +183,7 @@ func (s *Service) UpdateContract(
 
 	// Start a database transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// If a new file is provided, update the filename and replace the file in S3
 	if pdfContractObj != nil {

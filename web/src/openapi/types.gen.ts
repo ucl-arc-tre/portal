@@ -557,20 +557,6 @@ export type ContractBase = {
     asset_ids: Array<string>;
 };
 
-export type ContractUploadObject = ContractBase & {
-    /**
-     * The contract file to upload (e.g., PDF)
-     */
-    file: Blob | File;
-};
-
-export type ContractUpdate = ContractBase & {
-    /**
-     * Optional new contract file to replace the existing one
-     */
-    file?: Blob | File;
-};
-
 /**
  * A contract associated with a study
  */
@@ -1922,16 +1908,16 @@ export type GetStudiesByStudyIdContractsResponses = {
 
 export type GetStudiesByStudyIdContractsResponse = GetStudiesByStudyIdContractsResponses[keyof GetStudiesByStudyIdContractsResponses];
 
-export type PostStudiesByStudyIdContractsUploadData = {
-    body: ContractUploadObject;
+export type PostStudiesByStudyIdContractsData = {
+    body: ContractBase;
     path: {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/contracts/upload';
+    url: '/studies/{studyId}/contracts';
 };
 
-export type PostStudiesByStudyIdContractsUploadErrors = {
+export type PostStudiesByStudyIdContractsErrors = {
     /**
      * Validation error
      */
@@ -1950,19 +1936,53 @@ export type PostStudiesByStudyIdContractsUploadErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdContractsUploadError = PostStudiesByStudyIdContractsUploadErrors[keyof PostStudiesByStudyIdContractsUploadErrors];
+export type PostStudiesByStudyIdContractsError = PostStudiesByStudyIdContractsErrors[keyof PostStudiesByStudyIdContractsErrors];
 
-export type PostStudiesByStudyIdContractsUploadResponses = {
+export type PostStudiesByStudyIdContractsResponses = {
+    /**
+     * OK
+     */
+    200: Contract;
+};
+
+export type PostStudiesByStudyIdContractsResponse = PostStudiesByStudyIdContractsResponses[keyof PostStudiesByStudyIdContractsResponses];
+
+export type PostStudiesByStudyIdContractsByContractIdUploadData = {
+    body: unknown;
+    path: {
+        studyId: string;
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}/upload';
+};
+
+export type PostStudiesByStudyIdContractsByContractIdUploadErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostStudiesByStudyIdContractsByContractIdUploadResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type PostStudiesByStudyIdContractsUploadResponse = PostStudiesByStudyIdContractsUploadResponses[keyof PostStudiesByStudyIdContractsUploadResponses];
+export type PostStudiesByStudyIdContractsByContractIdUploadResponse = PostStudiesByStudyIdContractsByContractIdUploadResponses[keyof PostStudiesByStudyIdContractsByContractIdUploadResponses];
 
 export type PutStudiesByStudyIdContractsByContractIdData = {
-    body: ContractUpdate;
+    body: Contract;
     path: {
         studyId: string;
         contractId: string;

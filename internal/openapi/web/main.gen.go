@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
-	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for AgreementType.
@@ -366,48 +365,6 @@ func (e ContractBaseStatus) Valid() bool {
 	}
 }
 
-// Defines values for ContractUpdateStatus.
-const (
-	ContractUpdateStatusActive   ContractUpdateStatus = "active"
-	ContractUpdateStatusExpired  ContractUpdateStatus = "expired"
-	ContractUpdateStatusProposed ContractUpdateStatus = "proposed"
-)
-
-// Valid indicates whether the value is a known member of the ContractUpdateStatus enum.
-func (e ContractUpdateStatus) Valid() bool {
-	switch e {
-	case ContractUpdateStatusActive:
-		return true
-	case ContractUpdateStatusExpired:
-		return true
-	case ContractUpdateStatusProposed:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for ContractUploadObjectStatus.
-const (
-	ContractUploadObjectStatusActive   ContractUploadObjectStatus = "active"
-	ContractUploadObjectStatusExpired  ContractUploadObjectStatus = "expired"
-	ContractUploadObjectStatusProposed ContractUploadObjectStatus = "proposed"
-)
-
-// Valid indicates whether the value is a known member of the ContractUploadObjectStatus enum.
-func (e ContractUploadObjectStatus) Valid() bool {
-	switch e {
-	case ContractUploadObjectStatusActive:
-		return true
-	case ContractUploadObjectStatusExpired:
-		return true
-	case ContractUploadObjectStatusProposed:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for ProjectTRERoleName.
 const (
 	DesktopUser     ProjectTRERoleName = "desktop_user"
@@ -689,60 +646,6 @@ type ContractBase struct {
 
 // ContractBaseStatus Current status of the contract
 type ContractBaseStatus string
-
-// ContractUpdate defines model for ContractUpdate.
-type ContractUpdate struct {
-	// AssetIds List of assets associated with this contract
-	AssetIds []string `json:"asset_ids"`
-
-	// ExpiryDate Contract expiry date in YYYY-MM-DD format
-	ExpiryDate string `json:"expiry_date"`
-
-	// File Optional new contract file to replace the existing one
-	File *openapi_types.File `json:"file,omitempty"`
-
-	// OrganisationSignatory Name of the organisation signatory
-	OrganisationSignatory string `json:"organisation_signatory"`
-
-	// StartDate Contract start date in YYYY-MM-DD format
-	StartDate string `json:"start_date"`
-
-	// Status Current status of the contract
-	Status ContractUpdateStatus `json:"status"`
-
-	// ThirdPartyName Name of the third party organization
-	ThirdPartyName string `json:"third_party_name"`
-}
-
-// ContractUpdateStatus Current status of the contract
-type ContractUpdateStatus string
-
-// ContractUploadObject defines model for ContractUploadObject.
-type ContractUploadObject struct {
-	// AssetIds List of assets associated with this contract
-	AssetIds []string `json:"asset_ids"`
-
-	// ExpiryDate Contract expiry date in YYYY-MM-DD format
-	ExpiryDate string `json:"expiry_date"`
-
-	// File The contract file to upload (e.g., PDF)
-	File openapi_types.File `json:"file"`
-
-	// OrganisationSignatory Name of the organisation signatory
-	OrganisationSignatory string `json:"organisation_signatory"`
-
-	// StartDate Contract start date in YYYY-MM-DD format
-	StartDate string `json:"start_date"`
-
-	// Status Current status of the contract
-	Status ContractUploadObjectStatus `json:"status"`
-
-	// ThirdPartyName Name of the third party organization
-	ThirdPartyName string `json:"third_party_name"`
-}
-
-// ContractUploadObjectStatus Current status of the contract
-type ContractUploadObjectStatus string
 
 // Environment An environment with its tier mapping
 type Environment struct {
@@ -1211,11 +1114,11 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
-// PostStudiesStudyIdContractsUploadMultipartRequestBody defines body for PostStudiesStudyIdContractsUpload for multipart/form-data ContentType.
-type PostStudiesStudyIdContractsUploadMultipartRequestBody = ContractUploadObject
+// PostStudiesStudyIdContractsJSONRequestBody defines body for PostStudiesStudyIdContracts for application/json ContentType.
+type PostStudiesStudyIdContractsJSONRequestBody = ContractBase
 
-// PutStudiesStudyIdContractsContractIdMultipartRequestBody defines body for PutStudiesStudyIdContractsContractId for multipart/form-data ContentType.
-type PutStudiesStudyIdContractsContractIdMultipartRequestBody = ContractUpdate
+// PutStudiesStudyIdContractsContractIdJSONRequestBody defines body for PutStudiesStudyIdContractsContractId for application/json ContentType.
+type PutStudiesStudyIdContractsContractIdJSONRequestBody = Contract
 
 // PostTokensDshJSONRequestBody defines body for PostTokensDsh for application/json ContentType.
 type PostTokensDshJSONRequestBody = TokenRequest
@@ -1322,14 +1225,17 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/contracts)
 	GetStudiesStudyIdContracts(c *gin.Context, studyId string)
 
-	// (POST /studies/{studyId}/contracts/upload)
-	PostStudiesStudyIdContractsUpload(c *gin.Context, studyId string)
+	// (POST /studies/{studyId}/contracts)
+	PostStudiesStudyIdContracts(c *gin.Context, studyId string)
 
 	// (PUT /studies/{studyId}/contracts/{contractId})
 	PutStudiesStudyIdContractsContractId(c *gin.Context, studyId string, contractId string)
 
 	// (GET /studies/{studyId}/contracts/{contractId}/download)
 	GetStudiesStudyIdContractsContractIdDownload(c *gin.Context, studyId string, contractId string)
+
+	// (POST /studies/{studyId}/contracts/{contractId}/upload)
+	PostStudiesStudyIdContractsContractIdUpload(c *gin.Context, studyId string, contractId string)
 
 	// (PATCH /studies/{studyId}/pending)
 	PatchStudiesStudyIdPending(c *gin.Context, studyId string)
@@ -1968,8 +1874,8 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContracts(c *gin.Context) {
 	siw.Handler.GetStudiesStudyIdContracts(c, studyId)
 }
 
-// PostStudiesStudyIdContractsUpload operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsUpload(c *gin.Context) {
+// PostStudiesStudyIdContracts operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContracts(c *gin.Context) {
 
 	var err error
 
@@ -1989,7 +1895,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsUpload(c *gin.Cont
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdContractsUpload(c, studyId)
+	siw.Handler.PostStudiesStudyIdContracts(c, studyId)
 }
 
 // PutStudiesStudyIdContractsContractId operation middleware
@@ -2056,6 +1962,39 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdDownload(
 	}
 
 	siw.Handler.GetStudiesStudyIdContractsContractIdDownload(c, studyId, contractId)
+}
+
+// PostStudiesStudyIdContractsContractIdUpload operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdUpload(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractId" -------------
+	var contractId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdContractsContractIdUpload(c, studyId, contractId)
 }
 
 // PatchStudiesStudyIdPending operation middleware
@@ -2309,9 +2248,10 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
-	router.POST(options.BaseURL+"/studies/:studyId/contracts/upload", wrapper.PostStudiesStudyIdContractsUpload)
+	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)
 	router.PUT(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.PutStudiesStudyIdContractsContractId)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/download", wrapper.GetStudiesStudyIdContractsContractIdDownload)
+	router.POST(options.BaseURL+"/studies/:studyId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdContractsContractIdUpload)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.GET(options.BaseURL+"/tokens/dsh", wrapper.GetTokensDsh)
 	router.POST(options.BaseURL+"/tokens/dsh", wrapper.PostTokensDsh)
