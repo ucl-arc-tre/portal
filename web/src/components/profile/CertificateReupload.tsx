@@ -25,7 +25,7 @@ export default function CertificateReupload({ trainingData, expiryUrgency, onReu
 
   const toggleShowCertReupload = () => setShowCertReupload((prev) => !prev);
 
-  const nhsdTraining = trainingData?.training_records.find((r) => r.kind === "training_kind_nhsd");
+  const nhsdTraining = trainingData?.training_records.find((record) => record.kind === "training_kind_nhsd");
 
   return (
     <div className={styles["reupload-option"]}>
