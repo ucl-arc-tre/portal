@@ -48,16 +48,15 @@ func InitDB() {
 		&types.Token{},
 	}
 	db := NewDB()
-	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "pg_trgm";`)
 
 	migrateContractStudyIds(db)
 
 	// Set up a sequence for the study caseref
 	// this must exist before AutoMigrate is run below, as the Caseref column default references it
 	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
-	if err := db.Exec(`CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`).Error; err != nil {
-		panic(err)
-	}
+	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
@@ -144,7 +143,7 @@ type UpdateObject interface {
 	IsDeleted() bool
 }
 
-// Update an existing list of many ojects to their new values using
+// Update an existing list of many objects to their new values using
 // unique keys that can only exist once in the database.
 func UpdateManyExisting[T UpdateObject](tx *gorm.DB, old []T, new []T) error {
 	newKeys := []string{}
@@ -174,5 +173,12 @@ func UpdateManyExisting[T UpdateObject](tx *gorm.DB, old []T, new []T) error {
 func RollbackTransactionOnPanic(tx *gorm.DB) {
 	if r := recover(); r != nil {
 		tx.Rollback()
+	}
+}
+
+func mustExec(db *gorm.DB, sql string) {
+	err := db.Exec(sql).Error
+	if err != nil {
+		panic(err)
 	}
 }

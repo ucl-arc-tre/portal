@@ -159,7 +159,7 @@ export const postUsersInvite = <ThrowOnError extends boolean = false>(options: O
 export const getUsersMetrics = <ThrowOnError extends boolean = false>(options?: Options<GetUsersMetricsData, ThrowOnError>) => (options?.client ?? client).get<GetUsersMetricsResponses, unknown, ThrowOnError>({ url: '/users/metrics', ...options });
 
 /**
- * Get all studies accessible to the current user
+ * Get all studies accessible to the current user. Filtering is admin only
  */
 export const getStudies = <ThrowOnError extends boolean = false>(options?: Options<GetStudiesData, ThrowOnError>) => (options?.client ?? client).get<GetStudiesResponses, GetStudiesErrors, ThrowOnError>({ url: '/studies', ...options });
 
