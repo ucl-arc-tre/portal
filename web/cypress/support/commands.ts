@@ -888,14 +888,15 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
   cy.waitForProfileData();
 
   cy.get("body").then(($body) => {
-    if ($body.text().includes("Save Name")) {
+    if ($body.find("[data-cy='chosen-name-form']").length > 0) {
       cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
       cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
     }
+  });
 
-    if (!$body.text().includes("Verify another certificate")) {
+  cy.get("body").then(($body) => {
+    if ($body.find("[data-cy='agreement-agree']").length > 0) {
       cy.get("[data-cy='agreement-agree']").click();
-
       cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
       cy.get("[data-cy='training-certificate-sumbit']").click();
     }
