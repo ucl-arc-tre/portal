@@ -881,9 +881,11 @@ Cypress.Commands.add("mockEnvironmentsTre", () => {
 });
 
 Cypress.Commands.add("becomeApprovedResearcher", () => {
+  cy.intercept("GET", "/web/api/v0/profile").as("getChosenName");
+  cy.intercept("GET", "/web/api/v0/profile/agreements").as("getAgreements");
+  cy.intercept("GET", "/web/api/v0/profile/training").as("getTraining");
   cy.visit("/profile");
-
-  cy.contains("Profile Information").should("be.visible");
+  cy.waitForProfileData();
 
   cy.get("body").then(($body) => {
     if ($body.text().includes("Save Name")) {
@@ -891,7 +893,7 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
       cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
     }
 
-    if (!$body.text().includes("Profile Complete")) {
+    if (!$body.text().includes("Verify another certificate")) {
       cy.get("[data-cy='agreement-agree']").click();
 
       cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
