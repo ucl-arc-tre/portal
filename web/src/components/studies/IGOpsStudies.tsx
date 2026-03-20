@@ -46,16 +46,13 @@ export default function IGOpsStudies() {
       let response;
       switch (true) {
         case query.includes("caseref"):
-          response = await getStudies({ query: { query } });
+          response = await getStudies({ query: { caseref: Number(query.split("caseref:")[1]) } });
           break;
         case query.includes("title"):
           response = await getStudies({ query: { fuzzy_title: query.split("title:")[1] } });
           break;
         case query.includes("iao"):
           response = await getStudies({ query: { owner_username: query.split("iao:")[1] } });
-          break;
-        case query.includes("status"):
-          response = await getStudies({ query: { query } });
           break;
         default:
           response = await getStudies({ query: { query: query } });
@@ -129,7 +126,7 @@ export default function IGOpsStudies() {
         <Search placeholder="Search Studies" onSearch={(q) => handleSearch(q)} id={styles.search} />
         <HelperText>
           <small>
-            You can use keywords to narrow your search: caseref, title, iao or status. eg. `caseref:12345`
+            You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
             <br></br>Note that `iao` will search IAO usernames (emails)
           </small>
         </HelperText>
