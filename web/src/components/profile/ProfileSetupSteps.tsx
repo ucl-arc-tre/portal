@@ -11,27 +11,20 @@ type Props = {
   profileData: ProfileData;
   agreementsData: UserAgreements;
   trainingData: ProfileTraining;
-  expiryUrgency: ExpiryUrgency | null;
   onStepsComplete: (chosenName: string) => void;
 };
 
-export default function ProfileSetupSteps({
-  profileData,
-  agreementsData,
-  trainingData,
-  expiryUrgency,
-  onStepsComplete,
-}: Props) {
+export default function ProfileSetupSteps({ profileData, agreementsData, trainingData, onStepsComplete }: Props) {
   const [chosenName, setChosenName] = useState(profileData.chosen_name);
   const [agreementCompleted, setAgreementCompleted] = useState(
     agreementsData.confirmed_agreements.some((a) => a.agreement_type === "approved-researcher")
   );
   const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(
-    trainingData.training_records.find((r) => r.kind === "training_kind_nhsd")?.is_valid || false
+    trainingData.training_records.find((record) => record.kind === "training_kind_nhsd")?.is_valid || false
   );
 
   const hasChosenName = !!chosenName;
-  const isComplete = hasChosenName && agreementCompleted && trainingCertificateCompleted && !expiryUrgency;
+  const isComplete = hasChosenName && agreementCompleted && trainingCertificateCompleted;
 
   useEffect(() => {
     if (isComplete) onStepsComplete(chosenName);
@@ -56,33 +49,24 @@ export default function ProfileSetupSteps({
       id: "certificate",
       title: "Training Certificate",
       description: "Verify your NHS Digital Data Security Awareness certificate",
-      completed: !expiryUrgency && trainingCertificateCompleted,
+      completed: trainingCertificateCompleted,
       current: hasChosenName && agreementCompleted,
-      expiryUrgency: expiryUrgency,
     },
   ];
-
-  const completionTitle = expiryUrgency
-    ? expiryUrgency.level === "critical"
-      ? "Your certificate has expired!"
-      : "Your certificate is expiring soon!"
-    : undefined;
-  const completionSubtitle = expiryUrgency
-    ? "To retain access to the portal, please verify a new certificate."
-    : undefined;
 
   return (
     <>
       <StepProgress
         steps={steps}
         isComplete={isComplete}
-        completionTitle={completionTitle}
-        completionSubtitle={completionSubtitle}
         introText="Complete the following steps to set up your profile and become an approved researcher."
         ariaLabel="Profile setup progress"
       />
+
       <StepArrow />
+
       {!hasChosenName && <ProfileChosenName chosenName={chosenName} setChosenName={setChosenName} />}
+
       {hasChosenName && (
         <div className={styles["approved-researcher-steps"]}>
           <ApprovedResearcherAgreement

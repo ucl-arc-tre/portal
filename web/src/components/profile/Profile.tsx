@@ -21,7 +21,9 @@ import styles from "./Profile.module.css";
 const computeExpiryUrgency = (completedAt: string): ExpiryUrgency | null => {
   const expiryDate = new Date(completedAt);
   expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-  return calculateExpiryUrgency(expiryDate);
+  //return calculateExpiryUrgency(expiryDate);
+
+  return { level: "high" };
 };
 
 type Props = {
@@ -71,12 +73,13 @@ export default function Profile({ userData, refreshAuth }: Props) {
       const nhsdTraining = trainingResponse.data.training_records.find(
         (record) => record.kind === "training_kind_nhsd"
       );
+      const urgency = nhsdTraining?.is_valid ? computeExpiryUrgency(nhsdTraining.completed_at!) : null;
+      setExpiryUrgency(urgency);
 
       setChosenName(profileResponse.data.chosen_name);
       setProfileData(profileResponse.data);
       setAgreementsData(agreementsResponse.data);
       setTrainingData(trainingResponse.data);
-      if (nhsdTraining?.is_valid) setExpiryUrgency(computeExpiryUrgency(nhsdTraining.completed_at!));
     } catch (error) {
       console.error("Failed to get profile data:", error);
       setError("Failed to load profile data. Please try again.");
@@ -94,6 +97,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
     setProfileComplete(true);
     setExpiryUrgency(null);
     refreshAuth();
+    fetchProfileData();
   };
 
   if (isLoading) return <Loading message="Loading your profile..." />;
@@ -106,13 +110,12 @@ export default function Profile({ userData, refreshAuth }: Props) {
     );
   }
 
-  if (!profileComplete || expiryUrgency) {
+  if (!profileComplete) {
     return (
       <ProfileSetupSteps
         profileData={profileData!}
         agreementsData={agreementsData!}
         trainingData={trainingData!}
-        expiryUrgency={expiryUrgency}
         onStepsComplete={handleStepsComplete}
       />
     );
@@ -121,7 +124,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
   return (
     <div className={styles["profile-content-container"]}>
       <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
-      <CertificateReupload trainingData={trainingData} onReupload={fetchProfileData} />
+      <CertificateReupload trainingData={trainingData} expiryUrgency={expiryUrgency} onReupload={fetchProfileData} />
     </div>
   );
 }
