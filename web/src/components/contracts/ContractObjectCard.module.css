@@ -42,6 +42,10 @@
 .button-wrapper {
   display: flex;
   gap: 0.5rem;
+
+  .download-button {
+    margin-left: auto;
+  }
 }
 
 @media (width >=768px) {

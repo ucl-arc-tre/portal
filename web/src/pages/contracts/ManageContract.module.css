@@ -5,14 +5,10 @@
 }
 
 .info {
-  margin-top: 2rem;
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-
-  a {
-    color: var(--form-link);
-  }
 }
 
 .section {
@@ -43,6 +39,16 @@
 
 .field span {
   color: #212529;
+}
+
+.header {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+
+  button {
+    margin-left: auto;
+  }
 }
 
 @media (width >=768px) {

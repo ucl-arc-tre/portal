@@ -30,7 +30,7 @@ export default function ContractManagement(props: ContractManagementProps) {
         <>
           <div className={styles.header}>
             <h3>Contract Management</h3>
-            <Button onClick={() => setShowUploadModal(true)} variant="primary">
+            <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="add-contract">
               Add Contract
             </Button>
           </div>

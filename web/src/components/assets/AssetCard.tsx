@@ -129,7 +129,7 @@ export default function AssetCard(props: AssetCardProps) {
         )}
 
         <Button onClick={() => router.push(`/assets/manage?studyId=${studyId}&assetId=${asset.id}`)} size="small">
-          {canModify ? "Manage Asset" : "View Asset"}
+          {canModify ? "Manage" : "View"}
         </Button>
       </div>
     </div>

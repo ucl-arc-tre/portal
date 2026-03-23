@@ -124,11 +124,12 @@ export default function ManageContractPage() {
       <div className="content">
         <div className={styles.header}>
           <Title text={`Manage Contract: ${contract.title}`} />
-          <Button onClick={() => setShowUploadModal(true)} variant="primary">
+          <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="contract-edit">
             Edit
           </Button>
         </div>
-        <div className={styles["info"]}>
+
+        <div className={styles.info}>
           <div className={styles.section}>
             <h3>Contract Details</h3>
             <div className={styles.field}>
@@ -152,8 +153,8 @@ export default function ManageContractPage() {
             </div>
 
             <div className={styles.field}>
-              <label>End data:</label>
-              <span>{formatDate(contract.third_party_name)}</span>
+              <label>Expiry date:</label>
+              <span>{formatDate(contract.expiry_date)}</span>
             </div>
           </div>
         </div>
@@ -165,7 +166,7 @@ export default function ManageContractPage() {
             contractId={contract.id}
             studyId={study.id}
             filename={obj.filename}
-            created_at={formatDate(obj.created_at)}
+            createdAt={formatDate(obj.created_at)}
           />
         ))}
 

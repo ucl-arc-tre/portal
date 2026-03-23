@@ -13,11 +13,11 @@ type ContractObjectCardProps = {
   contractId: string;
   filename: string;
   id: string;
-  created_at: string;
+  createdAt: string;
 };
 
 export default function ContractObjectCard(props: ContractObjectCardProps) {
-  const { id, contractId, studyId, filename, created_at } = props;
+  const { id, contractId, studyId, filename, createdAt: created_at } = props;
 
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,11 +92,24 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
       </div>
 
       <div className={styles["button-wrapper"]}>
-        <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
+        <Button
+          className={styles["download-button"]}
+          onClick={handleDownload}
+          disabled={downloading}
+          size="small"
+          variant="secondary"
+          cy="contract-object-download-button"
+        >
           {downloading ? "Downloading..." : "Download"}
         </Button>
 
-        <Button onClick={handleDelete} size="small" data-cy="delete-contract-button">
+        <Button
+          className="delete-button"
+          onClick={handleDelete}
+          size="small"
+          data-cy="delete-contract-button"
+          cy="contract-object-delete-button"
+        >
           Delete
         </Button>
       </div>

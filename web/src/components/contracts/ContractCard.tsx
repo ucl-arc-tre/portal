@@ -83,7 +83,7 @@ export default function ContractCard({ studyId, contract, canModify }: ContractC
                 router.push(`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`);
               }}
               size="small"
-              data-cy="edit-contract-button"
+              data-cy="manage-contract-button"
             >
               Manage
             </Button>
