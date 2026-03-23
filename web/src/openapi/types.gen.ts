@@ -532,6 +532,10 @@ export type ProjectTre = {
 
 export type ContractBase = {
     /**
+     * Name of the contract
+     */
+    title: string;
+    /**
      * Name of the organisation signatory
      */
     organisation_signatory: string;
@@ -557,13 +561,6 @@ export type ContractBase = {
     asset_ids: Array<string>;
 };
 
-export type ContractObject = {
-    /**
-     * The contract file to upload (e.g., PDF)
-     */
-    file: Blob | File;
-};
-
 /**
  * A contract associated with a study
  */
@@ -572,10 +569,6 @@ export type Contract = ContractBase & {
      * Unique identifier for the contract
      */
     id: string;
-    /**
-     * Original filename of the uploaded contract
-     */
-    filename: string;
     /**
      * Time in RFC3339 format when the contract was created
      */
@@ -588,6 +581,22 @@ export type Contract = ContractBase & {
      * Unique identifier of the study to which the contract belongs
      */
     study_id: string;
+    objects_metadata: Array<ContractObjectMetadata>;
+};
+
+export type ContractObject = {
+    /**
+     * The contract file to upload (e.g., PDF)
+     */
+    file: Blob | File;
+};
+
+export type ContractObjectMetadata = {
+    /**
+     * Unique identifier for the contract metadata object
+     */
+    id: string;
+    filename: string;
 };
 
 export type TokenRequest = {
@@ -632,6 +641,11 @@ export type AssetIdParam = string;
  * Contract UUID
  */
 export type ContractIdParam = string;
+
+/**
+ * Contract object UUID
+ */
+export type ContractObjectIdParam = string;
 
 export type GetAuthData = {
     body?: never;
@@ -2005,42 +2019,8 @@ export type PostStudiesByStudyIdContractsResponses = {
 
 export type PostStudiesByStudyIdContractsResponse = PostStudiesByStudyIdContractsResponses[keyof PostStudiesByStudyIdContractsResponses];
 
-export type PostStudiesByStudyIdContractsByContractIdUploadData = {
-    body: ContractObject;
-    path: {
-        studyId: string;
-        contractId: string;
-    };
-    query?: never;
-    url: '/studies/{studyId}/contracts/{contractId}/upload';
-};
-
-export type PostStudiesByStudyIdContractsByContractIdUploadErrors = {
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PostStudiesByStudyIdContractsByContractIdUploadResponses = {
-    /**
-     * OK
-     */
-    204: void;
-};
-
-export type PostStudiesByStudyIdContractsByContractIdUploadResponse = PostStudiesByStudyIdContractsByContractIdUploadResponses[keyof PostStudiesByStudyIdContractsByContractIdUploadResponses];
-
 export type PutStudiesByStudyIdContractsByContractIdData = {
-    body: Contract;
+    body: ContractBase;
     path: {
         /**
          * Study UUID
@@ -2089,8 +2069,8 @@ export type PutStudiesByStudyIdContractsByContractIdResponses = {
 
 export type PutStudiesByStudyIdContractsByContractIdResponse = PutStudiesByStudyIdContractsByContractIdResponses[keyof PutStudiesByStudyIdContractsByContractIdResponses];
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadData = {
-    body?: never;
+export type PostStudiesByStudyIdContractsByContractIdObjectsData = {
+    body: ContractObject;
     path: {
         /**
          * Study UUID
@@ -2102,10 +2082,10 @@ export type GetStudiesByStudyIdContractsByContractIdDownloadData = {
         contractId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/contracts/{contractId}/download';
+    url: '/studies/{studyId}/contracts/{contractId}/objects';
 };
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadErrors = {
+export type PostStudiesByStudyIdContractsByContractIdObjectsErrors = {
     /**
      * Forbidden
      */
@@ -2120,11 +2100,99 @@ export type GetStudiesByStudyIdContractsByContractIdDownloadErrors = {
     default: unknown;
 };
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadResponses = {
+export type PostStudiesByStudyIdContractsByContractIdObjectsResponses = {
+    /**
+     * OK
+     */
+    200: ContractObjectMetadata;
+};
+
+export type PostStudiesByStudyIdContractsByContractIdObjectsResponse = PostStudiesByStudyIdContractsByContractIdObjectsResponses[keyof PostStudiesByStudyIdContractsByContractIdObjectsResponses];
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+        /**
+         * Contract object UUID
+         */
+        contractObjectId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}/objects/{contractObjectId}';
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponse = DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses[keyof DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses];
+
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+        /**
+         * Contract object UUID
+         */
+        contractObjectId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}/objects/{contractObjectId}';
+};
+
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses = {
     /**
      * OK
      */
     200: Blob | File;
 };
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadResponse = GetStudiesByStudyIdContractsByContractIdDownloadResponses[keyof GetStudiesByStudyIdContractsByContractIdDownloadResponses];
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponse = GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses[keyof GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses];

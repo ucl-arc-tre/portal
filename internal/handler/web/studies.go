@@ -323,3 +323,5 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 
 	ctx.Status(http.StatusOK)
 }
+
+// todo - delete contract objects

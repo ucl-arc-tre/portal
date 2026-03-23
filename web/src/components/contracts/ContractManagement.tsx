@@ -36,7 +36,6 @@ export default function ContractManagement(props: ContractManagementProps) {
     <Box>
       {canModify ? (
         <>
-          {" "}
           <div className={styles.header}>
             <h3>Contract Management</h3>
             <Button onClick={() => setShowUploadModal(true)} variant="primary">

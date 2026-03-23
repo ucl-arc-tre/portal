@@ -1,9 +1,7 @@
-import { useState } from "react";
 import Button from "@/components/ui/Button";
-import { Contract, getStudiesByStudyIdContractsByContractIdDownload } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { Contract } from "@/openapi";
 import styles from "./ContractCard.module.css";
-import { AlertMessage, Alert, AlertCircleIcon } from "../shared/uikitExports";
+import { AlertCircleIcon } from "../shared/uikitExports";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 
 type ContractCardProps = {
@@ -13,45 +11,8 @@ type ContractCardProps = {
   canModify: boolean;
 };
 
-export default function ContractCard({ contract, studyId, onEdit, canModify }: ContractCardProps) {
-  const [downloading, setDownloading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function ContractCard({ contract, onEdit, canModify }: ContractCardProps) {
   const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
-
-  const handleDownload = async () => {
-    setDownloading(true);
-    setError(null);
-
-    try {
-      const response = await getStudiesByStudyIdContractsByContractIdDownload({
-        path: {
-          studyId,
-          contractId: contract.id,
-        },
-      });
-
-      if (!response.response.ok || !response.data) {
-        const errorMsg = extractErrorMessage(response);
-        setError(`Download failed: ${errorMsg}`);
-        return;
-      }
-
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = contract.filename || "contract.pdf";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download failed:", error);
-      setError("Failed to download contract. Please try again.");
-    } finally {
-      setDownloading(false);
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -72,7 +33,7 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
     >
       <div className={styles.header}>
         <div className={styles["file-info"]}>
-          <h4 className={styles.filename}>{contract.filename}</h4>
+          <h4 className={styles.title}>{contract.title}</h4>
         </div>
         <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
           {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
@@ -106,12 +67,6 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
         </div>
       </div>
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
-
       <div className={styles.actions}>
         {expiryUrgency && (
           <small className={styles["expiry-message"]}>
@@ -122,10 +77,6 @@ export default function ContractCard({ contract, studyId, onEdit, canModify }: C
           </small>
         )}
         <div className={styles["button-wrapper"]}>
-          <Button onClick={handleDownload} disabled={downloading} size="small" variant="secondary">
-            {downloading ? "Downloading..." : "Download PDF"}
-          </Button>
-
           {canModify && (
             <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
               Edit

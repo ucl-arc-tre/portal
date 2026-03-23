@@ -38,6 +38,7 @@ func InitDB() {
 		&types.Asset{},
 		&types.AssetLocation{},
 		&types.Contract{},
+		&types.ContractObjectMetadata{},
 		&types.UserSponsorship{},
 		&types.Environment{},
 		&types.Project{},
@@ -52,6 +53,8 @@ func InitDB() {
 	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "pg_trgm";`)
 
 	migrateContractStudyIds(db)
+
+	// todo - migrate contracts
 
 	// Set up a sequence for the study caseref
 	// this must exist before AutoMigrate is run below, as the Caseref column default references it

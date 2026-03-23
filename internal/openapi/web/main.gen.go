@@ -596,11 +596,9 @@ type Contract struct {
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
 	ExpiryDate string `json:"expiry_date"`
 
-	// Filename Original filename of the uploaded contract
-	Filename string `json:"filename"`
-
 	// Id Unique identifier for the contract
-	Id string `json:"id"`
+	Id              string                   `json:"id"`
+	ObjectsMetadata []ContractObjectMetadata `json:"objects_metadata"`
 
 	// OrganisationSignatory Name of the organisation signatory
 	OrganisationSignatory string `json:"organisation_signatory"`
@@ -616,6 +614,9 @@ type Contract struct {
 
 	// ThirdPartyName Name of the third party organization
 	ThirdPartyName string `json:"third_party_name"`
+
+	// Title Name of the contract
+	Title string `json:"title"`
 
 	// UpdatedAt Time in RFC3339 format when the contract was last updated
 	UpdatedAt string `json:"updated_at"`
@@ -643,6 +644,9 @@ type ContractBase struct {
 
 	// ThirdPartyName Name of the third party organization
 	ThirdPartyName string `json:"third_party_name"`
+
+	// Title Name of the contract
+	Title string `json:"title"`
 }
 
 // ContractBaseStatus Current status of the contract
@@ -652,6 +656,14 @@ type ContractBaseStatus string
 type ContractObject struct {
 	// File The contract file to upload (e.g., PDF)
 	File openapi_types.File `json:"file"`
+}
+
+// ContractObjectMetadata defines model for ContractObjectMetadata.
+type ContractObjectMetadata struct {
+	Filename string `json:"filename"`
+
+	// Id Unique identifier for the contract metadata object
+	Id string `json:"id"`
 }
 
 // Environment An environment with its tier mapping
@@ -1074,6 +1086,9 @@ type AssetIdParam = string
 // ContractIdParam defines model for ContractIdParam.
 type ContractIdParam = string
 
+// ContractObjectIdParam defines model for ContractObjectIdParam.
+type ContractObjectIdParam = string
+
 // ProjectIdParam defines model for ProjectIdParam.
 type ProjectIdParam = string
 
@@ -1155,10 +1170,10 @@ type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 type PostStudiesStudyIdContractsJSONRequestBody = ContractBase
 
 // PutStudiesStudyIdContractsContractIdJSONRequestBody defines body for PutStudiesStudyIdContractsContractId for application/json ContentType.
-type PutStudiesStudyIdContractsContractIdJSONRequestBody = Contract
+type PutStudiesStudyIdContractsContractIdJSONRequestBody = ContractBase
 
-// PostStudiesStudyIdContractsContractIdUploadMultipartRequestBody defines body for PostStudiesStudyIdContractsContractIdUpload for multipart/form-data ContentType.
-type PostStudiesStudyIdContractsContractIdUploadMultipartRequestBody = ContractObject
+// PostStudiesStudyIdContractsContractIdObjectsMultipartRequestBody defines body for PostStudiesStudyIdContractsContractIdObjects for multipart/form-data ContentType.
+type PostStudiesStudyIdContractsContractIdObjectsMultipartRequestBody = ContractObject
 
 // PostTokensDshJSONRequestBody defines body for PostTokensDsh for application/json ContentType.
 type PostTokensDshJSONRequestBody = TokenRequest
@@ -1271,11 +1286,14 @@ type ServerInterface interface {
 	// (PUT /studies/{studyId}/contracts/{contractId})
 	PutStudiesStudyIdContractsContractId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
 
-	// (GET /studies/{studyId}/contracts/{contractId}/download)
-	GetStudiesStudyIdContractsContractIdDownload(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
+	// (POST /studies/{studyId}/contracts/{contractId}/objects)
+	PostStudiesStudyIdContractsContractIdObjects(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
 
-	// (POST /studies/{studyId}/contracts/{contractId}/upload)
-	PostStudiesStudyIdContractsContractIdUpload(c *gin.Context, studyId string, contractId string)
+	// (DELETE /studies/{studyId}/contracts/{contractId}/objects/{contractObjectId})
+	DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam, contractObjectId ContractObjectIdParam)
+
+	// (GET /studies/{studyId}/contracts/{contractId}/objects/{contractObjectId})
+	GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam, contractObjectId ContractObjectIdParam)
 
 	// (PATCH /studies/{studyId}/pending)
 	PatchStudiesStudyIdPending(c *gin.Context, studyId StudyIdParam)
@@ -2003,8 +2021,8 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.C
 	siw.Handler.PutStudiesStudyIdContractsContractId(c, studyId, contractId)
 }
 
-// GetStudiesStudyIdContractsContractIdDownload operation middleware
-func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdDownload(c *gin.Context) {
+// PostStudiesStudyIdContractsContractIdObjects operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdObjects(c *gin.Context) {
 
 	var err error
 
@@ -2033,16 +2051,16 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdDownload(
 		}
 	}
 
-	siw.Handler.GetStudiesStudyIdContractsContractIdDownload(c, studyId, contractId)
+	siw.Handler.PostStudiesStudyIdContractsContractIdObjects(c, studyId, contractId)
 }
 
-// PostStudiesStudyIdContractsContractIdUpload operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdUpload(c *gin.Context) {
+// DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId(c *gin.Context) {
 
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -2051,11 +2069,20 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdUpload(c
 	}
 
 	// ------------- Path parameter "contractId" -------------
-	var contractId string
+	var contractId ContractIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractObjectId" -------------
+	var contractObjectId ContractObjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractObjectId", c.Param("contractObjectId"), &contractObjectId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractObjectId: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -2066,7 +2093,49 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdUpload(c
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdContractsContractIdUpload(c, studyId, contractId)
+	siw.Handler.DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId(c, studyId, contractId, contractObjectId)
+}
+
+// GetStudiesStudyIdContractsContractIdObjectsContractObjectId operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractId" -------------
+	var contractId ContractIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractObjectId" -------------
+	var contractObjectId ContractObjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractObjectId", c.Param("contractObjectId"), &contractObjectId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractObjectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c, studyId, contractId, contractObjectId)
 }
 
 // PatchStudiesStudyIdPending operation middleware
@@ -2322,8 +2391,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)
 	router.PUT(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.PutStudiesStudyIdContractsContractId)
-	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/download", wrapper.GetStudiesStudyIdContractsContractIdDownload)
-	router.POST(options.BaseURL+"/studies/:studyId/contracts/:contractId/upload", wrapper.PostStudiesStudyIdContractsContractIdUpload)
+	router.POST(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects", wrapper.PostStudiesStudyIdContractsContractIdObjects)
+	router.DELETE(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId)
+	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.GetStudiesStudyIdContractsContractIdObjectsContractObjectId)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.GET(options.BaseURL+"/tokens/dsh", wrapper.GetTokensDsh)
 	router.POST(options.BaseURL+"/tokens/dsh", wrapper.PostTokensDsh)
