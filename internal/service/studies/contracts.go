@@ -17,7 +17,10 @@ import (
 )
 
 func (s *Service) ValidateContract(studyId uuid.UUID, data openapi.ContractBase) *openapi.ValidationError {
-	// Only validate file extension if a filename is provided (for an updated contract, file is optional)
+	if !validation.ContractNamePattern.MatchString(data.Title) {
+		return openapi.NewValidationError("Title must be between 2 and 100 characters")
+	}
+
 	if !validation.ContractNamePattern.MatchString(data.OrganisationSignatory) {
 		return openapi.NewValidationError("Organisation signatory must be between 2 and 100 characters")
 	}
@@ -145,7 +148,7 @@ func (s *Service) GetContractObject(ctx context.Context,
 ) (types.S3Object, error) {
 	log.Debug().Any("contractID", contractID).Msg("Getting contract")
 
-	if err := s.checkContractExists(studyID, contractID); err != nil {
+	if err := s.checkContractObjectExists(studyID, contractID, contractObjectID); err != nil {
 		return types.S3Object{}, err
 	}
 
@@ -161,12 +164,12 @@ func (s *Service) DeleteContractObject(ctx context.Context,
 	contractID uuid.UUID,
 	contractObjectID uuid.UUID,
 ) error {
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
-	if err := s.checkContractExists(studyID, contractID); err != nil {
+	if err := s.checkContractObjectExists(studyID, contractID, contractObjectID); err != nil {
 		return err
 	}
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	result := tx.Where("id = ? AND contract_id = ?", contractObjectID, contractID).
 		Delete(&types.ContractObjectMetadata{})
@@ -224,6 +227,11 @@ func (s *Service) UpdateContract(
 		return nil, types.NewErrFromGorm(err, "failed to update contract assets")
 	}
 
+	if err := tx.Preload("Assets").Preload("Objects").First(contract, contractID).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(result.Error, "failed to get updated contract")
+	}
+
 	return contract, commitTransaction(tx)
 }
 
@@ -237,6 +245,21 @@ func (s *Service) checkContractExists(studyID uuid.UUID, contractID uuid.UUID) e
 		return types.NewErrFromGorm(err, "failed check if contract exists")
 	} else if !exists {
 		return types.NewNotFoundError(fmt.Errorf("contract did not exist for study [%v]", studyID))
+	}
+	return nil
+}
+
+func (s *Service) checkContractObjectExists(studyID uuid.UUID, contractID uuid.UUID, contractObjectID uuid.UUID) error {
+	exists := false
+	err := s.db.Model(&types.ContractObjectMetadata{}).
+		Joins("INNER JOIN contracts on contracts.id = contract_object_metadata.contract_id").
+		Select("count(*) > 0").
+		Where("study_id = ? AND contract_id = ? AND contract_object_metadata.id = ?", studyID, contractID, contractObjectID).
+		Find(&exists).Error
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed check if contract exists")
+	} else if !exists {
+		return types.NewNotFoundError(fmt.Errorf("contract object did not exist"))
 	}
 	return nil
 }

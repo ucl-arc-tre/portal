@@ -106,8 +106,9 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 	}
 
 	ctx.JSON(http.StatusOK, openapi.ContractObjectMetadata{
-		Filename: metadata.Filename,
-		Id:       metadata.ID.String(),
+		Filename:  metadata.Filename,
+		Id:        metadata.ID.String(),
+		CreatedAt: metadata.CreatedAt.Format(config.TimeFormat),
 	})
 }
 

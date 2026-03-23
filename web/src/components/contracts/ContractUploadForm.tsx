@@ -128,24 +128,29 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     setError(null);
     setSuccess(false);
 
+    let filesError: undefined | string = undefined;
     Array.from(event.target.files).forEach((file) => {
       if (!file) {
-        setUploadFiles([]);
+        filesError = "File was nil";
         return;
       }
 
       if (!validMimeTypes.includes(file.type)) {
-        setError(`File format must be one of ${validMimeTypes}.`);
-        setUploadFiles([]);
+        filesError = `File format must be one of ${validMimeTypes}.`;
         return;
       }
 
       if (file.size > 1e7) {
-        setError("File size must be less than 10MB.");
-        setUploadFiles([]);
+        filesError = "File size must be less than 10MB.";
         return;
       }
     });
+
+    if (filesError) {
+      setUploadFiles([]);
+      setError(filesError);
+      return;
+    }
 
     setUploadFiles(Array.from(event.target.files));
   };
@@ -198,7 +203,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       }
       const contractId = response.data.id;
 
-      for (const file of uploadFiles) {
+      while (uploadFiles.length > 0) {
+        const file = uploadFiles.pop()!;
         response = await postStudiesByStudyIdContractsByContractIdObjects({
           path: {
             studyId: study.id,
