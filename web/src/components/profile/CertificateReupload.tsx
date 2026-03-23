@@ -48,9 +48,9 @@ export default function CertificateReupload({ trainingData, expiryUrgency, onReu
 
       {nhsdTraining?.completed_at && (
         <dl className={styles["cert-details"]}>
-          <dt>Upload date:</dt>
+          <dt>Training completion date:</dt>
           <dd>{formatDate(nhsdTraining.completed_at)}</dd>
-          <dt>Expiry date:</dt>
+          <dt>Certificate expiry date:</dt>
           <dd>{getExpiryDate(nhsdTraining.completed_at)}</dd>
         </dl>
       )}
