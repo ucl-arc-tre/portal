@@ -887,6 +887,8 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
   cy.visit("/profile");
   cy.waitForProfileData();
 
+  cy.contains("Loading your profile...").should("not.exist");
+
   cy.get("body").then(($body) => {
     const needsName = $body.find("[data-cy='chosen-name-form']").length > 0;
     const needsAgreement = $body.find("[data-cy='agreement-agree']").length > 0;

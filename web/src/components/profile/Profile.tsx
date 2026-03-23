@@ -98,7 +98,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
     fetchProfileData();
   };
 
-  if (isLoading) return <Loading message="Loading your profile..." />;
+  if (isLoading) return <Loading message="Loading your profile" />;
 
   if (errorMessage) {
     return (
