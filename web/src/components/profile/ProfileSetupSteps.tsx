@@ -50,7 +50,7 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
       title: "Training Certificate",
       description: "Verify your NHS Digital Data Security Awareness certificate",
       completed: trainingCertificateCompleted,
-      current: hasChosenName && agreementCompleted,
+      current: hasChosenName && agreementCompleted && !trainingCertificateCompleted,
     },
   ];
 
