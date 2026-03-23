@@ -221,12 +221,7 @@ paths:
   /users/{userId}/training:
     post:
       parameters:
-        - in: path
-          name: userId
-          required: true
-          description: ID of the user to be updated
-          schema:
-            type: string
+        - $ref: "#/components/parameters/UserIdParam"
       requestBody:
         required: true
         content:
@@ -253,12 +248,7 @@ paths:
     put:
       description: Update a user's attributes (admin only)
       parameters:
-        - in: path
-          name: userId
-          required: true
-          description: ID of the user to update
-          schema:
-            type: string
+        - $ref: "#/components/parameters/UserIdParam"
       requestBody:
         required: true
         content:
@@ -341,14 +331,42 @@ paths:
   # Study Management
   /studies:
     get:
-      description: Get all studies accessible to the current user
+      description: Get all studies accessible to the current user. Filtering is admin only
       parameters:
         - in: query
           name: status
+          description: get studies by status
+          required: false
           schema:
             $ref: "#/components/schemas/ApprovalStatus"
+        - in: query
+          name: query
           required: false
-          description: get studies by status
+          description: |
+            Flexible search query. Depending on the structure it will either search:
+              - caseref: If <= 5 digit number, with optional leading zeros
+              - study owner email/username: If the query contains an @
+              - partial study name: If none of the above
+          schema:
+            type: string
+        - in: query
+          name: caseref
+          required: false
+          description: Study caseref
+          schema:
+            type: integer
+        - in: query
+          name: fuzzy_title
+          required: false
+          description: Fuzzy title to match on
+          schema:
+            type: string
+        - in: query
+          name: owner_username
+          required: false
+          description: Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+          schema:
+            type: string
       responses:
         "200":
           content:
@@ -393,12 +411,7 @@ paths:
     get:
       description: Get details of a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           content:
@@ -450,12 +463,7 @@ paths:
     post:
       description: Update study status + opportunity to update feedback
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
@@ -478,12 +486,7 @@ paths:
     patch:
       description: Update study status to pending
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "201":
           description: Study review submitted successfully
@@ -492,7 +495,7 @@ paths:
         "404":
           description: Study not found
 
-    # Environments
+  # Environments
   /environments:
     get:
       description: Get all available environments with their tier mappings
@@ -578,12 +581,7 @@ paths:
     get:
       description: Get one TRE project with base project details joined in
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "200":
           content:
@@ -655,12 +653,7 @@ paths:
     patch:
       description: Submit a TRE project for review (changes status from Incomplete to Pending)
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "200":
           description: Project submitted successfully
@@ -677,12 +670,7 @@ paths:
     post:
       description: Approve a TRE project (admin/TRE ops staff only)
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "200":
           description: Project approved successfully
@@ -700,12 +688,7 @@ paths:
     get:
       description: Get all assets for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           content:
@@ -761,18 +744,8 @@ paths:
     get:
       description: Get details of a specific asset within a study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
-        - in: path
-          name: assetId
-          required: true
-          description: ID of the asset
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
       responses:
         "200":
           content:
@@ -792,18 +765,8 @@ paths:
     get:
       description: Get contracts associated with a specific asset within a study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
-        - in: path
-          name: assetId
-          required: true
-          description: ID of the asset
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
       responses:
         "200":
           content:
@@ -835,12 +798,7 @@ paths:
     get:
       description: Get all agreements signed for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           content:
@@ -888,11 +846,7 @@ paths:
     get:
       description: Get all contracts for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           description: List of contracts for the study
@@ -913,11 +867,7 @@ paths:
     post:
       description: Create a contract object e.g. PDF
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
@@ -978,16 +928,8 @@ paths:
     put:
       description: Update contract metadata and optionally replace file
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
       requestBody:
         required: true
         content:
@@ -1020,16 +962,8 @@ paths:
     get:
       description: Get a contract object e.g. PDF
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
       responses:
         "200":
           description: OK
@@ -1046,6 +980,43 @@ paths:
           description: Unexpected error
 
 components:
+  parameters:
+    UserIdParam:
+      name: userId
+      in: path
+      required: true
+      description: User UUID
+      schema:
+        type: string
+    StudyIdParam:
+      in: path
+      name: studyId
+      required: true
+      description: Study UUID
+      schema:
+        type: string
+    ProjectIdParam:
+      in: path
+      name: projectId
+      required: true
+      description: Project UUID
+      schema:
+        type: string
+    AssetIdParam:
+      in: path
+      name: assetId
+      required: true
+      description: Asset UUID
+      schema:
+        type: string
+    ContractIdParam:
+      in: path
+      name: contractId
+      required: true
+      description: Contract UUID
+      schema:
+        type: string
+
   schemas:
     Auth:
       type: object
@@ -1840,7 +1811,6 @@ components:
         expires_at:
           type: string
           description: Time in RFC3339 at which the token expires
-
     TokenWithValue:
       allOf:
         - $ref: "#/components/schemas/Token"

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for AgreementType.
@@ -647,6 +648,12 @@ type ContractBase struct {
 // ContractBaseStatus Current status of the contract
 type ContractBaseStatus string
 
+// ContractObject defines model for ContractObject.
+type ContractObject struct {
+	// File The contract file to upload (e.g., PDF)
+	File openapi_types.File `json:"file"`
+}
+
 // Environment An environment with its tier mapping
 type Environment struct {
 	// Id Unique identifier for the environment
@@ -1061,10 +1068,40 @@ type ValidationError struct {
 	ErrorMessage string `json:"error_message"`
 }
 
+// AssetIdParam defines model for AssetIdParam.
+type AssetIdParam = string
+
+// ContractIdParam defines model for ContractIdParam.
+type ContractIdParam = string
+
+// ProjectIdParam defines model for ProjectIdParam.
+type ProjectIdParam = string
+
+// StudyIdParam defines model for StudyIdParam.
+type StudyIdParam = string
+
+// UserIdParam defines model for UserIdParam.
+type UserIdParam = string
+
 // GetStudiesParams defines parameters for GetStudies.
 type GetStudiesParams struct {
 	// Status get studies by status
 	Status *ApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
+
+	// Query Flexible search query. Depending on the structure it will either search:
+	//   - caseref: If <= 5 digit number, with optional leading zeros
+	//   - study owner email/username: If the query contains an @
+	//   - partial study name: If none of the above
+	Query *string `form:"query,omitempty" json:"query,omitempty"`
+
+	// Caseref Study caseref
+	Caseref *int `form:"caseref,omitempty" json:"caseref,omitempty"`
+
+	// FuzzyTitle Fuzzy title to match on
+	FuzzyTitle *string `form:"fuzzy_title,omitempty" json:"fuzzy_title,omitempty"`
+
+	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1119,6 +1156,9 @@ type PostStudiesStudyIdContractsJSONRequestBody = ContractBase
 
 // PutStudiesStudyIdContractsContractIdJSONRequestBody defines body for PutStudiesStudyIdContractsContractId for application/json ContentType.
 type PutStudiesStudyIdContractsContractIdJSONRequestBody = Contract
+
+// PostStudiesStudyIdContractsContractIdUploadMultipartRequestBody defines body for PostStudiesStudyIdContractsContractIdUpload for multipart/form-data ContentType.
+type PostStudiesStudyIdContractsContractIdUploadMultipartRequestBody = ContractObject
 
 // PostTokensDshJSONRequestBody defines body for PostTokensDsh for application/json ContentType.
 type PostTokensDshJSONRequestBody = TokenRequest
@@ -1175,19 +1215,19 @@ type ServerInterface interface {
 	PostProjectsTre(c *gin.Context)
 
 	// (POST /projects/tre/admin/{projectId}/approve)
-	PostProjectsTreAdminProjectIdApprove(c *gin.Context, projectId string)
+	PostProjectsTreAdminProjectIdApprove(c *gin.Context, projectId ProjectIdParam)
 
 	// (DELETE /projects/tre/{projectId})
 	DeleteProjectsTreProjectId(c *gin.Context, projectId string)
 
 	// (GET /projects/tre/{projectId})
-	GetProjectsTreProjectId(c *gin.Context, projectId string)
+	GetProjectsTreProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (PUT /projects/tre/{projectId})
 	PutProjectsTreProjectId(c *gin.Context, projectId string)
 
 	// (PATCH /projects/tre/{projectId}/pending)
-	PatchProjectsTreProjectIdPending(c *gin.Context, projectId string)
+	PatchProjectsTreProjectIdPending(c *gin.Context, projectId ProjectIdParam)
 
 	// (GET /studies)
 	GetStudies(c *gin.Context, params GetStudiesParams)
@@ -1196,49 +1236,49 @@ type ServerInterface interface {
 	PostStudies(c *gin.Context)
 
 	// (POST /studies/admin/{studyId}/review)
-	PostStudiesAdminStudyIdReview(c *gin.Context, studyId string)
+	PostStudiesAdminStudyIdReview(c *gin.Context, studyId StudyIdParam)
 
 	// (GET /studies/{studyId})
-	GetStudiesStudyId(c *gin.Context, studyId string)
+	GetStudiesStudyId(c *gin.Context, studyId StudyIdParam)
 
 	// (PUT /studies/{studyId})
 	PutStudiesStudyId(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/agreements)
-	GetStudiesStudyIdAgreements(c *gin.Context, studyId string)
+	GetStudiesStudyIdAgreements(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/{studyId}/agreements)
 	PostStudiesStudyIdAgreements(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/assets)
-	GetStudiesStudyIdAssets(c *gin.Context, studyId string)
+	GetStudiesStudyIdAssets(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/{studyId}/assets)
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
 	// (GET /studies/{studyId}/assets/{assetId})
-	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId string, assetId string)
+	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts)
-	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId string, assetId string)
+	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
 
 	// (GET /studies/{studyId}/contracts)
-	GetStudiesStudyIdContracts(c *gin.Context, studyId string)
+	GetStudiesStudyIdContracts(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/{studyId}/contracts)
-	PostStudiesStudyIdContracts(c *gin.Context, studyId string)
+	PostStudiesStudyIdContracts(c *gin.Context, studyId StudyIdParam)
 
 	// (PUT /studies/{studyId}/contracts/{contractId})
-	PutStudiesStudyIdContractsContractId(c *gin.Context, studyId string, contractId string)
+	PutStudiesStudyIdContractsContractId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
 
 	// (GET /studies/{studyId}/contracts/{contractId}/download)
-	GetStudiesStudyIdContractsContractIdDownload(c *gin.Context, studyId string, contractId string)
+	GetStudiesStudyIdContractsContractIdDownload(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
 
 	// (POST /studies/{studyId}/contracts/{contractId}/upload)
 	PostStudiesStudyIdContractsContractIdUpload(c *gin.Context, studyId string, contractId string)
 
 	// (PATCH /studies/{studyId}/pending)
-	PatchStudiesStudyIdPending(c *gin.Context, studyId string)
+	PatchStudiesStudyIdPending(c *gin.Context, studyId StudyIdParam)
 
 	// (GET /tokens/dsh)
 	GetTokensDsh(c *gin.Context)
@@ -1262,10 +1302,10 @@ type ServerInterface interface {
 	GetUsersMetrics(c *gin.Context)
 
 	// (PUT /users/{userId}/attributes)
-	PutUsersUserIdAttributes(c *gin.Context, userId string)
+	PutUsersUserIdAttributes(c *gin.Context, userId UserIdParam)
 
 	// (POST /users/{userId}/training)
-	PostUsersUserIdTraining(c *gin.Context, userId string)
+	PostUsersUserIdTraining(c *gin.Context, userId UserIdParam)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1463,7 +1503,7 @@ func (siw *ServerInterfaceWrapper) PostProjectsTreAdminProjectIdApprove(c *gin.C
 	var err error
 
 	// ------------- Path parameter "projectId" -------------
-	var projectId string
+	var projectId ProjectIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1511,7 +1551,7 @@ func (siw *ServerInterfaceWrapper) GetProjectsTreProjectId(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "projectId" -------------
-	var projectId string
+	var projectId ProjectIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1559,7 +1599,7 @@ func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPending(c *gin.Conte
 	var err error
 
 	// ------------- Path parameter "projectId" -------------
-	var projectId string
+	var projectId ProjectIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1593,6 +1633,38 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		return
 	}
 
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", c.Request.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter query: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "caseref" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "caseref", c.Request.URL.Query(), &params.Caseref, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter caseref: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "fuzzy_title" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "fuzzy_title", c.Request.URL.Query(), &params.FuzzyTitle, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter fuzzy_title: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "owner_username" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner_username", c.Request.URL.Query(), &params.OwnerUsername, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner_username: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1622,7 +1694,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdReview(c *gin.Context)
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1646,7 +1718,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1694,7 +1766,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAgreements(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1742,7 +1814,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssets(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1790,7 +1862,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1799,7 +1871,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	}
 
 	// ------------- Path parameter "assetId" -------------
-	var assetId string
+	var assetId AssetIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1823,7 +1895,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gi
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1832,7 +1904,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gi
 	}
 
 	// ------------- Path parameter "assetId" -------------
-	var assetId string
+	var assetId AssetIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1856,7 +1928,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContracts(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1880,7 +1952,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContracts(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1904,7 +1976,7 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.C
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1913,7 +1985,7 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.C
 	}
 
 	// ------------- Path parameter "contractId" -------------
-	var contractId string
+	var contractId ContractIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1937,7 +2009,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdDownload(
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1946,7 +2018,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdDownload(
 	}
 
 	// ------------- Path parameter "contractId" -------------
-	var contractId string
+	var contractId ContractIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -2003,7 +2075,7 @@ func (siw *ServerInterfaceWrapper) PatchStudiesStudyIdPending(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -2149,7 +2221,7 @@ func (siw *ServerInterfaceWrapper) PutUsersUserIdAttributes(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "userId" -------------
-	var userId string
+	var userId UserIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -2173,7 +2245,7 @@ func (siw *ServerInterfaceWrapper) PostUsersUserIdTraining(c *gin.Context) {
 	var err error
 
 	// ------------- Path parameter "userId" -------------
-	var userId string
+	var userId UserIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
