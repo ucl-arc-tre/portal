@@ -415,6 +415,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                 variant="secondary"
                 size="small"
                 aria-label="Add Asset"
+                cy="add-asset"
               >
                 Add Asset
               </Button>

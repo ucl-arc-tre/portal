@@ -4,7 +4,8 @@ beforeEach(() => {
 });
 
 describe("Study creation end-to-end", () => {
-  const studyTitle = `study-${Date.now()}`;
+  const studyTitle = "study-1774279678708"; // todo `study-${Date.now()}`;
+  const contractTitle = "contract-1774279678708"; // todo `contract-${Date.now()}`;
 
   it("staff should become an approved researcher", () => {
     cy.loginAsStaff();
@@ -80,7 +81,7 @@ describe("Study creation end-to-end", () => {
     cy.contains("Last signed off").should("not.exist");
   });
 
-  it("owner should be able to add assets", () => {
+  it("owner should be able to add and edit contracts", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
@@ -88,7 +89,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="study-contracts"]').click();
 
     cy.get('[data-cy="add-contract"]').click();
-    cy.get('[name="title"]').type("Test contract");
+    cy.get('[name="title"]').type(contractTitle);
     cy.get('[name="organisationSignatory"]').type("bob@example.com");
     cy.get('[name="thirdPartyName"]').type("other");
     cy.get('[name="status"]').select("active");
@@ -108,9 +109,11 @@ describe("Study creation end-to-end", () => {
 
     cy.get("button[type='submit']").click();
 
-    cy.get('[data-cy="manage-contract-button"]').click();
+    cy.contains(contractTitle).parents('[data-cy="contract-card"]').contains("Manage").click();
     cy.get('[data-cy="contract-edit"]').click();
     cy.get('[name="title"]').type("Test contract edited");
+    cy.get('[data-cy="add-asset"]').click();
+    cy.get('[name="assets.0.value"]').select(0);
     cy.get("button[type='submit']").click();
 
     cy.contains("Test contract edited").should("be.visible");

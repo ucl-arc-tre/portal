@@ -30,6 +30,7 @@ export default function ContractCard({ studyId, contract, canModify }: ContractC
   return (
     <div
       className={`${styles.card} ${expiryUrgency ? `${styles[`card__expiry-urgency--${expiryUrgency.level}`]}` : ""}`}
+      data-cy="contract-card"
     >
       <div className={styles.header}>
         <div className={styles.title}>
