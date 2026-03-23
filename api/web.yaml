@@ -895,6 +895,19 @@ paths:
           description: Unexpected error
 
   /studies/{studyId}/contracts/{contractId}:
+    get:
+      description: Get a contract
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
+
     put:
       description: Update contract metadata
       parameters:
@@ -1813,12 +1826,16 @@ components:
       required:
         - id
         - filename
+        - created_at
       properties:
         id:
           type: string
           description: Unique identifier for the contract metadata object
         filename:
           type: string
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the contract was created
 
     TokenRequest:
       type: object

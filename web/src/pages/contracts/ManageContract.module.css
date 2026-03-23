@@ -1,0 +1,61 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.info {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  a {
+    color: var(--form-link);
+  }
+}
+
+.section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.section h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: start;
+}
+
+.field label {
+  font-weight: 700;
+  color: #495057;
+}
+
+.field span {
+  color: #212529;
+}
+
+@media (width >=768px) {
+  .field {
+    grid-template-columns: 150px 1fr;
+    gap: 1rem;
+  }
+
+  .field label {
+    font-weight: 600;
+  }
+
+  .actions {
+    flex-direction: row;
+  }
+}

@@ -3,15 +3,15 @@ import { Contract } from "@/openapi";
 import styles from "./ContractCard.module.css";
 import { AlertCircleIcon } from "../shared/uikitExports";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
+import router from "next/router";
 
 type ContractCardProps = {
   contract: Contract;
   studyId: string;
-  onEdit?: () => void;
   canModify: boolean;
 };
 
-export default function ContractCard({ contract, onEdit, canModify }: ContractCardProps) {
+export default function ContractCard({ studyId, contract, canModify }: ContractCardProps) {
   const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
 
   const getStatusColor = (status: string) => {
@@ -32,8 +32,8 @@ export default function ContractCard({ contract, onEdit, canModify }: ContractCa
       className={`${styles.card} ${expiryUrgency ? `${styles[`card__expiry-urgency--${expiryUrgency.level}`]}` : ""}`}
     >
       <div className={styles.header}>
-        <div className={styles["file-info"]}>
-          <h4 className={styles.title}>{contract.title}</h4>
+        <div className={styles.title}>
+          <h4>{contract.title}</h4>
         </div>
         <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
           {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
@@ -78,8 +78,14 @@ export default function ContractCard({ contract, onEdit, canModify }: ContractCa
         )}
         <div className={styles["button-wrapper"]}>
           {canModify && (
-            <Button onClick={onEdit} size="small" data-cy="edit-contract-button">
-              Edit
+            <Button
+              onClick={() => {
+                router.push(`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`);
+              }}
+              size="small"
+              data-cy="edit-contract-button"
+            >
+              Manage
             </Button>
           )}
         </div>

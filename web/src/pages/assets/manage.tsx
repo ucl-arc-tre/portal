@@ -21,6 +21,7 @@ import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
 import { HelperText } from "@/components/shared/uikitExports";
+import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -86,26 +87,7 @@ export default function ManageAssetPage() {
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
   if (loading) return <Loading />;
-
-  if (!isApprovedResearcher) {
-    return (
-      <>
-        <MetaHead
-          title="Manage Asset | ARC Services Portal"
-          description="Manage your asset in the ARC Services Portal"
-        />
-
-        <div className={styles["not-approved-section"]}>
-          <h2>To manage assets, please first set up your profile by completing the approved researcher process.</h2>
-          <div className={styles["profile-completion-action"]}>
-            <Button onClick={() => router.push("/profile")} size="large">
-              Complete your profile
-            </Button>
-          </div>
-        </div>
-      </>
-    );
-  }
+  if (!isApprovedResearcher) return <ApprovedResearcherFallback />;
 
   if (error) {
     return (

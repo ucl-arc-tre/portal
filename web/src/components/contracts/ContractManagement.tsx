@@ -18,18 +18,10 @@ type ContractManagementProps = {
 export default function ContractManagement(props: ContractManagementProps) {
   const { study, contracts, canModify, someAssetsRequireContracts, fetchStudyContents } = props;
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [editingContract, setEditingContract] = useState<Contract | null>(null);
 
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
-    setEditingContract(null);
     fetchStudyContents();
-  };
-
-  const handleEditContract = (contract: Contract) => {
-    if (!canModify) return;
-    setEditingContract(contract);
-    setShowUploadModal(true);
   };
 
   return (
@@ -76,13 +68,7 @@ export default function ContractManagement(props: ContractManagementProps) {
       ) : (
         <div className={styles["contracts-list"]}>
           {contracts.map((contract) => (
-            <ContractCard
-              key={contract.id}
-              contract={contract}
-              studyId={study.id}
-              onEdit={() => handleEditContract(contract)}
-              canModify={canModify}
-            />
+            <ContractCard key={contract.id} contract={contract} studyId={study.id} canModify={canModify} />
           ))}
         </div>
       )}
@@ -92,10 +78,9 @@ export default function ContractManagement(props: ContractManagementProps) {
           study={study}
           onClose={() => {
             setShowUploadModal(false);
-            setEditingContract(null);
           }}
           onSuccess={handleUploadSuccess}
-          editingContract={editingContract}
+          editingContract={null}
         />
       )}
     </Box>

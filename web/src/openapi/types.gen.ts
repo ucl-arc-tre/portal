@@ -597,6 +597,10 @@ export type ContractObjectMetadata = {
      */
     id: string;
     filename: string;
+    /**
+     * Time in RFC3339 format when the contract was created
+     */
+    created_at: string;
 };
 
 export type TokenRequest = {
@@ -2018,6 +2022,31 @@ export type PostStudiesByStudyIdContractsResponses = {
 };
 
 export type PostStudiesByStudyIdContractsResponse = PostStudiesByStudyIdContractsResponses[keyof PostStudiesByStudyIdContractsResponses];
+
+export type GetStudiesByStudyIdContractsByContractIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}';
+};
+
+export type GetStudiesByStudyIdContractsByContractIdResponses = {
+    /**
+     * OK
+     */
+    200: Contract;
+};
+
+export type GetStudiesByStudyIdContractsByContractIdResponse = GetStudiesByStudyIdContractsByContractIdResponses[keyof GetStudiesByStudyIdContractsByContractIdResponses];
 
 export type PutStudiesByStudyIdContractsByContractIdData = {
     body: ContractBase;

@@ -90,6 +90,16 @@ func (s *Service) CreateContract(
 	return contract, nil
 }
 
+func (s *Service) GetContract(studyID uuid.UUID, contractID uuid.UUID) (*types.Contract, error) {
+	contract := types.Contract{}
+	result := s.db.Model(&contract).
+		Preload("Objects").
+		Preload("Assets").
+		Where("id = ? AND study_id = ?", contractID, studyID).
+		First(&contract)
+	return &contract, types.NewErrFromGorm(result.Error, "failed to get contract")
+}
+
 func (s *Service) CreateContractObject(
 	ctx context.Context,
 	studyID uuid.UUID,

@@ -46,6 +46,20 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
+func (h *Handler) GetStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
+	if err != nil {
+		return
+	}
+
+	contract, err := h.studies.GetContract(uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to get get contract")
+		return
+	}
+	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}
+
 func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context, studyId string, contractId string) {
 	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {
@@ -221,14 +235,17 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
 		StudyId:               contract.StudyID.String(),
+		ObjectsMetadata:       []openapi.ContractObjectMetadata{},
+		AssetIds:              []string{},
 	}
 	for _, asset := range contract.Assets {
 		data.AssetIds = append(data.AssetIds, asset.ID.String())
 	}
 	for _, object := range contract.Objects {
 		data.ObjectsMetadata = append(data.ObjectsMetadata, openapi.ContractObjectMetadata{
-			Filename: object.Filename,
-			Id:       object.ID.String(),
+			Filename:  object.Filename,
+			Id:        object.ID.String(),
+			CreatedAt: object.CreatedAt.Format(config.TimeFormat),
 		})
 	}
 	return data

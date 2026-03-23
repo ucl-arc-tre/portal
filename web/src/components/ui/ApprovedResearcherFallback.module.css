@@ -1,0 +1,10 @@
+.wrapper {
+  margin-top: 2rem;
+  justify-items: center;
+  gap: 0.8rem;
+  display: grid;
+}
+
+.button {
+  margin: 1rem;
+}

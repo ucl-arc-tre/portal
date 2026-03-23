@@ -660,7 +660,9 @@ type ContractObject struct {
 
 // ContractObjectMetadata defines model for ContractObjectMetadata.
 type ContractObjectMetadata struct {
-	Filename string `json:"filename"`
+	// CreatedAt Time in RFC3339 format when the contract was created
+	CreatedAt string `json:"created_at"`
+	Filename  string `json:"filename"`
 
 	// Id Unique identifier for the contract metadata object
 	Id string `json:"id"`
@@ -1282,6 +1284,9 @@ type ServerInterface interface {
 
 	// (POST /studies/{studyId}/contracts)
 	PostStudiesStudyIdContracts(c *gin.Context, studyId StudyIdParam)
+
+	// (GET /studies/{studyId}/contracts/{contractId})
+	GetStudiesStudyIdContractsContractId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
 
 	// (PUT /studies/{studyId}/contracts/{contractId})
 	PutStudiesStudyIdContractsContractId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam)
@@ -1988,6 +1993,39 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContracts(c *gin.Context) {
 	siw.Handler.PostStudiesStudyIdContracts(c, studyId)
 }
 
+// GetStudiesStudyIdContractsContractId operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "contractId" -------------
+	var contractId ContractIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdContractsContractId(c, studyId, contractId)
+}
+
 // PutStudiesStudyIdContractsContractId operation middleware
 func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.Context) {
 
@@ -2390,6 +2428,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)
+	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.GetStudiesStudyIdContractsContractId)
 	router.PUT(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.PutStudiesStudyIdContractsContractId)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects", wrapper.PostStudiesStudyIdContractsContractIdObjects)
 	router.DELETE(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId)

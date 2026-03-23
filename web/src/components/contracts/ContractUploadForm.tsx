@@ -11,7 +11,6 @@ import {
   Contract,
   Asset,
   getStudiesByStudyIdAssets,
-  getStudiesByStudyIdContractsByContractIdObjectsByContractObjectId,
 } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
@@ -198,7 +197,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         return;
       }
       const contractId = response.data.id;
-      console.log(contractId);
 
       for (const file of uploadFiles) {
         response = await postStudiesByStudyIdContractsByContractIdObjects({
