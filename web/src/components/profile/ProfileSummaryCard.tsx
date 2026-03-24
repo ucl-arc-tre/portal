@@ -38,6 +38,7 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
               )}
             </span>
           </div>
+
           <div className={styles.field}>
             <span className={styles.label}>Username:</span>
             <span className={styles.value}>{username}</span>

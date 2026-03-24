@@ -66,6 +66,7 @@ export default function PeoplePage() {
         setErrorMessage(`Failed to search users: ${errorMsg}`);
         return;
       }
+
       setSearchTerm(query);
       setUsers(response.data);
       setSearchErrorMessage("");
@@ -89,12 +90,13 @@ export default function PeoplePage() {
     }
   };
 
-  if (!isAdmin && !isTreOpsStaff && !isIAO)
+  if (!isAdmin && !isTreOpsStaff && !isIAO) {
     return (
       <Alert type="warning">
         <AlertMessage>You do not have permission to view this page</AlertMessage>
       </Alert>
     );
+  }
 
   return (
     <>
@@ -119,6 +121,7 @@ export default function PeoplePage() {
         {isAdmin && <ApprovedResearcherImport />}
         {(isAdmin || isIAO) && <ExternalInvite />}
       </div>
+
       {canSearch && (
         <div className={styles["search-wrapper"]}>
           <form className={styles["search-container"]} data-cy="search-users">
@@ -169,12 +172,15 @@ export default function PeoplePage() {
           <AlertMessage>{searchErrorMessage}</AlertMessage>
         </Alert>
       )}
+
       {errorMessage && (
         <Alert type="error">
           <AlertMessage>{errorMessage}</AlertMessage>
         </Alert>
       )}
+
       {!isAdmin && <Callout construction />}
+
       {canSearch &&
         searchTerm.length > 0 &&
         !searchErrorMessage &&
