@@ -114,7 +114,7 @@ export default function IGOpsStudies() {
           <div>
             <Search
               placeholder="Search Studies"
-              onSearch={(q) => handleSearch(q)}
+              onSearch={(query) => handleSearch(query)}
               id="study-search"
               className={styles.search}
             />
