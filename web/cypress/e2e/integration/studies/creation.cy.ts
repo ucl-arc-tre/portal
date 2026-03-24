@@ -80,6 +80,16 @@ describe("Study creation end-to-end", () => {
     cy.contains("Last signed off").should("not.exist");
   });
 
+  it("ig ops should be able to search for a study", () => {
+    cy.loginAsIGOps();
+    cy.visit("/studies");
+    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('[data-testid="ucl-uikit-search"]').type("caseref:10001");
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
+    cy.contains("10001").should("exist");
+    cy.get("[data-cy='study-card']").should("have.length", 1);
+  });
+
   it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
