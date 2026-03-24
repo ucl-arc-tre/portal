@@ -5,7 +5,8 @@ import Button from "@/components/ui/Button";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./IGOpsStudies.module.css";
 import Loading from "../ui/Loading";
-import { Alert, AlertMessage, HelperText, Search } from "../shared/uikitExports";
+import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
+import Search from "../ui/Search";
 
 export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
@@ -67,12 +68,6 @@ export default function IGOpsStudies() {
     fetchStudies();
   }, [tab]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      handleSearch(event.currentTarget.querySelector("input")!.value);
-    }
-  };
-
   const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
 
   return (
@@ -109,7 +104,6 @@ export default function IGOpsStudies() {
               onSearch={(query) => handleSearch(query)}
               id="study-search"
               className="search"
-              onKeyDown={handleKeyDown}
             />
             <HelperText>
               <small>

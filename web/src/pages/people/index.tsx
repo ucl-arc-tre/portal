@@ -9,10 +9,11 @@ import { useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, HelperText, Search } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
+import Search from "@/components/ui/Search";
 
 export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
   ssr: false,
@@ -76,12 +77,6 @@ export default function PeoplePage() {
     }
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      handleUserSearch(event.currentTarget.querySelector("input")?.value || "");
-    }
-  };
-
   if (!isAdmin && !isTreOpsStaff && !isIAO) {
     return (
       <Alert type="warning">
@@ -116,12 +111,7 @@ export default function PeoplePage() {
 
       {canSearch && (
         <div className={styles["search-wrapper"]}>
-          <Search
-            placeholder="search users..."
-            onSearch={handleUserSearch}
-            className="search"
-            onKeyDown={handleKeyDown}
-          />
+          <Search placeholder="search users..." onSearch={handleUserSearch} className="search" />
           <HelperText>
             <small>Search by email address or user principal</small>
           </HelperText>
