@@ -5,13 +5,7 @@ import Button from "@/components/ui/Button";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import styles from "./IGOpsStudies.module.css";
 import Loading from "../ui/Loading";
-import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
-
-import dynamic from "next/dynamic";
-
-export const Search = dynamic(() => import("uikit-react-public").then((mod) => mod.Search), {
-  ssr: false,
-});
+import { Alert, AlertMessage, HelperText, Search } from "../shared/uikitExports";
 
 export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
@@ -73,15 +67,13 @@ export default function IGOpsStudies() {
     fetchStudies();
   }, [tab]);
 
-  const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch(event.currentTarget.querySelector("input")!.value);
+    }
+  };
 
-  if (errorMessage) {
-    return (
-      <Alert type="error">
-        <AlertMessage>{errorMessage}</AlertMessage>
-      </Alert>
-    );
-  }
+  const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
 
   return (
     <>
@@ -116,7 +108,8 @@ export default function IGOpsStudies() {
               placeholder="Search Studies"
               onSearch={(query) => handleSearch(query)}
               id="study-search"
-              className={styles.search}
+              className="search"
+              onKeyDown={handleKeyDown}
             />
             <HelperText>
               <small>
@@ -126,6 +119,12 @@ export default function IGOpsStudies() {
             </HelperText>
           </div>
         </>
+      )}
+
+      {errorMessage && (
+        <Alert type="error">
+          <AlertMessage>{errorMessage}</AlertMessage>
+        </Alert>
       )}
 
       {isLoading && <Loading message="Loading studies..." />}
