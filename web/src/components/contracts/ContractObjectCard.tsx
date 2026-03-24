@@ -61,6 +61,12 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
   };
 
   const handleDelete = async () => {
+    const confirmed = window.confirm("Are you sure you want to delete this contract? This operation cannot be undone.");
+
+    if (!confirmed) {
+      return;
+    }
+
     const response = await deleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectId({
       path: {
         studyId,
