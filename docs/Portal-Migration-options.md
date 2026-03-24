@@ -209,8 +209,8 @@ Or in one "big bang":
 | **Section**            | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Option Description** | Migrate in one fell swoop: big bang                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| **Benefits**           | - Shortest transition period for users<br>- Fewest concurrent platforms for users<br>- SP turned read-only after completion                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| **Risks & Issues**     | - Not as easy to handle mishaps; very few people (~2) to address tickets<br>- ~~Likely to block research in the case of mishaps~~<br>- ~~Smallest opportunity for live testing~~<br>- Biggest delay before starting; can fall into the trap of "never being ready"<br>- Highest pressure on good comms <br>- Relies more heavily on testing prior to implementation |
+| **Benefits**           | - Shortest transition period for users<br>- Fewest concurrent platforms for users<br>- SP turned read-only at beginning of migration sequence                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Risks & Issues**     | - Not as easy to handle mishaps; very few people (~2) to address tickets<br>- Biggest delay before starting; can fall into the trap of "never being ready"<br>- Highest pressure on good comms <br>- Relies more heavily on testing prior to implementation |
 | **UX Impact**          | - Users will be given clear indication of where to manage their Researcher status and Studies and Projects but the least amount of time to adjust to the new places<br>- Users go from 3 potential platforms to 1 immediately (with the option to continue using MyServices to make DSH requests)                                                                                                                                                                                                                                           |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
@@ -228,12 +228,14 @@ Options 2 and 3 will share MyServices as a route for DSH users to request new sh
 
 ## 3. Evaluation
 
-First thoughts: option 3 is conceptually the cleanest and should be the one we pick in an ideal word. We should start here and moderate down in light of practical limitations.
+First thoughts: option 3 is conceptually the cleanest from a UX perspective and should be the one we pick in an ideal word: users would receive comms in advance, informing them of a period of a few days of downtime for the SP portal. All being well, they could log in to the new Portal on a Wednesday morning and see all of their Studies, with associated Assets and Contracts, and all of their Projects. Assuming no functionality breaks or has debilitating bugs, IAO/IAAs would be able to create new Studies and Projects, or edit existing ones, and internal and external users would have a new Profile page on which they can upload in-date training certificates whenever their 12-month coverage expires. This scenario beats all others which involve using the POrtal for some actions, the old SP for others, and MyServices for others still (although, in any case, DSH service request forms will remain available to any UCL users in MyServices for some time after the Portal also has Project functionality live).
+
+We should start here i.e. at Option 3, and moderate down in light of practical limitations or capacity concerns.
 
 ### What could go wrong?
 
 What could go wrong in Option 3 that wouldn't go wrong in Option 1 or Option 2? 
-1. If Users goes wrong in Option 3, then it would probably also go wrong in Options 1 and 2. This could be:
+1. If Users goes wrong in Option 3, then, on the assumption that we don't ship features until we're satisfied they are robust, the same thing would probably also go wrong in Options 1 and 2. This could be:
   - Major problems with the import such that some (random subset of) approved researchers are not recorded in the portal DB, so then don't show up in the people search or in the lookup when someone is trying to add them to a Project. **We can thoroughly test this.**
   - Problems with adding external users in particular to the portal. This seems more likely since the process is lengthier and there is more room for things to go wrong i.e. invitations to Entra not being sent, or being sent but not accepted, or being sent and accepted but then not being discoverable, as in the point above. **We can thoroughly test this.**
 
@@ -246,6 +248,31 @@ But whereas in Options 1 and 2, this would be the sole set of problems to triage
 
   **We can test all of this thoroughly**
 
-3. Project problems. This is twofold, since projects need to be visible, editable, and creatable in the frontend by users, but the DSH environment team need to be able to GET and PATCH project records via API. As above, if Project functionality breaks, frontend or backend, it will probably also break in Options 1 and 2. Possible problems include:
-  - Project forms not being able to lookup (approved) Studies and Users (Approved Researchers).
-  - 
+3. Project problems. This is twofold, since projects need to be visible, editable, and creatable in the frontend by users, **and** the DSH environment team need to be able to GET and PATCH project records via API. As above, on the assumption that we don't ship features until we're satisfied they are robust, if any Project functionality breaks following an Option 3 "big bang" migration, be it in the frontend or backend, the same thing would probably also break in Options 1 and 2. Possible problems include:
+  - Project forms not being able to lookup eligible Studies and Users (Approved Researchers).
+  - MyServices tickets can not be created in the DSH or TRE Ops teams' inboxes.
+  - The DSH POST endpoints or the portal frontend fail in some way such that accurate project data is not displayed in the portal
+
+### Why not do a Blue/Green deployment?
+
+A Blue/Green deployment is not viable on account of:
+- Incompatible database systems
+  - The existing system relies on SharePoint lists, whereas the new system uses PostgreSQL.
+  - Blue/green deployment assumes that the new version can operate alongside the old version using the same production data and database, enabling instant traffic switching. In this case, the old environment cannot communicate with Postgres, nor can the new environment interact with SharePoint lists, making instantaneous switching impossible.
+- Different application stacks and architectures
+  - Blue/green deployment requires “identical” environments, where all infrastructure, configuration, and external dependencies etc. are the same, and only the application code differs. This condition is not met here: the environments are not interchangeable, and the new application cannot simply replace the old one without data migration and user adaptation.
+
+### Why not do a Canary deployment?
+
+A Canary deployment, whilst certainly more viable than Blue/Green, would involve:
+- Migrating the Study data of small groups of users at a time
+- Exposing the Portal to a this subset of users first
+- Monitoring behavior, fixing any issues, then expanding gradually
+
+The process of incrementing by small groups of users will be close to selecting groups of users based on arbitrary attributes (beyond "TRE users" as the first group). This is not necessarily a problem. This is essentially what Options 1 and 2 involve.
+
+What is difficult is revoking edit access to these users' existing SP records (i.e. making their existing records Read Only). Obviously we do not want to allow users to edit ostensibly the same data in two places, so the Study-level SharePoint groups which govern access to SharePoint records will have to be emptied, once a copy has been made of the membership at the point of switchover. The rollback plan will necessitate manually adding all members back into these SharePoint groups. Once users start using the Portal to begin writing data to the Postgres DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible. 
+
+> [!NOTE] 
+> For all options, regarding rollback:
+>- Rollback is non-trivial: once users begin writing data to the Portal DB, reverting to the old system whilst trying to persist this new data would require complex synchronization back to SharePoint, which is practically impossible.
