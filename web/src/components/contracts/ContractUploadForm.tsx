@@ -204,6 +204,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         setSuccess(false);
         return;
       }
+      const contractId = response.data.id;
       setCurrentContract(response.data);
 
       while (uploadFiles.length > 0) {
@@ -211,7 +212,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         response = await postStudiesByStudyIdContractsByContractIdObjects({
           path: {
             studyId: study.id,
-            contractId: response.data!.id,
+            contractId: contractId,
           },
           body: { file },
         });
@@ -444,6 +445,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               onChange={handleFileSelect}
               className={styles["hidden-input"]}
               id="contract-file-input"
+              multiple
             />
             <Label htmlFor="contract-file-input" className={styles["file-label"]}>
               <div className={styles["upload-icon"]}>📄</div>
