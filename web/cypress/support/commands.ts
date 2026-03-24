@@ -890,20 +890,14 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
   cy.contains("Loading your profile").should("not.exist");
 
   cy.get("body").then(($body) => {
-    const needsName = $body.find("[data-cy='chosen-name-form']").length > 0;
-    const needsAgreement = $body.find("[data-cy='agreement-agree']").length > 0;
+    // If the chosen name form is absent the user is already set up - skip all steps.
+    if ($body.find("[data-cy='chosen-name-form']").length === 0) return;
 
-    if (needsName) {
-      cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
-      cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
-      cy.get("[data-cy='agreement-agree']").click();
-      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-      cy.get("[data-cy='training-certificate-sumbit']").click();
-    } else if (needsAgreement) {
-      cy.get("[data-cy='agreement-agree']").click();
-      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-      cy.get("[data-cy='training-certificate-sumbit']").click();
-    }
+    cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
+    cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
+    cy.get("[data-cy='agreement-agree']").click();
+    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
+    cy.get("[data-cy='training-certificate-sumbit']").click();
   });
 
   cy.contains("Verify another certificate").should("be.visible");
