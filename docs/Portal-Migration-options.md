@@ -32,7 +32,7 @@ The ARC Services Portal (the Portal) aims to replace the Information Governance 
 
 ### 1.2 Managing the complexity of having one Portal and two TREs 
 
-Of any statement about this data migration, you can reasonably ask the question "are we talking about the DSH or TRE here?". There is some complexity since not only are we talking about three core processes - User onboarding, Study management, and Project management - we're talking about those three processes across the two environments, effectively creating a 2x3 matrix of components:
+Of any statement about this data migration, you can reasonably ask the question "are we talking about the DSH or TRE? Or both?". There is some complexity since not only are we talking about three core processes - User onboarding, Study management, and Project management - we're talking about those three processes across the two environments, effectively creating a 2x3 matrix of components:
 
 <div align="center">
 
@@ -282,25 +282,25 @@ All Options will share MyServices as a route for DSH users to request new shares
 
 ## 3. Evaluation
 
-First thoughts: option 4 is conceptually the cleanest from a UX perspective and should be the one we pick in an ideal word: users would receive comms in advance, informing them of a period of a few days of downtime e.g. Monday & Tuesday for the SP portal. All being well, they could log in to the new Portal on Wednesday morning and see all of their Studies, with associated Assets and Contracts, and all of their Projects. Assuming no functionality breaks or has debilitating bugs, IAO/IAAs could create new Studies and Projects, or edit existing ones, and internal and external users would have a new Profile page on which they can upload in-date training certificates whenever their 12-month coverage expires. The Project page routes validated service requests direct to the TRE/Environment team for swift execution. Daily updates reflect executed requests on the Projects page. This scenario beats all others which involve using the Portal for some actions, the old SP for others, and MyServices for others still (although, in any case, DSH service request forms will remain available to any UCL users in MyServices for some time after the Portal also has Project functionality live).
+First thoughts: Option 4 is conceptually the cleanest from a UX perspective and should be the one we would pick in an ideal word: users would receive comms in advance, informing them of a period of a few days of downtime e.g. Monday & Tuesday for the SP portal. All being well, they could log in to the new Portal on Wednesday morning and see all of their Studies, with associated Assets and Contracts, and all of their Projects. Assuming no functionality breaks or has debilitating bugs, IAO/IAAs could create new Studies and Projects, or edit existing ones, and internal and external users would have a new Profile page on which they can upload in-date training certificates whenever their 12-month coverage expires. The Project page routes validated service requests direct to the TRE/Environment team for swift execution. Daily updates reflect executed requests on the Projects page. This scenario beats all others which involve using the Portal for some actions, the old SP for others, and MyServices for others still (although, in any case, DSH service request forms will remain available to any UCL users in MyServices for some time after the Portal also has Project functionality live).
 
 We should start here i.e. at Option 4, and moderate down the list of preferences in light of practical limitations or capacity concerns.
 
 ### What could go wrong?
 
-What could go wrong in Option 4 that wouldn't go wrong in Option 1 or Option 2? 
+What could go wrong in Option 4 that wouldn't go wrong in Option 1, Option 2 or Option 3? 
 1. If the Portal's UserS functionality goes wrong in Option 4, then, on the assumption that we don't ship features until we're satisfied they are robust, the same thing would probably also go wrong in Options 1, 2 and 3. This could be:
   - Major problems with the import such that some (random subset of) approved researchers are not recorded in the portal DB, so then don't show up in the people search or in the lookup when someone is trying to add them to a Project. **We can thoroughly test this.**
   - Problems with adding external users in particular to the portal. This seems more likely since the process is lengthier and there is more room for things to go wrong i.e. invitations to Entra not being sent, or being sent but not accepted, or being sent and accepted but then not being discoverable, as in the point above. **We can thoroughly test this.**
 
 But whereas in Options 1, 2 and 3 this would be the sole set of problems to triage and fix, in Option 4 the Portal team could also be having to deal with Study and/or Project-related problems:
 
-2. Study problems. As with before, if the import of Study data goes wrong in Option 3, then it would probably also go wrong in Options 1, 2 and 3 but in Option 4 other things might also be going wrong simultaneously, reducing the capacity of the team to fix the Study problems, which could be:
+2. Study problems. As with before, if the migration of Study management to the Portal goes wrong in Option 4, then it would probably also go wrong in Options 1, 2 and 3 - but in Option 4 other things could also be going wrong simultaneously, reducing the capacity of the team to fix the Study problems, which could be:
   - Studies being uneditable (i.e. the form to edit works but submission of it fails, perhaps due to validation issues)
   - Studies receiving the wrong status on import (we want Studies that are Approved in SP to retain their Approved Status, even if they would not pass muster if they were requested today) such that new Projects can't be created under the Study or existing ones effectively managed.
   - Studies not being visible to their owners at all (they may in fact exist in the DB, just not visible via the Study page - they may or may not still be visible to the Project form's Study lookup field)
 
-  **We can test all of this thoroughly**
+  **We can test all of this thoroughly.**
 
 3. Project problems. This is twofold, since projects need to be visible, editable, and creatable in the frontend by users, **and** the DSH environment team need to be able to GET and PATCH project records via API. As above, on the assumption that we don't ship features until we're satisfied they are robust, if any Project functionality breaks following an Option 4 "big bang" migration, be it in the frontend or backend, the same thing would probably also break in Options 1, 2 and 3. Possible problems include:
   - Project forms not being able to lookup eligible Studies and Users (Approved Researchers).
@@ -320,12 +320,13 @@ A Blue/Green deployment is not viable on account of:
 
 A Canary deployment, whilst certainly more viable than Blue/Green, would involve:
 - Migrating the Study data of small groups of users at a time
-- Exposing the Portal to a this subset of users first
-- Monitoring behavior, fixing any issues, then expanding gradually
+- Making these groups' existing SharePoint records read-only the moment they have access to the Portal
+- Exposing the Portal to a this subset of users
+- Monitoring behavior, fixing any issues, then expanding gradually to the next group
 
-The process of incrementing by small groups of users will be close to selecting groups of users based on arbitrary attributes (beyond "TRE users" as the first group). This is not necessarily a problem. It is essentially what Options 1, 2 and 3 involve.
+Options 1, 2 and 3 involve this to an extent (insofar as they each suggest using the ARC TRE's users as early pilot users (Canaries) for the Portal)
 
-What is difficult (at scale) is revoking edit access to these users' existing SP records (i.e. making their existing records Read Only). Obviously we do not want to allow users to edit ostensibly the same data in two places, so the Study-level SharePoint groups which govern access to SharePoint records will have to be emptied, once a copy has been made of the membership at the point of switchover. The rollback plan will necessitate manually adding all members back into these SharePoint groups. Once users start using the Portal to begin writing data to the Postgres DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible. 
+What is difficult (at scale) about this approach is revoking edit access to these users' existing SP records (i.e. making their existing records read-only). Obviously we do not want to allow users to edit ostensibly the same data in two places, so the Study-level SharePoint groups which govern access to SharePoint records will have to be emptied (once a copy has been made of the full set of gropu membership at the point of switchover). Any rollback plan under this approach will necessitate manually adding all members back into these SharePoint groups. Furthermore, once users begin writing data to the Portal DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible.
 
 > [!NOTE] 
 > For all options, regarding rollback:
