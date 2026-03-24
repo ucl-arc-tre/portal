@@ -5,15 +5,14 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { getUsers, UserData } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, HelperText, Search } from "@/components/shared/uikitExports";
 import UserDataTable from "@/components/people/UserDataTable";
 import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
-import Button from "@/components/ui/Button";
 
 export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
   ssr: false,
@@ -26,7 +25,6 @@ export default function PeoplePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
 
   if (authInProgress) return null;
 
@@ -78,17 +76,6 @@ export default function PeoplePage() {
     }
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    searchRef.current!.value = inputValue;
-  };
-
-  const clearSearchTerm = () => {
-    if (searchRef.current) {
-      searchRef.current.value = "";
-    }
-  };
-
   if (!isAdmin && !isTreOpsStaff && !isIAO)
     return (
       <Alert type="warning">
@@ -121,43 +108,7 @@ export default function PeoplePage() {
       </div>
       {canSearch && (
         <div className={styles["search-wrapper"]}>
-          <form className={styles["search-container"]} data-cy="search-users">
-            <input
-              placeholder="search users..."
-              id={styles.search}
-              name="search"
-              onChange={handleInputChange}
-              ref={searchRef}
-              aria-label="search users of the portal"
-            ></input>
-            <Button
-              variant="tertiary"
-              icon={<SearchIcon />}
-              onClick={(e) => {
-                e.preventDefault();
-
-                handleUserSearch(searchRef.current!.value);
-              }}
-              type="submit"
-              data-cy="submit-user-search"
-              aria-label="submit user search query"
-            ></Button>
-            {searchTerm.length > 0 && (
-              <Button
-                variant="tertiary"
-                onClick={() => {
-                  handleUserSearch("");
-                  clearSearchTerm();
-                }}
-                className={styles["clear-search"]}
-                type="reset"
-                data-cy="clear-user-search"
-                aria-label="clear user search query"
-              >
-                <small>Clear</small>
-              </Button>
-            )}
-          </form>
+          <Search placeholder="search users..." onSearch={handleUserSearch} className="search" />
           <HelperText>
             <small>Search by email address or user principal</small>
           </HelperText>
