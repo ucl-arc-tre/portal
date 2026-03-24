@@ -1,0 +1,5 @@
+.approved-researcher-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
