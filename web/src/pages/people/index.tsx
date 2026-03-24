@@ -43,7 +43,6 @@ export default function PeoplePage() {
       setSearchTerm("");
       return;
     }
-
     const regex = /^\w[\w.\s0-9@-]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
@@ -73,6 +72,12 @@ export default function PeoplePage() {
       setErrorMessage("Failed to search users. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleUserSearch(event.currentTarget.querySelector("input")?.value || "");
     }
   };
 
@@ -108,7 +113,12 @@ export default function PeoplePage() {
       </div>
       {canSearch && (
         <div className={styles["search-wrapper"]}>
-          <Search placeholder="search users..." onSearch={handleUserSearch} className="search" />
+          <Search
+            placeholder="search users..."
+            onSearch={handleUserSearch}
+            className="search"
+            onKeyDown={handleKeyDown}
+          />
           <HelperText>
             <small>Search by email address or user principal</small>
           </HelperText>
