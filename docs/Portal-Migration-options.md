@@ -175,6 +175,44 @@ Or in one "big bang":
 
 </div>
 
+### Option 4
+
+TRE first:
+
+<div align="center">
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark:             |
+| Study mgmt.          |     :x: (SharePoint)          |   :x: (SharePoint)               |
+| Project mgmt.        |     :x: (MyServices)          |   :x: (SharePoint)               |
+
+</div>
+
+<p align="center">:arrow_down:</p>
+<div align="center">
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User onboarding   |     :x: (SharePoint)          |   :white_check_mark: |
+| Study mgmt.          |     :x: (SharePoint)          |   :white_check_mark:               |
+| Project mgmt.        |     :x: (MyServices)          |   :white_check_mark:               |
+
+</div>
+
+<p align="center">Once this migration of TRE-only users has exposed any large issues or bugs</p>
+
+<p align="center">:arrow_down:</p>
+<div align="center">
+
+| Portal function      |    DSH            |      TRE             |
+|----------------------|-------------------|----------------------|
+| User onboarding   |     :white_check_mark:          |   :white_check_mark: |
+| Study mgmt.          |     :white_check_mark:          |   :white_check_mark:               |
+| Project mgmt.        |     :white_check_mark:          |   :white_check_mark:               |
+
+</div>
+
 ## 2. Analysis
 
 > [!NOTE]
@@ -212,6 +250,16 @@ Or in one "big bang":
 | **Benefits**           | - Shortest transition period for users<br>- Fewest concurrent platforms for users<br>- SP turned read-only at beginning of migration sequence                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | **Risks & Issues**     | - Not as easy to handle mishaps; very few people (~2) to address tickets<br>- Biggest delay before starting; can fall into the trap of "never being ready"<br>- Highest pressure on good comms <br>- Relies more heavily on testing prior to implementation |
 | **UX Impact**          | - Users will be given clear indication of where to manage their Researcher status and Studies and Projects but the least amount of time to adjust to the new places<br>- Users go from 3 potential platforms to 1 immediately (with the option to continue using MyServices to make DSH requests)                                                                                                                                                                                                                                           |
+| **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+
+## 2.4 Option 4
+
+| **Section**            | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Option Description** | Migrate all TRE users first, then migrate DSH users                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| **Benefits**           | - Smaller chunks are more manageable for the Portal team<br>- Allows TRE to decommission the TRE SharePoint<br>- Canary deployment-like, which mitigates risk of serious breakages/bugs hitting a large number of users                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Risks & Issues**     | - Requires repeated phases of manual data migraiton<br>- Begs the question about the sequence of migration: ought it be phased or a big bang for TRE? And then phased or big bang for DSH users?<br>- No single source of truth for Studies, Assets, Contracts, Approved Researchers |
+| **UX Impact**          | - Users will be split into "TRE" and "DSH" groups, although there are many TRE users who are also DSH users: for these people, they will have to manage <br>- Users go from 3 potential platforms to 1 immediately (with the option to continue using MyServices to make DSH requests)                                                                                                                                                                                                                                           |
 | **Option Score (1-5)** |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### Other Notes/Considerations
@@ -269,9 +317,9 @@ A Canary deployment, whilst certainly more viable than Blue/Green, would involve
 - Exposing the Portal to a this subset of users first
 - Monitoring behavior, fixing any issues, then expanding gradually
 
-The process of incrementing by small groups of users will be close to selecting groups of users based on arbitrary attributes (beyond "TRE users" as the first group). This is not necessarily a problem. This is essentially what Options 1 and 2 involve.
+The process of incrementing by small groups of users will be close to selecting groups of users based on arbitrary attributes (beyond "TRE users" as the first group). This is not necessarily a problem. It is essentially what Options 1, 2 and 4 involve.
 
-What is difficult is revoking edit access to these users' existing SP records (i.e. making their existing records Read Only). Obviously we do not want to allow users to edit ostensibly the same data in two places, so the Study-level SharePoint groups which govern access to SharePoint records will have to be emptied, once a copy has been made of the membership at the point of switchover. The rollback plan will necessitate manually adding all members back into these SharePoint groups. Once users start using the Portal to begin writing data to the Postgres DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible. 
+What is difficult (at scale) is revoking edit access to these users' existing SP records (i.e. making their existing records Read Only). Obviously we do not want to allow users to edit ostensibly the same data in two places, so the Study-level SharePoint groups which govern access to SharePoint records will have to be emptied, once a copy has been made of the membership at the point of switchover. The rollback plan will necessitate manually adding all members back into these SharePoint groups. Once users start using the Portal to begin writing data to the Postgres DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible. 
 
 > [!NOTE] 
 > For all options, regarding rollback:
