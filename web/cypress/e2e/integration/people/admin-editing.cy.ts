@@ -9,7 +9,7 @@ describe("Admin can edit people", () => {
   });
 
   it("can edit a person's training record", () => {
-    cy.get("[data-cy='search-users']").type("portal");
+    cy.get("[data-cy='ucl-uikit-search']").type("portal");
     cy.get("[data-cy='ucl-uikit-search-search-btn']").click();
     cy.contains("tr", botBaseUsername).find("[data-cy='training']").contains("Edit").click();
 
