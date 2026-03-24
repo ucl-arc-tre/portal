@@ -49,6 +49,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentContract, setCurrentContract] = useState<Contract | null>(editingContract ?? null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -78,6 +79,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   });
 
   useEffect(() => {
+    setCurrentContract(editingContract ?? null);
+
     // populate form with existing data when editing
     if (editingContract) {
       reset({
@@ -165,7 +168,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     setIsSubmitting(true);
     setError(null);
 
-    const contractData: ContractBase = {
+    const body: ContractBase = {
       title: formData.title,
       organisation_signatory: formData.organisationSignatory,
       third_party_name: formData.thirdPartyName,
@@ -177,13 +180,13 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
     let response;
     try {
-      if (editingContract) {
+      if (currentContract) {
         response = await putStudiesByStudyIdContractsByContractId({
           path: {
             studyId: study.id,
-            contractId: editingContract.id,
+            contractId: currentContract.id,
           },
-          body: contractData,
+          body: body,
         });
       } else {
         // Upload new contract
@@ -191,7 +194,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
           path: {
             studyId: study.id,
           },
-          body: contractData,
+          body: body,
         });
       }
 
@@ -201,14 +204,14 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         setSuccess(false);
         return;
       }
-      const contractId = response.data.id;
+      setCurrentContract(response.data);
 
       while (uploadFiles.length > 0) {
         const file = uploadFiles.pop()!;
         response = await postStudiesByStudyIdContractsByContractIdObjects({
           path: {
             studyId: study.id,
-            contractId: contractId,
+            contractId: response.data!.id,
           },
           body: { file },
         });

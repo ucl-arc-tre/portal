@@ -177,7 +177,7 @@ export default function ManageAssetPage() {
                 </label>
                 <ul>
                   {contracts.map((contract) => (
-                    <ContractCard key={contract.id} contract={contract} studyId={study.id} canModify={false} />
+                    <ContractCard key={contract.id} contract={contract} studyId={study.id} />
                   ))}
                 </ul>
               </div>

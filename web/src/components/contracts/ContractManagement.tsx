@@ -68,7 +68,7 @@ export default function ContractManagement(props: ContractManagementProps) {
       ) : (
         <div className={styles["contracts-list"]}>
           {contracts.map((contract) => (
-            <ContractCard key={contract.id} contract={contract} studyId={study.id} canModify={canModify} />
+            <ContractCard key={contract.id} contract={contract} studyId={study.id} />
           ))}
         </div>
       )}

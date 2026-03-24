@@ -14,10 +14,11 @@ type ContractObjectCardProps = {
   filename: string;
   id: string;
   createdAt: string;
+  canModify: boolean;
 };
 
 export default function ContractObjectCard(props: ContractObjectCardProps) {
-  const { id, contractId, studyId, filename, createdAt: created_at } = props;
+  const { id, contractId, studyId, filename, createdAt, canModify } = props;
 
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +88,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Created at: </span>
-          <span className={styles.value}>{created_at}</span>
+          <span className={styles.value}>{createdAt}</span>
         </div>
       </div>
 
@@ -103,15 +104,17 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
           {downloading ? "Downloading..." : "Download"}
         </Button>
 
-        <Button
-          className="delete-button"
-          onClick={handleDelete}
-          size="small"
-          data-cy="delete-contract-button"
-          cy="contract-object-delete-button"
-        >
-          Delete
-        </Button>
+        {canModify && (
+          <Button
+            className="delete-button"
+            onClick={handleDelete}
+            size="small"
+            data-cy="delete-contract-button"
+            cy="contract-object-delete-button"
+          >
+            Delete
+          </Button>
+        )}
       </div>
 
       {error && (

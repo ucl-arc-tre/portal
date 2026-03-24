@@ -20,8 +20,9 @@ var (
 )
 
 func IsValidContractFilename(filename string) bool {
+	lowercaseFilename := strings.ToLower(filename)
 	filenameHasSuffix := func(s string) bool {
-		return strings.HasSuffix(filename, s)
+		return strings.HasSuffix(lowercaseFilename, s)
 	}
 	isLocalPath := filepath.IsLocal(filename)
 	hasValidExtension := slices.ContainsFunc(validContractFileExtensions, filenameHasSuffix)

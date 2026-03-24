@@ -8,10 +8,9 @@ import router from "next/router";
 type ContractCardProps = {
   contract: Contract;
   studyId: string;
-  canModify: boolean;
 };
 
-export default function ContractCard({ studyId, contract, canModify }: ContractCardProps) {
+export default function ContractCard({ studyId, contract }: ContractCardProps) {
   const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
 
   const getStatusColor = (status: string) => {
@@ -78,17 +77,15 @@ export default function ContractCard({ studyId, contract, canModify }: ContractC
           </small>
         )}
         <div className={styles["button-wrapper"]}>
-          {canModify && (
-            <Button
-              onClick={() => {
-                router.push(`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`);
-              }}
-              size="small"
-              data-cy="manage-contract-button"
-            >
-              Manage
-            </Button>
-          )}
+          <Button
+            onClick={() => {
+              router.push(`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`);
+            }}
+            size="small"
+            data-cy="manage-contract-button"
+          >
+            Manage
+          </Button>
         </div>
       </div>
     </div>

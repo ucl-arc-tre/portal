@@ -27,6 +27,11 @@ export default function ManageContractPage() {
   const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowUploadModal] = useState(false);
 
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
+  const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
+  const canModify = isStudyOwner || isStudyAdmin;
+
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   const fetchData = async (studyIdParam: string, contractIdParam: string) => {
@@ -124,9 +129,11 @@ export default function ManageContractPage() {
       <div className="content">
         <div className={styles.header}>
           <Title text={`Manage Contract: ${contract.title}`} />
-          <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="contract-edit">
-            Edit
-          </Button>
+          {canModify && (
+            <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="contract-edit">
+              Edit
+            </Button>
+          )}
         </div>
 
         <div className={styles.info}>
@@ -167,6 +174,7 @@ export default function ManageContractPage() {
             studyId={study.id}
             filename={obj.filename}
             createdAt={formatDate(obj.created_at)}
+            canModify={canModify}
           />
         ))}
 

@@ -118,7 +118,7 @@ type Contract struct {
 	ModelAuditable
 	StudyID               uuid.UUID `gorm:"index"`
 	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
-	Title                 string    `gorm:"not null"`
+	Title                 string
 	OrganisationSignatory string
 	ThirdPartyName        string
 	Status                string // proposed, active, expired
