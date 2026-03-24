@@ -9,8 +9,8 @@ describe("Admin can edit people", () => {
   });
 
   it("can edit a person's training record", () => {
-    cy.get("[data-cy='ucl-uikit-search']").type("portal");
-    cy.get("[data-cy='ucl-uikit-search-search-btn']").click();
+    cy.get("[data-testid='ucl-uikit-search']").type("portal");
+    cy.get("[data-testid='ucl-uikit-search-search-btn']").click();
     cy.contains("tr", botBaseUsername).find("[data-cy='training']").contains("Edit").click();
 
     cy.get("select[name='training_kind']").select("nhsd");

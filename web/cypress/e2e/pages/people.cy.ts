@@ -27,7 +27,7 @@ describe(`People page content`, () => {
     cy.visit("/people");
 
     cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.get("[data-cy='ucl-uikit-search']").should("be.visible");
+    cy.get("[data-testid='ucl-uikit-search']").should("be.visible");
   });
 
   it("should show content for TRE ops staff", () => {
@@ -37,7 +37,7 @@ describe(`People page content`, () => {
     cy.waitForAuth();
 
     cy.contains("You do not have permission to view this page").should("not.exist");
-    cy.get("[data-cy='ucl-uikit-search']").should("be.visible");
+    cy.get("[data-testid='ucl-uikit-search']").should("be.visible");
     cy.contains("View approved researchers").should("be.visible");
 
     // should only show approved researchers...best way to test this? Or not bother here?
