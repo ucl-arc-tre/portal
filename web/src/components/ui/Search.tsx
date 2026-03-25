@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import styles from "./Search.module.css";
 
 const UCLSearch = dynamic(() => import("uikit-react-public").then((mod) => mod.Search), {
   ssr: false,
@@ -22,7 +23,7 @@ export default function Search(props: Props) {
       placeholder={props.placeholder || "Search..."}
       onSearch={props.onSearch}
       id={props.id}
-      className="search"
+      className={styles.search}
       onKeyDown={handleKeyDown}
     />
   );
