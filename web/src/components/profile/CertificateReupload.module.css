@@ -1,0 +1,28 @@
+.reupload-option {
+  width: 100%;
+  margin-block: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  button {
+    align-self: end;
+    margin-top: 0.5rem;
+  }
+}
+
+.cert-details {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0;
+
+  dt {
+    color: #374151;
+  }
+}

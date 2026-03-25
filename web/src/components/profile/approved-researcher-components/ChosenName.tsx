@@ -8,14 +8,14 @@ import styles from "./ChosenName.module.css";
 import { Alert, AlertMessage, Input } from "@/components/shared/uikitExports";
 
 type ProfileChosenNameProps = {
-  currentName?: string;
+  chosenName: string;
   setChosenName: (name: string) => void;
 };
 
 export default function ProfileChosenName(props: ProfileChosenNameProps) {
-  const { currentName, setChosenName } = props;
+  const { chosenName, setChosenName } = props;
 
-  const [inputNameValue, setInputNameValue] = useState(currentName || "");
+  const [inputNameValue, setInputNameValue] = useState(chosenName);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const [isSubmitting, setIsSubmitting] = useState(false);
