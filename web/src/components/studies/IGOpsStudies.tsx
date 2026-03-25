@@ -103,7 +103,7 @@ export default function IGOpsStudies() {
             <HelperText>
               <small>
                 You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
-                <br></br>Note that `iao` will search IAO usernames (emails)
+                <br></br>Note that `iao` will search IAO usernames (UPI, eg. ccabcd)
               </small>
             </HelperText>
           </div>
