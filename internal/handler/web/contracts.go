@@ -3,97 +3,74 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-// Helper functions
-
-func mustParseDate(dateStr string) time.Time {
-	parsedDate, err := time.Parse(config.DateFormat, dateStr)
-	if err != nil {
-		panic(fmt.Sprintf("failed to parse date %q: %v", dateStr, err))
-	}
-	return parsedDate
-}
-
-func extractContractFormData(ctx *gin.Context) openapi.ContractUploadObject {
-	return openapi.ContractUploadObject{
-		OrganisationSignatory: ctx.PostForm("organisation_signatory"),
-		ThirdPartyName:        ctx.PostForm("third_party_name"),
-		Status:                openapi.ContractUploadObjectStatus(ctx.PostForm("status")),
-		StartDate:             ctx.PostForm("start_date"),
-		ExpiryDate:            ctx.PostForm("expiry_date"),
-		AssetIds:              ctx.PostFormArray("asset_ids"),
-	}
-}
-
-func contractToOpenApiContract(contract types.Contract) openapi.Contract {
-	assetIds := []string{}
-	for _, asset := range contract.Assets {
-		assetIds = append(assetIds, asset.ID.String())
-	}
-
-	return openapi.Contract{
-		Id:                    contract.ID.String(),
-		Filename:              contract.Filename,
-		OrganisationSignatory: contract.OrganisationSignatory,
-		ThirdPartyName:        contract.ThirdPartyName,
-		Status:                openapi.ContractStatus(contract.Status),
-		StartDate:             contract.StartDate.Format(config.DateFormat),
-		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
-		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
-		AssetIds:              assetIds,
-		StudyId:               contract.StudyID.String(),
-	}
-}
+var (
+	attachmentHeaders = map[string]string{"Content-Disposition": "attachment"}
+)
 
 // Handler methods
-
-func prepareAssetsForContractLinkage(ctx *gin.Context, assetIds []string) ([]types.Asset, error) {
-
-	assets := []types.Asset{}
-	assetUuids, err := parseUUIDsOrSetError(ctx, assetIds...)
-	if err != nil {
-		return nil, err
-	}
-	for _, assetUuid := range assetUuids {
-		assets = append(assets, types.Asset{ModelAuditable: types.ModelAuditable{Model: types.Model{ID: assetUuid}}})
-	}
-
-	return assets, nil
-}
-
-func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId)
+func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
+	studyUuid, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
 		return
 	}
 
-	// Get the uploaded file
-	fileHeader, err := ctx.FormFile("file")
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Failed to get uploaded file")
+	var data openapi.ContractBase
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
 
-	contractMetadata := extractContractFormData(ctx)
-
-	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, fileHeader.Filename)
+	validationError := h.studies.ValidateContract(studyUuid, data)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
-	user := middleware.GetUser(ctx)
+	creator := middleware.GetUser(ctx)
+	contract, err := h.studies.CreateContract(studyUuid, data, creator)
+	if err != nil {
+		setError(ctx, err, "Failed to create contract")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}
+
+func (h *Handler) GetStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
+	if err != nil {
+		return
+	}
+
+	contract, err := h.studies.GetContract(uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to get contract")
+		return
+	}
+	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}
+
+func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
+	if err != nil {
+		return
+	}
+
+	fileHeader, err := ctx.FormFile("file")
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Failed to get uploaded file")
+		return
+	}
 
 	// Open the uploaded file
 	file, err := fileHeader.Open()
@@ -103,47 +80,36 @@ func (h *Handler) PostStudiesStudyIdContractsUpload(ctx *gin.Context, studyId st
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Error().Err(err).Msg("Failed to close uploaded file")
+			log.Err(err).Msg("Failed to close uploaded file")
 		}
 	}()
 
 	if mimeType, err := validation.MimeType(file); err != nil {
 		setError(ctx, err, "Failed to determine MIME type of file")
 		return
-	} else if mimeType != types.MimeTypePdf {
-		setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not PDF", mimeType)), "Invalid MIME type")
+	} else if !validation.IsValidContractMimeType(mimeType) {
+		setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not valid", mimeType)), "Invalid MIME type")
 		return
 	}
 
-	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
-	if err != nil {
-		setError(ctx, err, "Failed to prepare assets for contract linkage")
-		return
+	contractObject := studies.ContractObject{
+		Meta: types.ContractObjectMetadata{
+			Filename:   fileHeader.Filename,
+			ContractID: uuids[1],
+		},
+		Object: types.S3Object{Content: file},
 	}
-	// Create the final contract record for storage
-	contractData := types.Contract{
-		StudyID:               uuids[0],
-		Filename:              fileHeader.Filename,
-		CreatorUserID:         user.ID,
-		OrganisationSignatory: contractMetadata.OrganisationSignatory,
-		ThirdPartyName:        contractMetadata.ThirdPartyName,
-		Status:                string(contractMetadata.Status),
-		StartDate:             mustParseDate(contractMetadata.StartDate),
-		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
-
-		Assets: assets,
-	}
-
-	contractObj := types.S3Object{
-		Content: file,
-	}
-	err = h.studies.StoreContract(ctx, uuids[0], contractObj, contractData)
+	metadata, err := h.studies.CreateContractObject(ctx, uuids[0], contractObject)
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
 		return
 	}
 
-	ctx.Status(http.StatusNoContent)
+	ctx.JSON(http.StatusOK, openapi.ContractObjectMetadata{
+		Filename:  metadata.Filename,
+		Id:        metadata.ID.String(),
+		CreatedAt: metadata.CreatedAt.Format(config.TimeFormat),
+	})
 }
 
 func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
@@ -152,73 +118,24 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		return
 	}
 
-	// Get optional uploaded file (don't error if no file provided)
-	fileHeader, _ := ctx.FormFile("file")
-	filename := ""
-	if fileHeader != nil {
-		filename = fileHeader.Filename
+	var data openapi.ContractBase
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
 	}
 
-	contractMetadata := extractContractFormData(ctx)
-
-	validationError := h.studies.ValidateContractMetadata(uuids[0], contractMetadata, filename)
+	validationError := h.studies.ValidateContract(uuids[0], data)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
-	// Handle file processing if a new file is provided
-	var contractObj *types.S3Object
-	if fileHeader != nil {
-		file, err := fileHeader.Open()
-		if err != nil {
-			setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
-			return
-		}
-		defer func() {
-			if err := file.Close(); err != nil {
-				log.Error().Err(err).Msg("Failed to close uploaded file")
-			}
-		}()
-
-		if mimeType, err := validation.MimeType(file); err != nil {
-			setError(ctx, err, "Failed to determine MIME type of file")
-			return
-		} else if mimeType != types.MimeTypePdf {
-			setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not PDF", mimeType)), "Invalid MIME type")
-			return
-		}
-
-		contractObj = &types.S3Object{
-			Content: file,
-		}
-	}
-
-	assets, err := prepareAssetsForContractLinkage(ctx, contractMetadata.AssetIds)
-	if err != nil {
-		setError(ctx, err, "Failed to prepare assets for contract linkage")
-		return
-	}
-	contractUpdateData := types.Contract{
-		ModelAuditable:        types.ModelAuditable{Model: types.Model{ID: uuids[1]}},
-		StudyID:               uuids[0],
-		OrganisationSignatory: contractMetadata.OrganisationSignatory,
-		ThirdPartyName:        contractMetadata.ThirdPartyName,
-		Status:                string(contractMetadata.Status),
-		StartDate:             mustParseDate(contractMetadata.StartDate),
-		ExpiryDate:            mustParseDate(contractMetadata.ExpiryDate),
-		Filename:              filename,
-
-		Assets: assets,
-	}
-
-	err = h.studies.UpdateContract(ctx, uuids[0], uuids[1], contractUpdateData, contractObj)
+	contract, err := h.studies.UpdateContract(ctx, uuids[0], uuids[1], data)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
 	}
 
-	ctx.Status(http.StatusNoContent)
+	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
 func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
@@ -259,14 +176,19 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 	ctx.JSON(http.StatusOK, apiContracts)
 }
 
-func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context, studyId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
+func (h *Handler) GetStudiesStudyIdContractsContractIdObjectsContractObjectId(
+	ctx *gin.Context,
+	studyId string,
+	contractId string,
+	contractObjectId string,
+) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId, contractObjectId)
 	if err != nil {
 		return
 	}
-	object, err := h.studies.GetContract(ctx, uuids[0], uuids[1])
+	object, err := h.studies.GetContractObject(ctx, uuids[0], uuids[1], uuids[2])
 	if err != nil {
-		setError(ctx, err, "Failed get contract")
+		setError(ctx, err, "Failed get contract object")
 		return
 	} else if object.NumBytes == nil {
 		setError(ctx, types.NewErrServerError("contract object missing content length"), "Failed get contract")
@@ -275,9 +197,57 @@ func (h *Handler) GetStudiesStudyIdContractsContractIdDownload(ctx *gin.Context,
 	ctx.DataFromReader(
 		http.StatusOK,
 		*object.NumBytes,
-		"application/pdf",
-		object.Content, map[string]string{
-			"Content-Disposition": "attachment",
-		},
+		"application/octet-stream",
+		object.Content,
+		attachmentHeaders,
 	)
+}
+
+func (h *Handler) DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId(
+	ctx *gin.Context,
+	studyId string,
+	contractId string,
+	contractObjectId string,
+) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId, contractObjectId)
+	if err != nil {
+		return
+	}
+
+	err = h.studies.DeleteContractObject(ctx, uuids[0], uuids[1], uuids[2])
+	if err != nil {
+		setError(ctx, err, "Failed delete contract object")
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+// Helper functions
+
+func contractToOpenApiContract(contract types.Contract) openapi.Contract {
+	data := openapi.Contract{
+		Id:                    contract.ID.String(),
+		Title:                 contract.Title,
+		OrganisationSignatory: contract.OrganisationSignatory,
+		ThirdPartyName:        contract.ThirdPartyName,
+		Status:                openapi.ContractStatus(contract.Status),
+		StartDate:             contract.StartDate.Format(config.DateFormat),
+		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
+		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
+		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
+		StudyId:               contract.StudyID.String(),
+		ObjectsMetadata:       []openapi.ContractObjectMetadata{},
+		AssetIds:              []string{},
+	}
+	for _, asset := range contract.Assets {
+		data.AssetIds = append(data.AssetIds, asset.ID.String())
+	}
+	for _, object := range contract.Objects {
+		data.ObjectsMetadata = append(data.ObjectsMetadata, openapi.ContractObjectMetadata{
+			Filename:  object.Filename,
+			Id:        object.ID.String(),
+			CreatedAt: object.CreatedAt.Format(config.TimeFormat),
+		})
+	}
+	return data
 }

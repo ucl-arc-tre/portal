@@ -5,6 +5,7 @@ beforeEach(() => {
 
 describe("Study creation end-to-end", () => {
   const studyTitle = `study-${Date.now()}`;
+  const contractTitle = `contract-${Date.now()}`;
 
   it("staff should become an approved researcher", () => {
     cy.loginAsStaff();
@@ -79,8 +80,49 @@ describe("Study creation end-to-end", () => {
     cy.contains("Case ref").should("exist");
     cy.contains("Last signed off").should("not.exist");
   });
+  
+  it("owner should be able to add and edit contracts", () => {
+    cy.loginAsStaff();
 
-  it("ig ops should be able to search for a study", () => {
+    cy.visit("/studies");
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.get('[data-cy="study-contracts"]').click();
+
+    cy.get('[data-cy="add-contract"]').click();
+    cy.get('[name="title"]').type(contractTitle);
+    cy.get('[name="organisationSignatory"]').type("bob@example.com");
+    cy.get('[name="thirdPartyName"]').type("other");
+    cy.get('[name="status"]').select("active");
+    cy.get("input[name='startDate']").type("2024-01-01");
+    cy.get("input[name='expiryDate']").type("2025-12-31");
+
+    cy.fixture("valid_nhsd_certificate.pdf", "base64").then((fileContent) => {
+      cy.get("input[type='file']").selectFile(
+        {
+          contents: Cypress.Buffer.from(fileContent, "base64"),
+          fileName: "sample-contract.pdf",
+          mimeType: "application/pdf",
+        },
+        { force: true }
+      );
+    });
+
+    cy.get("button[type='submit']").click();
+
+    cy.contains(contractTitle).parents('[data-cy="contract-card"]').contains("Manage").click();
+    cy.get('[data-cy="contract-edit"]').click();
+    cy.get('[name="title"]').type("Test contract edited");
+    cy.get('[data-cy="add-asset"]').click();
+    cy.get('[name="assets.0.value"]').select(0);
+    cy.get("button[type='submit']").click();
+
+    cy.contains("Test contract edited").should("be.visible");
+
+    cy.get('[data-cy="contract-object-download-button"]').click();
+    cy.get('[data-cy="delete-contract-button"]').click();
+  });
+  
+   it("ig ops should be able to search for a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
@@ -88,7 +130,6 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).should("exist");
     cy.get("[data-cy='study-card']").should("have.length", 1);
-  });
 
   it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();

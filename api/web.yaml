@@ -864,21 +864,23 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-
-  /studies/{studyId}/contracts/upload:
     post:
-      description: Upload a contract object e.g. PDF
+      description: Create a contract
       parameters:
         - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ContractUploadObject"
+              $ref: "#/components/schemas/ContractBase"
       responses:
-        "204":
+        "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
         "400":
           description: Validation error
           content:
@@ -893,17 +895,30 @@ paths:
           description: Unexpected error
 
   /studies/{studyId}/contracts/{contractId}:
+    get:
+      description: Get a contract
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
+
     put:
-      description: Update contract metadata and optionally replace file
+      description: Update contract metadata
       parameters:
         - $ref: "#/components/parameters/StudyIdParam"
         - $ref: "#/components/parameters/ContractIdParam"
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ContractUpdate"
+              $ref: "#/components/schemas/ContractBase"
       responses:
         "200":
           description: Contract updated successfully
@@ -926,12 +941,39 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/contracts/{contractId}/download:
+  /studies/{studyId}/contracts/{contractId}/objects:
+    post:
+      description: Upload a contract object e.g. PDF
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ContractObject"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractObjectMetadata"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /studies/{studyId}/contracts/{contractId}/objects/{contractObjectId}:
     get:
       description: Get a contract object e.g. PDF
       parameters:
         - $ref: "#/components/parameters/StudyIdParam"
         - $ref: "#/components/parameters/ContractIdParam"
+        - $ref: "#/components/parameters/ContractObjectIdParam"
       responses:
         "200":
           description: OK
@@ -940,6 +982,21 @@ paths:
               schema:
                 type: string
                 format: binary
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    delete:
+      description: Delete a contract object e.g. PDF
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+        - $ref: "#/components/parameters/ContractObjectIdParam"
+      responses:
+        "204":
+          description: OK
         "403":
           description: Forbidden
         "500":
@@ -982,6 +1039,13 @@ components:
       name: contractId
       required: true
       description: Contract UUID
+      schema:
+        type: string
+    ContractObjectIdParam:
+      in: path
+      name: contractObjectId
+      required: true
+      description: Contract object UUID
       schema:
         type: string
 
@@ -1683,6 +1747,7 @@ components:
     ContractBase:
       type: object
       required:
+        - title
         - organisation_signatory
         - third_party_name
         - status
@@ -1690,6 +1755,9 @@ components:
         - expiry_date
         - asset_ids
       properties:
+        title:
+          type: string
+          description: Name of the contract
         organisation_signatory:
           type: string
           description: Name of the organisation signatory
@@ -1714,45 +1782,21 @@ components:
           items:
             type: string
 
-    ContractUploadObject:
-      allOf:
-        - $ref: "#/components/schemas/ContractBase"
-        - type: object
-          required:
-            - file
-          properties:
-            file:
-              type: string
-              format: binary
-              description: The contract file to upload (e.g., PDF)
-
-    ContractUpdate:
-      allOf:
-        - $ref: "#/components/schemas/ContractBase"
-        - type: object
-          properties:
-            file:
-              type: string
-              format: binary
-              description: Optional new contract file to replace the existing one
-
     Contract:
+      description: A contract associated with a study
       allOf:
         - $ref: "#/components/schemas/ContractBase"
         - type: object
           required:
             - id
-            - filename
             - created_at
             - updated_at
             - study_id
+            - objects_metadata
           properties:
             id:
               type: string
               description: Unique identifier for the contract
-            filename:
-              type: string
-              description: Original filename of the uploaded contract
             created_at:
               type: string
               description: Time in RFC3339 format when the contract was created
@@ -1762,8 +1806,36 @@ components:
             study_id:
               type: string
               description: Unique identifier of the study to which the contract belongs
+            objects_metadata:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContractObjectMetadata"
 
-      description: A contract associated with a study
+    ContractObject:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The contract file to upload (e.g., PDF)
+
+    ContractObjectMetadata:
+      type: object
+      required:
+        - id
+        - filename
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the contract metadata object
+        filename:
+          type: string
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the contract was created
 
     TokenRequest:
       type: object

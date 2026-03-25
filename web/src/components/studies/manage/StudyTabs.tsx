@@ -25,7 +25,12 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
 
   return (
     <div className={"tab-collection"}>
-      <Button onClick={() => setTab("study")} variant="secondary" className={`tab ${tab === "study" ? "active" : ""}`}>
+      <Button
+        onClick={() => setTab("study")}
+        variant="secondary"
+        className={`tab ${tab === "study" ? "active" : ""}`}
+        cy="study-overview"
+      >
         Study Overview
       </Button>
 
@@ -33,6 +38,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
         onClick={() => setTab("assets")}
         variant="secondary"
         className={`tab ${tab === "assets" ? "active" : ""}`}
+        cy="study-assets"
       >
         Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
       </Button>
@@ -41,6 +47,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
         onClick={() => setTab("contracts")}
         variant="secondary"
         className={`tab ${tab === "contracts" ? "active" : ""}`}
+        cy="study-contracts"
       >
         Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
       </Button>

@@ -1,0 +1,55 @@
+.card {
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-top: 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.value {
+  font-size: 1rem;
+  color: var(--color-text);
+  word-break: break-word;
+  flex: 1;
+}
+
+.button-wrapper {
+  display: flex;
+  gap: 0.5rem;
+
+  .download-button {
+    margin-left: auto;
+  }
+}
+
+@media (width >=768px) {
+  .card {
+    padding: 1.5rem;
+  }
+}
