@@ -60,7 +60,7 @@ func StartPostgresContainer(ctx context.Context) (*Container, error) {
 	}
 
 	dsn := fmt.Sprintf(
-		"host=%s port=%s user=postgres password=postgres dbname=testdb sslmode=disable",
+		"host=%s port=%s user=postgres password=postgres dbname=testdb sslmode=disable", // pragma: allowlist secret
 		host, port.Port(),
 	)
 
