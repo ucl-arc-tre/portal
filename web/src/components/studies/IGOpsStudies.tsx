@@ -39,13 +39,13 @@ export default function IGOpsStudies() {
     try {
       let response;
       switch (true) {
-        case query.includes("caseref"):
+        case query.includes("caseref:"):
           response = await getStudies({ query: { caseref: Number(query.split("caseref:")[1]) } });
           break;
-        case query.includes("title"):
+        case query.includes("title:"):
           response = await getStudies({ query: { fuzzy_title: query.split("title:")[1] } });
           break;
-        case query.includes("iao"):
+        case query.includes("iao:"):
           response = await getStudies({ query: { owner_username: query.split("iao:")[1] } });
           break;
         default:
