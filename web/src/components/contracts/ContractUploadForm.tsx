@@ -160,7 +160,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   const onSubmit = async (formData: ContractFormData) => {
     // For upload mode, file is required
-    if (!editingContract && uploadFiles.length == 0) {
+    if (!editingContract && uploadFiles.length === 0) {
       setError("Please select a file before submitting.");
       return;
     }
@@ -456,10 +456,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
           {uploadFiles.map((file, index) => (
             <div key={index} className={styles["selected-file"]}>
-              <div key={index} className={styles["file-info"]}>
-                <span key={index} className={styles["file-name"]}>
-                  {file.name}
-                </span>
+              <div className={styles["file-info"]}>
+                <span className={styles["file-name"]}>{file.name}</span>
               </div>
               <Button onClick={clearFile} size="small" variant="tertiary">
                 Remove

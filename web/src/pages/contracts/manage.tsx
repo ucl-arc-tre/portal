@@ -51,7 +51,7 @@ export default function ManageContractPage() {
         errorMessages.push(`Failed to load contract: ${extractErrorMessage(contractResponse)}`);
       }
       if (!studyResponse.response.ok || !studyResponse.data) {
-        errorMessages.push(`Failed to load contract: ${extractErrorMessage(contractResponse)}`);
+        errorMessages.push(`Failed to load study: ${extractErrorMessage(studyResponse)}`);
       }
       if (errorMessages.length > 0) {
         setError(errorMessages.join("\n"));
@@ -187,7 +187,7 @@ export default function ManageContractPage() {
             onSuccess={() => {
               setShowUploadModal(false);
               fetchData(study.id, contract.id);
-            }} // todo
+            }}
             editingContract={contract}
           />
         )}

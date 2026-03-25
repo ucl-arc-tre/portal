@@ -39,7 +39,7 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 	creator := middleware.GetUser(ctx)
 	contract, err := h.studies.CreateContract(studyUuid, data, creator)
 	if err != nil {
-		setError(ctx, err, "Failed to get create contract")
+		setError(ctx, err, "Failed to create contract")
 		return
 	}
 
@@ -54,7 +54,7 @@ func (h *Handler) GetStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 
 	contract, err := h.studies.GetContract(uuids[0], uuids[1])
 	if err != nil {
-		setError(ctx, err, "Failed to get get contract")
+		setError(ctx, err, "Failed to get contract")
 		return
 	}
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
