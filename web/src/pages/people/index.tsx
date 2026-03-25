@@ -111,7 +111,7 @@ export default function PeoplePage() {
 
       {canSearch && (
         <div className={styles["search-wrapper"]}>
-          <Search placeholder="search users..." onSearch={handleUserSearch} />
+          <Search placeholder="Search users..." onSearch={handleUserSearch} id="user-search" />
           <HelperText>
             <small>Search by email address or user principal</small>
           </HelperText>

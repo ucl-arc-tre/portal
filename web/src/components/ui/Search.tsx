@@ -8,7 +8,7 @@ const UCLSearch = dynamic(() => import("uikit-react-public").then((mod) => mod.S
 type Props = React.ComponentProps<typeof UCLSearch> & {
   placeholder?: string;
   onSearch: (query: string) => void;
-  id?: string;
+  id: string;
 };
 export default function Search(props: Props) {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -20,7 +20,7 @@ export default function Search(props: Props) {
 
   return (
     <UCLSearch
-      placeholder={props.placeholder || "Search..."}
+      placeholder={props.placeholder}
       onSearch={props.onSearch}
       id={props.id}
       className={styles.search}
