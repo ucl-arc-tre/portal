@@ -12,17 +12,19 @@
 
 ## 1. Executive Summary
 
-The ARC Services Portal (the Portal) aims to replace the Information Governance Sharepoint portal (SP) as the primary platform for UCL's research community to conduct Information Governance activities and management of sensitive research data (and  metadata relating to its storage and processing). These activities include adding and maintaining documents through the creation of "Studies", "Projects", and the creation of "Approved Researchers", which are mostly handled by the SP currently. Once the Portal has the functionality to support the core actions of SP, the data in SP will need to be migrated. This paper outlines the options for this migration with a focus on user experience.
+The ARC Services Portal (the Portal) aims to replace the Information Governance Sharepoint portal (the SP) as the primary platform for UCL's research community to conduct Information Governance activities and management of sensitive research data (and  metadata relating to its storage and processing). These activities include adding and maintaining records and documents through the creation of "Studies" and the creation of "Approved Researchers", which are handled by the SP currently. Additionally, the SP contains a mirror of project data from the Data Safe Haven, allowing Project owners to view their project configuration and access lists. Once the Portal has the functionality to support the core actions of SP, plus enhanced Project management actions, the User and Study data in SP will need to be migrated (and Project data needs to be pushed into the Portal instead of the SP). This paper outlines the options for this migration with a focus on user experience.
 
-3 options are considered in this paper:
+4 options are considered in this paper:
 
 1. **Option 1:** **Migrate Incrementally** splitting out Users (Approved Researchers), Studies (including Assets and Contracts) and Projects into three different phases.
 
 2. **Option 2:** **Migrate Incrementally** splitting out Users (Approved Researchers) and Studies and Projects (including Assets, Contracts) into two different phases.
 
-2. **Option 3:** **Migrate TRE First** the order of the TRE migration TBC, the DSH to follow suit.
+3. **Option 3:** **Migrate TRE First** the order of the TRE migration TBC, the DSH to follow suit.
 
-3. **Option 4:** **Big Bang** wherein Users (Approved Researchers), Studies (including Assets and Contracts) and Projects are all done in one phase.
+4. **Option 4:** **Big Bang** wherein Users (Approved Researchers), Studies (including Assets and Contracts) and Projects are all done in one phase.
+
+Following the reasoning laid out in full in the [Evaluation](#3-evaluation) section, **Option 3:** **Migrate TRE First** is recommended.
 
 ### 1.1 Context
 
@@ -330,4 +332,16 @@ What is intensive/difficult (at scale) about this approach is revoking edit acce
 
 > [!NOTE] 
 > For all options, regarding rollback:
->- Rollback is non-trivial: once users begin writing data to the Portal DB, reverting to the old system whilst trying to persist this new data would require complex synchronization back to SharePoint, which is practically impossible.
+>- Rollback is non-trivial: once users begin writing data to the Portal DB, reverting to the old system and persisting this new data would require complex synchronization back to SharePoint, which is practically impossible.
+
+### Development and testing time
+
+This is the most constrained resource in the Portal team, specifically the development of the Project management functions for both DSH and ARC TRE Projects, which share a set of features, but also differ a lot in implementation. In order to do Option 4, a large amount of development work still needs to be undertaken. The risk that this would take more than one term is high. And that is ignoring for the moment the thorough testing which we would need to conduct in preparation for a "big bang" deployment. 
+
+As a result of these constraints, Option 3 (TRE users/studies migrated first) appears to be the best option. It allows us to roll out the new Portal's Study and Project management features to a smaller subset of users, which limits the blast radius of any catastrophic downtime, but also allows for more effective management of what's most likely to be a modest stream of bug reports/requests for help that will come from this smaller group of users. Option 3 thus allows the Portal team to continue development of the DSH Project management functionality at a steady rate, whilst also tending to any necessary fixes in the Study and TRE Project management functionality.
+
+### What questions still need answering?
+
+We still need to answer the question of how the TRE-first rollout will happen: Studies, and then Projects, or Studies and Projects together? And furthermore, after the TRE rollout complete and stable, how will the DSH rollout happen: in one big bang, or phased: and if phased, in how many phases?
+
+By this point, however, having rolled out the full set of Portal functionality to TRE users, we ought to be better placed to make this decision. We will be armed with the knowledge of how the TRE rollout went, and will know how confident we are in the robustness of the Portal's core functionality (in light of how many bugs/breaks were reported during the TRE rollout).
