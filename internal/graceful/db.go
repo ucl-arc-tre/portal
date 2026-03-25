@@ -103,18 +103,11 @@ func migrateContracts(db *gorm.DB) {
 
 	if !migrator.HasTable(&types.Contract{}) {
 		return // fresh deployment - nothing to migrate
-	} else if migrator.HasColumn(&types.Contract{}, "title") &&
-		migrator.HasTable(&types.ContractObjectMetadata{}) {
-		return // already migrated
 	}
 
-	if err := db.AutoMigrate(&types.ContractObjectMetadata{}); err != nil {
-		log.Err(err).Msg("Failed to automigrate ContractObjectMetadata for migration")
+	if err := db.AutoMigrate(&types.ContractObjectMetadata{}, &types.Contract{}); err != nil {
+		log.Err(err).Msg("Failed to automigrate contract tables for migration")
 		return
-	}
-
-	if err := migrator.AddColumn(&types.Contract{}, "title"); err != nil {
-		panic(err)
 	}
 
 	tx := db.Begin()
@@ -125,15 +118,21 @@ func migrateContracts(db *gorm.DB) {
 		Filename  string    `gorm:"filename"`
 		CreatedAt time.Time `gorm:"created_at"`
 	}{}
-
-	err := tx.Table("contracts").Select("id, filename, created_at").Scan(&contractPartials).Error
+	err := tx.Table("contracts").
+		Select("id, filename, created_at").
+		Where("filename != ''").
+		Scan(&contractPartials).Error
 	if err != nil {
 		panic(err)
 	}
 
 	for _, contractPartial := range contractPartials {
 		title, _ := strings.CutSuffix(contractPartial.Filename, ".pdf")
-		err = tx.Table("contracts").Where("id = ?", contractPartial.ID).Update("title", title).Error
+		err = tx.Table("contracts").
+			Where("id = ?", contractPartial.ID).
+			Update("title", title).
+			Update("filename", "").
+			Error
 		if err != nil {
 			panic(err)
 		}
@@ -152,6 +151,8 @@ func migrateContracts(db *gorm.DB) {
 	if err := tx.Commit().Error; err != nil {
 		panic(err)
 	}
+
+	log.Info().Msg("Migrated contracts")
 }
 
 // Set a study id column of contracts using their existing values
