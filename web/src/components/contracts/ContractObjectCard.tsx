@@ -77,7 +77,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
 
     if (!response.response.ok) {
       const errorMsg = extractErrorMessage(response);
-      setError(`Download failed: ${errorMsg}`);
+      setError(`Delete failed: ${errorMsg}`);
       return;
     }
     setIsDeleted(true);
