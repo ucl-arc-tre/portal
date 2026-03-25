@@ -117,8 +117,8 @@ type AssetLocation struct {
 type Contract struct {
 	ModelAuditable
 	StudyID               uuid.UUID `gorm:"index"`
-	Filename              string    `gorm:"not null"`
 	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
+	Title                 string
 	OrganisationSignatory string
 	ThirdPartyName        string
 	Status                string // proposed, active, expired
@@ -126,7 +126,18 @@ type Contract struct {
 	ExpiryDate            time.Time
 
 	// Relationships
-	Study       Study   `gorm:"foreignKey:StudyID"`
-	CreatorUser User    `gorm:"foreignKey:CreatorUserID"`
-	Assets      []Asset `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
+	Study       Study                    `gorm:"foreignKey:StudyID"`
+	CreatorUser User                     `gorm:"foreignKey:CreatorUserID"`
+	Assets      []Asset                  `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
+	Objects     []ContractObjectMetadata `gorm:"foreignKey:ContractID"`
+}
+
+// Contract object is the metadata for a file object {pdf, docx} etc.
+type ContractObjectMetadata struct {
+	ModelAuditable
+	Filename   string    `gorm:"not null"`
+	ContractID uuid.UUID `gorm:"type:uuid;not null"`
+
+	// Relationships
+	Contract Contract
 }

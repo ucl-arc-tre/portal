@@ -3,10 +3,10 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
-  postStudiesByStudyIdContractsUpload,
+  postStudiesByStudyIdContracts,
+  postStudiesByStudyIdContractsByContractIdObjects,
   putStudiesByStudyIdContractsByContractId,
-  ContractUploadObject,
-  ContractUpdate,
+  ContractBase,
   Study,
   Contract,
   Asset,
@@ -17,6 +17,7 @@ import styles from "./ContractUploadForm.module.css";
 import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
+  title: string;
   organisationSignatory: string;
   thirdPartyName: string;
   status: "proposed" | "active" | "expired";
@@ -29,17 +30,26 @@ type ContractUploadModalProps = {
   study: Study;
   onClose: () => void;
   onSuccess: () => void;
-  editingContract?: Contract | null;
+  editingContract?: Contract;
 };
 
+const validMimeTypes = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/png",
+];
+
 export default function ContractUploadModal({ study, onClose, onSuccess, editingContract }: ContractUploadModalProps) {
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<Array<File>>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadSuccess, setSuccess] = useState(false);
   const [studyAssets, setStudyAssets] = useState<Asset[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentContract, setCurrentContract] = useState<Contract | null>(editingContract ?? null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,9 +79,12 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   });
 
   useEffect(() => {
+    setCurrentContract(editingContract ?? null);
+
     // populate form with existing data when editing
     if (editingContract) {
       reset({
+        title: editingContract.title,
         organisationSignatory: editingContract.organisation_signatory,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
@@ -110,41 +123,53 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   }, [editingContract, reset, study.id]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    if (!event.target.files) {
+      setUploadFiles([]);
+      return;
+    }
+
     setError(null);
-    setUploadSuccess(false);
+    setSuccess(false);
 
-    if (!file) {
-      setUploadFile(null);
+    let filesError: undefined | string = undefined;
+    Array.from(event.target.files).forEach((file) => {
+      if (!file) {
+        filesError = "File was nil";
+        return;
+      }
+
+      if (!validMimeTypes.includes(file.type)) {
+        filesError = `File format must be one of ${validMimeTypes}.`;
+        return;
+      }
+
+      if (file.size > 1e7) {
+        filesError = "File size must be less than 10MB.";
+        return;
+      }
+    });
+
+    if (filesError) {
+      setUploadFiles([]);
+      setError(filesError);
       return;
     }
 
-    if (file.type !== "application/pdf") {
-      setError("File format must be PDF.");
-      setUploadFile(null);
-      return;
-    }
-
-    if (file.size > 1e7) {
-      setError("File size must be less than 10MB.");
-      setUploadFile(null);
-      return;
-    }
-
-    setUploadFile(file);
+    setUploadFiles(Array.from(event.target.files));
   };
 
   const onSubmit = async (formData: ContractFormData) => {
     // For upload mode, file is required
-    if (!editingContract && !uploadFile) {
-      setError("Please select a PDF file before uploading.");
+    if (!editingContract && uploadFiles.length === 0) {
+      setError("Please select a file before submitting.");
       return;
     }
     setUploading(true);
     setIsSubmitting(true);
     setError(null);
 
-    const contractData: ContractUpdate | ContractUploadObject = {
+    const body: ContractBase = {
+      title: formData.title,
       organisation_signatory: formData.organisationSignatory,
       third_party_name: formData.thirdPartyName,
       status: formData.status,
@@ -155,44 +180,54 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
     let response;
     try {
-      if (editingContract) {
-        // Update existing contract
-        const contractUpdateData: ContractUpdate = {
-          ...contractData,
-          file: uploadFile || undefined,
-        };
-
+      if (currentContract) {
         response = await putStudiesByStudyIdContractsByContractId({
           path: {
             studyId: study.id,
-            contractId: editingContract.id,
+            contractId: currentContract.id,
           },
-          body: contractUpdateData,
+          body: body,
         });
       } else {
         // Upload new contract
-        const contractUploadData: ContractUploadObject = {
-          ...contractData,
-          file: uploadFile!,
-        };
-
-        response = await postStudiesByStudyIdContractsUpload({
+        response = await postStudiesByStudyIdContracts({
           path: {
             studyId: study.id,
           },
-          body: contractUploadData,
+          body: body,
         });
+      }
+
+      if (!response.response.ok || !response.data) {
+        const errorMsg = extractErrorMessage(response);
+        setError(errorMsg);
+        setSuccess(false);
+        return;
+      }
+      const contractId = response.data.id;
+      setCurrentContract(response.data);
+
+      while (uploadFiles.length > 0) {
+        const file = uploadFiles.pop()!;
+        response = await postStudiesByStudyIdContractsByContractIdObjects({
+          path: {
+            studyId: study.id,
+            contractId: contractId,
+          },
+          body: { file },
+        });
+        if (!response.response.ok) break;
       }
 
       if (!response.response.ok) {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
-        setUploadSuccess(false);
+        setSuccess(false);
         return;
       }
 
-      setUploadSuccess(true);
-      setUploadFile(null);
+      setSuccess(true);
+      setUploadFiles([]);
       reset();
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -201,7 +236,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     } catch (error) {
       console.error(editingContract ? "Update failed:" : "Upload failed:", error);
       setError("Error: " + String((error as Error).message));
-      setUploadSuccess(false);
+      setSuccess(false);
     } finally {
       setUploading(false);
       setIsSubmitting(false);
@@ -209,9 +244,9 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   };
 
   const clearFile = () => {
-    setUploadFile(null);
+    setUploadFiles([]);
     setError(null);
-    setUploadSuccess(false);
+    setSuccess(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -219,9 +254,9 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   const handleClose = () => {
     reset();
-    setUploadFile(null);
+    setUploadFiles([]);
     setError(null);
-    setUploadSuccess(false);
+    setSuccess(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -233,62 +268,27 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       <h2>{editingContract ? "Edit Contract" : "Upload Contract"}</h2>
       <p className={styles.description}>
         {editingContract
-          ? "Edit the contract details below. You can optionally upload a new PDF file to replace the existing one."
-          : "Upload a PDF contract document for this asset. Only PDF files up to 10MB are accepted."}
+          ? "Edit the contract details below. You can optionally upload new files to replace the existing one."
+          : "Add contract details and files below."}
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="form">
-        <div className={styles["upload-section"]}>
-          <div className={styles["file-input"]}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,application/pdf"
-              onChange={handleFileSelect}
-              className={styles["hidden-input"]}
-              id="contract-file-input"
-            />
-            <Label htmlFor="contract-file-input" className={styles["file-label"]}>
-              <div className={styles["upload-icon"]}>📄</div>
-              <span>{editingContract ? "Choose new PDF file (optional)" : "Choose PDF file or drag and drop"}</span>
-            </Label>
-          </div>
-
-          {uploadFile && (
-            <div className={styles["selected-file"]}>
-              <div className={styles["file-info"]}>
-                <span className={styles["file-name"]}>{uploadFile.name}</span>
-              </div>
-              <Button onClick={clearFile} size="small" variant="tertiary">
-                Remove
-              </Button>
-            </div>
-          )}
-
-          {/* Show current file when editing */}
-          {editingContract && !uploadFile && (
-            <div className={styles["current-file"]}>
-              <div className={styles["file-info"]}>
-                <span className={styles["file-name"]}>Current file: {editingContract.filename}</span>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <Alert type="error">
-              <AlertMessage>{error}</AlertMessage>
-            </Alert>
-          )}
-
-          {uploadSuccess && (
-            <div className={styles.success}>
-              {editingContract ? "Contract updated successfully!" : "Contract uploaded successfully!"}
-            </div>
-          )}
-        </div>
-
         <div className={styles["form-section"]}>
-          <h4>Contract Details</h4>
+          <div className={styles["form-group"]}>
+            <Label htmlFor="title">Title *</Label>
+            <input
+              id="title"
+              type="text"
+              {...register("title", {
+                required: "Title is required",
+                minLength: { value: 2, message: "Title must be at least 2 characters" },
+                maxLength: { value: 100, message: "Title must be less than 100 characters" },
+              })}
+              className={styles["form-input"]}
+              placeholder="Title of the contract"
+            />
+            {errors.title && <span className={styles["form-error"]}>{errors.title.message}</span>}
+          </div>
 
           <div className={styles["form-group"]}>
             <Label htmlFor="organisationSignatory">{organisationName} Signatory *</Label>
@@ -425,12 +425,57 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
                 variant="secondary"
                 size="small"
                 aria-label="Add Asset"
+                cy="add-asset"
               >
                 Add Asset
               </Button>
             </fieldset>
             <HelperText>Optionally link this contract to one or more existing assets from this study</HelperText>
           </div>
+        </div>
+
+        <h3>Files</h3>
+
+        <div className={styles["upload-section"]}>
+          <div className={styles["file-input"]}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              onChange={handleFileSelect}
+              className={styles["hidden-input"]}
+              id="contract-file-input"
+              multiple
+            />
+            <Label htmlFor="contract-file-input" className={styles["file-label"]}>
+              <div className={styles["upload-icon"]}>📄</div>
+              <span>{editingContract ? "Choose new files (optional)" : "Choose files or drag and drop"}</span>
+            </Label>
+          </div>
+          <HelperText>Only PDF, Word, PNG, and JPEG files up to 10MB are accepted.</HelperText>
+
+          {uploadFiles.map((file, index) => (
+            <div key={index} className={styles["selected-file"]}>
+              <div className={styles["file-info"]}>
+                <span className={styles["file-name"]}>{file.name}</span>
+              </div>
+              <Button onClick={clearFile} size="small" variant="tertiary">
+                Remove
+              </Button>
+            </div>
+          ))}
+
+          {error && (
+            <Alert type="error">
+              <AlertMessage>{error}</AlertMessage>
+            </Alert>
+          )}
+
+          {uploadSuccess && (
+            <div className={styles.success}>
+              {editingContract ? "Contract updated successfully!" : "Contract uploaded successfully!"}
+            </div>
+          )}
         </div>
 
         <div className={styles.actions}>
