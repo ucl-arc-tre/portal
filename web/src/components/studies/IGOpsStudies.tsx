@@ -99,12 +99,7 @@ export default function IGOpsStudies() {
         <>
           <p>All studies in the system for visibility and oversight.</p>
           <div>
-            <Search
-              placeholder="Search Studies"
-              onSearch={(query) => handleSearch(query)}
-              id="study-search"
-              className="search"
-            />
+            <Search placeholder="Search Studies" onSearch={(query) => handleSearch(query)} id="study-search" />
             <HelperText>
               <small>
                 You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
