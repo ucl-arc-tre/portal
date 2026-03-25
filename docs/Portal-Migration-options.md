@@ -291,44 +291,44 @@ We should start here i.e. at Option 4, and moderate down the list of preferences
 ### What could go wrong?
 
 What could go wrong in Option 4 that wouldn't go wrong in Option 1, Option 2 or Option 3? 
-1. If the Portal's UserS functionality goes wrong in Option 4, then, on the assumption that we don't ship features until we're satisfied they are robust, the same thing would probably also go wrong in Options 1, 2 and 3. This could be:
-  - Major problems with the import such that some (random subset of) approved researchers are not recorded in the portal DB, so then don't show up in the people search or in the lookup when someone is trying to add them to a Project. **We can thoroughly test this.**
-  - Problems with adding external users in particular to the portal. This seems more likely since the process is lengthier and there is more room for things to go wrong i.e. invitations to Entra not being sent, or being sent but not accepted, or being sent and accepted but then not being discoverable, as in the point above. **We can thoroughly test this.**
+1. If the Portal's User functionality goes wrong in Option 4, then, on the assumption that we don't ship features until we're satisfied they are robust, the same thing would probably also go wrong in Options 1, 2 and 3. This could be:
+  - Major problems with the user import such that some (random subset of) approved researchers are not recorded in the Portal DB, so then don't show up in the people search or in the lookup when someone is trying to add them to a Project.
+  - Problems with adding external users to the Portal. This seems more likely since the process is lengthier and there is more room for things to go wrong i.e. invitations to Entra not being sent, or being sent but not accepted, or being sent and accepted but then not being discoverable, as in the point above.
 
-But whereas in Options 1, 2 and 3 this would be the sole set of problems to triage and fix, in Option 4 the Portal team could also be having to deal with Study and/or Project-related problems:
+But whereas in Options 1, 2 and 3 this would be the sole set of problems to triage and fix after the first phase, in Option 4 the Portal team could also be having to deal with Study and/or Project-related problems:
 
-2. Study problems. As with before, if the migration of Study management to the Portal goes wrong in Option 4, then it would probably also go wrong in Options 1, 2 and 3 - but in Option 4 other things could also be going wrong simultaneously, reducing the capacity of the team to fix the Study problems, which could be:
+2. Study problems. As with before, if the migration of Study management activities to the Portal goes wrong in Option 4, then it would probably also go wrong in Options 1, 2 and 3 - but in Option 4 other things could also be going wrong simultaneously, reducing the capacity of the team to fix the Study problems, which could be:
   - Studies being uneditable (i.e. the form to edit works but submission of it fails, perhaps due to validation issues)
   - Studies receiving the wrong status on import (we want Studies that are Approved in SP to retain their Approved Status, even if they would not pass muster if they were requested today) such that new Projects can't be created under the Study or existing ones effectively managed.
   - Studies not being visible to their owners at all (they may in fact exist in the DB, just not visible via the Study page - they may or may not still be visible to the Project form's Study lookup field)
 
-  **We can test all of this thoroughly.**
-
-3. Project problems. This is twofold, since projects need to be visible, editable, and creatable in the frontend by users, **and** the DSH environment team need to be able to GET and PATCH project records via API. As above, on the assumption that we don't ship features until we're satisfied they are robust, if any Project functionality breaks following an Option 4 "big bang" migration, be it in the frontend or backend, the same thing would probably also break in Options 1, 2 and 3. Possible problems include:
+3. Project problems. This is twofold, since projects need to be visible, editable, and creatable in the frontend by users, **and** the DSH environment team needs to be able to GET and PUT/PATCH/POST project records via API. As above, on the assumption that we don't ship features until we're satisfied they are robust, if any Project functionality breaks following an Option 4 "big bang" migration, be it in the frontend or backend, the same thing would probably also break in Options 1, 2 and 3. Possible problems include:
   - Project forms not being able to lookup eligible Studies and Users (Approved Researchers).
   - Project request/updates made in the Portal do not successfully create validated MyServices tickets in the DSH or TRE Ops teams' inboxes.
-  - The DSH POST endpoints or the portal frontend fail in some way such that accurate project data from the daily updates from the DSH are not displayed in the Portal
+  - The DSH POST endpoints or the portal frontend fail in some way such that accurate project data from the daily updates from the DSH are not displayed in the Portal.
+
+All of these problems should be exposed through thorough testing, but it would require a lot of resource being dedicated to robust testing.
 
 ### Why not do a Blue/Green deployment?
 
 A Blue/Green deployment is not viable on account of:
-- Incompatible database systems
+- Incompatible database systems:
   - The existing system relies on SharePoint lists, whereas the new system uses PostgreSQL.
   - Blue/green deployment assumes that the new version can operate alongside the old version using the same production data and database, enabling instant traffic switching. In this case, the old environment cannot communicate with Postgres, nor can the new environment interact with SharePoint lists, making instantaneous switching impossible.
-- Different application stacks and architectures
-  - Blue/green deployment requires “identical” environments, where all infrastructure, configuration, and external dependencies etc. are the same, and only the application code differs. This condition is not met here: the environments are not interchangeable, and the new application cannot simply replace the old one without data migration and user adaptation.
+- Different application stacks and architectures:
+  - Blue/green deployment requires “identical” environments, where all infrastructure, configuration, and external dependencies etc. are the same, and only the application code version differs. This condition is not met here: the environments are not interchangeable, and the new application cannot simply replace the old one without data migration and user adaptation.
 
 ### Why not do a Canary deployment?
 
-A Canary deployment, whilst certainly more viable than Blue/Green, would involve:
+A Canary deployment involves:
 - Migrating the Study data of small groups of users at a time
 - Making these groups' existing SharePoint records read-only the moment they have access to the Portal
 - Exposing the Portal to a this subset of users
 - Monitoring behavior, fixing any issues, then expanding gradually to the next group
 
-Options 1, 2 and 3 involve this to an extent (insofar as they each suggest using the ARC TRE's users as early pilot users (Canaries) for the Portal)
+Options 1, and 2 involve this to an extent (insofar as they each suggest using the ARC TRE's users as early pilot users (Canaries) for the Portal), and Option 3 is an outright Canary deployment.
 
-What is intensive/difficult (at scale) about this approach is revoking edit access to these users' existing SP records (i.e. making their existing records read-only). Obviously we do not want to allow users to edit ostensibly the same data in two places, so the Study-level SharePoint groups which govern access to SharePoint records will have to be emptied (once a copy has been made of the full set of group membership at the point of switchover). Any rollback plan under this approach will necessitate manually adding all members back into these SharePoint groups. Furthermore, once users begin writing data to the Portal DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible.
+What is intensive/difficult (at scale) about this type of approach is revoking edit access to the Canary users' existing SP records (i.e. making their existing records read-only). Obviously we do not want to allow users to edit User or Study data in two places, so the Study-level SharePoint groups which govern access to these records will need to be emptied (once a copy has been made of the full set of group membership at the point of switchover). Any rollback plan under this approach will necessitate manually adding all members back into these SharePoint groups. Furthermore, once users begin writing data to the Portal DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible.
 
 > [!NOTE] 
 > For all options, regarding rollback:
