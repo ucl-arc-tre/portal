@@ -4,8 +4,8 @@ beforeEach(() => {
 });
 
 describe("Study creation end-to-end", () => {
-  const studyTitle = "study-1774279678708"; // todo `study-${Date.now()}`;
-  const contractTitle = "contract-1774279678708"; // todo `contract-${Date.now()}`;
+  const studyTitle = `study-${Date.now()}`;
+  const contractTitle = `contract-${Date.now()}`;
 
   it("staff should become an approved researcher", () => {
     cy.loginAsStaff();
