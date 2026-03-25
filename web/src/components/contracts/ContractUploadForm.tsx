@@ -30,7 +30,7 @@ type ContractUploadModalProps = {
   study: Study;
   onClose: () => void;
   onSuccess: () => void;
-  editingContract?: Contract | null;
+  editingContract?: Contract;
 };
 
 const validMimeTypes = [

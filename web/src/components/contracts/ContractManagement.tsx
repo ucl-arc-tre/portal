@@ -80,7 +80,6 @@ export default function ContractManagement(props: ContractManagementProps) {
             setShowUploadModal(false);
           }}
           onSuccess={handleUploadSuccess}
-          editingContract={null}
         />
       )}
     </Box>
