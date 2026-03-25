@@ -16,10 +16,3 @@
     padding: 2rem 1rem;
   }
 }
-
-.search {
-  input:focus-visible {
-    outline: var(--form-blue--shadow);
-    box-shadow: 0px 0px 0px 2px var(--form-blue--shadow);
-  }
-}
