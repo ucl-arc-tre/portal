@@ -340,6 +340,8 @@ Developer-time is a constrained resource in the Portal team, and in particular, 
 
 As a result of these constraints, Option 3 (TRE users/studies migrated first) appears to be the best option. It allows us to roll out the new Portal's Study and Project management features to a smaller subset of users, which limits the blast radius of any catastrophic downtime, but also allows for more effective management of what's most likely to be a modest stream of bug reports/requests for help that will come from this smaller group of users. Option 3 thus allows the Portal team to continue development of the DSH Project management functionality at a steady rate, whilst also tending to any necessary fixes in the Study and TRE Project management functionality.
 
+Option 3 also appears to effectively lower the risk of needing to rollback, which, as noted above, would be very suboptimal if it came to pass. 
+
 ### What questions still need answering?
 
 We still need to answer the question of how the TRE Rollout will happen: Studies, and then Projects, or Studies and Projects together? And furthermore, after the TRE Rollout complete and stable, how will the DSH Rollout happen: in one big bang, or phased: and if phased, in how many phases?
