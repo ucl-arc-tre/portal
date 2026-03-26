@@ -44,6 +44,7 @@ type Study struct {
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`
 	Assets      []Asset      `gorm:"foreignKey:StudyID"`
 	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
+	Contracts   []Contract   `gorm:"foreignKey:StudyID"`
 }
 
 // Queried via the DSH API

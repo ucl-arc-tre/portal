@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
+	"fmt"
 	"html/template"
 
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
@@ -132,13 +133,15 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string, days string, contract types.Contract) error {
+func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string, days int, contract types.Contract) error {
 
-	content := "Your contract" + contract.Filename + "in" + contract.Study.Title + " is due to expire in"
-	if days != "1" {
-		content += days + " or fewer. Please sign in to the Portal to upload a new contract. "
-	} else {
+	content := "You have a contract in the Study" + contract.Study.Title + " that is due to expire within"
+	if days != 1 && days > 0 {
+		content += fmt.Sprint(rune(days)) + " days. Please sign in to the Portal to upload a new contract. "
+	} else if days == 1 {
 		content += " the next 24 hours. Please sign in to the Portal to upload a new contract."
+	} else {
+		content = "You have a contract in the Study" + contract.Study.Title + " that has expired. Please sign in to the Portal to upload a new contract."
 	}
 
 	notificationMsg := "Notification: Your contract in" + contract.Study.Title + " is due to expire soon"

@@ -2,42 +2,56 @@ package tasks
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (m *Manager) checkContractsExpiryDaily() error {
-	// RM: every day, check time left on contract expiry, send notification at 30 days, 14 days, 7 days and 1 day
-
+func (m *Manager) checkContractsExpiry() error {
 	ctx := context.Background()
 
-	contracts := []types.Contract{}
-	result := m.db.Model(&types.Contract{}).Find(&contracts)
+	studies := []types.Study{}
+	result := m.db.Model(&types.Study{}).Preload("Contracts").Find(&studies)
 	if result.Error != nil {
-		return types.NewErrFromGorm(result.Error, "failed to get contracts")
+		return types.NewErrFromGorm(result.Error, "failed to get studies")
 	}
 
-	for _, contract := range contracts {
-		daysUntilExpiry := int(time.Until(contract.ExpiryDate).Hours() / 24)
+	for _, study := range studies {
 
-		if daysUntilExpiry == 30 || daysUntilExpiry == 14 || daysUntilExpiry == 7 || daysUntilExpiry == 1 {
-			// send notification to IAO + IAA
+		recipients := []string{string(study.Owner.Username)}
+		for _, studyAdmin := range study.StudyAdmins {
+			recipients = append(recipients, string(studyAdmin.User.Username))
+		}
 
-			recipients := []string{string(contract.Study.Owner.Username)}
-			for _, studyAdmin := range contract.Study.StudyAdmins {
-				recipients = append(recipients, string(studyAdmin.User.Username))
-			}
+		for _, contract := range study.Contracts {
+			daysUntilExpiry := int(time.Until(contract.ExpiryDate).Hours() / 24)
 
-			if err := m.entra.SendExpiryNotification(ctx, recipients, fmt.Sprint(rune(daysUntilExpiry)), contract); err != nil {
-				return err
+			if daysUntilExpiry < 0 {
+				err := m.entra.SendExpiryNotification(ctx, recipients, daysUntilExpiry, contract)
+				if err != nil {
+					return err
+				}
+				return nil
+			} else if daysUntilExpiry == 1 {
+				err := m.entra.SendExpiryNotification(ctx, recipients, daysUntilExpiry, contract)
+				if err != nil {
+					return err
+				}
+				return nil
+			} else if daysUntilExpiry == 30 || daysUntilExpiry == 14 || daysUntilExpiry == 7 {
+
+				err := m.entra.SendExpiryNotification(ctx, recipients, daysUntilExpiry, contract)
+				if err != nil {
+					return err
+				}
+				return nil
 			}
 		}
 	}
+
 	return nil
 }
 
 func (m *Manager) DailyChecks() {
-	m.mustEvery(time.Hour*24, m.checkContractsExpiryDaily, "checkContractsExpiryDaily")
+	m.mustEvery(time.Minute*1440, m.checkContractsExpiry, "checkContractsExpiry")
 }
