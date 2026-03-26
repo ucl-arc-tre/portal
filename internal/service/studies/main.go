@@ -323,12 +323,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 		return err
 	}
 
-	// Commit the transaction
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit create study transaction")
-	}
-
-	return nil
+	return commitTransaction(tx)
 }
 
 func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
@@ -372,11 +367,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit update study transaction")
-	}
-
-	return nil
+	return commitTransaction(tx)
 }
 
 func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uuid.UUID, review openapi.StudyReview) error {
