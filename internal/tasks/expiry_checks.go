@@ -24,7 +24,7 @@ func (m *Manager) checkContractsExpiry() error {
 		}
 
 		contract := study.EarliestExpringContract()
-		err := m.entra.SendExpiryNotification(ctx, recipients, contract)
+		err := m.entra.SendExpiryNotification(ctx, recipients, *contract)
 		if err != nil {
 			return err
 		}
