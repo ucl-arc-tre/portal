@@ -122,26 +122,36 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="delete-contract-button"]').click();
   });
 
-  it("ig ops should be able to approve a study", () => {
+  it("ig ops should be able to search for a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
-    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
-    cy.get('[data-cy="study-approve-button"]').click();
-  });
+    cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
+    cy.contains(studyTitle).should("exist");
+    cy.get("[data-cy='study-card']").should("have.length", 1);
 
-  it("staff should see an approved study", () => {
-    cy.loginAsStaff();
+    it("ig ops should be able to approve a study", () => {
+      cy.loginAsIGOps();
+      cy.visit("/studies");
+      cy.get('[data-cy="all-studies-tab-button"]').click();
+      cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+      cy.get('[data-cy="study-approve-button"]').click();
+    });
 
-    cy.visit("/studies");
-    cy.contains(studyTitle).parent().parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
+    it("staff should see an approved study", () => {
+      cy.loginAsStaff();
 
-    cy.contains(studyTitle)
-      .parent()
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="manage-study-button"]').click();
-      });
-    cy.contains("Last signed off").should("exist");
+      cy.visit("/studies");
+      cy.contains(studyTitle).parent().parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
+
+      cy.contains(studyTitle)
+        .parent()
+        .parent()
+        .within(() => {
+          cy.get('[data-cy="manage-study-button"]').click();
+        });
+      cy.contains("Last signed off").should("exist");
+    });
   });
 });
