@@ -20,6 +20,11 @@ type ClientInterface interface {
 		input *awsS3.GetObjectInput,
 		optFns ...func(*awsS3.Options),
 	) (*awsS3.GetObjectOutput, error)
+	DeleteObject(
+		ctx context.Context,
+		input *awsS3.DeleteObjectInput,
+		optFns ...func(*awsS3.Options),
+	) (*awsS3.DeleteObjectOutput, error)
 }
 
 type Controller struct {
@@ -80,6 +85,18 @@ func (c *Controller) GetObject(ctx context.Context, metadata ObjectMetadata) (ty
 		NumBytes: output.ContentLength,
 	}
 	return object, nil
+}
+
+func (c *Controller) DeleteObject(metadata ObjectMetadata) error {
+	log.Debug().Any("metadata", metadata).Msg("Deleting S3 object")
+	_, err := c.client.DeleteObject(context.Background(), &awsS3.DeleteObjectInput{
+		Bucket: aws.String(config.S3BucketName()),
+		Key:    aws.String(metadata.Key()),
+	})
+	if err != nil {
+		return types.NewErrServerError(err)
+	}
+	return nil
 }
 
 func makeResolver() awsS3.EndpointResolverV2 {

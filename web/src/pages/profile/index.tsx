@@ -1,89 +1,17 @@
-import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getProfileAgreements, getProfileTraining } from "@/openapi";
 import MetaHead from "@/components/meta/Head";
-import ProfileSetup from "@/components/profile/ProfileSetup";
+import Profile from "@/components/profile/Profile";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
-import Loading from "@/components/ui/Loading";
-import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard";
-import styles from "./ProfilePage.module.css";
 import DSHTokens from "@/components/profile/DSHTokens";
-import { calculateExpiryUrgency } from "@/components/shared/exports";
 
 export default function ProfilePage() {
   const { authInProgress, isAuthed, userData, refreshAuth } = useAuth();
-  const [chosenName, setChosenName] = useState<string | undefined>(undefined);
-  const [agreementCompleted, setAgreementCompleted] = useState(false);
-  const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(false);
-  const [expiryUrgency, setExpiryUrgency] = useState<ExpiryUrgency | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const canSeeDSHTokens = userData?.roles.includes("dsh-ops-staff") || userData?.roles.includes("admin");
-
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      setIsLoading(true);
-
-      try {
-        const [profileResponse, agreementsResponse, trainingResponse] = await Promise.all([
-          getProfile(),
-          getProfileAgreements(),
-          getProfileTraining(),
-        ]);
-
-        if (profileResponse.response.ok && profileResponse.data?.chosen_name) {
-          setChosenName(profileResponse.data.chosen_name);
-        } else {
-          setChosenName("");
-        }
-
-        if (agreementsResponse.response.ok && agreementsResponse.data) {
-          const confirmedAgreements = agreementsResponse.data.confirmed_agreements;
-          setAgreementCompleted(
-            confirmedAgreements.some((agreement) => agreement.agreement_type === "approved-researcher")
-          );
-        }
-
-        if (trainingResponse.response.ok && trainingResponse.data) {
-          const nhsdTraining = trainingResponse.data.training_records.find(
-            (record) => record.kind === "training_kind_nhsd"
-          );
-          setTrainingCertificateCompleted(nhsdTraining?.is_valid || false);
-          if (nhsdTraining?.is_valid) {
-            const completedDate = new Date(nhsdTraining.completed_at!);
-            // training valid for a year from completion
-            const expiryDate = new Date(completedDate);
-            expiryDate.setFullYear(completedDate.getFullYear() + 1);
-            setExpiryUrgency(calculateExpiryUrgency(expiryDate));
-          } else {
-            // if training not valid (has expired)
-            setExpiryUrgency({ level: "critical" });
-          }
-        }
-      } catch (error) {
-        console.error("Failed to get profile data:", error);
-        setChosenName("");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (isAuthed) {
-      fetchProfileData();
-    }
-  }, [isAuthed, trainingCertificateCompleted]);
 
   if (authInProgress) return null;
 
-  if (!isAuthed && !authInProgress) return <LoginFallback />;
-
-  if (isLoading) {
-    return (
-      <>
-        <Title text={"Profile Setup"} centered />
-        <Loading message="Loading your profile..." />
-      </>
-    );
-  }
+  if (!isAuthed) return <LoginFallback />;
 
   return (
     <>
@@ -93,22 +21,9 @@ export default function ProfilePage() {
       />
 
       <div className="content">
-        <Title text={"Profile Setup"} centered />
-        <div className={styles["profile-content-container"]}>
-          <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
+        <Title text={"Profile"} centered />
 
-          <ProfileSetup
-            chosenName={chosenName}
-            setChosenName={setChosenName}
-            agreementCompleted={agreementCompleted}
-            setAgreementCompleted={setAgreementCompleted}
-            trainingCertificateCompleted={trainingCertificateCompleted}
-            setTrainingCertificateCompleted={setTrainingCertificateCompleted}
-            userData={userData}
-            expiryUrgency={expiryUrgency}
-            refreshAuth={refreshAuth}
-          />
-        </div>
+        <Profile userData={userData} refreshAuth={refreshAuth} />
 
         {canSeeDSHTokens && <DSHTokens />}
       </div>

@@ -166,8 +166,8 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    // Should show completion message instead of steps
-    cy.contains("Profile Complete").should("be.visible");
+    // Should show summary view, not setup steps
+    cy.get("[aria-label='Profile setup progress']").should("not.exist");
 
     // Should have the option to upload another certificate
     cy.contains("Verify another certificate").should("be.visible");
@@ -211,7 +211,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    cy.contains("Your certificate is expiring soon!").should("be.visible").should("have.class", "expiry-urgency--low");
+    cy.contains("Your training certificate is expiring soon").should("be.visible");
   });
 
   it("should show message when expired", () => {
@@ -226,7 +226,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    cy.contains("Your certificate has expired").should("be.visible").should("have.class", "expiry-urgency--critical");
+    cy.contains("Your training certificate has expired").should("be.visible");
   });
 
   it("should show medium urgency when training has more than 30 days left but fewer than 60", () => {
@@ -241,9 +241,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    cy.contains("Your certificate is expiring soon!")
-      .should("be.visible")
-      .should("have.class", "expiry-urgency--medium");
+    cy.contains("Your training certificate is expiring soon").should("be.visible");
   });
 
   it("should show high urgency when training has fewer than 30 days left", () => {
@@ -257,7 +255,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForAuth();
     cy.waitForProfileData();
 
-    cy.contains("Your certificate is expiring soon!").should("be.visible").should("have.class", "expiry-urgency--high");
+    cy.contains("Your training certificate is expiring soon").should("be.visible");
   });
 
   it("approved researcher agreement can be agreed to", () => {

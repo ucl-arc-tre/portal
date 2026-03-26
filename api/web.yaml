@@ -221,12 +221,7 @@ paths:
   /users/{userId}/training:
     post:
       parameters:
-        - in: path
-          name: userId
-          required: true
-          description: ID of the user to be updated
-          schema:
-            type: string
+        - $ref: "#/components/parameters/UserIdParam"
       requestBody:
         required: true
         content:
@@ -253,12 +248,7 @@ paths:
     put:
       description: Update a user's attributes (admin only)
       parameters:
-        - in: path
-          name: userId
-          required: true
-          description: ID of the user to update
-          schema:
-            type: string
+        - $ref: "#/components/parameters/UserIdParam"
       requestBody:
         required: true
         content:
@@ -341,14 +331,42 @@ paths:
   # Study Management
   /studies:
     get:
-      description: Get all studies accessible to the current user
+      description: Get all studies accessible to the current user. Filtering is admin only
       parameters:
         - in: query
           name: status
+          description: get studies by status
+          required: false
           schema:
             $ref: "#/components/schemas/ApprovalStatus"
+        - in: query
+          name: query
           required: false
-          description: get studies by status
+          description: |
+            Flexible search query. Depending on the structure it will either search:
+              - caseref: If <= 5 digit number, with optional leading zeros
+              - study owner email/username: If the query contains an @
+              - partial study name: If none of the above
+          schema:
+            type: string
+        - in: query
+          name: caseref
+          required: false
+          description: Study caseref
+          schema:
+            type: integer
+        - in: query
+          name: fuzzy_title
+          required: false
+          description: Fuzzy title to match on
+          schema:
+            type: string
+        - in: query
+          name: owner_username
+          required: false
+          description: Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+          schema:
+            type: string
       responses:
         "200":
           content:
@@ -393,12 +411,7 @@ paths:
     get:
       description: Get details of a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           content:
@@ -450,12 +463,7 @@ paths:
     post:
       description: Update study status + opportunity to update feedback
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
@@ -478,12 +486,7 @@ paths:
     patch:
       description: Update study status to pending
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "201":
           description: Study review submitted successfully
@@ -492,7 +495,7 @@ paths:
         "404":
           description: Study not found
 
-    # Environments
+  # Environments
   /environments:
     get:
       description: Get all available environments with their tier mappings
@@ -578,12 +581,7 @@ paths:
     get:
       description: Get one TRE project with base project details joined in
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "200":
           content:
@@ -655,12 +653,7 @@ paths:
     patch:
       description: Submit a TRE project for review (changes status from Incomplete to Pending)
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "200":
           description: Project submitted successfully
@@ -677,12 +670,7 @@ paths:
     post:
       description: Approve a TRE project (admin/TRE ops staff only)
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "200":
           description: Project approved successfully
@@ -700,12 +688,7 @@ paths:
     get:
       description: Get all assets for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           content:
@@ -761,18 +744,8 @@ paths:
     get:
       description: Get details of a specific asset within a study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
-        - in: path
-          name: assetId
-          required: true
-          description: ID of the asset
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
       responses:
         "200":
           content:
@@ -792,18 +765,8 @@ paths:
     get:
       description: Get contracts associated with a specific asset within a study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
-        - in: path
-          name: assetId
-          required: true
-          description: ID of the asset
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
       responses:
         "200":
           content:
@@ -835,12 +798,7 @@ paths:
     get:
       description: Get all agreements signed for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           content:
@@ -888,11 +846,7 @@ paths:
     get:
       description: Get all contracts for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       responses:
         "200":
           description: List of contracts for the study
@@ -910,25 +864,23 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-
-  /studies/{studyId}/contracts/upload:
     post:
-      description: Upload a contract object e.g. PDF
+      description: Create a contract
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ContractUploadObject"
+              $ref: "#/components/schemas/ContractBase"
       responses:
-        "204":
+        "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
         "400":
           description: Validation error
           content:
@@ -943,25 +895,30 @@ paths:
           description: Unexpected error
 
   /studies/{studyId}/contracts/{contractId}:
-    put:
-      description: Update contract metadata and optionally replace file
+    get:
+      description: Get a contract
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contract"
+
+    put:
+      description: Update contract metadata
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ContractUpdate"
+              $ref: "#/components/schemas/ContractBase"
       responses:
         "200":
           description: Contract updated successfully
@@ -984,20 +941,39 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/{studyId}/contracts/{contractId}/download:
+  /studies/{studyId}/contracts/{contractId}/objects:
+    post:
+      description: Upload a contract object e.g. PDF
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ContractObject"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContractObjectMetadata"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /studies/{studyId}/contracts/{contractId}/objects/{contractObjectId}:
     get:
       description: Get a contract object e.g. PDF
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: contractId
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+        - $ref: "#/components/parameters/ContractObjectIdParam"
       responses:
         "200":
           description: OK
@@ -1012,8 +988,67 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    delete:
+      description: Delete a contract object e.g. PDF
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+        - $ref: "#/components/parameters/ContractObjectIdParam"
+      responses:
+        "204":
+          description: OK
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
 components:
+  parameters:
+    UserIdParam:
+      name: userId
+      in: path
+      required: true
+      description: User UUID
+      schema:
+        type: string
+    StudyIdParam:
+      in: path
+      name: studyId
+      required: true
+      description: Study UUID
+      schema:
+        type: string
+    ProjectIdParam:
+      in: path
+      name: projectId
+      required: true
+      description: Project UUID
+      schema:
+        type: string
+    AssetIdParam:
+      in: path
+      name: assetId
+      required: true
+      description: Asset UUID
+      schema:
+        type: string
+    ContractIdParam:
+      in: path
+      name: contractId
+      required: true
+      description: Contract UUID
+      schema:
+        type: string
+    ContractObjectIdParam:
+      in: path
+      name: contractObjectId
+      required: true
+      description: Contract object UUID
+      schema:
+        type: string
+
   schemas:
     Auth:
       type: object
@@ -1712,6 +1747,7 @@ components:
     ContractBase:
       type: object
       required:
+        - title
         - organisation_signatory
         - third_party_name
         - status
@@ -1719,6 +1755,9 @@ components:
         - expiry_date
         - asset_ids
       properties:
+        title:
+          type: string
+          description: Name of the contract
         organisation_signatory:
           type: string
           description: Name of the organisation signatory
@@ -1743,45 +1782,21 @@ components:
           items:
             type: string
 
-    ContractUploadObject:
-      allOf:
-        - $ref: "#/components/schemas/ContractBase"
-        - type: object
-          required:
-            - file
-          properties:
-            file:
-              type: string
-              format: binary
-              description: The contract file to upload (e.g., PDF)
-
-    ContractUpdate:
-      allOf:
-        - $ref: "#/components/schemas/ContractBase"
-        - type: object
-          properties:
-            file:
-              type: string
-              format: binary
-              description: Optional new contract file to replace the existing one
-
     Contract:
+      description: A contract associated with a study
       allOf:
         - $ref: "#/components/schemas/ContractBase"
         - type: object
           required:
             - id
-            - filename
             - created_at
             - updated_at
             - study_id
+            - objects_metadata
           properties:
             id:
               type: string
               description: Unique identifier for the contract
-            filename:
-              type: string
-              description: Original filename of the uploaded contract
             created_at:
               type: string
               description: Time in RFC3339 format when the contract was created
@@ -1791,8 +1806,36 @@ components:
             study_id:
               type: string
               description: Unique identifier of the study to which the contract belongs
+            objects_metadata:
+              type: array
+              items:
+                $ref: "#/components/schemas/ContractObjectMetadata"
 
-      description: A contract associated with a study
+    ContractObject:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The contract file to upload (e.g., PDF)
+
+    ContractObjectMetadata:
+      type: object
+      required:
+        - id
+        - filename
+        - created_at
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the contract metadata object
+        filename:
+          type: string
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the contract was created
 
     TokenRequest:
       type: object
@@ -1819,7 +1862,6 @@ components:
         expires_at:
           type: string
           description: Time in RFC3339 at which the token expires
-
     TokenWithValue:
       allOf:
         - $ref: "#/components/schemas/Token"

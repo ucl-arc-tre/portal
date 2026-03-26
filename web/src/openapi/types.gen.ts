@@ -532,6 +532,10 @@ export type ProjectTre = {
 
 export type ContractBase = {
     /**
+     * Name of the contract
+     */
+    title: string;
+    /**
      * Name of the organisation signatory
      */
     organisation_signatory: string;
@@ -557,20 +561,6 @@ export type ContractBase = {
     asset_ids: Array<string>;
 };
 
-export type ContractUploadObject = ContractBase & {
-    /**
-     * The contract file to upload (e.g., PDF)
-     */
-    file: Blob | File;
-};
-
-export type ContractUpdate = ContractBase & {
-    /**
-     * Optional new contract file to replace the existing one
-     */
-    file?: Blob | File;
-};
-
 /**
  * A contract associated with a study
  */
@@ -579,10 +569,6 @@ export type Contract = ContractBase & {
      * Unique identifier for the contract
      */
     id: string;
-    /**
-     * Original filename of the uploaded contract
-     */
-    filename: string;
     /**
      * Time in RFC3339 format when the contract was created
      */
@@ -595,6 +581,26 @@ export type Contract = ContractBase & {
      * Unique identifier of the study to which the contract belongs
      */
     study_id: string;
+    objects_metadata: Array<ContractObjectMetadata>;
+};
+
+export type ContractObject = {
+    /**
+     * The contract file to upload (e.g., PDF)
+     */
+    file: Blob | File;
+};
+
+export type ContractObjectMetadata = {
+    /**
+     * Unique identifier for the contract metadata object
+     */
+    id: string;
+    filename: string;
+    /**
+     * Time in RFC3339 format when the contract was created
+     */
+    created_at: string;
 };
 
 export type TokenRequest = {
@@ -614,6 +620,36 @@ export type Token = {
 export type TokenWithValue = Token & {
     value: string;
 };
+
+/**
+ * User UUID
+ */
+export type UserIdParam = string;
+
+/**
+ * Study UUID
+ */
+export type StudyIdParam = string;
+
+/**
+ * Project UUID
+ */
+export type ProjectIdParam = string;
+
+/**
+ * Asset UUID
+ */
+export type AssetIdParam = string;
+
+/**
+ * Contract UUID
+ */
+export type ContractIdParam = string;
+
+/**
+ * Contract object UUID
+ */
+export type ContractObjectIdParam = string;
 
 export type GetAuthData = {
     body?: never;
@@ -939,7 +975,7 @@ export type PostUsersByUserIdTrainingData = {
     body: UserTrainingUpdate;
     path: {
         /**
-         * ID of the user to be updated
+         * User UUID
          */
         userId: string;
     };
@@ -981,7 +1017,7 @@ export type PutUsersByUserIdAttributesData = {
     };
     path: {
         /**
-         * ID of the user to update
+         * User UUID
          */
         userId: string;
     };
@@ -1097,6 +1133,26 @@ export type GetStudiesData = {
          * get studies by status
          */
         status?: ApprovalStatus;
+        /**
+         * Flexible search query. Depending on the structure it will either search:
+         * - caseref: If <= 5 digit number, with optional leading zeros
+         * - study owner email/username: If the query contains an @
+         * - partial study name: If none of the above
+         *
+         */
+        query?: string;
+        /**
+         * Study caseref
+         */
+        caseref?: number;
+        /**
+         * Fuzzy title to match on
+         */
+        fuzzy_title?: string;
+        /**
+         * Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+         */
+        owner_username?: string;
     };
     url: '/studies';
 };
@@ -1165,7 +1221,7 @@ export type GetStudiesByStudyIdData = {
     body?: never;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };
@@ -1246,7 +1302,7 @@ export type PostStudiesAdminByStudyIdReviewData = {
     body: StudyReview;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };
@@ -1284,7 +1340,7 @@ export type PatchStudiesByStudyIdPendingData = {
     body?: never;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };
@@ -1471,7 +1527,7 @@ export type GetProjectsTreByProjectIdData = {
     body?: never;
     path: {
         /**
-         * ID of the TRE project
+         * Project UUID
          */
         projectId: string;
     };
@@ -1552,7 +1608,7 @@ export type PatchProjectsTreByProjectIdPendingData = {
     body?: never;
     path: {
         /**
-         * ID of the TRE project
+         * Project UUID
          */
         projectId: string;
     };
@@ -1590,7 +1646,7 @@ export type PostProjectsTreAdminByProjectIdApproveData = {
     body?: never;
     path: {
         /**
-         * ID of the TRE project
+         * Project UUID
          */
         projectId: string;
     };
@@ -1628,7 +1684,7 @@ export type GetStudiesByStudyIdAssetsData = {
     body?: never;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };
@@ -1707,11 +1763,11 @@ export type GetStudiesByStudyIdAssetsByAssetIdData = {
     body?: never;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
         /**
-         * ID of the asset
+         * Asset UUID
          */
         assetId: string;
     };
@@ -1748,11 +1804,11 @@ export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
     body?: never;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
         /**
-         * ID of the asset
+         * Asset UUID
          */
         assetId: string;
     };
@@ -1810,7 +1866,7 @@ export type GetStudiesByStudyIdAgreementsData = {
     body?: never;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };
@@ -1888,6 +1944,9 @@ export type PostStudiesByStudyIdAgreementsResponses = {
 export type GetStudiesByStudyIdContractsData = {
     body?: never;
     path: {
+        /**
+         * Study UUID
+         */
         studyId: string;
     };
     query?: never;
@@ -1922,16 +1981,19 @@ export type GetStudiesByStudyIdContractsResponses = {
 
 export type GetStudiesByStudyIdContractsResponse = GetStudiesByStudyIdContractsResponses[keyof GetStudiesByStudyIdContractsResponses];
 
-export type PostStudiesByStudyIdContractsUploadData = {
-    body: ContractUploadObject;
+export type PostStudiesByStudyIdContractsData = {
+    body: ContractBase;
     path: {
+        /**
+         * Study UUID
+         */
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/contracts/upload';
+    url: '/studies/{studyId}/contracts';
 };
 
-export type PostStudiesByStudyIdContractsUploadErrors = {
+export type PostStudiesByStudyIdContractsErrors = {
     /**
      * Validation error
      */
@@ -1950,21 +2012,52 @@ export type PostStudiesByStudyIdContractsUploadErrors = {
     default: unknown;
 };
 
-export type PostStudiesByStudyIdContractsUploadError = PostStudiesByStudyIdContractsUploadErrors[keyof PostStudiesByStudyIdContractsUploadErrors];
+export type PostStudiesByStudyIdContractsError = PostStudiesByStudyIdContractsErrors[keyof PostStudiesByStudyIdContractsErrors];
 
-export type PostStudiesByStudyIdContractsUploadResponses = {
+export type PostStudiesByStudyIdContractsResponses = {
     /**
      * OK
      */
-    204: void;
+    200: Contract;
 };
 
-export type PostStudiesByStudyIdContractsUploadResponse = PostStudiesByStudyIdContractsUploadResponses[keyof PostStudiesByStudyIdContractsUploadResponses];
+export type PostStudiesByStudyIdContractsResponse = PostStudiesByStudyIdContractsResponses[keyof PostStudiesByStudyIdContractsResponses];
+
+export type GetStudiesByStudyIdContractsByContractIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}';
+};
+
+export type GetStudiesByStudyIdContractsByContractIdResponses = {
+    /**
+     * OK
+     */
+    200: Contract;
+};
+
+export type GetStudiesByStudyIdContractsByContractIdResponse = GetStudiesByStudyIdContractsByContractIdResponses[keyof GetStudiesByStudyIdContractsByContractIdResponses];
 
 export type PutStudiesByStudyIdContractsByContractIdData = {
-    body: ContractUpdate;
+    body: ContractBase;
     path: {
+        /**
+         * Study UUID
+         */
         studyId: string;
+        /**
+         * Contract UUID
+         */
         contractId: string;
     };
     query?: never;
@@ -2005,17 +2098,23 @@ export type PutStudiesByStudyIdContractsByContractIdResponses = {
 
 export type PutStudiesByStudyIdContractsByContractIdResponse = PutStudiesByStudyIdContractsByContractIdResponses[keyof PutStudiesByStudyIdContractsByContractIdResponses];
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadData = {
-    body?: never;
+export type PostStudiesByStudyIdContractsByContractIdObjectsData = {
+    body: ContractObject;
     path: {
+        /**
+         * Study UUID
+         */
         studyId: string;
+        /**
+         * Contract UUID
+         */
         contractId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/contracts/{contractId}/download';
+    url: '/studies/{studyId}/contracts/{contractId}/objects';
 };
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadErrors = {
+export type PostStudiesByStudyIdContractsByContractIdObjectsErrors = {
     /**
      * Forbidden
      */
@@ -2030,11 +2129,99 @@ export type GetStudiesByStudyIdContractsByContractIdDownloadErrors = {
     default: unknown;
 };
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadResponses = {
+export type PostStudiesByStudyIdContractsByContractIdObjectsResponses = {
+    /**
+     * OK
+     */
+    200: ContractObjectMetadata;
+};
+
+export type PostStudiesByStudyIdContractsByContractIdObjectsResponse = PostStudiesByStudyIdContractsByContractIdObjectsResponses[keyof PostStudiesByStudyIdContractsByContractIdObjectsResponses];
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+        /**
+         * Contract object UUID
+         */
+        contractObjectId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}/objects/{contractObjectId}';
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponse = DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses[keyof DeleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses];
+
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+        /**
+         * Contract object UUID
+         */
+        contractObjectId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}/objects/{contractObjectId}';
+};
+
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses = {
     /**
      * OK
      */
     200: Blob | File;
 };
 
-export type GetStudiesByStudyIdContractsByContractIdDownloadResponse = GetStudiesByStudyIdContractsByContractIdDownloadResponses[keyof GetStudiesByStudyIdContractsByContractIdDownloadResponses];
+export type GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponse = GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses[keyof GetStudiesByStudyIdContractsByContractIdObjectsByContractObjectIdResponses];

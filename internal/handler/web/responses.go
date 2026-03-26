@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -29,6 +30,12 @@ func setError(ctx *gin.Context, err error, message string) {
 	user := middleware.GetUser(ctx)
 	log.Err(err).Any("username", user.Username).Msg(message)
 	ctx.Status(statusCode)
+}
+
+func setValidationError(ctx *gin.Context, message string) {
+	ctx.JSON(http.StatusBadRequest, openapi.ValidationError{
+		ErrorMessage: message,
+	})
 }
 
 func bindJSONOrSetError(ctx *gin.Context, obj any) error {

@@ -154,10 +154,22 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 	return nil, nil
 }
 
-// gets all studies (for admin access)
-func (s *Service) AllStudies() ([]types.Study, error) {
+func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
+	db := s.db.Model(&types.Study{})
+	if query.CaseRef != nil {
+		db = db.Where("caseref = ?", *query.CaseRef)
+	}
+	if query.ApprovalStatus != nil {
+		db = db.Where("approval_status = ?", *query.ApprovalStatus)
+	}
+	if query.OwnerUsername != nil {
+		db = db.Joins("JOIN users ON studies.owner_user_id = users.id AND users.username = ?", *query.OwnerUsername)
+	}
+	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
+		db = db.Where("title % ?", *query.FuzzyTitle)
+	}
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
+	err := db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 
@@ -181,13 +193,6 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 		return nil, types.NewErrFromGorm(result.Error, "failed to get approved studies")
 	}
 	return records, nil
-}
-
-func (s *Service) PendingStudies() ([]types.Study, error) {
-	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("approval_status = ?", openapi.Pending).Find(&studies).Error
-
-	return studies, types.NewErrFromGorm(err)
 }
 
 // StudiesById retrieves all studies that are in a list of ids
@@ -318,12 +323,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 		return err
 	}
 
-	// Commit the transaction
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit create study transaction")
-	}
-
-	return nil
+	return commitTransaction(tx)
 }
 
 func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
@@ -367,11 +367,7 @@ func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) erro
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit update study transaction")
-	}
-
-	return nil
+	return commitTransaction(tx)
 }
 
 func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uuid.UUID, review openapi.StudyReview) error {

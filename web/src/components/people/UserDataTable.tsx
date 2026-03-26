@@ -62,6 +62,7 @@ export default function UserDataTable(Props: Props) {
   };
 
   if (!users) return null;
+
   if (isLoading) {
     return (
       <div className={styles.container}>
@@ -92,6 +93,7 @@ export default function UserDataTable(Props: Props) {
       <p>
         Please note the dates shown are when the agreement/training is <em>valid from</em>
       </p>
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -124,7 +126,7 @@ export default function UserDataTable(Props: Props) {
                 </div>
               </td>
               <td className={styles.roles}>
-                {userData.roles
+                {(userData.roles ?? [])
                   .filter((role) => !role.includes("study") && !role.includes("base"))
                   .map((role) => (
                     <span key={role} className="role">

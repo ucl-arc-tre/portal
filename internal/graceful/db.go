@@ -2,6 +2,7 @@ package graceful
 
 import (
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -38,6 +39,7 @@ func InitDB() {
 		&types.Asset{},
 		&types.AssetLocation{},
 		&types.Contract{},
+		&types.ContractObjectMetadata{},
 		&types.UserSponsorship{},
 		&types.Environment{},
 		&types.Project{},
@@ -48,16 +50,16 @@ func InitDB() {
 		&types.Token{},
 	}
 	db := NewDB()
-	db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
+	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "pg_trgm";`)
 
 	migrateContractStudyIds(db)
+	migrateContracts(db)
 
 	// Set up a sequence for the study caseref
 	// this must exist before AutoMigrate is run below, as the Caseref column default references it
 	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
-	if err := db.Exec(`CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`).Error; err != nil {
-		panic(err)
-	}
+	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
@@ -92,10 +94,65 @@ func NewDB() *gorm.DB {
 // migrateCaseref adds a unique auto-incrementing caseref to each existing study.
 func migrateCaseref(db *gorm.DB) {
 	// Backfill any studies that were created previously (i.e. those that have a NULL caseref).
-	if err := db.Exec(`UPDATE studies SET caseref = nextval('study_caseref_seq') WHERE caseref IS NULL`).Error; err != nil {
+	mustExec(db, `UPDATE studies SET caseref = nextval('study_caseref_seq') WHERE caseref IS NULL`)
+	log.Info().Msg("Study caseref migration complete")
+}
+
+func migrateContracts(db *gorm.DB) {
+	migrator := db.Migrator()
+
+	if !migrator.HasTable(&types.Contract{}) {
+		return // fresh deployment - nothing to migrate
+	}
+
+	if err := db.AutoMigrate(&types.ContractObjectMetadata{}, &types.Contract{}); err != nil {
+		log.Err(err).Msg("Failed to automigrate contract tables for migration")
+		return
+	}
+
+	tx := db.Begin()
+	defer RollbackTransactionOnPanic(tx)
+
+	contractPartials := []struct {
+		ID        uuid.UUID `gorm:"id"`
+		Filename  string    `gorm:"filename"`
+		CreatedAt time.Time `gorm:"created_at"`
+	}{}
+	err := tx.Table("contracts").
+		Select("id, filename, created_at").
+		Where("filename != ''").
+		Scan(&contractPartials).Error
+	if err != nil {
 		panic(err)
 	}
-	log.Info().Msg("Study caseref migration complete")
+
+	for _, contractPartial := range contractPartials {
+		title, _ := strings.CutSuffix(contractPartial.Filename, ".pdf")
+		err = tx.Table("contracts").
+			Where("id = ?", contractPartial.ID).
+			Update("title", title).
+			Update("filename", "").
+			Error
+		if err != nil {
+			panic(err)
+		}
+
+		contractMetadata := types.ContractObjectMetadata{
+			Filename:   contractPartial.Filename,
+			ContractID: contractPartial.ID,
+		}
+		contractMetadata.ID = contractPartial.ID
+		contractMetadata.CreatedAt = contractPartial.CreatedAt
+
+		if err := tx.Create(&contractMetadata).Error; err != nil {
+			panic(err)
+		}
+	}
+	if err := tx.Commit().Error; err != nil {
+		panic(err)
+	}
+
+	log.Info().Msg("Migrated contracts")
 }
 
 // Set a study id column of contracts using their existing values
@@ -144,7 +201,7 @@ type UpdateObject interface {
 	IsDeleted() bool
 }
 
-// Update an existing list of many ojects to their new values using
+// Update an existing list of many objects to their new values using
 // unique keys that can only exist once in the database.
 func UpdateManyExisting[T UpdateObject](tx *gorm.DB, old []T, new []T) error {
 	newKeys := []string{}
@@ -174,5 +231,12 @@ func UpdateManyExisting[T UpdateObject](tx *gorm.DB, old []T, new []T) error {
 func RollbackTransactionOnPanic(tx *gorm.DB) {
 	if r := recover(); r != nil {
 		tx.Rollback()
+	}
+}
+
+func mustExec(db *gorm.DB, sql string) {
+	err := db.Exec(sql).Error
+	if err != nil {
+		panic(err)
 	}
 }

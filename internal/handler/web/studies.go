@@ -3,6 +3,9 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -10,7 +13,12 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
+	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
+)
+
+var (
+	caserefPattern = regexp.MustCompile(`^[0-9]{1,5}$`)
 )
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {
@@ -60,17 +68,43 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 }
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
-	if params.Status != nil && openapi.ApprovalStatus(*params.Status) == openapi.Pending {
-		// admins can see all pending studies
-		return h.studies.PendingStudies()
-
-	} else if params.Status != nil {
-		return []types.Study{}, types.NewErrInvalidObject("Invalid query param")
-	} else {
-		// Admins can see all studies normally
-		return h.studies.AllStudies()
+	if !params.Valid() {
+		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
 	}
+	queryParams := studies.QueryParams{
+		ApprovalStatus: params.Status,
+		CaseRef:        params.Caseref,
+		FuzzyTitle:     params.FuzzyTitle,
+		OwnerUsername:  params.OwnerUsername,
+	}
+	if queryIsCaseref(params.Query) {
+		caseref, err := strconv.Atoi(*params.Query)
+		if err != nil {
+			return []types.Study{}, types.NewErrInvalidObject("caseref was not int")
+		}
+		queryParams.CaseRef = &caseref
+	} else if queryIsOwnerUsername(params.Query) {
+		queryParams.OwnerUsername = params.Query
+	} else if params.Query != nil {
+		queryParams.FuzzyTitle = params.Query
+	}
+	return h.studies.AllStudies(queryParams)
+}
 
+func queryIsCaseref(query *string) bool {
+	if query == nil {
+		return false
+	} else if len(*query) > 5 {
+		return false
+	}
+	return caserefPattern.MatchString(strings.TrimLeft(*query, "0"))
+}
+
+func queryIsOwnerUsername(query *string) bool {
+	if query == nil {
+		return false
+	}
+	return types.Username(*query).IsValid()
 }
 
 func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
@@ -92,26 +126,21 @@ func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
 func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) {
 	user := middleware.GetUser(ctx)
 
-	var studies []types.Study
-
 	isAdminOrIGOps, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
 
+	var studies []types.Study
 	if isAdminOrIGOps {
 		studies, err = h.studiesAll(params)
-		if err != nil {
-			setError(ctx, err, "Failed to get studies for admin")
-			return
-		}
 	} else {
 		studies, err = h.studiesStudyOwner(user)
-		if err != nil {
-			setError(ctx, err, "Failed to get studies for study owner")
-			return
-		}
+	}
+	if err != nil {
+		setError(ctx, err, "Failed to get studies")
+		return
 	}
 
 	response := []openapi.Study{}
