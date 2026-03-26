@@ -19,7 +19,7 @@ import (
 
 type Container struct {
 	DSN       string
-	terminate func(context.Context) error
+	Terminate func(context.Context) error
 }
 
 /*
@@ -66,7 +66,7 @@ func StartPostgresContainer(ctx context.Context) (*Container, error) {
 
 	return &Container{
 		DSN: dsn,
-		terminate: func(ctx context.Context) error {
+		Terminate: func(ctx context.Context) error {
 			return container.Terminate(ctx)
 		},
 	}, nil
@@ -111,7 +111,7 @@ func NewTestDBSchema(t *testing.T, baseDSN string, migrate Migrator) *gorm.DB {
 		if err := adminDB.Exec(fmt.Sprintf(`DROP SCHEMA "%s" CASCADE`, schema)).Error; err != nil {
 			t.Errorf("drop schema: %v", err)
 		}
-		//adminDB.Exec(fmt.Sprintf(`DROP SCHEMA "%s" CASCADE`, schema))
+
 	})
 
 	return db

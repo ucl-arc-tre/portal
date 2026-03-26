@@ -2,7 +2,6 @@ package studies
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 
@@ -32,12 +31,13 @@ func TestMain(m *testing.M) {
 	}
 
 	testDBDSN = container.DSN
-	fmt.Println("TestMain DSN:", testDBDSN)
 
 	// run tests
 	code := m.Run()
 
 	// terminate container
+	_ = container.Terminate(ctx)
+
 	os.Exit(code)
 }
 

@@ -184,20 +184,17 @@ func TestValidateAssetData(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for _, curTest := range tests {
+		t.Run(curTest.name, func(t *testing.T) {
 			asset := validAssetBase()
-			tt.modify(&asset)
+			curTest.modify(&asset)
 
 			validationErr, err := svc.validateAssetData(asset)
 
 			// Stop immediately if system-level error (e.g., panic, DB error)
 			require.NoError(t, err, "unexpected error: %+v", err)
 
-			// Check if we expected a validation error
-			// If this fails, test setup or logic is broken
-			// (only use require if validate should never panic/return unexpected errors)
-			assert.Equal(t, tt.wantError, validationErr != nil, "validationErr: %+v", validationErr)
+			assert.Equal(t, curTest.wantError, validationErr != nil, "validationErr: %+v", validationErr)
 
 		})
 	}
@@ -206,8 +203,8 @@ func TestValidateAssetData(t *testing.T) {
 // Integration Test (with Postgres test container) for CreateAsset
 func TestIntegration_CreateAsset(t *testing.T) {
 
-	// Enable parallel test (TBC)
-	//t.Parallel()
+	// Enable parallel test
+	t.Parallel()
 
 	// Create DB schema, and AutoMigrate only the models/tables required by this package
 	db := testutil.NewTestDBSchema(t, testDBDSN, migrate)
