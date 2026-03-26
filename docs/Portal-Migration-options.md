@@ -32,7 +32,7 @@ Following the reasoning laid out in full in the [Evaluation](#3-evaluation) sect
 - Studies refers to the top level Study entity and associated Contract and Asset children. Migration of Studies involves recreating the Studies in the Portal with the relevant Asset records and any Contract documents
 - Projects refers to the management of TRE and DSH user access and roles. This varies by the Environment (TRE/DSH) and has different APIs. Migration of this involves reading of user access and roles from the Environment to display in the Portal
 
-### 1.2 Managing the complexity of having one Portal and two TREs 
+### 1.2 Managing the complexity of having one Portal and two TREs
 
 Of any statement about this data migration, you can reasonably ask the question "are we talking about the DSH or TRE? Or both?". There is some complexity since not only are we talking about three core processes - User onboarding, Study management, and Project management - we're talking about those three processes across the two environments, effectively creating a 2x3 matrix of components:
 
@@ -224,7 +224,7 @@ Or in one "big bang":
 > [!NOTE]
 >
 > - Project management can't be moved into the portal before Study management, because it relies on lookups of Study data.
-> - The sources of truth for project configuration and access control are inside the TRE systems themselves (i.e. as IaC or Active Directory config). Currently projects are managed by users either inside the TREs or through completing request forms in MyServices or SharePoint. **The Portal will not replace the TREs as the source of truth for this data**. It will, however, become the source of truth for User and Study data, i.e. who is an approved researcher, and what Studies (including assets and contracts) are approved or pending approval.
+- Currently projects are managed by users either inside the TREs or through completing request forms in MyServices or SharePoint. The sources of truth for deployed project configuration and access controls are inside the TRE systems themselves (i.e. as IaC or Active Directory config). **The Portal will not replace the TREs as the source of truth for this data**. It will, however, become the source of truth for the *desired* state of projects, in addition to User and Study data, i.e. who is an approved researcher, and what Studies (including assets and contracts) are approved or pending approval.
 > - Whilst this options paper is considering the question of how to sequence the migration of groups of data from one datastore to another, the answers lie as much in the correct functioning of the portal once the data has been successfully migrated into its database. It seems most likely that the reason we may need to rollback would be because of broken portal functionality, rather than issues with getting data into the portal DB i.e. the migration itself.
 
 ## 2.1 Option 1
@@ -292,7 +292,7 @@ We should start here i.e. at Option 4, and moderate down the list of preferences
 
 ### What could go wrong?
 
-What could go wrong in Option 4 that wouldn't go wrong in Option 1, Option 2 or Option 3? 
+What could go wrong in Option 4 that wouldn't go wrong in Option 1, Option 2 or Option 3?
 1. If the Portal's User functionality goes wrong in Option 4, then, on the assumption that we don't ship features until we're satisfied they are robust, the same thing would probably also go wrong in Options 1, 2 and 3. This could be:
   - Major problems with the user import such that some (random subset of) approved researchers are not recorded in the Portal DB, so then don't show up in the people search or in the lookup when someone is trying to add them to a Project.
   - Problems with adding external users to the Portal. This seems more likely since the process is lengthier and there is more room for things to go wrong i.e. invitations to Entra not being sent, or being sent but not accepted, or being sent and accepted but then not being discoverable, as in the point above.
@@ -332,19 +332,19 @@ Options 1, and 2 involve this to an extent (insofar as they each suggest using t
 
 What is intensive/difficult (at scale) about this type of approach is revoking edit access to the Canary users' existing SP records (i.e. making their existing records read-only). Obviously we do not want to allow users to edit User or Study data in two places, so the Study-level SharePoint groups which govern access to these records will need to be emptied (once a copy has been made of the full set of group membership at the point of switchover). Any rollback plan under this approach will necessitate manually adding all members back into these SharePoint groups. Furthermore, once users begin writing data to the Portal DB, persisting this new data through a rollback would require complex synchronization back to SharePoint, which is practically impossible.
 
-> [!NOTE] 
+> [!NOTE]
 > For all options, regarding rollback:
 >- Rollback is non-trivial: once users begin writing data to the Portal DB, reverting to the old system and persisting this new data would require complex synchronization back to SharePoint, which is practically impossible.
 
 ### Development and testing time
 
-Developer-time is a constrained resource in the Portal team, and in particular, the development of the Project management functions for both DSH and ARC TRE Projects, which share a set of features, but also differ a lot in implementation, require a significant amount of work. In order to do Option 4, a large amount of development work still needs to be undertaken. The risk that this would take more than one term is high. And that is ignoring for the moment the thorough testing which we would need to conduct in preparation for a "big bang" deployment. 
+Developer-time is a constrained resource in the Portal team, and in particular, the development of the Project management functions for both DSH and ARC TRE Projects, which share a set of features, but also differ a lot in implementation, require a significant amount of work. In order to do Option 4, a large amount of development work still needs to be undertaken. The risk that this would take more than one term is high. And that is ignoring for the moment the thorough testing which we would need to conduct in preparation for a "big bang" deployment.
 
 ### Conclusion
 
 As a result of these constraints, Option 3 (TRE users/studies migrated first) appears to be the best option. It allows us to roll out the new Portal's Study and Project management features to a smaller subset of users, which limits the blast radius of any catastrophic downtime, but also allows for more effective management of what's most likely to be a modest stream of bug reports/requests for help that will come from this smaller group of users. Option 3 thus allows the Portal team to continue development of the DSH Project management functionality at a steady rate, whilst also tending to any necessary fixes in the Study and TRE Project management functionality.
 
-Option 3 also appears to effectively lower the risk of needing to rollback, which, as noted above, would be very suboptimal if it came to pass. 
+Option 3 also appears to effectively lower the risk of needing to rollback, which, as noted above, would be very suboptimal if it came to pass.
 
 ### What questions still need answering?
 
