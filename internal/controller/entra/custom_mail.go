@@ -131,3 +131,16 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	content := templateReader.String()
 	return &content, nil
 }
+
+func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string, days string, contract types.Contract) error {
+
+	content := "Your contract" + contract.Filename + "in" + contract.Study.Title + " is due to expire in"
+	if days != "1" {
+		content += days + " or fewer. Please sign in to the Portal to upload a new contract. "
+	} else {
+		content += " the next 24 hours. Please sign in to the Portal to upload a new contract."
+	}
+
+	notificationMsg := "Notification: Your contract in" + contract.Study.Title + " is due to expire soon"
+	return c.createCustomEmail(ctx, notificationMsg, emails, content)
+}

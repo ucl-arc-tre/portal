@@ -9,17 +9,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	"gorm.io/gorm"
 )
 
 type Manager struct {
 	scheduler gocron.Scheduler
+	db        *gorm.DB
+	entra     *entra.Controller
 }
 
 // Create a task manager instance
 func New() *Manager {
 	scheduler := newScheduler()
-	return &Manager{scheduler: scheduler}
+	return &Manager{scheduler: scheduler, db: graceful.NewDB(), entra: entra.New()}
 }
 
 // Start the task manager - non blocking
