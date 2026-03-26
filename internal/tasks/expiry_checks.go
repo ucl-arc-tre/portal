@@ -23,30 +23,12 @@ func (m *Manager) checkContractsExpiry() error {
 			recipients = append(recipients, string(studyAdmin.User.Username))
 		}
 
-		for _, contract := range study.Contracts {
-			daysUntilExpiry := int(time.Until(contract.ExpiryDate).Hours() / 24)
-
-			if daysUntilExpiry < 0 {
-				err := m.entra.SendExpiryNotification(ctx, recipients, daysUntilExpiry, contract)
-				if err != nil {
-					return err
-				}
-				return nil
-			} else if daysUntilExpiry == 1 {
-				err := m.entra.SendExpiryNotification(ctx, recipients, daysUntilExpiry, contract)
-				if err != nil {
-					return err
-				}
-				return nil
-			} else if daysUntilExpiry == 30 || daysUntilExpiry == 14 || daysUntilExpiry == 7 {
-
-				err := m.entra.SendExpiryNotification(ctx, recipients, daysUntilExpiry, contract)
-				if err != nil {
-					return err
-				}
-				return nil
-			}
+		contract := study.EarliestExpringContract()
+		err := m.entra.SendExpiryNotification(ctx, recipients, contract)
+		if err != nil {
+			return err
 		}
+
 	}
 
 	return nil

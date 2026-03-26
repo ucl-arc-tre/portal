@@ -142,3 +142,21 @@ type ContractObjectMetadata struct {
 	// Relationships
 	Contract Contract
 }
+
+func (c Contract) DaysUntilExpiry() int {
+	return int(time.Until(c.ExpiryDate).Hours() / 24)
+}
+
+func (s Study) EarliestExpringContract() Contract {
+	earliestContract := Contract{}
+	for _, contract := range s.Contracts {
+		if contract.DaysUntilExpiry() < 0 {
+			earliestContract = contract
+		} else if contract.DaysUntilExpiry() == 1 {
+			earliestContract = contract
+		} else if contract.DaysUntilExpiry() == 7 || contract.DaysUntilExpiry() == 14 || contract.DaysUntilExpiry() == 30 {
+			earliestContract = contract
+		}
+	}
+	return earliestContract
+}

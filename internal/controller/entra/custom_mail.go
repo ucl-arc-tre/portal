@@ -133,8 +133,8 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string, days int, contract types.Contract) error {
-
+func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string, contract types.Contract) error {
+	days := contract.DaysUntilExpiry()
 	content := "You have a contract in the Study" + contract.Study.Title + " that is due to expire within"
 	if days != 1 && days > 0 {
 		content += fmt.Sprint(rune(days)) + " days. Please sign in to the Portal to upload a new contract. "
