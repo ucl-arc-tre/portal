@@ -137,7 +137,7 @@ func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string
 	days := contract.DaysUntilExpiry()
 	content := "You have a contract in the Study" + contract.Study.Title + " that is due to expire within"
 	if days != 1 && days > 0 {
-		content += fmt.Sprint(rune(days)) + " days. Please sign in to the Portal to upload a new contract. "
+		content += fmt.Sprint("%d", days) + " days. Please sign in to the Portal to upload a new contract. "
 	} else if days == 1 {
 		content += " the next 24 hours. Please sign in to the Portal to upload a new contract."
 	} else {
