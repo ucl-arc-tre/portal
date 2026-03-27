@@ -30,6 +30,7 @@ func New() *Manager {
 func (m *Manager) Start() {
 	m.mustEvery(time.Minute, exampleJob, "exampleJob")
 	m.scheduler.Start()
+	m.DailyChecks()
 }
 
 // Shutdown the task manager. Errors are logged
