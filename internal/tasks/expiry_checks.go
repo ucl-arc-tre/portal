@@ -16,7 +16,7 @@ func (m *Manager) checkContractsExpiry() error {
 	ctx := context.Background()
 
 	studies := []types.Study{}
-	result := m.db.Model(&types.Study{}).Preload("Contracts").Find(&studies)
+	result := m.db.Model(&types.Study{}).Preload("Owner").Preload("StudyAdmins.User").Preload("Contracts").Find(&studies)
 	if result.Error != nil {
 		return types.NewErrFromGorm(result.Error, "failed to get studies")
 	}
