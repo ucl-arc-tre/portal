@@ -38,7 +38,7 @@ type Study struct {
 	// caseref sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	// study_caseref_seq defined in internal/graceful/db.go
 	// todo: remove the *int after the migration is complete
-	Caseref *int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
+	Caseref int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
 
 	// Relationships
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`
