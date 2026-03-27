@@ -32,7 +32,7 @@ func (m *Manager) checkContractsExpiry() error {
 		if contract == nil {
 			continue
 		}
-		err := m.entra.SendExpiryNotification(ctx, recipients, *contract)
+		err := m.entra.SendExpiryNotification(ctx, recipients, *contract, study)
 		if err != nil {
 			return err
 		}
