@@ -1513,6 +1513,7 @@ components:
             - created_at
             - updated_at
             - approval_status
+            - caseref
           properties:
             id:
               type: string
@@ -1533,7 +1534,6 @@ components:
               description: Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
             caseref:
               type: integer
-              nullable: true
               description: Unique 5-digit reference number for the study, assigned on creation
       description: A research study
 

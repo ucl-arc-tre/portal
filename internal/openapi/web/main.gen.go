@@ -825,7 +825,7 @@ type Study struct {
 	CagReference *string `json:"cag_reference,omitempty"`
 
 	// Caseref Unique 5-digit reference number for the study, assigned on creation
-	Caseref *int `json:"caseref,omitempty"`
+	Caseref int `json:"caseref"`
 
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt string `json:"created_at"`
