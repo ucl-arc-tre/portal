@@ -5,6 +5,17 @@ import Button from "@/components/ui/Button";
 
 import styles from "./StudyCardsList.module.css";
 
+import dynamic from "next/dynamic";
+const PaginationControls = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Controls), {
+  ssr: false,
+});
+const PaginationInfo = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Info), {
+  ssr: false,
+});
+const Pagination = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination), {
+  ssr: false,
+});
+
 type Props = {
   studies: Study[];
 };
@@ -52,6 +63,15 @@ export default function StudyCardsList(props: Props) {
             </div>
           ))}
       </div>
+      {studies.length > 1 && (
+        <div className={styles["pagination-container"]}>
+          <Pagination total={studies.length} limit={1} offset={0}>
+            <PaginationControls />
+            <PaginationInfo />
+          </Pagination>
+          {studies.length == 50 && <small>Please note these results have been limited to 50 items</small>}
+        </div>
+      )}
     </div>
   );
 }

@@ -7,16 +7,6 @@ import styles from "./IGOpsStudies.module.css";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Search from "../ui/Search";
-import dynamic from "next/dynamic";
-const PaginationControls = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Controls), {
-  ssr: false,
-});
-const PaginationInfo = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Info), {
-  ssr: false,
-});
-const Pagination = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination), {
-  ssr: false,
-});
 
 export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
@@ -137,15 +127,6 @@ export default function IGOpsStudies() {
       {studies.length > 0 && (
         <>
           <StudyCardsList studies={studies} />
-          {studies.length > 10 && (
-            <div className={styles["pagination-container"]}>
-              <Pagination total={studies.length} limit={10} offset={0}>
-                <PaginationControls />
-                <PaginationInfo />
-              </Pagination>
-              {studies.length == 50 && <small>Please note these results have been limited to 50 items</small>}
-            </div>
-          )}
         </>
       )}
     </>

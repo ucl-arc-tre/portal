@@ -140,3 +140,14 @@
     flex-direction: column;
   }
 }
+
+.pagination-container {
+  margin-top: 2rem;
+
+  small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #6c757d;
+    text-align: center;
+  }
+}
