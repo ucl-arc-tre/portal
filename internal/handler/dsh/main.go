@@ -59,13 +59,8 @@ func (h *Handler) GetApprovedStudies(ctx *gin.Context) {
 	var b bytes.Buffer
 	b.WriteString("caseref,study_owner_username,study_admin_usernames\n")
 	for _, study := range approvedStudies {
-		caseref := ""
-		if study.Caseref != nil {
-			caseref = fmt.Sprintf("%v", *study.Caseref)
-		}
-
 		fmt.Fprintf(&b, "%v,%v,%v\n",
-			caseref,
+			study.Caseref,
 			study.OwnerUsername,
 			study.AdminUsernames,
 		)

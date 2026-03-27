@@ -355,7 +355,7 @@ export type Study = StudyBase & {
     /**
      * Unique 5-digit reference number for the study, assigned on creation
      */
-    caseref?: number | null;
+    caseref: number;
 };
 
 /**

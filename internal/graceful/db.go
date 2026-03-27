@@ -65,8 +65,6 @@ func InitDB() {
 		panic(err)
 	}
 
-	migrateCaseref(db)
-
 	log.Debug().Msg("Initialised database")
 }
 
@@ -89,13 +87,6 @@ func NewDB() *gorm.DB {
 		}
 	})
 	return db
-}
-
-// migrateCaseref adds a unique auto-incrementing caseref to each existing study.
-func migrateCaseref(db *gorm.DB) {
-	// Backfill any studies that were created previously (i.e. those that have a NULL caseref).
-	mustExec(db, `UPDATE studies SET caseref = nextval('study_caseref_seq') WHERE caseref IS NULL`)
-	log.Info().Msg("Study caseref migration complete")
 }
 
 func migrateContracts(db *gorm.DB) {
