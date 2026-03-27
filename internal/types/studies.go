@@ -147,7 +147,7 @@ func (c Contract) DaysUntilExpiry() int {
 	return int(time.Until(c.ExpiryDate).Hours() / 24)
 }
 
-func (s Study) EarliestExpringContractRequiringNotification() *Contract {
+func (s Study) EarliestExpringContractWithin30Days() *Contract {
 	var earliestContract *Contract
 	for _, contract := range s.Contracts {
 		if contract.DaysUntilExpiry() < 0 {
