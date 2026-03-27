@@ -150,6 +150,9 @@ func (c Contract) DaysUntilExpiry() int {
 func (s Study) EarliestExpringContractWithin30Days() *Contract {
 	var earliestContract *Contract
 	for _, contract := range s.Contracts {
+		if earliestContract != nil && contract.DaysUntilExpiry() > earliestContract.DaysUntilExpiry() {
+			continue
+		}
 		if contract.DaysUntilExpiry() < 0 {
 			earliestContract = &contract
 		} else if contract.DaysUntilExpiry() == 1 {
@@ -157,6 +160,7 @@ func (s Study) EarliestExpringContractWithin30Days() *Contract {
 		} else if contract.DaysUntilExpiry() == 7 || contract.DaysUntilExpiry() == 14 || contract.DaysUntilExpiry() == 30 {
 			earliestContract = &contract
 		}
+
 	}
 	return earliestContract
 }
