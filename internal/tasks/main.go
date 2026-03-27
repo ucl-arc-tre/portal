@@ -28,9 +28,8 @@ func New() *Manager {
 
 // Start the task manager - non blocking
 func (m *Manager) Start() {
-	m.mustEvery(time.Minute, exampleJob, "exampleJob")
+	m.scheduleDailyChecks()
 	m.scheduler.Start()
-	m.DailyChecks()
 }
 
 // Shutdown the task manager. Errors are logged

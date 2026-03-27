@@ -23,7 +23,7 @@ func (m *Manager) checkContractsExpiry() error {
 			recipients = append(recipients, string(studyAdmin.User.Username))
 		}
 
-		contract := study.EarliestExpringContract()
+		contract := study.EarliestExpringContractRequiringNotification()
 		if contract == nil {
 			continue
 		}
@@ -37,6 +37,6 @@ func (m *Manager) checkContractsExpiry() error {
 	return nil
 }
 
-func (m *Manager) DailyChecks() {
+func (m *Manager) scheduleDailyChecks() {
 	m.mustEvery(time.Minute*1440, m.checkContractsExpiry, "checkContractsExpiry")
 }
