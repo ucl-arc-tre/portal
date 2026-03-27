@@ -142,6 +142,10 @@ func DSHOpsStaffUsernames() []types.Username {
 	return usernames("dsh_ops_staff_usernames")
 }
 
+func NotificationsEnabled() bool {
+	return k.Bool("entra.notifications_enabled")
+}
+
 // Map of paths to strictly rate limit, so they are 'slow'
 func RateLimitSlowPaths() map[string]bool {
 	return map[string]bool{

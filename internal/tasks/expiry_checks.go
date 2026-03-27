@@ -4,10 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (m *Manager) checkContractsExpiry() error {
+	if !config.NotificationsEnabled() {
+		return nil
+	}
+
 	ctx := context.Background()
 
 	studies := []types.Study{}
