@@ -20,7 +20,10 @@ export default function IGOpsStudies() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = tab === "pending" ? await getStudies({ query: { status: "Pending" } }) : await getStudies();
+      const response =
+        tab === "pending"
+          ? await getStudies({ query: { status: "Pending" } })
+          : await getStudies({ query: { max_items: maxStudySearchItems } });
 
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
