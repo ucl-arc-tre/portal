@@ -169,7 +169,7 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 		db = db.Where("title % ?", *query.FuzzyTitle)
 	}
 	studies := []types.Study{}
-	err := db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Order("last_signoff DESC").Limit(*query.MaxItems).Error
+	err := db.Preload("StudyAdmins.User").Preload("Owner").Find(&studies).Order("last_signoff DESC").Limit(query.MaxItems).Error
 	return studies, types.NewErrFromGorm(err)
 }
 

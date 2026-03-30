@@ -79,7 +79,7 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		CaseRef:        params.Caseref,
 		FuzzyTitle:     params.FuzzyTitle,
 		OwnerUsername:  params.OwnerUsername,
-		MaxItems:       params.MaxItems,
+		MaxItems:       *params.MaxItems,
 	}
 	if queryIsCaseref(params.Query) {
 		caseref, err := strconv.Atoi(*params.Query)
