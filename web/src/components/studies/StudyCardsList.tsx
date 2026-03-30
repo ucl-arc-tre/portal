@@ -32,8 +32,8 @@ export default function StudyCardsList(props: Props) {
   const { studies } = props;
   const router = useRouter();
 
-  const limit = 10; // number of items to show per page
-  const [offset, setOffset] = useState(0); // index of item to start page from
+  const studiesPerPage = 10;
+  const [pageOffset, setPageOffset] = useState(0);
 
   return (
     <div className={styles["study-selection"]}>
