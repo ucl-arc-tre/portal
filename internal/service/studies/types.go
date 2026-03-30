@@ -11,6 +11,7 @@ type QueryParams struct {
 	FuzzyTitle     *string
 	OwnerUsername  *string
 	MaxItems       int
+	StartIndex     int
 }
 
 type ContractObject struct {

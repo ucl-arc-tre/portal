@@ -5,19 +5,6 @@ import Button from "@/components/ui/Button";
 
 import styles from "./StudyCardsList.module.css";
 
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import { maxStudySearchItems } from "./IGOpsStudies";
-const PaginationControls = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Controls), {
-  ssr: false,
-});
-const PaginationInfo = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Info), {
-  ssr: false,
-});
-const Pagination = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination), {
-  ssr: false,
-});
-
 type Props = {
   studies: Study[];
 };
@@ -33,16 +20,12 @@ export default function StudyCardsList(props: Props) {
   const { studies } = props;
   const router = useRouter();
 
-  const studiesPerPage = 10;
-  const [pageOffset, setPageOffset] = useState(0);
-
   return (
     <div className={styles["study-selection"]}>
       <div className={styles["studies-list"]}>
         {studies
           .slice()
           .sort((a, b) => studySortOrder[a.approval_status] - studySortOrder[b.approval_status])
-          .slice(pageOffset, pageOffset + studiesPerPage)
           .map((study) => (
             <div key={study.id} className={styles["study-card"]} data-cy="study-card">
               <div className={styles["status-indicator"]}>
@@ -67,25 +50,6 @@ export default function StudyCardsList(props: Props) {
             </div>
           ))}
       </div>
-      {studies.length > 15 && (
-        <div className={styles["pagination-container"]}>
-          <Pagination
-            total={studies.length}
-            limit={studiesPerPage}
-            offset={pageOffset}
-            onPageChange={(newOffset) => setPageOffset(newOffset)}
-          >
-            <PaginationControls />
-            <PaginationInfo />
-          </Pagination>
-          {studies.length == maxStudySearchItems && (
-            <small>
-              Please note these results have been limited to the first {maxStudySearchItems} items, ordered by date of
-              IAO signoff
-            </small>
-          )}
-        </div>
-      )}
     </div>
   );
 }

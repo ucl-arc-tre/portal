@@ -1157,6 +1157,10 @@ export type GetStudiesData = {
          * Maximum number of items to return
          */
         max_items?: number;
+        /**
+         * Index of the first item to return
+         */
+        start_index?: number;
     };
     url: '/studies';
 };

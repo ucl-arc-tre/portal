@@ -373,6 +373,12 @@ paths:
           description: Maximum number of items to return
           schema:
             type: integer
+        - in: query
+          name: start_index
+          required: false
+          description: Index of the first item to return
+          schema:
+            type: integer
       responses:
         "200":
           content:

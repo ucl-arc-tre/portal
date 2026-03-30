@@ -74,12 +74,16 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if params.MaxItems != nil && *params.MaxItems > 50 {
 		return []types.Study{}, types.NewErrInvalidObject("maxItems cannot be greater than 50")
 	}
+	if params.StartIndex != nil && *params.StartIndex < 0 {
+		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
+	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,
 		CaseRef:        params.Caseref,
 		FuzzyTitle:     params.FuzzyTitle,
 		OwnerUsername:  params.OwnerUsername,
 		MaxItems:       50,
+		StartIndex:     0,
 	}
 	if queryIsCaseref(params.Query) {
 		caseref, err := strconv.Atoi(*params.Query)

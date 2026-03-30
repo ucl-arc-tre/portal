@@ -1122,6 +1122,9 @@ type GetStudiesParams struct {
 
 	// MaxItems Maximum number of items to return
 	MaxItems *int `form:"max_items,omitempty" json:"max_items,omitempty"`
+
+	// StartIndex Index of the first item to return
+	StartIndex *int `form:"start_index,omitempty" json:"start_index,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1696,6 +1699,14 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "max_items", c.Request.URL.Query(), &params.MaxItems, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter max_items: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "start_index" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "start_index", c.Request.URL.Query(), &params.StartIndex, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter start_index: %w", err), http.StatusBadRequest)
 		return
 	}
 

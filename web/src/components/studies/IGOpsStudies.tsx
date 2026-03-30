@@ -8,7 +8,16 @@ import Loading from "../ui/Loading";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Search from "../ui/Search";
 
-export const maxStudySearchItems = 50;
+import dynamic from "next/dynamic";
+const PaginationControls = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Controls), {
+  ssr: false,
+});
+const PaginationInfo = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Info), {
+  ssr: false,
+});
+const Pagination = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination), {
+  ssr: false,
+});
 
 export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,14 +25,19 @@ export default function IGOpsStudies() {
   const [studies, setStudies] = useState<Study[]>([]);
   const [tab, setTab] = useState("pending");
 
-  const fetchStudies = async () => {
+  const studiesPerPage = 10;
+  const [pageOffset, setPageOffset] = useState(0);
+  const maxStudySearchItems = 50;
+  const fetchStudies = async (index?: number) => {
     setIsLoading(true);
     setError(null);
     try {
       const response =
         tab === "pending"
           ? await getStudies({ query: { status: "Pending" } })
-          : await getStudies({ query: { max_items: maxStudySearchItems } });
+          : index
+            ? await getStudies({ query: { max_items: maxStudySearchItems, start_index: index } })
+            : await getStudies({ query: { max_items: maxStudySearchItems } });
 
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
@@ -75,6 +89,11 @@ export default function IGOpsStudies() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageChange = (newOffset: number) => {
+    setPageOffset(newOffset);
+    fetchStudies(newOffset);
   };
   useEffect(() => {
     fetchStudies();
@@ -136,7 +155,26 @@ export default function IGOpsStudies() {
         </div>
       )}
 
-      {studies.length > 0 && <StudyCardsList studies={studies} />}
+      {studies.length > 0 && (
+        <>
+          <StudyCardsList studies={studies} />
+
+          {studies.length > 15 && (
+            <div className={styles["pagination-container"]}>
+              <Pagination
+                total={studies.length}
+                limit={studiesPerPage}
+                offset={pageOffset}
+                onPageChange={(newOffset) => handlePageChange(newOffset)}
+              >
+                <PaginationControls />
+                <PaginationInfo />
+              </Pagination>
+              <small>Please note these results have been ordered by date of IAO signoff</small>
+            </div>
+          )}
+        </>
+      )}
     </>
   );
 }
