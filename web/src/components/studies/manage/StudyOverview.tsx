@@ -2,10 +2,11 @@ import { patchStudiesByStudyIdPending, Study, Asset } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";
 import { storageDefinitions } from "../../shared/storageDefinitions";
+
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
 
@@ -18,26 +19,19 @@ type StudyOverviewProps = {
 
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
   let assetsRiskScore = 0;
+  const nhs_multiplier = 3;
 
   for (const asset of assets) {
-    let assetScore = 0;
-    const NhsMultiplier = 3;
-
-    asset.locations.forEach((loc) => {
-      const location = storageDefinitions.find((def) => def.value === loc);
+    asset.locations.forEach((assetLocation) => {
+      const location = storageDefinitions.find((def) => def.value === assetLocation);
       if (!location) return;
-      if (involvesNhsEngland) {
-        assetScore += asset.tier * NhsMultiplier * location!.riskScore;
-      } else {
-        assetScore += asset.tier * location!.riskScore;
-      }
+      assetsRiskScore += involvesNhsEngland
+        ? asset.tier * nhs_multiplier * location.riskScore
+        : asset.tier * location.riskScore;
     });
-
-    assetsRiskScore += assetScore;
   }
 
-  score += assetsRiskScore;
-  return score;
+  return score + assetsRiskScore;
 };
 
 const calculateBaseRiskScore = (study: Study) => {
@@ -50,15 +44,13 @@ const calculateBaseRiskScore = (study: Study) => {
   return score;
 };
 
-const calculateRiskScore = async (study: Study, assets: Asset[]) => {
+const calculateRiskScore = (study: Study, assets: Asset[]) => {
   const baseRiskScore = calculateBaseRiskScore(study);
   if (!assets || assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 
 export default function StudyOverview({ study, assets, fetchStudy, unagreedAdminUsernames }: StudyOverviewProps) {
-  const [riskScore, setRiskScore] = useState(0);
-  const [riskScoreLoading, setRiskScoreLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
@@ -68,10 +60,12 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
-  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
-  const canRequestReview = study.approval_status !== "Approved" && isStudyOwnerOrAdmin && !isIGOpsStaff;
+  const canRequestReview =
+    study.approval_status !== "Approved" && isStudyOwnerOrAdmin && !userData?.roles.includes("ig-ops-staff");
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
+
+  const riskScore = calculateRiskScore(study, assets);
 
   const onEditComplete = () => {
     setIsFormOpen(false);
@@ -89,22 +83,6 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     }
     setIsSubmittingReview(false);
   };
-
-  useEffect(() => {
-    const getRiskScore = async () => {
-      setRiskScoreLoading(true);
-      try {
-        const score = await calculateRiskScore(study, assets);
-        setRiskScore(score);
-      } catch (err) {
-        setError(`Failed to calculate risk score. ${err}`);
-      } finally {
-        setRiskScoreLoading(false);
-      }
-    };
-
-    getRiskScore();
-  }, [study, assets]);
 
   return (
     <>
@@ -139,13 +117,11 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         </Alert>
       )}
 
-      {(isStudyOwnerOrAdmin || canRequestReview) && (
+      {isStudyOwnerOrAdmin && (
         <div className={styles["study-actions"]}>
-          {isStudyOwnerOrAdmin && (
-            <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
-              Edit Study
-            </Button>
-          )}
+          <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
+            Edit Study
+          </Button>
 
           {canRequestReview && (
             <>
@@ -168,13 +144,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         </div>
       )}
 
-      <StudyDetails
-        study={study}
-        riskScore={riskScore}
-        riskScoreLoading={riskScoreLoading}
-        approvalStatus={study.approval_status}
-        feedback={study.feedback}
-      />
+      <StudyDetails study={study} riskScore={riskScore} />
     </>
   );
 }

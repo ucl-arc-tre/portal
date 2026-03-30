@@ -21,6 +21,19 @@ const formatProtection = (protection: string) => {
   return protection.replace(/_/g, " ");
 };
 
+const getClassificationClass = (classification: string) => {
+  switch (classification) {
+    case "public":
+      return styles["asset-classification-public"];
+    case "confidential":
+      return styles["asset-classification-confidential"];
+    case "highly_confidential":
+      return styles["asset-classification-highly-confidential"];
+    default:
+      return styles["asset-classification-public"];
+  }
+};
+
 export default function AssetCard(props: AssetCardProps) {
   const { studyId, asset, canModify } = props;
   const router = useRouter();
@@ -39,19 +52,6 @@ export default function AssetCard(props: AssetCardProps) {
     };
     isAssetCompleted();
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
-
-  const getClassificationClass = (classification: string) => {
-    switch (classification) {
-      case "public":
-        return styles["asset-classification-public"];
-      case "confidential":
-        return styles["asset-classification-confidential"];
-      case "highly_confidential":
-        return styles["asset-classification-highly-confidential"];
-      default:
-        return styles["asset-classification-public"];
-    }
-  };
 
   return (
     <div className={`${styles["asset-card"]} ${!isCompleted ? styles["asset-incomplete"] : ""}`}>
