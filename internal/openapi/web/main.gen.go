@@ -994,6 +994,44 @@ type StudyBase struct {
 	Title string `json:"title"`
 }
 
+// StudyImport defines model for StudyImport.
+type StudyImport struct {
+	AdditionalStudyAdminUsername *string `json:"additional_study_admin_username,omitempty"`
+	ApprovalStatus               string  `json:"approval_status"`
+	CagReference                 *string `json:"cag_reference,omitempty"`
+	Caseref                      int     `json:"caseref"`
+
+	// CreatedAt Time in RFC3339 format when the study was created
+	CreatedAt                        string  `json:"created_at"`
+	DataControllerOrganisation       string  `json:"data_controller_organisation"`
+	DataProtectionNumber             *string `json:"data_protection_number,omitempty"`
+	Description                      *string `json:"description,omitempty"`
+	Feedback                         *string `json:"feedback,omitempty"`
+	InvolvesCag                      *bool   `json:"involves_cag,omitempty"`
+	InvolvesDataProcessingOutsideEea *bool   `json:"involves_data_processing_outside_eea,omitempty"`
+	InvolvesEthicsApproval           *bool   `json:"involves_ethics_approval,omitempty"`
+	InvolvesExternalUsers            *bool   `json:"involves_external_users,omitempty"`
+	InvolvesHraApproval              *bool   `json:"involves_hra_approval,omitempty"`
+	InvolvesIndirectDataCollection   *bool   `json:"involves_indirect_data_collection,omitempty"`
+	InvolvesMnca                     *bool   `json:"involves_mnca,omitempty"`
+	InvolvesNhsEngland               *bool   `json:"involves_nhs_england,omitempty"`
+	InvolvesParticipantConsent       *bool   `json:"involves_participant_consent,omitempty"`
+	InvolvesThirdParty               *bool   `json:"involves_third_party,omitempty"`
+	InvolvesUclSponsorship           *bool   `json:"involves_ucl_sponsorship,omitempty"`
+	IrasId                           *string `json:"iras_id,omitempty"`
+	IsDataProtectionOfficeRegistered *bool   `json:"is_data_protection_office_registered,omitempty"`
+	IsNhsAssociated                  *bool   `json:"is_nhs_associated,omitempty"`
+	LastSignoff                      *string `json:"last_signoff,omitempty"`
+	NhsEnglandReference              *string `json:"nhs_england_reference,omitempty"`
+	OwnerUsername                    string  `json:"owner_username"`
+	RequiresDbs                      *bool   `json:"requires_dbs,omitempty"`
+	RequiresDspt                     *bool   `json:"requires_dspt,omitempty"`
+	Title                            string  `json:"title"`
+
+	// UpdatedAt Time in RFC3339 format when the study was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
 // StudyRequest Base study properties
 type StudyRequest = StudyBase
 
@@ -1156,6 +1194,9 @@ type PutProjectsTreProjectIdJSONRequestBody = ProjectTREUpdate
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyRequest
 
+// PostStudiesAdminImportJSONRequestBody defines body for PostStudiesAdminImport for application/json ContentType.
+type PostStudiesAdminImportJSONRequestBody = StudyImport
+
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
@@ -1251,6 +1292,9 @@ type ServerInterface interface {
 
 	// (POST /studies)
 	PostStudies(c *gin.Context)
+
+	// (POST /studies/admin/import)
+	PostStudiesAdminImport(c *gin.Context)
 
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId StudyIdParam)
@@ -1709,6 +1753,19 @@ func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
 	}
 
 	siw.Handler.PostStudies(c)
+}
+
+// PostStudiesAdminImport operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminImport(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminImport(c)
 }
 
 // PostStudiesAdminStudyIdReview operation middleware
@@ -2417,6 +2474,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
+	router.POST(options.BaseURL+"/studies/admin/import", wrapper.PostStudiesAdminImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)

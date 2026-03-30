@@ -323,3 +323,17 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) PostStudiesAdminImport(ctx *gin.Context) {
+	data := openapi.StudyImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	study, err := h.studies.ImportStudy(data)
+	if err != nil {
+		setError(ctx, err, "Failed to update study")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study))
+}

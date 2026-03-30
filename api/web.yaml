@@ -482,6 +482,23 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/admin/import:
+    post:
+      description: Tempoary endpoint to import a study object. Idempotent. Updates on caseref
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyImport"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Study"
+
   /studies/{studyId}/pending:
     patch:
       description: Update study status to pending
@@ -1536,6 +1553,80 @@ components:
               type: integer
               description: Unique 5-digit reference number for the study, assigned on creation
       description: A research study
+
+    StudyImport:
+      type: object
+      required:
+        - caseref
+        - title
+        - created_at
+        - updated_at
+        - owner_username
+        - data_controller_organisation
+        - approval_status
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        additional_study_admin_username:
+          type: string
+        data_controller_organisation:
+          type: string
+        involves_ucl_sponsorship:
+          type: boolean
+        involves_cag:
+          type: boolean
+        cag_reference:
+          type: string
+        involves_ethics_approval:
+          type: boolean
+        involves_hra_approval:
+          type: boolean
+        iras_id:
+          type: string
+        is_nhs_associated:
+          type: boolean
+        involves_nhs_england:
+          type: boolean
+        nhs_england_reference:
+          type: string
+        involves_mnca:
+          type: boolean
+        requires_dspt:
+          type: boolean
+        requires_dbs:
+          type: boolean
+        is_data_protection_office_registered:
+          type: boolean
+        data_protection_number:
+          type: string
+        involves_third_party:
+          type: boolean
+        involves_external_users:
+          type: boolean
+        involves_participant_consent:
+          type: boolean
+        involves_indirect_data_collection:
+          type: boolean
+        involves_data_processing_outside_eea:
+          type: boolean
+        owner_username:
+          type: string
+        created_at:
+          type: string
+          description: Time in RFC3339 format when the study was created
+        updated_at:
+          type: string
+          description: Time in RFC3339 format when the study was last updated
+        approval_status:
+          type: string
+        feedback:
+          type: string
+        last_signoff:
+          type: string
+        caseref:
+          type: integer
 
     ApprovalStatus:
       type: string

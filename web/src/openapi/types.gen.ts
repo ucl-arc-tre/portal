@@ -358,6 +358,45 @@ export type Study = StudyBase & {
     caseref: number;
 };
 
+export type StudyImport = {
+    title: string;
+    description?: string;
+    additional_study_admin_username?: string;
+    data_controller_organisation: string;
+    involves_ucl_sponsorship?: boolean;
+    involves_cag?: boolean;
+    cag_reference?: string;
+    involves_ethics_approval?: boolean;
+    involves_hra_approval?: boolean;
+    iras_id?: string;
+    is_nhs_associated?: boolean;
+    involves_nhs_england?: boolean;
+    nhs_england_reference?: string;
+    involves_mnca?: boolean;
+    requires_dspt?: boolean;
+    requires_dbs?: boolean;
+    is_data_protection_office_registered?: boolean;
+    data_protection_number?: string;
+    involves_third_party?: boolean;
+    involves_external_users?: boolean;
+    involves_participant_consent?: boolean;
+    involves_indirect_data_collection?: boolean;
+    involves_data_processing_outside_eea?: boolean;
+    owner_username: string;
+    /**
+     * Time in RFC3339 format when the study was created
+     */
+    created_at: string;
+    /**
+     * Time in RFC3339 format when the study was last updated
+     */
+    updated_at: string;
+    approval_status: string;
+    feedback?: string;
+    last_signoff?: string;
+    caseref: number;
+};
+
 /**
  * Current approval status (used for studies, projects, etc.)
  */
@@ -1335,6 +1374,22 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
      */
     201: unknown;
 };
+
+export type PostStudiesAdminImportData = {
+    body: StudyImport;
+    path?: never;
+    query?: never;
+    url: '/studies/admin/import';
+};
+
+export type PostStudiesAdminImportResponses = {
+    /**
+     * OK
+     */
+    200: Study;
+};
+
+export type PostStudiesAdminImportResponse = PostStudiesAdminImportResponses[keyof PostStudiesAdminImportResponses];
 
 export type PatchStudiesByStudyIdPendingData = {
     body?: never;
