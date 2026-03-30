@@ -10,6 +10,7 @@ type QueryParams struct {
 	ApprovalStatus *openapi.ApprovalStatus
 	FuzzyTitle     *string
 	OwnerUsername  *string
+	MaxItems       *int
 }
 
 type ContractObject struct {
