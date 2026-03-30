@@ -25,9 +25,8 @@ export default function IGOpsStudies() {
   const [studies, setStudies] = useState<Study[]>([]);
   const [tab, setTab] = useState("pending");
 
-  const studiesPerPage = 10;
+  const studiesPerPage = 12;
   const [pageOffset, setPageOffset] = useState(0);
-  const maxStudySearchItems = 50;
   const fetchStudies = async (index?: number) => {
     setIsLoading(true);
     setError(null);
@@ -36,8 +35,8 @@ export default function IGOpsStudies() {
         tab === "pending"
           ? await getStudies({ query: { status: "Pending" } })
           : index
-            ? await getStudies({ query: { max_items: maxStudySearchItems, start_index: index } })
-            : await getStudies({ query: { max_items: maxStudySearchItems } });
+            ? await getStudies({ query: { start_index: index, max_items: studiesPerPage } })
+            : await getStudies({ query: { max_items: studiesPerPage } });
 
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
@@ -61,21 +60,21 @@ export default function IGOpsStudies() {
       switch (true) {
         case query.includes("caseref:"):
           response = await getStudies({
-            query: { max_items: maxStudySearchItems, caseref: Number(query.split("caseref:")[1]) },
+            query: { caseref: Number(query.split("caseref:")[1]) },
           });
           break;
         case query.includes("title:"):
           response = await getStudies({
-            query: { max_items: maxStudySearchItems, fuzzy_title: query.split("title:")[1] },
+            query: { fuzzy_title: query.split("title:")[1] },
           });
           break;
         case query.includes("iao:"):
           response = await getStudies({
-            query: { max_items: maxStudySearchItems, owner_username: query.split("iao:")[1] },
+            query: { owner_username: query.split("iao:")[1] },
           });
           break;
         default:
-          response = await getStudies({ query: { max_items: maxStudySearchItems, query: query } });
+          response = await getStudies({ query: { query: query } });
       }
 
       if (!response.response.ok || !response.data) {
@@ -159,20 +158,18 @@ export default function IGOpsStudies() {
         <>
           <StudyCardsList studies={studies} />
 
-          {studies.length > 15 && (
-            <div className={styles["pagination-container"]}>
-              <Pagination
-                total={studies.length}
-                limit={studiesPerPage}
-                offset={pageOffset}
-                onPageChange={(newOffset) => handlePageChange(newOffset)}
-              >
-                <PaginationControls />
-                <PaginationInfo />
-              </Pagination>
-              <small>Please note these results have been ordered by date of IAO signoff</small>
-            </div>
-          )}
+          <div className={styles["pagination-container"]}>
+            <Pagination
+              total={studies.length}
+              limit={studiesPerPage}
+              offset={pageOffset}
+              onPageChange={(newOffset) => handlePageChange(newOffset)}
+            >
+              <PaginationControls />
+              <PaginationInfo />
+            </Pagination>
+            <small>Please note these results have been ordered by date of IAO signoff</small>
+          </div>
         </>
       )}
     </>
