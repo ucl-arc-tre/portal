@@ -79,7 +79,10 @@ export default function StudyCardsList(props: Props) {
             <PaginationInfo />
           </Pagination>
           {studies.length == maxStudySearchItems && (
-            <small>Please note these results have been limited to 50 items</small>
+            <small>
+              Please note these results have been limited to the first {maxStudySearchItems} items, ordered by date of
+              IAO signoff
+            </small>
           )}
         </div>
       )}
