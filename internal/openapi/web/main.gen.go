@@ -1119,6 +1119,9 @@ type GetStudiesParams struct {
 
 	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
 	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
+
+	// MaxItems Maximum number of items to return
+	MaxItems *int `form:"max_items,omitempty" json:"max_items,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1685,6 +1688,14 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner_username", c.Request.URL.Query(), &params.OwnerUsername, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner_username: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "max_items" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "max_items", c.Request.URL.Query(), &params.MaxItems, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter max_items: %w", err), http.StatusBadRequest)
 		return
 	}
 

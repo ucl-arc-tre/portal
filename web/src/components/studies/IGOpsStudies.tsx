@@ -8,6 +8,8 @@ import Loading from "../ui/Loading";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Search from "../ui/Search";
 
+export const maxStudySearchItems = 50;
+
 export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
@@ -18,7 +20,10 @@ export default function IGOpsStudies() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = tab === "pending" ? await getStudies({ query: { status: "Pending" } }) : await getStudies();
+      const response =
+        tab === "pending"
+          ? await getStudies({ query: { status: "Pending" } })
+          : await getStudies({ query: { max_items: maxStudySearchItems } });
 
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
@@ -38,18 +43,25 @@ export default function IGOpsStudies() {
     setError(null);
     try {
       let response;
+
       switch (true) {
         case query.includes("caseref:"):
-          response = await getStudies({ query: { caseref: Number(query.split("caseref:")[1]) } });
+          response = await getStudies({
+            query: { max_items: maxStudySearchItems, caseref: Number(query.split("caseref:")[1]) },
+          });
           break;
         case query.includes("title:"):
-          response = await getStudies({ query: { fuzzy_title: query.split("title:")[1] } });
+          response = await getStudies({
+            query: { max_items: maxStudySearchItems, fuzzy_title: query.split("title:")[1] },
+          });
           break;
         case query.includes("iao:"):
-          response = await getStudies({ query: { owner_username: query.split("iao:")[1] } });
+          response = await getStudies({
+            query: { max_items: maxStudySearchItems, owner_username: query.split("iao:")[1] },
+          });
           break;
         default:
-          response = await getStudies({ query: { query: query } });
+          response = await getStudies({ query: { max_items: maxStudySearchItems, query: query } });
       }
 
       if (!response.response.ok || !response.data) {

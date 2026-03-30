@@ -367,6 +367,12 @@ paths:
           description: Full username of the study owner. e.g. ccxyz@ucl.ac.uk
           schema:
             type: string
+        - in: query
+          name: max_items
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
       responses:
         "200":
           content:
