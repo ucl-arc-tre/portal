@@ -73,8 +73,6 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	}
 	if params.MaxItems != nil && *params.MaxItems > 50 {
 		return []types.Study{}, types.NewErrInvalidObject("maxItems cannot be greater than 50")
-	} else if params.MaxItems == nil {
-		*params.MaxItems = 50
 	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,
