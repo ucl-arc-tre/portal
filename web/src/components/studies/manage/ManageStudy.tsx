@@ -36,10 +36,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const tab = (router.query.tab as string) ?? "study";
 
   const { userData } = useAuth();
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
-  const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
-  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
 
   const checkStudyAdminAgreements = useCallback(
@@ -143,7 +139,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <ContractManagement
           study={study}
           contracts={contracts}
-          canModify={isStudyOwnerOrAdmin}
           someAssetsRequireContracts={assets.some((asset) => asset.requires_contract)}
           fetchStudyContents={fetchStudyContents}
         />
