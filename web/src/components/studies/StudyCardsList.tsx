@@ -66,7 +66,7 @@ export default function StudyCardsList(props: Props) {
             </div>
           ))}
       </div>
-      {studies.length > 10 && (
+      {studies.length > 15 && (
         <div className={styles["pagination-container"]}>
           <Pagination
             total={studies.length}
