@@ -124,11 +124,7 @@ export default function IGOpsStudies() {
         </div>
       )}
 
-      {studies.length > 0 && (
-        <>
-          <StudyCardsList studies={studies} />
-        </>
-      )}
+      {studies.length > 0 && <StudyCardsList studies={studies} />}
     </>
   );
 }
