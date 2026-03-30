@@ -7,6 +7,7 @@ import styles from "./StudyCardsList.module.css";
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { maxStudySearchItems } from "./IGOpsStudies";
 const PaginationControls = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Controls), {
   ssr: false,
 });
@@ -77,7 +78,9 @@ export default function StudyCardsList(props: Props) {
             <PaginationControls />
             <PaginationInfo />
           </Pagination>
-          {studies.length == 50 && <small>Please note these results have been limited to 50 items</small>}
+          {studies.length == maxStudySearchItems && (
+            <small>Please note these results have been limited to 50 items</small>
+          )}
         </div>
       )}
     </div>
