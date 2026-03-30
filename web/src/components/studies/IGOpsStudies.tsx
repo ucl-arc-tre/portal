@@ -38,18 +38,19 @@ export default function IGOpsStudies() {
     setError(null);
     try {
       let response;
+      const maxItems = 50;
       switch (true) {
         case query.includes("caseref:"):
-          response = await getStudies({ query: { caseref: Number(query.split("caseref:")[1]) } });
+          response = await getStudies({ query: { max_items: maxItems, caseref: Number(query.split("caseref:")[1]) } });
           break;
         case query.includes("title:"):
-          response = await getStudies({ query: { fuzzy_title: query.split("title:")[1] } });
+          response = await getStudies({ query: { max_items: maxItems, fuzzy_title: query.split("title:")[1] } });
           break;
         case query.includes("iao:"):
-          response = await getStudies({ query: { owner_username: query.split("iao:")[1] } });
+          response = await getStudies({ query: { max_items: maxItems, owner_username: query.split("iao:")[1] } });
           break;
         default:
-          response = await getStudies({ query: { query: query } });
+          response = await getStudies({ query: { max_items: maxItems, query: query } });
       }
 
       if (!response.response.ok || !response.data) {

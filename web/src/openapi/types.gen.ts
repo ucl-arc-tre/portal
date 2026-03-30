@@ -1153,6 +1153,10 @@ export type GetStudiesData = {
          * Full username of the study owner. e.g. ccxyz@ucl.ac.uk
          */
         owner_username?: string;
+        /**
+         * Maximum number of items to return
+         */
+        max_items?: number;
     };
     url: '/studies';
 };
