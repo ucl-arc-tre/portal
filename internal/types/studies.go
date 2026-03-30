@@ -43,6 +43,7 @@ type Study struct {
 	Owner       User         `gorm:"foreignKey:OwnerUserID"`
 	Assets      []Asset      `gorm:"foreignKey:StudyID"`
 	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
+	Contracts   []Contract   `gorm:"foreignKey:StudyID"`
 }
 
 // Queried via the DSH API
@@ -138,4 +139,26 @@ type ContractObjectMetadata struct {
 
 	// Relationships
 	Contract Contract
+}
+
+func (c Contract) DaysUntilExpiry() int {
+	return int(time.Until(c.ExpiryDate).Hours() / 24)
+}
+
+func (s Study) EarliestExpringContractWithin30Days() *Contract {
+	var earliestContract *Contract
+	for _, contract := range s.Contracts {
+		if earliestContract != nil && contract.DaysUntilExpiry() > earliestContract.DaysUntilExpiry() {
+			continue
+		}
+		if contract.DaysUntilExpiry() < 0 {
+			earliestContract = &contract
+		} else if contract.DaysUntilExpiry() == 1 {
+			earliestContract = &contract
+		} else if contract.DaysUntilExpiry() == 7 || contract.DaysUntilExpiry() == 14 || contract.DaysUntilExpiry() == 30 {
+			earliestContract = &contract
+		}
+
+	}
+	return earliestContract
 }
