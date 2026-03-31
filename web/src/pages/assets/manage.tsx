@@ -19,6 +19,8 @@ import Button from "@/components/ui/Button";
 import styles from "./ManageAssetPage.module.css";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ManageAsset from "@/components/assets/ManageAsset";
+import MetaHead from "@/components/meta/Head";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -110,5 +112,26 @@ export default function ManageAssetPage() {
     );
   }
 
-  return <ManageAsset study={study} asset={asset} contracts={contracts} />;
+  return (
+    <>
+      <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
+      <Breadcrumbs
+        links={[
+          {
+            title: "Studies",
+            url: "/studies",
+          },
+          {
+            title: study.title,
+            url: `/studies/manage?studyId=${study.id}`,
+          },
+          {
+            title: asset.title,
+            url: `/assets/manage?studyId=${study.id}&assetId=${asset.id}`,
+          },
+        ]}
+      />
+      <ManageAsset study={study} asset={asset} contracts={contracts} />;
+    </>
+  );
 }
