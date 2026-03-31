@@ -7,11 +7,14 @@ import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
 import { Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Asset } from "@/openapi/types.gen";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
   closeModal: () => void;
+  setIsFormOpen?: (isOpen: boolean) => void;
+  editingAsset?: Asset;
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {

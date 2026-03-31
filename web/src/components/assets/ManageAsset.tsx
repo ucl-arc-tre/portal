@@ -1,8 +1,12 @@
 import { Asset, Contract, Study } from "@/openapi";
 
 import styles from "./ManageAsset.module.css";
-import { HelperText } from "../shared/uikitExports";
+import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import ContractCard from "../contracts/ContractCard";
+import AssetCreationForm from "./AssetCreationForm";
+import Button from "../ui/Button";
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 type ManageAssetProps = {
   study: Study;
@@ -12,8 +16,46 @@ type ManageAssetProps = {
 
 export default function ManageAsset(props: ManageAssetProps) {
   const { study, asset, contracts } = props;
+  const [error, setError] = useState<string | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const { userData } = useAuth();
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
+  const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
+  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+
+  const onEditComplete = async (assetData: AssetFormData) => {
+    setIsFormOpen(false);
+    // fetchAsset(asset.id);
+  };
   return (
     <>
+      {isFormOpen && (
+        <AssetCreationForm
+          closeModal={() => setIsFormOpen(false)}
+          editingAsset={asset}
+          handleAssetSubmit={onEditComplete}
+        />
+      )}
+
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
+
+      {isStudyOwnerOrAdmin && (
+        <div className={styles["asset-actions"]}>
+          <Button variant="primary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-asset-button">
+            Edit Asset
+          </Button>
+
+          <Button disabled size="small" variant="secondary">
+            Delete Asset
+          </Button>
+        </div>
+      )}
       <div className={styles["asset-info"]}>
         <div className={styles.section}>
           <h3>Asset Details</h3>
