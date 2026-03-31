@@ -565,6 +565,23 @@ type AssetBaseProtection string
 // AssetBaseStatus Status of the asset
 type AssetBaseStatus string
 
+// AssetImport defines model for AssetImport.
+type AssetImport struct {
+	CreatedAt          string   `json:"created_at"`
+	Description        string   `json:"description"`
+	ExpiresAt          string   `json:"expires_at"`
+	Format             string   `json:"format"`
+	HasDspt            bool     `json:"has_dspt"`
+	LegalBasis         string   `json:"legal_basis"`
+	Locations          []string `json:"locations"`
+	Protection         string   `json:"protection"`
+	RequiresContract   bool     `json:"requires_contract"`
+	Status             string   `json:"status"`
+	StoredOutsideUkEea bool     `json:"stored_outside_uk_eea"`
+	Tier               int      `json:"tier"`
+	Title              string   `json:"title"`
+}
+
 // Auth defines model for Auth.
 type Auth struct {
 	// Roles List of roles assigned to the user. This array can contain both:
@@ -1203,6 +1220,9 @@ type PostStudiesJSONRequestBody = StudyRequest
 // PostStudiesAdminImportJSONRequestBody defines body for PostStudiesAdminImport for application/json ContentType.
 type PostStudiesAdminImportJSONRequestBody = StudyImport
 
+// PostStudiesAdminStudyIdAssetsImportJSONRequestBody defines body for PostStudiesAdminStudyIdAssetsImport for application/json ContentType.
+type PostStudiesAdminStudyIdAssetsImportJSONRequestBody = AssetImport
+
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
@@ -1301,6 +1321,9 @@ type ServerInterface interface {
 
 	// (POST /studies/admin/import)
 	PostStudiesAdminImport(c *gin.Context)
+
+	// (POST /studies/admin/{studyId}/assets/import)
+	PostStudiesAdminStudyIdAssetsImport(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId StudyIdParam)
@@ -1772,6 +1795,30 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminImport(c *gin.Context) {
 	}
 
 	siw.Handler.PostStudiesAdminImport(c)
+}
+
+// PostStudiesAdminStudyIdAssetsImport operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdAssetsImport(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdAssetsImport(c, studyId)
 }
 
 // PostStudiesAdminStudyIdReview operation middleware
@@ -2481,6 +2528,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/import", wrapper.PostStudiesAdminImport)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/assets/import", wrapper.PostStudiesAdminStudyIdAssetsImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)

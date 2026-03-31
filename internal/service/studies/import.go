@@ -3,6 +3,7 @@ package studies
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -77,7 +78,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 	}
 
 	result := tx.Model(&types.Study{}).
-		Assign(&study). // update all fields
+		Assign(study). // update all fields
 		Where("caseref = ?", data.Caseref).
 		FirstOrCreate(&study)
 	if result.Error != nil {
@@ -121,7 +122,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		}
 
 		studyAdmin := types.StudyAdmin{StudyID: study.ID, UserID: admin.ID}
-		if err := tx.Model(&studyAdmin).Where("user_id = ? AND study_id = ?", admin.ID, study.ID).Assign(&studyAdmin).FirstOrCreate(&studyAdmin).Error; err != nil {
+		if err := tx.Model(&studyAdmin).Where("user_id = ? AND study_id = ?", admin.ID, study.ID).Assign(studyAdmin).FirstOrCreate(&studyAdmin).Error; err != nil {
 			tx.Rollback()
 			return nil, types.NewErrFromGorm(err, "failed to create study admin")
 		}
@@ -155,4 +156,77 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 
 	log.Debug().Any("id", study.ID).Msg("Imported study")
 	return &study, commitTransaction(tx)
+}
+
+func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*types.Asset, error) {
+	// NOTE: this deliberately doesn't do strong validation of the object
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	study := types.Study{}
+	if err := tx.Where("id = ?", studyId).First(&study).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to get study")
+	}
+
+	asset := types.Asset{
+		Title:              data.Title,
+		Description:        data.Description,
+		Tier:               data.Tier,
+		CreatorUserID:      study.OwnerUserID,
+		StudyID:            studyId,
+		Protection:         data.Protection,
+		LegalBasis:         data.LegalBasis,
+		Format:             data.Format,
+		RequiresContract:   data.RequiresContract,
+		HasDspt:            data.HasDspt,
+		StoredOutsideUkEea: data.StoredOutsideUkEea,
+		Status:             data.Status,
+	}
+	switch data.Tier {
+	case 0:
+		asset.ClassificationImpact = string(openapi.AssetClassificationImpactPublic)
+	case 1:
+		asset.ClassificationImpact = string(openapi.AssetBaseClassificationImpactConfidential)
+	case 2, 3, 4:
+		asset.ClassificationImpact = string(openapi.AssetClassificationImpactHighlyConfidential)
+	default:
+		return nil, types.NewErrInvalidObject("invalid tier impact")
+	}
+
+	if createdAt, err := time.Parse(config.TimeFormat, data.CreatedAt); err != nil {
+		return nil, types.NewErrInvalidObject("failed to parse created at")
+	} else {
+		asset.CreatedAt = createdAt
+	}
+	if expiresAt, err := time.Parse(config.TimeFormat, data.ExpiresAt); err != nil {
+		return nil, types.NewErrInvalidObject("failed to parse expires at")
+	} else {
+		asset.ExpiresAt = expiresAt
+	}
+	log.Debug().Any("asset", asset).Msg("pre create asset") // todo
+
+	if err := tx.Where("title = ? AND study_id = ?", asset.Title, studyId).Assign(asset).FirstOrCreate(&asset).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to agree owner agreement")
+	}
+
+	for _, locationStr := range data.Locations {
+		if locationStr == "" {
+			return nil, types.NewErrInvalidObject("empty location string")
+		}
+		assetLocation := types.AssetLocation{
+			AssetID:  asset.ID,
+			Location: locationStr,
+		}
+		if err := tx.Where("asset_id = ? AND location = ?", asset.ID, locationStr).FirstOrCreate(&assetLocation).Error; err != nil {
+			tx.Rollback()
+			return nil, types.NewErrFromGorm(err, "failed to create asset location")
+		}
+		asset.Locations = append(asset.Locations, assetLocation)
+	}
+
+	log.Debug().Any("asset", asset).Msg("Created asset")
+	return &asset, commitTransaction(tx)
 }

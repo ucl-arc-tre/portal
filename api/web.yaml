@@ -498,6 +498,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Study"
+  /studies/admin/{studyId}/assets/import:
+    post:
+      description: Tempoary endpoint to import a asset object for a contract. Idempotent. Updates on title
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetImport"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
 
   /studies/{studyId}/pending:
     patch:
@@ -1633,6 +1651,54 @@ components:
         admin_agreed_at:
           type: string
           description: Time in RFC3339 format when the owner agreed to the IAA agreement
+
+    AssetImport:
+      type: object
+      required:
+        - title
+        - description
+        - classification_impact
+        - tier
+        - locations
+        - protection
+        - legal_basis
+        - format
+        - requires_contract
+        - expires_at
+        - has_dspt
+        - stored_outside_uk_eea
+        - accessed_by_third_parties
+        - status
+        - created_at
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        tier:
+          type: integer
+        locations:
+          type: array
+          items:
+            type: string
+        protection:
+          type: string
+        legal_basis:
+          type: string
+        format:
+          type: string
+        expires_at:
+          type: string
+        requires_contract:
+          type: boolean
+        has_dspt:
+          type: boolean
+        stored_outside_uk_eea:
+          type: boolean
+        status:
+          type: string
+        created_at:
+          type: string
 
     ApprovalStatus:
       type: string

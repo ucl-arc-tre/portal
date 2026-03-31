@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -114,11 +115,7 @@ func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, stud
 func (s *Service) createInformationAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
 	// Start a transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// Parse the expiry date string (already validated in validateAssetData)
 	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)

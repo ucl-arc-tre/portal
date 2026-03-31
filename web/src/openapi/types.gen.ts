@@ -405,6 +405,22 @@ export type StudyImport = {
     admin_agreed_at?: string;
 };
 
+export type AssetImport = {
+    title: string;
+    description: string;
+    tier: number;
+    locations: Array<string>;
+    protection: string;
+    legal_basis: string;
+    format: string;
+    expires_at: string;
+    requires_contract: boolean;
+    has_dspt: boolean;
+    stored_outside_uk_eea: boolean;
+    status: string;
+    created_at: string;
+};
+
 /**
  * Current approval status (used for studies, projects, etc.)
  */
@@ -1398,6 +1414,27 @@ export type PostStudiesAdminImportResponses = {
 };
 
 export type PostStudiesAdminImportResponse = PostStudiesAdminImportResponses[keyof PostStudiesAdminImportResponses];
+
+export type PostStudiesAdminByStudyIdAssetsImportData = {
+    body: AssetImport;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/assets/import';
+};
+
+export type PostStudiesAdminByStudyIdAssetsImportResponses = {
+    /**
+     * OK
+     */
+    200: Asset;
+};
+
+export type PostStudiesAdminByStudyIdAssetsImportResponse = PostStudiesAdminByStudyIdAssetsImportResponses[keyof PostStudiesAdminByStudyIdAssetsImportResponses];
 
 export type PatchStudiesByStudyIdPendingData = {
     body?: never;

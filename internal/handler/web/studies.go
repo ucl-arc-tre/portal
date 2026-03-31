@@ -337,3 +337,21 @@ func (h *Handler) PostStudiesAdminImport(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study))
 }
+
+func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	data := openapi.AssetImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	asset, err := h.studies.ImportAsset(studyUUID, data)
+	if err != nil {
+		setError(ctx, err, "Failed to update asset")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, assetToOpenApiAsset(*asset))
+}
