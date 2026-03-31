@@ -90,7 +90,7 @@ export default function ManageAssetPage() {
     return (
       <div className={styles.container}>
         <Title text="Error" />
-        <p className={styles.error}>{error}</p>
+        <p className="error-message">{error}</p>
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>
@@ -102,7 +102,7 @@ export default function ManageAssetPage() {
     return (
       <div className={styles.container}>
         <Title text="Not Found" />
-        <p className={styles.error}>Study or asset not found.</p>
+        <p className="error-message">Study or asset not found.</p>
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>

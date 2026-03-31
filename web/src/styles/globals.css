@@ -84,8 +84,9 @@ dialog {
   background-color: #fdeaea;
   border: 1px solid #f5c6cb;
   border-radius: 4px;
-  padding: 12px;
-  margin-bottom: 16px;
+  background: #f8d7da;
+  padding: 1rem;
+  margin: 1rem 0;
 }
 
 .tab-collection {
