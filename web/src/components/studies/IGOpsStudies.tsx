@@ -35,8 +35,8 @@ export default function IGOpsStudies() {
         tab === "pending"
           ? await getStudies({ query: { status: "Pending" } })
           : index
-            ? await getStudies({ query: { start_index: index, max_items: studiesPerPage } })
-            : await getStudies({ query: { max_items: studiesPerPage } });
+            ? await getStudies({ query: { offset: index, limit: studiesPerPage } })
+            : await getStudies({ query: { limit: studiesPerPage } });
 
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
