@@ -1627,6 +1627,12 @@ components:
           type: string
         caseref:
           type: integer
+        owner_agreed_at:
+          type: string
+          description: Time in RFC3339 format when the owner agreed to the IAO agreement
+        admin_agreed_at:
+          type: string
+          description: Time in RFC3339 format when the owner agreed to the IAA agreement
 
     ApprovalStatus:
       type: string

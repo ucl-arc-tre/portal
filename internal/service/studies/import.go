@@ -7,6 +7,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -83,17 +85,56 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		return nil, types.NewErrFromGorm(err, "failed to create study")
 	}
 
+	if _, err := rbac.AddStudyOwnerRole(owner, study.ID); err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	agreemeent := types.Agreement{}
+	if err := s.db.Where("type = ?", agreements.StudyOwnerType).Order("created_at desc").Limit(1).First(&agreemeent).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to get agreement")
+	}
+
+	ownerSignature := types.StudyAgreementSignature{
+		UserID:      owner.ID,
+		StudyID:     study.ID,
+		AgreementID: agreemeent.ID,
+	}
+	if err := tx.Where(&ownerSignature).FirstOrCreate(&ownerSignature).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to agree owner agreement")
+	}
+
 	if data.AdditionalStudyAdminUsername != nil {
 		admin, err := s.users.PersistedUser(types.Username(*data.AdditionalStudyAdminUsername))
 		if err != nil {
 			tx.Rollback()
 			return nil, err
 		}
+
 		studyAdmin := types.StudyAdmin{StudyID: study.ID, UserID: admin.ID}
 		if err := tx.Model(&studyAdmin).Where("user_id = ? AND study_id = ?", admin.ID, study.ID).Assign(&studyAdmin).FirstOrCreate(&studyAdmin).Error; err != nil {
 			tx.Rollback()
 			return nil, types.NewErrFromGorm(err, "failed to create study admin")
 		}
+
+		adminRole := rbac.StudyRole{StudyID: study.ID, Name: rbac.StudyOwner}
+		if _, err := rbac.AddRole(owner, adminRole.RoleName()); err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		adminSignature := types.StudyAgreementSignature{
+			UserID:      admin.ID,
+			StudyID:     study.ID,
+			AgreementID: agreemeent.ID,
+		}
+		if err := tx.Where(&adminSignature).FirstOrCreate(&adminSignature).Error; err != nil {
+			tx.Rollback()
+			return nil, types.NewErrFromGorm(err, "failed to agree admin agreement")
+		}
+
 		studyAdmin.User = admin
 		study.StudyAdmins = append(study.StudyAdmins, studyAdmin)
 	}

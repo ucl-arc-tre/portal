@@ -395,6 +395,14 @@ export type StudyImport = {
     feedback?: string;
     last_signoff?: string;
     caseref: number;
+    /**
+     * Time in RFC3339 format when the owner agreed to the IAO agreement
+     */
+    owner_agreed_at?: string;
+    /**
+     * Time in RFC3339 format when the owner agreed to the IAA agreement
+     */
+    admin_agreed_at?: string;
 };
 
 /**

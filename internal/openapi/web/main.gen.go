@@ -997,9 +997,12 @@ type StudyBase struct {
 // StudyImport defines model for StudyImport.
 type StudyImport struct {
 	AdditionalStudyAdminUsername *string `json:"additional_study_admin_username,omitempty"`
-	ApprovalStatus               string  `json:"approval_status"`
-	CagReference                 *string `json:"cag_reference,omitempty"`
-	Caseref                      int     `json:"caseref"`
+
+	// AdminAgreedAt Time in RFC3339 format when the owner agreed to the IAA agreement
+	AdminAgreedAt  *string `json:"admin_agreed_at,omitempty"`
+	ApprovalStatus string  `json:"approval_status"`
+	CagReference   *string `json:"cag_reference,omitempty"`
+	Caseref        int     `json:"caseref"`
 
 	// CreatedAt Time in RFC3339 format when the study was created
 	CreatedAt                        string  `json:"created_at"`
@@ -1023,10 +1026,13 @@ type StudyImport struct {
 	IsNhsAssociated                  *bool   `json:"is_nhs_associated,omitempty"`
 	LastSignoff                      *string `json:"last_signoff,omitempty"`
 	NhsEnglandReference              *string `json:"nhs_england_reference,omitempty"`
-	OwnerUsername                    string  `json:"owner_username"`
-	RequiresDbs                      *bool   `json:"requires_dbs,omitempty"`
-	RequiresDspt                     *bool   `json:"requires_dspt,omitempty"`
-	Title                            string  `json:"title"`
+
+	// OwnerAgreedAt Time in RFC3339 format when the owner agreed to the IAO agreement
+	OwnerAgreedAt *string `json:"owner_agreed_at,omitempty"`
+	OwnerUsername string  `json:"owner_username"`
+	RequiresDbs   *bool   `json:"requires_dbs,omitempty"`
+	RequiresDspt  *bool   `json:"requires_dspt,omitempty"`
+	Title         string  `json:"title"`
 
 	// UpdatedAt Time in RFC3339 format when the study was last updated
 	UpdatedAt string `json:"updated_at"`
