@@ -1,0 +1,81 @@
+.fieldset {
+  border: none;
+  padding-bottom: 0.4rem;
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fieldset label {
+  width: 100%;
+  justify-self: start;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.fieldset [data-testid="ucl-uikit-field__helper-text"] {
+  font-weight: 400;
+}
+
+.fieldset input,
+.fieldset textarea,
+.fieldset select {
+  accent-color: var(--form-blue--light);
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.fieldset input:focus-visible,
+.fieldset textarea:focus-visible,
+.fieldset select:focus-visible {
+  -webkit-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+  -moz-box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+  box-shadow: 0 0 1px 1.5px var(--form-blue--shadow);
+  outline: none;
+}
+
+.fieldset textarea {
+  display: block;
+  max-width: 100%;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.fieldset small {
+  display: block;
+}
+
+.option-field {
+  padding: 0.4rem;
+  font-weight: 400;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-content: center;
+}
+
+.form-link {
+  color: var(--form-link);
+  text-decoration: underline;
+}
+
+.form-link:hover {
+  color: var(--form-link--hover);
+  text-decoration: none;
+}
+
+.readonly {
+  cursor: not-allowed;
+}
+
+.readonly:focus-visible {
+  box-shadow: none !important;
+}

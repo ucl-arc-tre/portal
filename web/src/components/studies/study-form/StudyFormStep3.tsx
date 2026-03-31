@@ -1,39 +1,39 @@
 import { Control, Controller, FieldErrors, useWatch } from "react-hook-form";
 import { Alert, AlertMessage, HelperText, Label } from "../../shared/uikitExports";
-import styles from "./StudyForm.module.css";
-import { UclDpoId } from "./studyFormUtils";
-import YesNoUnsureButtons from "./YesNoUnsureButtons";
+import sharedStyles from "./StudyFormShared.module.css";
+import styles from "./StudyFormStep3.module.css";
+import { UclDpoId } from "./lib/studyFormUtils";
+import ButtonGroup from "./ButtonGroup";
 
 type StudyFormStep3Props = {
   control: Control<StudyFormData>;
   errors: FieldErrors<StudyFormData>;
   controllerValue: string;
-  className: string;
 };
 
-export default function StudyFormStep3({ control, errors, controllerValue, className }: StudyFormStep3Props) {
+export default function StudyFormStep3({ control, errors, controllerValue }: StudyFormStep3Props) {
   const showDataProtectionNumber = useWatch({ name: "isDataProtectionOfficeRegistered", control });
 
   return (
-    <fieldset className={className}>
-      <div className={styles["option-field"]} data-cy="requiresDbs">
+    <fieldset className={sharedStyles.fieldset}>
+      <div className={sharedStyles["option-field"]} data-cy="requiresDbs">
         There is data related to this research only to be handled by staff who have obtained a Disclosure and Barring
         Service (DBS) check
         <Controller
           name="requiresDbs"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
 
-      <div className={styles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
+      <div className={sharedStyles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
         The research is already registered with the UCL Data Protection Office
         <Controller
           name="isDataProtectionOfficeRegistered"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -49,18 +49,25 @@ export default function StudyFormStep3({ control, errors, controllerValue, class
               name="dataProtectionPrefix"
               control={control}
               rules={{
-                required: showDataProtectionNumber ? "Registry ID is required" : false,
+                required:
+                  controllerValue?.toLowerCase() !== "ucl" && showDataProtectionNumber
+                    ? "Registry ID is required"
+                    : false,
               }}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  id="dataProtectionPrefix"
-                  readOnly={controllerValue?.toLowerCase() === "ucl"}
-                  placeholder={controllerValue?.toLowerCase() === "ucl" ? "" : "Registry ID eg ZX1234"}
-                  className={controllerValue?.toLowerCase() === "ucl" ? styles.readonly : ""}
-                />
-              )}
+              render={({ field }) => {
+                const isUcl = controllerValue?.toLowerCase() === "ucl";
+                return (
+                  <input
+                    {...field}
+                    value={isUcl ? UclDpoId : (field.value ?? "")}
+                    type="text"
+                    id="dataProtectionPrefix"
+                    readOnly={isUcl}
+                    placeholder={isUcl ? "" : "Registry ID eg ZX1234"}
+                    className={isUcl ? sharedStyles.readonly : ""}
+                  />
+                );
+              }}
             />
 
             <Controller
@@ -71,6 +78,7 @@ export default function StudyFormStep3({ control, errors, controllerValue, class
               }}
               render={({ field }) => <input {...field} type="month" id="dataProtectionDate" />}
             />
+
             <Controller
               name="dataProtectionId"
               control={control}
@@ -99,52 +107,55 @@ export default function StudyFormStep3({ control, errors, controllerValue, class
         </Label>
       )}
 
-      <div className={styles["option-field"]} data-cy="involvesThirdParty">
+      <div className={sharedStyles["option-field"]} data-cy="involvesThirdParty">
         Organisations or businesses other than UCL will be involved in creating, storing, modifying, gatekeeping or
         providing data for this research
         <Controller
           name="involvesThirdParty"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
-      <div className={styles["option-field"]} data-cy="involvesExternalUsers">
+
+      <div className={sharedStyles["option-field"]} data-cy="involvesExternalUsers">
         We plan to give access to someone who is not a member of UCL
         <Controller
           name="involvesExternalUsers"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
 
-      <div className={styles["option-field"]} data-cy="involvesParticipantConsent">
+      <div className={sharedStyles["option-field"]} data-cy="involvesParticipantConsent">
         We will be seeking/have sought consent from participants to collect data about them for this research
         <Controller
           name="involvesParticipantConsent"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
-      <div className={styles["option-field"]} data-cy="involvesIndirectDataCollection">
+
+      <div className={sharedStyles["option-field"]} data-cy="involvesIndirectDataCollection">
         There is data to be collected indirectly for this research, e.g. by another organisation
         <Controller
           name="involvesIndirectDataCollection"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
-      <div className={styles["option-field"]} data-cy="involvesDataProcessingOutsideEea">
+
+      <div className={sharedStyles["option-field"]} data-cy="involvesDataProcessingOutsideEea">
         There is data related to this research to be processed outside of the UK and the countries that form the
         European Economic Area (For GDPR purposes)
         <Controller
           name="involvesDataProcessingOutsideEea"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
         />
       </div>
     </fieldset>

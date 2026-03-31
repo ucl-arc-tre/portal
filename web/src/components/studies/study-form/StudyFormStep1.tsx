@@ -1,44 +1,28 @@
-import {
-  Control,
-  Controller,
-  FieldErrors,
-  FieldArrayWithId,
-  UseFormGetValues,
-  UseFormRegister,
-  UseFieldArrayAppend,
-  UseFieldArrayRemove,
-} from "react-hook-form";
+import { Control, Controller, FieldErrors, UseFormGetValues, UseFormRegister, useFieldArray } from "react-hook-form";
 import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../../shared/uikitExports";
 import Button from "../../ui/Button";
-import styles from "./StudyForm.module.css";
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+import sharedStyles from "./StudyFormShared.module.css";
+import styles from "./StudyFormStep1.module.css";
 
 type StudyFormStep1Props = {
   control: Control<StudyFormData>;
   errors: FieldErrors<StudyFormData>;
   register: UseFormRegister<StudyFormData>;
   getValues: UseFormGetValues<StudyFormData>;
-  fields: FieldArrayWithId<StudyFormData, "additionalStudyAdminUsernames", "id">[];
-  append: UseFieldArrayAppend<StudyFormData, "additionalStudyAdminUsernames">;
-  remove: UseFieldArrayRemove;
   username: string;
-  className: string;
 };
 
-export default function StudyFormStep1({
-  control,
-  errors,
-  register,
-  getValues,
-  fields,
-  append,
-  remove,
-  username,
-  className,
-}: StudyFormStep1Props) {
+const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+
+export default function StudyFormStep1({ control, errors, register, getValues, username }: StudyFormStep1Props) {
+  const { fields, append, remove } = useFieldArray<StudyFormData, "additionalStudyAdminUsernames", "id">({
+    control,
+    name: "additionalStudyAdminUsernames",
+  });
+
   return (
     <>
-      <fieldset className={className}>
+      <fieldset className={sharedStyles.fieldset}>
         <Label htmlFor="studyName">
           Study Name*:
           <Controller
@@ -86,7 +70,7 @@ export default function StudyFormStep1({
         </Label>
       </fieldset>
 
-      <fieldset className={className}>
+      <fieldset className={sharedStyles.fieldset}>
         <Label htmlFor="owner">
           Study Owner (PI):
           <Input
@@ -95,7 +79,7 @@ export default function StudyFormStep1({
             {...register("owner")}
             readOnly={true}
             value={username}
-            inputClassName={styles.readonly}
+            inputClassName={sharedStyles.readonly}
           />
           <HelperText>
             If you are not the study owner, contact the owner and ask them to fill out this form on their account.
@@ -104,7 +88,7 @@ export default function StudyFormStep1({
 
         <Label>
           Additional Study Administrators (optional):
-          <fieldset className={styles.fieldset}>
+          <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
               Add UCL staff members who will help administrate this study. <strong>Must</strong> be valid UCL staff
               usernames.
@@ -112,7 +96,7 @@ export default function StudyFormStep1({
 
             {fields.map((field, index) => (
               <div key={field.id} className={styles["admin-wrapper"]}>
-                <Label htmlFor={`admin-${index}`} className={styles["admin-Label"]}>
+                <Label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
                   Administrator {index + 1}:
                   <Controller
                     name={`additionalStudyAdminUsernames.${index}.value` as const}

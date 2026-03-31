@@ -1,0 +1,39 @@
+.button-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-self: end;
+}
+
+.button-group button {
+  padding: 0.4rem 0.55rem;
+  cursor: pointer;
+  border: 2px solid #0d68cf;
+  color: #0d4b92;
+}
+
+.button-group button.yes {
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+}
+
+.button-group button.no {
+  border-radius: 0 5px 5px 0;
+  border-left: none;
+}
+
+.button-group button.selected {
+  background-color: #0d68cf;
+  color: #fff;
+  font-weight: bolder;
+}
+
+.button-group button.selected:nth-child(1) {
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+}
+
+.button-group button.selected:nth-child(3) {
+  border-radius: 0 5px 5px 0;
+  border-left: none;
+}

@@ -1,6 +1,6 @@
-import styles from "./StudyForm.module.css";
+import styles from "./ButtonGroup.module.css";
 
-export default function YesNoUnsureButtons({
+export default function ButtonGroup({
   value,
   onChange,
 }: {
@@ -8,30 +8,32 @@ export default function YesNoUnsureButtons({
   onChange: (value: boolean | null) => void;
 }) {
   return (
-    <div className={styles["yes-no-unsure-buttons"]}>
+    <div className={styles["button-group"]}>
       <button
         type="button"
+        className={value === true ? styles.selected : styles.yes}
         onClick={() => onChange(true)}
         data-cy="option-yes"
-        className={value === true ? styles.selected : styles.yes}
       >
         Yes
       </button>
+
       <button
         type="button"
-        data-cy="option-unsure"
+        className={value == null ? styles.selected : styles.unsure}
         onClick={() => {
           onChange(null);
         }}
-        className={value === null || value === undefined ? styles.selected : styles.unsure}
+        data-cy="option-unsure"
       >
         Unsure
       </button>
+
       <button
         type="button"
-        data-cy="option-no"
-        onClick={() => onChange(false)}
         className={value === false ? styles.selected : styles.no}
+        onClick={() => onChange(false)}
+        data-cy="option-no"
       >
         No
       </button>

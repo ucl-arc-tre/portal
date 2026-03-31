@@ -30,7 +30,7 @@ export default function ManageStudyPage() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher") ?? false;
 
   const fetchStudy = async (id: string) => {
-    setIsLoading(true);
+    if (!study) setIsLoading(true);
     setError(null);
 
     try {

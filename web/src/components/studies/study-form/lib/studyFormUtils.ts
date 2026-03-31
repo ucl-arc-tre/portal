@@ -1,6 +1,41 @@
-import { StudyRequest } from "@/openapi";
+import { Study, StudyRequest } from "@/openapi";
 
 export const UclDpoId = "Z6364106";
+
+export const populateExistingFormData = (study: Study): StudyFormData => {
+  const [dataProtectionPrefix, dataProtectionYear, dataProtectionMonth, dataProtectionId] =
+    study.data_protection_number?.split("/") ?? [];
+
+  return {
+    title: study.title,
+    description: study.description?.trim(),
+    owner: study.owner_username!,
+    additionalStudyAdminUsernames: study.additional_study_admin_usernames.map((username) => ({ value: username! })),
+    dataControllerOrganisation: study.data_controller_organisation,
+    cagReference: study.cag_reference || "",
+    dataProtectionPrefix: dataProtectionPrefix,
+    dataProtectionDate: dataProtectionYear && dataProtectionMonth ? `${dataProtectionYear}-${dataProtectionMonth}` : "",
+    dataProtectionId: dataProtectionId,
+    dataProtectionNumber: study.data_protection_number,
+    nhsEnglandReference: study.nhs_england_reference?.split(/(?<=DARS-NIC-)(\d{6}-\d{5}-\d{2})/)[1] || "",
+    irasId: study.iras_id || "",
+    involvesUclSponsorship: study.involves_ucl_sponsorship ?? null,
+    involvesCag: study.involves_cag ?? null,
+    involvesEthicsApproval: study.involves_ethics_approval ?? null,
+    involvesHraApproval: study.involves_hra_approval ?? null,
+    requiresDbs: study.requires_dbs ?? null,
+    isDataProtectionOfficeRegistered: study.is_data_protection_office_registered ?? null,
+    involvesThirdParty: study.involves_third_party ?? null,
+    involvesExternalUsers: study.involves_external_users ?? null,
+    involvesParticipantConsent: study.involves_participant_consent ?? null,
+    involvesIndirectDataCollection: study.involves_indirect_data_collection ?? null,
+    involvesDataProcessingOutsideEea: study.involves_data_processing_outside_eea ?? null,
+    isNhsAssociated: study.is_nhs_associated ?? null,
+    involvesNhsEngland: study.involves_nhs_england ?? null,
+    involvesMnca: study.involves_mnca ?? null,
+    requiresDspt: study.requires_dspt ?? null,
+  };
+};
 
 export const convertStudyFormDataToApiRequest = (data: StudyFormData): StudyRequest => {
   return {
@@ -26,11 +61,8 @@ export const convertStudyFormDataToApiRequest = (data: StudyFormData): StudyRequ
     is_data_protection_office_registered:
       data.isDataProtectionOfficeRegistered !== undefined ? data.isDataProtectionOfficeRegistered : undefined,
     data_protection_number:
-      data.isDataProtectionOfficeRegistered &&
-      data.dataProtectionPrefix &&
-      data.dataProtectionDate &&
-      data.dataProtectionId
-        ? `${data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
+      data.isDataProtectionOfficeRegistered && data.dataProtectionDate && data.dataProtectionId
+        ? `${data.dataControllerOrganisation.toLowerCase() === "ucl" ? UclDpoId : data.dataProtectionPrefix}/${data.dataProtectionDate.replace("-", "/")}/${data.dataProtectionId}`
         : undefined,
     involves_third_party: data.involvesThirdParty !== undefined ? data.involvesThirdParty : undefined,
     involves_external_users: data.involvesExternalUsers !== undefined ? data.involvesExternalUsers : undefined,
