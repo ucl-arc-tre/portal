@@ -27,15 +27,18 @@
     text-align: center;
     align-items: center;
 
+    small {
+      grid-column: 2;
+    }
+
     .next-button {
       grid-column: 3;
     }
   }
 
-  small {
+  .pagination-help {
     display: block;
     margin-top: 0.5rem;
-    color: #6c757d;
     text-align: center;
   }
 }

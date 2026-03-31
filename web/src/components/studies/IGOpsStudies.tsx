@@ -16,15 +16,16 @@ export default function IGOpsStudies() {
 
   const studiesPerPage = 12;
   const [offset, setOffset] = useState(0);
-  const fetchStudies = async (index?: number) => {
+  const [noMoreStudies, setNoMoreStudies] = useState(false);
+  const fetchStudies = async (offset?: number) => {
     setIsLoading(true);
     setError(null);
     try {
       const response =
         tab === "pending"
           ? await getStudies({ query: { status: "Pending" } })
-          : index
-            ? await getStudies({ query: { offset: index, limit: studiesPerPage } })
+          : offset
+            ? await getStudies({ query: { offset: offset, limit: studiesPerPage } })
             : await getStudies({ query: { limit: studiesPerPage } });
 
       if (!response.response.ok || !response.data) {
@@ -80,7 +81,6 @@ export default function IGOpsStudies() {
   };
 
   const handlePageChange = async (newOffset: number) => {
-    setIsLoading(true);
     setError(null);
     try {
       const response = await getStudies({ query: { offset: newOffset, limit: studiesPerPage } });
@@ -88,14 +88,15 @@ export default function IGOpsStudies() {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
       }
-      if (response.data != studies) {
+      if (response.data.length !== 0) {
         setStudies(response.data);
         setOffset(newOffset);
+        setNoMoreStudies(false);
+      } else {
+        setNoMoreStudies(true);
       }
     } catch (error) {
       console.error("Failed to fetch studies:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -160,7 +161,6 @@ export default function IGOpsStudies() {
           <AlertMessage>{errorMessage}</AlertMessage>
         </Alert>
       )}
-      {offset}
 
       {isLoading && <Loading message="Loading studies..." />}
 
@@ -176,25 +176,33 @@ export default function IGOpsStudies() {
 
           <div className={styles["pagination-container"]}>
             <div className={styles["pagination-buttons"]}>
-              {offset > studiesPerPage && (
+              {(offset >= studiesPerPage || noMoreStudies) && (
                 <Button
                   size="small"
                   variant="secondary"
                   className={styles["prev-button"]}
                   onClick={handleFetchPreviousPage}
                 >
-                  Request Previous Page
+                  Previous Page
                 </Button>
               )}
-              <div>
+              <small>
                 Showing studies {offset + 1} - {offset + studies.length}
-              </div>
-              <Button size="small" variant="secondary" className={styles["next-button"]} onClick={handleFetchNextPage}>
-                Request Next Page
+              </small>
+              <Button
+                size="small"
+                variant="secondary"
+                className={styles["next-button"]}
+                onClick={handleFetchNextPage}
+                disabled={noMoreStudies}
+              >
+                Next Page
               </Button>
             </div>
-
-            <small>Please note these results have been ordered by date of IAO signoff</small>
+            <HelperText className={styles["pagination-help"]}>
+              {noMoreStudies && <div>No more studies available</div>}
+              <small>Please note these results have been ordered by date of IAO signoff</small>
+            </HelperText>
           </div>
         </>
       )}
