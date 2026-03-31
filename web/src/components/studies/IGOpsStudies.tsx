@@ -8,17 +8,6 @@ import Loading from "../ui/Loading";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Search from "../ui/Search";
 
-import dynamic from "next/dynamic";
-const PaginationControls = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Controls), {
-  ssr: false,
-});
-const PaginationInfo = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination.Info), {
-  ssr: false,
-});
-const Pagination = dynamic(() => import("uikit-react-public").then((mod) => mod.Pagination), {
-  ssr: false,
-});
-
 export default function IGOpsStudies() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
@@ -26,7 +15,7 @@ export default function IGOpsStudies() {
   const [tab, setTab] = useState("pending");
 
   const studiesPerPage = 12;
-  const [pageOffset, setPageOffset] = useState(0);
+  const [offset, setOffset] = useState(0);
   const fetchStudies = async (index?: number) => {
     setIsLoading(true);
     setError(null);
@@ -90,10 +79,36 @@ export default function IGOpsStudies() {
     }
   };
 
-  const handlePageChange = (newOffset: number) => {
-    setPageOffset(newOffset);
-    fetchStudies(newOffset);
+  const handlePageChange = async (newOffset: number) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await getStudies({ query: { offset: newOffset, limit: studiesPerPage } });
+      if (!response.response.ok || !response.data) {
+        setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
+        return;
+      }
+      if (response.data != studies) {
+        setStudies(response.data);
+        setOffset(newOffset);
+      }
+    } catch (error) {
+      console.error("Failed to fetch studies:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleFetchNextPage = () => {
+    const newOffset = offset + studiesPerPage;
+    handlePageChange(newOffset);
+  };
+
+  const handleFetchPreviousPage = () => {
+    const newOffset = Math.max(0, offset - studiesPerPage);
+    handlePageChange(newOffset);
+  };
+
   useEffect(() => {
     fetchStudies();
   }, [tab]);
@@ -145,6 +160,7 @@ export default function IGOpsStudies() {
           <AlertMessage>{errorMessage}</AlertMessage>
         </Alert>
       )}
+      {offset}
 
       {isLoading && <Loading message="Loading studies..." />}
 
@@ -159,15 +175,25 @@ export default function IGOpsStudies() {
           <StudyCardsList studies={studies} />
 
           <div className={styles["pagination-container"]}>
-            <Pagination
-              total={studies.length}
-              limit={studiesPerPage}
-              offset={pageOffset}
-              onPageChange={(newOffset) => handlePageChange(newOffset)}
-            >
-              <PaginationControls />
-              <PaginationInfo />
-            </Pagination>
+            <div className={styles["pagination-buttons"]}>
+              {offset > studiesPerPage && (
+                <Button
+                  size="small"
+                  variant="secondary"
+                  className={styles["prev-button"]}
+                  onClick={handleFetchPreviousPage}
+                >
+                  Request Previous Page
+                </Button>
+              )}
+              <div>
+                Showing studies {offset + 1} - {offset + studies.length}
+              </div>
+              <Button size="small" variant="secondary" className={styles["next-button"]} onClick={handleFetchNextPage}>
+                Request Next Page
+              </Button>
+            </div>
+
             <small>Please note these results have been ordered by date of IAO signoff</small>
           </div>
         </>

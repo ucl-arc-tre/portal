@@ -16,3 +16,26 @@
     padding: 2rem 1rem;
   }
 }
+
+.pagination-container {
+  margin-top: 2rem;
+
+  .pagination-buttons {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 1rem;
+    text-align: center;
+    align-items: center;
+
+    .next-button {
+      grid-column: 3;
+    }
+  }
+
+  small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #6c757d;
+    text-align: center;
+  }
+}
