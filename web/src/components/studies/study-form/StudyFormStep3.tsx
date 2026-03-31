@@ -3,7 +3,7 @@ import { Alert, AlertMessage, HelperText, Label } from "../../shared/uikitExport
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep3.module.css";
 import { UclDpoId } from "./lib/studyFormUtils";
-import ButtonGroup from "./ButtonGroup";
+import YesNoUnsureButtons from "./YesNoUnsureButtons";
 
 type StudyFormStep3Props = {
   control: Control<StudyFormData>;
@@ -23,7 +23,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="requiresDbs"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -33,7 +33,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="isDataProtectionOfficeRegistered"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -114,7 +114,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="involvesThirdParty"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -124,7 +124,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="involvesExternalUsers"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -134,7 +134,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="involvesParticipantConsent"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -144,7 +144,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="involvesIndirectDataCollection"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
 
@@ -155,7 +155,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           name="involvesDataProcessingOutsideEea"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
     </fieldset>

@@ -1,6 +1,6 @@
-import styles from "./ButtonGroup.module.css";
+import styles from "./YesNoUnsureButtons.module.css";
 
-export default function ButtonGroup({
+export default function YesNoUnsureButtons({
   value,
   onChange,
 }: {

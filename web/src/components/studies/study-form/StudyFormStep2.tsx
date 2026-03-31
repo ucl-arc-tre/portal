@@ -2,7 +2,7 @@ import { Control, Controller, FieldErrors, useWatch } from "react-hook-form";
 import { Alert, AlertMessage, HelperText, Label } from "../../shared/uikitExports";
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep2.module.css";
-import ButtonGroup from "./ButtonGroup";
+import YesNoUnsureButtons from "./YesNoUnsureButtons";
 
 type StudyFormStep2Props = {
   control: Control<StudyFormData>;
@@ -33,7 +33,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
             name="involvesUclSponsorship"
             control={control}
             defaultValue={undefined}
-            render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
           />
         </div>
 
@@ -53,7 +53,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
             name="involvesCag"
             control={control}
             defaultValue={undefined}
-            render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
           />
         </div>
 
@@ -96,7 +96,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
             name="involvesEthicsApproval"
             control={control}
             defaultValue={undefined}
-            render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
           />
         </div>
 
@@ -115,7 +115,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
             name="involvesHraApproval"
             control={control}
             defaultValue={undefined}
-            render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
           />
         </div>
 
@@ -169,7 +169,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
             name="isNhsAssociated"
             control={control}
             defaultValue={undefined}
-            render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
           />
         </div>
 
@@ -181,7 +181,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 name="involvesNhsEngland"
                 control={control}
                 defaultValue={undefined}
-                render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+                render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
               />
             </div>
             {showNhsEnglandRef === true && (
@@ -242,7 +242,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 name="involvesMnca"
                 control={control}
                 defaultValue={undefined}
-                render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+                render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
               />
             </div>
 
@@ -253,7 +253,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 name="requiresDspt"
                 control={control}
                 defaultValue={undefined}
-                render={({ field }) => <ButtonGroup value={field.value} onChange={field.onChange} />}
+                render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
               />
             </div>
           </>
