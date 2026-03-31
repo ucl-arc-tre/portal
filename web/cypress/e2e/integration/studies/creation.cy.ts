@@ -66,6 +66,8 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").contains("Update Study").click();
     cy.contains("Update Study").should("not.exist");
+    cy.contains("Edit Study").should("exist");
+    cy.contains(additionalAdminUsernamePrefix).should("exist");
 
     // remove added study admin
     cy.get('[data-cy="edit-study-button"]').click();
