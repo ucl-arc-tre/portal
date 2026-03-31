@@ -96,14 +96,21 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		return nil, types.NewErrFromGorm(err, "failed to get agreement")
 	}
 
-	ownerSignature := types.StudyAgreementSignature{
-		UserID:      owner.ID,
-		StudyID:     study.ID,
-		AgreementID: agreemeent.ID,
-	}
-	if err := tx.Where(&ownerSignature).FirstOrCreate(&ownerSignature).Error; err != nil {
-		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to agree owner agreement")
+	if data.OwnerAgreedAt != nil {
+		agreedAt, err := time.Parse(config.TimeFormat, *data.OwnerAgreedAt)
+		if err != nil {
+			return nil, types.NewErrInvalidObject(err)
+		}
+		ownerSignature := types.StudyAgreementSignature{
+			Model:       types.Model{CreatedAt: agreedAt},
+			UserID:      owner.ID,
+			StudyID:     study.ID,
+			AgreementID: agreemeent.ID,
+		}
+		if err := tx.Where(&ownerSignature).FirstOrCreate(&ownerSignature).Error; err != nil {
+			tx.Rollback()
+			return nil, types.NewErrFromGorm(err, "failed to agree owner agreement")
+		}
 	}
 
 	if data.AdditionalStudyAdminUsername != nil {
@@ -125,14 +132,21 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 			return nil, err
 		}
 
-		adminSignature := types.StudyAgreementSignature{
-			UserID:      admin.ID,
-			StudyID:     study.ID,
-			AgreementID: agreemeent.ID,
-		}
-		if err := tx.Where(&adminSignature).FirstOrCreate(&adminSignature).Error; err != nil {
-			tx.Rollback()
-			return nil, types.NewErrFromGorm(err, "failed to agree admin agreement")
+		if data.AdminAgreedAt != nil {
+			agreedAt, err := time.Parse(config.TimeFormat, *data.AdminAgreedAt)
+			if err != nil {
+				return nil, types.NewErrInvalidObject(err)
+			}
+			adminSignature := types.StudyAgreementSignature{
+				Model:       types.Model{CreatedAt: agreedAt},
+				UserID:      admin.ID,
+				StudyID:     study.ID,
+				AgreementID: agreemeent.ID,
+			}
+			if err := tx.Where(&adminSignature).FirstOrCreate(&adminSignature).Error; err != nil {
+				tx.Rollback()
+				return nil, types.NewErrFromGorm(err, "failed to agree admin agreement")
+			}
 		}
 
 		studyAdmin.User = admin
