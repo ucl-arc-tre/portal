@@ -368,13 +368,13 @@ paths:
           schema:
             type: string
         - in: query
-          name: max_items
+          name: limit
           required: false
           description: Maximum number of items to return
           schema:
             type: integer
         - in: query
-          name: start_index
+          name: offset
           required: false
           description: Index of the first item to return
           schema:

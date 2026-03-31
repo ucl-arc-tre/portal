@@ -1120,11 +1120,11 @@ type GetStudiesParams struct {
 	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
 	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
 
-	// MaxItems Maximum number of items to return
-	MaxItems *int `form:"max_items,omitempty" json:"max_items,omitempty"`
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
 
-	// StartIndex Index of the first item to return
-	StartIndex *int `form:"start_index,omitempty" json:"start_index,omitempty"`
+	// Offset Index of the first item to return
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1694,19 +1694,19 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "max_items" -------------
+	// ------------- Optional query parameter "limit" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "max_items", c.Request.URL.Query(), &params.MaxItems, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter max_items: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
 		return
 	}
 
-	// ------------- Optional query parameter "start_index" -------------
+	// ------------- Optional query parameter "offset" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "start_index", c.Request.URL.Query(), &params.StartIndex, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter start_index: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
 		return
 	}
 

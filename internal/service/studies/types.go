@@ -10,8 +10,8 @@ type QueryParams struct {
 	ApprovalStatus *openapi.ApprovalStatus
 	FuzzyTitle     *string
 	OwnerUsername  *string
-	MaxItems       int
-	StartIndex     int
+	Limit          int
+	Offset         int
 }
 
 type ContractObject struct {

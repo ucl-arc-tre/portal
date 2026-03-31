@@ -71,10 +71,10 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if !params.Valid() {
 		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
 	}
-	if params.MaxItems != nil && *params.MaxItems > 12 {
+	if params.Limit != nil && *params.Limit > 12 {
 		return []types.Study{}, types.NewErrInvalidObject("maxItems cannot be greater than 12")
 	}
-	if params.StartIndex != nil && *params.StartIndex < 0 {
+	if params.Offset != nil && *params.Offset < 0 {
 		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
 	}
 	queryParams := studies.QueryParams{
@@ -82,8 +82,8 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		CaseRef:        params.Caseref,
 		FuzzyTitle:     params.FuzzyTitle,
 		OwnerUsername:  params.OwnerUsername,
-		MaxItems:       12,
-		StartIndex:     0,
+		Limit:          12,
+		Offset:         0,
 	}
 	if queryIsCaseref(params.Query) {
 		caseref, err := strconv.Atoi(*params.Query)
@@ -96,8 +96,8 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	} else if params.Query != nil {
 		queryParams.FuzzyTitle = params.Query
 	}
-	if params.MaxItems != nil {
-		queryParams.MaxItems = *params.MaxItems
+	if params.Limit != nil {
+		queryParams.Limit = *params.Limit
 	}
 	return h.studies.AllStudies(queryParams)
 }
