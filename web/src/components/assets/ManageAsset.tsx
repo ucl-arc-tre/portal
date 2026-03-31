@@ -1,7 +1,6 @@
 import { Asset, Contract, Study } from "@/openapi";
 
 import styles from "./ManageAsset.module.css";
-import Title from "../ui/Title";
 import { HelperText } from "../shared/uikitExports";
 import ContractCard from "../contracts/ContractCard";
 
@@ -14,9 +13,7 @@ type ManageAssetProps = {
 export default function ManageAsset(props: ManageAssetProps) {
   const { study, asset, contracts } = props;
   return (
-    <div className="content">
-      <Title text={`Manage Asset: ${asset.title}`} centered />
-
+    <>
       <div className={styles["asset-info"]}>
         <div className={styles.section}>
           <h3>Asset Details</h3>
@@ -65,6 +62,6 @@ export default function ManageAsset(props: ManageAssetProps) {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
