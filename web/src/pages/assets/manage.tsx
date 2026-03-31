@@ -133,7 +133,7 @@ export default function ManageAssetPage() {
       />
       <div className="content">
         <Title text={`Manage Asset: ${asset.title}`} centered />
-        <ManageAsset study={study} asset={asset} contracts={contracts} />;
+        <ManageAsset study={study} asset={asset} contracts={contracts} />
       </div>
     </>
   );
