@@ -99,6 +99,9 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if params.Limit != nil {
 		queryParams.Limit = *params.Limit
 	}
+	if params.Offset != nil {
+		queryParams.Offset = *params.Offset
+	}
 	return h.studies.AllStudies(queryParams)
 }
 
