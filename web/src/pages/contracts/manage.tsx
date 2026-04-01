@@ -154,6 +154,13 @@ export default function ManageContractPage() {
               <span>{contract.third_party_name}</span>
             </div>
 
+            {contract.other_signatories && (
+              <div className={styles.field}>
+                <label>Other Signatories:</label>
+                <span>{contract.other_signatories}</span>
+              </div>
+            )}
+
             <div className={styles.field}>
               <label>Start date:</label>
               <span>{formatDate(contract.start_date)}</span>

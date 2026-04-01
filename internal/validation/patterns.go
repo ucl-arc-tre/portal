@@ -1,6 +1,8 @@
 package validation
 
-import "regexp"
+import (
+	"regexp"
+)
 
 // Common validation patterns used across the application
 var (
@@ -14,4 +16,5 @@ var (
 	ContractNamePattern         = regexp.MustCompile(`^.{2,100}$`)           // 2-100 characters, any content
 	TREProjectNamePattern       = regexp.MustCompile(`^[0-9a-z]{4,14}$`)     // 4-14 lowercase alphanumeric characters only
 	TokenNamePattern            = regexp.MustCompile(`^.{1,50}$`)            // 1-50 characters, any content
+	DefaultStringPattern        = regexp.MustCompile(`^.{1,255}$`)           // 1-255 characters, any content
 )

@@ -18,8 +18,9 @@ import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
   title: string;
-  organisationSignatory: string;
+  organisationSignatoryEmail: string;
   thirdPartyName: string;
+  otherSignatories: string | undefined;
   status: "proposed" | "active" | "expired";
   startDate: string;
   expiryDate: string;
@@ -85,7 +86,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     if (editingContract) {
       reset({
         title: editingContract.title,
-        organisationSignatory: editingContract.organisation_signatory,
+        organisationSignatoryEmail: editingContract.organisation_signatory,
+        otherSignatories: editingContract.other_signatories,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
         startDate: editingContract.start_date,
@@ -96,10 +98,11 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       // reset to defaults when not editing
       reset({
         status: "proposed",
-        organisationSignatory: "",
+        organisationSignatoryEmail: "",
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
+        otherSignatories: undefined,
         assets: [],
       });
     }
@@ -170,11 +173,12 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
     const body: ContractBase = {
       title: formData.title,
-      organisation_signatory: formData.organisationSignatory,
+      organisation_signatory: formData.organisationSignatoryEmail,
       third_party_name: formData.thirdPartyName,
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
+      other_signatories: formData.otherSignatories,
       asset_ids: formData.assets.map((asset) => asset.value).filter((id) => id !== "") as string[],
     };
 
@@ -291,21 +295,38 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
           </div>
 
           <div className={styles["form-group"]}>
-            <Label htmlFor="organisationSignatory">{organisationName} Signatory *</Label>
+            <Label htmlFor="organisationSignatoryEmail">{organisationName} Signatory *</Label>
             <input
-              id="organisationSignatory"
+              id="organisationSignatoryEmail"
               type="text"
-              {...register("organisationSignatory", {
+              {...register("organisationSignatoryEmail", {
                 required: "Organisation Signatory is required",
-                minLength: { value: 2, message: "Organisation Signatory must be at least 2 characters" },
-                maxLength: { value: 100, message: "Organisation Signatory must be less than 100 characters" },
+                pattern: {
+                  value: RegExp(`^[^@]+${process.env.NEXT_PUBLIC_DOMAIN_NAME}$`),
+                  message: `Must be a valid email address ending with ${process.env.NEXT_PUBLIC_DOMAIN_NAME}`,
+                },
               })}
               className={styles["form-input"]}
-              placeholder="Enter organisation signatory name"
+              placeholder="Enter organisation signatory email"
             />
-            {errors.organisationSignatory && (
-              <span className={styles["form-error"]}>{errors.organisationSignatory.message}</span>
+            {errors.organisationSignatoryEmail && (
+              <span className={styles["form-error"]}>{errors.organisationSignatoryEmail.message}</span>
             )}
+          </div>
+
+          <div className={styles["form-group"]}>
+            <Label htmlFor="title">Other Signatories</Label>
+            <input
+              id="otherSignatories"
+              type="text"
+              {...register("otherSignatories", {
+                minLength: { value: 1, message: "Other Signatories must be at least 1 character" },
+                maxLength: { value: 255, message: "Other Signatories must be less than 256 characters" },
+              })}
+              className={styles["form-input"]}
+              placeholder="e.g. Alice Smith, bob@example.com, NHS England"
+            />
+            {errors.title && <span className={styles["form-error"]}>{errors.title.message}</span>}
           </div>
 
           <div className={styles["form-group"]}>
@@ -465,12 +486,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             </div>
           ))}
 
-          {error && (
-            <Alert type="error">
-              <AlertMessage>{error}</AlertMessage>
-            </Alert>
-          )}
-
           {uploadSuccess && (
             <div className={styles.success}>
               {editingContract ? "Contract updated successfully!" : "Contract uploaded successfully!"}
@@ -492,6 +507,11 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             Cancel
           </Button>
         </div>
+        {error && (
+          <Alert type="error">
+            <AlertMessage>{error}</AlertMessage>
+          </Alert>
+        )}
       </form>
     </Dialog>
   );

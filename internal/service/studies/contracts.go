@@ -3,11 +3,13 @@ package studies
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -16,13 +18,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *Service) ValidateContract(studyId uuid.UUID, data openapi.ContractBase) *openapi.ValidationError {
+func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data openapi.ContractBase) *openapi.ValidationError {
 	if !validation.ContractNamePattern.MatchString(data.Title) {
 		return openapi.NewValidationError("Title must be between 2 and 100 characters")
 	}
 
-	if !validation.ContractNamePattern.MatchString(data.OrganisationSignatory) {
-		return openapi.NewValidationError("Organisation signatory must be between 2 and 100 characters")
+	organisationSignatoryPattern := regexp.MustCompile(`^[^@]+@` + config.EntraTenantPrimaryDomain() + `$`)
+	if !organisationSignatoryPattern.MatchString(data.OrganisationSignatory) || entra.IsExternalUsername(types.Username(data.OrganisationSignatory)) {
+		log.Debug().Any("s", organisationSignatoryPattern.String()).Str("domain", config.EntraTenantPrimaryDomain()).Msg("---") // todo
+		return openapi.NewValidationError("Organisation signatory must be a valid internal email")
 	}
 
 	if !validation.ContractNamePattern.MatchString(data.ThirdPartyName) {
@@ -68,10 +72,20 @@ func (s *Service) ValidateContract(studyId uuid.UUID, data openapi.ContractBase)
 		return openapi.NewValidationError("Did not find existing study assets")
 	}
 
+	signatoryUsernames, err := s.entra.FindUsernames(ctx, data.OrganisationSignatory)
+	if err != nil {
+		log.Err(err).Msg("Failed to find usernames from entra")
+		return openapi.NewValidationError("Failed to lookup organisation signatory in EntraID")
+	} else if len(signatoryUsernames) != 1 {
+		log.Debug().Any("signatoryUsernames", signatoryUsernames).Msg("Found organisation Signatory")
+		return openapi.NewValidationError("Organisation signatory did not match one user EntraID")
+	}
+
 	return nil
 }
 
 func (s *Service) CreateContract(
+	ctx context.Context,
 	studyID uuid.UUID,
 	contractBase openapi.ContractBase,
 	creator types.User,
@@ -84,6 +98,13 @@ func (s *Service) CreateContract(
 	}
 	contract.StudyID = studyID
 	contract.CreatorUserID = creator.ID
+
+	signatory, err := s.persistedContractSignatory(ctx, contractBase.OrganisationSignatory)
+	if err != nil {
+		return nil, err
+	}
+	contract.SignatoryUserId = signatory.ID
+	contract.SignatoryUser = signatory
 
 	// Store the contract metadata in the database first to generate an ID
 	if err := s.db.Create(&contract).Error; err != nil {
@@ -98,6 +119,7 @@ func (s *Service) GetContract(studyID uuid.UUID, contractID uuid.UUID) (*types.C
 	result := s.db.Model(&contract).
 		Preload("Objects").
 		Preload("Assets").
+		Preload("SignatoryUser").
 		Where("id = ? AND study_id = ?", contractID, studyID).
 		First(&contract)
 	return &contract, types.NewErrFromGorm(result.Error, "failed to get contract")
@@ -212,6 +234,14 @@ func (s *Service) UpdateContract(
 	contract.ID = contractID
 	contract.StudyID = studyID
 
+	signatory, err := s.persistedContractSignatory(ctx, contractBase.OrganisationSignatory)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	contract.SignatoryUserId = signatory.ID
+	contract.SignatoryUser = signatory
+
 	result := tx.Model(&types.Contract{}).
 		Where("id = ? AND study_id = ?", contractID, studyID).
 		Updates(contract)
@@ -267,10 +297,20 @@ func (s *Service) checkContractObjectExists(studyID uuid.UUID, contractID uuid.U
 // retrieves all contracts within a study
 func (s *Service) StudyContracts(studyID uuid.UUID) ([]types.Contract, error) {
 	contracts := []types.Contract{}
-	err := s.db.Preload("Assets").Preload("Objects").Where("study_id = ?", studyID).
+	err := s.db.Preload("Assets").Preload("Objects").Preload("SignatoryUser").Where("study_id = ?", studyID).
 		Order("created_at DESC").
 		Find(&contracts).Error
 	return contracts, types.NewErrFromGorm(err, "failed to get asset contracts")
+}
+
+func (s *Service) persistedContractSignatory(ctx context.Context, signatory string) (types.User, error) {
+	signatoryUsernames, err := s.entra.FindUsernames(ctx, signatory)
+	if err != nil {
+		return types.User{}, err
+	} else if len(signatoryUsernames) != 1 {
+		return types.User{}, types.NewErrInvalidObject("failed to find single user signatory in entra")
+	}
+	return s.users.PersistedUser(signatoryUsernames[0])
 }
 
 func contractFromBase(contractBase openapi.ContractBase) (*types.Contract, error) {
@@ -285,12 +325,12 @@ func contractFromBase(contractBase openapi.ContractBase) (*types.Contract, error
 	}
 
 	contract := types.Contract{
-		Title:                 contractBase.Title,
-		OrganisationSignatory: contractBase.OrganisationSignatory,
-		ThirdPartyName:        contractBase.ThirdPartyName,
-		StartDate:             startDate,
-		ExpiryDate:            expiryDate,
-		Status:                string(contractBase.Status),
+		Title:            contractBase.Title,
+		ThirdPartyName:   contractBase.ThirdPartyName,
+		StartDate:        startDate,
+		ExpiryDate:       expiryDate,
+		Status:           string(contractBase.Status),
+		OtherSignatories: contractBase.OtherSignatories,
 	}
 
 	for _, assetID := range contractBase.AssetIds {
