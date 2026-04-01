@@ -64,7 +64,17 @@ export default function StudyForm(StudyProps: StudyProps) {
       }
     }
 
-    // Step 2 is all optional fields
+    if (currentStep === 2) {
+      const cagValid = await trigger("cagReference");
+      const irasValid = await trigger("irasId");
+      const nhseValid = await trigger("nhsEnglandReference");
+
+      if (!cagValid || !irasValid || !nhseValid) {
+        setError("Please fix the validation errors before proceeding.");
+        return;
+      }
+    }
+
     // Step 3's conditional fields will be validated on final submit
     setCurrentStep(currentStep + 1);
   };
