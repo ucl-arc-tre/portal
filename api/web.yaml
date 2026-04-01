@@ -752,6 +752,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Asset"
+    put:
+      description: Update an existing asset within a study
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetBase"
         "403":
           description: Forbidden - no access to study or asset
         "404":

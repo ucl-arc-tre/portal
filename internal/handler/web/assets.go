@@ -100,3 +100,18 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
 }
+
+func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	if err != nil {
+		return
+	}
+
+	asset, err := h.studies.InformationAssetById(uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to retrieve asset")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
+}

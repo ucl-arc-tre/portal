@@ -1775,30 +1775,33 @@ export type GetStudiesByStudyIdAssetsByAssetIdData = {
     url: '/studies/{studyId}/assets/{assetId}';
 };
 
-export type GetStudiesByStudyIdAssetsByAssetIdErrors = {
-    /**
-     * Forbidden - no access to study or asset
-     */
-    403: unknown;
-    /**
-     * Study or asset not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
 export type GetStudiesByStudyIdAssetsByAssetIdResponses = {
     200: Asset;
 };
 
 export type GetStudiesByStudyIdAssetsByAssetIdResponse = GetStudiesByStudyIdAssetsByAssetIdResponses[keyof GetStudiesByStudyIdAssetsByAssetIdResponses];
+
+export type PutStudiesByStudyIdAssetsByAssetIdData = {
+    body: AssetBase;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Asset UUID
+         */
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}';
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdResponses = {
+    200: Asset;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdResponse = PutStudiesByStudyIdAssetsByAssetIdResponses[keyof PutStudiesByStudyIdAssetsByAssetIdResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
     body?: never;

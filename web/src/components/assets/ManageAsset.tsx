@@ -1,4 +1,4 @@
-import { Asset, Contract, Study } from "@/openapi";
+import { Asset, AssetBase, Contract, putStudiesByStudyIdAssetsByAssetId, Study } from "@/openapi";
 
 import styles from "./ManageAsset.module.css";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
@@ -7,6 +7,7 @@ import AssetCreationForm from "./AssetCreationForm";
 import Button from "../ui/Button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { extractErrorMessage } from "@/lib/errorHandler";
 
 type ManageAssetProps = {
   study: Study;
@@ -26,7 +27,22 @@ export default function ManageAsset(props: ManageAssetProps) {
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const onEditComplete = async (assetData: AssetFormData) => {
-    setIsFormOpen(false);
+    try {
+      const response = await putStudiesByStudyIdAssetsByAssetId({
+        path: { studyId: study.id, assetId: asset.id },
+        body: assetData as AssetBase,
+      });
+
+      if (!response.response.ok) {
+        const errorMsg = extractErrorMessage(response);
+        throw new Error(errorMsg);
+      }
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error("Search failed:", error);
+      setError("Search failed. Please try again.");
+    }
+
     // fetchAsset(asset.id);
   };
   return (
@@ -84,7 +100,7 @@ export default function ManageAsset(props: ManageAssetProps) {
             <span>{asset.requires_contract ? "Yes" : "No"}</span>
           </div>
 
-          {contracts.length > 0 && (
+          {contracts.length > 0 ? (
             <div className={styles.field}>
               <label>
                 Associated Contracts:
@@ -101,6 +117,8 @@ export default function ManageAsset(props: ManageAssetProps) {
                 ))}
               </ul>
             </div>
+          ) : (
+            <p>No associated contracts.</p>
           )}
         </div>
       </div>
