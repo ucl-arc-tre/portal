@@ -18,7 +18,7 @@ import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
   title: string;
-  organisationSignatoryEmail: string;
+  organisationSignatory: string;
   thirdPartyName: string;
   otherSignatories: string | undefined;
   status: "proposed" | "active" | "expired";
@@ -86,7 +86,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     if (editingContract) {
       reset({
         title: editingContract.title,
-        organisationSignatoryEmail: editingContract.organisation_signatory,
+        organisationSignatory: editingContract.organisation_signatory,
         otherSignatories: editingContract.other_signatories,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
@@ -98,7 +98,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       // reset to defaults when not editing
       reset({
         status: "proposed",
-        organisationSignatoryEmail: "",
+        organisationSignatory: "",
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
@@ -173,7 +173,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
     const body: ContractBase = {
       title: formData.title,
-      organisation_signatory: formData.organisationSignatoryEmail,
+      organisation_signatory: formData.organisationSignatory,
       third_party_name: formData.thirdPartyName,
       status: formData.status,
       start_date: formData.startDate,
@@ -299,7 +299,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             <input
               id="organisationSignatoryEmail"
               type="text"
-              {...register("organisationSignatoryEmail", {
+              {...register("organisationSignatory", {
                 required: "Organisation Signatory is required",
                 pattern: {
                   value: RegExp(`^[^@]+${process.env.NEXT_PUBLIC_DOMAIN_NAME}$`),
@@ -309,8 +309,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Enter organisation signatory email"
             />
-            {errors.organisationSignatoryEmail && (
-              <span className={styles["form-error"]}>{errors.organisationSignatoryEmail.message}</span>
+            {errors.organisationSignatory && (
+              <span className={styles["form-error"]}>{errors.organisationSignatory.message}</span>
             )}
           </div>
 
