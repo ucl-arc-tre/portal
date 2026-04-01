@@ -257,7 +257,7 @@ func (s *Service) UpdateContract(
 		return nil, types.NewErrFromGorm(err, "failed to update contract assets")
 	}
 
-	if err := tx.Preload("Assets").Preload("Objects").First(contract, contractID).Error; err != nil {
+	if err := tx.Preload("Assets").Preload("Objects").Preload("SignatoryUser").First(contract, contractID).Error; err != nil {
 		tx.Rollback()
 		return nil, types.NewErrFromGorm(result.Error, "failed to get updated contract")
 	}

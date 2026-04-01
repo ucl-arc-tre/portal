@@ -326,7 +326,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="e.g. Alice Smith, bob@example.com, NHS England"
             />
-            {errors.title && <span className={styles["form-error"]}>{errors.title.message}</span>}
+            {errors.otherSignatories && <span className={styles["form-error"]}>{errors.otherSignatories.message}</span>}
           </div>
 
           <div className={styles["form-group"]}>
