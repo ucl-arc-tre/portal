@@ -355,3 +355,21 @@ func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId 
 
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(*asset))
 }
+
+func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	data := openapi.ContractImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	contract, err := h.studies.ImportContract(studyUUID, data)
+	if err != nil {
+		setError(ctx, err, "Failed to update contract")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}

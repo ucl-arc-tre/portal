@@ -25,7 +25,7 @@ func (s *Service) ValidateContract(studyId uuid.UUID, data openapi.ContractBase)
 		return openapi.NewValidationError("Organisation signatory must be between 2 and 100 characters")
 	}
 
-	if !validation.ContractNamePattern.MatchString(data.ThirdPartyName) {
+	if data.ThirdPartyName != nil && !validation.ContractNamePattern.MatchString(*data.ThirdPartyName) {
 		return openapi.NewValidationError("Third party name must be between 2 and 100 characters")
 	}
 
@@ -288,8 +288,8 @@ func contractFromBase(contractBase openapi.ContractBase) (*types.Contract, error
 		Title:                 contractBase.Title,
 		OrganisationSignatory: contractBase.OrganisationSignatory,
 		ThirdPartyName:        contractBase.ThirdPartyName,
-		StartDate:             startDate,
-		ExpiryDate:            expiryDate,
+		StartDate:             &startDate,
+		ExpiryDate:            &expiryDate,
 		Status:                string(contractBase.Status),
 	}
 

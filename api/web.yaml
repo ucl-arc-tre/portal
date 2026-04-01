@@ -516,6 +516,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Asset"
+  /studies/admin/{studyId}/contracts/import:
+    post:
+      description: Tempoary endpoint to import a contract object for a contract. Idempotent. Updates on title
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractImport"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
 
   /studies/{studyId}/pending:
     patch:
@@ -1700,6 +1718,29 @@ components:
         created_at:
           type: string
 
+    ContractImport:
+      type: object
+      required:
+        - title
+        - created_at
+        - organisation_signatory
+        - status
+      properties:
+        title:
+          type: string
+        created_at:
+          type: string
+        organisation_signatory:
+          type: string
+        third_party_name:
+          type: string
+        status:
+          type: string
+        start_at:
+          type: string
+        expiry_at:
+          type: string
+
     ApprovalStatus:
       type: string
       enum:
@@ -1912,7 +1953,6 @@ components:
       required:
         - title
         - organisation_signatory
-        - third_party_name
         - status
         - start_date
         - expiry_date

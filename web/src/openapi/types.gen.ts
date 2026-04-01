@@ -421,6 +421,16 @@ export type AssetImport = {
     created_at: string;
 };
 
+export type ContractImport = {
+    title: string;
+    created_at: string;
+    organisation_signatory: string;
+    third_party_name?: string;
+    status: string;
+    start_at?: string;
+    expiry_at?: string;
+};
+
 /**
  * Current approval status (used for studies, projects, etc.)
  */
@@ -605,7 +615,7 @@ export type ContractBase = {
     /**
      * Name of the third party organization
      */
-    third_party_name: string;
+    third_party_name?: string;
     /**
      * Current status of the contract
      */
@@ -1435,6 +1445,27 @@ export type PostStudiesAdminByStudyIdAssetsImportResponses = {
 };
 
 export type PostStudiesAdminByStudyIdAssetsImportResponse = PostStudiesAdminByStudyIdAssetsImportResponses[keyof PostStudiesAdminByStudyIdAssetsImportResponses];
+
+export type PostStudiesAdminByStudyIdContractsImportData = {
+    body: ContractImport;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/contracts/import';
+};
+
+export type PostStudiesAdminByStudyIdContractsImportResponses = {
+    /**
+     * OK
+     */
+    200: Asset;
+};
+
+export type PostStudiesAdminByStudyIdContractsImportResponse = PostStudiesAdminByStudyIdContractsImportResponses[keyof PostStudiesAdminByStudyIdContractsImportResponses];
 
 export type PatchStudiesByStudyIdPendingData = {
     body?: never;

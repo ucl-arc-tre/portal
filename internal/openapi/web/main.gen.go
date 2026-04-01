@@ -630,7 +630,7 @@ type Contract struct {
 	StudyId string `json:"study_id"`
 
 	// ThirdPartyName Name of the third party organization
-	ThirdPartyName string `json:"third_party_name"`
+	ThirdPartyName *string `json:"third_party_name,omitempty"`
 
 	// Title Name of the contract
 	Title string `json:"title"`
@@ -660,7 +660,7 @@ type ContractBase struct {
 	Status ContractBaseStatus `json:"status"`
 
 	// ThirdPartyName Name of the third party organization
-	ThirdPartyName string `json:"third_party_name"`
+	ThirdPartyName *string `json:"third_party_name,omitempty"`
 
 	// Title Name of the contract
 	Title string `json:"title"`
@@ -668,6 +668,17 @@ type ContractBase struct {
 
 // ContractBaseStatus Current status of the contract
 type ContractBaseStatus string
+
+// ContractImport defines model for ContractImport.
+type ContractImport struct {
+	CreatedAt             string  `json:"created_at"`
+	ExpiryAt              *string `json:"expiry_at,omitempty"`
+	OrganisationSignatory string  `json:"organisation_signatory"`
+	StartAt               *string `json:"start_at,omitempty"`
+	Status                string  `json:"status"`
+	ThirdPartyName        *string `json:"third_party_name,omitempty"`
+	Title                 string  `json:"title"`
+}
 
 // ContractObject defines model for ContractObject.
 type ContractObject struct {
@@ -1223,6 +1234,9 @@ type PostStudiesAdminImportJSONRequestBody = StudyImport
 // PostStudiesAdminStudyIdAssetsImportJSONRequestBody defines body for PostStudiesAdminStudyIdAssetsImport for application/json ContentType.
 type PostStudiesAdminStudyIdAssetsImportJSONRequestBody = AssetImport
 
+// PostStudiesAdminStudyIdContractsImportJSONRequestBody defines body for PostStudiesAdminStudyIdContractsImport for application/json ContentType.
+type PostStudiesAdminStudyIdContractsImportJSONRequestBody = ContractImport
+
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
@@ -1324,6 +1338,9 @@ type ServerInterface interface {
 
 	// (POST /studies/admin/{studyId}/assets/import)
 	PostStudiesAdminStudyIdAssetsImport(c *gin.Context, studyId StudyIdParam)
+
+	// (POST /studies/admin/{studyId}/contracts/import)
+	PostStudiesAdminStudyIdContractsImport(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId StudyIdParam)
@@ -1819,6 +1836,30 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdAssetsImport(c *gin.Co
 	}
 
 	siw.Handler.PostStudiesAdminStudyIdAssetsImport(c, studyId)
+}
+
+// PostStudiesAdminStudyIdContractsImport operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdContractsImport(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdContractsImport(c, studyId)
 }
 
 // PostStudiesAdminStudyIdReview operation middleware
@@ -2529,6 +2570,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
 	router.POST(options.BaseURL+"/studies/admin/import", wrapper.PostStudiesAdminImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/assets/import", wrapper.PostStudiesAdminStudyIdAssetsImport)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/contracts/import", wrapper.PostStudiesAdminStudyIdContractsImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)

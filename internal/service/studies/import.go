@@ -209,7 +209,7 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 
 	if err := tx.Where("title = ? AND study_id = ?", asset.Title, studyId).Assign(asset).FirstOrCreate(&asset).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to agree owner agreement")
+		return nil, types.NewErrFromGorm(err, "failed to create asset")
 	}
 
 	for _, locationStr := range data.Locations {
@@ -229,4 +229,48 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 
 	log.Debug().Any("asset", asset).Msg("Created asset")
 	return &asset, commitTransaction(tx)
+}
+
+func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport) (*types.Contract, error) {
+	// NOTE: this deliberately doesn't do strong validation of the object
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	study := types.Study{}
+	if err := tx.Where("id = ?", studyId).First(&study).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to get study")
+	}
+
+	contract := types.Contract{
+		StudyID:               studyId,
+		CreatorUserID:         study.OwnerUserID,
+		Title:                 data.Title,
+		OrganisationSignatory: data.OrganisationSignatory,
+		ThirdPartyName:        data.ThirdPartyName,
+		Status:                data.Status,
+	}
+	if data.StartAt != nil {
+		if startDate, err := time.Parse(config.TimeFormat, *data.StartAt); err != nil {
+			return nil, types.NewErrInvalidObject("invalid date")
+		} else {
+			contract.StartDate = &startDate
+		}
+	}
+	if data.ExpiryAt != nil {
+		if expiryDate, err := time.Parse(config.TimeFormat, *data.ExpiryAt); err != nil {
+			return nil, types.NewErrInvalidObject("invalid date")
+		} else {
+			contract.ExpiryDate = &expiryDate
+		}
+	}
+
+	if err := tx.Where("title = ? AND study_id = ?", contract.Title, studyId).Assign(contract).FirstOrCreate(&contract).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to create contract")
+	}
+
+	contract.Study = study
+	return &contract, commitTransaction(tx)
 }
