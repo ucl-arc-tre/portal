@@ -95,6 +95,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="add-contract"]').click();
     cy.get('[name="title"]').type(contractTitle);
     cy.get('[name="organisationSignatory"]').type(botStaffUsername);
+    cy.get('[name="otherSignatories"]').type("other signatory");
     cy.get('[name="thirdPartyName"]').type("other");
     cy.get('[name="status"]').select("active");
     cy.get("input[name='startDate']").type("2024-01-01");

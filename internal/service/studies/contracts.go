@@ -25,8 +25,11 @@ func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data 
 
 	organisationSignatoryPattern := regexp.MustCompile(`^[^@]+@` + config.EntraTenantPrimaryDomain() + `$`)
 	if !organisationSignatoryPattern.MatchString(data.OrganisationSignatory) || entra.IsExternalUsername(types.Username(data.OrganisationSignatory)) {
-		log.Debug().Any("s", organisationSignatoryPattern.String()).Str("domain", config.EntraTenantPrimaryDomain()).Msg("---") // todo
 		return openapi.NewValidationError("Organisation signatory must be a valid internal email")
+	}
+
+	if data.OtherSignatories != nil && !validation.OtherSignatoriesStringPattern.MatchString(*data.OtherSignatories) {
+		return openapi.NewValidationError("OtherSignatories must be a short string")
 	}
 
 	if !validation.ContractNamePattern.MatchString(data.ThirdPartyName) {
@@ -78,7 +81,7 @@ func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data 
 		return openapi.NewValidationError("Failed to lookup organisation signatory in EntraID")
 	} else if len(signatoryUsernames) != 1 {
 		log.Debug().Any("signatoryUsernames", signatoryUsernames).Msg("Found organisation Signatory")
-		return openapi.NewValidationError("Organisation signatory did not match one user EntraID")
+		return openapi.NewValidationError("Organisation signatory did not match one person")
 	}
 
 	return nil
@@ -224,9 +227,6 @@ func (s *Service) UpdateContract(
 		return nil, err
 	}
 
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
 	contract, err := contractFromBase(contractBase)
 	if err != nil {
 		return nil, err
@@ -236,11 +236,13 @@ func (s *Service) UpdateContract(
 
 	signatory, err := s.persistedContractSignatory(ctx, contractBase.OrganisationSignatory)
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 	contract.SignatoryUserId = signatory.ID
 	contract.SignatoryUser = signatory
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
 	result := tx.Model(&types.Contract{}).
 		Where("id = ? AND study_id = ?", contractID, studyID).

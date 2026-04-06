@@ -320,7 +320,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               id="otherSignatories"
               type="text"
               {...register("otherSignatories", {
-                minLength: { value: 1, message: "Other Signatories must be at least 1 character" },
                 maxLength: { value: 255, message: "Other Signatories must be less than 256 characters" },
               })}
               className={styles["form-input"]}
