@@ -115,20 +115,22 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	StudyID               uuid.UUID `gorm:"index"`
-	CreatorUserID         uuid.UUID `gorm:"type:uuid;not null"`
-	Title                 string
-	OrganisationSignatory string
-	ThirdPartyName        *string
-	Status                string // proposed, active, expired
-	StartDate             *time.Time
-	ExpiryDate            *time.Time
+	StudyID          uuid.UUID `gorm:"index"`
+	CreatorUserID    uuid.UUID `gorm:"type:uuid;not null"`
+	SignatoryUserId  uuid.UUID `gorm:"type:uuid"`
+	Title            string
+	ThirdPartyName   *string
+	OtherSignatories *string // free text: could be name(s), email(s), UPN(s), organisations
+	Status           string  // proposed, active, expired
+	StartDate        *time.Time
+	ExpiryDate       *time.Time
 
 	// Relationships
-	Study       Study                    `gorm:"foreignKey:StudyID"`
-	CreatorUser User                     `gorm:"foreignKey:CreatorUserID"`
-	Assets      []Asset                  `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
-	Objects     []ContractObjectMetadata `gorm:"foreignKey:ContractID"`
+	Study         Study                    `gorm:"foreignKey:StudyID"`
+	CreatorUser   User                     `gorm:"foreignKey:CreatorUserID"`
+	SignatoryUser User                     `gorm:"foreignKey:SignatoryUserId"`
+	Assets        []Asset                  `gorm:"many2many:contract_assets;"` // autogen the contract_assets table
+	Objects       []ContractObjectMetadata `gorm:"foreignKey:ContractID"`
 }
 
 // Contract object is the metadata for a file object {pdf, docx} etc.

@@ -1,0 +1,12 @@
+.data-protection-wrapper {
+  display: flex;
+}
+
+.data-protection-wrapper input {
+  display: inline-block;
+  font-size: 1rem;
+  border: 1px solid rgb(102, 102, 102);
+  border-radius: 0px;
+  margin: 5px;
+  padding: 5px;
+}

@@ -184,7 +184,7 @@ func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (ty
 // retrieves all contracts for a specific asset within a study
 func (s *Service) AssetContracts(studyID uuid.UUID, assetID uuid.UUID) ([]types.Contract, error) {
 	asset := types.Asset{}
-	err := s.db.Preload("Contracts.Assets").
+	err := s.db.Preload("Contracts.Assets").Preload("Contracts.SignatoryUser").
 		Where("id = ? AND study_id = ?", assetID, studyID).
 		Order("created_at DESC").
 		Find(&asset).Error

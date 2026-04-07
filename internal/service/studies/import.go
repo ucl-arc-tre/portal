@@ -244,12 +244,11 @@ func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport)
 	}
 
 	contract := types.Contract{
-		StudyID:               studyId,
-		CreatorUserID:         study.OwnerUserID,
-		Title:                 data.Title,
-		OrganisationSignatory: data.OrganisationSignatory,
-		ThirdPartyName:        data.ThirdPartyName,
-		Status:                data.Status,
+		StudyID:        studyId,
+		CreatorUserID:  study.OwnerUserID,
+		Title:          data.Title,
+		ThirdPartyName: data.ThirdPartyName,
+		Status:         data.Status,
 	}
 	if data.StartAt != nil {
 		if startDate, err := time.Parse(config.TimeFormat, *data.StartAt); err != nil {

@@ -78,6 +78,7 @@ jobs:
             tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
             client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}
             client_secret: ${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}
+            primary_domain: arctretest.onmicrosoft.com
           tre:
             users:
               username: password

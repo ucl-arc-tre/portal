@@ -30,14 +30,14 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 		return
 	}
 
-	validationError := h.studies.ValidateContract(studyUuid, data)
+	validationError := h.studies.ValidateContract(ctx, studyUuid, data)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
 	creator := middleware.GetUser(ctx)
-	contract, err := h.studies.CreateContract(studyUuid, data, creator)
+	contract, err := h.studies.CreateContract(ctx, studyUuid, data, creator)
 	if err != nil {
 		setError(ctx, err, "Failed to create contract")
 		return
@@ -123,7 +123,7 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 		return
 	}
 
-	validationError := h.studies.ValidateContract(uuids[0], data)
+	validationError := h.studies.ValidateContract(ctx, uuids[0], data)
 	if validationError != nil {
 		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
@@ -228,8 +228,9 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	data := openapi.Contract{
 		Id:                    contract.ID.String(),
 		Title:                 contract.Title,
-		OrganisationSignatory: contract.OrganisationSignatory,
+		OrganisationSignatory: string(contract.SignatoryUser.Username),
 		ThirdPartyName:        contract.ThirdPartyName,
+		OtherSignatories:      contract.OtherSignatories,
 		Status:                openapi.ContractStatus(contract.Status),
 		StartDate:             contract.StartDate.Format(config.DateFormat),
 		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
