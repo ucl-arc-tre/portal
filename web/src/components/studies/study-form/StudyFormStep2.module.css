@@ -1,0 +1,22 @@
+.option__text-input {
+  font-size: 1.1rem;
+  border: 1px solid rgb(102, 102, 102);
+  border-radius: 0px;
+  margin: 5px;
+  padding: 12px;
+  display: block;
+  width: 100%;
+}
+
+.nhse-ref {
+  display: flex;
+  flex-direction: row;
+  text-wrap: nowrap;
+  align-items: center;
+  color: var(--text--secondary);
+  margin-inline: 0.5rem;
+}
+
+.nhse-ref .option__text-input {
+  max-width: 50%;
+}

@@ -1,0 +1,31 @@
+.fieldset #controller {
+  margin-inline-start: 0.3rem;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+}
+
+.admin-wrapper {
+  margin-bottom: 0.5rem;
+}
+
+.admin-label {
+  padding-inline: 0;
+}
+
+.username-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.username-input-wrapper > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.domain-suffix {
+  color: var(--text--secondary);
+  font-weight: 500;
+  font-size: 1rem;
+}
