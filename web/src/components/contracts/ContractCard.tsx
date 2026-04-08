@@ -51,6 +51,13 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
           <span className={styles.value}>{contract.third_party_name}</span>
         </div>
 
+        {contract.other_signatories && (
+          <div className={styles["detail-item"]}>
+            <span className={styles.label}>Other Signatories: </span>
+            <span className={styles.value}>{contract.other_signatories}</span>
+          </div>
+        )}
+
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Expiry Date: </span>
           <span className={styles.value}>{formatDate(contract.expiry_date)}</span>
