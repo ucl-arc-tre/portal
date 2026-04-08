@@ -232,13 +232,17 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		ThirdPartyName:        contract.ThirdPartyName,
 		OtherSignatories:      contract.OtherSignatories,
 		Status:                openapi.ContractStatus(contract.Status),
-		StartDate:             contract.StartDate.Format(config.DateFormat),
-		ExpiryDate:            contract.ExpiryDate.Format(config.DateFormat),
 		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
 		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
 		StudyId:               contract.StudyID.String(),
 		ObjectsMetadata:       []openapi.ContractObjectMetadata{},
 		AssetIds:              []string{},
+	}
+	if contract.StartDate != nil {
+		data.StartDate = contract.StartDate.Format(config.DateFormat)
+	}
+	if contract.ExpiryDate != nil {
+		data.ExpiryDate = contract.ExpiryDate.Format(config.DateFormat)
 	}
 	for _, asset := range contract.Assets {
 		data.AssetIds = append(data.AssetIds, asset.ID.String())

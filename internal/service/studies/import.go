@@ -1,6 +1,7 @@
 package studies
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -205,7 +206,6 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 	} else {
 		asset.ExpiresAt = expiresAt
 	}
-	log.Debug().Any("asset", asset).Msg("pre create asset") // todo
 
 	if err := tx.Where("title = ? AND study_id = ?", asset.Title, studyId).Assign(asset).FirstOrCreate(&asset).Error; err != nil {
 		tx.Rollback()
@@ -227,7 +227,6 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 		asset.Locations = append(asset.Locations, assetLocation)
 	}
 
-	log.Debug().Any("asset", asset).Msg("Created asset")
 	return &asset, commitTransaction(tx)
 }
 
@@ -250,6 +249,16 @@ func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport)
 		ThirdPartyName: data.ThirdPartyName,
 		Status:         data.Status,
 	}
+
+	if data.OrganisationSignatory != nil {
+		signatory, err := s.persistedContractSignatory(context.Background(), *data.OrganisationSignatory)
+		if err != nil {
+			return nil, err
+		}
+		contract.SignatoryUserId = &signatory.ID
+		contract.SignatoryUser = signatory
+	}
+
 	if data.StartAt != nil {
 		if startDate, err := time.Parse(config.TimeFormat, *data.StartAt); err != nil {
 			return nil, types.NewErrInvalidObject("invalid date")

@@ -424,7 +424,7 @@ export type AssetImport = {
 export type ContractImport = {
     title: string;
     created_at: string;
-    organisation_signatory: string;
+    organisation_signatory?: string;
     third_party_name?: string;
     status: string;
     start_at?: string;
@@ -1466,7 +1466,7 @@ export type PostStudiesAdminByStudyIdContractsImportResponses = {
     /**
      * OK
      */
-    200: Asset;
+    200: Contract;
 };
 
 export type PostStudiesAdminByStudyIdContractsImportResponse = PostStudiesAdminByStudyIdContractsImportResponses[keyof PostStudiesAdminByStudyIdContractsImportResponses];

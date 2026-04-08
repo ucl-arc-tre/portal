@@ -115,9 +115,9 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	StudyID          uuid.UUID `gorm:"index"`
-	CreatorUserID    uuid.UUID `gorm:"type:uuid;not null"`
-	SignatoryUserId  uuid.UUID `gorm:"type:uuid"`
+	StudyID          uuid.UUID  `gorm:"index"`
+	CreatorUserID    uuid.UUID  `gorm:"type:uuid;not null"`
+	SignatoryUserId  *uuid.UUID `gorm:"type:uuid"`
 	Title            string
 	ThirdPartyName   *string
 	OtherSignatories *string // free text: could be name(s), email(s), UPN(s), organisations

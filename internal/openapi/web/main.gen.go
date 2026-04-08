@@ -679,7 +679,7 @@ type ContractBaseStatus string
 type ContractImport struct {
 	CreatedAt             string  `json:"created_at"`
 	ExpiryAt              *string `json:"expiry_at,omitempty"`
-	OrganisationSignatory string  `json:"organisation_signatory"`
+	OrganisationSignatory *string `json:"organisation_signatory,omitempty"`
 	StartAt               *string `json:"start_at,omitempty"`
 	Status                string  `json:"status"`
 	ThirdPartyName        *string `json:"third_party_name,omitempty"`

@@ -533,7 +533,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Asset"
+                $ref: "#/components/schemas/Contract"
 
   /studies/{studyId}/pending:
     patch:
@@ -1723,7 +1723,6 @@ components:
       required:
         - title
         - created_at
-        - organisation_signatory
         - status
       properties:
         title:

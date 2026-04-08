@@ -106,7 +106,7 @@ func (s *Service) CreateContract(
 	if err != nil {
 		return nil, err
 	}
-	contract.SignatoryUserId = signatory.ID
+	contract.SignatoryUserId = &signatory.ID
 	contract.SignatoryUser = signatory
 
 	// Store the contract metadata in the database first to generate an ID
@@ -238,7 +238,7 @@ func (s *Service) UpdateContract(
 	if err != nil {
 		return nil, err
 	}
-	contract.SignatoryUserId = signatory.ID
+	contract.SignatoryUserId = &signatory.ID
 	contract.SignatoryUser = signatory
 
 	tx := s.db.Begin()
