@@ -92,7 +92,7 @@ describe("Study creation end-to-end", () => {
 
     cy.get('[data-cy="add-contract"]').click();
     cy.get('[name="title"]').type(contractTitle);
-    cy.env(["botBaseUsername"]).then(({ botStaffUsername }) => {
+    cy.env(["botStaffUsername"]).then(({ botStaffUsername }) => {
       cy.get('[name="organisationSignatory"]').type(botStaffUsername);
     });
     cy.get('[name="otherSignatories"]').type("other signatory");
