@@ -110,6 +110,18 @@ func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, stud
 	return nil, err
 }
 
+func (s *Service) UpdateAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID, assetID uuid.UUID) (*openapi.ValidationError, error) {
+	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Updating asset")
+
+	validationError, err := s.validateAssetData(assetData)
+	if err != nil || validationError != nil {
+		return validationError, err
+	}
+
+	_, err = s.createInformationAsset(user, assetData, studyID)
+	return nil, err
+}
+
 // handles the database transaction for creating a study asset
 func (s *Service) createInformationAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
 	// Start a transaction

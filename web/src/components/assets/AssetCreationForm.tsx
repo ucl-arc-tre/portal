@@ -18,7 +18,7 @@ type AssetFormProps = {
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {
-  const { handleAssetSubmit, isSubmitting = false, closeModal } = props;
+  const { handleAssetSubmit, isSubmitting = false, closeModal, setIsFormOpen, editingAsset } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -88,7 +88,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
   return (
     <Dialog setDialogOpen={closeModal} cy="create-asset-form">
-      <h2>Create New Asset</h2>
+      <h2>{editingAsset ? "Edit Asset" : "Create New Asset"}</h2>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="form">
         <div className={styles.field}>
