@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { Asset, Study } from "@/openapi";
+import { Asset, Study, getStudiesByStudyIdAgreements } from "@/openapi";
+import { extractErrorMessage } from "@/lib/errorHandler";
 import StepProgress from "../../ui/steps/StepProgress";
 import StepArrow from "../../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
 import Assets from "../../assets/Assets";
+import Loading from "../../ui/Loading";
+import { useAuth } from "@/hooks/useAuth";
+import { Alert, AlertMessage } from "../../shared/uikitExports";
 
 type StudySetupStepsProps = {
   study: Study;
@@ -14,12 +18,39 @@ type StudySetupStepsProps = {
 
 export default function StudySetupSteps({ study, assets, setAssets, onStepsComplete }: StudySetupStepsProps) {
   const [agreementCompleted, setAgreementCompleted] = useState(false);
+  const [isCheckingAgreement, setIsCheckingAgreement] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { userData } = useAuth();
   const hasAsset = assets.length > 0;
   const isComplete = agreementCompleted && hasAsset;
 
   useEffect(() => {
     if (isComplete) onStepsComplete();
   }, [isComplete, onStepsComplete]);
+
+  useEffect(() => {
+    const checkStudyAgreement = async () => {
+      try {
+        const result = await getStudiesByStudyIdAgreements({ path: { studyId: study.id } });
+        if (!result.response.ok || !result.data) {
+          const errorMsg = extractErrorMessage(result);
+          setError(`Failed to load study agreements: ${errorMsg}`);
+          return;
+        }
+        const isConfirmed = userData?.username && result.data.usernames.includes(userData.username);
+        if (isConfirmed) setAgreementCompleted(true);
+      } catch (error) {
+        console.error("Failed to check study agreement:", error);
+        setError("Failed to check study agreement. Please try again later.");
+      } finally {
+        setIsCheckingAgreement(false);
+      }
+    };
+
+    checkStudyAgreement();
+  }, [study.id, userData]);
+
+  if (isCheckingAgreement) return <Loading message="Checking study setup..." />;
 
   const studySteps: Step[] = [
     {
@@ -41,6 +72,12 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
 
   return (
     <>
+      {error && (
+        <Alert type="error">
+          <AlertMessage>{error}</AlertMessage>
+        </Alert>
+      )}
+
       <StepProgress
         steps={studySteps}
         isComplete={isComplete}
