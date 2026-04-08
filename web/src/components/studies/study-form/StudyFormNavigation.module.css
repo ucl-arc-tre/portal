@@ -1,0 +1,16 @@
+.buttons-container {
+  display: grid;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.button--continue {
+  grid-column: 2;
+}
+
+.button--continue,
+.button--back {
+  margin-inline: 0.4%;
+  margin-bottom: 1rem;
+  text-wrap: nowrap;
+}

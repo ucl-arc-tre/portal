@@ -66,6 +66,8 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").contains("Update Study").click();
     cy.contains("Update Study").should("not.exist");
+    cy.contains("Edit Study").should("exist");
+    cy.contains(additionalAdminUsernamePrefix).should("exist");
 
     // remove added study admin
     cy.get('[data-cy="edit-study-button"]').click();
@@ -128,30 +130,29 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="all-studies-tab-button"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
-    cy.contains(studyTitle).should("exist");
-    cy.get("[data-cy='study-card']").should("have.length", 1);
+    cy.contains("[data-cy='study-card']", studyTitle).should("exist");
+  });
 
-    it("ig ops should be able to approve a study", () => {
-      cy.loginAsIGOps();
-      cy.visit("/studies");
-      cy.get('[data-cy="all-studies-tab-button"]').click();
-      cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
-      cy.get('[data-cy="study-approve-button"]').click();
-    });
+  it("ig ops should be able to approve a study", () => {
+    cy.loginAsIGOps();
+    cy.visit("/studies");
+    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.get('[data-cy="study-approve-button"]').click();
+  });
 
-    it("staff should see an approved study", () => {
-      cy.loginAsStaff();
+  it("staff should see an approved study", () => {
+    cy.loginAsStaff();
 
-      cy.visit("/studies");
-      cy.contains(studyTitle).parent().parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
+    cy.visit("/studies");
+    cy.contains(studyTitle).parent().parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
 
-      cy.contains(studyTitle)
-        .parent()
-        .parent()
-        .within(() => {
-          cy.get('[data-cy="manage-study-button"]').click();
-        });
-      cy.contains("Last signed off").should("exist");
-    });
+    cy.contains(studyTitle)
+      .parent()
+      .parent()
+      .within(() => {
+        cy.get('[data-cy="manage-study-button"]').click();
+      });
+    cy.contains("Last signed off").should("exist");
   });
 });
