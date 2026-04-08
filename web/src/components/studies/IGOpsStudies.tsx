@@ -200,15 +200,17 @@ export default function IGOpsStudies() {
               <small>
                 Showing studies {offset + 1} - {offset + studies.length}
               </small>
-              <Button
-                size="small"
-                variant="secondary"
-                className={styles["next-button"]}
-                onClick={handleFetchNextPage}
-                disabled={noMoreStudies}
-              >
-                Next Page
-              </Button>
+              {!(studies.length < studiesPerPage) && (
+                <Button
+                  size="small"
+                  variant="secondary"
+                  className={styles["next-button"]}
+                  onClick={handleFetchNextPage}
+                  disabled={noMoreStudies}
+                >
+                  Next Page
+                </Button>
+              )}
             </div>
             <HelperText className={styles["pagination-help"]}>
               {noMoreStudies && <div>No more studies available</div>}
