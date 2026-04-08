@@ -13,12 +13,11 @@ type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
   closeModal: () => void;
-  setIsFormOpen?: (isOpen: boolean) => void;
   editingAsset?: Asset;
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {
-  const { handleAssetSubmit, isSubmitting = false, closeModal, setIsFormOpen, editingAsset } = props;
+  const { handleAssetSubmit, isSubmitting = false, closeModal, editingAsset } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
