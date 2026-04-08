@@ -32,6 +32,10 @@ func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data 
 		return openapi.NewValidationError("OtherSignatories must be a short string")
 	}
 
+	if data.OtherSignatories != nil && !validation.OtherSignatoriesStringPattern.MatchString(*data.OtherSignatories) {
+		return openapi.NewValidationError("OtherSignatories must be a short string")
+	}
+
 	if data.ThirdPartyName != nil && !validation.ContractNamePattern.MatchString(*data.ThirdPartyName) {
 		return openapi.NewValidationError("Third party name must be between 2 and 100 characters")
 	}
