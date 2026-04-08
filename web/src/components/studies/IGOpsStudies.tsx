@@ -80,6 +80,12 @@ export default function IGOpsStudies() {
     }
   };
 
+  const handleClearSearch = () => {
+    setError(null);
+    setOffset(0);
+    fetchStudies(0);
+  };
+
   const handlePageChange = async (newOffset: number) => {
     setError(null);
     try {
@@ -145,7 +151,12 @@ export default function IGOpsStudies() {
         <>
           <p>All studies in the system for visibility and oversight.</p>
           <div>
-            <Search placeholder="Search Studies" onSearch={(query) => handleSearch(query)} id="study-search" />
+            <Search
+              placeholder="Search Studies"
+              onSearch={(query) => handleSearch(query)}
+              id="study-search"
+              onClear={handleClearSearch}
+            />
             <HelperText>
               <small>
                 You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
