@@ -106,12 +106,19 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 	if err != nil {
 		return
 	}
-
-	asset, err := h.studies.InformationAssetById(uuids[0], uuids[1])
+	assetData := openapi.AssetBase{}
+	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
+		return
+	}
+	user := middleware.GetUser(ctx)
+	validationError, err := h.studies.UpdateAsset(user, assetData, uuids[0], uuids[1])
 	if err != nil {
-		setError(ctx, err, "Failed to retrieve asset")
+		setError(ctx, err, "Failed to update asset")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
+	ctx.Status(http.StatusCreated)
 }

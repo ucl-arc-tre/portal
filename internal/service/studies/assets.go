@@ -117,7 +117,7 @@ func (s *Service) UpdateAsset(user types.User, assetData openapi.AssetBase, stud
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
-
+	// TODO: update this with the right function
 	_, err = s.createInformationAsset(user, assetData, studyID)
 	return nil, err
 }
