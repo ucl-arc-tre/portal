@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -117,44 +118,45 @@ func (s *Service) UpdateAsset(user types.User, assetData openapi.AssetBase, stud
 	if err != nil || validationError != nil {
 		return validationError, err
 	}
-	// TODO: update this with the right function
-	_, err = s.createInformationAsset(user, assetData, studyID)
+	err = s.updateInformationAsset(user, assetData, studyID, assetID)
 	return nil, err
+}
+func assetBaseToAsset(userID uuid.UUID, studyID uuid.UUID, assetBase openapi.AssetBase) types.Asset {
+
+	// Parse the expiry date string (already validated in validateAssetData)
+	expiryDate, err := time.Parse(config.DateFormat, assetBase.ExpiresAt)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetBase.ExpiresAt, err))
+	}
+
+	// Create the Asset with proper fields from AssetBase
+	asset := types.Asset{
+		CreatorUserID:        userID,
+		StudyID:              studyID,
+		Title:                assetBase.Title,
+		Description:          assetBase.Description,
+		ClassificationImpact: string(assetBase.ClassificationImpact),
+		Tier:                 assetBase.Tier,
+		Protection:           string(assetBase.Protection),
+		LegalBasis:           string(assetBase.LegalBasis),
+		Format:               string(assetBase.Format),
+		ExpiresAt:            expiryDate,
+		HasDspt:              assetBase.HasDspt,
+		RequiresContract:     assetBase.RequiresContract,
+		StoredOutsideUkEea:   assetBase.StoredOutsideUkEea,
+		Status:               string(assetBase.Status),
+	}
+
+	return asset
 }
 
 // handles the database transaction for creating a study asset
 func (s *Service) createInformationAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*types.Asset, error) {
 	// Start a transaction
 	tx := s.db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	defer graceful.RollbackTransactionOnPanic(tx)
 
-	// Parse the expiry date string (already validated in validateAssetData)
-	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
-	if err != nil {
-		panic(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
-	}
-
-	// Create the Asset with proper fields from AssetBase
-	asset := types.Asset{
-		CreatorUserID:        user.ID,
-		StudyID:              studyID,
-		Title:                assetData.Title,
-		Description:          assetData.Description,
-		ClassificationImpact: string(assetData.ClassificationImpact),
-		Tier:                 assetData.Tier,
-		Protection:           string(assetData.Protection),
-		LegalBasis:           string(assetData.LegalBasis),
-		Format:               string(assetData.Format),
-		ExpiresAt:            expiryDate,
-		HasDspt:              assetData.HasDspt,
-		RequiresContract:     assetData.RequiresContract,
-		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
-		Status:               string(assetData.Status),
-	}
+	asset := assetBaseToAsset(user.ID, studyID, assetData)
 
 	// Create the asset
 	if err := tx.Create(&asset).Error; err != nil {
@@ -180,6 +182,31 @@ func (s *Service) createInformationAsset(user types.User, assetData openapi.Asse
 	}
 
 	return &asset, nil
+}
+
+func (s *Service) updateInformationAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID, assetID uuid.UUID) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	asset, err := s.InformationAssetById(studyID, assetID)
+	if err != nil {
+		return err
+	}
+
+	updatedAsset := assetBaseToAsset(user.ID, studyID, assetData)
+
+	// replace the list of locations
+	locs := tx.Model(asset).Association("Locations")
+	if err := locs.Replace(&updatedAsset.Locations); err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to update asset locations")
+	}
+
+	if err := tx.Model(&asset).Where("id = ?", assetID).Select("*").Updates(&updatedAsset).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to update asset")
+	}
+	return commitTransaction(tx)
 }
 
 // retrieves all assets for a study
