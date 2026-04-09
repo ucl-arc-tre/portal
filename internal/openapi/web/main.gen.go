@@ -611,7 +611,7 @@ type Contract struct {
 	CreatedAt string `json:"created_at"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
-	ExpiryDate string `json:"expiry_date"`
+	ExpiryDate *string `json:"expiry_date,omitempty"`
 
 	// Id Unique identifier for the contract
 	Id              string                   `json:"id"`
@@ -624,7 +624,7 @@ type Contract struct {
 	OtherSignatories *string `json:"other_signatories,omitempty"`
 
 	// StartDate Contract start date in YYYY-MM-DD format
-	StartDate string `json:"start_date"`
+	StartDate *string `json:"start_date,omitempty"`
 
 	// Status Current status of the contract
 	Status ContractStatus `json:"status"`
@@ -651,7 +651,7 @@ type ContractBase struct {
 	AssetIds []string `json:"asset_ids"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
-	ExpiryDate string `json:"expiry_date"`
+	ExpiryDate *string `json:"expiry_date,omitempty"`
 
 	// OrganisationSignatory Email of the organisation signatory
 	OrganisationSignatory string `json:"organisation_signatory"`
@@ -660,7 +660,7 @@ type ContractBase struct {
 	OtherSignatories *string `json:"other_signatories,omitempty"`
 
 	// StartDate Contract start date in YYYY-MM-DD format
-	StartDate string `json:"start_date"`
+	StartDate *string `json:"start_date,omitempty"`
 
 	// Status Current status of the contract
 	Status ContractBaseStatus `json:"status"`

@@ -1953,8 +1953,6 @@ components:
         - title
         - organisation_signatory
         - status
-        - start_date
-        - expiry_date
         - asset_ids
       properties:
         title:

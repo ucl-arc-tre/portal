@@ -239,10 +239,12 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		AssetIds:              []string{},
 	}
 	if contract.StartDate != nil {
-		data.StartDate = contract.StartDate.Format(config.DateFormat)
+		startDate := contract.StartDate.Format(config.DateFormat)
+		data.StartDate = &startDate
 	}
 	if contract.ExpiryDate != nil {
-		data.ExpiryDate = contract.ExpiryDate.Format(config.DateFormat)
+		expiryDate := contract.ExpiryDate.Format(config.DateFormat)
+		data.ExpiryDate = &expiryDate
 	}
 	for _, asset := range contract.Assets {
 		data.AssetIds = append(data.AssetIds, asset.ID.String())

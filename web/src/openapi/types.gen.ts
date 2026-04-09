@@ -627,11 +627,11 @@ export type ContractBase = {
     /**
      * Contract start date in YYYY-MM-DD format
      */
-    start_date: string;
+    start_date?: string;
     /**
      * Contract expiry date in YYYY-MM-DD format
      */
-    expiry_date: string;
+    expiry_date?: string;
     /**
      * List of assets associated with this contract
      */
