@@ -17,9 +17,6 @@ import (
 func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 	// NOTE: this deliberately doesn't do strong validation of the object
 
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
 	study := types.Study{
 		Caseref:                          data.Caseref,
 		Title:                            data.Title,
@@ -78,6 +75,9 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		study.Owner = owner
 	}
 
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
 	result := tx.Model(&types.Study{}).
 		Assign(study). // update all fields
 		Where("caseref = ?", data.Caseref).
@@ -101,6 +101,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 	if data.OwnerAgreedAt != nil {
 		agreedAt, err := time.Parse(config.TimeFormat, *data.OwnerAgreedAt)
 		if err != nil {
+			tx.Rollback()
 			return nil, types.NewErrInvalidObject(err)
 		}
 		ownerSignature := types.StudyAgreementSignature{
@@ -137,6 +138,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		if data.AdminAgreedAt != nil {
 			agreedAt, err := time.Parse(config.TimeFormat, *data.AdminAgreedAt)
 			if err != nil {
+				tx.Rollback()
 				return nil, types.NewErrInvalidObject(err)
 			}
 			adminSignature := types.StudyAgreementSignature{
@@ -193,15 +195,18 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 	case 2, 3, 4:
 		asset.ClassificationImpact = string(openapi.AssetClassificationImpactHighlyConfidential)
 	default:
+		tx.Rollback()
 		return nil, types.NewErrInvalidObject("invalid tier impact")
 	}
 
 	if createdAt, err := time.Parse(config.TimeFormat, data.CreatedAt); err != nil {
+		tx.Rollback()
 		return nil, types.NewErrInvalidObject("failed to parse created at")
 	} else {
 		asset.CreatedAt = createdAt
 	}
 	if expiresAt, err := time.Parse(config.TimeFormat, data.ExpiresAt); err != nil {
+		tx.Rollback()
 		return nil, types.NewErrInvalidObject("failed to parse expires at")
 	} else {
 		asset.ExpiresAt = expiresAt
@@ -214,6 +219,7 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 
 	for _, locationStr := range data.Locations {
 		if locationStr == "" {
+			tx.Rollback()
 			return nil, types.NewErrInvalidObject("empty location string")
 		}
 		assetLocation := types.AssetLocation{
@@ -253,6 +259,7 @@ func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport)
 	if data.OrganisationSignatory != nil {
 		signatory, err := s.persistedContractSignatory(context.Background(), *data.OrganisationSignatory)
 		if err != nil {
+			tx.Rollback()
 			return nil, err
 		}
 		contract.SignatoryUserId = &signatory.ID
@@ -261,6 +268,7 @@ func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport)
 
 	if data.StartAt != nil {
 		if startDate, err := time.Parse(config.TimeFormat, *data.StartAt); err != nil {
+			tx.Rollback()
 			return nil, types.NewErrInvalidObject("invalid date")
 		} else {
 			contract.StartDate = &startDate
@@ -268,6 +276,7 @@ func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport)
 	}
 	if data.ExpiryAt != nil {
 		if expiryDate, err := time.Parse(config.TimeFormat, *data.ExpiryAt); err != nil {
+			tx.Rollback()
 			return nil, types.NewErrInvalidObject("invalid date")
 		} else {
 			contract.ExpiryDate = &expiryDate
