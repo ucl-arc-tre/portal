@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
-import styles from "./AssetCreationForm.module.css";
+import styles from "./AssetForm.module.css";
 import { Alert, AlertMessage, Label } from "../shared/uikitExports";
 import { Asset } from "@/openapi/types.gen";
+import { populateExistingAssetFormData } from "../studies/study-form/lib/assetFormUtils";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
@@ -16,7 +17,7 @@ type AssetFormProps = {
   editingAsset?: Asset;
 };
 
-export default function AssetCreationForm(props: AssetFormProps) {
+export default function AssetForm(props: AssetFormProps) {
   const { handleAssetSubmit, isSubmitting = false, closeModal, editingAsset } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -84,6 +85,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
       setErrorMessage("Error: " + String((error as Error).message));
     }
   };
+
+  useEffect(() => {
+    if (!editingAsset) return;
+    reset(populateExistingAssetFormData(editingAsset));
+  }, [editingAsset, reset]);
 
   return (
     <Dialog setDialogOpen={closeModal} cy="create-asset-form">

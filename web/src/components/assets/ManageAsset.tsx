@@ -3,7 +3,7 @@ import { Asset, AssetBase, Contract, putStudiesByStudyIdAssetsByAssetId, Study }
 import styles from "./ManageAsset.module.css";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import ContractCard from "../contracts/ContractCard";
-import AssetCreationForm from "./AssetCreationForm";
+import AssetForm from "./AssetForm";
 import Button from "../ui/Button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,10 +13,11 @@ type ManageAssetProps = {
   study: Study;
   asset: Asset;
   contracts: Contract[];
+  fetchData: (studyId: string, assetId: string) => Promise<void>;
 };
 
 export default function ManageAsset(props: ManageAssetProps) {
-  const { study, asset, contracts } = props;
+  const { study, asset, contracts, fetchData } = props;
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -43,16 +44,12 @@ export default function ManageAsset(props: ManageAssetProps) {
       setError("Search failed. Please try again.");
     }
 
-    // fetchAsset(asset.id);
+    fetchData(study.id, asset.id);
   };
   return (
     <>
       {isFormOpen && (
-        <AssetCreationForm
-          closeModal={() => setIsFormOpen(false)}
-          editingAsset={asset}
-          handleAssetSubmit={onEditComplete}
-        />
+        <AssetForm closeModal={() => setIsFormOpen(false)} editingAsset={asset} handleAssetSubmit={onEditComplete} />
       )}
 
       {error && (
@@ -65,10 +62,6 @@ export default function ManageAsset(props: ManageAssetProps) {
         <div className={styles["asset-actions"]}>
           <Button variant="primary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-asset-button">
             Edit Asset
-          </Button>
-
-          <Button disabled size="small" variant="secondary">
-            Delete Asset
           </Button>
         </div>
       )}

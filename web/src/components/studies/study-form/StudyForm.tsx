@@ -4,7 +4,7 @@ import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
-import { convertStudyFormDataToApiRequest, populateExistingFormData } from "./lib/studyFormUtils";
+import { convertStudyFormDataToApiRequest, populateExistingStudyFormData } from "./lib/studyFormUtils";
 import StudyFormStep1 from "./StudyFormStep1";
 import StudyFormStep2 from "./StudyFormStep2";
 import StudyFormStep3 from "./StudyFormStep3";
@@ -118,7 +118,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
   useEffect(() => {
     if (!editingStudy) return;
-    reset(populateExistingFormData(editingStudy));
+    reset(populateExistingStudyFormData(editingStudy));
   }, [editingStudy, reset]);
 
   return (

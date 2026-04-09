@@ -3,7 +3,7 @@ import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets
 import { extractErrorMessage } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 
-import AssetCreationForm from "./AssetCreationForm";
+import AssetForm from "./AssetForm";
 import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
@@ -102,7 +102,7 @@ export default function Assets(props: AssetsProps) {
           </div>
 
           {showAssetForm && (
-            <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+            <AssetForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
           )}
         </div>
       ) : (
@@ -121,7 +121,7 @@ export default function Assets(props: AssetsProps) {
               </div>
 
               {showAssetForm && (
-                <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+                <AssetForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
               )}
             </>
           )}

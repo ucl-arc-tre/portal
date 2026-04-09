@@ -2,7 +2,7 @@ import { Study, StudyRequest } from "@/openapi";
 
 export const UclDpoId = "Z6364106";
 
-export const populateExistingFormData = (study: Study): StudyFormData => {
+export const populateExistingStudyFormData = (study: Study): StudyFormData => {
   const [dataProtectionPrefix, dataProtectionYear, dataProtectionMonth, dataProtectionId] =
     study.data_protection_number?.split("/") ?? [];
 
