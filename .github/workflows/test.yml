@@ -20,6 +20,23 @@ jobs:
       - name: Run unit tests
         run: make test-unit
 
+
+  integration:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Docker
+        run: docker compose version
+
+      - name: Run integration tests
+        run: make test-integration
+
+
   e2e:
     runs-on: ubuntu-latest
     environment: e2e

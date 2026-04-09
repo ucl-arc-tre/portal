@@ -1,0 +1,40 @@
+services:
+
+  postgres-test:
+    image: postgres:17
+    profiles: ["test"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres # pragma: allowlist secret
+      POSTGRES_DB: test
+    tmpfs:
+      - /var/lib/postgresql/data  # fast + wiped every run (perfect for tests)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      retries: 10
+
+
+  integration-tests:
+    profiles: ["test"]
+    build:
+      context: ../..
+      target: api-dev   # reuse existing Go dev image
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres-test:5432/test?sslmode=disable # pragma: allowlist secret
+    volumes:
+      - type: bind
+        source: ../..  # actual project folder on your laptop
+        target: /repo  # where it appears inside the container, it is just an internal path, not tied to the real repo name
+    working_dir: /repo
+    command:
+      - go
+      - test
+      - ./internal/service/studies
+      - ./internal/service/projects
+      - ./internal/service/users
+      - -tags=integration
+      - -v
