@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Agreement,
-  getAgreementsByAgreementType,
-  getStudiesByStudyIdAgreements,
-  postStudiesByStudyIdAgreements,
-} from "@/openapi";
+import { Agreement, getAgreementsByAgreementType, postStudiesByStudyIdAgreements } from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
@@ -19,9 +14,7 @@ type StudyAgreementProps = {
   setAgreementCompleted: (completed: boolean) => void;
 };
 
-export default function StudyAgreement(props: StudyAgreementProps) {
-  const { studyId, studyTitle, setAgreementCompleted } = props;
-
+export default function StudyAgreement({ studyId, studyTitle, setAgreementCompleted }: StudyAgreementProps) {
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +22,7 @@ export default function StudyAgreement(props: StudyAgreementProps) {
   const isIAO = userData?.roles.includes("information-asset-owner");
 
   useEffect(() => {
-    const fetchStudyAgreementData = async () => {
+    const fetchAgreementText = async () => {
       setIsLoading(true);
 
       try {
@@ -41,20 +34,6 @@ export default function StudyAgreement(props: StudyAgreementProps) {
           return;
         }
         setStudyAgreementText(agreementTextResult.data);
-
-        // Check if the user has already accepted the study agreement
-        const studyAgreementsResult = await getStudiesByStudyIdAgreements({ path: { studyId } });
-        if (!studyAgreementsResult.response.ok || !studyAgreementsResult.data) {
-          const errorMsg = extractErrorMessage(studyAgreementsResult);
-          setError(`Failed to load study agreements: ${errorMsg}`);
-          return;
-        }
-        const confirmedAgreements = studyAgreementsResult.data.usernames;
-        const isConfirmed = userData?.username && confirmedAgreements.includes(userData?.username);
-
-        if (isConfirmed) {
-          setAgreementCompleted(true);
-        }
       } catch (err) {
         console.error("Failed to load study agreement:", err);
         setError("Failed to load study agreement. Please try again later.");
@@ -63,10 +42,10 @@ export default function StudyAgreement(props: StudyAgreementProps) {
       }
     };
 
-    fetchStudyAgreementData();
-  }, [studyId, setAgreementCompleted, userData]);
+    fetchAgreementText();
+  }, []);
 
-  if (isLoading) return <Loading message="Checking if all study agreements are present..." />;
+  if (isLoading) return <Loading message="Loading study agreement..." />;
 
   if (!studyAgreementText) return <div>No study agreement could be found.</div>;
 

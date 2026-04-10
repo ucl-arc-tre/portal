@@ -1772,7 +1772,10 @@ components:
           description: Name of the contract
         organisation_signatory:
           type: string
-          description: Name of the organisation signatory
+          description: Email of the organisation signatory
+        other_signatories:
+          type: string
+          description: Other signatories to the contract. Could be name(s) or email(s)
         third_party_name:
           type: string
           description: Name of the third party organization
