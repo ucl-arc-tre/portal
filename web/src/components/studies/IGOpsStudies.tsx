@@ -153,7 +153,7 @@ export default function IGOpsStudies() {
         <p>Studies submitted for review. Approve or request changes for each study.</p>
       ) : (
         <>
-          <p>All studies in the Portal, .</p>
+          <p>All studies in the Portal, organised by status.</p>
           <div>
             <Search
               placeholder="Search Studies"
