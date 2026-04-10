@@ -52,12 +52,12 @@ test:  ## Run all tests
 test-unit:  ## Run unit tests
 	go test ./internal/...
 
-test-integration:
-	cd internal/testutil && docker compose -p $(INTTEST_PROJECT_NAME) --profile test up \
-		--build \
-		--abort-on-container-exit \
-		--exit-code-from integration-tests
-	docker compose -p $(INTTEST_PROJECT_NAME) --profile test down -v
+test-integration:  ## Run integration tests
+	cd internal/testutil && \
+	docker compose -p $(INTTEST_PROJECT_NAME) build && \
+	docker compose -p $(INTTEST_PROJECT_NAME) up -d postgres-test && \
+	docker compose -p $(INTTEST_PROJECT_NAME) run --rm integration-tests && \
+	docker compose -p $(INTTEST_PROJECT_NAME) down -v
 
 test-e2e-cypress-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev server
 	if ! docker compose -p $(DEV_PROJECT_NAME) ps --services --filter "status=running" | grep nginx; then \

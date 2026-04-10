@@ -2,9 +2,7 @@ package testutil
 
 import (
 	"fmt"
-	"net/url"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -29,18 +27,6 @@ func NewTestDBSchema(t *testing.T, migrate Migrator) *gorm.DB {
 
 	// Admin connection
 	baseDSN := os.Getenv("DATABASE_URL") // as defined in docker-compose.yaml
-	if strings.HasPrefix(baseDSN, "postgres://") {
-		// parse URL and convert to keyword DSN
-		u, err := url.Parse(baseDSN)
-		require.NoError(err, "url-to-dsn conversion for admin connect")
-		host := u.Hostname()
-		port := u.Port()
-		user := u.User.Username()
-		pass, _ := u.User.Password()
-		dbname := strings.TrimPrefix(u.Path, "/")
-		ssl := u.Query().Get("sslmode")
-		baseDSN = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", host, port, user, pass, dbname, ssl)
-	}
 	adminDB, err := gorm.Open(postgres.Open(baseDSN), &gorm.Config{})
 	require.NoError(err, "admin connect")
 
@@ -63,7 +49,7 @@ func NewTestDBSchema(t *testing.T, migrate Migrator) *gorm.DB {
 		// Use require during setup, but prefer t.Errorf (non-fatal) in cleanup because if cleanup
 		// fails, the test has already finished running and failure reporting can be less clear
 		if err := adminDB.Exec(fmt.Sprintf(`DROP SCHEMA "%s" CASCADE`, schema)).Error; err != nil {
-			t.Errorf("drop schema: %v", err)
+			t.Errorf("failed to drop schema: %v", err)
 		}
 
 		// Close connections /  BOTH pools

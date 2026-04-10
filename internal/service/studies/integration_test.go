@@ -43,6 +43,9 @@ func migrate(db *gorm.DB) error {
 
 func TestIntegration_CreateAsset(t *testing.T) {
 
+	// Enable parallel test
+	t.Parallel()
+
 	// Create unique schema for this test
 	db := testutil.NewTestDBSchema(t, migrate)
 
