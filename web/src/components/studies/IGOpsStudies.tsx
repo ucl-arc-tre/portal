@@ -44,6 +44,9 @@ export default function IGOpsStudies() {
   };
 
   const handleSearch = async (query: string) => {
+    if (query !== searchQuery) {
+      setOffset(0);
+    }
     setIsLoading(true);
     setError(null);
     setSearchQuery(query);
