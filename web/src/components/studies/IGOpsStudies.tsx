@@ -15,6 +15,7 @@ export default function IGOpsStudies() {
   const [tab, setTab] = useState("pending");
 
   const studiesPerPage = 12;
+  const [searchQuery, setSearchQuery] = useState("");
   const [offset, setOffset] = useState(0);
   const [noMoreStudies, setNoMoreStudies] = useState(false);
   const fetchStudies = async (offset?: number) => {
@@ -32,6 +33,7 @@ export default function IGOpsStudies() {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
       }
+
       setStudies(response.data);
     } catch (error) {
       console.error("Failed to fetch studies:", error);
@@ -44,6 +46,7 @@ export default function IGOpsStudies() {
   const handleSearch = async (query: string) => {
     setIsLoading(true);
     setError(null);
+    setSearchQuery(query);
     try {
       let response;
 
@@ -84,12 +87,13 @@ export default function IGOpsStudies() {
     setError(null);
     setOffset(0);
     fetchStudies(0);
+    setSearchQuery("");
   };
 
   const handlePageChange = async (newOffset: number) => {
     setError(null);
     try {
-      const response = await getStudies({ query: { offset: newOffset, limit: studiesPerPage } });
+      const response = await getStudies({ query: { offset: newOffset, limit: studiesPerPage, query: searchQuery } });
       if (!response.response.ok || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
@@ -149,7 +153,7 @@ export default function IGOpsStudies() {
         <p>Studies submitted for review. Approve or request changes for each study.</p>
       ) : (
         <>
-          <p>All studies in the system for visibility and oversight.</p>
+          <p>All studies in the Portal, .</p>
           <div>
             <Search
               placeholder="Search Studies"
