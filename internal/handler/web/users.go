@@ -13,42 +13,15 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
-
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
 func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
-	// for search, check entra then find matches in our db, based on user principal
-	user := middleware.GetUser(ctx)
-	isAdmin, err := rbac.HasRole(user, rbac.Admin)
-	if err != nil {
-		setError(ctx, err, "Failed to get roles for user")
-		return
-	}
-	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
-	if err != nil {
-		setError(ctx, err, "Failed to get roles for user")
-		return
-	}
-	query := params.Find
-
-	// retrieve auth + agreements + training info for set of users
-	if isAdmin || isTreOpsStaff {
-		h.getUsersAll(ctx, query)
-
-	} else {
-		ctx.JSON(http.StatusInternalServerError, "Not implemented")
-	}
-}
-
-func (h *Handler) getUsersAll(ctx *gin.Context, query string) {
-	people, err := h.users.SearchEntraForUsersAndMatch(ctx, query)
+	people, err := h.users.SearchEntraForUsersAndMatch(ctx, params.Find)
 	if err != nil {
 		setError(ctx, err, "Failed to find people in tenant")
 		return
 	}
 	ctx.JSON(http.StatusOK, people)
-
 }
 
 func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {

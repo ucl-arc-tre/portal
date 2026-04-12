@@ -35,7 +35,8 @@ export default function PeoplePage() {
   const isIGOps = userData?.roles.includes("ig-ops-staff");
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
-  const canSearch = isTreOpsStaff || isAdmin || isIGOps;
+  const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff");
+  const canSearch = isTreOpsStaff || isAdmin || isIGOps || isDSHOpsStaff;
 
   const handleUserSearch = async (query: string) => {
     setIsLoading(true);
@@ -104,10 +105,12 @@ export default function PeoplePage() {
                 : "You do not have permission to view this page"
         }
       />
-      <div className={styles["button-container"]}>
-        {isAdmin && <ApprovedResearcherImport />}
-        {(isAdmin || isIAO) && <ExternalInvite />}
-      </div>
+      {(isAdmin || isIAO) && (
+        <div className={styles["button-container"]}>
+          {isAdmin && <ApprovedResearcherImport />}
+          <ExternalInvite />
+        </div>
+      )}
 
       {canSearch && (
         <div className={styles["search-wrapper"]}>
@@ -130,7 +133,7 @@ export default function PeoplePage() {
         </Alert>
       )}
 
-      {!isAdmin && <Callout construction />}
+      {!canSearch && <Callout construction />}
 
       {canSearch &&
         searchTerm.length > 0 &&
