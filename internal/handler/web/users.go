@@ -18,7 +18,7 @@ import (
 func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 	people, err := h.users.Find(ctx, params.Find)
 	if err != nil {
-		setError(ctx, err, "Failed to find people in tenant")
+		setError(ctx, err, "Failed to find people")
 		return
 	}
 	ctx.JSON(http.StatusOK, people)

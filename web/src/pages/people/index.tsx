@@ -45,7 +45,7 @@ export default function PeoplePage() {
       setSearchTerm("");
       return;
     }
-    const regex = /^\w[\w.\s0-9@-]+\w$/;
+    const regex = /^^[a-zA-Z0-9\-\.+@_\s]{3,}$/;
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
@@ -78,7 +78,7 @@ export default function PeoplePage() {
     }
   };
 
-  if (!isAdmin && !isTreOpsStaff && !isIAO) {
+  if (!isAdmin && !isTreOpsStaff && !isIAO && !canSearch) {
     return (
       <Alert type="warning">
         <AlertMessage>You do not have permission to view this page</AlertMessage>
@@ -98,7 +98,7 @@ export default function PeoplePage() {
         description={
           isAdmin
             ? "View and manage portal users, including adding via invitation or upload"
-            : isTreOpsStaff
+            : isTreOpsStaff || isDSHOpsStaff
               ? "View approved researchers"
               : isIAO
                 ? "View users in your projects or invite a collaborator"

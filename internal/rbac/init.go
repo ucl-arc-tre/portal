@@ -87,7 +87,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 
 func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
-		Policy{RoleName: IGOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: WriteAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: ReadAction},
