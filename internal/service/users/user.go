@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -178,20 +179,39 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	return user, types.NewErrFromGorm(result.Error)
 }
 
-func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string) ([]openapi.UserData, error) {
-	// query entra
+// Find a user by a search query, which may be the start of an username, email address
+// or chosen name. If no results are found then falls back to querying entra and
+// matching on usernames
+func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, error) {
+	if len(query) < 3 {
+		return []openapi.UserData{}, types.NewErrInvalidObject("users query must be at least 2 chars")
+	}
+
+	users := []types.User{}
+
+	dbLikeQuery := strings.TrimSuffix(query, "%") + "%"
+	result := s.db.Model(&types.User{}).
+		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
+		Where("username ILIKE ? OR user_attributes.email ILIKE ? OR user_attributes.chosen_name ILIKE ?", dbLikeQuery, dbLikeQuery, dbLikeQuery).
+		Limit(100).
+		Scan(&users)
+
+	if result.Error != nil {
+		return []openapi.UserData{}, types.NewErrFromGorm(result.Error, "failed to query users")
+	}
+	if len(users) > 0 {
+		return s.usersData(users)
+	}
+
+	// fallback to querying entra, then finding on usernames
 	usernames, err := s.entra.FindUsernames(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	// then match to users in our db
-	users := []types.User{}
-
-	result := s.db.Where("username IN (?)", usernames).Find(&users)
+	result = s.db.Where("username IN (?)", usernames).Find(&users)
 	if result.Error != nil {
-		return nil, types.NewErrFromGorm(result.Error)
+		return []openapi.UserData{}, types.NewErrFromGorm(result.Error)
 	}
-
 	return s.usersData(users)
 }
 

@@ -16,7 +16,7 @@ import (
 )
 
 func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
-	people, err := h.users.SearchEntraForUsersAndMatch(ctx, params.Find)
+	people, err := h.users.Find(ctx, params.Find)
 	if err != nil {
 		setError(ctx, err, "Failed to find people in tenant")
 		return
