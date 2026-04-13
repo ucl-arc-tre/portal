@@ -31,9 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up Docker for integration tests
-        run: docker compose version
-
       - name: Run integration tests
         run: make test-integration
 
