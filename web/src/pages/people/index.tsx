@@ -78,7 +78,7 @@ export default function PeoplePage() {
     }
   };
 
-  if (!isAdmin && !isTreOpsStaff && !isIAO && !canSearch) {
+  if (!isIAO && !canSearch) {
     return (
       <Alert type="warning">
         <AlertMessage>You do not have permission to view this page</AlertMessage>
@@ -133,7 +133,7 @@ export default function PeoplePage() {
         </Alert>
       )}
 
-      {!canSearch && <Callout construction />}
+      <Callout construction />
 
       {canSearch &&
         searchTerm.length > 0 &&
