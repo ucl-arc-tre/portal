@@ -194,7 +194,7 @@ func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, e
 		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
 		Where("username ILIKE ? OR user_attributes.email ILIKE ? OR user_attributes.chosen_name ILIKE ?", dbLikeQuery, dbLikeQuery, dbLikeQuery).
 		Limit(100).
-		Scan(&portalUsers)
+		Find(&portalUsers)
 
 	if result.Error != nil {
 		return []openapi.UserData{}, types.NewErrFromGorm(result.Error, "failed to query users")
@@ -204,15 +204,15 @@ func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, e
 		portalUserIds = append(portalUserIds, portalUser.ID)
 	}
 
-	usernames, err := s.entra.FindUsernames(ctx, query)
+	entraUsernames, err := s.entra.FindUsernames(ctx, query)
 	if err != nil {
 		log.Err(err).Msg("Failed to query entra for additional users")
 	}
 	entraUsers := []types.User{}
-	if len(portalUserIds) > 0 {
-		result = s.db.Where("username IN (?) AND id NOT IN (?)", usernames, portalUserIds).Find(&entraUsers)
-	} else {
-		result = s.db.Where("username IN (?)", usernames).Find(&entraUsers)
+	if len(portalUserIds) > 0 && len(entraUsernames) > 0 {
+		result = s.db.Where("username IN (?) AND id NOT IN (?)", entraUsernames, portalUserIds).Find(&entraUsers)
+	} else if len(entraUsernames) > 0 {
+		result = s.db.Where("username IN (?)", entraUsernames).Find(&entraUsers)
 	}
 	if result.Error != nil {
 		return []openapi.UserData{}, types.NewErrFromGorm(result.Error)

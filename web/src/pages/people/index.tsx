@@ -45,7 +45,7 @@ export default function PeoplePage() {
       setSearchTerm("");
       return;
     }
-    const regex = /^^[a-zA-Z0-9\-\.+@_\s]{3,}$/;
+    const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
