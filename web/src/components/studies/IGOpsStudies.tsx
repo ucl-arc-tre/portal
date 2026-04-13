@@ -207,7 +207,7 @@ export default function IGOpsStudies() {
               <small>
                 Showing studies {offset + 1} - {offset + studies.length}
               </small>
-              {!(studies.length < studiesPerPage) && (
+              {studies.length >= studiesPerPage && (
                 <Button
                   size="small"
                   variant="secondary"
