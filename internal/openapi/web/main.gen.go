@@ -1125,6 +1125,12 @@ type GetStudiesParams struct {
 
 	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
 	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
+
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Offset Index of the first item to return
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1691,6 +1697,22 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner_username", c.Request.URL.Query(), &params.OwnerUsername, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner_username: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
 		return
 	}
 

@@ -24,6 +24,7 @@ export default function StudyCardsList(props: Props) {
     <div className={styles["study-selection"]}>
       <div className={styles["studies-list"]}>
         {studies
+          .slice()
           .sort((a, b) => studySortOrder[a.approval_status] - studySortOrder[b.approval_status])
           .map((study) => (
             <div key={study.id} className={styles["study-card"]} data-cy="study-card">
