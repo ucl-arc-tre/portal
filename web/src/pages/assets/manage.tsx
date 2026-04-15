@@ -161,7 +161,7 @@ export default function ManageAssetPage() {
 
       <div className="content">
         <div className={styles.header}>
-          <Title text={`Manage Asset: ${asset.title}`} centered />
+          <Title text={`Manage Asset: ${asset.title}`} />
 
           {canModify && (
             <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
