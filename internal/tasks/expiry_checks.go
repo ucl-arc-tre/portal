@@ -56,14 +56,14 @@ func (m *Manager) checkTrainingCertificatesExpiry() error {
 	}
 
 	for _, trainingRecord := range trainingRecords {
-		recipients := []string{string(trainingRecord.User.Username)}
+		recipient := string(trainingRecord.User.Username)
 
 		certificateIsExpiring := trainingRecord.CertificateExpiringWithin30Days()
 		if certificateIsExpiring == nil {
 			continue
 		}
 
-		err := m.entra.SendTrainingExpiryNotification(ctx, recipients, *certificateIsExpiring)
+		err := m.entra.SendTrainingExpiryNotification(ctx, recipient, *certificateIsExpiring)
 		if err != nil {
 			return err
 		}

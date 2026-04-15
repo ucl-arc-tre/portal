@@ -148,7 +148,7 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 	return c.createCustomEmail(ctx, notificationMsg, emails, content)
 }
 
-func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, emails []string, training types.UserTrainingRecord) error {
+func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
 	days := training.DaysUntilExpiry()
 	content := "You have a training certificate that is due to expire within"
 	if days != 1 && days > 0 {
@@ -165,5 +165,5 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, emails 
 	}
 
 	notificationMsg := "Notification: Your training certificate is due to expire soon"
-	return c.createCustomEmail(ctx, notificationMsg, emails, content)
+	return c.createCustomEmail(ctx, notificationMsg, []string{email}, content)
 }
