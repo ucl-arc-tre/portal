@@ -32,7 +32,38 @@ func (m *Manager) checkContractsExpiry() error {
 		if contract == nil {
 			continue
 		}
-		err := m.entra.SendExpiryNotification(ctx, recipients, *contract, study)
+		err := m.entra.SendContractExpiryNotification(ctx, recipients, *contract, study)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Manager) checkTrainingCertificatesExpiry() error {
+	if !config.NotificationsEnabled() {
+		return nil
+	}
+
+	ctx := context.Background()
+
+	trainingRecords := []types.UserTrainingRecord{}
+	result := m.db.Model(&types.UserTrainingRecord{}).Preload("User").Find(&trainingRecords)
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get training records")
+	}
+
+	for _, trainingRecord := range trainingRecords {
+		recipients := []string{string(trainingRecord.User.Username)}
+
+		certificateIsExpiring := trainingRecord.CertificateExpiringWithin30Days()
+		if certificateIsExpiring == nil {
+			continue
+		}
+
+		err := m.entra.SendTrainingExpiryNotification(ctx, recipients, *certificateIsExpiring)
 		if err != nil {
 			return err
 		}
@@ -44,4 +75,5 @@ func (m *Manager) checkContractsExpiry() error {
 
 func (m *Manager) scheduleDailyChecks() {
 	m.mustEvery(time.Minute*1440, m.checkContractsExpiry, "checkContractsExpiry")
+	m.mustEvery(time.Minute*1440, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
 }
