@@ -71,11 +71,19 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if !params.Valid() {
 		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
 	}
+	if params.Limit != nil && *params.Limit > 12 {
+		return []types.Study{}, types.NewErrInvalidObject("maxItems cannot be greater than 12")
+	}
+	if params.Offset != nil && *params.Offset < 0 {
+		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
+	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,
 		CaseRef:        params.Caseref,
 		FuzzyTitle:     params.FuzzyTitle,
 		OwnerUsername:  params.OwnerUsername,
+		Limit:          12,
+		Offset:         0,
 	}
 	if queryIsCaseref(params.Query) {
 		caseref, err := strconv.Atoi(*params.Query)
@@ -87,6 +95,12 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		queryParams.OwnerUsername = params.Query
 	} else if params.Query != nil {
 		queryParams.FuzzyTitle = params.Query
+	}
+	if params.Limit != nil {
+		queryParams.Limit = *params.Limit
+	}
+	if params.Offset != nil {
+		queryParams.Offset = *params.Offset
 	}
 	return h.studies.AllStudies(queryParams)
 }
