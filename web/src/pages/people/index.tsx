@@ -35,7 +35,8 @@ export default function PeoplePage() {
   const isIGOps = userData?.roles.includes("ig-ops-staff");
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
-  const canSearch = isTreOpsStaff || isAdmin || isIGOps;
+  const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff");
+  const canSearch = isTreOpsStaff || isAdmin || isIGOps || isDSHOpsStaff;
 
   const handleUserSearch = async (query: string) => {
     setIsLoading(true);
@@ -44,7 +45,7 @@ export default function PeoplePage() {
       setSearchTerm("");
       return;
     }
-    const regex = /^\w[\w.\s0-9@-]+\w$/;
+    const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
@@ -77,7 +78,7 @@ export default function PeoplePage() {
     }
   };
 
-  if (!isAdmin && !isTreOpsStaff && !isIAO) {
+  if (!isIAO && !canSearch) {
     return (
       <Alert type="warning">
         <AlertMessage>You do not have permission to view this page</AlertMessage>
@@ -97,17 +98,19 @@ export default function PeoplePage() {
         description={
           isAdmin
             ? "View and manage portal users, including adding via invitation or upload"
-            : isTreOpsStaff
+            : isTreOpsStaff || isDSHOpsStaff
               ? "View approved researchers"
               : isIAO
                 ? "View users in your projects or invite a collaborator"
                 : "You do not have permission to view this page"
         }
       />
-      <div className={styles["button-container"]}>
-        {isAdmin && <ApprovedResearcherImport />}
-        {(isAdmin || isIAO) && <ExternalInvite />}
-      </div>
+      {(isAdmin || isIAO) && (
+        <div className={styles["button-container"]}>
+          {isAdmin && <ApprovedResearcherImport />}
+          <ExternalInvite />
+        </div>
+      )}
 
       {canSearch && (
         <div className={styles["search-wrapper"]}>
@@ -130,7 +133,7 @@ export default function PeoplePage() {
         </Alert>
       )}
 
-      {!isAdmin && <Callout construction />}
+      <Callout construction />
 
       {canSearch &&
         searchTerm.length > 0 &&

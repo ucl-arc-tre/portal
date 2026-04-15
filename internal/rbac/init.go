@@ -13,7 +13,7 @@ import (
 
 // Initialise the RBAC with roles and users
 func Init() {
-	log.Info().Msg("Seeding roles and admin users")
+	log.Info().Msg("Seeding roles and static user role bindings")
 	enforcer := NewEnforcer()
 
 	addBasePolicies(enforcer)
@@ -67,6 +67,7 @@ func addAdminPolicy(enforcer *casbin.Enforcer) {
 
 func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
+		Policy{RoleName: TreOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: WriteAction},
@@ -75,6 +76,7 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 
 func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
+		Policy{RoleName: IGOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/metrics", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
@@ -85,6 +87,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 
 func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
+		Policy{RoleName: DSHOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: WriteAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: ReadAction},

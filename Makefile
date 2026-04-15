@@ -2,6 +2,7 @@ SHELL := /bin/bash
 .PHONY: *
 DEV_PROJECT_NAME := "ucl-arc-tre-portal-dev"
 E2E_PROJECT_NAME := "ucl-arc-tre-e2e"
+INTTEST_PROJECT_NAME := "ucl-arc-tre-inttest"
 
 
 define assert_file_exists
@@ -50,6 +51,13 @@ test:  ## Run all tests
 
 test-unit:  ## Run unit tests
 	go test ./internal/...
+
+test-integration:  ## Run integration tests
+	cd internal/testutil && \
+	docker compose -p $(INTTEST_PROJECT_NAME) build && \
+	docker compose -p $(INTTEST_PROJECT_NAME) up -d postgres-test && \
+	docker compose -p $(INTTEST_PROJECT_NAME) run --rm integration-tests && \
+	docker compose -p $(INTTEST_PROJECT_NAME) down -v
 
 test-e2e-cypress-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev server
 	if ! docker compose -p $(DEV_PROJECT_NAME) ps --services --filter "status=running" | grep nginx; then \
