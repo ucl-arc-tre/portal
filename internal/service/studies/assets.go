@@ -229,6 +229,38 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 	return nil, &updatedAsset, nil
 }
 
+func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) (*openapi.ValidationError, error) {
+	log.Debug().Any("studyID", studyID).Any("assetID", assetID).Msg("Deleting asset")
+
+	if err := s.checkAssetExists(studyID, assetID); err != nil {
+		return nil, err
+	}
+
+	asset, err := s.InformationAssetById(studyID, assetID)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(asset.Contracts) > 0 {
+		return &openapi.ValidationError{ErrorMessage: "cannot delete asset that is linked to one or more contracts"}, nil
+	}
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	if err := tx.Where("asset_id = ?", assetID).Delete(&types.AssetLocation{}).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to delete asset locations")
+	}
+
+	if err := tx.Where("id = ? AND study_id = ?", assetID, studyID).Delete(&types.Asset{}).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to delete asset")
+	}
+
+	return nil, commitTransaction(tx)
+}
+
 // retrieves all assets for a study
 func (s *Service) InformationAssets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}

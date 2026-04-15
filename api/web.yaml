@@ -804,6 +804,28 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+    delete:
+      description: Delete an asset within a study
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
+      responses:
+        "204":
+          description: Asset deleted successfully
+        "400":
+          description: Asset is linked to a contract and cannot be deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden - no access to study or asset
+        "404":
+          description: Study or asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   /studies/{studyId}/assets/{assetId}/contracts:
     get:
