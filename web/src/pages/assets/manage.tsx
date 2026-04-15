@@ -211,7 +211,7 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Locations:</label>
-              <span>{asset.locations.map((l) => l.replace(/_/g, " ")).join(", ")}</span>
+              <span>{asset.locations.map((location) => location.replace(/_/g, " ")).join(", ")}</span>
             </div>
 
             <div className={styles.field}>
