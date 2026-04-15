@@ -27,7 +27,7 @@ func (t UserTrainingRecord) DaysUntilExpiry() int {
 }
 
 func (t UserTrainingRecord) CertificateExpiringWithin30Days() *UserTrainingRecord {
-	if t.DaysUntilExpiry() < 0 || t.DaysUntilExpiry() < 30 {
+	if t.DaysUntilExpiry() < 30 {
 		return &t
 	} else {
 		return nil
