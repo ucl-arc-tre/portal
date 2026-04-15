@@ -8,6 +8,7 @@ import {
   getStudiesByStudyId,
   getStudiesByStudyIdAssetsByAssetId,
   putStudiesByStudyIdAssetsByAssetId,
+  deleteStudiesByStudyIdAssetsByAssetId,
   Contract,
   getStudiesByStudyIdAssetsByAssetIdContracts,
 } from "@/openapi";
@@ -37,6 +38,7 @@ export default function ManageAssetPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
@@ -44,6 +46,27 @@ export default function ManageAssetPage() {
     (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
   const canModify = isStudyOwner || isStudyAdmin;
+
+  const handleAssetDelete = async () => {
+    if (!study || !asset) return;
+
+    const confirmed = window.confirm("Are you sure you want to delete this asset? This operation cannot be undone.");
+    if (!confirmed) return;
+
+    setDeleteError(null);
+
+    const response = await deleteStudiesByStudyIdAssetsByAssetId({
+      path: { studyId: study.id, assetId: asset.id },
+    });
+
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      setDeleteError(`Delete failed: ${errorMsg}`);
+      return;
+    }
+
+    router.push(`/studies/manage?studyId=${study.id}`);
+  };
 
   const handleAssetUpdate = async (assetData: AssetFormData) => {
     if (!study || !asset) return;
@@ -164,11 +187,18 @@ export default function ManageAssetPage() {
           <Title text={`Manage Asset: ${asset.title}`} />
 
           {canModify && (
-            <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
-              Edit
-            </Button>
+            <div className={styles["header-actions"]}>
+              <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
+                Edit
+              </Button>
+              <Button onClick={handleAssetDelete} className="delete-button" cy="asset-delete">
+                Delete
+              </Button>
+            </div>
           )}
         </div>
+
+        {deleteError && <p className={styles.error}>{deleteError}</p>}
 
         <div className={styles["asset-info"]}>
           <div className={styles.section}>

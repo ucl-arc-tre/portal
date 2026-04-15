@@ -54,7 +54,7 @@ export default function AssetCard(props: AssetCardProps) {
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
 
   return (
-    <div className={`${styles["asset-card"]} ${!isCompleted ? styles["asset-incomplete"] : ""}`}>
+    <div data-cy="asset-card" className={`${styles["asset-card"]} ${!isCompleted ? styles["asset-incomplete"] : ""}`}>
       <div className={styles["asset-header"]}>
         <h4 className={styles["asset-title"]}>{asset.title}</h4>
         <div className={styles["asset-meta"]}>

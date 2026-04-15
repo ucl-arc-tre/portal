@@ -91,13 +91,46 @@ describe("Study creation end-to-end", () => {
     cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
     cy.get('[data-cy="study-assets"]').click();
 
-    cy.contains(assetTitle).parents("div").contains("button", "Manage").click();
+    cy.contains('[data-cy="asset-card"]', assetTitle).contains("button", "Manage").click();
 
     cy.get('[data-cy="asset-edit"]').click();
     cy.get("input#title").clear({ force: true }).type(`${assetTitle} edited`, { force: true });
     cy.get("button[type='submit']").click();
 
     cy.contains(`${assetTitle} edited`).should("be.visible");
+  });
+
+  it("owner should be able to delete an asset", () => {
+    const deleteAssetTitle = `asset-to-delete-${Date.now()}`;
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.get('[data-cy="study-assets"]').click();
+
+    cy.get('[data-cy="add-asset-button"]').click({ force: true });
+    cy.get("input#title").type(deleteAssetTitle);
+    cy.get('[name="description"]').type("Unknown");
+    cy.get('[name="classification_impact"]').select("public");
+    cy.get('[name="protection"]').select("anonymisation");
+    cy.get('[name="legal_basis"]').select("consent");
+    cy.get('[name="format"]').select("electronic");
+    cy.get('[name="expires_at"]').type("2022-01-01");
+    cy.get('[data-cy="create-asset-form"] input[value="arc_tre"]').check();
+    cy.get("input[name='requires_contract'][value='false']").check({ force: true });
+    cy.get("input[name='has_dspt'][value='false']").check({ force: true });
+    cy.get("input[name='stored_outside_uk_eea'][value='false']").check({ force: true });
+    cy.get('[name="status"]').select("active");
+    cy.get("button[type='submit']").click();
+
+    cy.contains('[data-cy="asset-card"]', deleteAssetTitle).contains("button", "Manage").click();
+
+    cy.window().then((win) => cy.stub(win, "confirm").returns(true));
+    cy.get('[data-cy="asset-delete"]').click();
+
+    cy.url().should("include", "/studies/manage");
+    cy.get('[data-cy="study-assets"]').click();
+    cy.contains(deleteAssetTitle).should("not.exist");
   });
 
   it("owner should be able to add and edit contracts", () => {
