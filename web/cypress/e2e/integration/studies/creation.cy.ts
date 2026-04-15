@@ -5,6 +5,7 @@ beforeEach(() => {
 
 describe("Study creation end-to-end", () => {
   const studyTitle = `study-${Date.now()}`;
+  const assetTitle = `asset-${Date.now()}`;
   const contractTitle = `contract-${Date.now()}`;
 
   it("staff should become an approved researcher", () => {
@@ -40,7 +41,7 @@ describe("Study creation end-to-end", () => {
 
     // step 2: add an asset to complete setup
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
-    cy.get("input#title").type("Thing");
+    cy.get("input#title").type(assetTitle);
     cy.get('[name="description"]').type("Unknown");
     cy.get('[name="classification_impact"]').select("public");
     cy.get('[name="protection"]').select("anonymisation");
@@ -81,6 +82,22 @@ describe("Study creation end-to-end", () => {
 
     cy.contains("Case ref").should("exist");
     cy.contains("Last signed off").should("not.exist");
+  });
+
+  it("owner should be able to edit an asset", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.get('[data-cy="study-assets"]').click();
+
+    cy.contains(assetTitle).parents("div").contains("button", "Manage").click();
+
+    cy.get('[data-cy="asset-edit"]').click();
+    cy.get("input#title").clear({ force: true }).type(`${assetTitle} edited`, { force: true });
+    cy.get("button[type='submit']").click();
+
+    cy.contains(`${assetTitle} edited`).should("be.visible");
   });
 
   it("owner should be able to add and edit contracts", () => {

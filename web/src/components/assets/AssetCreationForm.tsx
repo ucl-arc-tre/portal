@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
@@ -7,15 +7,17 @@ import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
 import { Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Asset } from "@/openapi";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
   closeModal: () => void;
+  editingAsset?: Asset;
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {
-  const { handleAssetSubmit, isSubmitting = false, closeModal } = props;
+  const { handleAssetSubmit, isSubmitting = false, closeModal, editingAsset } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -43,6 +45,42 @@ export default function AssetCreationForm(props: AssetFormProps) {
       status: "",
     },
   });
+
+  useEffect(() => {
+    if (editingAsset) {
+      reset({
+        title: editingAsset.title,
+        description: editingAsset.description,
+        classification_impact: editingAsset.classification_impact,
+        tier: editingAsset.tier,
+        protection: editingAsset.protection,
+        legal_basis: editingAsset.legal_basis,
+        format: editingAsset.format,
+        expires_at: editingAsset.expires_at.slice(0, 10),
+        locations: editingAsset.locations,
+        requires_contract: String(editingAsset.requires_contract),
+        has_dspt: String(editingAsset.has_dspt),
+        stored_outside_uk_eea: String(editingAsset.stored_outside_uk_eea),
+        status: editingAsset.status,
+      });
+    } else {
+      reset({
+        title: "",
+        description: "",
+        classification_impact: "",
+        tier: "",
+        protection: "",
+        legal_basis: "",
+        format: "",
+        expires_at: "",
+        locations: [],
+        requires_contract: false,
+        has_dspt: false,
+        stored_outside_uk_eea: false,
+        status: "",
+      });
+    }
+  }, [editingAsset, reset]);
 
   const protectionValue = watch("protection");
   const classificationValue = watch("classification_impact");
@@ -75,17 +113,17 @@ export default function AssetCreationForm(props: AssetFormProps) {
       };
 
       await handleAssetSubmit(transformedAssetData);
-      setSuccessMessage("Asset created successfully!");
-      reset();
+      setSuccessMessage(editingAsset ? "Asset updated successfully!" : "Asset created successfully!");
+      if (!editingAsset) reset();
     } catch (error) {
-      console.error("Error creating asset:", error);
+      console.error(editingAsset ? "Error updating asset:" : "Error creating asset:", error);
       setErrorMessage("Error: " + String((error as Error).message));
     }
   };
 
   return (
     <Dialog setDialogOpen={closeModal} cy="create-asset-form">
-      <h2>Create New Asset</h2>
+      <h2>{editingAsset ? "Edit Asset" : "Create New Asset"}</h2>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="form">
         <div className={styles.field}>
@@ -520,7 +558,13 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
         <div className={styles.actions}>
           <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
-            {isSubmitting ? "Creating..." : "Create Asset"}
+            {isSubmitting
+              ? editingAsset
+                ? "Updating..."
+                : "Creating..."
+              : editingAsset
+                ? "Update Asset"
+                : "Create Asset"}
           </Button>
         </div>
       </form>
