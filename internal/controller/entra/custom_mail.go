@@ -152,11 +152,16 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, emails 
 	days := training.DaysUntilExpiry()
 	content := "You have a training certificate that is due to expire within"
 	if days != 1 && days > 0 {
-		content += fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate. "
+		if days == 21 || days == 14 || days == 7 {
+			content += fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate. "
+		}
 	} else if days == 1 {
 		content += " the next 24 hours. Please sign in to the Portal to upload a new certificate."
-	} else {
+	} else if days < 0 {
 		content = "You have a training certificate that has expired. Please sign in to the Portal to upload a new certificate."
+	} else {
+		// don't send a notification outside of those specific timeframes
+		return nil
 	}
 
 	notificationMsg := "Notification: Your training certificate is due to expire soon"
