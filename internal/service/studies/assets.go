@@ -137,8 +137,8 @@ func (s *Service) checkAssetExists(studyID uuid.UUID, assetID uuid.UUID) error {
 	return nil
 }
 
-func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
-	log.Debug().Any("studyID", studyID).Any("user", user).Msg("Creating asset")
+func (s *Service) CreateAsset(creator types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
+	log.Debug().Any("studyID", studyID).Any("creator", creator).Msg("Creating asset")
 
 	validationError, err := s.validateAssetData(assetData)
 	if err != nil || validationError != nil {
@@ -149,7 +149,7 @@ func (s *Service) CreateAsset(user types.User, assetData openapi.AssetBase, stud
 	if err != nil {
 		return nil, err
 	}
-	asset.CreatorUserID = user.ID
+	asset.CreatorUserID = creator.ID
 	asset.StudyID = studyID
 
 	tx := s.db.Begin()
