@@ -23,7 +23,7 @@ import Button from "@/components/ui/Button";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
-import { HelperText } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import { formatDate } from "@/components/shared/exports";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
@@ -198,7 +198,11 @@ export default function ManageAssetPage() {
           )}
         </div>
 
-        {deleteError && <p className={styles.error}>{deleteError}</p>}
+        {deleteError && (
+          <Alert type="error">
+            <AlertMessage>{deleteError}</AlertMessage>
+          </Alert>
+        )}
 
         <div className={styles["asset-info"]}>
           <div className={styles.section}>
