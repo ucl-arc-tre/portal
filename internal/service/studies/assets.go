@@ -221,7 +221,7 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 		return nil, nil, err
 	}
 
-	updatedAsset, err := s.InformationAssetById(studyID, assetID)
+	updatedAsset, err := s.AssetById(studyID, assetID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -236,7 +236,7 @@ func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) (*openapi.Va
 		return nil, err
 	}
 
-	asset, err := s.InformationAssetById(studyID, assetID)
+	asset, err := s.AssetById(studyID, assetID)
 	if err != nil {
 		return nil, err
 	}
@@ -262,17 +262,17 @@ func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) (*openapi.Va
 }
 
 // retrieves all assets for a study
-func (s *Service) InformationAssets(studyID uuid.UUID) ([]types.Asset, error) {
+func (s *Service) Assets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
 	err := s.db.Preload("Locations").Preload("Contracts.Assets").Where("study_id = ?", studyID).Find(&assets).Error
-	return assets, types.NewErrFromGorm(err, "failed to get Information Assets")
+	return assets, types.NewErrFromGorm(err, "failed to get assets")
 }
 
 // retrieves a specific asset within a study
-func (s *Service) InformationAssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
+func (s *Service) AssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
 	asset := types.Asset{}
 	err := s.db.Preload("Locations").Preload("Contracts.Assets").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
-	return asset, types.NewErrFromGorm(err, "failed to get study asset by id")
+	return asset, types.NewErrFromGorm(err, "failed to get asset by id")
 }
 
 // retrieves all contracts for a specific asset within a study
