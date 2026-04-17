@@ -170,7 +170,7 @@ export type AssetBase = {
     /**
      * Retention expiry date of the asset
      */
-    expires_at: string;
+    expires_at?: string | null;
     /**
      * Whether a contract is required for the asset
      */

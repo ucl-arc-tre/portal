@@ -1351,7 +1351,6 @@ components:
         - legal_basis
         - format
         - requires_contract
-        - expires_at
         - has_dspt
         - stored_outside_uk_eea
         - accessed_by_third_parties
@@ -1408,6 +1407,7 @@ components:
           description: Format of the asset
         expires_at:
           type: string
+          nullable: true
           description: Retention expiry date of the asset
         requires_contract:
           type: boolean

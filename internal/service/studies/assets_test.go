@@ -13,6 +13,8 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
+func ptr[T any](value T) *T { return &value }
+
 func validAssetBase() openapi.AssetBase {
 	return openapi.AssetBase{
 		Title:                "Valid Asset",
@@ -23,7 +25,7 @@ func validAssetBase() openapi.AssetBase {
 		Protection:           openapi.AssetBaseProtectionAnonymisation,
 		LegalBasis:           openapi.AssetBaseLegalBasisConsent,
 		Format:               openapi.AssetBaseFormatElectronic,
-		ExpiresAt:            time.Now().Format(config.DateFormat),
+		ExpiresAt:            ptr(time.Now().Format(config.DateFormat)),
 		Status:               openapi.AssetBaseStatusActive,
 	}
 }
@@ -70,7 +72,14 @@ func TestValidateAssetData(t *testing.T) {
 		{
 			name: "valid expiry date",
 			modify: func(a *openapi.AssetBase) {
-				a.ExpiresAt = "2025-12-31"
+				a.ExpiresAt = ptr("2025-12-31")
+			},
+			wantError: false,
+		},
+		{
+			name: "no expiry date",
+			modify: func(a *openapi.AssetBase) {
+				a.ExpiresAt = nil
 			},
 			wantError: false,
 		},
@@ -137,7 +146,7 @@ func TestValidateAssetData(t *testing.T) {
 		{
 			name: "invalid expiry date",
 			modify: func(a *openapi.AssetBase) {
-				a.ExpiresAt = "not-a-date"
+				a.ExpiresAt = ptr("not-a-date")
 			},
 			wantError: true,
 		},

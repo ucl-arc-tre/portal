@@ -55,6 +55,7 @@ func InitDB() {
 
 	migrateContractStudyIds(db)
 	migrateContracts(db)
+	migrateAssetExpiresAt(db)
 
 	// Set up a sequence for the study caseref
 	// this must exist before AutoMigrate is run below, as the Caseref column default references it
@@ -144,6 +145,23 @@ func migrateContracts(db *gorm.DB) {
 	}
 
 	log.Info().Msg("Migrated contracts")
+}
+
+// Drop the NOT NULL constraint on assets.expires_at to make expiry optional
+func migrateAssetExpiresAt(db *gorm.DB) {
+	if !db.Migrator().HasTable(&types.Asset{}) {
+		return
+	}
+	db.Exec(`
+		DO $$ BEGIN
+			IF EXISTS (
+				SELECT 1 FROM information_schema.columns
+				WHERE table_name = 'assets' AND column_name = 'expires_at' AND is_nullable = 'NO'
+			) THEN
+				ALTER TABLE assets ALTER COLUMN expires_at DROP NOT NULL;
+			END IF;
+		END $$;
+	`)
 }
 
 // Set a study id column of contracts using their existing values

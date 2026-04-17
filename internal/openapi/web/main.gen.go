@@ -448,7 +448,7 @@ type Asset struct {
 	Description string `json:"description"`
 
 	// ExpiresAt Retention expiry date of the asset
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
 
 	// Format Format of the asset
 	Format AssetFormat `json:"format"`
@@ -517,7 +517,7 @@ type AssetBase struct {
 	Description string `json:"description"`
 
 	// ExpiresAt Retention expiry date of the asset
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
 
 	// Format Format of the asset
 	Format AssetBaseFormat `json:"format"`
