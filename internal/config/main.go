@@ -185,3 +185,8 @@ func ProcessIdentity() string {
 	}
 	return value
 }
+
+func DaysUntilTrainingExpiry(trainingRecord types.UserTrainingRecord) int {
+	return int(time.Since(trainingRecord.CompletedAt).Hours()/24 - TrainingValidity.Hours()/24)
+
+}

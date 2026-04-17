@@ -149,7 +149,7 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 }
 
 func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
-	days := training.DaysUntilExpiry()
+	days := config.DaysUntilTrainingExpiry(training)
 	content := "You have a training certificate that is due to expire within"
 	if days != 1 && days > 0 {
 		if days == 21 || days == 14 || days == 7 {
