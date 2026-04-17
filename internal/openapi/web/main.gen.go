@@ -1180,6 +1180,9 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
 
+// PutStudiesStudyIdAssetsAssetIdJSONRequestBody defines body for PutStudiesStudyIdAssetsAssetId for application/json ContentType.
+type PutStudiesStudyIdAssetsAssetIdJSONRequestBody = AssetBase
+
 // PostStudiesStudyIdContractsJSONRequestBody defines body for PostStudiesStudyIdContracts for application/json ContentType.
 type PostStudiesStudyIdContractsJSONRequestBody = ContractBase
 
@@ -1285,8 +1288,14 @@ type ServerInterface interface {
 	// (POST /studies/{studyId}/assets)
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
+	// (DELETE /studies/{studyId}/assets/{assetId})
+	DeleteStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
+
 	// (GET /studies/{studyId}/assets/{assetId})
 	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
+
+	// (PUT /studies/{studyId}/assets/{assetId})
+	PutStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts)
 	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
@@ -1907,6 +1916,39 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
 }
 
+// DeleteStudiesStudyIdAssetsAssetId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdAssetsAssetId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId AssetIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteStudiesStudyIdAssetsAssetId(c, studyId, assetId)
+}
+
 // GetStudiesStudyIdAssetsAssetId operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context) {
 
@@ -1938,6 +1980,39 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	}
 
 	siw.Handler.GetStudiesStudyIdAssetsAssetId(c, studyId, assetId)
+}
+
+// PutStudiesStudyIdAssetsAssetId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId AssetIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutStudiesStudyIdAssetsAssetId(c, studyId, assetId)
 }
 
 // GetStudiesStudyIdAssetsAssetIdContracts operation middleware
@@ -2452,7 +2527,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
+	router.DELETE(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.DeleteStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
+	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.PutStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)

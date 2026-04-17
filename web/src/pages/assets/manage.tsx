@@ -4,8 +4,11 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   Study,
   Asset,
+  AssetBase,
   getStudiesByStudyId,
   getStudiesByStudyIdAssetsByAssetId,
+  putStudiesByStudyIdAssetsByAssetId,
+  deleteStudiesByStudyIdAssetsByAssetId,
   Contract,
   getStudiesByStudyIdAssetsByAssetIdContracts,
 } from "@/openapi";
@@ -20,8 +23,10 @@ import Button from "@/components/ui/Button";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
-import { HelperText } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
+import { formatDate } from "@/components/shared/exports";
+import AssetCreationForm from "@/components/assets/AssetCreationForm";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -32,8 +37,52 @@ export default function ManageAssetPage() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+
+  const isStudyOwner =
+    (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
+  const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
+  const canModify = isStudyOwner || isStudyAdmin;
+
+  const handleAssetDelete = async () => {
+    if (!study || !asset) return;
+
+    const confirmed = window.confirm("Are you sure you want to delete this asset? This operation cannot be undone.");
+    if (!confirmed) return;
+
+    setDeleteError(null);
+
+    const response = await deleteStudiesByStudyIdAssetsByAssetId({
+      path: { studyId: study.id, assetId: asset.id },
+    });
+
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      setDeleteError(`Delete failed: ${errorMsg}`);
+      return;
+    }
+
+    router.push(`/studies/manage?studyId=${study.id}`);
+  };
+
+  const handleAssetUpdate = async (assetData: AssetFormData) => {
+    if (!study || !asset) return;
+
+    const response = await putStudiesByStudyIdAssetsByAssetId({
+      path: { studyId: study.id, assetId: asset.id },
+      body: assetData as AssetBase,
+    });
+
+    if (!response.response.ok || !response.data) {
+      throw new Error(extractErrorMessage(response));
+    }
+
+    setAsset(response.data);
+    setShowEditModal(false);
+  };
 
   const fetchData = async (studyIdParam: string, assetIdParam: string) => {
     setLoading(true);
@@ -134,7 +183,26 @@ export default function ManageAssetPage() {
       />
 
       <div className="content">
-        <Title text={`Manage Asset: ${asset.title}`} centered />
+        <div className={styles.header}>
+          <Title text={`Manage Asset: ${asset.title}`} />
+
+          {canModify && (
+            <div className={styles["header-actions"]}>
+              <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
+                Edit
+              </Button>
+              <Button onClick={handleAssetDelete} className="delete-button" cy="asset-delete">
+                Delete
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {deleteError && (
+          <Alert type="error">
+            <AlertMessage>{deleteError}</AlertMessage>
+          </Alert>
+        )}
 
         <div className={styles["asset-info"]}>
           <div className={styles.section}>
@@ -148,20 +216,49 @@ export default function ManageAssetPage() {
               <span>{asset.description}</span>
             </div>
             <div className={styles.field}>
+              <label>Status:</label>
+              <span className={styles.status}>{asset.status}</span>
+            </div>
+            <div className={styles.field}>
               <label>Classification:</label>
               <span>{asset.classification_impact}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Tier:</label>
+              <span>{asset.tier}</span>
             </div>
             <div className={styles.field}>
               <label>Protection:</label>
               <span>{asset.protection}</span>
             </div>
             <div className={styles.field}>
-              <label>Status:</label>
-              <span className={styles.status}>{asset.status}</span>
+              <label>Legal Basis:</label>
+              <span>{asset.legal_basis}</span>
             </div>
+            <div className={styles.field}>
+              <label>Format:</label>
+              <span>{asset.format}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Expiry Date:</label>
+              <span>{formatDate(asset.expires_at)}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Locations:</label>
+              <span>{asset.locations.map((location) => location.replace(/_/g, " ")).join(", ")}</span>
+            </div>
+
             <div className={styles.field}>
               <label>Contract Required:</label>
               <span>{asset.requires_contract ? "Yes" : "No"}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Has DSPT:</label>
+              <span>{asset.has_dspt ? "Yes" : "No"}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Stored Outside UK/EEA:</label>
+              <span>{asset.stored_outside_uk_eea ? "Yes" : "No"}</span>
             </div>
 
             {contracts.length > 0 && (
@@ -184,6 +281,14 @@ export default function ManageAssetPage() {
             )}
           </div>
         </div>
+
+        {showEditModal && (
+          <AssetCreationForm
+            editingAsset={asset}
+            handleAssetSubmit={handleAssetUpdate}
+            closeModal={() => setShowEditModal(false)}
+          />
+        )}
       </div>
     </>
   );
