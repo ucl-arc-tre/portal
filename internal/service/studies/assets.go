@@ -182,7 +182,9 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 		return validationError, nil, err
 	}
 
-	if err := s.checkAssetExists(studyID, assetID); err != nil {
+	// verifies the asset exists and returns the existing asset so we can preserve uneditable fields
+	existingAsset, err := s.AssetById(studyID, assetID)
+	if err != nil {
 		return nil, nil, err
 	}
 
@@ -192,11 +194,12 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 	}
 	asset.ID = assetID
 	asset.StudyID = studyID
+	asset.CreatorUserID = existingAsset.CreatorUserID
 
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
-	if err := tx.Model(asset).Where("id = ? AND study_id = ?", assetID, studyID).Updates(asset).Error; err != nil {
+	if err := tx.Model(asset).Select("*").Where("id = ? AND study_id = ?", assetID, studyID).Updates(asset).Error; err != nil {
 		tx.Rollback()
 		return nil, nil, types.NewErrFromGorm(err, "failed to update asset")
 	}
