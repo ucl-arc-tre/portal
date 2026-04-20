@@ -26,7 +26,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
   });
 
   const contractsNeedAttention = contracts.some((contract) => {
-    const urgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+    const urgency = contract.expiry_date ? calculateExpiryUrgency(new Date(contract.expiry_date)) : null;
     return urgency !== null && urgency.level !== "low";
   });
 

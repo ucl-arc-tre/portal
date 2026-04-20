@@ -34,11 +34,13 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		InvolvesMnca:                     data.InvolvesMnca,
 		RequiresDspt:                     data.RequiresDspt,
 		RequiresDbs:                      data.RequiresDbs,
+		DataProtectionNumber:             data.DataProtectionNumber,
 		IsDataProtectionOfficeRegistered: data.IsDataProtectionOfficeRegistered,
 		InvolvesThirdParty:               data.InvolvesThirdParty,
 		InvolvesExternalUsers:            data.InvolvesExternalUsers,
 		InvolvesParticipantConsent:       data.InvolvesParticipantConsent,
-		InvolvesIndirectDataCollection:   data.InvolvesDataProcessingOutsideEea,
+		InvolvesDataProcessingOutsideEea: data.InvolvesDataProcessingOutsideEea,
+		InvolvesIndirectDataCollection:   data.InvolvesIndirectDataCollection,
 		Feedback:                         data.Feedback,
 	}
 	if !openapi.ApprovalStatus(data.ApprovalStatus).Valid() {
@@ -84,7 +86,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		FirstOrCreate(&study)
 	if result.Error != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to create study")
+		return nil, types.NewErrFromGorm(result.Error, "failed to create study")
 	}
 
 	if _, err := rbac.AddStudyOwnerRole(owner, study.ID); err != nil {
@@ -130,7 +132,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		}
 
 		adminRole := rbac.StudyRole{StudyID: study.ID, Name: rbac.StudyOwner}
-		if _, err := rbac.AddRole(owner, adminRole.RoleName()); err != nil {
+		if _, err := rbac.AddRole(admin, adminRole.RoleName()); err != nil {
 			tx.Rollback()
 			return nil, err
 		}
@@ -217,6 +219,11 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 		return nil, types.NewErrFromGorm(err, "failed to create asset")
 	}
 
+	if err := tx.Where("asset_id = ?", asset.ID).Delete(&types.AssetLocation{}).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to delete asset locations")
+	}
+
 	for _, locationStr := range data.Locations {
 		if locationStr == "" {
 			tx.Rollback()
@@ -281,6 +288,12 @@ func (s *Service) ImportContract(studyId uuid.UUID, data openapi.ContractImport)
 		} else {
 			contract.ExpiryDate = &expiryDate
 		}
+	}
+	if createdAt, err := time.Parse(config.TimeFormat, data.CreatedAt); err != nil {
+		tx.Rollback()
+		return nil, types.NewErrInvalidObject("invalid created at date")
+	} else {
+		contract.CreatedAt = createdAt
 	}
 
 	if err := tx.Where("title = ? AND study_id = ?", contract.Title, studyId).Assign(contract).FirstOrCreate(&contract).Error; err != nil {
