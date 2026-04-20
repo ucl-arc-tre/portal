@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
@@ -7,15 +7,17 @@ import { storageDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
 import { Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Asset } from "@/openapi";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
   isSubmitting?: boolean;
   closeModal: () => void;
+  editingAsset?: Asset;
 };
 
 export default function AssetCreationForm(props: AssetFormProps) {
-  const { handleAssetSubmit, isSubmitting = false, closeModal } = props;
+  const { handleAssetSubmit, isSubmitting = false, closeModal, editingAsset } = props;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -35,7 +37,8 @@ export default function AssetCreationForm(props: AssetFormProps) {
       protection: "",
       legal_basis: "",
       format: "",
-      expires_at: "",
+      has_expiry_date: false,
+      expires_at: null,
       locations: [],
       requires_contract: false,
       has_dspt: false,
@@ -44,10 +47,50 @@ export default function AssetCreationForm(props: AssetFormProps) {
     },
   });
 
+  useEffect(() => {
+    if (editingAsset) {
+      reset({
+        title: editingAsset.title,
+        description: editingAsset.description,
+        classification_impact: editingAsset.classification_impact,
+        tier: editingAsset.tier,
+        protection: editingAsset.protection,
+        legal_basis: editingAsset.legal_basis,
+        format: editingAsset.format,
+        has_expiry_date: editingAsset.expires_at ? "true" : "false",
+        expires_at: editingAsset.expires_at ? editingAsset.expires_at.split("T")[0] : null,
+        locations: editingAsset.locations,
+        requires_contract: String(editingAsset.requires_contract),
+        has_dspt: String(editingAsset.has_dspt),
+        stored_outside_uk_eea: String(editingAsset.stored_outside_uk_eea),
+        status: editingAsset.status,
+      });
+    } else {
+      reset({
+        title: "",
+        description: "",
+        classification_impact: "",
+        tier: "",
+        protection: "",
+        legal_basis: "",
+        format: "",
+        has_expiry_date: false,
+        expires_at: null,
+        locations: [],
+        requires_contract: false,
+        has_dspt: false,
+        stored_outside_uk_eea: false,
+        status: "",
+      });
+    }
+  }, [editingAsset, reset]);
+
   const protectionValue = watch("protection");
   const classificationValue = watch("classification_impact");
+  const hasExpiryDateValue = watch("has_expiry_date");
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
   const showTierSelection = classificationValue === "highly_confidential";
+  const showExpiryDate = hasExpiryDateValue === "true" || hasExpiryDateValue === true;
 
   const onFormSubmit = async (data: AssetFormData) => {
     try {
@@ -69,23 +112,24 @@ export default function AssetCreationForm(props: AssetFormProps) {
       const transformedAssetData: AssetFormData = {
         ...data,
         tier,
+        expires_at: showExpiryDate ? data.expires_at : null,
         requires_contract: data.requires_contract === "true" || data.requires_contract === true,
         has_dspt: data.has_dspt === "true" || data.has_dspt === true,
         stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
       };
 
       await handleAssetSubmit(transformedAssetData);
-      setSuccessMessage("Asset created successfully!");
-      reset();
+      setSuccessMessage(editingAsset ? "Asset updated successfully!" : "Asset created successfully!");
+      if (!editingAsset) reset();
     } catch (error) {
-      console.error("Error creating asset:", error);
+      console.error(editingAsset ? "Error updating asset:" : "Error creating asset:", error);
       setErrorMessage("Error: " + String((error as Error).message));
     }
   };
 
   return (
     <Dialog setDialogOpen={closeModal} cy="create-asset-form">
-      <h2>Create New Asset</h2>
+      <h2>{editingAsset ? "Edit Asset" : "Create New Asset"}</h2>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="form">
         <div className={styles.field}>
@@ -320,24 +364,57 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         <div className={styles.field}>
-          <Label htmlFor="expires_at" className={styles["red-text"]}>
-            What is the asset&apos;s retention expiry date? *
-          </Label>
-          <input
-            id="expires_at"
-            type="date"
-            {...register("expires_at", {
-              required: "Expiry date is required",
-            })}
-            aria-invalid={!!errors.expires_at}
-            className={errors.expires_at ? styles.error : ""}
-          />
-          {errors.expires_at && (
+          <Label htmlFor="has_expiry_date">Does this asset have a retention expiry date? *</Label>
+          <div className={styles["radio-group"]}>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="true"
+                {...register("has_expiry_date", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              Yes
+            </label>
+            <label className={styles["radio-label"]}>
+              <input
+                type="radio"
+                value="false"
+                {...register("has_expiry_date", {
+                  required: "Please select yes or no",
+                })}
+                className={styles.radio}
+              />
+              No
+            </label>
+          </div>
+          {errors.has_expiry_date && (
             <Alert type="error">
-              <AlertMessage>{errors.expires_at.message}</AlertMessage>
+              <AlertMessage>{errors.has_expiry_date.message}</AlertMessage>
             </Alert>
           )}
         </div>
+
+        {showExpiryDate && (
+          <div className={styles.field}>
+            <Label htmlFor="expires_at">What is the asset&apos;s retention expiry date? *</Label>
+            <input
+              id="expires_at"
+              type="date"
+              {...register("expires_at", {
+                required: showExpiryDate ? "Expiry date is required" : false,
+              })}
+              aria-invalid={!!errors.expires_at}
+              className={errors.expires_at ? styles.error : ""}
+            />
+            {errors.expires_at && (
+              <Alert type="error">
+                <AlertMessage>{errors.expires_at.message}</AlertMessage>
+              </Alert>
+            )}
+          </div>
+        )}
 
         <div className={styles.field}>
           <Label htmlFor="location">
@@ -520,7 +597,13 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
         <div className={styles.actions}>
           <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
-            {isSubmitting ? "Creating..." : "Create Asset"}
+            {isSubmitting
+              ? editingAsset
+                ? "Updating..."
+                : "Creating..."
+              : editingAsset
+                ? "Update Asset"
+                : "Create Asset"}
           </Button>
         </div>
       </form>

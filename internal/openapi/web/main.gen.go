@@ -448,7 +448,7 @@ type Asset struct {
 	Description string `json:"description"`
 
 	// ExpiresAt Retention expiry date of the asset
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
 
 	// Format Format of the asset
 	Format AssetFormat `json:"format"`
@@ -510,14 +510,11 @@ type AssetBase struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
 
-	// ContractIds List of contract IDs associated with the asset (empty array if none)
-	ContractIds []string `json:"contract_ids"`
-
 	// Description Description of the asset
 	Description string `json:"description"`
 
 	// ExpiresAt Retention expiry date of the asset
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
 
 	// Format Format of the asset
 	Format AssetBaseFormat `json:"format"`
@@ -1197,6 +1194,12 @@ type GetStudiesParams struct {
 
 	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
 	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
+
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Offset Index of the first item to return
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
 // GetUsersParams defines parameters for GetUsers.
@@ -1254,6 +1257,9 @@ type PostStudiesStudyIdAgreementsJSONRequestBody = AgreementConfirmation
 
 // PostStudiesStudyIdAssetsJSONRequestBody defines body for PostStudiesStudyIdAssets for application/json ContentType.
 type PostStudiesStudyIdAssetsJSONRequestBody = AssetBase
+
+// PutStudiesStudyIdAssetsAssetIdJSONRequestBody defines body for PutStudiesStudyIdAssetsAssetId for application/json ContentType.
+type PutStudiesStudyIdAssetsAssetIdJSONRequestBody = AssetBase
 
 // PostStudiesStudyIdContractsJSONRequestBody defines body for PostStudiesStudyIdContracts for application/json ContentType.
 type PostStudiesStudyIdContractsJSONRequestBody = ContractBase
@@ -1369,8 +1375,14 @@ type ServerInterface interface {
 	// (POST /studies/{studyId}/assets)
 	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
 
+	// (DELETE /studies/{studyId}/assets/{assetId})
+	DeleteStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
+
 	// (GET /studies/{studyId}/assets/{assetId})
 	GetStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
+
+	// (PUT /studies/{studyId}/assets/{assetId})
+	PutStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
 
 	// (GET /studies/{studyId}/assets/{assetId}/contracts)
 	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
@@ -1784,6 +1796,22 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		return
 	}
 
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -2036,6 +2064,39 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	siw.Handler.PostStudiesStudyIdAssets(c, studyId)
 }
 
+// DeleteStudiesStudyIdAssetsAssetId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdAssetsAssetId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId AssetIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteStudiesStudyIdAssetsAssetId(c, studyId, assetId)
+}
+
 // GetStudiesStudyIdAssetsAssetId operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context) {
 
@@ -2067,6 +2128,39 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	}
 
 	siw.Handler.GetStudiesStudyIdAssetsAssetId(c, studyId, assetId)
+}
+
+// PutStudiesStudyIdAssetsAssetId operation middleware
+func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "assetId" -------------
+	var assetId AssetIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutStudiesStudyIdAssetsAssetId(c, studyId, assetId)
 }
 
 // GetStudiesStudyIdAssetsAssetIdContracts operation middleware
@@ -2584,7 +2678,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
+	router.DELETE(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.DeleteStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.GetStudiesStudyIdAssetsAssetId)
+	router.PUT(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.PutStudiesStudyIdAssetsAssetId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets/:assetId/contracts", wrapper.GetStudiesStudyIdAssetsAssetIdContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)

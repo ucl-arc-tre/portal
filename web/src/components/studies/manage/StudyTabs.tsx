@@ -16,7 +16,14 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
   const setTab = (newTab: string) =>
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
 
-  const assetsNeedAttention = assets.some((asset) => asset.requires_contract && asset.contract_ids.length === 0);
+  const assetsNeedAttention = assets.some((asset) => {
+    if (asset.requires_contract && asset.contract_ids.length === 0) return true;
+    if (asset.expires_at) {
+      const urgency = calculateExpiryUrgency(new Date(asset.expires_at));
+      if (urgency !== null && urgency.level !== "low") return true;
+    }
+    return false;
+  });
 
   const contractsNeedAttention = contracts.some((contract) => {
     const urgency = calculateExpiryUrgency(new Date(contract.expiry_date));

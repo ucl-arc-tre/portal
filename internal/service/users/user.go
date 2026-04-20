@@ -11,6 +11,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
@@ -178,21 +179,46 @@ func (s *Service) findUser(user *types.User) (*types.User, error) {
 	return user, types.NewErrFromGorm(result.Error)
 }
 
-func (s *Service) SearchEntraForUsersAndMatch(ctx context.Context, query string) ([]openapi.UserData, error) {
-	// query entra
-	usernames, err := s.entra.FindUsernames(ctx, query)
-	if err != nil {
-		return nil, err
+// Find a user by a search query, which may be the start of an username, email address
+// or chosen name. If no results are found then falls back to querying entra and
+// matching on usernames
+func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, error) {
+	if !validation.UsersSearchQueryPattern.MatchString(query) {
+		return []openapi.UserData{}, types.NewErrInvalidObject("invalid users query")
 	}
-	// then match to users in our db
-	users := []types.User{}
 
-	result := s.db.Where("username IN (?)", usernames).Find(&users)
+	portalUsers := []types.User{}
+
+	dbLikeQuery := "%" + query + "%"
+	result := s.db.Model(&types.User{}).
+		Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
+		Where("username ILIKE ? OR user_attributes.email ILIKE ? OR user_attributes.chosen_name ILIKE ?", dbLikeQuery, dbLikeQuery, dbLikeQuery).
+		Limit(100).
+		Find(&portalUsers)
+
 	if result.Error != nil {
-		return nil, types.NewErrFromGorm(result.Error)
+		return []openapi.UserData{}, types.NewErrFromGorm(result.Error, "failed to query users")
+	}
+	portalUserIds := []uuid.UUID{}
+	for _, portalUser := range portalUsers {
+		portalUserIds = append(portalUserIds, portalUser.ID)
 	}
 
-	return s.usersData(users)
+	entraUsernames, err := s.entra.FindUsernames(ctx, query)
+	if err != nil {
+		log.Err(err).Msg("Failed to query entra for additional users")
+	}
+	entraUsers := []types.User{}
+	if len(portalUserIds) > 0 && len(entraUsernames) > 0 {
+		result = s.db.Where("username IN (?) AND id NOT IN (?)", entraUsernames, portalUserIds).Find(&entraUsers)
+	} else if len(entraUsernames) > 0 {
+		result = s.db.Where("username IN (?)", entraUsernames).Find(&entraUsers)
+	}
+	if result.Error != nil {
+		return []openapi.UserData{}, types.NewErrFromGorm(result.Error)
+	}
+
+	return s.usersData(append(portalUsers, entraUsers...))
 }
 
 func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error) {

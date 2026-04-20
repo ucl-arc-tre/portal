@@ -1,8 +1,8 @@
 import Button from "@/components/ui/Button";
 import { Contract } from "@/openapi";
 import styles from "./ContractCard.module.css";
-import { AlertCircleIcon } from "../shared/uikitExports";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
+import ExpiryWarning from "../ui/ExpiryWarning";
 import router from "next/router";
 
 type ContractCardProps = {
@@ -75,14 +75,7 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
       </div>
 
       <div className={styles.actions}>
-        {expiryUrgency && (
-          <small className={styles["expiry-message"]}>
-            <AlertCircleIcon className={`expiry-urgency--${expiryUrgency.level} actions-icon`} />
-            {expiryUrgency.level === "critical"
-              ? "This contract has expired, please review and update as soon as possible"
-              : "This contract is expiring soon, please review and update if necessary"}
-          </small>
-        )}
+        {expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />}
         <div className={styles["button-wrapper"]}>
           <Button
             onClick={() => {

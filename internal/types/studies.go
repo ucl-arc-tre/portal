@@ -82,11 +82,11 @@ type Asset struct {
 	Protection           string    `gorm:"not null"`
 	LegalBasis           string    `gorm:"not null"`
 	Format               string    `gorm:"not null"`
-	ExpiresAt            time.Time `gorm:"not null"`
-	RequiresContract     bool      `gorm:"not null;default:false"`
-	HasDspt              bool      `gorm:"not null;default:false"`
-	StoredOutsideUkEea   bool      `gorm:"not null;default:false"`
-	Status               string    `gorm:"not null"`
+	ExpiresAt            *time.Time
+	RequiresContract     bool   `gorm:"not null;default:false"`
+	HasDspt              bool   `gorm:"not null;default:false"`
+	StoredOutsideUkEea   bool   `gorm:"not null;default:false"`
+	Status               string `gorm:"not null"`
 
 	// Relationships
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`

@@ -209,7 +209,7 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 		tx.Rollback()
 		return nil, types.NewErrInvalidObject("failed to parse expires at")
 	} else {
-		asset.ExpiresAt = expiresAt
+		asset.ExpiresAt = &expiresAt
 	}
 
 	if err := tx.Where("title = ? AND study_id = ?", asset.Title, studyId).Assign(asset).FirstOrCreate(&asset).Error; err != nil {

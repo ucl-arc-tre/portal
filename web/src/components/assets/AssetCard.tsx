@@ -4,8 +4,9 @@ import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
-import { formatDate } from "../shared/exports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
+import ExpiryWarning from "../ui/ExpiryWarning";
 
 type AssetCardProps = {
   asset: Asset;
@@ -40,6 +41,8 @@ export default function AssetCard(props: AssetCardProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const expiryUrgency = asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
+
   useEffect(() => {
     const isAssetCompleted = async () => {
       try {
@@ -54,7 +57,7 @@ export default function AssetCard(props: AssetCardProps) {
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
 
   return (
-    <div className={`${styles["asset-card"]} ${!isCompleted ? styles["asset-incomplete"] : ""}`}>
+    <div data-cy="asset-card" className={`${styles["asset-card"]} ${!isCompleted ? styles["asset-incomplete"] : ""}`}>
       <div className={styles["asset-header"]}>
         <h4 className={styles["asset-title"]}>{asset.title}</h4>
         <div className={styles["asset-meta"]}>
@@ -108,6 +111,8 @@ export default function AssetCard(props: AssetCardProps) {
       )}
 
       <div className={styles["asset-actions"]}>
+        {expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="asset" />}
+
         {!isCompleted && (
           <>
             <small className={styles["asset-incomplete__message"]}>

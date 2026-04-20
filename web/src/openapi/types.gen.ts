@@ -170,7 +170,7 @@ export type AssetBase = {
     /**
      * Retention expiry date of the asset
      */
-    expires_at: string;
+    expires_at?: string | null;
     /**
      * Whether a contract is required for the asset
      */
@@ -187,10 +187,6 @@ export type AssetBase = {
      * Status of the asset
      */
     status: 'active' | 'awaiting' | 'destroyed';
-    /**
-     * List of contract IDs associated with the asset (empty array if none)
-     */
-    contract_ids: Array<string>;
 };
 
 /**
@@ -217,6 +213,10 @@ export type Asset = AssetBase & {
      * Time in RFC3339 format when the asset was last updated
      */
     updated_at: string;
+    /**
+     * List of contract IDs associated with the asset (empty array if none)
+     */
+    contract_ids: Array<string>;
 };
 
 /**
@@ -1230,6 +1230,14 @@ export type GetStudiesData = {
          * Full username of the study owner. e.g. ccxyz@ucl.ac.uk
          */
         owner_username?: string;
+        /**
+         * Maximum number of items to return
+         */
+        limit?: number;
+        /**
+         * Index of the first item to return
+         */
+        offset?: number;
     };
     url: '/studies';
 };
@@ -1894,6 +1902,56 @@ export type PostStudiesByStudyIdAssetsResponses = {
 
 export type PostStudiesByStudyIdAssetsResponse = PostStudiesByStudyIdAssetsResponses[keyof PostStudiesByStudyIdAssetsResponses];
 
+export type DeleteStudiesByStudyIdAssetsByAssetIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Asset UUID
+         */
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}';
+};
+
+export type DeleteStudiesByStudyIdAssetsByAssetIdErrors = {
+    /**
+     * Asset is linked to a contract and cannot be deleted
+     */
+    400: ValidationError;
+    /**
+     * Forbidden - no access to study or asset
+     */
+    403: unknown;
+    /**
+     * Study or asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type DeleteStudiesByStudyIdAssetsByAssetIdError = DeleteStudiesByStudyIdAssetsByAssetIdErrors[keyof DeleteStudiesByStudyIdAssetsByAssetIdErrors];
+
+export type DeleteStudiesByStudyIdAssetsByAssetIdResponses = {
+    /**
+     * Asset deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteStudiesByStudyIdAssetsByAssetIdResponse = DeleteStudiesByStudyIdAssetsByAssetIdResponses[keyof DeleteStudiesByStudyIdAssetsByAssetIdResponses];
+
 export type GetStudiesByStudyIdAssetsByAssetIdData = {
     body?: never;
     path: {
@@ -1934,6 +1992,56 @@ export type GetStudiesByStudyIdAssetsByAssetIdResponses = {
 };
 
 export type GetStudiesByStudyIdAssetsByAssetIdResponse = GetStudiesByStudyIdAssetsByAssetIdResponses[keyof GetStudiesByStudyIdAssetsByAssetIdResponses];
+
+export type PutStudiesByStudyIdAssetsByAssetIdData = {
+    body: AssetBase;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Asset UUID
+         */
+        assetId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/assets/{assetId}';
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden - no access to study or asset
+     */
+    403: unknown;
+    /**
+     * Study or asset not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdError = PutStudiesByStudyIdAssetsByAssetIdErrors[keyof PutStudiesByStudyIdAssetsByAssetIdErrors];
+
+export type PutStudiesByStudyIdAssetsByAssetIdResponses = {
+    /**
+     * Asset updated successfully
+     */
+    200: Asset;
+};
+
+export type PutStudiesByStudyIdAssetsByAssetIdResponse = PutStudiesByStudyIdAssetsByAssetIdResponses[keyof PutStudiesByStudyIdAssetsByAssetIdResponses];
 
 export type GetStudiesByStudyIdAssetsByAssetIdContractsData = {
     body?: never;

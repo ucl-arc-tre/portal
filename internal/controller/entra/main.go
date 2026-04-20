@@ -19,6 +19,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
 const (
@@ -289,8 +290,7 @@ func employeeTypeIsStaff(employeeType string) bool {
 
 // FindUsernames searches entra for usernames given a query of email, user principal
 func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
-	queryRegex := regexp.MustCompile(`^\w[\w\'.\s0-9@-]+\w$`)
-	queryIsValid := queryRegex.MatchString(query)
+	queryIsValid := validation.UsersSearchQueryPattern.MatchString(query)
 	if !queryIsValid {
 		return nil, types.NewErrInvalidObject(fmt.Sprintf("invalid query [%v]", query))
 	}

@@ -367,6 +367,18 @@ paths:
           description: Full username of the study owner. e.g. ccxyz@ucl.ac.uk
           schema:
             type: string
+        - in: query
+          name: limit
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          description: Index of the first item to return
+          schema:
+            type: integer
       responses:
         "200":
           content:
@@ -805,6 +817,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Asset"
+        "403":
+          description: Forbidden - no access to study or asset
+        "404":
+          description: Study or asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    put:
+      description: Update an existing asset within a study
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetBase"
+      responses:
+        "200":
+          description: Asset updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Asset"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden - no access to study or asset
+        "404":
+          description: Study or asset not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    delete:
+      description: Delete an asset within a study
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/AssetIdParam"
+      responses:
+        "204":
+          description: Asset deleted successfully
+        "400":
+          description: Asset is linked to a contract and cannot be deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
         "403":
           description: Forbidden - no access to study or asset
         "404":
@@ -1338,13 +1404,11 @@ components:
         - legal_basis
         - format
         - requires_contract
-        - expires_at
         - has_dspt
         - stored_outside_uk_eea
         - accessed_by_third_parties
         - third_party_agreement
         - status
-        - contract_ids
       properties:
         title:
           type: string
@@ -1395,6 +1459,7 @@ components:
           description: Format of the asset
         expires_at:
           type: string
+          nullable: true
           description: Retention expiry date of the asset
         requires_contract:
           type: boolean
@@ -1412,12 +1477,6 @@ components:
             - awaiting
             - destroyed
           description: Status of the asset
-        contract_ids:
-          type: array
-          description: List of contract IDs associated with the asset (empty array if none)
-          items:
-            type: string
-
     Asset:
       allOf:
         - $ref: "#/components/schemas/AssetBase"
@@ -1428,6 +1487,7 @@ components:
             - study_id
             - created_at
             - updated_at
+            - contract_ids
           properties:
             id:
               type: string
@@ -1444,6 +1504,11 @@ components:
             updated_at:
               type: string
               description: Time in RFC3339 format when the asset was last updated
+            contract_ids:
+              type: array
+              description: List of contract IDs associated with the asset (empty array if none)
+              items:
+                type: string
       description: A research study asset
 
     StudyBase:

@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -11,6 +12,14 @@ import (
 )
 
 // Helper functions
+
+func formatExpiresAt(expiresAt *time.Time) *string {
+	if expiresAt == nil {
+		return nil
+	}
+	formattedDateTime := expiresAt.Format(config.TimeFormat)
+	return &formattedDateTime
+}
 
 func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 	contractIds := []string{}
@@ -28,7 +37,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Protection:           openapi.AssetProtection(asset.Protection),
 		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
 		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            asset.ExpiresAt.Format(config.TimeFormat),
+		ExpiresAt:            formatExpiresAt(asset.ExpiresAt),
 		Locations:            asset.LocationStrings(),
 		RequiresContract:     asset.RequiresContract,
 		HasDspt:              asset.HasDspt,
@@ -48,7 +57,7 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	assets, err := h.studies.InformationAssets(studyUUID)
+	assets, err := h.studies.Assets(studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return
@@ -92,11 +101,56 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 		return
 	}
 
-	asset, err := h.studies.InformationAssetById(uuids[0], uuids[1])
+	asset, err := h.studies.AssetById(uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve asset")
 		return
 	}
 
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
+}
+
+func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	if err != nil {
+		return
+	}
+
+	var assetData openapi.AssetBase
+	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
+		return
+	}
+
+	validationError, asset, err := h.studies.UpdateAsset(assetData, uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to update asset")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, assetToOpenApiAsset(*asset))
+}
+
+func (h *Handler) DeleteStudiesStudyIdAssetsAssetId(
+	ctx *gin.Context,
+	studyId string,
+	assetId string,
+) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
+	if err != nil {
+		return
+	}
+
+	validationError, err := h.studies.DeleteAsset(uuids[0], uuids[1])
+	if err != nil {
+		setError(ctx, err, "Failed to delete asset")
+		return
+	} else if validationError != nil {
+		ctx.JSON(http.StatusBadRequest, *validationError)
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }
