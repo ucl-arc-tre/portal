@@ -51,7 +51,7 @@ func TestIntegration_CreateAsset(t *testing.T) {
 	// Create unique schema for this test
 	db := testutil.NewTestDBSchema(t, migrate)
 
-	svc := &Service{db: db}
+	svc := &Service{db: db, entra: &testutil.FakeEntra{}}
 
 	user := types.User{
 		Username: "username",
@@ -104,5 +104,4 @@ func TestIntegration_CreateAsset(t *testing.T) {
 
 	locationValues := []string{locations[0].Location, locations[1].Location}
 	assert.ElementsMatch(t, []string{"UK", "EU"}, locationValues)
-
 }
