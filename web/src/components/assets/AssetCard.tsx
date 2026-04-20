@@ -4,8 +4,9 @@ import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
-import { formatDate } from "../shared/exports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
+import ExpiryWarning from "../ui/ExpiryWarning";
 
 type AssetCardProps = {
   asset: Asset;
@@ -39,6 +40,8 @@ export default function AssetCard(props: AssetCardProps) {
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const expiryUrgency = asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
 
   useEffect(() => {
     const isAssetCompleted = async () => {
@@ -108,6 +111,8 @@ export default function AssetCard(props: AssetCardProps) {
       )}
 
       <div className={styles["asset-actions"]}>
+        {expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="asset" />}
+
         {!isCompleted && (
           <>
             <small className={styles["asset-incomplete__message"]}>

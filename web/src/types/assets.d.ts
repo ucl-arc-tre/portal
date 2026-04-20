@@ -6,7 +6,8 @@ type AssetFormData = {
   protection: string;
   legal_basis: string;
   format: string;
-  expires_at: string;
+  has_expiry_date: boolean | string;
+  expires_at: string | null;
   locations: string[];
   requires_contract: boolean | string; // Can be string from form, converted to boolean
   has_dspt: boolean | string; // Can be string from form, converted to boolean

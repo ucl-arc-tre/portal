@@ -47,6 +47,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[name="protection"]').select("anonymisation");
     cy.get('[name="legal_basis"]').select("consent");
     cy.get('[name="format"]').select("electronic");
+    cy.get("input[name='has_expiry_date'][value='true']").check({ force: true });
     cy.get('[name="expires_at"]').type("2022-01-01");
     cy.get('[data-cy="create-asset-form"] input[value="arc_tre"]').check();
     cy.get("input[name='requires_contract'][value='false']").check({ force: true });
@@ -115,6 +116,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[name="protection"]').select("anonymisation");
     cy.get('[name="legal_basis"]').select("consent");
     cy.get('[name="format"]').select("electronic");
+    cy.get("input[name='has_expiry_date'][value='true']").check({ force: true });
     cy.get('[name="expires_at"]').type("2022-01-01");
     cy.get('[data-cy="create-asset-form"] input[value="arc_tre"]').check();
     cy.get("input[name='requires_contract'][value='false']").check({ force: true });

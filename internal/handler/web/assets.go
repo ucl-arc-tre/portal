@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -11,6 +12,14 @@ import (
 )
 
 // Helper functions
+
+func formatExpiresAt(expiresAt *time.Time) *string {
+	if expiresAt == nil {
+		return nil
+	}
+	formattedDateTime := expiresAt.Format(config.TimeFormat)
+	return &formattedDateTime
+}
 
 func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 	contractIds := []string{}
@@ -28,7 +37,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Protection:           openapi.AssetProtection(asset.Protection),
 		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
 		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            asset.ExpiresAt.Format(config.TimeFormat),
+		ExpiresAt:            formatExpiresAt(asset.ExpiresAt),
 		Locations:            asset.LocationStrings(),
 		RequiresContract:     asset.RequiresContract,
 		HasDspt:              asset.HasDspt,
