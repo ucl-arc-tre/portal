@@ -170,7 +170,7 @@ export type AssetBase = {
     /**
      * Retention expiry date of the asset
      */
-    expires_at: string;
+    expires_at?: string | null;
     /**
      * Whether a contract is required for the asset
      */
@@ -187,10 +187,6 @@ export type AssetBase = {
      * Status of the asset
      */
     status: 'active' | 'awaiting' | 'destroyed';
-    /**
-     * List of contract IDs associated with the asset (empty array if none)
-     */
-    contract_ids: Array<string>;
 };
 
 /**
@@ -217,6 +213,10 @@ export type Asset = AssetBase & {
      * Time in RFC3339 format when the asset was last updated
      */
     updated_at: string;
+    /**
+     * List of contract IDs associated with the asset (empty array if none)
+     */
+    contract_ids: Array<string>;
 };
 
 /**

@@ -27,7 +27,7 @@ const (
 
 type Service struct {
 	db    *gorm.DB
-	entra *entra.Controller
+	entra entra.Interface
 	s3    *s3.Controller
 	users *users.Service
 }

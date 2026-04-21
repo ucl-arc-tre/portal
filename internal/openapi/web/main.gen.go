@@ -448,7 +448,7 @@ type Asset struct {
 	Description string `json:"description"`
 
 	// ExpiresAt Retention expiry date of the asset
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
 
 	// Format Format of the asset
 	Format AssetFormat `json:"format"`
@@ -510,14 +510,11 @@ type AssetBase struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
 
-	// ContractIds List of contract IDs associated with the asset (empty array if none)
-	ContractIds []string `json:"contract_ids"`
-
 	// Description Description of the asset
 	Description string `json:"description"`
 
 	// ExpiresAt Retention expiry date of the asset
-	ExpiresAt string `json:"expires_at"`
+	ExpiresAt *string `json:"expires_at,omitempty"`
 
 	// Format Format of the asset
 	Format AssetBaseFormat `json:"format"`

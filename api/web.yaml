@@ -1351,13 +1351,11 @@ components:
         - legal_basis
         - format
         - requires_contract
-        - expires_at
         - has_dspt
         - stored_outside_uk_eea
         - accessed_by_third_parties
         - third_party_agreement
         - status
-        - contract_ids
       properties:
         title:
           type: string
@@ -1408,6 +1406,7 @@ components:
           description: Format of the asset
         expires_at:
           type: string
+          nullable: true
           description: Retention expiry date of the asset
         requires_contract:
           type: boolean
@@ -1425,12 +1424,6 @@ components:
             - awaiting
             - destroyed
           description: Status of the asset
-        contract_ids:
-          type: array
-          description: List of contract IDs associated with the asset (empty array if none)
-          items:
-            type: string
-
     Asset:
       allOf:
         - $ref: "#/components/schemas/AssetBase"
@@ -1441,6 +1434,7 @@ components:
             - study_id
             - created_at
             - updated_at
+            - contract_ids
           properties:
             id:
               type: string
@@ -1457,6 +1451,11 @@ components:
             updated_at:
               type: string
               description: Time in RFC3339 format when the asset was last updated
+            contract_ids:
+              type: array
+              description: List of contract IDs associated with the asset (empty array if none)
+              items:
+                type: string
       description: A research study asset
 
     StudyBase:

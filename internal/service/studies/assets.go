@@ -80,10 +80,11 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 		return &openapi.ValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
 	}
 
-	// Validate expiry field
-	_, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
-	if err != nil {
-		return &openapi.ValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
+	// Validate expiry field if provided
+	if assetData.ExpiresAt != nil {
+		if _, err := time.Parse(config.DateFormat, *assetData.ExpiresAt); err != nil {
+			return &openapi.ValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
+		}
 	}
 
 	// Validate status field
@@ -100,9 +101,13 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 }
 
 func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
-	expiryDate, err := time.Parse(config.DateFormat, assetData.ExpiresAt)
-	if err != nil {
-		return nil, types.NewErrInvalidObject(fmt.Sprintf("failed to parse validated expiry date %s: %v", assetData.ExpiresAt, err))
+	var expiresAt *time.Time
+	if assetData.ExpiresAt != nil {
+		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
+		if err != nil {
+			return nil, types.NewErrInvalidObject(fmt.Sprintf("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err))
+		}
+		expiresAt = &parsedDateTime
 	}
 
 	asset := &types.Asset{
@@ -113,7 +118,7 @@ func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
 		Protection:           string(assetData.Protection),
 		LegalBasis:           string(assetData.LegalBasis),
 		Format:               string(assetData.Format),
-		ExpiresAt:            expiryDate,
+		ExpiresAt:            expiresAt,
 		HasDspt:              assetData.HasDspt,
 		RequiresContract:     assetData.RequiresContract,
 		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,

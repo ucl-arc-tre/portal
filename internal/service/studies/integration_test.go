@@ -16,6 +16,8 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
+func ptr[T any](value T) *T { return &value }
+
 // To be called by each test within this package to AutoMigrate
 // only the models/tables required by this package
 func migrate(db *gorm.DB) error {
@@ -49,7 +51,7 @@ func TestIntegration_CreateAsset(t *testing.T) {
 	// Create unique schema for this test
 	db := testutil.NewTestDBSchema(t, migrate)
 
-	svc := &Service{db: db}
+	svc := &Service{db: db, entra: &testutil.FakeEntra{}}
 
 	user := types.User{
 		Username: "username",
@@ -74,7 +76,7 @@ func TestIntegration_CreateAsset(t *testing.T) {
 		Protection:           openapi.AssetBaseProtectionAnonymisation,
 		LegalBasis:           openapi.AssetBaseLegalBasisConsent,
 		Format:               openapi.AssetBaseFormatElectronic,
-		ExpiresAt:            time.Now().AddDate(1, 0, 0).Format("2006-01-02"),
+		ExpiresAt:            ptr(time.Now().AddDate(1, 0, 0).Format("2006-01-02")),
 		Status:               openapi.AssetBaseStatusActive,
 	}
 
@@ -102,5 +104,4 @@ func TestIntegration_CreateAsset(t *testing.T) {
 
 	locationValues := []string{locations[0].Location, locations[1].Location}
 	assert.ElementsMatch(t, []string{"UK", "EU"}, locationValues)
-
 }

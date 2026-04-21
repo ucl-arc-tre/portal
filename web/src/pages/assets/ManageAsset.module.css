@@ -78,6 +78,12 @@
   border-top: 1px solid #e9ecef;
 }
 
+.expiry-warning {
+  text-align: center;
+  margin: 1.5rem 0;
+  font-size: 1.2rem;
+}
+
 .error {
   color: #dc3545;
   background: #f8d7da;

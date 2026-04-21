@@ -25,7 +25,8 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
 import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
-import { formatDate } from "@/components/shared/exports";
+import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports";
+import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
 
 export default function ManageAssetPage() {
@@ -162,6 +163,8 @@ export default function ManageAssetPage() {
     );
   }
 
+  const expiryUrgency = asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
+
   return (
     <>
       <MetaHead title={`Manage Asset: ${asset.title}`} description={`Manage asset details for ${asset.title}`} />
@@ -204,6 +207,12 @@ export default function ManageAssetPage() {
           </Alert>
         )}
 
+        {expiryUrgency && (
+          <div className={styles["expiry-warning"]}>
+            <ExpiryWarning expiryUrgency={expiryUrgency} entityName="asset" />
+          </div>
+        )}
+
         <div className={styles["asset-info"]}>
           <div className={styles.section}>
             <h3>Asset Details</h3>
@@ -241,7 +250,7 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Expiry Date:</label>
-              <span>{formatDate(asset.expires_at)}</span>
+              <span>{asset.expires_at ? formatDate(asset.expires_at) : "None"}</span>
             </div>
             <div className={styles.field}>
               <label>Locations:</label>
