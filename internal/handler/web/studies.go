@@ -337,3 +337,53 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) PostStudiesAdminImport(ctx *gin.Context) {
+	data := openapi.StudyImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	study, err := h.studies.ImportStudy(data)
+	if err != nil {
+		setError(ctx, err, "Failed to update study")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study))
+}
+
+func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	data := openapi.AssetImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	asset, err := h.studies.ImportAsset(studyUUID, data)
+	if err != nil {
+		setError(ctx, err, "Failed to update asset")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, assetToOpenApiAsset(*asset))
+}
+
+func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	data := openapi.ContractImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	contract, err := h.studies.ImportContract(studyUUID, data)
+	if err != nil {
+		setError(ctx, err, "Failed to update contract")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}

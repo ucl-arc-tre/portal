@@ -161,15 +161,19 @@ export default function ManageContractPage() {
               </div>
             )}
 
-            <div className={styles.field}>
-              <label>Start date:</label>
-              <span>{formatDate(contract.start_date)}</span>
-            </div>
+            {contract.start_date && (
+              <div className={styles.field}>
+                <label>Start date:</label>
+                <span>{formatDate(contract.start_date)}</span>
+              </div>
+            )}
 
-            <div className={styles.field}>
-              <label>Expiry date:</label>
-              <span>{formatDate(contract.expiry_date)}</span>
-            </div>
+            {contract.expiry_date && (
+              <div className={styles.field}>
+                <label>Expiry date:</label>
+                <span>{formatDate(contract.expiry_date)}</span>
+              </div>
+            )}
           </div>
         </div>
 

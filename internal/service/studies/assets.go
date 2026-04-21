@@ -100,15 +100,8 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.Valid
 	return nil, nil
 }
 
+// handles the database transaction for creating a study asset
 func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
-	var expiresAt *time.Time
-	if assetData.ExpiresAt != nil {
-		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
-		if err != nil {
-			return nil, types.NewErrInvalidObject(fmt.Sprintf("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err))
-		}
-		expiresAt = &parsedDateTime
-	}
 
 	asset := &types.Asset{
 		Title:                assetData.Title,
@@ -118,11 +111,18 @@ func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
 		Protection:           string(assetData.Protection),
 		LegalBasis:           string(assetData.LegalBasis),
 		Format:               string(assetData.Format),
-		ExpiresAt:            expiresAt,
 		HasDspt:              assetData.HasDspt,
 		RequiresContract:     assetData.RequiresContract,
 		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
 		Status:               string(assetData.Status),
+	}
+
+	if assetData.ExpiresAt != nil {
+		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
+		if err != nil {
+			return nil, types.NewErrInvalidObject(fmt.Sprintf("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err))
+		}
+		asset.ExpiresAt = &parsedDateTime
 	}
 
 	return asset, nil
