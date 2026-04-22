@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -52,8 +51,8 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 			StudyId:         project.StudyID.String(),
 			CreatorUsername: string(project.CreatorUser.Username),
 			ApprovalStatus:  openapi.ApprovalStatus(project.ApprovalStatus),
-			CreatedAt:       project.CreatedAt.Format(config.TimeFormat),
-			UpdatedAt:       project.UpdatedAt.Format(config.TimeFormat),
+			CreatedAt:       openapi.FormatTime(project.CreatedAt),
+			UpdatedAt:       openapi.FormatTime(project.UpdatedAt),
 			EnvironmentName: string(project.Environment.Name),
 		})
 	}
@@ -159,8 +158,8 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		StudyTitle:      projectTRE.Project.Study.Title,
 		CreatorUsername: string(projectTRE.Project.CreatorUser.Username),
 		ApprovalStatus:  openapi.ApprovalStatus(projectTRE.Project.ApprovalStatus),
-		CreatedAt:       projectTRE.Project.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:       projectTRE.Project.UpdatedAt.Format(config.TimeFormat),
+		CreatedAt:       openapi.FormatTime(projectTRE.Project.CreatedAt),
+		UpdatedAt:       openapi.FormatTime(projectTRE.Project.UpdatedAt),
 		EnvironmentName: string(projectTRE.Project.Environment.Name),
 		Assets:          assets,
 		Members:         members,

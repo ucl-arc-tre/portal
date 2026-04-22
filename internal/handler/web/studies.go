@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -24,12 +23,6 @@ var (
 func studyToOpenApiStudy(study types.Study) openapi.Study {
 	ownerUserIDStr := study.OwnerUserID.String()
 	ownerUsernameStr := string(study.Owner.Username)
-
-	var lastSignoff *string
-	if study.LastSignoff != nil {
-		formatted := study.LastSignoff.Format(config.TimeFormat)
-		lastSignoff = &formatted
-	}
 
 	return openapi.Study{
 		Id:                               study.ID.String(),
@@ -60,9 +53,9 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
 		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
 		Feedback:                         study.Feedback,
-		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
-		LastSignoff:                      lastSignoff,
+		CreatedAt:                        openapi.FormatTime(study.CreatedAt),
+		UpdatedAt:                        openapi.FormatTime(study.UpdatedAt),
+		LastSignoff:                      openapi.FormatOptionalTime(study.LastSignoff),
 		Caseref:                          study.Caseref,
 	}
 }

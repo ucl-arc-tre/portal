@@ -2,24 +2,14 @@ package web
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 // Helper functions
-
-func formatExpiresAt(expiresAt *time.Time) *string {
-	if expiresAt == nil {
-		return nil
-	}
-	formattedDateTime := expiresAt.Format(config.TimeFormat)
-	return &formattedDateTime
-}
 
 func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 	contractIds := []string{}
@@ -37,14 +27,14 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Protection:           openapi.AssetProtection(asset.Protection),
 		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
 		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            formatExpiresAt(asset.ExpiresAt),
+		ExpiresAt:            openapi.FormatOptionalTime(asset.ExpiresAt),
 		Locations:            asset.LocationStrings(),
 		RequiresContract:     asset.RequiresContract,
 		HasDspt:              asset.HasDspt,
 		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
 		Status:               openapi.AssetStatus(asset.Status),
-		CreatedAt:            asset.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
+		CreatedAt:            openapi.FormatTime(asset.CreatedAt),
+		UpdatedAt:            openapi.FormatTime(asset.UpdatedAt),
 		ContractIds:          contractIds,
 	}
 }

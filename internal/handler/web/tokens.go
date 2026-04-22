@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -28,7 +27,7 @@ func (h *Handler) GetTokensDsh(ctx *gin.Context) {
 		response = append(response, openapi.Token{
 			Id:        token.ID.String(),
 			Name:      token.Name,
-			ExpiresAt: token.ExpiresAt.Format(config.TimeFormat),
+			ExpiresAt: openapi.FormatTime(token.ExpiresAt),
 		})
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -62,7 +61,7 @@ func (h *Handler) PostTokensDsh(ctx *gin.Context) {
 		Id:        token.ID.String(),
 		Value:     tokenWithValue.Value,
 		Name:      token.Name,
-		ExpiresAt: token.ExpiresAt.Format(config.TimeFormat),
+		ExpiresAt: openapi.FormatTime(token.ExpiresAt),
 	})
 }
 
