@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -32,12 +31,6 @@ func setError(ctx *gin.Context, err error, message string) {
 	ctx.Status(statusCode)
 }
 
-func setValidationError(ctx *gin.Context, message string) {
-	ctx.JSON(http.StatusBadRequest, openapi.ValidationError{
-		ErrorMessage: message,
-	})
-}
-
 func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 	err := ctx.ShouldBindJSON(&obj)
 	if err != nil {
@@ -49,7 +42,7 @@ func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 func parseUUIDOrSetError(ctx *gin.Context, id string) (uuid.UUID, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expeced uuid")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expected uuid")
 		return [16]byte{}, err
 	}
 	return uuid, nil
@@ -60,7 +53,7 @@ func parseUUIDsOrSetError(ctx *gin.Context, ids ...string) ([]uuid.UUID, error) 
 	for _, id := range ids {
 		uuid, err := uuid.Parse(id)
 		if err != nil {
-			setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expeced uuid")
+			setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expected uuid")
 			return uuids, err
 		}
 		uuids = append(uuids, uuid)
