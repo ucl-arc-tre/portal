@@ -2,7 +2,6 @@ package users
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
@@ -12,9 +11,9 @@ import (
 // Invite an external user to the portal. Idempotent
 func (s *Service) InviteExternalUser(ctx context.Context, email string, inviter types.User) (types.User, error) {
 	if username := types.Username(email); !username.IsValid() {
-		return types.User{}, types.NewErrInvalidObject(fmt.Errorf("[%s] was not a valid username", email))
+		return types.User{}, types.NewErrInvalidObjectF("[%s] was not a valid username", email)
 	} else if !entra.IsExternalUsername(username) {
-		return types.User{}, types.NewErrInvalidObject(fmt.Errorf("[%s] was not an external username", email))
+		return types.User{}, types.NewErrInvalidObjectF("[%s] was not an external username", email)
 	}
 
 	attributes, err := s.Attributes(inviter)

@@ -13,8 +13,25 @@ var (
 	ErrNotFound      = errors.New("not found")
 )
 
+type ErrClientInvalidObject struct {
+	ClientReadableReason string // Client readable
+}
+
+func (e ErrClientInvalidObject) Error() string {
+	return fmt.Sprintf("invalid object: %s", e.ClientReadableReason)
+}
+
+// New invalid object error with a reason that will be client readable
+func NewErrClientInvalidObjectF(format string, objs ...any) *ErrClientInvalidObject {
+	return &ErrClientInvalidObject{ClientReadableReason: fmt.Sprintf(format, objs...)}
+}
+
 func NewErrInvalidObject(err any) error {
 	return newErrorWithType(err, ErrInvalidObject)
+}
+
+func NewErrInvalidObjectF(format string, objs ...any) error {
+	return newErrorWithType(fmt.Errorf(format, objs...), ErrInvalidObject)
 }
 
 func NewErrServerError(err any) error {

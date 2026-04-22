@@ -62,7 +62,7 @@ func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 // they were created or not and an error
 func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	if !username.IsValid() {
-		return types.User{}, types.NewErrInvalidObject(fmt.Errorf("username [%s] invalid", username))
+		return types.User{}, types.NewErrInvalidObjectF("username [%s] invalid", username)
 	}
 
 	user := types.User{}

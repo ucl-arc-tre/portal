@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -87,7 +86,7 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 		setError(ctx, err, "Failed to determine MIME type of file")
 		return
 	} else if !validation.IsValidContractMimeType(mimeType) {
-		setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not valid", mimeType)), "Invalid MIME type")
+		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v] not valid", mimeType), "Invalid MIME type")
 		return
 	}
 

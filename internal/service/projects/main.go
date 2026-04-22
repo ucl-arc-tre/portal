@@ -280,7 +280,7 @@ func (s *Service) SubmitProject(projectId uuid.UUID) error {
 	}
 
 	if result.RowsAffected == 0 {
-		return types.NewErrInvalidObject(fmt.Errorf("project must be in Incomplete status to be submitted"))
+		return types.NewErrInvalidObjectF("project must be in Incomplete status to be submitted")
 	}
 
 	return nil

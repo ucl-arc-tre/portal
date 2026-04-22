@@ -103,7 +103,7 @@ func (c *Controller) userData(ctx context.Context, username types.Username) (*Us
 
 func (c *Controller) findUser(ctx context.Context, username types.Username) (graphmodels.Userable, error) {
 	if !username.IsValid() {
-		return nil, types.NewErrInvalidObject(fmt.Errorf("username [%v] was not valid", username))
+		return nil, types.NewErrInvalidObjectF("username [%v] was not valid", username)
 	}
 	if IsExternalUsername(username) {
 		return c.findUserExternal(ctx, Email(username))
@@ -292,7 +292,7 @@ func employeeTypeIsStaff(employeeType string) bool {
 func (c *Controller) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
 	queryIsValid := validation.UsersSearchQueryPattern.MatchString(query)
 	if !queryIsValid {
-		return nil, types.NewErrInvalidObject(fmt.Sprintf("invalid query [%v]", query))
+		return nil, types.NewErrInvalidObjectF("invalid query [%v]", query)
 	}
 
 	filterQuery := fmt.Sprintf(

@@ -120,7 +120,7 @@ func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
 	if assetData.ExpiresAt != nil {
 		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
 		if err != nil {
-			return nil, types.NewErrInvalidObject(fmt.Sprintf("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err))
+			return nil, types.NewErrInvalidObjectF("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err)
 		}
 		asset.ExpiresAt = &parsedDateTime
 	}
