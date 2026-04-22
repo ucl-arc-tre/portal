@@ -8,6 +8,10 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+const (
+	day = 24 * time.Hour
+)
+
 func (m *Manager) checkContractsExpiry() error {
 	if !config.NotificationsEnabled() {
 		return nil
@@ -28,8 +32,8 @@ func (m *Manager) checkContractsExpiry() error {
 			recipients = append(recipients, string(studyAdmin.User.Username))
 		}
 
-		contract := study.EarliestExpringContractWithin30Days()
-		if contract == nil {
+		contract := study.EarliestExpringContract()
+		if contract == nil || !contract.ShouldNotifyExpiry() {
 			continue
 		}
 		err := m.entra.SendContractExpiryNotification(ctx, recipients, *contract, study)
@@ -58,7 +62,7 @@ func (m *Manager) checkTrainingCertificatesExpiry() error {
 	for _, trainingRecord := range trainingRecords {
 		recipient := string(trainingRecord.User.Username)
 
-		if config.DaysUntilTrainingExpiry(trainingRecord) > 30 {
+		if !config.ShouldNotifyTrainingExpiry(trainingRecord) {
 			continue
 		}
 
@@ -73,6 +77,6 @@ func (m *Manager) checkTrainingCertificatesExpiry() error {
 }
 
 func (m *Manager) scheduleDailyChecks() {
-	m.mustEvery(time.Minute*1440, m.checkContractsExpiry, "checkContractsExpiry")
-	m.mustEvery(time.Minute*1440, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
+	m.mustEvery(day, m.checkContractsExpiry, "checkContractsExpiry")
+	m.mustEvery(day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
 }
