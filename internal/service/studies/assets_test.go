@@ -3,12 +3,14 @@
 package studies
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/types"
 
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
@@ -196,13 +198,14 @@ func TestValidateAssetData(t *testing.T) {
 			asset := validAssetBase()
 			curTest.modify(&asset)
 
-			validationErr, err := svc.validateAssetData(asset)
+			err := svc.validateAssetData(asset)
 
 			// Stop immediately if system-level error (e.g., panic, DB error)
-			require.NoError(t, err, "unexpected error: %+v", err)
+			if errors.Is(err, types.ErrServerError) {
+				require.NoError(t, err, "unexpected error: %+v", err)
+			}
 
-			assert.Equal(t, curTest.wantError, validationErr != nil, "validationErr: %+v", validationErr)
-
+			assert.Equal(t, curTest.wantError, err != nil, "validationErr: %+v", err)
 		})
 	}
 }

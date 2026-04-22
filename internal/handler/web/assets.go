@@ -41,12 +41,9 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateAsset(user, assetData, studyUUID)
+	err = h.studies.CreateAsset(user, assetData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to create asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -79,12 +76,9 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 		return
 	}
 
-	validationError, asset, err := h.studies.UpdateAsset(assetData, uuids[0], uuids[1])
+	asset, err := h.studies.UpdateAsset(assetData, uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to update asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -101,12 +95,9 @@ func (h *Handler) DeleteStudiesStudyIdAssetsAssetId(
 		return
 	}
 
-	validationError, err := h.studies.DeleteAsset(uuids[0], uuids[1])
+	err = h.studies.DeleteAsset(uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to delete asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 

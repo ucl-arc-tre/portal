@@ -18,8 +18,8 @@ func setError(ctx *gin.Context, err error, message string) {
 		panic(fmt.Errorf("set error called with nil error [%v]", message))
 	}
 
-	if v, ok := errors.AsType[types.ErrClientInvalidObject](err); ok {
-		ctx.JSON(http.StatusNotAcceptable, openapi.ValidationError{
+	if v, ok := errors.AsType[*types.ErrClientInvalidObject](err); ok && v != nil {
+		ctx.JSON(http.StatusBadRequest, openapi.ValidationError{
 			ErrorMessage: v.ClientReadableReason,
 		})
 		return

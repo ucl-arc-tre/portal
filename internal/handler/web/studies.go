@@ -122,12 +122,9 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateStudy(ctx, user, studyData)
+	err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to create study")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -248,19 +245,13 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 	if err != nil {
 		return
 	}
+
 	studyData := openapi.StudyRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
-	validationError, err := h.studies.ValidateStudyData(ctx, studyData, true)
-	if err != nil {
-		setError(ctx, err, "Failed to validate study data")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-	err = h.studies.UpdateStudy(studyUUID, studyData)
+
+	err = h.studies.UpdateStudy(ctx, studyUUID, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to update study")
 		return

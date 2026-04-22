@@ -28,65 +28,63 @@ func New() *Service {
 	}
 }
 
-func (s *Service) ValidateProjectTREData(projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectTREData(projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) error {
 	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
-		return &openapi.ValidationError{ErrorMessage: "Project name must be 4-14 characters long and contain only lowercase letters and numbers"}, nil
+		return types.NewErrClientInvalidObjectF("Project name must be 4-14 characters long and contain only lowercase letters and numbers")
 	}
 
-	validationError, err := s.validateProjectNameUniqueness(projectTreData.Name)
-	if err != nil || validationError != nil {
-		return validationError, err
+	if err := s.validateProjectNameUniqueness(projectTreData.Name); err != nil {
+		return err
 	}
 
 	return s.validateProjectTREAssetsAndMembers(projectTreData.AssetIds, projectTreData.Members, studyUUID)
 }
 
-func (s *Service) ValidateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) error {
 	return s.validateProjectTREAssetsAndMembers(projectUpdateData.AssetIds, projectUpdateData.Members, studyUUID)
 }
 
-func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) error {
 	// Validate assets belong to study and are compatible with TRE environment tier
 	if len(assetIds) > 0 {
 		// Get TRE environment tier
 		var treEnvironment types.Environment
 		err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
 		if err != nil {
-			return nil, types.NewErrFromGorm(err, "failed to fetch TRE environment")
+			return types.NewErrFromGorm(err, "failed to fetch TRE environment")
 		}
 
-		validationError, err := s.validateAssets(assetIds, studyUUID, treEnvironment.Tier)
-		if err != nil || validationError != nil {
-			return validationError, err
+		if err := s.validateAssets(assetIds, studyUUID, treEnvironment.Tier); err != nil {
+			return err
 		}
 	}
 
 	// Validate members
 	if len(members) > 0 {
-		validationError, err := s.validateProjectMembers(members)
-		if err != nil || validationError != nil {
-			return validationError, err
+
+		if err := s.validateProjectMembers(members); err != nil {
+			return err
 		}
 	}
 
-	return nil, nil
+	return nil
 }
 
-func (s *Service) validateProjectNameUniqueness(projectName string) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectNameUniqueness(projectName string) error {
 	maxExpectedProjects := 0 // only one project with a given name should exist
 
 	// Check if project name already exists
 	var count int64
 	err := s.db.Model(&types.Project{}).Where("LOWER(name) = LOWER(?)", projectName).Count(&count).Error
 	if err != nil {
-		return nil, types.NewErrFromGorm(err, "failed to check for duplicate project name")
+		return types.NewErrFromGorm(err, "failed to check for duplicate project name")
 	}
 
 	if count > int64(maxExpectedProjects) {
-		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("A project with the name [%v] already exists", projectName)}, nil
+		return types.NewErrClientInvalidObjectF("A project with the name [%v] already exists", projectName)
 	}
 
-	return nil, nil
+	return nil
 }
 
 func isValidProjectTRERole(role openapi.ProjectTRERoleName) bool {
@@ -98,7 +96,7 @@ func isValidProjectTRERole(role openapi.ProjectTRERoleName) bool {
 	return false
 }
 
-func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*openapi.ValidationError, error) {
+func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) error {
 	errorMessage := ""
 	for _, member := range members {
 		if len(member.Roles) == 0 {
@@ -112,12 +110,12 @@ func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*o
 				errorMessage += fmt.Sprintf("• User '%s' not found. They must become an approved researcher before being added to a project\n\n", member.Username)
 				continue
 			}
-			return nil, err
+			return err
 		}
 
 		isApprovedResearcher, err := rbac.HasRole(*user, rbac.ApprovedResearcher)
 		if err != nil {
-			return nil, types.NewErrServerError(fmt.Errorf("failed to check approved researcher role for %s: %w", member.Username, err))
+			return err
 		}
 		if !isApprovedResearcher {
 			errorMessage += fmt.Sprintf("• User '%s' does not have the approved researcher role\n\n", member.Username)
@@ -129,41 +127,46 @@ func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) (*o
 			}
 		}
 	}
-	if errorMessage == "" {
-		return nil, nil
+	if errorMessage != "" {
+		return types.NewErrClientInvalidObjectF("invalid project members: %s", errorMessage)
 	}
-	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
+	return nil
 }
 
-func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environmentTier int) (*openapi.ValidationError, error) {
+func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environmentTier int) error {
 	for _, assetIDStr := range assetIDs {
 		assetUUID, err := uuid.Parse(assetIDStr)
 		if err != nil {
-			return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("Invalid asset ID format: %v", assetIDStr)}, nil
+			return types.NewErrClientInvalidObjectF("Invalid asset ID format: %v", assetIDStr)
 		}
 
 		var asset types.Asset
 		err = s.db.Where("id = ?", assetUUID).First(&asset).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("Asset with ID [%v] does not exist", assetUUID)}, nil
+				return types.NewErrClientInvalidObjectF("Asset with ID [%v] does not exist", assetUUID)
 			}
-			return nil, types.NewErrFromGorm(err, "failed to fetch asset")
+			return types.NewErrFromGorm(err, "failed to fetch asset")
 		}
 
 		if asset.StudyID != studyUUID {
-			return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("Asset [%v] does not belong to the specified study", asset.Title)}, nil
+			return types.NewErrClientInvalidObjectF("Asset [%v] does not belong to the specified study", asset.Title)
 		}
 
 		if asset.Tier > environmentTier {
-			return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("Asset [%v] has tier %d which is incompatible with environment (max tier %d)", asset.Title, asset.Tier, environmentTier)}, nil
+			return types.NewErrClientInvalidObjectF("Asset [%v] has tier %d which is incompatible with environment (max tier %d)", asset.Title, asset.Tier, environmentTier)
 		}
 	}
 
-	return nil, nil
+	return nil
 }
 
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
+
+	if err := s.validateProjectTREData(projectTreData, studyUUID); err != nil {
+		return err
+	}
+
 	// Get TRE environment
 	var treEnvironment types.Environment
 	err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
@@ -349,6 +352,10 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 }
 
 func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateData openapi.ProjectTREUpdate) error {
+	if err := s.validateProjectTREUpdate(projectUpdateData, projectTRE.Project.StudyID); err != nil {
+		return err
+	}
+
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 

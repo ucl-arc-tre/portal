@@ -108,15 +108,6 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 		return
 	}
 
-	validationError, err := h.projects.ValidateProjectTREData(projectTreData, studyUUID)
-	if err != nil {
-		setError(ctx, err, "Failed to validate project")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-
 	if err := h.projects.CreateProjectTRE(ctx, user, studyUUID, projectTreData); err != nil {
 		setError(ctx, err, "Failed to create project")
 		return
@@ -182,17 +173,6 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	projectTRE, err := h.projects.ProjectTreById(projectUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to get project")
-		return
-	}
-
-	studyUUID := projectTRE.Project.StudyID
-
-	validationError, err := h.projects.ValidateProjectTREUpdate(projectUpdateData, studyUUID)
-	if err != nil {
-		setError(ctx, err, "Failed to validate project update")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 

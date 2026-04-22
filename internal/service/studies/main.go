@@ -41,23 +41,22 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest) error {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
-
 		if errors.Is(err, types.ErrNotFound) {
 			errorMessage += fmt.Sprintf("• User '%s' not found in directory\n\n", studyAdminUsername)
 		} else if err != nil {
-			return nil, types.NewErrServerError(fmt.Errorf("failed to validate employee status for %s: %w", studyAdminUsername, err))
+			return err
 		} else if !isStaff {
 			errorMessage += fmt.Sprintf("• User '%s' is not a staff member\n\n", studyAdminUsername)
 		}
 	}
-	if errorMessage == "" {
-		return nil, nil
+	if errorMessage != "" {
+		return types.NewErrClientInvalidObjectF("invalid study admins: %s", errorMessage)
 	}
-	return &openapi.ValidationError{ErrorMessage: errorMessage}, nil
+	return nil
 }
 
 func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types.User, error) {
@@ -76,39 +75,39 @@ func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types
 	return admins, nil
 }
 
-func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) (*openapi.ValidationError, error) {
+func (s *Service) validateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) error {
 	if !validation.StudyTitlePattern.MatchString(studyData.Title) {
-		return &openapi.ValidationError{ErrorMessage: "study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
+		return types.NewErrClientInvalidObjectF("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
-		return &openapi.ValidationError{ErrorMessage: "data_controller_organisation is required"}, nil
+		return types.NewErrClientInvalidObjectF("data_controller_organisation is required")
 	}
 
 	if studyData.Description != nil && !validation.StudyDescriptionPattern.MatchString(*studyData.Description) {
-		return &openapi.ValidationError{ErrorMessage: "study description must be 255 characters or less"}, nil
+		return types.NewErrClientInvalidObjectF("study description must be 255 characters or less")
 	}
 
 	if studyData.IsDataProtectionOfficeRegistered != nil && *studyData.IsDataProtectionOfficeRegistered {
 		if studyData.DataProtectionNumber == nil {
-			return &openapi.ValidationError{ErrorMessage: "data protection registry ID, registration date, and registration number are required when registered with data protection office"}, nil
+			return types.NewErrClientInvalidObjectF("data protection registry ID, registration date, and registration number are required when registered with data protection office")
 		}
 		if !validation.DataProtectionNumberPattern.MatchString(*studyData.DataProtectionNumber) {
-			return &openapi.ValidationError{ErrorMessage: "data protection ID invalid format"}, nil
+			return types.NewErrClientInvalidObjectF("data protection ID invalid format")
 		}
 	}
 
 	if studyData.CagReference != nil && !validation.CagPattern.MatchString(*studyData.CagReference) {
-		return &openapi.ValidationError{ErrorMessage: "please adhere to the CAG reference format"}, nil
+		return types.NewErrClientInvalidObjectF("please adhere to the CAG reference format")
 
 	}
 
 	if studyData.NhsEnglandReference != nil && !validation.NhsePattern.MatchString(*studyData.NhsEnglandReference) {
-		return &openapi.ValidationError{ErrorMessage: "please adhere to the NHS England reference format"}, nil
+		return types.NewErrClientInvalidObjectF("please adhere to the NHS England reference format")
 	}
 
 	if len(studyData.AdditionalStudyAdminUsernames) > maxNumberStudyAdmins {
-		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("must have fewer than %d study admins", maxNumberStudyAdmins)}, nil
+		return types.NewErrClientInvalidObjectF("must have fewer than %d study admins", maxNumberStudyAdmins)
 	}
 
 	maxExpectedStudies := 0
@@ -120,38 +119,30 @@ func (s *Service) ValidateStudyData(ctx context.Context, studyData openapi.Study
 	var count int64
 	err := s.db.Model(&types.Study{}).Where("LOWER(title) = LOWER(?)", studyData.Title).Count(&count).Error
 	if err != nil {
-		return nil, types.NewErrFromGorm(err, "failed to check for duplicate study title")
+		return types.NewErrFromGorm(err, "failed to check for duplicate study title")
 	}
 	if count > int64(maxExpectedStudies) {
-		return &openapi.ValidationError{ErrorMessage: fmt.Sprintf("a study with the title [%v] already exists", studyData.Title)}, nil
+		return types.NewErrClientInvalidObjectF("a study with the title [%v] already exists", studyData.Title)
 	}
 
-	validationError, err := s.validateAdmins(ctx, studyData)
-	if err != nil {
-		return nil, err
-	} else if validationError != nil {
-		return validationError, nil
-	}
-
-	return nil, nil
+	return s.validateAdmins(ctx, studyData)
 }
 
-func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) (*openapi.ValidationError, error) {
-	validationError, err := s.ValidateStudyData(ctx, studyData, false)
-	if err != nil || validationError != nil {
-		return validationError, err
+func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) error {
+	if err := s.validateStudyData(ctx, studyData, false); err != nil {
+		return err
 	}
 
 	studyAdminUsers, err := s.createStudyAdminUsers(studyData)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := s.createStudy(owner, studyData, studyAdminUsers); err != nil {
-		return nil, err
+		return err
 	}
 
-	return nil, nil
+	return nil
 }
 
 func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
@@ -338,7 +329,10 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	return types.NewErrFromGorm(db.Error, "failed to update study review")
 }
 
-func (s *Service) UpdateStudy(id uuid.UUID, studyData openapi.StudyRequest) error {
+func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest) error {
+	if err := s.validateStudyData(ctx, studyData, true); err != nil {
+		return err
+	}
 
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)

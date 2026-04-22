@@ -28,12 +28,6 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 		return
 	}
 
-	validationError := h.studies.ValidateContract(ctx, studyUuid, data)
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-
 	creator := middleware.GetUser(ctx)
 	contract, err := h.studies.CreateContract(ctx, studyUuid, data, creator)
 	if err != nil {
@@ -118,12 +112,6 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 
 	var data openapi.ContractBase
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
-		return
-	}
-
-	validationError := h.studies.ValidateContract(ctx, uuids[0], data)
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -235,8 +223,8 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		StudyId:               contract.StudyID.String(),
 		ObjectsMetadata:       []openapi.ContractObjectMetadata{},
 		AssetIds:              []string{},
-		StartDate:             openapi.FormatOptionalTime(contract.StartDate),
-		ExpiryDate:            openapi.FormatOptionalTime(contract.ExpiryDate),
+		StartDate:             openapi.FormatOptionalDate(contract.StartDate),
+		ExpiryDate:            openapi.FormatOptionalDate(contract.ExpiryDate),
 	}
 	for _, asset := range contract.Assets {
 		data.AssetIds = append(data.AssetIds, asset.ID.String())

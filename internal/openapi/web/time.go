@@ -17,3 +17,11 @@ func FormatOptionalTime(t *time.Time) *string {
 	formattedTime := FormatTime(*t)
 	return &formattedTime
 }
+
+func FormatOptionalDate(t *time.Time) *string {
+	if t == nil {
+		return nil
+	}
+	formattedDate := t.Format(config.DateFormat)
+	return &formattedDate
+}

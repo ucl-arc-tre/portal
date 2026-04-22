@@ -80,10 +80,9 @@ func TestIntegration_CreateAsset(t *testing.T) {
 		Status:               openapi.AssetBaseStatusActive,
 	}
 
-	validationErr, err := svc.CreateAsset(user, assetData, studyID)
+	err = svc.CreateAsset(user, assetData, studyID)
 
 	require.NoError(t, err)
-	require.Nil(t, validationErr)
 
 	// Verify asset exists
 	var asset types.Asset
