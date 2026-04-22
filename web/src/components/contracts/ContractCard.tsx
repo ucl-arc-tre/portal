@@ -11,7 +11,7 @@ type ContractCardProps = {
 };
 
 export default function ContractCard({ studyId, contract }: ContractCardProps) {
-  const expiryUrgency = calculateExpiryUrgency(new Date(contract.expiry_date));
+  const expiryUrgency = contract.expiry_date ? calculateExpiryUrgency(new Date(contract.expiry_date)) : null;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -60,7 +60,7 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
 
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Expiry Date: </span>
-          <span className={styles.value}>{formatDate(contract.expiry_date)}</span>
+          <span className={styles.value}>{contract.expiry_date ? formatDate(contract.expiry_date) : "None"}</span>
         </div>
 
         <div className={styles["detail-item"]}>

@@ -562,6 +562,23 @@ type AssetBaseProtection string
 // AssetBaseStatus Status of the asset
 type AssetBaseStatus string
 
+// AssetImport defines model for AssetImport.
+type AssetImport struct {
+	CreatedAt          string   `json:"created_at"`
+	Description        string   `json:"description"`
+	ExpiresAt          string   `json:"expires_at"`
+	Format             string   `json:"format"`
+	HasDspt            bool     `json:"has_dspt"`
+	LegalBasis         string   `json:"legal_basis"`
+	Locations          []string `json:"locations"`
+	Protection         string   `json:"protection"`
+	RequiresContract   bool     `json:"requires_contract"`
+	Status             string   `json:"status"`
+	StoredOutsideUkEea bool     `json:"stored_outside_uk_eea"`
+	Tier               int      `json:"tier"`
+	Title              string   `json:"title"`
+}
+
 // Auth defines model for Auth.
 type Auth struct {
 	// Roles List of roles assigned to the user. This array can contain both:
@@ -591,7 +608,7 @@ type Contract struct {
 	CreatedAt string `json:"created_at"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
-	ExpiryDate string `json:"expiry_date"`
+	ExpiryDate *string `json:"expiry_date,omitempty"`
 
 	// Id Unique identifier for the contract
 	Id              string                   `json:"id"`
@@ -604,7 +621,7 @@ type Contract struct {
 	OtherSignatories *string `json:"other_signatories,omitempty"`
 
 	// StartDate Contract start date in YYYY-MM-DD format
-	StartDate string `json:"start_date"`
+	StartDate *string `json:"start_date,omitempty"`
 
 	// Status Current status of the contract
 	Status ContractStatus `json:"status"`
@@ -613,7 +630,7 @@ type Contract struct {
 	StudyId string `json:"study_id"`
 
 	// ThirdPartyName Name of the third party organization
-	ThirdPartyName string `json:"third_party_name"`
+	ThirdPartyName *string `json:"third_party_name,omitempty"`
 
 	// Title Name of the contract
 	Title string `json:"title"`
@@ -631,7 +648,7 @@ type ContractBase struct {
 	AssetIds []string `json:"asset_ids"`
 
 	// ExpiryDate Contract expiry date in YYYY-MM-DD format
-	ExpiryDate string `json:"expiry_date"`
+	ExpiryDate *string `json:"expiry_date,omitempty"`
 
 	// OrganisationSignatory Email of the organisation signatory
 	OrganisationSignatory string `json:"organisation_signatory"`
@@ -640,13 +657,13 @@ type ContractBase struct {
 	OtherSignatories *string `json:"other_signatories,omitempty"`
 
 	// StartDate Contract start date in YYYY-MM-DD format
-	StartDate string `json:"start_date"`
+	StartDate *string `json:"start_date,omitempty"`
 
 	// Status Current status of the contract
 	Status ContractBaseStatus `json:"status"`
 
 	// ThirdPartyName Name of the third party organization
-	ThirdPartyName string `json:"third_party_name"`
+	ThirdPartyName *string `json:"third_party_name,omitempty"`
 
 	// Title Name of the contract
 	Title string `json:"title"`
@@ -654,6 +671,17 @@ type ContractBase struct {
 
 // ContractBaseStatus Current status of the contract
 type ContractBaseStatus string
+
+// ContractImport defines model for ContractImport.
+type ContractImport struct {
+	CreatedAt             string  `json:"created_at"`
+	ExpiryAt              *string `json:"expiry_at,omitempty"`
+	OrganisationSignatory *string `json:"organisation_signatory,omitempty"`
+	StartAt               *string `json:"start_at,omitempty"`
+	Status                string  `json:"status"`
+	ThirdPartyName        *string `json:"third_party_name,omitempty"`
+	Title                 string  `json:"title"`
+}
 
 // ContractObject defines model for ContractObject.
 type ContractObject struct {
@@ -997,6 +1025,50 @@ type StudyBase struct {
 	Title string `json:"title"`
 }
 
+// StudyImport defines model for StudyImport.
+type StudyImport struct {
+	AdditionalStudyAdminUsername *string `json:"additional_study_admin_username,omitempty"`
+
+	// AdminAgreedAt Time in RFC3339 format when the owner agreed to the IAA agreement
+	AdminAgreedAt  *string `json:"admin_agreed_at,omitempty"`
+	ApprovalStatus string  `json:"approval_status"`
+	CagReference   *string `json:"cag_reference,omitempty"`
+	Caseref        int     `json:"caseref"`
+
+	// CreatedAt Time in RFC3339 format when the study was created
+	CreatedAt                        string  `json:"created_at"`
+	DataControllerOrganisation       string  `json:"data_controller_organisation"`
+	DataProtectionNumber             *string `json:"data_protection_number,omitempty"`
+	Description                      *string `json:"description,omitempty"`
+	Feedback                         *string `json:"feedback,omitempty"`
+	InvolvesCag                      *bool   `json:"involves_cag,omitempty"`
+	InvolvesDataProcessingOutsideEea *bool   `json:"involves_data_processing_outside_eea,omitempty"`
+	InvolvesEthicsApproval           *bool   `json:"involves_ethics_approval,omitempty"`
+	InvolvesExternalUsers            *bool   `json:"involves_external_users,omitempty"`
+	InvolvesHraApproval              *bool   `json:"involves_hra_approval,omitempty"`
+	InvolvesIndirectDataCollection   *bool   `json:"involves_indirect_data_collection,omitempty"`
+	InvolvesMnca                     *bool   `json:"involves_mnca,omitempty"`
+	InvolvesNhsEngland               *bool   `json:"involves_nhs_england,omitempty"`
+	InvolvesParticipantConsent       *bool   `json:"involves_participant_consent,omitempty"`
+	InvolvesThirdParty               *bool   `json:"involves_third_party,omitempty"`
+	InvolvesUclSponsorship           *bool   `json:"involves_ucl_sponsorship,omitempty"`
+	IrasId                           *string `json:"iras_id,omitempty"`
+	IsDataProtectionOfficeRegistered *bool   `json:"is_data_protection_office_registered,omitempty"`
+	IsNhsAssociated                  *bool   `json:"is_nhs_associated,omitempty"`
+	LastSignoff                      *string `json:"last_signoff,omitempty"`
+	NhsEnglandReference              *string `json:"nhs_england_reference,omitempty"`
+
+	// OwnerAgreedAt Time in RFC3339 format when the owner agreed to the IAO agreement
+	OwnerAgreedAt *string `json:"owner_agreed_at,omitempty"`
+	OwnerUsername string  `json:"owner_username"`
+	RequiresDbs   *bool   `json:"requires_dbs,omitempty"`
+	RequiresDspt  *bool   `json:"requires_dspt,omitempty"`
+	Title         string  `json:"title"`
+
+	// UpdatedAt Time in RFC3339 format when the study was last updated
+	UpdatedAt string `json:"updated_at"`
+}
+
 // StudyRequest Base study properties
 type StudyRequest = StudyBase
 
@@ -1165,6 +1237,15 @@ type PutProjectsTreProjectIdJSONRequestBody = ProjectTREUpdate
 // PostStudiesJSONRequestBody defines body for PostStudies for application/json ContentType.
 type PostStudiesJSONRequestBody = StudyRequest
 
+// PostStudiesAdminImportJSONRequestBody defines body for PostStudiesAdminImport for application/json ContentType.
+type PostStudiesAdminImportJSONRequestBody = StudyImport
+
+// PostStudiesAdminStudyIdAssetsImportJSONRequestBody defines body for PostStudiesAdminStudyIdAssetsImport for application/json ContentType.
+type PostStudiesAdminStudyIdAssetsImportJSONRequestBody = AssetImport
+
+// PostStudiesAdminStudyIdContractsImportJSONRequestBody defines body for PostStudiesAdminStudyIdContractsImport for application/json ContentType.
+type PostStudiesAdminStudyIdContractsImportJSONRequestBody = ContractImport
+
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
 
@@ -1263,6 +1344,15 @@ type ServerInterface interface {
 
 	// (POST /studies)
 	PostStudies(c *gin.Context)
+
+	// (POST /studies/admin/import)
+	PostStudiesAdminImport(c *gin.Context)
+
+	// (POST /studies/admin/{studyId}/assets/import)
+	PostStudiesAdminStudyIdAssetsImport(c *gin.Context, studyId StudyIdParam)
+
+	// (POST /studies/admin/{studyId}/contracts/import)
+	PostStudiesAdminStudyIdContractsImport(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId StudyIdParam)
@@ -1743,6 +1833,67 @@ func (siw *ServerInterfaceWrapper) PostStudies(c *gin.Context) {
 	}
 
 	siw.Handler.PostStudies(c)
+}
+
+// PostStudiesAdminImport operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminImport(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminImport(c)
+}
+
+// PostStudiesAdminStudyIdAssetsImport operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdAssetsImport(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdAssetsImport(c, studyId)
+}
+
+// PostStudiesAdminStudyIdContractsImport operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdContractsImport(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdContractsImport(c, studyId)
 }
 
 // PostStudiesAdminStudyIdReview operation middleware
@@ -2517,6 +2668,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
 	router.GET(options.BaseURL+"/studies", wrapper.GetStudies)
 	router.POST(options.BaseURL+"/studies", wrapper.PostStudies)
+	router.POST(options.BaseURL+"/studies/admin/import", wrapper.PostStudiesAdminImport)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/assets/import", wrapper.PostStudiesAdminStudyIdAssetsImport)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/contracts/import", wrapper.PostStudiesAdminStudyIdContractsImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)

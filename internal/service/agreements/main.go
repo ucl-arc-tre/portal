@@ -43,12 +43,6 @@ func (s *Service) latestAgreement(agreementType types.AgreementType) (*types.Agr
 	result := s.db.Where("type = ?", agreementType).
 		Order("created_at desc").
 		Limit(1).
-		Find(&agreemeent)
-	if result.Error != nil {
-		return nil, types.NewErrServerError(result.Error)
-	}
-	if result.RowsAffected == 0 {
-		return nil, types.NewNotFoundError("no agreements")
-	}
-	return &agreemeent, nil
+		First(&agreemeent)
+	return &agreemeent, types.NewErrFromGorm(result.Error, "failed to get latest agreement")
 }

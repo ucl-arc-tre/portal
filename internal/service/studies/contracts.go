@@ -32,7 +32,11 @@ func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data 
 		return openapi.NewValidationError("OtherSignatories must be a short string")
 	}
 
-	if !validation.ContractNamePattern.MatchString(data.ThirdPartyName) {
+	if data.OtherSignatories != nil && !validation.OtherSignatoriesStringPattern.MatchString(*data.OtherSignatories) {
+		return openapi.NewValidationError("OtherSignatories must be a short string")
+	}
+
+	if data.ThirdPartyName != nil && !validation.ContractNamePattern.MatchString(*data.ThirdPartyName) {
 		return openapi.NewValidationError("Third party name must be between 2 and 100 characters")
 	}
 
@@ -42,22 +46,22 @@ func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data 
 		return openapi.NewValidationError("Status must be proposed, active, or expired")
 	}
 
-	if data.StartDate == "" {
+	if data.StartDate == nil {
 		return openapi.NewValidationError("Start date is required")
 	}
 
 	// Validate start date format
-	startDate, err := time.Parse(config.DateFormat, data.StartDate)
+	startDate, err := time.Parse(config.DateFormat, *data.StartDate)
 	if err != nil {
 		return openapi.NewValidationError("Invalid start date format")
 	}
 
-	if data.ExpiryDate == "" {
+	if data.ExpiryDate == nil {
 		return openapi.NewValidationError("Expiry date is required")
 	}
 
 	// Validate expiry date format
-	expiryDate, err := time.Parse(config.DateFormat, data.ExpiryDate)
+	expiryDate, err := time.Parse(config.DateFormat, *data.ExpiryDate)
 	if err != nil {
 		return openapi.NewValidationError("Invalid expiry date format")
 	}
@@ -106,7 +110,7 @@ func (s *Service) CreateContract(
 	if err != nil {
 		return nil, err
 	}
-	contract.SignatoryUserId = signatory.ID
+	contract.SignatoryUserId = &signatory.ID
 	contract.SignatoryUser = signatory
 
 	// Store the contract metadata in the database first to generate an ID
@@ -238,7 +242,7 @@ func (s *Service) UpdateContract(
 	if err != nil {
 		return nil, err
 	}
-	contract.SignatoryUserId = signatory.ID
+	contract.SignatoryUserId = &signatory.ID
 	contract.SignatoryUser = signatory
 
 	tx := s.db.Begin()
@@ -316,23 +320,28 @@ func (s *Service) persistedContractSignatory(ctx context.Context, signatory stri
 }
 
 func contractFromBase(contractBase openapi.ContractBase) (*types.Contract, error) {
-	startDate, err := time.Parse(config.DateFormat, contractBase.StartDate)
-	if err != nil {
-		return nil, types.NewErrInvalidObject("invalid start date format")
-	}
-
-	expiryDate, err := time.Parse(config.DateFormat, contractBase.ExpiryDate)
-	if err != nil {
-		return nil, types.NewErrInvalidObject("invalid end date format")
-	}
 
 	contract := types.Contract{
 		Title:            contractBase.Title,
 		ThirdPartyName:   contractBase.ThirdPartyName,
-		StartDate:        startDate,
-		ExpiryDate:       expiryDate,
 		Status:           string(contractBase.Status),
 		OtherSignatories: contractBase.OtherSignatories,
+	}
+
+	if contractBase.StartDate != nil {
+		startDate, err := time.Parse(config.DateFormat, *contractBase.StartDate)
+		if err != nil {
+			return nil, types.NewErrInvalidObject("invalid start date format")
+		}
+		contract.StartDate = &startDate
+	}
+
+	if contractBase.ExpiryDate != nil {
+		expiryDate, err := time.Parse(config.DateFormat, *contractBase.ExpiryDate)
+		if err != nil {
+			return nil, types.NewErrInvalidObject("invalid end date format")
+		}
+		contract.ExpiryDate = &expiryDate
 	}
 
 	for _, assetID := range contractBase.AssetIds {

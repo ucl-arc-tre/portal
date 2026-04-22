@@ -115,15 +115,15 @@ type AssetLocation struct {
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
-	StudyID          uuid.UUID `gorm:"index"`
-	CreatorUserID    uuid.UUID `gorm:"type:uuid;not null"`
-	SignatoryUserId  uuid.UUID `gorm:"type:uuid"`
+	StudyID          uuid.UUID  `gorm:"index"`
+	CreatorUserID    uuid.UUID  `gorm:"type:uuid;not null"`
+	SignatoryUserId  *uuid.UUID `gorm:"type:uuid"`
 	Title            string
-	ThirdPartyName   string
+	ThirdPartyName   *string
 	OtherSignatories *string // free text: could be name(s), email(s), UPN(s), organisations
 	Status           string  // proposed, active, expired
-	StartDate        time.Time
-	ExpiryDate       time.Time
+	StartDate        *time.Time
+	ExpiryDate       *time.Time
 
 	// Relationships
 	Study         Study                    `gorm:"foreignKey:StudyID"`
@@ -143,24 +143,31 @@ type ContractObjectMetadata struct {
 	Contract Contract
 }
 
-func (c Contract) DaysUntilExpiry() int {
-	return int(time.Until(c.ExpiryDate).Hours() / 24)
+func (c Contract) DaysUntilExpiry() *int {
+	if c.ExpiryDate == nil {
+		return nil
+	}
+	expiryDays := int(time.Until(*c.ExpiryDate).Hours() / 24)
+	return &expiryDays
 }
 
 func (s Study) EarliestExpringContractWithin30Days() *Contract {
 	var earliestContract *Contract
 	for _, contract := range s.Contracts {
-		if earliestContract != nil && contract.DaysUntilExpiry() > earliestContract.DaysUntilExpiry() {
+		daysUntilExpiry := contract.DaysUntilExpiry()
+		if daysUntilExpiry == nil {
 			continue
 		}
-		if contract.DaysUntilExpiry() < 0 {
+		if earliestContract != nil && *daysUntilExpiry > *earliestContract.DaysUntilExpiry() {
+			continue
+		}
+		if *daysUntilExpiry < 0 {
 			earliestContract = &contract
-		} else if contract.DaysUntilExpiry() == 1 {
+		} else if *daysUntilExpiry == 1 {
 			earliestContract = &contract
-		} else if contract.DaysUntilExpiry() == 7 || contract.DaysUntilExpiry() == 14 || contract.DaysUntilExpiry() == 30 {
+		} else if *daysUntilExpiry == 7 || *daysUntilExpiry == 14 || *daysUntilExpiry == 30 {
 			earliestContract = &contract
 		}
-
 	}
 	return earliestContract
 }

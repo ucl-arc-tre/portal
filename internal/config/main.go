@@ -22,7 +22,7 @@ const (
 
 	TimeFormat     = time.RFC3339
 	DateFormat     = "2006-01-02" // YYYY-MM-DD format for dates
-	MaxUploadBytes = 1e7          // 10 MB
+	MaxUploadBytes = 1e8          // 100 MB
 
 	TrainingValidityYears = 1
 	TrainingValidity      = TrainingValidityYears * 365 * 24 * time.Hour
