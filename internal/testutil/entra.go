@@ -35,7 +35,11 @@ func (f *FakeEntra) SendCustomInviteNotification(ctx context.Context, email stri
 	panic("not implemented")
 }
 
-func (f *FakeEntra) SendExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
+func (f *FakeEntra) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
+	panic("not implemented")
+}
+
+func (f *FakeEntra) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
 	panic("not implemented")
 }
 
