@@ -14,7 +14,7 @@ var (
 )
 
 type ErrClientInvalidObject struct {
-	ClientReadableReason string // Client readable
+	ClientReadableReason string
 }
 
 func (e ErrClientInvalidObject) Error() string {
