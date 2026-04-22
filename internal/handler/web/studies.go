@@ -20,46 +20,6 @@ var (
 	caserefPattern = regexp.MustCompile(`^[0-9]{1,5}$`)
 )
 
-func studyToOpenApiStudy(study types.Study) openapi.Study {
-	ownerUserIDStr := study.OwnerUserID.String()
-	ownerUsernameStr := string(study.Owner.Username)
-
-	return openapi.Study{
-		Id:                               study.ID.String(),
-		Title:                            study.Title,
-		Description:                      study.Description,
-		OwnerUserId:                      &ownerUserIDStr,
-		OwnerUsername:                    &ownerUsernameStr,
-		ApprovalStatus:                   openapi.ApprovalStatus(study.ApprovalStatus),
-		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
-		DataControllerOrganisation:       study.DataControllerOrganisation,
-		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
-		InvolvesCag:                      study.InvolvesCag,
-		CagReference:                     study.CagReference,
-		InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
-		InvolvesHraApproval:              study.InvolvesHraApproval,
-		IrasId:                           study.IrasId,
-		IsNhsAssociated:                  study.IsNhsAssociated,
-		InvolvesNhsEngland:               study.InvolvesNhsEngland,
-		NhsEnglandReference:              study.NhsEnglandReference,
-		InvolvesMnca:                     study.InvolvesMnca,
-		RequiresDspt:                     study.RequiresDspt,
-		RequiresDbs:                      study.RequiresDbs,
-		IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
-		DataProtectionNumber:             study.DataProtectionNumber,
-		InvolvesThirdParty:               study.InvolvesThirdParty,
-		InvolvesExternalUsers:            study.InvolvesExternalUsers,
-		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
-		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
-		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
-		Feedback:                         study.Feedback,
-		CreatedAt:                        openapi.FormatTime(study.CreatedAt),
-		UpdatedAt:                        openapi.FormatTime(study.UpdatedAt),
-		LastSignoff:                      openapi.FormatOptionalTime(study.LastSignoff),
-		Caseref:                          study.Caseref,
-	}
-}
-
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
 	if !params.Valid() {
 		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
@@ -379,4 +339,46 @@ func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, study
 	}
 
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}
+
+// Helper functions
+
+func studyToOpenApiStudy(study types.Study) openapi.Study {
+	ownerUserIDStr := study.OwnerUserID.String()
+	ownerUsernameStr := string(study.Owner.Username)
+
+	return openapi.Study{
+		Id:                               study.ID.String(),
+		Title:                            study.Title,
+		Description:                      study.Description,
+		OwnerUserId:                      &ownerUserIDStr,
+		OwnerUsername:                    &ownerUsernameStr,
+		ApprovalStatus:                   openapi.ApprovalStatus(study.ApprovalStatus),
+		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
+		DataControllerOrganisation:       study.DataControllerOrganisation,
+		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
+		InvolvesCag:                      study.InvolvesCag,
+		CagReference:                     study.CagReference,
+		InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
+		InvolvesHraApproval:              study.InvolvesHraApproval,
+		IrasId:                           study.IrasId,
+		IsNhsAssociated:                  study.IsNhsAssociated,
+		InvolvesNhsEngland:               study.InvolvesNhsEngland,
+		NhsEnglandReference:              study.NhsEnglandReference,
+		InvolvesMnca:                     study.InvolvesMnca,
+		RequiresDspt:                     study.RequiresDspt,
+		RequiresDbs:                      study.RequiresDbs,
+		IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
+		DataProtectionNumber:             study.DataProtectionNumber,
+		InvolvesThirdParty:               study.InvolvesThirdParty,
+		InvolvesExternalUsers:            study.InvolvesExternalUsers,
+		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
+		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
+		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
+		Feedback:                         study.Feedback,
+		CreatedAt:                        openapi.FormatTime(study.CreatedAt),
+		UpdatedAt:                        openapi.FormatTime(study.UpdatedAt),
+		LastSignoff:                      openapi.FormatOptionalTime(study.LastSignoff),
+		Caseref:                          study.Caseref,
+	}
 }

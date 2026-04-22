@@ -9,38 +9,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-// Helper functions
-
-func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
-	contractIds := []string{}
-	for _, contract := range asset.Contracts {
-		contractIds = append(contractIds, contract.ID.String())
-	}
-	return openapi.Asset{
-		Id:                   asset.ID.String(),
-		CreatorUserId:        asset.CreatorUserID.String(),
-		StudyId:              asset.StudyID.String(),
-		Title:                asset.Title,
-		Description:          asset.Description,
-		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
-		Tier:                 asset.Tier,
-		Protection:           openapi.AssetProtection(asset.Protection),
-		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
-		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            openapi.FormatOptionalTime(asset.ExpiresAt),
-		Locations:            asset.LocationStrings(),
-		RequiresContract:     asset.RequiresContract,
-		HasDspt:              asset.HasDspt,
-		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
-		Status:               openapi.AssetStatus(asset.Status),
-		CreatedAt:            openapi.FormatTime(asset.CreatedAt),
-		UpdatedAt:            openapi.FormatTime(asset.UpdatedAt),
-		ContractIds:          contractIds,
-	}
-}
-
-// Handler methods
-
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
@@ -143,4 +111,34 @@ func (h *Handler) DeleteStudiesStudyIdAssetsAssetId(
 	}
 
 	ctx.Status(http.StatusNoContent)
+}
+
+// Helper functions
+
+func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
+	contractIds := []string{}
+	for _, contract := range asset.Contracts {
+		contractIds = append(contractIds, contract.ID.String())
+	}
+	return openapi.Asset{
+		Id:                   asset.ID.String(),
+		CreatorUserId:        asset.CreatorUserID.String(),
+		StudyId:              asset.StudyID.String(),
+		Title:                asset.Title,
+		Description:          asset.Description,
+		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
+		Tier:                 asset.Tier,
+		Protection:           openapi.AssetProtection(asset.Protection),
+		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
+		Format:               openapi.AssetFormat(asset.Format),
+		ExpiresAt:            openapi.FormatOptionalTime(asset.ExpiresAt),
+		Locations:            asset.LocationStrings(),
+		RequiresContract:     asset.RequiresContract,
+		HasDspt:              asset.HasDspt,
+		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
+		Status:               openapi.AssetStatus(asset.Status),
+		CreatedAt:            openapi.FormatTime(asset.CreatedAt),
+		UpdatedAt:            openapi.FormatTime(asset.UpdatedAt),
+		ContractIds:          contractIds,
+	}
 }
