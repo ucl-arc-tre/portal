@@ -139,8 +139,10 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
 	}
 	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
-	if *days <= 0 {
+	if *days < 0 {
 		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract."
+	} else if *days == 0 {
+		content += "today. Please sign in to the Portal to upload a new contract."
 	} else if *days == 1 {
 		content += "tomorrow. Please sign in to the Portal to upload a new contract."
 	} else {
@@ -153,9 +155,11 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 
 func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
 	days := config.DaysUntilTrainingExpiry(training)
-	content := "You have a training certificate that is due to expire "
-	if days <= 0 {
+	content := "You have a training certificate that expires "
+	if days < 0 {
 		content = "You have a training certificate that has expired. Please sign in to the Portal to upload a new certificate."
+	} else if days == 0 {
+		content += "today. Please sign in to the Portal to upload a new certificate."
 	} else if days == 1 {
 		content += "tomorrow. Please sign in to the Portal to upload a new certificate."
 	} else {

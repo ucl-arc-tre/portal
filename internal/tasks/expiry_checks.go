@@ -32,8 +32,8 @@ func (m *Manager) checkContractsExpiry() error {
 			recipients = append(recipients, string(studyAdmin.User.Username))
 		}
 
-		contract := study.EarliestExpringContract()
-		if contract == nil || !contract.ShouldNotifyExpiry() {
+		contract := study.EarliestExpringContractShouldNotifyExpiry()
+		if contract == nil {
 			continue
 		}
 		err := m.entra.SendContractExpiryNotification(ctx, recipients, *contract, study)
