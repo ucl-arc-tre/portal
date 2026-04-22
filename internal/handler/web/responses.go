@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -16,6 +17,14 @@ func setError(ctx *gin.Context, err error, message string) {
 	if err == nil {
 		panic(fmt.Errorf("set error called with nil error [%v]", message))
 	}
+
+	if v, ok := errors.AsType[types.ErrClientInvalidObject](err); ok {
+		ctx.JSON(http.StatusNotAcceptable, openapi.ValidationError{
+			ErrorMessage: v.ClientReadableReason,
+		})
+		return
+	}
+
 	statusCode := 520
 	if errors.Is(err, types.ErrServerError) {
 		statusCode = http.StatusInternalServerError
