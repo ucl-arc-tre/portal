@@ -3,9 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
@@ -14,10 +12,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
-)
-
-var (
-	caserefPattern = regexp.MustCompile(`^[0-9]{1,5}$`)
 )
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
@@ -38,13 +32,13 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		Limit:          12,
 		Offset:         0,
 	}
-	if queryIsCaseref(params.Query) {
+	if params.QueryIsCaseref() {
 		caseref, err := strconv.Atoi(*params.Query)
 		if err != nil {
 			return []types.Study{}, types.NewErrInvalidObject("caseref was not int")
 		}
 		queryParams.CaseRef = &caseref
-	} else if queryIsOwnerUsername(params.Query) {
+	} else if params.QueryIsOwnerUsername() {
 		queryParams.OwnerUsername = params.Query
 	} else if params.Query != nil {
 		queryParams.FuzzyTitle = params.Query
@@ -56,22 +50,6 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		queryParams.Offset = *params.Offset
 	}
 	return h.studies.AllStudies(queryParams)
-}
-
-func queryIsCaseref(query *string) bool {
-	if query == nil {
-		return false
-	} else if len(*query) > 5 {
-		return false
-	}
-	return caserefPattern.MatchString(strings.TrimLeft(*query, "0"))
-}
-
-func queryIsOwnerUsername(query *string) bool {
-	if query == nil {
-		return false
-	}
-	return types.Username(*query).IsValid()
 }
 
 func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
