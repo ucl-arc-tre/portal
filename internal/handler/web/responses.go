@@ -17,6 +17,14 @@ func setError(ctx *gin.Context, err error, message string) {
 	if err == nil {
 		panic(fmt.Errorf("set error called with nil error [%v]", message))
 	}
+
+	if v, ok := errors.AsType[*types.ErrClientInvalidObject](err); ok && v != nil {
+		ctx.JSON(http.StatusBadRequest, openapi.ValidationError{
+			ErrorMessage: v.ClientReadableReason,
+		})
+		return
+	}
+
 	statusCode := 520
 	if errors.Is(err, types.ErrServerError) {
 		statusCode = http.StatusInternalServerError
@@ -32,12 +40,6 @@ func setError(ctx *gin.Context, err error, message string) {
 	ctx.Status(statusCode)
 }
 
-func setValidationError(ctx *gin.Context, message string) {
-	ctx.JSON(http.StatusBadRequest, openapi.ValidationError{
-		ErrorMessage: message,
-	})
-}
-
 func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 	err := ctx.ShouldBindJSON(&obj)
 	if err != nil {
@@ -49,7 +51,7 @@ func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 func parseUUIDOrSetError(ctx *gin.Context, id string) (uuid.UUID, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expeced uuid")
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expected uuid")
 		return [16]byte{}, err
 	}
 	return uuid, nil
@@ -60,7 +62,7 @@ func parseUUIDsOrSetError(ctx *gin.Context, ids ...string) ([]uuid.UUID, error) 
 	for _, id := range ids {
 		uuid, err := uuid.Parse(id)
 		if err != nil {
-			setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expeced uuid")
+			setError(ctx, types.NewErrInvalidObject(err), "Invalid id. Expected uuid")
 			return uuids, err
 		}
 		uuids = append(uuids, uuid)

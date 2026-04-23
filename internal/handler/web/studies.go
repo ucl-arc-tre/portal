@@ -3,12 +3,9 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -16,56 +13,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
-
-var (
-	caserefPattern = regexp.MustCompile(`^[0-9]{1,5}$`)
-)
-
-func studyToOpenApiStudy(study types.Study) openapi.Study {
-	ownerUserIDStr := study.OwnerUserID.String()
-	ownerUsernameStr := string(study.Owner.Username)
-
-	var lastSignoff *string
-	if study.LastSignoff != nil {
-		formatted := study.LastSignoff.Format(config.TimeFormat)
-		lastSignoff = &formatted
-	}
-
-	return openapi.Study{
-		Id:                               study.ID.String(),
-		Title:                            study.Title,
-		Description:                      study.Description,
-		OwnerUserId:                      &ownerUserIDStr,
-		OwnerUsername:                    &ownerUsernameStr,
-		ApprovalStatus:                   openapi.ApprovalStatus(study.ApprovalStatus),
-		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
-		DataControllerOrganisation:       study.DataControllerOrganisation,
-		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
-		InvolvesCag:                      study.InvolvesCag,
-		CagReference:                     study.CagReference,
-		InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
-		InvolvesHraApproval:              study.InvolvesHraApproval,
-		IrasId:                           study.IrasId,
-		IsNhsAssociated:                  study.IsNhsAssociated,
-		InvolvesNhsEngland:               study.InvolvesNhsEngland,
-		NhsEnglandReference:              study.NhsEnglandReference,
-		InvolvesMnca:                     study.InvolvesMnca,
-		RequiresDspt:                     study.RequiresDspt,
-		RequiresDbs:                      study.RequiresDbs,
-		IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
-		DataProtectionNumber:             study.DataProtectionNumber,
-		InvolvesThirdParty:               study.InvolvesThirdParty,
-		InvolvesExternalUsers:            study.InvolvesExternalUsers,
-		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
-		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
-		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
-		Feedback:                         study.Feedback,
-		CreatedAt:                        study.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:                        study.UpdatedAt.Format(config.TimeFormat),
-		LastSignoff:                      lastSignoff,
-		Caseref:                          study.Caseref,
-	}
-}
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
 	if !params.Valid() {
@@ -85,13 +32,13 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		Limit:          12,
 		Offset:         0,
 	}
-	if queryIsCaseref(params.Query) {
+	if params.QueryIsCaseref() {
 		caseref, err := strconv.Atoi(*params.Query)
 		if err != nil {
 			return []types.Study{}, types.NewErrInvalidObject("caseref was not int")
 		}
 		queryParams.CaseRef = &caseref
-	} else if queryIsOwnerUsername(params.Query) {
+	} else if params.QueryIsOwnerUsername() {
 		queryParams.OwnerUsername = params.Query
 	} else if params.Query != nil {
 		queryParams.FuzzyTitle = params.Query
@@ -103,22 +50,6 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		queryParams.Offset = *params.Offset
 	}
 	return h.studies.AllStudies(queryParams)
-}
-
-func queryIsCaseref(query *string) bool {
-	if query == nil {
-		return false
-	} else if len(*query) > 5 {
-		return false
-	}
-	return caserefPattern.MatchString(strings.TrimLeft(*query, "0"))
-}
-
-func queryIsOwnerUsername(query *string) bool {
-	if query == nil {
-		return false
-	}
-	return types.Username(*query).IsValid()
 }
 
 func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
@@ -191,12 +122,9 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateStudy(ctx, user, studyData)
+	err := h.studies.CreateStudy(ctx, user, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to create study")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -317,19 +245,13 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 	if err != nil {
 		return
 	}
+
 	studyData := openapi.StudyRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
-	validationError, err := h.studies.ValidateStudyData(ctx, studyData, true)
-	if err != nil {
-		setError(ctx, err, "Failed to validate study data")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
-		return
-	}
-	err = h.studies.UpdateStudy(studyUUID, studyData)
+
+	err = h.studies.UpdateStudy(ctx, studyUUID, studyData)
 	if err != nil {
 		setError(ctx, err, "Failed to update study")
 		return
@@ -386,4 +308,46 @@ func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, study
 	}
 
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
+}
+
+// Helper functions
+
+func studyToOpenApiStudy(study types.Study) openapi.Study {
+	ownerUserIDStr := study.OwnerUserID.String()
+	ownerUsernameStr := string(study.Owner.Username)
+
+	return openapi.Study{
+		Id:                               study.ID.String(),
+		Title:                            study.Title,
+		Description:                      study.Description,
+		OwnerUserId:                      &ownerUserIDStr,
+		OwnerUsername:                    &ownerUsernameStr,
+		ApprovalStatus:                   openapi.ApprovalStatus(study.ApprovalStatus),
+		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
+		DataControllerOrganisation:       study.DataControllerOrganisation,
+		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
+		InvolvesCag:                      study.InvolvesCag,
+		CagReference:                     study.CagReference,
+		InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
+		InvolvesHraApproval:              study.InvolvesHraApproval,
+		IrasId:                           study.IrasId,
+		IsNhsAssociated:                  study.IsNhsAssociated,
+		InvolvesNhsEngland:               study.InvolvesNhsEngland,
+		NhsEnglandReference:              study.NhsEnglandReference,
+		InvolvesMnca:                     study.InvolvesMnca,
+		RequiresDspt:                     study.RequiresDspt,
+		RequiresDbs:                      study.RequiresDbs,
+		IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
+		DataProtectionNumber:             study.DataProtectionNumber,
+		InvolvesThirdParty:               study.InvolvesThirdParty,
+		InvolvesExternalUsers:            study.InvolvesExternalUsers,
+		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
+		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
+		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
+		Feedback:                         study.Feedback,
+		CreatedAt:                        openapi.FormatTime(study.CreatedAt),
+		UpdatedAt:                        openapi.FormatTime(study.UpdatedAt),
+		LastSignoff:                      openapi.FormatOptionalTime(study.LastSignoff),
+		Caseref:                          study.Caseref,
+	}
 }

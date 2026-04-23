@@ -1,12 +1,10 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
@@ -27,12 +25,6 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 
 	var data openapi.ContractBase
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
-		return
-	}
-
-	validationError := h.studies.ValidateContract(ctx, studyUuid, data)
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -88,7 +80,7 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 		setError(ctx, err, "Failed to determine MIME type of file")
 		return
 	} else if !validation.IsValidContractMimeType(mimeType) {
-		setError(ctx, types.NewErrInvalidObject(fmt.Errorf("mime type was [%v] not valid", mimeType)), "Invalid MIME type")
+		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v] not valid", mimeType), "Invalid MIME type")
 		return
 	}
 
@@ -108,7 +100,7 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 	ctx.JSON(http.StatusOK, openapi.ContractObjectMetadata{
 		Filename:  metadata.Filename,
 		Id:        metadata.ID.String(),
-		CreatedAt: metadata.CreatedAt.Format(config.TimeFormat),
+		CreatedAt: openapi.FormatTime(metadata.CreatedAt),
 	})
 }
 
@@ -120,12 +112,6 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 
 	var data openapi.ContractBase
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
-		return
-	}
-
-	validationError := h.studies.ValidateContract(ctx, uuids[0], data)
-	if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -232,19 +218,13 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		ThirdPartyName:        contract.ThirdPartyName,
 		OtherSignatories:      contract.OtherSignatories,
 		Status:                openapi.ContractStatus(contract.Status),
-		CreatedAt:             contract.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:             contract.UpdatedAt.Format(config.TimeFormat),
+		CreatedAt:             openapi.FormatTime(contract.CreatedAt),
+		UpdatedAt:             openapi.FormatTime(contract.UpdatedAt),
 		StudyId:               contract.StudyID.String(),
 		ObjectsMetadata:       []openapi.ContractObjectMetadata{},
 		AssetIds:              []string{},
-	}
-	if contract.StartDate != nil {
-		startDate := contract.StartDate.Format(config.DateFormat)
-		data.StartDate = &startDate
-	}
-	if contract.ExpiryDate != nil {
-		expiryDate := contract.ExpiryDate.Format(config.DateFormat)
-		data.ExpiryDate = &expiryDate
+		StartDate:             openapi.FormatOptionalDate(contract.StartDate),
+		ExpiryDate:            openapi.FormatOptionalDate(contract.ExpiryDate),
 	}
 	for _, asset := range contract.Assets {
 		data.AssetIds = append(data.AssetIds, asset.ID.String())
@@ -253,7 +233,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		data.ObjectsMetadata = append(data.ObjectsMetadata, openapi.ContractObjectMetadata{
 			Filename:  object.Filename,
 			Id:        object.ID.String(),
-			CreatedAt: object.CreatedAt.Format(config.TimeFormat),
+			CreatedAt: openapi.FormatTime(object.CreatedAt),
 		})
 	}
 	return data

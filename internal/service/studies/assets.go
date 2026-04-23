@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"slices"
-
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
@@ -16,88 +14,51 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) validateAssetData(assetData openapi.AssetBase) (*openapi.ValidationError, error) {
-	// Validate title
+func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
-		return &openapi.ValidationError{ErrorMessage: "asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens"}, nil
+		return types.NewErrClientInvalidObjectF("asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
 	}
 
-	// Validate description
 	if !validation.AssetDescriptionPattern.MatchString(assetData.Description) {
-		return &openapi.ValidationError{ErrorMessage: "asset description must be 4-255 characters"}, nil
+		return types.NewErrClientInvalidObjectF("asset description must be 4-255 characters")
 	}
 
-	// Validate classification_impact
-	validClassifications := []openapi.AssetBaseClassificationImpact{
-		openapi.AssetBaseClassificationImpactPublic,
-		openapi.AssetBaseClassificationImpactConfidential,
-		openapi.AssetBaseClassificationImpactHighlyConfidential,
-	}
-	if !slices.Contains(validClassifications, assetData.ClassificationImpact) {
-		return &openapi.ValidationError{ErrorMessage: "classification_impact must be one of: public, confidential, highly_confidential"}, nil
+	if !assetData.ClassificationImpact.Valid() {
+		return types.NewErrClientInvalidObjectF("classification_impact must be one of: public, confidential, highly_confidential")
 	}
 
-	// Validate tier
 	if assetData.Tier < 0 || assetData.Tier > 4 {
-		return &openapi.ValidationError{ErrorMessage: "tier must be between 0 and 4"}, nil
+		return types.NewErrClientInvalidObjectF("tier must be between 0 and 4")
 	}
 
-	// Validate locations
 	if len(assetData.Locations) == 0 {
-		return &openapi.ValidationError{ErrorMessage: "at least one location must be specified"}, nil
+		return types.NewErrClientInvalidObjectF("at least one location must be specified")
 	}
 
-	// Validate protection field
-	validProtections := []openapi.AssetBaseProtection{
-		openapi.AssetBaseProtectionAnonymisation,
-		openapi.AssetBaseProtectionPseudonymisation,
-		openapi.AssetBaseProtectionIdentifiableLowConfidencePseudonymisation,
-	}
-	if !slices.Contains(validProtections, assetData.Protection) {
-		return &openapi.ValidationError{ErrorMessage: "protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation"}, nil
+	if !assetData.Protection.Valid() {
+		return types.NewErrClientInvalidObjectF("protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation")
 	}
 
-	// Validate legal_basis
-	validLegalBases := []openapi.AssetBaseLegalBasis{
-		openapi.AssetBaseLegalBasisConsent,
-		openapi.AssetBaseLegalBasisContract,
-		openapi.AssetBaseLegalBasisLegalObligation,
-		openapi.AssetBaseLegalBasisVitalInterests,
-		openapi.AssetBaseLegalBasisPublicTask,
-		openapi.AssetBaseLegalBasisLegitimateInterests,
-	}
-	if !slices.Contains(validLegalBases, assetData.LegalBasis) {
-		return &openapi.ValidationError{ErrorMessage: "legal_basis must be one of: consent, contract, legal_obligation, vital_interests, public_task, legitimate_interests"}, nil
+	if !assetData.LegalBasis.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid legal basis")
 	}
 
-	// Validate format field
-	validFormats := []openapi.AssetBaseFormat{
-		openapi.AssetBaseFormatElectronic,
-		openapi.AssetBaseFormatPaper,
-		openapi.AssetBaseFormatOther,
+	if !assetData.Format.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid format. must be one of: electronic, paper, other")
 	}
-	if !slices.Contains(validFormats, assetData.Format) {
-		return &openapi.ValidationError{ErrorMessage: "format must be one of: electronic, paper, other"}, nil
+
+	if !assetData.Status.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid status")
 	}
 
 	// Validate expiry field if provided
 	if assetData.ExpiresAt != nil {
 		if _, err := time.Parse(config.DateFormat, *assetData.ExpiresAt); err != nil {
-			return &openapi.ValidationError{ErrorMessage: "expiry date must be in YYYY-MM-DD format"}, nil
+			return types.NewErrClientInvalidObjectF("expiry date must be in %s format", config.DateFormat)
 		}
 	}
 
-	// Validate status field
-	validStatuses := []openapi.AssetBaseStatus{
-		openapi.AssetBaseStatusActive,
-		openapi.AssetBaseStatusAwaiting,
-		openapi.AssetBaseStatusDestroyed,
-	}
-	if !slices.Contains(validStatuses, assetData.Status) {
-		return &openapi.ValidationError{ErrorMessage: "status must be one of: active, awaiting, destroyed"}, nil
-	}
-
-	return nil, nil
+	return nil
 }
 
 // handles the database transaction for creating a study asset
@@ -120,7 +81,7 @@ func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
 	if assetData.ExpiresAt != nil {
 		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
 		if err != nil {
-			return nil, types.NewErrInvalidObject(fmt.Sprintf("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err))
+			return nil, types.NewErrInvalidObjectF("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err)
 		}
 		asset.ExpiresAt = &parsedDateTime
 	}
@@ -142,17 +103,16 @@ func (s *Service) checkAssetExists(studyID uuid.UUID, assetID uuid.UUID) error {
 	return nil
 }
 
-func (s *Service) CreateAsset(creator types.User, assetData openapi.AssetBase, studyID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) CreateAsset(creator types.User, assetData openapi.AssetBase, studyID uuid.UUID) error {
 	log.Debug().Any("studyID", studyID).Any("creator", creator).Msg("Creating asset")
 
-	validationError, err := s.validateAssetData(assetData)
-	if err != nil || validationError != nil {
-		return validationError, err
+	if err := s.validateAssetData(assetData); err != nil {
+		return err
 	}
 
 	asset, err := assetFromBase(assetData)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	asset.CreatorUserID = creator.ID
 	asset.StudyID = studyID
@@ -162,7 +122,7 @@ func (s *Service) CreateAsset(creator types.User, assetData openapi.AssetBase, s
 
 	if err := tx.Create(asset).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to create asset")
+		return types.NewErrFromGorm(err, "failed to create asset")
 	}
 
 	for _, locationStr := range assetData.Locations {
@@ -172,30 +132,29 @@ func (s *Service) CreateAsset(creator types.User, assetData openapi.AssetBase, s
 		}
 		if err := tx.Create(&assetLocation).Error; err != nil {
 			tx.Rollback()
-			return nil, types.NewErrFromGorm(err, "failed to create asset location")
+			return types.NewErrFromGorm(err, "failed to create asset location")
 		}
 	}
 
-	return nil, commitTransaction(tx)
+	return commitTransaction(tx)
 }
 
-func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, assetID uuid.UUID) (*openapi.ValidationError, *types.Asset, error) {
+func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, assetID uuid.UUID) (*types.Asset, error) {
 	log.Debug().Any("studyID", studyID).Any("assetID", assetID).Msg("Updating asset")
 
-	validationError, err := s.validateAssetData(assetData)
-	if err != nil || validationError != nil {
-		return validationError, nil, err
+	if err := s.validateAssetData(assetData); err != nil {
+		return nil, err
 	}
 
 	// verifies the asset exists and returns the existing asset so we can preserve uneditable fields
 	existingAsset, err := s.AssetById(studyID, assetID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	asset, err := assetFromBase(assetData)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	asset.ID = assetID
 	asset.StudyID = studyID
@@ -206,12 +165,12 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 
 	if err := tx.Model(asset).Select("*").Where("id = ? AND study_id = ?", assetID, studyID).Updates(asset).Error; err != nil {
 		tx.Rollback()
-		return nil, nil, types.NewErrFromGorm(err, "failed to update asset")
+		return nil, types.NewErrFromGorm(err, "failed to update asset")
 	}
 
 	if err := tx.Where("asset_id = ?", assetID).Delete(&types.AssetLocation{}).Error; err != nil {
 		tx.Rollback()
-		return nil, nil, types.NewErrFromGorm(err, "failed to delete asset locations")
+		return nil, types.NewErrFromGorm(err, "failed to delete asset locations")
 	}
 
 	for _, locationStr := range assetData.Locations {
@@ -221,36 +180,36 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 		}
 		if err := tx.Create(&assetLocation).Error; err != nil {
 			tx.Rollback()
-			return nil, nil, types.NewErrFromGorm(err, "failed to create asset location")
+			return nil, types.NewErrFromGorm(err, "failed to create asset location")
 		}
 	}
 
 	if err := commitTransaction(tx); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	updatedAsset, err := s.AssetById(studyID, assetID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return nil, &updatedAsset, nil
+	return &updatedAsset, nil
 }
 
-func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) (*openapi.ValidationError, error) {
+func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) error {
 	log.Debug().Any("studyID", studyID).Any("assetID", assetID).Msg("Deleting asset")
 
 	if err := s.checkAssetExists(studyID, assetID); err != nil {
-		return nil, err
+		return err
 	}
 
 	asset, err := s.AssetById(studyID, assetID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if len(asset.Contracts) > 0 {
-		return &openapi.ValidationError{ErrorMessage: "cannot delete asset that is linked to one or more contracts"}, nil
+		return types.NewErrClientInvalidObjectF("cannot delete asset that is linked to one or more contracts")
 	}
 
 	tx := s.db.Begin()
@@ -258,15 +217,15 @@ func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) (*openapi.Va
 
 	if err := tx.Where("asset_id = ?", assetID).Delete(&types.AssetLocation{}).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to delete asset locations")
+		return types.NewErrFromGorm(err, "failed to delete asset locations")
 	}
 
 	if err := tx.Where("id = ? AND study_id = ?", assetID, studyID).Delete(&types.Asset{}).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to delete asset")
+		return types.NewErrFromGorm(err, "failed to delete asset")
 	}
 
-	return nil, commitTransaction(tx)
+	return commitTransaction(tx)
 }
 
 // retrieves all assets for a study

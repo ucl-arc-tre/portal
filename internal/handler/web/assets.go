@@ -2,54 +2,12 @@ package web
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
-
-// Helper functions
-
-func formatExpiresAt(expiresAt *time.Time) *string {
-	if expiresAt == nil {
-		return nil
-	}
-	formattedDateTime := expiresAt.Format(config.TimeFormat)
-	return &formattedDateTime
-}
-
-func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
-	contractIds := []string{}
-	for _, contract := range asset.Contracts {
-		contractIds = append(contractIds, contract.ID.String())
-	}
-	return openapi.Asset{
-		Id:                   asset.ID.String(),
-		CreatorUserId:        asset.CreatorUserID.String(),
-		StudyId:              asset.StudyID.String(),
-		Title:                asset.Title,
-		Description:          asset.Description,
-		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
-		Tier:                 asset.Tier,
-		Protection:           openapi.AssetProtection(asset.Protection),
-		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
-		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            formatExpiresAt(asset.ExpiresAt),
-		Locations:            asset.LocationStrings(),
-		RequiresContract:     asset.RequiresContract,
-		HasDspt:              asset.HasDspt,
-		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
-		Status:               openapi.AssetStatus(asset.Status),
-		CreatedAt:            asset.CreatedAt.Format(config.TimeFormat),
-		UpdatedAt:            asset.UpdatedAt.Format(config.TimeFormat),
-		ContractIds:          contractIds,
-	}
-}
-
-// Handler methods
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
@@ -83,12 +41,9 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	}
 
 	user := middleware.GetUser(ctx)
-	validationError, err := h.studies.CreateAsset(user, assetData, studyUUID)
+	err = h.studies.CreateAsset(user, assetData, studyUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to create asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -121,12 +76,9 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 		return
 	}
 
-	validationError, asset, err := h.studies.UpdateAsset(assetData, uuids[0], uuids[1])
+	asset, err := h.studies.UpdateAsset(assetData, uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to update asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
@@ -143,14 +95,41 @@ func (h *Handler) DeleteStudiesStudyIdAssetsAssetId(
 		return
 	}
 
-	validationError, err := h.studies.DeleteAsset(uuids[0], uuids[1])
+	err = h.studies.DeleteAsset(uuids[0], uuids[1])
 	if err != nil {
 		setError(ctx, err, "Failed to delete asset")
-		return
-	} else if validationError != nil {
-		ctx.JSON(http.StatusBadRequest, *validationError)
 		return
 	}
 
 	ctx.Status(http.StatusNoContent)
+}
+
+// Helper functions
+
+func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
+	contractIds := []string{}
+	for _, contract := range asset.Contracts {
+		contractIds = append(contractIds, contract.ID.String())
+	}
+	return openapi.Asset{
+		Id:                   asset.ID.String(),
+		CreatorUserId:        asset.CreatorUserID.String(),
+		StudyId:              asset.StudyID.String(),
+		Title:                asset.Title,
+		Description:          asset.Description,
+		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
+		Tier:                 asset.Tier,
+		Protection:           openapi.AssetProtection(asset.Protection),
+		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
+		Format:               openapi.AssetFormat(asset.Format),
+		ExpiresAt:            openapi.FormatOptionalTime(asset.ExpiresAt),
+		Locations:            asset.LocationStrings(),
+		RequiresContract:     asset.RequiresContract,
+		HasDspt:              asset.HasDspt,
+		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
+		Status:               openapi.AssetStatus(asset.Status),
+		CreatedAt:            openapi.FormatTime(asset.CreatedAt),
+		UpdatedAt:            openapi.FormatTime(asset.UpdatedAt),
+		ContractIds:          contractIds,
+	}
 }

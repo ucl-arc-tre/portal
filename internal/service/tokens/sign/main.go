@@ -57,7 +57,7 @@ func (s *Service) CreateDSH(token types.Token) (*TokenWithValue, error) {
 		return nil, types.NewErrInvalidObject("cannot create an already expired token")
 	}
 	if token.ExpiresAt.After(time.Now().Add(config.MaxTokenValidity)) {
-		return nil, types.NewErrInvalidObject(fmt.Errorf("token had a expiry [%s] beyond the max", token.ExpiresAt))
+		return nil, types.NewErrInvalidObjectF("token had a expiry [%s] beyond the max", token.ExpiresAt)
 	}
 	if !validation.TokenNamePattern.MatchString(token.Name) {
 		return nil, types.NewErrInvalidObject("token had invalid name")

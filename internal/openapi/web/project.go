@@ -1,8 +1,6 @@
 package openapi
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -24,7 +22,7 @@ func parseManyUUID(values []string) ([]uuid.UUID, error) {
 	for _, value := range values {
 		assetUUID, err := uuid.Parse(value)
 		if err != nil {
-			return uuids, types.NewErrInvalidObject(fmt.Errorf("invalid ID format: %s", value))
+			return uuids, types.NewErrInvalidObjectF("invalid ID format: %s", value)
 		}
 		uuids = append(uuids, assetUUID)
 	}

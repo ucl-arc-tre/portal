@@ -18,74 +18,68 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *Service) ValidateContract(ctx context.Context, studyId uuid.UUID, data openapi.ContractBase) *openapi.ValidationError {
+func (s *Service) validateContract(ctx context.Context, studyId uuid.UUID, data openapi.ContractBase) error {
 	if !validation.ContractNamePattern.MatchString(data.Title) {
-		return openapi.NewValidationError("Title must be between 2 and 100 characters")
+		return types.NewErrClientInvalidObjectF("Title must be between 2 and 100 characters")
 	}
 
 	organisationSignatoryPattern := regexp.MustCompile(`^[^@]+@` + config.EntraTenantPrimaryDomain() + `$`)
 	if !organisationSignatoryPattern.MatchString(data.OrganisationSignatory) || entra.IsExternalUsername(types.Username(data.OrganisationSignatory)) {
-		return openapi.NewValidationError("Organisation signatory must be a valid internal email")
+		return types.NewErrClientInvalidObjectF("Organisation signatory must be a valid internal email")
 	}
 
 	if data.OtherSignatories != nil && !validation.OtherSignatoriesStringPattern.MatchString(*data.OtherSignatories) {
-		return openapi.NewValidationError("OtherSignatories must be a short string")
-	}
-
-	if data.OtherSignatories != nil && !validation.OtherSignatoriesStringPattern.MatchString(*data.OtherSignatories) {
-		return openapi.NewValidationError("OtherSignatories must be a short string")
+		return types.NewErrClientInvalidObjectF("OtherSignatories must be a short string")
 	}
 
 	if data.ThirdPartyName != nil && !validation.ContractNamePattern.MatchString(*data.ThirdPartyName) {
-		return openapi.NewValidationError("Third party name must be between 2 and 100 characters")
+		return types.NewErrClientInvalidObjectF("Third party name must be between 2 and 100 characters")
 	}
 
-	if openapi.ContractStatus(data.Status) != openapi.ContractStatusProposed &&
-		openapi.ContractStatus(data.Status) != openapi.ContractStatusActive &&
-		openapi.ContractStatus(data.Status) != openapi.ContractStatusExpired {
-		return openapi.NewValidationError("Status must be proposed, active, or expired")
+	if !data.Status.Valid() {
+		return types.NewErrClientInvalidObjectF("Status must be proposed, active, or expired")
 	}
 
 	if data.StartDate == nil {
-		return openapi.NewValidationError("Start date is required")
+		return types.NewErrClientInvalidObjectF("Start date is required")
 	}
 
 	// Validate start date format
 	startDate, err := time.Parse(config.DateFormat, *data.StartDate)
 	if err != nil {
-		return openapi.NewValidationError("Invalid start date format")
+		return types.NewErrClientInvalidObjectF("Invalid start date format")
 	}
 
 	if data.ExpiryDate == nil {
-		return openapi.NewValidationError("Expiry date is required")
+		return types.NewErrClientInvalidObjectF("Expiry date is required")
 	}
 
 	// Validate expiry date format
 	expiryDate, err := time.Parse(config.DateFormat, *data.ExpiryDate)
 	if err != nil {
-		return openapi.NewValidationError("Invalid expiry date format")
+		return types.NewErrClientInvalidObjectF("Invalid expiry date format")
 	}
 
 	if !startDate.Before(expiryDate) {
-		return openapi.NewValidationError("Start date must be before expiry date")
+		return types.NewErrClientInvalidObjectF("Start date must be before expiry date")
 	}
 
 	var numExistingAssets int64
 	err = s.db.Model(types.Asset{}).Where("study_id = ? AND id in ?", studyId, data.AssetIds).Count(&numExistingAssets).Error
 	if err != nil {
 		log.Err(err).Msg("Failed to find matching assets")
-		return openapi.NewValidationError("Failed to find matching assets")
+		return types.NewErrClientInvalidObjectF("Failed to find matching assets")
 	} else if numExistingAssets != int64(len(data.AssetIds)) {
-		return openapi.NewValidationError("Did not find existing study assets")
+		return types.NewErrClientInvalidObjectF("Did not find existing study assets")
 	}
 
 	signatoryUsernames, err := s.entra.FindUsernames(ctx, data.OrganisationSignatory)
 	if err != nil {
 		log.Err(err).Msg("Failed to find usernames from entra")
-		return openapi.NewValidationError("Failed to lookup organisation signatory in EntraID")
+		return types.NewErrClientInvalidObjectF("Failed to lookup organisation signatory in EntraID")
 	} else if len(signatoryUsernames) != 1 {
 		log.Debug().Any("signatoryUsernames", signatoryUsernames).Msg("Found organisation Signatory")
-		return openapi.NewValidationError("Organisation signatory did not match one person")
+		return types.NewErrClientInvalidObjectF("Organisation signatory did not match one person")
 	}
 
 	return nil
@@ -98,6 +92,10 @@ func (s *Service) CreateContract(
 	creator types.User,
 ) (*types.Contract, error) {
 	log.Debug().Msg("Storing contract")
+
+	if err := s.validateContract(ctx, studyID, contractBase); err != nil {
+		return nil, err
+	}
 
 	contract, err := contractFromBase(contractBase)
 	if err != nil {
@@ -228,6 +226,10 @@ func (s *Service) UpdateContract(
 	log.Debug().Any("contractId", contractID).Msg("Updating contract")
 
 	if err := s.checkContractExists(studyID, contractID); err != nil {
+		return nil, err
+	}
+
+	if err := s.validateContract(ctx, studyID, contractBase); err != nil {
 		return nil, err
 	}
 
