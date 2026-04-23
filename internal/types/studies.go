@@ -151,23 +151,32 @@ func (c Contract) DaysUntilExpiry() *int {
 	return &expiryDays
 }
 
-func (s Study) EarliestExpringContractWithin30Days() *Contract {
-	var earliestContract *Contract
+func (c Contract) ShouldNotifyExpiry() bool {
+	daysUntilExpiry := c.DaysUntilExpiry()
+	if daysUntilExpiry == nil {
+		return false
+	} else if *daysUntilExpiry < -90 {
+		return false // don't notify very expired contracts
+	}
+	return *daysUntilExpiry <= 1 || *daysUntilExpiry == 7 || *daysUntilExpiry == 14 || *daysUntilExpiry == 30
+}
+
+// Return the contract with the most urgent expiry notification.
+// Returns nil if there are no contracts that should notify the expiry for
+func (s Study) EarliestExpringContractShouldNotifyExpiry() *Contract {
+	var expiringContract *Contract
 	for _, contract := range s.Contracts {
+		if !contract.ShouldNotifyExpiry() {
+			continue
+		}
+		if expiringContract == nil {
+			expiringContract = &contract
+			continue
+		}
 		daysUntilExpiry := contract.DaysUntilExpiry()
-		if daysUntilExpiry == nil {
-			continue
-		}
-		if earliestContract != nil && *daysUntilExpiry > *earliestContract.DaysUntilExpiry() {
-			continue
-		}
-		if *daysUntilExpiry < 0 {
-			earliestContract = &contract
-		} else if *daysUntilExpiry == 1 {
-			earliestContract = &contract
-		} else if *daysUntilExpiry == 7 || *daysUntilExpiry == 14 || *daysUntilExpiry == 30 {
-			earliestContract = &contract
+		if daysUntilExpiry != nil && *daysUntilExpiry < *expiringContract.DaysUntilExpiry() {
+			expiringContract = &contract
 		}
 	}
-	return earliestContract
+	return expiringContract
 }

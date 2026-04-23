@@ -185,3 +185,19 @@ func ProcessIdentity() string {
 	}
 	return value
 }
+
+func DaysUntilTrainingExpiry(trainingRecord types.UserTrainingRecord) int {
+	expiresAt := trainingRecord.CompletedAt.Add(TrainingValidity)
+	return int(time.Until(expiresAt).Hours() / 24)
+}
+
+func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {
+	if trainingRecord.CompletedAt.IsZero() { // unset value
+		return false
+	}
+	daysUntilExpiry := DaysUntilTrainingExpiry(trainingRecord)
+	if daysUntilExpiry < -90 { // don't notify very expired training
+		return false
+	}
+	return daysUntilExpiry <= 1 || daysUntilExpiry == 7 || daysUntilExpiry == 14 || daysUntilExpiry == 21
+}

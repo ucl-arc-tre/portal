@@ -14,6 +14,7 @@ type Interface interface {
 	AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error
 	FindUsernames(ctx context.Context, query string) ([]types.Username, error)
 	SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor) error
-	SendExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error
+	SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error
+	SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error
 	SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error
 }

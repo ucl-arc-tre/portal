@@ -133,20 +133,39 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) SendExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
+func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
 	days := contract.DaysUntilExpiry()
 	if days == nil {
 		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
 	}
-	content := "You have a contract in the Study" + study.Title + " that is due to expire within"
-	if *days != 1 && *days > 0 {
-		content += fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract. "
+	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
+	if *days < 0 {
+		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract."
+	} else if *days == 0 {
+		content += "today. Please sign in to the Portal to upload a new contract."
 	} else if *days == 1 {
-		content += " the next 24 hours. Please sign in to the Portal to upload a new contract."
+		content += "tomorrow. Please sign in to the Portal to upload a new contract."
 	} else {
-		content = "You have a contract in the Study" + study.Title + " that has expired. Please sign in to the Portal to upload a new contract."
+		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract."
 	}
 
-	notificationMsg := "Notification: Your contract in" + study.Title + " is due to expire soon"
-	return c.createCustomEmail(ctx, notificationMsg, emails, content)
+	subject := "Notification: Your contract in" + study.Title + " is due to expire soon"
+	return c.createCustomEmail(ctx, subject, emails, content)
+}
+
+func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
+	days := config.DaysUntilTrainingExpiry(training)
+	content := "You have a training certificate that expires "
+	if days < 0 {
+		content = "You have a training certificate that has expired. Please sign in to the Portal to upload a new certificate."
+	} else if days == 0 {
+		content += "today. Please sign in to the Portal to upload a new certificate."
+	} else if days == 1 {
+		content += "tomorrow. Please sign in to the Portal to upload a new certificate."
+	} else {
+		content += "in " + fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate."
+	}
+
+	subject := "Notification: Your training certificate is due to expire soon"
+	return c.createCustomEmail(ctx, subject, []string{email}, content)
 }
