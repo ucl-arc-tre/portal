@@ -29,7 +29,7 @@ type ClientInterface interface {
 
 type Controller struct {
 	client   ClientInterface
-	uploader *awsS3Manager.Uploader
+	uploader *awsS3Manager.Uploader //nolint:staticcheck
 }
 
 func New() *Controller {
@@ -56,14 +56,14 @@ func New() *Controller {
 	)
 	controller := Controller{
 		client:   client,
-		uploader: awsS3Manager.NewUploader(client),
+		uploader: awsS3Manager.NewUploader(client), //nolint:staticcheck
 	}
 	return &controller
 }
 
 func (c *Controller) StoreObject(ctx context.Context, metadata ObjectMetadata, obj types.S3Object) error {
 	log.Debug().Any("metadata", metadata).Msg("Uploading S3 object")
-	_, err := c.uploader.Upload(ctx, &awsS3.PutObjectInput{
+	_, err := c.uploader.Upload(ctx, &awsS3.PutObjectInput{ //nolint:staticcheck
 		Bucket: aws.String(config.S3BucketName()),
 		Key:    aws.String(metadata.Key()),
 		Body:   obj.Content,
