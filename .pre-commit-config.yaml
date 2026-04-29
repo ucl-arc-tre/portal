@@ -7,14 +7,10 @@ repos:
       - id: end-of-file-fixer
         exclude: openapi
 
-  - repo: local
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v2.11.4
     hooks:
       - id: golangci-lint
-        name: golangci-lint
-        language: system
-        entry: golangci-lint run
-        types: [go]
-        pass_filenames: false
         args:
           - "--timeout=5m"
         language_version: "1.26.2"
