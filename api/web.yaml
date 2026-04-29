@@ -1027,6 +1027,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/Contract"
 
+    delete:
+      description: Delete a contract and all its associated objects
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      responses:
+        "204":
+          description: Contract deleted successfully
+        "404":
+          description: Contract not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
     put:
       description: Update contract metadata
       parameters:

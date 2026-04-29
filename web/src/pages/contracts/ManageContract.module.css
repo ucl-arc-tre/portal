@@ -45,10 +45,12 @@
   display: flex;
   gap: 0.5rem;
   padding-top: 1rem;
+}
 
-  button {
-    margin-left: auto;
-  }
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
 }
 
 @media (width >=768px) {
