@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sync"
@@ -39,9 +40,18 @@ func NewTestDBSchema(t *testing.T, migrate Migrator) *gorm.DB {
 	setupOnce.Do(func() {
 		fmt.Printf("adminDB bootstrap (extension + sequence)\n")
 
+		// use a 10-min timeout to prevent CI jobs end up hanging
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+		defer cancel()
+
 		connectRetryDelay := 1 * time.Second
 
 		for {
+			select {
+			case <-ctx.Done():
+				panic(fmt.Sprintf("adminDB bootstrap failed after timeout: %v", ctx.Err()))
+			default:
+			}
 			err1 := adminDB.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`).Error
 			err2 := adminDB.Exec(`CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000;`).Error
 			if err1 == nil && err2 == nil {

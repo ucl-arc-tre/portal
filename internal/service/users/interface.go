@@ -27,7 +27,6 @@ type Interface interface {
 	CreateNHSDTrainingRecord(user types.User, completedAt time.Time) error
 	TrainingRecords(user types.User) ([]openapi.TrainingRecord, error)
 	NHSDTrainingExpiresAt(user types.User) (*time.Time, error)
-	//func NHSDTrainingIsValid(completedAt time.Time) bool
 	PersistedUser(username types.Username) (types.User, error)
 	PersistedExternalUser(username types.Username, email Email) (types.User, error)
 	UserExistsWithEmailOrUsername(ctx context.Context, value string) (bool, error)

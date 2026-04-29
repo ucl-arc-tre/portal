@@ -184,7 +184,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 		{
 			name: "invalid third party name",
 			modify: func(c *openapi.ContractBase) {
-				c.Title = "a"
+				c.ThirdPartyName = ptr("a")
 			},
 			expectErr: true,
 		},
