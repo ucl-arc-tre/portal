@@ -8,7 +8,7 @@ import (
 
 type Service struct {
 	db    *gorm.DB
-	entra *entra.Controller
+	entra entra.Interface
 }
 
 func New() *Service {
