@@ -104,6 +104,20 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 	})
 }
 
+func (h *Handler) DeleteStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
+	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
+	if err != nil {
+		return
+	}
+
+	if err := h.studies.DeleteContract(uuids[0], uuids[1]); err != nil {
+		setError(ctx, err, "Failed to delete contract")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
 func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
 	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
 	if err != nil {

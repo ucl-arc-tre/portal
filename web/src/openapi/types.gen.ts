@@ -2266,6 +2266,46 @@ export type PostStudiesByStudyIdContractsResponses = {
 
 export type PostStudiesByStudyIdContractsResponse = PostStudiesByStudyIdContractsResponses[keyof PostStudiesByStudyIdContractsResponses];
 
+export type DeleteStudiesByStudyIdContractsByContractIdData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+        /**
+         * Contract UUID
+         */
+        contractId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/contracts/{contractId}';
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdErrors = {
+    /**
+     * Validation error
+     */
+    400: unknown;
+    /**
+     * Contract not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdResponses = {
+    /**
+     * Contract deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteStudiesByStudyIdContractsByContractIdResponse = DeleteStudiesByStudyIdContractsByContractIdResponses[keyof DeleteStudiesByStudyIdContractsByContractIdResponses];
+
 export type GetStudiesByStudyIdContractsByContractIdData = {
     body?: never;
     path: {
