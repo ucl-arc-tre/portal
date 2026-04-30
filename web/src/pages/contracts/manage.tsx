@@ -249,7 +249,10 @@ export default function ManageContractPage() {
                 : "Are you sure you want to delete this contract? This operation cannot be undone."
             }
             onConfirm={handleContractDelete}
-            onCancel={() => setShowDeleteModal(false)}
+            onCancel={() => {
+              setShowDeleteModal(false);
+              setDeleteError(null);
+            }}
             isDeleting={isDeleting}
             error={deleteError}
           />

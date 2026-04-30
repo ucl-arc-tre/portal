@@ -301,7 +301,10 @@ export default function ManageAssetPage() {
             title="Delete Asset"
             message="Are you sure you want to delete this asset? This operation cannot be undone."
             onConfirm={handleAssetDelete}
-            onCancel={() => setShowDeleteModal(false)}
+            onCancel={() => {
+              setShowDeleteModal(false);
+              setDeleteError(null);
+            }}
             isDeleting={isDeleting}
             error={deleteError}
           />

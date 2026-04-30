@@ -135,7 +135,10 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
           title="Delete File"
           message="Are you sure you want to delete this file? This operation cannot be undone."
           onConfirm={handleDelete}
-          onCancel={() => setShowDeleteModal(false)}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setError(null);
+          }}
           isDeleting={isDeleting}
           error={error}
         />
