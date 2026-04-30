@@ -23,8 +23,9 @@ import Button from "@/components/ui/Button";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
-import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
+import { HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports";
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
@@ -39,6 +40,8 @@ export default function ManageAssetPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
@@ -51,14 +54,14 @@ export default function ManageAssetPage() {
   const handleAssetDelete = async () => {
     if (!study || !asset) return;
 
-    const confirmed = window.confirm("Are you sure you want to delete this asset? This operation cannot be undone.");
-    if (!confirmed) return;
-
+    setIsDeleting(true);
     setDeleteError(null);
 
     const response = await deleteStudiesByStudyIdAssetsByAssetId({
       path: { studyId: study.id, assetId: asset.id },
     });
+
+    setIsDeleting(false);
 
     if (!response.response.ok) {
       const errorMsg = extractErrorMessage(response);
@@ -194,18 +197,12 @@ export default function ManageAssetPage() {
               <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
                 Edit
               </Button>
-              <Button onClick={handleAssetDelete} className="delete-button" cy="asset-delete">
+              <Button onClick={() => setShowDeleteModal(true)} className="delete-button" cy="asset-delete">
                 Delete
               </Button>
             </div>
           )}
         </div>
-
-        {deleteError && (
-          <Alert type="error">
-            <AlertMessage>{deleteError}</AlertMessage>
-          </Alert>
-        )}
 
         {expiryUrgency && (
           <div className={styles["expiry-warning"]}>
@@ -296,6 +293,17 @@ export default function ManageAssetPage() {
             editingAsset={asset}
             handleAssetSubmit={handleAssetUpdate}
             closeModal={() => setShowEditModal(false)}
+          />
+        )}
+
+        {showDeleteModal && (
+          <ConfirmDeleteModal
+            title="Delete Asset"
+            message="Are you sure you want to delete this asset? This operation cannot be undone."
+            onConfirm={handleAssetDelete}
+            onCancel={() => setShowDeleteModal(false)}
+            isDeleting={isDeleting}
+            error={deleteError}
           />
         )}
       </div>

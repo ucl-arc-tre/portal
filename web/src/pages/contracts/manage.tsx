@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { Study, getStudiesByStudyId, Contract, getStudiesByStudyIdContractsByContractId } from "@/openapi";
+import {
+  Study,
+  getStudiesByStudyId,
+  Contract,
+  getStudiesByStudyIdContractsByContractId,
+  deleteStudiesByStudyIdContractsByContractId,
+} from "@/openapi";
 import { extractErrorMessage } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
@@ -9,6 +15,7 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 
 import styles from "./ManageContract.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -26,6 +33,9 @@ export default function ManageContractPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showEditModal, setShowUploadModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
@@ -33,6 +43,27 @@ export default function ManageContractPage() {
   const canModify = isStudyOwner || isStudyAdmin;
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+
+  const handleContractDelete = async () => {
+    if (!study || !contract) return;
+
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    const response = await deleteStudiesByStudyIdContractsByContractId({
+      path: { studyId: study.id, contractId: contract.id },
+    });
+
+    setIsDeleting(false);
+
+    if (!response.response.ok) {
+      const errorMsg = extractErrorMessage(response);
+      setDeleteError(`Delete failed: ${errorMsg}`);
+      return;
+    }
+
+    router.push(`/studies/manage?studyId=${study.id}`);
+  };
 
   const fetchData = async (studyIdParam: string, contractIdParam: string) => {
     setLoading(true);
@@ -130,9 +161,15 @@ export default function ManageContractPage() {
         <div className={styles.header}>
           <Title text={`Manage Contract: ${contract.title}`} />
           {canModify && (
-            <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="contract-edit">
-              Edit
-            </Button>
+            <div className={styles["header-actions"]}>
+              <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="contract-edit">
+                Edit
+              </Button>
+
+              <Button onClick={() => setShowDeleteModal(true)} className="delete-button" cy="contract-delete">
+                Delete
+              </Button>
+            </div>
           )}
         </div>
 
@@ -200,6 +237,21 @@ export default function ManageContractPage() {
               fetchData(study.id, contract.id);
             }}
             editingContract={contract}
+          />
+        )}
+
+        {showDeleteModal && (
+          <ConfirmDeleteModal
+            title="Delete Contract"
+            message={
+              contract.objects_metadata.length > 0
+                ? `This contract has ${contract.objects_metadata.length} attached file(s) which will also be deleted. Are you sure you want to delete this contract and its attached file(s)? This operation cannot be undone.`
+                : "Are you sure you want to delete this contract? This operation cannot be undone."
+            }
+            onConfirm={handleContractDelete}
+            onCancel={() => setShowDeleteModal(false)}
+            isDeleting={isDeleting}
+            error={deleteError}
           />
         )}
       </div>
