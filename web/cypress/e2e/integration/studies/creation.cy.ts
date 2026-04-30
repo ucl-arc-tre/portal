@@ -177,10 +177,10 @@ describe("Study creation end-to-end", () => {
     cy.contains("Test contract edited").should("be.visible");
 
     cy.get('[data-cy="contract-object-download-button"]').click();
-    cy.contains("button", "Delete File").click();
+    cy.get('[data-cy="contract-object-delete-button"]').click();
     cy.contains("Delete File").should("be.visible");
     cy.get('[data-cy="confirm-delete"]').click();
-    cy.contains("button", "Delete File").should("not.exist");
+    cy.get('[data-cy="contract-object-delete-button"]').should("not.exist");
   });
 
   it("owner should be able to delete a contract", () => {
@@ -213,7 +213,7 @@ describe("Study creation end-to-end", () => {
     cy.get("button[type='submit']").click();
 
     cy.contains(deleteContractTitle).parents('[data-cy="contract-card"]').contains("Manage").click();
-    cy.contains("button", "Delete Contract").click();
+    cy.get('[data-cy="contract-delete"]').click();
     cy.contains("Delete Contract").should("be.visible");
     cy.contains("This operation cannot be undone.").should("be.visible");
     cy.get('[data-cy="confirm-delete"]').click();

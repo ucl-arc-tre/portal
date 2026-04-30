@@ -117,10 +117,9 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
             className="delete-button"
             onClick={() => setShowDeleteModal(true)}
             size="small"
-            data-cy="delete-contract-button"
-            cy="contract-object-delete-button"
+            data-cy="contract-object-delete-button"
           >
-            Delete File
+            Delete
           </Button>
         )}
       </div>

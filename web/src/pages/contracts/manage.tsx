@@ -167,7 +167,7 @@ export default function ManageContractPage() {
               </Button>
 
               <Button onClick={() => setShowDeleteModal(true)} className="delete-button" cy="contract-delete">
-                Delete Contract
+                Delete
               </Button>
             </div>
           )}
