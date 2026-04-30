@@ -120,7 +120,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
             data-cy="delete-contract-button"
             cy="contract-object-delete-button"
           >
-            Delete
+            Delete File
           </Button>
         )}
       </div>
