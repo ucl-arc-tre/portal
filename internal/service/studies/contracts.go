@@ -220,10 +220,6 @@ func (s *Service) DeleteContractObject(ctx context.Context,
 func (s *Service) DeleteContract(studyID uuid.UUID, contractID uuid.UUID) error {
 	log.Debug().Any("contractID", contractID).Msg("Deleting contract")
 
-	if err := s.checkContractExists(studyID, contractID); err != nil {
-		return err
-	}
-
 	contract, err := s.GetContract(studyID, contractID)
 	if err != nil {
 		return err
