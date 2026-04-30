@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/testutil"
 	"gorm.io/gorm"
@@ -115,13 +116,19 @@ func TestIntegration_ValidateContract(t *testing.T) {
 	// Create unique schema for this test
 	db := testutil.NewTestDBSchema(t, migrate)
 
+	// set up test config
+	config.Init()
+	if err := config.SetforTesting("entra.primary_domain", "testIntegration.com"); err != nil {
+		t.Fatal(err)
+	}
+
 	creator := types.User{
-		Username: "bob@example.com",
+		Username: "bob@testIntegration.com",
 	}
 	assert.NoError(t, db.Create(&creator).Error)
 
 	signatoryUser := types.User{
-		Username: "user1@",
+		Username: "user1@testIntegration.com",
 	}
 	assert.NoError(t, db.Create(&signatoryUser).Error)
 
@@ -140,7 +147,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 	validBase := openapi.ContractBase{
 		Title:                 "Valid Contract",
-		OrganisationSignatory: "user1@",
+		OrganisationSignatory: "user1@testIntegration.com",
 		ThirdPartyName:        ptr("Third Party"),
 		Status:                openapi.ContractBaseStatusProposed,
 		StartDate:             ptr(now.Format("2006-01-02")),
@@ -279,14 +286,20 @@ func TestIntegration_CreateContract(t *testing.T) {
 		s3:    mockS3,
 	}
 
+	// set up test config
+	config.Init()
+	if err := config.SetforTesting("entra.primary_domain", "testIntegration.com"); err != nil {
+		t.Fatal(err)
+	}
+
 	// set up required models
 	creator := types.User{
-		Username: "bob@example.com",
+		Username: "bob@testIntegration.com",
 	}
 	assert.NoError(t, db.Create(&creator).Error)
 
 	signatoryUser := types.User{
-		Username: "user1@",
+		Username: "user1@testIntegration.com",
 	}
 	assert.NoError(t, db.Create(&signatoryUser).Error)
 
@@ -305,7 +318,7 @@ func TestIntegration_CreateContract(t *testing.T) {
 
 	contractBase := openapi.ContractBase{
 		Title:                 "Integration Contract",
-		OrganisationSignatory: "user1@",
+		OrganisationSignatory: "user1@testIntegration.com",
 		ThirdPartyName:        ptr("Third Party"),
 		Status:                openapi.ContractBaseStatusProposed,
 		StartDate:             ptr("2024-01-01"),
