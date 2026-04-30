@@ -28,8 +28,8 @@ const (
 type Service struct {
 	db    *gorm.DB
 	entra entra.Interface
-	s3    *s3.Controller
-	users *users.Service
+	s3    s3.Interface
+	users users.Interface
 }
 
 func New() *Service {
