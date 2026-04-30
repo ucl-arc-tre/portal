@@ -4,6 +4,7 @@ import {
 } from "@/openapi";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 import Button from "../ui/Button";
+import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 import styles from "./ContractObjectCard.module.css";
 import { useState } from "react";
 import { extractErrorMessage } from "@/lib/errorHandler";
@@ -23,6 +24,8 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -61,11 +64,8 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete this contract? This operation cannot be undone.");
-
-    if (!confirmed) {
-      return;
-    }
+    setIsDeleting(true);
+    setError(null);
 
     const response = await deleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectId({
       path: {
@@ -74,6 +74,8 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
         contractObjectId: id,
       },
     });
+
+    setIsDeleting(false);
 
     if (!response.response.ok) {
       const errorMsg = extractErrorMessage(response);
@@ -113,10 +115,9 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
         {canModify && (
           <Button
             className="delete-button"
-            onClick={handleDelete}
+            onClick={() => setShowDeleteModal(true)}
             size="small"
-            data-cy="delete-contract-button"
-            cy="contract-object-delete-button"
+            data-cy="contract-object-delete-button"
           >
             Delete
           </Button>
@@ -127,6 +128,20 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
         <Alert type="error">
           <AlertMessage>{error}</AlertMessage>
         </Alert>
+      )}
+
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          title="Delete File"
+          message="Are you sure you want to delete this file? This operation cannot be undone."
+          onConfirm={handleDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setError(null);
+          }}
+          isDeleting={isDeleting}
+          error={error}
+        />
       )}
     </div>
   );

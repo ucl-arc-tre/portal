@@ -217,6 +217,45 @@ func (s *Service) DeleteContractObject(ctx context.Context,
 	return commitTransaction(tx)
 }
 
+func (s *Service) DeleteContract(studyID uuid.UUID, contractID uuid.UUID) error {
+	log.Debug().Any("contractID", contractID).Msg("Deleting contract")
+
+	contract, err := s.GetContract(studyID, contractID)
+	if err != nil {
+		return err
+	}
+
+	if len(contract.Assets) > 0 {
+		return types.NewErrClientInvalidObjectF("cannot delete contract that is linked to one or more assets, please unlink the contract from all assets before deleting")
+	}
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	if err := tx.Where("contract_id = ?", contractID).Delete(&types.ContractObjectMetadata{}).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete contract objects")
+	}
+
+	for _, obj := range contract.Objects {
+		metadata := s3.ObjectMetadata{
+			Id:   obj.ID,
+			Kind: s3.ContractKind,
+		}
+		if err := s.s3.DeleteObject(metadata); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if err := tx.Where("id = ? AND study_id = ?", contractID, studyID).Delete(&types.Contract{}).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete contract")
+	}
+
+	return commitTransaction(tx)
+}
+
 func (s *Service) UpdateContract(
 	ctx context.Context,
 	studyID uuid.UUID,

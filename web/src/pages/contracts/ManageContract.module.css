@@ -51,6 +51,12 @@
   }
 }
 
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
+
 @media (width >=768px) {
   .field {
     grid-template-columns: 150px 1fr;

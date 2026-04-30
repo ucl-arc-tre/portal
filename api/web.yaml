@@ -1060,6 +1060,21 @@ paths:
         default:
           description: Unexpected error
 
+    delete:
+      description: Delete a contract
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+        - $ref: "#/components/parameters/ContractIdParam"
+      responses:
+        "204":
+          description: Contract deleted successfully
+        "400":
+          description: Validation error
+        "404":
+          description: Contract not found
+        "500":
+          description: Internal server error
+
   /studies/{studyId}/contracts/{contractId}/objects:
     post:
       description: Upload a contract object e.g. PDF

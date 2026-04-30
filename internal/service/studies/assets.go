@@ -209,7 +209,7 @@ func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) error {
 	}
 
 	if len(asset.Contracts) > 0 {
-		return types.NewErrClientInvalidObjectF("cannot delete asset that is linked to one or more contracts")
+		return types.NewErrClientInvalidObjectF("cannot delete asset that is linked to one or more contracts, please unlink the asset from all contracts before deleting")
 	}
 
 	tx := s.db.Begin()

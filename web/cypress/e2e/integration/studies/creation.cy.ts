@@ -127,8 +127,9 @@ describe("Study creation end-to-end", () => {
 
     cy.contains('[data-cy="asset-card"]', deleteAssetTitle).contains("button", "Manage").click();
 
-    cy.window().then((win) => cy.stub(win, "confirm").returns(true));
     cy.get('[data-cy="asset-delete"]').click();
+    cy.contains("Delete Asset").should("be.visible");
+    cy.get('[data-cy="confirm-delete"]').click();
 
     cy.url().should("include", "/studies/manage");
     cy.get('[data-cy="study-assets"]').click();
@@ -176,7 +177,50 @@ describe("Study creation end-to-end", () => {
     cy.contains("Test contract edited").should("be.visible");
 
     cy.get('[data-cy="contract-object-download-button"]').click();
-    cy.get('[data-cy="delete-contract-button"]').click();
+    cy.get('[data-cy="contract-object-delete-button"]').click();
+    cy.contains("Delete File").should("be.visible");
+    cy.get('[data-cy="confirm-delete"]').click();
+    cy.get('[data-cy="contract-object-delete-button"]').should("not.exist");
+  });
+
+  it("owner should be able to delete a contract", () => {
+    const deleteContractTitle = `contract-to-delete-${Date.now()}`;
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.get('[data-cy="study-contracts"]').click();
+
+    cy.get('[data-cy="add-contract"]').click();
+    cy.get('[name="title"]').type(deleteContractTitle);
+    cy.env(["botStaffUsername"]).then(({ botStaffUsername }) => {
+      cy.get('[name="organisationSignatory"]').type(botStaffUsername);
+    });
+    cy.get('[name="thirdPartyName"]').type("Third Party");
+    cy.get('[name="status"]').select("active");
+    cy.get("input[name='startDate']").type("2024-01-01");
+    cy.get("input[name='expiryDate']").type("2025-12-31");
+    cy.fixture("valid_nhsd_certificate.pdf", "base64").then((fileContent) => {
+      cy.get("input[type='file']").selectFile(
+        {
+          contents: Cypress.Buffer.from(fileContent, "base64"),
+          fileName: "sample-contract.pdf",
+          mimeType: "application/pdf",
+        },
+        { force: true }
+      );
+    });
+    cy.get("button[type='submit']").click();
+
+    cy.contains(deleteContractTitle).parents('[data-cy="contract-card"]').contains("Manage").click();
+    cy.get('[data-cy="contract-delete"]').click();
+    cy.contains("Delete Contract").should("be.visible");
+    cy.contains("This operation cannot be undone.").should("be.visible");
+    cy.get('[data-cy="confirm-delete"]').click();
+
+    cy.url().should("include", "/studies/manage");
+    cy.get('[data-cy="study-contracts"]').click();
+    cy.contains(deleteContractTitle).should("not.exist");
   });
 
   it("ig ops should be able to search for a study", () => {
