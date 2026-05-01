@@ -142,6 +142,10 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 		return err
 	}
 
+	if err := s.SendIaaAssignmentEmailNotification(ctx, studyAdminUsers, studyData.Title); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -378,6 +382,20 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 	}
 
 	err = s.entra.SendCustomStudyReviewNotification(ctx, recipients, review)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) SendIaaAssignmentEmailNotification(ctx context.Context, admins []types.User, studyTitle string) error {
+
+	recipients := []string{}
+	for _, studyAdmin := range admins {
+		recipients = append(recipients, string(studyAdmin.Username))
+	}
+
+	err := s.entra.SendIaaAssignmentNotification(ctx, recipients, studyTitle)
 	if err != nil {
 		return err
 	}

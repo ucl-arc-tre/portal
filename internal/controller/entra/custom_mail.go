@@ -24,6 +24,16 @@ var (
 	baseMailTemplate = template.Must(template.New("baseMailTemplate").Parse(baseMailTemplateContent))
 )
 
+func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
+	templateReader := new(bytes.Buffer)
+	err := baseMailTemplate.Execute(templateReader, params)
+	if err != nil {
+		return nil, err
+	}
+	content := templateReader.String()
+	return &content, nil
+}
+
 func (c *Controller) createCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
 
 	requestBody := graphusers.NewItemSendMailPostRequestBody()
@@ -123,16 +133,6 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 	return c.createCustomEmail(ctx, subject, emails, content)
 }
 
-func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
-	templateReader := new(bytes.Buffer)
-	err := baseMailTemplate.Execute(templateReader, params)
-	if err != nil {
-		return nil, err
-	}
-	content := templateReader.String()
-	return &content, nil
-}
-
 func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
 	days := contract.DaysUntilExpiry()
 	if days == nil {
@@ -168,4 +168,11 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 
 	subject := "Notification: Your training certificate is due to expire soon"
 	return c.createCustomEmail(ctx, subject, []string{email}, content)
+}
+
+func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, emails []string, studyTitle string) error {
+
+	content := "You have been added as an IAA to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
+
+	return c.createCustomEmail(ctx, "Notification: You have been added to a Study in the UCL ARC Services Portal", emails, content)
 }
