@@ -7,7 +7,7 @@ import Button from "../ui/Button";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 import styles from "./ContractObjectCard.module.css";
 import { useState } from "react";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 type ContractObjectCardProps = {
   studyId: string;
@@ -40,7 +40,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
         },
       });
 
-      if (!response.response.ok || !response.data) {
+      if (!response.response || !response.response.ok || !response.data) {
         const errorMsg = extractErrorMessage(response);
         setError(`Download failed: ${errorMsg}`);
         return;
@@ -77,7 +77,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
 
     setIsDeleting(false);
 
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
       setError(`Delete failed: ${errorMsg}`);
       return;

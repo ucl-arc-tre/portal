@@ -8,7 +8,7 @@ import {
   patchProjectsTreByProjectIdPending,
   Study,
 } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -60,7 +60,7 @@ export default function ManageProjectPage() {
         return;
       }
 
-      if (!projectResponse.response.ok || !projectResponse.data) {
+      if (responseIsError(projectResponse) || !projectResponse.data) {
         const errorMsg = extractErrorMessage(projectResponse);
         setError(`Failed to load project: ${errorMsg}`);
         return;
@@ -91,7 +91,7 @@ export default function ManageProjectPage() {
         path: { projectId },
       });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setError(`Failed to submit project: ${errorMsg}`);
         return;
@@ -116,7 +116,7 @@ export default function ManageProjectPage() {
         path: { projectId },
       });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setError(`Failed to approve project: ${errorMsg}`);
         return;

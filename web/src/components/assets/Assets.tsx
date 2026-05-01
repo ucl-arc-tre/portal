@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Asset, AssetBase, getStudiesByStudyIdAssets, postStudiesByStudyIdAssets, Study } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 
 import AssetCreationForm from "./AssetCreationForm";
@@ -37,14 +37,14 @@ export default function Assets(props: AssetsProps) {
       body: assetData as AssetBase,
     });
 
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
       throw new Error(errorMsg);
     }
 
     // Refresh assets list after successful creation
     const updatedAssetsResult = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
-    if (!updatedAssetsResult.response.ok || !updatedAssetsResult.data) {
+    if (responseIsError(updatedAssetsResult) || !updatedAssetsResult.data) {
       const errorMsg = extractErrorMessage(updatedAssetsResult);
       setError(`Failed to refresh asset list: ${errorMsg}`);
       return;
