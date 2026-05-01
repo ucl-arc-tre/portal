@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Input, Alert, AlertMessage, Label } from "../shared/uikitExports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Loading from "@/components/ui/Loading";
 import Dialog from "../ui/Dialog";
 
@@ -21,7 +21,7 @@ export default function ExternalInvite() {
       setErrorMessage("");
       setSuccessMessage("");
       const response = await postUsersInvite({ body: { email } });
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
         return;

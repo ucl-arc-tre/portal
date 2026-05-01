@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
 import Dialog from "@/components/ui/Dialog";
@@ -47,7 +47,7 @@ export default function ProjectCardsList(props: Props) {
         path: { projectId: projectToDelete.id },
       });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setDeleteError(`Failed to delete project: ${errorMsg}`);
         return;

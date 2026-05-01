@@ -1,5 +1,5 @@
 import { getStudiesByStudyIdAgreements } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useEffect, useState } from "react";
 import styles from "./StudyAdminsAgreements.module.css";
 
@@ -24,7 +24,7 @@ export default function StudyAdminsAgreements(props: StudyAdminsAgreementsProps)
         setError(null);
 
         const studyAgreementsResult = await getStudiesByStudyIdAgreements({ path: { studyId } });
-        if (!studyAgreementsResult.response.ok || !studyAgreementsResult.data) {
+        if (responseIsError(studyAgreementsResult) || !studyAgreementsResult.data) {
           const errorMsg = extractErrorMessage(studyAgreementsResult);
           setError(`Failed to load study agreements: ${errorMsg}`);
           return;

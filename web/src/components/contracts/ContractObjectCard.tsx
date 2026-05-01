@@ -40,7 +40,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
         },
       });
 
-      if (!response.response || !response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         const errorMsg = extractErrorMessage(response);
         setError(`Download failed: ${errorMsg}`);
         return;

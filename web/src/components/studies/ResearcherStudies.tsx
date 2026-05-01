@@ -5,7 +5,7 @@ import StudyForm from "./study-form/StudyForm";
 import Button from "@/components/ui/Button";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 
 import styles from "./ResearcherStudies.module.css";
@@ -25,7 +25,7 @@ export default function ResearcherStudies() {
 
     try {
       const response = await getStudies();
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         setStudies([]);
         return;

@@ -3,7 +3,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
 import { getProfile, getStudies } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 import { AlertMessage, Alert } from "../shared/uikitExports";
@@ -24,7 +24,7 @@ export default function UserTasks() {
       try {
         const response = await getProfile();
 
-        if (!response.response.ok || !response.data) {
+        if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setError(`Failed to load profile: ${errorMsg}`);
           setChosenName("");
@@ -48,7 +48,7 @@ export default function UserTasks() {
     const fetchPendingStudies = async () => {
       try {
         const response = await getStudies({ query: { status: "Pending" } });
-        if (!response.response.ok || !response.data) {
+        if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setError(`Failed to load pending studies: ${errorMsg}`);
           return;

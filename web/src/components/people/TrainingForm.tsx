@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import styles from "./TrainingForm.module.css";
 import Button from "../ui/Button";
 import { postUsersByUserIdTraining, TrainingKind, TrainingRecord } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Dialog from "../ui/Dialog";
@@ -45,7 +45,7 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         path: { userId: userId },
         body: { training_kind: trainingKind, training_date: trainingDate },
       });
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
         setErrorType("error");
