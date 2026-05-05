@@ -138,7 +138,7 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 		return err
 	}
 
-	if err := s.createStudy(owner, studyData, studyAdminUsers); err != nil {
+	if err := s.createStudy(ctx, owner, studyData, studyAdminUsers); err != nil {
 		return err
 	}
 
@@ -238,7 +238,7 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 
 }
 
-func createStudyAdmins(users []types.User, tx *gorm.DB, study *types.Study) error {
+func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx *gorm.DB, study *types.Study) error {
 	existingStudyAdmins := []types.StudyAdmin{}
 	if err := tx.Unscoped().Preload("User").Where("study_id = ?", study.ID).Find(&existingStudyAdmins).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list study admins")
@@ -267,6 +267,12 @@ func createStudyAdmins(users []types.User, tx *gorm.DB, study *types.Study) erro
 				return types.NewErrFromGorm(err, "failed to undelete study admin")
 			}
 		}
+
+		if studyAdminInRequested && !studyAdmin.DeletedAt.Valid {
+			if err := s.SendIaaAssignmentEmailNotification(ctx, []types.User{studyAdmin.User}, study.Title); err != nil {
+				return err
+			}
+		}
 	}
 
 	for _, user := range users {
@@ -281,11 +287,12 @@ func createStudyAdmins(users []types.User, tx *gorm.DB, study *types.Study) erro
 			return err
 		}
 	}
+
 	return nil
 }
 
 // handles the database transaction for creating a study and its admins
-func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) error {
+func (s *Service) createStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) error {
 	// Start a transaction
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
@@ -309,7 +316,7 @@ func (s *Service) createStudy(owner types.User, studyData openapi.StudyRequest, 
 	}
 
 	// Create StudyAdmin records for each study admin user
-	if err := createStudyAdmins(studyAdminUsers, tx, &study); err != nil {
+	if err := s.createStudyAdmins(ctx, studyAdminUsers, tx, &study); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -351,7 +358,7 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return err
 	}
 
-	if err := createStudyAdmins(studyAdminUsers, tx, &study); err != nil {
+	if err := s.createStudyAdmins(ctx, studyAdminUsers, tx, &study); err != nil {
 		return err
 	}
 
@@ -378,6 +385,20 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 	}
 
 	err = s.entra.SendCustomStudyReviewNotification(ctx, recipients, review)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Service) SendIaaAssignmentEmailNotification(ctx context.Context, admins []types.User, studyTitle string) error {
+
+	recipients := []string{}
+	for _, studyAdmin := range admins {
+		recipients = append(recipients, string(studyAdmin.Username))
+	}
+
+	err := s.entra.SendIaaAssignmentNotification(ctx, recipients, studyTitle)
 	if err != nil {
 		return err
 	}

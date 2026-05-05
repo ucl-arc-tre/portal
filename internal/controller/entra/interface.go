@@ -17,4 +17,5 @@ type Interface interface {
 	SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error
 	SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error
 	SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error
+	SendIaaAssignmentNotification(ctx context.Context, emails []string, studyTitle string) error
 }
