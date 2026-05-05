@@ -33,6 +33,11 @@ paths:
           description: Unexpected error
 
 components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: HTTP Basic authentication
   schemas:
     UserStatus:
       type: object
