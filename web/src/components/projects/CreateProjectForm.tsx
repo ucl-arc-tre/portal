@@ -12,7 +12,7 @@ import {
   getEnvironments,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName } from "@/types/projects";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import InfoTooltip from "../ui/InfoTooltip";
@@ -134,7 +134,7 @@ export default function CreateProjectForm({
       setEnvironmentsError(null);
       try {
         const response = await getEnvironments();
-        if (!response.response.ok || !response.data) {
+        if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setEnvironmentsError(`Failed to load environments: ${errorMsg}`);
           return;
@@ -165,7 +165,7 @@ export default function CreateProjectForm({
           path: { studyId: selectedStudyId },
         });
 
-        if (!response.response.ok || !response.data) {
+        if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setError(`Failed to fetch assets: ${errorMsg}`);
           setAssets([]);
@@ -248,7 +248,7 @@ export default function CreateProjectForm({
           throw new Error(`Unknown environment: ${selectedEnvironment.name}`);
       }
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
         return;

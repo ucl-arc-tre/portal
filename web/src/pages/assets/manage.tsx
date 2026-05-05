@@ -12,7 +12,7 @@ import {
   Contract,
   getStudiesByStudyIdAssetsByAssetIdContracts,
 } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -63,7 +63,7 @@ export default function ManageAssetPage() {
 
     setIsDeleting(false);
 
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
       setDeleteError(`Delete failed: ${errorMsg}`);
       return;
@@ -80,7 +80,7 @@ export default function ManageAssetPage() {
       body: assetData as AssetBase,
     });
 
-    if (!response.response.ok || !response.data) {
+    if (responseIsError(response) || !response.data) {
       throw new Error(extractErrorMessage(response));
     }
 
@@ -98,14 +98,14 @@ export default function ManageAssetPage() {
         getStudiesByStudyIdAssetsByAssetId({ path: { studyId: studyIdParam, assetId: assetIdParam } }),
       ]);
 
-      if (!studyResponse.response.ok || !studyResponse.data) {
+      if (responseIsError(studyResponse) || !studyResponse.data) {
         const errorMsg = extractErrorMessage(studyResponse);
         setError(`Failed to load study: ${errorMsg}`);
         return;
       }
       setStudy(studyResponse.data);
 
-      if (!assetResponse.response.ok || !assetResponse.data) {
+      if (responseIsError(assetResponse) || !assetResponse.data) {
         const errorMsg = extractErrorMessage(assetResponse);
         setError(`Failed to load asset: ${errorMsg}`);
         return;
@@ -116,7 +116,7 @@ export default function ManageAssetPage() {
           path: { studyId: studyIdParam, assetId: assetIdParam },
         });
 
-        if (!contractsResponse.response.ok || !contractsResponse.data) {
+        if (responseIsError(contractsResponse) || !contractsResponse.data) {
           const errorMsg = extractErrorMessage(contractsResponse);
           setError(`Failed to load contracts for asset: ${errorMsg}`);
           return;

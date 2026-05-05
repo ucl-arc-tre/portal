@@ -1,5 +1,5 @@
 import { patchStudiesByStudyIdPending, Study, Asset } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { useState } from "react";
@@ -76,7 +76,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     setError(null);
     setIsSubmittingReview(true);
     const response = await patchStudiesByStudyIdPending({ path: { studyId: study.id } });
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       setError(`Failed to update study status: ${extractErrorMessage(response)}`);
     } else {
       await fetchStudy(study.id);

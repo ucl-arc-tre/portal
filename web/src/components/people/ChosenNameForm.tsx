@@ -2,7 +2,7 @@ import { useState } from "react";
 import Dialog from "@/components/ui/Dialog";
 import Button from "@/components/ui/Button";
 import { putUsersByUserIdAttributes } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";
 
 type Props = {
@@ -33,7 +33,7 @@ export default function ChosenNameForm(props: Props) {
         },
       });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
         return;

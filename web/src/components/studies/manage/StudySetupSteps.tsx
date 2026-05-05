@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Asset, Study, getStudiesByStudyIdAgreements } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import StepProgress from "../../ui/steps/StepProgress";
 import StepArrow from "../../ui/steps/StepArrow";
 import StudyAgreement from "./StudyAgreement";
@@ -31,13 +31,13 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
   useEffect(() => {
     const checkStudyAgreement = async () => {
       try {
-        const result = await getStudiesByStudyIdAgreements({ path: { studyId: study.id } });
-        if (!result.response.ok || !result.data) {
-          const errorMsg = extractErrorMessage(result);
+        const response = await getStudiesByStudyIdAgreements({ path: { studyId: study.id } });
+        if (responseIsError(response) || !response.data) {
+          const errorMsg = extractErrorMessage(response);
           setError(`Failed to load study agreements: ${errorMsg}`);
           return;
         }
-        const isConfirmed = userData?.username && result.data.usernames.includes(userData.username);
+        const isConfirmed = userData?.username && response.data.usernames.includes(userData.username);
         if (isConfirmed) setAgreementCompleted(true);
       } catch (error) {
         console.error("Failed to check study agreement:", error);

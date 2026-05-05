@@ -12,7 +12,7 @@ import {
   Asset,
   getStudiesByStudyIdAssets,
 } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
 import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
 
@@ -111,7 +111,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       setIsLoadingAssets(true);
       try {
         const response = await getStudiesByStudyIdAssets({ path: { studyId: study.id } });
-        if (!response.response.ok || !response.data) {
+        if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setError(`Something went wrong: ${errorMsg}`);
           return;
@@ -202,7 +202,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         });
       }
 
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
         setSuccess(false);
@@ -220,10 +220,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
           },
           body: { file },
         });
-        if (!response.response.ok) break;
+        if (responseIsError(response)) break;
       }
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setError(errorMsg);
         setSuccess(false);
