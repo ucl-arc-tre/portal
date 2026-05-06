@@ -3,7 +3,7 @@ import { Alert, AlertMessage, Textarea } from "../../shared/uikitExports";
 import Button from "../../ui/Button";
 import { useState } from "react";
 import { ApprovalStatus, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./AdminReview.module.css";
 
@@ -44,7 +44,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
         body: { status: newStatus, feedback: feedbackContent },
       });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         setError(`Failed to update study status: ${extractErrorMessage(response)}`);
         return;
       }

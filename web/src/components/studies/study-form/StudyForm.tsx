@@ -3,7 +3,7 @@ import Dialog from "../../ui/Dialog";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { convertStudyFormDataToApiRequest, populateExistingFormData } from "./lib/studyFormUtils";
 import StudyFormStep1 from "./StudyFormStep1";
 import StudyFormStep2 from "./StudyFormStep2";
@@ -97,7 +97,7 @@ export default function StudyForm(StudyProps: StudyProps) {
         ? await putStudiesByStudyId({ path: { studyId }, body: studyData })
         : await postStudies({ body: studyData });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         setError(extractErrorMessage(response));
         return;
       }

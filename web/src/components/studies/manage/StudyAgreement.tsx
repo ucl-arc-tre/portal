@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Agreement, getAgreementsByAgreementType, postStudiesByStudyIdAgreements } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
@@ -28,7 +28,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
       try {
         setError(null);
         const agreementTextResult = await getAgreementsByAgreementType({ path: { agreementType: "study-owner" } });
-        if (!agreementTextResult.response.ok || !agreementTextResult.data) {
+        if (responseIsError(agreementTextResult) || !agreementTextResult.data) {
           const errorMsg = extractErrorMessage(agreementTextResult);
           setError(`Failed to load study agreement text: ${errorMsg}`);
           return;
@@ -58,7 +58,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
         body: { agreement_id: agreementId },
       });
 
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         throw new Error(errorMsg);
       }

@@ -4,7 +4,7 @@ import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import CreateProjectForm from "./CreateProjectForm";
 import ProjectCardsList from "./ProjectCardsList";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
@@ -31,13 +31,13 @@ export default function Projects({ userData }: Props) {
     try {
       const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
 
-      if (!projectsResponse.response.ok || !projectsResponse.data) {
+      if (responseIsError(projectsResponse) || !projectsResponse.data) {
         const errorMsg = extractErrorMessage(projectsResponse);
         setError(`Failed to fetch projects: ${errorMsg}`);
         return;
       }
 
-      if (!studiesResponse.response.ok || !studiesResponse.data) {
+      if (responseIsError(studiesResponse) || !studiesResponse.data) {
         const errorMsg = extractErrorMessage(studiesResponse);
         setError(`Failed to fetch studies: ${errorMsg}`);
         return;

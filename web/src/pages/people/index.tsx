@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
 import { useState } from "react";
 import { getUsers, UserData } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import UserDataTable from "@/components/people/UserDataTable";
@@ -60,7 +60,7 @@ export default function PeoplePage() {
     try {
       const response = await getUsers({ query: { find: query } });
 
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(`Failed to search users: ${errorMsg}`);
         return;

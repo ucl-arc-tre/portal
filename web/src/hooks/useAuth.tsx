@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await getAuth();
 
-      if (!cancelled.current && response.response.status === 200 && response.data) {
+      if (!cancelled.current && response.response && response.response.status === 200 && response.data) {
         setIsAuthed(true);
         setUserData(response.data);
       } else if (!cancelled.current) {

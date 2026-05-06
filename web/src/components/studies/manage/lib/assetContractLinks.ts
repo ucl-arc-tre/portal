@@ -1,4 +1,4 @@
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { Asset, getStudiesByStudyIdAssetsByAssetIdContracts } from "@/openapi";
 
 export const checkAllRequiredAssetContractsLinked = async (assets: Asset[], studyId: string) => {
@@ -7,7 +7,7 @@ export const checkAllRequiredAssetContractsLinked = async (assets: Asset[], stud
       path: { studyId, assetId },
     });
 
-    if (!response.response.ok || !response.data) {
+    if (responseIsError(response) || !response.data) {
       const errorMsg = extractErrorMessage(response);
       throw new Error(`Failed to load contracts for asset: ${errorMsg}`);
     }

@@ -1,6 +1,6 @@
 import Button from "@/components/ui/Button";
 import { postUsersApprovedResearchersImportCsv } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useRef, useState } from "react";
 import styles from "./ApprovedResearcherImport.module.css";
 import Loading from "../ui/Loading";
@@ -31,7 +31,7 @@ export default function ApprovedResearcherImport() {
           return b; // noop serialisation for blob
         },
       });
-      if (!response.response.ok) {
+      if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setErrorMessage(errorMsg);
       } else {
