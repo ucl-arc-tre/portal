@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: postgres # pragma: allowlist secret
       POSTGRES_DB: test
     tmpfs:
-      - /var/lib/postgresql/data # fast + wiped every run (perfect for tests)
+      - /var/lib/postgresql # fast + wiped every run (perfect for tests)
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
