@@ -4,7 +4,7 @@ import Dialog from "../ui/Dialog";
 import Button from "../ui/Button";
 import { useForm } from "react-hook-form";
 import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./DSHTokens.module.css";
 import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
 
@@ -25,7 +25,7 @@ export default function DSHTokens() {
     const fetchTokens = async () => {
       try {
         const response = await getTokensDsh();
-        if (!response.response.ok || !response.data) {
+        if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setErrorMessage(`Failed to load tokens: ${errorMsg}`);
           return;
@@ -57,7 +57,7 @@ export default function DSHTokens() {
     const response = await deleteTokensDshByTokenId({
       path: { tokenId: id },
     });
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
       setErrorMessage(`Failed to delete token: ${errorMsg}`);
       return;
@@ -76,7 +76,7 @@ export default function DSHTokens() {
           valid_for_days: parseInt(data.expiryDays),
         },
       });
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         const errorMsg = extractErrorMessage(response);
         setFormErrorMessage(errorMsg);
         return;

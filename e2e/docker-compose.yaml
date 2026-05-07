@@ -52,7 +52,7 @@ services:
       - oauth2-proxy
 
   postgres:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_PASSWORD: postgres # pragma: allowlist secret
       POSTGRES_DB: dev

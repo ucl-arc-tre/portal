@@ -26,7 +26,7 @@ services:
       - ./s3/entrypoint.sh:/entrypoint.sh:ro
 
   oauth2-proxy:
-    image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.2
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.2
     command: --config /oauth2-proxy.cfg
     hostname: oauth2-proxy
     volumes:
@@ -58,7 +58,7 @@ services:
       - web-frontend
 
   postgres:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_PASSWORD: postgres # pragma: allowlist secret
       POSTGRES_DB: dev

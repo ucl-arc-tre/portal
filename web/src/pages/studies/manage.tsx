@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { Study, getStudiesByStudyId } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import ManageStudy from "@/components/studies/manage/ManageStudy";
@@ -35,7 +35,7 @@ export default function ManageStudyPage() {
 
     try {
       const response = await getStudiesByStudyId({ path: { studyId: id } });
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         setError(extractErrorMessage(response));
         return;
       }

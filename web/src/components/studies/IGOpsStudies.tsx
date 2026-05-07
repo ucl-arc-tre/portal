@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import Button from "@/components/ui/Button";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./IGOpsStudies.module.css";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
@@ -29,7 +29,7 @@ export default function IGOpsStudies() {
             ? await getStudies({ query: { offset: offset, limit: studiesPerPage } })
             : await getStudies({ query: { limit: studiesPerPage } });
 
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
       }
@@ -73,7 +73,7 @@ export default function IGOpsStudies() {
           response = await getStudies({ query: { query: query } });
       }
 
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         setError(`Search failed: ${extractErrorMessage(response)}`);
         return;
       }
@@ -97,7 +97,7 @@ export default function IGOpsStudies() {
     setError(null);
     try {
       const response = await getStudies({ query: { offset: newOffset, limit: studiesPerPage, query: searchQuery } });
-      if (!response.response.ok || !response.data) {
+      if (responseIsError(response) || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
       }

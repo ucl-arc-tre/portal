@@ -15,7 +15,7 @@ import AdminReview from "./AdminReview";
 import Assets from "../../assets/Assets";
 import ContractManagement from "../../contracts/ContractManagement";
 import { useAuth } from "@/hooks/useAuth";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
 import Loading from "../../ui/Loading";
 
@@ -59,19 +59,19 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
       ]);
 
-      if (!assetsResponse.response.ok || !assetsResponse.data) {
+      if (responseIsError(assetsResponse) || !assetsResponse.data) {
         const errorMsg = extractErrorMessage(assetsResponse);
         setError(`Failed to load Information Assets: ${errorMsg}`);
         return;
       }
 
-      if (!contractsResponse.response.ok || !contractsResponse.data) {
+      if (responseIsError(contractsResponse) || !contractsResponse.data) {
         const errorMsg = extractErrorMessage(contractsResponse);
         setError(`Failed to load contracts: ${errorMsg}`);
         return;
       }
 
-      if (!agreementsResponse.response.ok || !agreementsResponse.data) {
+      if (responseIsError(agreementsResponse) || !agreementsResponse.data) {
         const errorMsg = extractErrorMessage(agreementsResponse);
         setError(`Failed to load agreements: ${errorMsg}`);
         return;

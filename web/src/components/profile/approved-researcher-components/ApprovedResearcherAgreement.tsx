@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Agreement, getAgreementsByAgreementType, getProfileAgreements, postProfileAgreements } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "../../ui/agreements/AgreementForm";
@@ -27,7 +27,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
         setError(null);
 
         const agreementResult = await getAgreementsByAgreementType({ path: { agreementType: "approved-researcher" } });
-        if (!agreementResult.response.ok || !agreementResult.data) {
+        if (responseIsError(agreementResult) || !agreementResult.data) {
           const errorMsg = extractErrorMessage(agreementResult);
           setError(`Failed to load agreement: ${errorMsg}`);
           return;
@@ -35,7 +35,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
         setAgreement(agreementResult.data);
 
         const profileAgreementsResult = await getProfileAgreements();
-        if (!profileAgreementsResult.response.ok || !profileAgreementsResult.data) {
+        if (responseIsError(profileAgreementsResult) || !profileAgreementsResult.data) {
           const errorMsg = extractErrorMessage(profileAgreementsResult);
           setError(`Failed to load profile agreements: ${errorMsg}`);
           return;
@@ -78,7 +78,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
 
   const handleAgreementSubmit = async (agreementId: string) => {
     const response = await postProfileAgreements({ body: { agreement_id: agreementId } });
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
       throw new Error(errorMsg);
     }

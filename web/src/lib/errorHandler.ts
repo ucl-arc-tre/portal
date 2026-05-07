@@ -1,7 +1,7 @@
 import { ValidationError } from "@/openapi";
 
 type ApiResponse = {
-  response: {
+  response?: {
     status: number;
     ok: boolean;
   };
@@ -9,12 +9,20 @@ type ApiResponse = {
   data?: unknown;
 };
 
+export function responseIsError(response: ApiResponse): boolean {
+  return !response.response || !response.response.ok;
+}
+
 export function extractErrorMessage(response: ApiResponse): string {
   if (response.error) {
     const errorData = response.error as { error_message?: string };
     if (errorData?.error_message) {
       return errorData.error_message;
     }
+  }
+
+  if (!response.response) {
+    return "Request failed with no response. Please try again.";
   }
 
   // If there is no error_message in the body, fall back to status-code-specific generic messages.

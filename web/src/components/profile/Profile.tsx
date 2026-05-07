@@ -9,7 +9,7 @@ import {
   Auth,
 } from "@/openapi";
 import { calculateExpiryUrgency } from "@/components/shared/exports";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import ProfileSetupSteps from "./ProfileSetupSteps";
 import ProfileSummaryCard from "./ProfileSummaryCard";
@@ -50,19 +50,19 @@ export default function Profile({ userData, refreshAuth }: Props) {
         getProfileTraining(),
       ]);
 
-      if (!profileResponse.response.ok || !profileResponse.data) {
+      if (responseIsError(profileResponse) || !profileResponse.data) {
         const errorMsg = extractErrorMessage(profileResponse);
         setError(`Failed to load Information Assets: ${errorMsg}`);
         return;
       }
 
-      if (!agreementsResponse.response.ok || !agreementsResponse.data) {
+      if (responseIsError(agreementsResponse) || !agreementsResponse.data) {
         const errorMsg = extractErrorMessage(agreementsResponse);
         setError(`Failed to load Information Assets: ${errorMsg}`);
         return;
       }
 
-      if (!trainingResponse.response.ok || !trainingResponse.data) {
+      if (responseIsError(trainingResponse) || !trainingResponse.data) {
         const errorMsg = extractErrorMessage(trainingResponse);
         setError(`Failed to load Information Assets: ${errorMsg}`);
         return;

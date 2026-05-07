@@ -8,7 +8,7 @@ import {
   getStudiesByStudyIdContractsByContractId,
   deleteStudiesByStudyIdContractsByContractId,
 } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
@@ -56,7 +56,7 @@ export default function ManageContractPage() {
 
     setIsDeleting(false);
 
-    if (!response.response.ok) {
+    if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
       setDeleteError(`Delete failed: ${errorMsg}`);
       return;
@@ -78,10 +78,10 @@ export default function ManageContractPage() {
       ]);
 
       const errorMessages = Array<string>();
-      if (!contractResponse.response.ok || !contractResponse.data) {
+      if (responseIsError(contractResponse) || !contractResponse.data) {
         errorMessages.push(`Failed to load contract: ${extractErrorMessage(contractResponse)}`);
       }
-      if (!studyResponse.response.ok || !studyResponse.data) {
+      if (responseIsError(studyResponse) || !studyResponse.data) {
         errorMessages.push(`Failed to load study: ${extractErrorMessage(studyResponse)}`);
       }
       if (errorMessages.length > 0) {

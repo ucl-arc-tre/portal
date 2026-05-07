@@ -1,5 +1,5 @@
 import { getUsersMetrics, UserMetrics } from "@/openapi";
-import { extractErrorMessage } from "@/lib/errorHandler";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useEffect, useState } from "react";
 import { Label, Pie, PieChart, Tooltip } from "recharts";
 import styles from "./Metrics.module.css";
@@ -13,13 +13,13 @@ export default function Metrics() {
     const fetchUserMetrics = async () => {
       setIsLoading(true);
       try {
-        const res = await getUsersMetrics();
-        if (!res.response.ok || !res.data) {
-          const errorMsg = extractErrorMessage(res);
+        const response = await getUsersMetrics();
+        if (responseIsError(response) || !response.data) {
+          const errorMsg = extractErrorMessage(response);
           setError(`Failed to load metrics: ${errorMsg}`);
           return;
         }
-        setMetrics(res.data);
+        setMetrics(response.data);
       } catch (err) {
         console.error("Failed to load metrics:", err);
         setError("Failed to load metrics. Please try again later.");
