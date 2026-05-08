@@ -290,6 +290,7 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -343,9 +344,6 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return err
 	}
 
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
 	studies, err := s.StudiesById(id)
 	if err != nil {
 		return err
@@ -360,7 +358,11 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return err
 	}
 
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
 	if err := s.createStudyAdmins(ctx, studyAdminUsers, tx, &study); err != nil {
+		tx.Rollback()
 		return err
 	}
 

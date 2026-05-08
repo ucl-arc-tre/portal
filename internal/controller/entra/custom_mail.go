@@ -36,6 +36,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 }
 
 func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
+
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
 	}
