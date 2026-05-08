@@ -170,9 +170,10 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 	return c.createCustomEmail(ctx, subject, []string{email}, content)
 }
 
-func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, emails []string, studyTitle string) error {
+func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
 
 	content := "You have been added as an IAA to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
 
-	return c.createCustomEmail(ctx, "Notification: You have been added to a Study in the UCL ARC Services Portal", emails, content)
+	subject := "Notification: You have been added as an administrator to a Study in the UCL ARC Services Portal"
+	return c.createCustomEmail(ctx, subject, []string{email}, content)
 }

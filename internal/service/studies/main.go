@@ -261,7 +261,7 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 				return err
 			}
 		}
-		if studyAdminInRequested && studyAdmin.DeletedAt.Valid { // is currently deleted
+		if studyAdminInRequested && studyAdmin.IsDeleted() {
 			log.Debug().Any("username", studyAdmin.User.Username).Msg("Un-deleting study admin")
 			if err := tx.Unscoped().Model(&studyAdmin).Update("deleted_at", nil).Error; err != nil {
 				return types.NewErrFromGorm(err, "failed to undelete study admin")
@@ -269,7 +269,15 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 		}
 
 		if studyAdminInRequested && !studyAdmin.DeletedAt.Valid {
-			if err := s.SendIaaAssignmentEmailNotification(ctx, []types.User{studyAdmin.User}, study.Title); err != nil {
+
+		}
+	}
+
+	for _, user := range users {
+		userIsNotExistingStudyAdmin := !containsStudyAdminUser(existingStudyAdmins, user)
+		if userIsNotExistingStudyAdmin {
+			if err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title); err != nil {
+				tx.Rollback()
 				return err
 			}
 		}
@@ -391,16 +399,11 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 	return nil
 }
 
-func (s *Service) SendIaaAssignmentEmailNotification(ctx context.Context, admins []types.User, studyTitle string) error {
-
-	recipients := []string{}
-	for _, studyAdmin := range admins {
-		recipients = append(recipients, string(studyAdmin.Username))
+func containsStudyAdminUser(studyAdmins []types.StudyAdmin, user types.User) bool {
+	for _, studyAdmin := range studyAdmins {
+		if studyAdmin.UserID == user.ID && !studyAdmin.IsDeleted() {
+			return true
+		}
 	}
-
-	err := s.entra.SendIaaAssignmentNotification(ctx, recipients, studyTitle)
-	if err != nil {
-		return err
-	}
-	return nil
+	return false
 }

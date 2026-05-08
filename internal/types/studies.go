@@ -71,6 +71,10 @@ type StudyAdmin struct {
 	User  User  `gorm:"foreignKey:UserID"`
 }
 
+func (s StudyAdmin) IsDeleted() bool {
+	return s.DeletedAt.Valid
+}
+
 type Asset struct {
 	ModelAuditable
 	CreatorUserID        uuid.UUID `gorm:"not null;index"`
