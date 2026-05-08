@@ -285,8 +285,9 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 	for _, user := range users {
 		userIsNotExistingStudyAdmin := !containsStudyAdminUser(existingStudyAdmins, user)
 		if userIsNotExistingStudyAdmin {
-			if err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title); err != nil {
-				return err
+			err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title)
+			if err != nil {
+				log.Err(err).Any("username", user.Username).Msg("Failed to send IAA assignment email")
 			}
 		}
 	}
