@@ -267,20 +267,6 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 				return types.NewErrFromGorm(err, "failed to undelete study admin")
 			}
 		}
-
-		if studyAdminInRequested && !studyAdmin.DeletedAt.Valid {
-
-		}
-	}
-
-	for _, user := range users {
-		userIsNotExistingStudyAdmin := !containsStudyAdminUser(existingStudyAdmins, user)
-		if userIsNotExistingStudyAdmin {
-			if err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title); err != nil {
-				tx.Rollback()
-				return err
-			}
-		}
 	}
 
 	for _, user := range users {
@@ -296,6 +282,14 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 		}
 	}
 
+	for _, user := range users {
+		userIsNotExistingStudyAdmin := !containsStudyAdminUser(existingStudyAdmins, user)
+		if userIsNotExistingStudyAdmin {
+			if err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
