@@ -9,6 +9,7 @@ import (
 
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -37,6 +38,11 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
+	}
+
+	if !config.EntraMailEnabled() {
+		log.Warn().Msg("Entra mail is not enabled – not sending email")
+		return nil
 	}
 
 	requestBody := graphusers.NewItemSendMailPostRequestBody()
