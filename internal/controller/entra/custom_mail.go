@@ -34,7 +34,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) createCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
+func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
 	}
@@ -111,7 +111,7 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
 	}
 
-	return c.createCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
+	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
 }
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
@@ -133,7 +133,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		}
 	}
 
-	return c.createCustomEmail(ctx, subject, emails, content)
+	return c.sendCustomEmail(ctx, subject, emails, content)
 }
 
 func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
@@ -153,7 +153,7 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 	}
 
 	subject := "Notification: Your contract in" + study.Title + " is due to expire soon"
-	return c.createCustomEmail(ctx, subject, emails, content)
+	return c.sendCustomEmail(ctx, subject, emails, content)
 }
 
 func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
@@ -170,7 +170,7 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 	}
 
 	subject := "Notification: Your training certificate is due to expire soon"
-	return c.createCustomEmail(ctx, subject, []string{email}, content)
+	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }
 
 func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
@@ -178,5 +178,5 @@ func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email st
 	content := "You have been added as an IAA to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
 
 	subject := "Notification: You have been added as an administrator to a Study in the UCL ARC Services Portal"
-	return c.createCustomEmail(ctx, subject, []string{email}, content)
+	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }

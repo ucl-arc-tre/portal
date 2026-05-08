@@ -21,6 +21,6 @@ func TestCustomMailContent(t *testing.T) {
 
 func TestCannotSendCustomEmail(t *testing.T) {
 	controller := Controller{}
-	err := controller.createCustomEmail(context.Background(), "subject", []string{}, "content")
+	err := controller.sendCustomEmail(context.Background(), "subject", []string{}, "content")
 	assert.True(t, errors.Is(err, types.ErrInvalidObject))
 }
