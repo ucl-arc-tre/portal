@@ -109,7 +109,7 @@ func EntraMailCredentials() EntraCredentialBundle {
 
 func EntraMailEnabled() bool {
 	e := EntraMailCredentials()
-	return e.TenantID != "" && e.ClientID != "" && e.ClientSecret != ""
+	return e.TenantID != "" && e.ClientID != "" && e.ClientSecret != "" && EntraMailUserPrincipal() != ""
 }
 
 func EntraMailUserPrincipal() string {

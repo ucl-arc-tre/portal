@@ -238,9 +238,9 @@ func setStudyFromStudyData(study *types.Study, studyData openapi.StudyRequest) {
 
 }
 
-func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx *gorm.DB, study *types.Study) error {
+func (s *Service) createStudyAdmins(tx *StudyTransaction, users []types.User, study *types.Study) error {
 	existingStudyAdmins := []types.StudyAdmin{}
-	if err := tx.Unscoped().Preload("User").Where("study_id = ?", study.ID).Find(&existingStudyAdmins).Error; err != nil {
+	if err := tx.db.Unscoped().Preload("User").Where("study_id = ?", study.ID).Find(&existingStudyAdmins).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list study admins")
 	}
 
@@ -254,7 +254,7 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 		studyAdminInRequested := slices.Contains(userIds, studyAdmin.UserID)
 		if !studyAdminInRequested {
 			log.Debug().Any("username", studyAdmin.User.Username).Msg("Deleting study admin")
-			if err := tx.Delete(&studyAdmin).Error; err != nil {
+			if err := tx.db.Delete(&studyAdmin).Error; err != nil {
 				return types.NewErrFromGorm(err, "failed to delete study admin")
 			}
 			if _, err := rbac.RemoveRole(studyAdmin.User, studyAdminRole.RoleName()); err != nil {
@@ -263,7 +263,7 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 		}
 		if studyAdminInRequested && studyAdmin.IsDeleted() {
 			log.Debug().Any("username", studyAdmin.User.Username).Msg("Un-deleting study admin")
-			if err := tx.Unscoped().Model(&studyAdmin).Update("deleted_at", nil).Error; err != nil {
+			if err := tx.db.Unscoped().Model(&studyAdmin).Update("deleted_at", nil).Error; err != nil {
 				return types.NewErrFromGorm(err, "failed to undelete study admin")
 			}
 		}
@@ -274,7 +274,7 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 			StudyID: study.ID,
 			UserID:  user.ID,
 		}
-		if err := tx.Unscoped().Where("study_id = ? AND user_id = ?", study.ID, user.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
+		if err := tx.db.Unscoped().Where("study_id = ? AND user_id = ?", study.ID, user.ID).FirstOrCreate(&studyAdmin).Error; err != nil {
 			return types.NewErrFromGorm(err, "failed to create study admin")
 		}
 		if _, err := rbac.AddRole(user, studyAdminRole.RoleName()); err != nil {
@@ -285,10 +285,7 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 	for _, user := range users {
 		userIsNotExistingStudyAdmin := !containsStudyAdminUser(existingStudyAdmins, user)
 		if userIsNotExistingStudyAdmin {
-			err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title)
-			if err != nil {
-				log.Err(err).Any("username", user.Username).Msg("Failed to send IAA assignment email")
-			}
+			tx.newIAAs = append(tx.newIAAs, user)
 		}
 	}
 
@@ -297,9 +294,6 @@ func (s *Service) createStudyAdmins(ctx context.Context, users []types.User, tx 
 
 // handles the database transaction for creating a study and its admins
 func (s *Service) createStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest, studyAdminUsers []types.User) error {
-	// Start a transaction
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
 
 	study := types.Study{
 		OwnerUserID:    owner.ID,
@@ -308,8 +302,10 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 
 	setStudyFromStudyData(&study, studyData)
 
-	// Create the study
-	if err := tx.Create(&study).Error; err != nil {
+	tx := s.newStudyTransaction(ctx)
+	defer tx.RollbackOnPanic()
+
+	if err := tx.db.Create(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err)
 	}
@@ -320,12 +316,12 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 	}
 
 	// Create StudyAdmin records for each study admin user
-	if err := s.createStudyAdmins(ctx, studyAdminUsers, tx, &study); err != nil {
+	if err := s.createStudyAdmins(tx, studyAdminUsers, &study); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	return commitTransaction(tx)
+	return s.commitStudyTransaction(tx, &study)
 }
 
 func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
@@ -359,21 +355,21 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return err
 	}
 
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
+	tx := s.newStudyTransaction(ctx)
+	defer tx.RollbackOnPanic()
 
-	if err := s.createStudyAdmins(ctx, studyAdminUsers, tx, &study); err != nil {
+	if err := s.createStudyAdmins(tx, studyAdminUsers, &study); err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// .Select("*") allows setting values to nil
-	if err := tx.Model(&study).Where("id = ?", id).Select("*").Updates(&study).Error; err != nil {
+	if err := tx.db.Model(&study).Where("id = ?", id).Select("*").Updates(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
 
-	return commitTransaction(tx)
+	return s.commitStudyTransaction(tx, &study)
 }
 
 func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uuid.UUID, review openapi.StudyReview) error {
@@ -393,6 +389,27 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *Service) newStudyTransaction(ctx context.Context) *StudyTransaction {
+	return &StudyTransaction{ctx: ctx, db: s.db.Begin(), newIAAs: []types.User{}}
+}
+
+func (s *Service) commitStudyTransaction(tx *StudyTransaction, study *types.Study) error {
+	if err := commitTransaction(tx.db); err != nil {
+		return err
+	}
+
+	go func() { // Send the emails in the background, allowing up to a minute for sending
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
+		for _, user := range tx.newIAAs {
+			if err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title); err != nil {
+				log.Err(err).Any("username", user.Username).Msg("Failed to send IAA assignment email")
+			}
+		}
+	}()
 	return nil
 }
 
