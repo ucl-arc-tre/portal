@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	day  = 24 * time.Hour
 	year = 365 * day
 )
 
@@ -29,4 +28,12 @@ func TestDaysUntilTrainingExpiry(t *testing.T) {
 	record.CompletedAt = time.Now().Add(-(year + 180*day + time.Hour))
 	assert.Equal(t, -180, DaysUntilTrainingExpiry(record))
 	assert.False(t, ShouldNotifyTrainingExpiry(record))
+}
+
+func TestDaysUntilStudySignoffExpiry(t *testing.T) {
+	assert.Equal(t, 0, DaysUntilStudySignoffExpiry(nil))
+
+	now := time.Now()
+	study := types.Study{LastSignoff: &now}
+	assert.Equal(t, 89, DaysUntilStudySignoffExpiry(&study))
 }

@@ -5,12 +5,19 @@ import (
 	"time"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 const (
 	day = 24 * time.Hour
 )
+
+func (m *Manager) scheduleDailyChecks() {
+	m.mustEvery(day, m.checkContractsExpiry, "checkContractsExpiry")
+	m.mustEvery(day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
+	m.mustEvery(day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
+}
 
 func (m *Manager) checkContractsExpiry() error {
 	if !config.NotificationsEnabled() {
@@ -76,7 +83,28 @@ func (m *Manager) checkTrainingCertificatesExpiry() error {
 	return nil
 }
 
-func (m *Manager) scheduleDailyChecks() {
-	m.mustEvery(day, m.checkContractsExpiry, "checkContractsExpiry")
-	m.mustEvery(day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
+func (m *Manager) checkStudySignoffExpiry() error {
+	if !config.NotificationsEnabled() {
+		return nil
+	}
+
+	ctx := context.Background()
+
+	studies := []types.Study{}
+	result := m.db.Model(&types.Study{}).Where("approval_status = ?", openapi.Approved).Preload("Owner").Find(&studies)
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get studies")
+	}
+
+	for _, study := range studies {
+		if !config.ShouldNotifyStudySignoffExpiry(&study) {
+			continue
+		}
+
+		err := m.entra.SendStudySignoffExpiryNotification(ctx, string(study.Owner.Username), study)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
