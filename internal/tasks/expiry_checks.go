@@ -39,7 +39,7 @@ func (m *Manager) checkContractsExpiry() error {
 			recipients = append(recipients, string(studyAdmin.User.Username))
 		}
 
-		contract := study.EarliestExpringContractShouldNotifyExpiry()
+		contract := earliestExpringContractShouldNotifyExpiry(study)
 		if contract == nil {
 			continue
 		}
@@ -51,6 +51,26 @@ func (m *Manager) checkContractsExpiry() error {
 	}
 
 	return nil
+}
+
+// Return the contract with the most urgent expiry notification.
+// Returns nil if there are no contracts that should notify the expiry for
+func earliestExpringContractShouldNotifyExpiry(study types.Study) *types.Contract {
+	var expiringContract *types.Contract
+	for _, contract := range study.Contracts {
+		if !config.ShouldNotifyContractExpiry(contract) {
+			continue
+		}
+		if expiringContract == nil {
+			expiringContract = &contract
+			continue
+		}
+		daysUntilExpiry := config.DaysUntilContractExpiry(contract)
+		if daysUntilExpiry != nil && *daysUntilExpiry < *config.DaysUntilContractExpiry(*expiringContract) {
+			expiringContract = &contract
+		}
+	}
+	return expiringContract
 }
 
 func (m *Manager) checkTrainingCertificatesExpiry() error {

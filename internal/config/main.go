@@ -201,7 +201,7 @@ func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {
 		return false
 	}
 	daysUntilExpiry := DaysUntilTrainingExpiry(trainingRecord)
-	if daysUntilExpiry < -90 { // don't notify very expired training
+	if daysUntilExpiry < -7 { // don't notify very expired training
 		return false
 	}
 	return daysUntilExpiry <= 1 || daysUntilExpiry == 7 || daysUntilExpiry == 14 || daysUntilExpiry == 21
@@ -220,8 +220,26 @@ func ShouldNotifyStudySignoffExpiry(study *types.Study) bool {
 		return false
 	}
 	daysUntilExpiry := DaysUntilStudySignoffExpiry(study)
-	if daysUntilExpiry < -90 { // don't notify very expired studies
+	if daysUntilExpiry < -7 { // don't notify very expired studies
 		return false
 	}
 	return daysUntilExpiry <= 1 || daysUntilExpiry == 7 || daysUntilExpiry == 14
+}
+
+func DaysUntilContractExpiry(contract types.Contract) *int {
+	if contract.ExpiryDate == nil {
+		return nil
+	}
+	expiryDays := int(time.Until(*contract.ExpiryDate).Hours() / 24)
+	return &expiryDays
+}
+
+func ShouldNotifyContractExpiry(contract types.Contract) bool {
+	daysUntilExpiry := DaysUntilContractExpiry(contract)
+	if daysUntilExpiry == nil {
+		return false
+	} else if *daysUntilExpiry < -7 {
+		return false // don't notify very expired contracts
+	}
+	return *daysUntilExpiry <= 1 || *daysUntilExpiry == 7 || *daysUntilExpiry == 14 || *daysUntilExpiry == 30
 }

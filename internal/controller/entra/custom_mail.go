@@ -134,7 +134,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 }
 
 func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
-	days := contract.DaysUntilExpiry()
+	days := config.DaysUntilContractExpiry(contract)
 	if days == nil {
 		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
 	}
