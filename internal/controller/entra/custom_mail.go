@@ -182,7 +182,7 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 
 func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
 
-	content := "You have been added as an IAA to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
+	content := "You have been added as an administrator to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
 
 	subject := "Notification: Training expiry"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
