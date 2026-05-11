@@ -254,4 +254,38 @@ describe("Study creation end-to-end", () => {
       });
     cy.contains("Last signed off").should("exist");
   });
+
+  it("study owners should see signoff warning and be able to confirm study details", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle)
+      .parent()
+      .parent()
+      .within(() => {
+        cy.get('[data-cy="manage-study-button"]').click();
+      });
+
+    cy.url().then((url) => {
+      const studyId = new URLSearchParams(url.split("?")[1]).get("studyId");
+
+      cy.intercept("GET", `/web/api/v0/studies/${studyId}`, (req) => {
+        req.reply((res) => {
+          res.body.last_signoff = "2020-01-01T00:00:00Z";
+        });
+      }).as("getStudyWithOldSignoff");
+
+      cy.visit(`/studies/manage?studyId=${studyId}`);
+      cy.wait("@getStudyWithOldSignoff");
+
+      cy.contains("As Study Owner you're required to confirm that your study").scrollIntoView().should("be.visible");
+      cy.contains("Confirm Details").should("be.disabled");
+
+      cy.contains("I confirm the above details are correct").click();
+      cy.contains("Confirm Details").should("not.be.disabled");
+
+      cy.contains("Confirm Details").click();
+      cy.contains("As Study Owner you're required to confirm that your study").should("not.exist");
+    });
+  });
 });
