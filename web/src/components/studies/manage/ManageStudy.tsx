@@ -154,10 +154,10 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <div className={styles["signoff-warning"]}>
           <Alert type="warning">
             <AlertMessage>
-              <p>As IAO you&apos;re required to confirm that your study:</p>
+              <p>As Study Owner you&apos;re required to confirm that your study:</p>
               <ul>
                 <li>is still ongoing</li>
-                <li>has the correct admins (IAAs) assigned</li>
+                <li>has the correct Study Administrators assigned</li>
                 <li>has all the correct information and references</li>
                 <li>has all relevant documents (contracts and assets)</li>
                 <li>has the correct roles assigned to project users</li>
