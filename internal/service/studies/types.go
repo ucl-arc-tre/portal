@@ -2,7 +2,6 @@ package studies
 
 import (
 	"context"
-	"time"
 
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -30,26 +29,11 @@ type StudyTransaction struct {
 	newIAAs []types.User // Newly added administrations that require notifications
 }
 
-func (s StudyTransaction) Rollback() {
+func (s *StudyTransaction) Rollback() {
 	s.db.Rollback()
+	s.newIAAs = []types.User{}
 }
 
-func (s StudyTransaction) RollbackOnPanic() {
+func (s *StudyTransaction) RollbackOnPanic() {
 	graceful.RollbackTransactionOnPanic(s.db)
-}
-
-func (s StudyTransaction) Deadline() (deadline time.Time, ok bool) {
-	return s.ctx.Deadline()
-}
-
-func (s StudyTransaction) Done() <-chan struct{} {
-	return s.ctx.Done()
-}
-
-func (s StudyTransaction) Err() error {
-	return s.ctx.Err()
-}
-
-func (s StudyTransaction) Value(key any) any {
-	return s.ctx.Value(key)
 }
