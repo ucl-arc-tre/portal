@@ -1509,6 +1509,40 @@ export type PatchStudiesByStudyIdPendingResponses = {
     201: unknown;
 };
 
+export type PostStudiesByStudyIdSignoffData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/signoff';
+};
+
+export type PostStudiesByStudyIdSignoffErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesByStudyIdSignoffResponses = {
+    /**
+     * Signoff recorded successfully
+     */
+    200: unknown;
+};
+
 export type GetEnvironmentsData = {
     body?: never;
     path?: never;

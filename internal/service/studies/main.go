@@ -329,6 +329,12 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 	return types.NewErrFromGorm(db.Error, "failed to update study review")
 }
 
+func (s *Service) RecordStudySignoff(id uuid.UUID) error {
+	now := time.Now()
+	db := s.db.Model(&types.Study{}).Where("id = ?", id).Update("last_signoff", now)
+	return types.NewErrFromGorm(db.Error, "failed to record study signoff")
+}
+
 func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest) error {
 	if err := s.validateStudyData(ctx, studyData, true); err != nil {
 		return err

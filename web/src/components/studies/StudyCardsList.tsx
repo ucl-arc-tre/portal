@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { Study } from "@/openapi";
 import StatusBadge from "../ui/StatusBadge";
 import Button from "@/components/ui/Button";
+import { studySignoffWarningRequired } from "../shared/exports";
 
 import styles from "./StudyCardsList.module.css";
 
@@ -30,6 +31,11 @@ export default function StudyCardsList(props: Props) {
             <div key={study.id} className={styles["study-card"]} data-cy="study-card">
               <div className={styles["status-indicator"]}>
                 <StatusBadge status={study.approval_status} type="study" />
+                {study.approval_status === "Approved" &&
+                  study.last_signoff != null &&
+                  studySignoffWarningRequired(study.last_signoff) && (
+                    <span className={styles["signoff-warning-tag"]}>Study Confirmation due</span>
+                  )}
               </div>
 
               <div className={styles["study-info"]}>

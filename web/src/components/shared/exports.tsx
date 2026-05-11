@@ -36,10 +36,24 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
   return humanReadableTrainingKind;
 }
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+export function studySignoffWarningRequired(lastSignoff: string): boolean {
+  const validityDays = 90;
+  const warningThresholdDays = 30;
+
+  const lastSignoffDate = new Date(lastSignoff); // e.g. "2024-01-01"
+  const millisecondsDiff = Date.now() - lastSignoffDate.getTime(); // e.g. 90 days (in milliseconds)
+  const daysSinceSignoff = Math.floor(millisecondsDiff / MS_PER_DAY); // e.g. 90 days
+  const daysRemaining = validityDays - daysSinceSignoff; // e.g. 0 days remaining
+
+  return daysRemaining <= warningThresholdDays;
+}
+
 export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {
   const today = new Date();
   const timeUntilExpiry = expiryDate.getTime() - today.getTime();
-  const daysUntilExpiry = Math.ceil(timeUntilExpiry / (1000 * 60 * 60 * 24));
+  const daysUntilExpiry = Math.ceil(timeUntilExpiry / MS_PER_DAY);
 
   let expiryUrgency: ExpiryUrgency | null = null;
   if (daysUntilExpiry > 90) {

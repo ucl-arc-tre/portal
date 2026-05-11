@@ -560,6 +560,21 @@ paths:
         "404":
           description: Study not found
 
+  /studies/{studyId}/signoff:
+    post:
+      description: Record that the IAO has attested the study details are up to date, resetting the signoff timestamp
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      responses:
+        "200":
+          description: Signoff recorded successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+
   # Environments
   /environments:
     get:

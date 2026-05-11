@@ -2,21 +2,24 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
-import { getProfile, getStudies } from "@/openapi";
+import { getProfile, getStudies, Study } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
 import { AlertMessage, Alert } from "../shared/uikitExports";
+import { studySignoffWarningRequired } from "../shared/exports";
 
 export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
   const [chosenName, setChosenName] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [hasPendingStudies, setHasPendingStudies] = useState(false);
+  const [studiesRequiringSignoff, setStudiesRequiringSignoff] = useState<Study[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const isIAO = userData?.roles.includes("information-asset-owner");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -63,6 +66,30 @@ export default function UserTasks() {
     };
     if (isIGOpsStaff) fetchPendingStudies();
   }, [isIGOpsStaff]);
+
+  useEffect(() => {
+    const fetchStudiesRequiringSignoff = async () => {
+      try {
+        const response = await getStudies({ query: { status: "Approved" } });
+        if (responseIsError(response) || !response.data) {
+          const errorMsg = extractErrorMessage(response);
+          setError(`Failed to load studies: ${errorMsg}`);
+          return;
+        }
+        const due = response.data.filter(
+          (study) =>
+            study.owner_username === userData?.username &&
+            study.last_signoff != null &&
+            studySignoffWarningRequired(study.last_signoff)
+        );
+        setStudiesRequiringSignoff(due);
+      } catch (error) {
+        console.error("Failed to get studies requiring signoff:", error);
+        setError("Failed to load studies. Please try again later.");
+      }
+    };
+    if (isIAO) fetchStudiesRequiringSignoff();
+  }, [isIAO, userData?.username]);
 
   if (authInProgress) return null;
 
@@ -120,7 +147,25 @@ export default function UserTasks() {
               )}
             </>
           ) : (
-            <p>You have completed all your tasks.</p>
+            <>
+              {studiesRequiringSignoff.length > 0 && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? (
+                <>
+                  {studiesRequiringSignoff.map((study) => (
+                    <div key={study.id} className={styles["signoff-task"]}>
+                      <p>
+                        Study confirmation is due for <strong>{study.title}</strong>.
+                      </p>
+
+                      <Button href={`/studies/manage?studyId=${study.id}`} size="small">
+                        Review Study
+                      </Button>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <p>You have completed all your tasks.</p>
+              )}
+            </>
           )}
         </div>
       )}
