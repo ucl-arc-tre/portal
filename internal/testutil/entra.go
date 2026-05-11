@@ -49,3 +49,7 @@ func (f *MockEntra) SendTrainingExpiryNotification(ctx context.Context, email st
 func (f *MockEntra) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
 	panic("not implemented")
 }
+
+func (f *MockEntra) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
+	panic("not implemented")
+}
