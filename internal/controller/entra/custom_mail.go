@@ -144,7 +144,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 }
 
 func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
-	days := contract.DaysUntilExpiry()
+	days := config.DaysUntilContractExpiry(contract)
 	if days == nil {
 		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
 	}
@@ -159,7 +159,7 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract."
 	}
 
-	subject := "Notification: Your contract in" + study.Title + " is due to expire soon"
+	subject := "Notification: Study contract expiry"
 	return c.sendCustomEmail(ctx, subject, emails, content)
 }
 
@@ -184,6 +184,25 @@ func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email st
 
 	content := "You have been added as an IAA to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
 
-	subject := "Notification: You have been added as an administrator to a Study in the UCL ARC Services Portal"
+	subject := "Notification: Training expiry"
+	return c.sendCustomEmail(ctx, subject, []string{email}, content)
+}
+
+func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
+	days := config.DaysUntilStudySignoffExpiry(&study)
+
+	content := "You are required to re-attest details about your Study '" + study.Title + "'. Your current attestation "
+	if days < 0 {
+		content += "has expired. "
+	} else if days == 0 {
+		content += "expires today. "
+	} else if days == 1 {
+		content += "expires tomorrow. "
+	} else {
+		content += fmt.Sprintf("expires in %d days. ", days)
+	}
+	content += "Please login to the ARC Services Portal to complete the attestation."
+
+	subject := "Notification: Study attestation expiry"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }

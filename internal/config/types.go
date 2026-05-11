@@ -1,5 +1,7 @@
 package config
 
+type Days = int
+
 type EntraCredentialBundle struct {
 	TenantID     string
 	ClientID     string
