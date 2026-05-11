@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	day  = 24 * time.Hour
 	year = 365 * day
 )
 
@@ -29,4 +28,33 @@ func TestDaysUntilTrainingExpiry(t *testing.T) {
 	record.CompletedAt = time.Now().Add(-(year + 180*day + time.Hour))
 	assert.Equal(t, -180, DaysUntilTrainingExpiry(record))
 	assert.False(t, ShouldNotifyTrainingExpiry(record))
+}
+
+func TestDaysUntilStudySignoffExpiry(t *testing.T) {
+	assert.Equal(t, 0, DaysUntilStudySignoffExpiry(nil))
+
+	now := time.Now()
+	study := types.Study{LastSignoff: &now}
+	assert.Equal(t, 89, DaysUntilStudySignoffExpiry(&study))
+}
+
+func TestContractShouldNotify(t *testing.T) {
+	c := types.Contract{}
+	assert.False(t, ShouldNotifyContractExpiry(c))
+
+	twoMonthsFromNow := time.Now().Add(2 * month)
+	c.ExpiryDate = &twoMonthsFromNow
+	assert.False(t, ShouldNotifyContractExpiry(c))
+
+	oneMonthFromNow := time.Now().Add(1 * month).Add(1 * time.Second)
+	c.ExpiryDate = &oneMonthFromNow
+	assert.True(t, ShouldNotifyContractExpiry(c))
+
+	today := time.Now()
+	c.ExpiryDate = &today
+	assert.True(t, ShouldNotifyContractExpiry(c))
+
+	yesterday := time.Now().Add(-1 * day)
+	c.ExpiryDate = &yesterday
+	assert.True(t, ShouldNotifyContractExpiry(c))
 }
