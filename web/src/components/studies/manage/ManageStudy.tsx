@@ -153,16 +153,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {showSignoffWarning && (
         <div className={styles["signoff-warning"]}>
           <Alert type="warning">
-            <AlertMessage>
-              <p>As Study Owner you&apos;re required to confirm that your study:</p>
-              <ul>
-                <li>is still ongoing</li>
-                <li>has the correct Study Administrators assigned</li>
-                <li>has the correct roles assigned to project users</li>
-                <li>has all the correct information and references</li>
-                <li>has all relevant documents (contracts and assets)</li>
-              </ul>
-            </AlertMessage>
+            <AlertMessage>As Study Owner you&apos;re required to confirm that your study:</AlertMessage>
+            <ul>
+              <li>is still ongoing</li>
+              <li>has the correct Study Administrators assigned</li>
+              <li>has the correct roles assigned to project users</li>
+              <li>has all the correct information and references</li>
+              <li>has all relevant documents (contracts and assets)</li>
+            </ul>
 
             <p className={styles["signoff-confirm-text"]}>
               Confirm these details are correct or update your Study as necessary.
