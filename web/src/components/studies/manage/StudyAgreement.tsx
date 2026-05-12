@@ -12,9 +12,10 @@ type StudyAgreementProps = {
   studyId: string;
   studyTitle: string;
   setAgreementCompleted: (completed: boolean) => void;
+  isOwner: boolean;
 };
 
-export default function StudyAgreement({ studyId, studyTitle, setAgreementCompleted }: StudyAgreementProps) {
+export default function StudyAgreement({ studyId, studyTitle, setAgreementCompleted, isOwner }: StudyAgreementProps) {
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,10 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
 
       try {
         setError(null);
-        const agreementTextResult = await getAgreementsByAgreementType({ path: { agreementType: "study-owner" } });
+        const agreementType = isOwner ? "study-owner" : "study-administrator";
+        const agreementTextResult = await getAgreementsByAgreementType({
+          path: { agreementType: agreementType },
+        });
         if (responseIsError(agreementTextResult) || !agreementTextResult.data) {
           const errorMsg = extractErrorMessage(agreementTextResult);
           setError(`Failed to load study agreement text: ${errorMsg}`);
@@ -43,7 +47,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
     };
 
     fetchAgreementText();
-  }, []);
+  }, [isOwner]);
 
   if (isLoading) return <Loading message="Loading study agreement..." />;
 
@@ -71,7 +75,9 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
 
   return (
     <section className={styles["study-agreement-container"]} data-cy="study-agreement">
-      <h2 className="subtitle">Study Owner Agreement for study: {studyTitle}</h2>
+      <h2 className="subtitle">
+        Study {isOwner ? "Owner" : "Administrator"} Agreement for study: {studyTitle}
+      </h2>
 
       {error && (
         <Alert type="error">

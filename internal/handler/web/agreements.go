@@ -18,6 +18,8 @@ func (h *Handler) GetAgreementsAgreementType(ctx *gin.Context, agreementType ope
 		agreement, err = h.agreements.LatestApprovedResearcher()
 	case openapi.AgreementTypeStudyOwner:
 		agreement, err = h.agreements.LatestStudyOwner()
+	case openapi.AgreementTypeStudyAdministrator:
+		agreement, err = h.agreements.LatestStudyAdministrator()
 	default:
 		err = types.NewNotFoundError("agreement type not found")
 	}
