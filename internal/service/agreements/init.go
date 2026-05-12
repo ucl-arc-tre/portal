@@ -16,7 +16,7 @@ var approvedResearcherMarkdown string
 //go:embed study_owner.md
 var studyOwnerMarkdown string
 
-//go:embed study_owner.md
+//go:embed study_administrator.md
 var studyAdministratorMarkdown string
 
 // Initialise the agreements
@@ -38,6 +38,6 @@ func initAgreement(db *gorm.DB, agreementMarkdown string, agreementType types.Ag
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&types.Agreement{})
 	if result.Error != nil {
-		panic(fmt.Sprintf("failed to initalise agreement: %v", result.Error))
+		panic(fmt.Sprintf("failed to initialise agreement: %v", result.Error))
 	}
 }
