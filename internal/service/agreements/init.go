@@ -16,11 +16,15 @@ var approvedResearcherMarkdown string
 //go:embed study_owner.md
 var studyOwnerMarkdown string
 
-// Initalise the agreements
+//go:embed study_owner.md
+var studyAdministratorMarkdown string
+
+// Initialise the agreements
 func Init() {
 	db := graceful.NewDB()
 	initAgreement(db, approvedResearcherMarkdown, ApprovedResearcherType)
 	initAgreement(db, studyOwnerMarkdown, StudyOwnerType)
+	initAgreement(db, studyAdministratorMarkdown, StudyAdministratorType)
 }
 
 func initAgreement(db *gorm.DB, agreementMarkdown string, agreementType types.AgreementType) {

@@ -15,6 +15,7 @@ import (
 // Defines values for AgreementType.
 const (
 	AgreementTypeApprovedResearcher AgreementType = "approved-researcher"
+	AgreementTypeStudyAdministrator AgreementType = "study-administrator"
 	AgreementTypeStudyOwner         AgreementType = "study-owner"
 )
 
@@ -22,6 +23,8 @@ const (
 func (e AgreementType) Valid() bool {
 	switch e {
 	case AgreementTypeApprovedResearcher:
+		return true
+	case AgreementTypeStudyAdministrator:
 		return true
 	case AgreementTypeStudyOwner:
 		return true
@@ -1367,7 +1370,7 @@ type ServerInterface interface {
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/{studyId}/agreements)
-	PostStudiesStudyIdAgreements(c *gin.Context, studyId string)
+	PostStudiesStudyIdAgreements(c *gin.Context, studyId StudyIdParam)
 
 	// (GET /studies/{studyId}/assets)
 	GetStudiesStudyIdAssets(c *gin.Context, studyId StudyIdParam)
@@ -2018,7 +2021,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAgreements(c *gin.Context) 
 	_ = err
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {

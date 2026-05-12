@@ -950,12 +950,7 @@ paths:
     post:
       description: Sign an agreement for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
@@ -1285,6 +1280,7 @@ components:
       enum:
         - approved-researcher
         - study-owner
+        - study-administrator
 
     UserAgreements:
       type: object

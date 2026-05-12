@@ -47,7 +47,7 @@ export type ConfirmedAgreement = {
     agreement_type: AgreementType;
 };
 
-export type AgreementType = 'approved-researcher' | 'study-owner';
+export type AgreementType = 'approved-researcher' | 'study-owner' | 'study-administrator';
 
 export type UserAgreements = {
     confirmed_agreements: Array<ConfirmedAgreement>;
@@ -2180,7 +2180,7 @@ export type PostStudiesByStudyIdAgreementsData = {
     body: AgreementConfirmation;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };
