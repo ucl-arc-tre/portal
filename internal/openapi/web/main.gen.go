@@ -1414,6 +1414,9 @@ type ServerInterface interface {
 	// (PATCH /studies/{studyId}/pending)
 	PatchStudiesStudyIdPending(c *gin.Context, studyId StudyIdParam)
 
+	// (POST /studies/{studyId}/signoff)
+	PostStudiesStudyIdSignoff(c *gin.Context, studyId StudyIdParam)
+
 	// (GET /tokens/dsh)
 	GetTokensDsh(c *gin.Context)
 
@@ -2516,6 +2519,31 @@ func (siw *ServerInterfaceWrapper) PatchStudiesStudyIdPending(c *gin.Context) {
 	siw.Handler.PatchStudiesStudyIdPending(c, studyId)
 }
 
+// PostStudiesStudyIdSignoff operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdSignoff(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdSignoff(c, studyId)
+}
+
 // GetTokensDsh operation middleware
 func (siw *ServerInterfaceWrapper) GetTokensDsh(c *gin.Context) {
 
@@ -2753,6 +2781,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.GetStudiesStudyIdContractsContractIdObjectsContractObjectId)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
+	router.POST(options.BaseURL+"/studies/:studyId/signoff", wrapper.PostStudiesStudyIdSignoff)
 	router.GET(options.BaseURL+"/tokens/dsh", wrapper.GetTokensDsh)
 	router.POST(options.BaseURL+"/tokens/dsh", wrapper.PostTokensDsh)
 	router.DELETE(options.BaseURL+"/tokens/dsh/:tokenId", wrapper.DeleteTokensDshTokenId)

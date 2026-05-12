@@ -189,6 +189,7 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, studyAgreements)
 }
 
+// Called by IG Ops staff to approve or reject a study, optionally with feedback
 func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{}
 	if err := bindJSONOrSetError(ctx, &review); err != nil {
@@ -215,6 +216,22 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 	ctx.Status(http.StatusOK)
 }
 
+// Called by the IAO to attest that study details are up to date, resetting the signoff timestamp
+func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	if err := h.studies.RecordStudySignoff(studyUUID); err != nil {
+		setError(ctx, err, "Failed to record study signoff")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+// Called by the study owner/researcher to submit their study for IG Ops review
 func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{
 		Status: openapi.Pending,

@@ -1,3 +1,22 @@
+.signoff-warning {
+  max-width: 600px;
+  margin: 0 auto 1rem auto;
+}
+
+.signoff-confirm-text {
+  margin-top: 0.75rem;
+}
+
+.signoff-checkbox {
+  margin-top: 0.75rem;
+}
+
+.signoff-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .manage-study {
   padding: 2rem 0;
 }
