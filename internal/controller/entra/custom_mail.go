@@ -9,6 +9,7 @@ import (
 
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -24,7 +25,26 @@ var (
 	baseMailTemplate = template.Must(template.New("baseMailTemplate").Parse(baseMailTemplateContent))
 )
 
-func (c *Controller) createCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
+func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
+	templateReader := new(bytes.Buffer)
+	err := baseMailTemplate.Execute(templateReader, params)
+	if err != nil {
+		return nil, err
+	}
+	content := templateReader.String()
+	return &content, nil
+}
+
+func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
+
+	if len(emails) == 0 {
+		return types.NewErrInvalidObjectF("cannot send email to no recipients")
+	}
+
+	if !config.EntraMailEnabled() {
+		log.Warn().Msg("Entra mail is not enabled – not sending email")
+		return nil
+	}
 
 	requestBody := graphusers.NewItemSendMailPostRequestBody()
 	message := graphmodels.NewMessage()
@@ -98,7 +118,7 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
 	}
 
-	return c.createCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
+	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
 }
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
@@ -120,17 +140,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		}
 	}
 
-	return c.createCustomEmail(ctx, subject, emails, content)
-}
-
-func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
-	templateReader := new(bytes.Buffer)
-	err := baseMailTemplate.Execute(templateReader, params)
-	if err != nil {
-		return nil, err
-	}
-	content := templateReader.String()
-	return &content, nil
+	return c.sendCustomEmail(ctx, subject, emails, content)
 }
 
 func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
@@ -150,7 +160,7 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 	}
 
 	subject := "Notification: Study contract expiry"
-	return c.createCustomEmail(ctx, subject, emails, content)
+	return c.sendCustomEmail(ctx, subject, emails, content)
 }
 
 func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
@@ -166,8 +176,16 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 		content += "in " + fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate."
 	}
 
+	subject := "Notification: Your training certificate is due to expire soon"
+	return c.sendCustomEmail(ctx, subject, []string{email}, content)
+}
+
+func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
+
+	content := "You have been added as an administrator to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
+
 	subject := "Notification: Training expiry"
-	return c.createCustomEmail(ctx, subject, []string{email}, content)
+	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }
 
 func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
@@ -186,5 +204,5 @@ func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, ema
 	content += "Please login to the ARC Services Portal to complete the attestation."
 
 	subject := "Notification: Study attestation expiry"
-	return c.createCustomEmail(ctx, subject, []string{email}, content)
+	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }
