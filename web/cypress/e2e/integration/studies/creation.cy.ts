@@ -286,7 +286,7 @@ describe("Study creation end-to-end", () => {
     cy.url().then((url) => {
       const studyId = new URLSearchParams(url.split("?")[1]).get("studyId");
 
-      cy.intercept("GET", `/web/api/v0/studies/${studyId}`, (req) => {
+      cy.intercept({ method: "GET", url: `/web/api/v0/studies/${studyId}`, times: 1 }, (req) => {
         req.reply((res) => {
           res.body.last_signoff = "2020-01-01T00:00:00Z";
         });
