@@ -112,6 +112,11 @@ func EntraMailCredentials() EntraCredentialBundle {
 	}
 }
 
+func EntraMailEnabled() bool {
+	e := EntraMailCredentials()
+	return e.TenantID != "" && e.ClientID != "" && e.ClientSecret != "" && EntraMailUserPrincipal() != ""
+}
+
 func EntraMailUserPrincipal() string {
 	return k.String("entra.mail_user_principal")
 }
