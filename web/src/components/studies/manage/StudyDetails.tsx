@@ -17,7 +17,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
 
   return (
     <Box>
-      <div className={styles["pre-description"]}>
+      <div className={styles["pre-description"]} data-cy="study-details">
         <span>
           Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
         </span>

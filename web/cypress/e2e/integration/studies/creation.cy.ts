@@ -70,6 +70,23 @@ describe("Study creation end-to-end", () => {
     cy.contains("Update Study").should("not.exist");
     cy.contains("Edit Study").should("exist");
     cy.contains(additionalAdminUsernamePrefix).should("exist");
+  });
+
+  it("admin should be able to agree to the study administrator agreement", () => {
+    cy.loginAsAdmin();
+    cy.becomeApprovedResearcher();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.get('[data-cy="agreement-agree"]').click();
+    cy.get('[data-cy="study-details"]').should("be.visible");
+  });
+
+  it("shiould be able to remove admin and request for review", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
 
     // remove added study admin
     cy.get('[data-cy="edit-study-button"]').click();

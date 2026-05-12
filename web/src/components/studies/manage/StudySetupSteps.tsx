@@ -23,6 +23,7 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
   const { userData } = useAuth();
   const hasAsset = assets.length > 0;
   const isComplete = agreementCompleted && hasAsset;
+  const isStudyOwner = study.owner_username == userData?.username;
 
   useEffect(() => {
     if (isComplete) onStepsComplete();
@@ -88,7 +89,12 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
       <StepArrow />
 
       {!agreementCompleted && (
-        <StudyAgreement studyId={study.id} studyTitle={study.title} setAgreementCompleted={setAgreementCompleted} />
+        <StudyAgreement
+          studyId={study.id}
+          studyTitle={study.title}
+          setAgreementCompleted={setAgreementCompleted}
+          isOwner={isStudyOwner}
+        />
       )}
 
       {agreementCompleted && !hasAsset && <Assets study={study} assets={assets} setAssets={setAssets} />}

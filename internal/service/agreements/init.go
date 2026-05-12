@@ -16,11 +16,15 @@ var approvedResearcherMarkdown string
 //go:embed study_owner.md
 var studyOwnerMarkdown string
 
-// Initalise the agreements
+//go:embed study_administrator.md
+var studyAdministratorMarkdown string
+
+// Initialise the agreements
 func Init() {
 	db := graceful.NewDB()
 	initAgreement(db, approvedResearcherMarkdown, ApprovedResearcherType)
 	initAgreement(db, studyOwnerMarkdown, StudyOwnerType)
+	initAgreement(db, studyAdministratorMarkdown, StudyAdministratorType)
 }
 
 func initAgreement(db *gorm.DB, agreementMarkdown string, agreementType types.AgreementType) {
@@ -34,6 +38,6 @@ func initAgreement(db *gorm.DB, agreementMarkdown string, agreementType types.Ag
 		Model: types.Model{CreatedAt: time.Now()},
 	}).FirstOrCreate(&types.Agreement{})
 	if result.Error != nil {
-		panic(fmt.Sprintf("failed to initalise agreement: %v", result.Error))
+		panic(fmt.Sprintf("failed to initialise agreement: %v", result.Error))
 	}
 }
