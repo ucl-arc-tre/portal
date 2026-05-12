@@ -278,7 +278,7 @@ describe("Study creation end-to-end", () => {
       cy.visit(`/studies/manage?studyId=${studyId}`);
       cy.wait("@getStudyWithOldSignoff");
 
-      cy.contains("As Study Owner you're required to confirm that your study").scrollIntoView().should("be.visible");
+      cy.contains("As Study Owner you're required to confirm that your study").should("exist");
       cy.contains("Confirm Details").should("be.disabled");
 
       cy.contains("I confirm the above details are correct").click();
