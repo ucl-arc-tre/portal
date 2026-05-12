@@ -21,6 +21,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
   const [error, setError] = useState<string | null>(null);
   const { refreshAuth, userData } = useAuth();
   const isIAO = userData?.roles.includes("information-asset-owner");
+  const studyRole = isOwner ? "Owner" : "Administrator";
 
   useEffect(() => {
     const fetchAgreementText = async () => {
@@ -76,7 +77,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
   return (
     <section className={styles["study-agreement-container"]} data-cy="study-agreement">
       <h2 className="subtitle">
-        Study {isOwner ? "Owner" : "Administrator"} Agreement for study: {studyTitle}
+        Study {studyRole} Agreement for study: {studyTitle}
       </h2>
 
       {error && (
@@ -91,7 +92,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
         setAgreementCompleted={setAgreementCompleted}
         handleAgreementSubmit={handleAgreementSubmit}
         timerSeconds={isIAO ? 1 : Number(process.env.NEXT_PUBLIC_AGREEMENT_TIMER_SECONDS)}
-        confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset Owner in UCL of the following study: ${studyTitle}`}
+        confirmationText={`By clicking 'I Agree' below I confirm that I am the Information Asset ${studyRole} in UCL of the following study: ${studyTitle}`}
       />
     </section>
   );
