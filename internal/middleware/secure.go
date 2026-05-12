@@ -21,7 +21,7 @@ func NewSecure() gin.HandlerFunc {
 		FrameDeny:             false, // no longer recommended or widely supported
 		ContentTypeNosniff:    true,
 		BrowserXssFilter:      false, // no longer recommended or widely supported
-		ContentSecurityPolicy: "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
+		ContentSecurityPolicy: "default-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; font-src 'self' data:;",
 		IENoOpen:              true,
 		SSLProxyHeaders:       map[string]string{"X-Forwarded-Proto": "https"},
 		ReferrerPolicy:        "strict-origin-when-cross-origin",
