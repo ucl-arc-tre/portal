@@ -27,5 +27,3 @@ type StudyFormData = {
   involvesMnca: boolean | null;
   requiresDspt: boolean | null;
 };
-
-type StudyAgreementType = "owner" | "administrator";
