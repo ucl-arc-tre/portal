@@ -192,7 +192,13 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           </Alert>
         </div>
       )}
-
+      {isIGOpsStaff && study.approval_status !== "Incomplete" && (
+        <AdminReview
+          study={study}
+          unagreedAdminUsernames={unagreedAdminUsernames}
+          onReviewComplete={() => fetchStudy(study.id)}
+        />
+      )}
       <StudyTabs assets={assets} contracts={contracts} />
 
       {tab === "study" && (
@@ -212,14 +218,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           contracts={contracts}
           someAssetsRequireContracts={assets.some((asset) => asset.requires_contract)}
           fetchStudyContents={fetchStudyContents}
-        />
-      )}
-
-      {isIGOpsStaff && study.approval_status !== "Incomplete" && (
-        <AdminReview
-          study={study}
-          unagreedAdminUsernames={unagreedAdminUsernames}
-          onReviewComplete={() => fetchStudy(study.id)}
         />
       )}
     </>
