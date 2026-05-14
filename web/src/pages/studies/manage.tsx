@@ -13,7 +13,6 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageStudyPage.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import Callout from "@/components/ui/Callout";
 
 const defaultMeta = (
   <MetaHead title="Manage Study | ARC Services Portal" description="Manage your study in the ARC Services Portal" />
@@ -55,17 +54,6 @@ export default function ManageStudyPage() {
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
-
-  if (process.env.NEXT_PUBLIC_ENABLE_STUDIES !== "true") {
-    return (
-      <>
-        {defaultMeta}
-        <Callout construction>
-          <span>Studies are still under construction.</span>
-        </Callout>
-      </>
-    );
-  }
 
   if (!isApprovedResearcher) {
     return (
