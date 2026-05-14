@@ -56,17 +56,6 @@ export default function ManageStudyPage() {
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
 
-  if (process.env.NEXT_PUBLIC_ENABLE_STUDIES !== "true") {
-    return (
-      <>
-        {defaultMeta}
-        <Callout construction>
-          <span>Studies are still under construction.</span>
-        </Callout>
-      </>
-    );
-  }
-
   if (!isApprovedResearcher) {
     return (
       <>

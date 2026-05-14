@@ -88,8 +88,8 @@ export default function Projects({ userData }: Props) {
     );
   }
 
-  if (process.env.NEXT_PUBLIC_ENABLE_STUDIES !== "true") {
-    return; // studies are required for projects
+  if (process.env.NEXT_PUBLIC_ENABLE_PROJECTS !== "true") {
+    return;
   }
 
   if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isOpsStaff) {
