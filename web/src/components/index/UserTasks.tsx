@@ -133,7 +133,7 @@ export default function UserTasks() {
         </div>
       ) : (
         <div className={styles["completed-tasks"]}>
-          {isIGOpsStaff && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? (
+          {isIGOpsStaff ? (
             <>
               {hasPendingStudies ? (
                 <>
@@ -148,7 +148,7 @@ export default function UserTasks() {
             </>
           ) : (
             <>
-              {studiesRequiringSignoff.length > 0 && process.env.NEXT_PUBLIC_ENABLE_STUDIES === "true" ? (
+              {studiesRequiringSignoff.length > 0 ? (
                 <>
                   {studiesRequiringSignoff.map((study) => (
                     <div key={study.id} className={styles["signoff-task"]}>

@@ -17,27 +17,6 @@ export default function StudiesPage() {
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
 
-  if (process.env.NEXT_PUBLIC_ENABLE_STUDIES !== "true") {
-    return (
-      <>
-        <MetaHead
-          title="Studies | ARC Services Portal"
-          description="View and modify studies in the ARC Services Portal"
-        />
-        <Title text={"Studies"} centered />
-        <Callout construction>
-          <span>
-            Studies are still under construction. Please use the existing{" "}
-            <a href="https://liveuclac.sharepoint.com/sites/ISD.IGAdvisoryService/Lists/Start%20a%20service%20request/NewForm.aspx">
-              IG form
-            </a>{" "}
-            to create a study.
-          </span>
-        </Callout>
-      </>
-    );
-  }
-
   return (
     <>
       <MetaHead
@@ -56,6 +35,18 @@ export default function StudiesPage() {
           Glossary
         </Button>
       </Callout>
+
+      {process.env.NEXT_PUBLIC_ENABLE_STUDY_CREATION !== "true" && (
+        <Callout construction>
+          <span>
+            Studies are still under construction. Please use the existing{" "}
+            <a href="https://liveuclac.sharepoint.com/sites/ISD.IGAdvisoryService/Lists/Start%20a%20service%20request/NewForm.aspx">
+              IG form
+            </a>{" "}
+            to create a study.
+          </span>
+        </Callout>
+      )}
 
       {!isApprovedResearcher && (
         <div className={styles["not-approved-section"]}>

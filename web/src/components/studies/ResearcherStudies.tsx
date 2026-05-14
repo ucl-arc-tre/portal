@@ -69,7 +69,7 @@ export default function ResearcherStudies() {
         <StudyForm username={userData.username} setIsFormOpen={setIsFormOpen} onComplete={onComplete} />
       )}
 
-      {isApprovedStaffResearcher && (
+      {isApprovedStaffResearcher && process.env.NEXT_PUBLIC_ENABLE_STUDY_CREATION === "true" && (
         <div className={styles["create-study-section"]}>
           <Button onClick={() => setIsFormOpen(true)} size="large" data-cy="create-study-button">
             Create New Study
