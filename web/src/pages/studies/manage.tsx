@@ -13,7 +13,6 @@ import Button from "@/components/ui/Button";
 
 import styles from "./ManageStudyPage.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import Callout from "@/components/ui/Callout";
 
 const defaultMeta = (
   <MetaHead title="Manage Study | ARC Services Portal" description="Manage your study in the ARC Services Portal" />
