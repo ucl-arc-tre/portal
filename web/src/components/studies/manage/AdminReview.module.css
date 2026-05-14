@@ -4,7 +4,7 @@
   align-items: flex-start;
   justify-content: center;
   gap: 0.5rem;
-  padding-top: 1rem;
+  padding-top: 0.75rem;
 }
 
 .approve-button {
@@ -39,7 +39,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .feedback-required {
