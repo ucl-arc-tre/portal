@@ -99,12 +99,14 @@ dialog {
   .tab {
     border: none;
     border-bottom: 2px solid var(--grey-border--light);
+    background-color: var(--background) !important;
     transition: all 0.3s ease;
     height: 2.5rem;
 
     &:hover {
       color: var(--form-blue--light);
       border-bottom-color: var(--form-blue--light);
+      background-color: var(--background) !important;
     }
 
     &:focus-visible {
