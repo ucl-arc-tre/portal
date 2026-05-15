@@ -106,6 +106,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
                 onClick={() => handleStudyStatusUpdate("Approved", feedback)}
                 data-cy="study-approve-button"
                 disabled={!!loadingAction || hasUnagreedAdmins}
+                size="small"
               >
                 {loadingAction === "Approved" ? "Approving..." : "Approve Study"}
               </Button>
@@ -115,6 +116,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
                 className={styles["reject-button"]}
                 onClick={() => handleStudyStatusUpdate("Rejected", feedback)}
                 disabled={!!loadingAction}
+                size="small"
               >
                 {loadingAction === "Rejected" ? "Requesting Changes..." : "Request Changes"}
               </Button>
