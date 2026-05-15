@@ -8,13 +8,14 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func (h *Handler) GetProjects(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 
-	var projects []types.Project
+	var projects []projects.GenericProject
 	var err error
 
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
@@ -31,7 +32,7 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 
 	if isAdmin || isTreOpsStaff {
 		// Admin & TRE ops staff: fetch ALL projects
-		projects, err = h.projectsAdmin()
+		projects, err = h.projects.AllProjects()
 	} else {
 		// Regular user: fetch only projects they own (via RBAC)
 		projects, err = h.projectsProjectOwner(user)
@@ -48,34 +49,31 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 		response = append(response, openapi.Project{
 			Id:              project.ID.String(),
 			Name:            project.Name,
-			StudyId:         project.StudyID.String(),
-			CreatorUsername: string(project.CreatorUser.Username),
+			StudyId:         project.StudyId.String(),
+			CreatorUsername: string(project.CreatorUsername),
 			CreatedAt:       openapi.FormatTime(project.CreatedAt),
 			UpdatedAt:       openapi.FormatTime(project.UpdatedAt),
-			EnvironmentName: string(project.Environment.Name),
+			EnvironmentName: openapi.EnvironmentName(project.EnvironmentName),
+			Status:          project.Status,
 		})
 	}
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) projectsAdmin() ([]types.Project, error) {
-	return h.projects.AllProjects()
-}
-
-func (h *Handler) projectsProjectOwner(user types.User) ([]types.Project, error) {
+func (h *Handler) projectsProjectOwner(user types.User) ([]projects.GenericProject, error) {
 	// Get project IDs where user has owner role (includes inherited via study ownership)
 	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
 	if err != nil {
-		return []types.Project{}, err
+		return []projects.GenericProject{}, err
 	}
 
-	projects, err := h.projects.ProjectsById(projectIds...)
+	genericProjects, err := h.projects.ProjectsById(projectIds...)
 	if err != nil {
-		return []types.Project{}, err
+		return []projects.GenericProject{}, err
 	}
 
-	return projects, nil
+	return genericProjects, nil
 }
 
 func (h *Handler) GetProjectsTre(ctx *gin.Context) {
@@ -150,7 +148,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		Status:          openapi.ProjectTREStatus(projectTRE.Status),
 		CreatedAt:       openapi.FormatTime(projectTRE.Project.CreatedAt),
 		UpdatedAt:       openapi.FormatTime(projectTRE.Project.UpdatedAt),
-		EnvironmentName: string(projectTRE.Project.Environment.Name),
+		EnvironmentName: openapi.EnvironmentName(projectTRE.Project.Environment.Name),
 		Assets:          assets,
 		Members:         members,
 	}

@@ -2,12 +2,10 @@ package graceful
 
 import (
 	"slices"
-	"strings"
 	"sync"
 	"time"
 
 	gormlock "github.com/go-co-op/gocron-gorm-lock/v2"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -53,9 +51,6 @@ func InitDB() {
 	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
 	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "pg_trgm";`)
 
-	migrateContractStudyIds(db)
-	migrateContracts(db)
-
 	// Set up a sequence for the study caseref
 	// this must exist before AutoMigrate is run below, as the Caseref column default references it
 	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
@@ -87,104 +82,6 @@ func NewDB() *gorm.DB {
 		}
 	})
 	return db
-}
-
-func migrateContracts(db *gorm.DB) {
-	migrator := db.Migrator()
-
-	if !migrator.HasTable(&types.Contract{}) {
-		return // fresh deployment - nothing to migrate
-	}
-
-	if err := db.AutoMigrate(&types.ContractObjectMetadata{}, &types.Contract{}); err != nil {
-		log.Err(err).Msg("Failed to automigrate contract tables for migration")
-		return
-	}
-
-	tx := db.Begin()
-	defer RollbackTransactionOnPanic(tx)
-
-	contractPartials := []struct {
-		ID        uuid.UUID `gorm:"id"`
-		Filename  string    `gorm:"filename"`
-		CreatedAt time.Time `gorm:"created_at"`
-	}{}
-	err := tx.Table("contracts").
-		Select("id, filename, created_at").
-		Where("filename != ''").
-		Scan(&contractPartials).Error
-	if err != nil {
-		panic(err)
-	}
-
-	for _, contractPartial := range contractPartials {
-		title, _ := strings.CutSuffix(contractPartial.Filename, ".pdf")
-		err = tx.Table("contracts").
-			Where("id = ?", contractPartial.ID).
-			Update("title", title).
-			Update("filename", "").
-			Error
-		if err != nil {
-			panic(err)
-		}
-
-		contractMetadata := types.ContractObjectMetadata{
-			Filename:   contractPartial.Filename,
-			ContractID: contractPartial.ID,
-		}
-		contractMetadata.ID = contractPartial.ID
-		contractMetadata.CreatedAt = contractPartial.CreatedAt
-
-		if err := tx.Create(&contractMetadata).Error; err != nil {
-			panic(err)
-		}
-	}
-	if err := tx.Commit().Error; err != nil {
-		panic(err)
-	}
-
-	log.Info().Msg("Migrated contracts")
-}
-
-// Set a study id column of contracts using their existing values
-// set in the associated asset
-func migrateContractStudyIds(db *gorm.DB) {
-	migrator := db.Migrator()
-
-	contract := types.Contract{}
-	if !migrator.HasTable(&contract) {
-		log.Info().Msg("Contract table did not exist")
-		return
-	}
-	if migrator.HasColumn(&contract, "study_id") {
-		log.Info().Msg("Contract study_id already migrated")
-		return
-	}
-
-	links := []struct {
-		StudyId    uuid.UUID `gorm:"study_id"`
-		ContractId uuid.UUID `gorm:"contract_id"`
-	}{}
-
-	err := db.Table("contracts").
-		Joins("INNER JOIN assets ON assets.id = contracts.asset_id").
-		Select("contracts.id AS contract_id, assets.study_id AS study_id").
-		Scan(&links).Error
-	if err != nil {
-		panic(err)
-	}
-
-	if err := migrator.AddColumn(&contract, "study_id"); err != nil {
-		panic(err)
-	}
-	for _, link := range links {
-		err := db.Model(&contract).
-			Where("id = ?", link.ContractId).
-			Update("study_id", link.StudyId).Error
-		if err != nil {
-			log.Err(err).Any("contractId", link.ContractId).Msg("Failed to set study id for contract")
-		}
-	}
 }
 
 type UpdateObject interface {

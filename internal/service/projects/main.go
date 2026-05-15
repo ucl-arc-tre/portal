@@ -226,30 +226,38 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 }
 
 // retrieves projects by their IDs
-func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]types.Project, error) {
+func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error) {
 	if len(projectIds) == 0 {
-		return []types.Project{}, nil
+		return []GenericProject{}, nil
 	}
 
-	var projects []types.Project
-	err := s.db.
-		Preload("CreatorUser").
-		Preload("Environment").
-		Where("id IN ?", projectIds).
-		Find(&projects).Error
+	var projects []GenericProject
+	err := s.genericProjectsQuery().Where("projects.id IN ?", projectIds).Scan(&projects).Error
 
 	return projects, types.NewErrFromGorm(err, "failed to retrieve projects")
 }
 
 // retrieves all projects (for admins and TRE ops staff)
-func (s *Service) AllProjects() ([]types.Project, error) {
-	var projects []types.Project
-	err := s.db.
-		Preload("CreatorUser").
-		Preload("Environment").
-		Find(&projects).Error
-
+func (s *Service) AllProjects() ([]GenericProject, error) {
+	var projects []GenericProject
+	err := s.genericProjectsQuery().Scan(&projects).Error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
+}
+
+func (s *Service) genericProjectsQuery() *gorm.DB {
+	return s.db.Table("projects").
+		Select(`
+  		projects.id,
+        projects.study_id,
+  		projects.name,
+  		projects.created_at,
+  		projects.updated_at,
+  		users.username as creator_username,
+  		environments.name as environment_name,
+  		COALESCE(pt.status, '') as status
+  	`).Joins("join users on users.id = projects.creator_user_id").
+		Joins("join environments on environments.id = projects.environment_id").
+		Joins("left join project_tres pt on pt.project_id = projects.id")
 }
 
 // retrieves a single TRE project by ID with all related data

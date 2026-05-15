@@ -523,6 +523,8 @@ export type Environment = {
     tier: number;
 };
 
+export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven';
+
 /**
  * A project with base details (environment-agnostic)
  */
@@ -543,7 +545,7 @@ export type Project = {
      * Username of the user who created the project
      */
     creator_username: string;
-    approval_status: StudyApprovalStatus;
+    status: string;
     /**
      * Time in RFC3339 format when the project was created
      */
@@ -552,10 +554,7 @@ export type Project = {
      * Time in RFC3339 format when the project was last updated
      */
     updated_at: string;
-    /**
-     * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
-     */
-    environment_name: string;
+    environment_name: EnvironmentName;
 };
 
 /**
@@ -591,10 +590,7 @@ export type ProjectTre = {
      * Time in RFC3339 format when the project was last updated
      */
     updated_at: string;
-    /**
-     * Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
-     */
-    environment_name: string;
+    environment_name: EnvironmentName;
     /**
      * List of assets associated with this project
      */

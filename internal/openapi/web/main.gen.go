@@ -345,6 +345,24 @@ func (e ContractBaseStatus) Valid() bool {
 	}
 }
 
+// Defines values for EnvironmentName.
+const (
+	ARCTrustedResearchEnvironment EnvironmentName = "ARC Trusted Research Environment"
+	DataSafeHaven                 EnvironmentName = "Data Safe Haven"
+)
+
+// Valid indicates whether the value is a known member of the EnvironmentName enum.
+func (e EnvironmentName) Valid() bool {
+	switch e {
+	case ARCTrustedResearchEnvironment:
+		return true
+	case DataSafeHaven:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ProjectTRERoleName.
 const (
 	DesktopUser     ProjectTRERoleName = "desktop_user"
@@ -741,6 +759,9 @@ type Environment struct {
 	Tier int `json:"tier"`
 }
 
+// EnvironmentName defines model for EnvironmentName.
+type EnvironmentName string
+
 // Profile defines model for Profile.
 type Profile struct {
 	ChosenName string `json:"chosen_name"`
@@ -779,23 +800,19 @@ type ProfileUpdate struct {
 
 // Project A project with base details (environment-agnostic)
 type Project struct {
-	// ApprovalStatus Current approval status
-	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
-
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
 
 	// CreatorUsername Username of the user who created the project
-	CreatorUsername string `json:"creator_username"`
-
-	// EnvironmentName Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
-	EnvironmentName string `json:"environment_name"`
+	CreatorUsername string          `json:"creator_username"`
+	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// Id Unique identifier for the project
 	Id string `json:"id"`
 
 	// Name Name of the project
-	Name string `json:"name"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
@@ -813,10 +830,8 @@ type ProjectTRE struct {
 	CreatedAt string `json:"created_at"`
 
 	// CreatorUsername Username of the user who created the project
-	CreatorUsername string `json:"creator_username"`
-
-	// EnvironmentName Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
-	EnvironmentName string `json:"environment_name"`
+	CreatorUsername string          `json:"creator_username"`
+	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// Id Unique identifier for the base project
 	Id string `json:"id"`

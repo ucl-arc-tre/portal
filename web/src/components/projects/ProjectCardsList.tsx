@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { ProjectTreStatus, ProjectTre, deleteProjectsTreByProjectId } from "@/openapi";
+import { Project, deleteProjectsTreByProjectId } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
@@ -10,18 +10,9 @@ import { Alert, AlertMessage } from "../shared/uikitExports";
 import styles from "./ProjectCardsList.module.css";
 
 type Props = {
-  projects: ProjectTre[];
+  projects: Project[];
   isOpsStaff: boolean;
   fetchData?: () => void;
-};
-
-const projectSortOrder: Record<ProjectTreStatus, number> = {
-  "pending-approval": 1,
-  "pending-creation": 2,
-  "pending-deletion": 3,
-  deployed: 4,
-  deleted: 5,
-  incomplete: 6,
 };
 
 export default function ProjectCardsList(props: Props) {
@@ -29,10 +20,10 @@ export default function ProjectCardsList(props: Props) {
   const router = useRouter();
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<ProjectTre | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const handleDeleteClick = (project: ProjectTre) => {
+  const handleDeleteClick = (project: Project) => {
     setProjectToDelete(project);
     setShowDeleteConfirm(true);
     setDeleteError(null);
@@ -80,11 +71,11 @@ export default function ProjectCardsList(props: Props) {
 
       <div className={styles["projects-list"]}>
         {projects
-          .sort((a, b) => projectSortOrder[a.status] - projectSortOrder[b.status])
+          .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))
           .map((project) => (
             <div key={project.id} className={styles["project-card"]}>
               <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.status} type="project" />
+                <StatusBadge status={project.status} type="project" environment={project.environment_name} />
               </div>
 
               <div className={styles["project-info"]}>

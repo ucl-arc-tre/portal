@@ -13,7 +13,7 @@ const (
 	DSH = types.EnvironmentName("Data Safe Haven")
 )
 
-// Initalise the environments
+// Initialise the environments
 func Init() {
 	environments := []types.Environment{
 		{Name: TRE, Tier: 3},
@@ -32,7 +32,7 @@ func Init() {
 		}).FirstOrCreate(&types.Environment{})
 
 		if result.Error != nil {
-			panic(fmt.Sprintf("failed to initalise environment: %v", result.Error))
+			panic(fmt.Sprintf("failed to initialise environment: %v", result.Error))
 		}
 	}
 }

@@ -1948,6 +1948,12 @@ components:
           type: integer
           description: Maximum data tier this environment can handle (assets with tier <= this value can be used)
 
+    EnvironmentName:
+      type: string
+      enum:
+        - "ARC Trusted Research Environment"
+        - "Data Safe Haven"
+
     Project:
       type: object
       description: A project with base details (environment-agnostic)
@@ -1956,7 +1962,7 @@ components:
         - name
         - study_id
         - creator_username
-        - approval_status
+        - status
         - created_at
         - updated_at
         - environment_name
@@ -1973,8 +1979,8 @@ components:
         creator_username:
           type: string
           description: Username of the user who created the project
-        approval_status:
-          $ref: "#/components/schemas/StudyApprovalStatus"
+        status:
+          type: string
         created_at:
           type: string
           description: Time in RFC3339 format when the project was created
@@ -1982,8 +1988,7 @@ components:
           type: string
           description: Time in RFC3339 format when the project was last updated
         environment_name:
-          type: string
-          description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+          $ref: "#/components/schemas/EnvironmentName"
 
     ProjectTRE:
       type: object
@@ -2025,8 +2030,7 @@ components:
           type: string
           description: Time in RFC3339 format when the project was last updated
         environment_name:
-          type: string
-          description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+          $ref: "#/components/schemas/EnvironmentName"
         assets:
           type: array
           description: List of assets associated with this project

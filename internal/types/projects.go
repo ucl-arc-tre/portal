@@ -24,7 +24,7 @@ type ProjectTRE struct {
 	ModelAuditable
 	ProjectID                     uuid.UUID        `gorm:"not null;index"`
 	EgressNumberRequiredApprovals int              `gorm:"not null;default:1"`
-	Status                        ProjectTREStatus `gorm:"not null"`
+	Status                        ProjectTREStatus `gorm:"not null;default:'incomplete'"`
 
 	// Relationships
 	Project         Project                 `gorm:"foreignKey:ProjectID"`
