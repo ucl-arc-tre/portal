@@ -28,7 +28,12 @@ export default function StudyCardsList(props: Props) {
           .slice()
           .sort((a, b) => studySortOrder[a.approval_status] - studySortOrder[b.approval_status])
           .map((study) => (
-            <div key={study.id} className={styles["study-card"]} data-cy="study-card">
+            <div
+              key={study.id}
+              className={styles["study-card"]}
+              data-cy="study-card"
+              onClick={() => router.push(`/studies/manage?studyId=${study.id}`)}
+            >
               <div className={styles["status-indicator"]}>
                 <StatusBadge status={study.approval_status} type="study" />
                 {study.approval_status === "Approved" &&
