@@ -346,7 +346,7 @@ export type Study = StudyBase & {
      * Time in RFC3339 format when the study was last updated
      */
     updated_at: string;
-    approval_status: ApprovalStatus;
+    approval_status: StudyApprovalStatus;
     feedback?: string;
     /**
      * Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
@@ -432,12 +432,14 @@ export type ContractImport = {
 };
 
 /**
- * Current approval status (used for studies, projects, etc.)
+ * Current approval status
  */
-export type ApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+
+export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-deletion' | 'deleted';
 
 export type StudyReview = {
-    status: ApprovalStatus;
+    status: StudyApprovalStatus;
     /**
      * Feedback for the study
      */
@@ -541,7 +543,7 @@ export type Project = {
      * Username of the user who created the project
      */
     creator_username: string;
-    approval_status: ApprovalStatus;
+    approval_status: StudyApprovalStatus;
     /**
      * Time in RFC3339 format when the project was created
      */
@@ -580,7 +582,7 @@ export type ProjectTre = {
      * Username of the user who created the project
      */
     creator_username: string;
-    approval_status: ApprovalStatus;
+    status: ProjectTreStatus;
     /**
      * Time in RFC3339 format when the project was created
      */
@@ -1209,7 +1211,7 @@ export type GetStudiesData = {
         /**
          * get studies by status
          */
-        status?: ApprovalStatus;
+        status?: StudyApprovalStatus;
         /**
          * Flexible search query. Depending on the structure it will either search:
          * - caseref: If <= 5 digit number, with optional leading zeros
@@ -1664,7 +1666,7 @@ export type DeleteProjectsTreByProjectIdData = {
     body?: never;
     path: {
         /**
-         * ID of the TRE project
+         * Project UUID
          */
         projectId: string;
     };
@@ -1741,7 +1743,7 @@ export type PutProjectsTreByProjectIdData = {
     body: ProjectTreUpdate;
     path: {
         /**
-         * ID of the TRE project
+         * Project UUID
          */
         projectId: string;
     };

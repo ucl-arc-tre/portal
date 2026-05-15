@@ -43,7 +43,7 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		InvolvesIndirectDataCollection:   data.InvolvesIndirectDataCollection,
 		Feedback:                         data.Feedback,
 	}
-	if !openapi.ApprovalStatus(data.ApprovalStatus).Valid() {
+	if !openapi.StudyApprovalStatus(data.ApprovalStatus).Valid() {
 		return nil, types.NewErrInvalidObject("invalid approval status")
 	} else {
 		study.ApprovalStatus = data.ApprovalStatus

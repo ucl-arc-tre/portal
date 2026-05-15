@@ -171,7 +171,7 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 		Joins("INNER JOIN users AS owners ON owners.id = studies.owner_user_id").
 		Joins("LEFT JOIN study_admins ON study_admins.study_id = studies.id AND study_admins.deleted_at IS NULL").
 		Joins("LEFT JOIN users AS admin_users ON admin_users.id = study_admins.user_id").
-		Where("studies.approval_status = ?", openapi.Approved).
+		Where("studies.approval_status = ?", openapi.StudyApprovalStatusApproved).
 		Select(
 			"studies.caseref, " +
 				"owners.username AS owner_username, " +
@@ -297,7 +297,7 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 
 	study := types.Study{
 		OwnerUserID:    owner.ID,
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.StudyApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 
 	setStudyFromStudyData(&study, studyData)
@@ -329,7 +329,7 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 		Update("approval_status", review.Status).
 		Update("feedback", review.Feedback)
 
-	if review.Status == openapi.Approved {
+	if review.Status == openapi.StudyApprovalStatusApproved {
 		db = db.Update("last_signoff", time.Now())
 	}
 

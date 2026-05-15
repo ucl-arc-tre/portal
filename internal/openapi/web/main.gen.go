@@ -33,30 +33,6 @@ func (e AgreementType) Valid() bool {
 	}
 }
 
-// Defines values for ApprovalStatus.
-const (
-	Approved   ApprovalStatus = "Approved"
-	Incomplete ApprovalStatus = "Incomplete"
-	Pending    ApprovalStatus = "Pending"
-	Rejected   ApprovalStatus = "Rejected"
-)
-
-// Valid indicates whether the value is a known member of the ApprovalStatus enum.
-func (e ApprovalStatus) Valid() bool {
-	switch e {
-	case Approved:
-		return true
-	case Incomplete:
-		return true
-	case Pending:
-		return true
-	case Rejected:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for AssetClassificationImpact.
 const (
 	AssetClassificationImpactConfidential       AssetClassificationImpact = "confidential"
@@ -399,6 +375,60 @@ func (e ProjectTRERoleName) Valid() bool {
 	}
 }
 
+// Defines values for ProjectTREStatus.
+const (
+	ProjectTREStatusDeleted         ProjectTREStatus = "deleted"
+	ProjectTREStatusDeployed        ProjectTREStatus = "deployed"
+	ProjectTREStatusIncomplete      ProjectTREStatus = "incomplete"
+	ProjectTREStatusPendingApproval ProjectTREStatus = "pending-approval"
+	ProjectTREStatusPendingCreation ProjectTREStatus = "pending-creation"
+	ProjectTREStatusPendingDeletion ProjectTREStatus = "pending-deletion"
+)
+
+// Valid indicates whether the value is a known member of the ProjectTREStatus enum.
+func (e ProjectTREStatus) Valid() bool {
+	switch e {
+	case ProjectTREStatusDeleted:
+		return true
+	case ProjectTREStatusDeployed:
+		return true
+	case ProjectTREStatusIncomplete:
+		return true
+	case ProjectTREStatusPendingApproval:
+		return true
+	case ProjectTREStatusPendingCreation:
+		return true
+	case ProjectTREStatusPendingDeletion:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for StudyApprovalStatus.
+const (
+	StudyApprovalStatusApproved   StudyApprovalStatus = "Approved"
+	StudyApprovalStatusIncomplete StudyApprovalStatus = "Incomplete"
+	StudyApprovalStatusPending    StudyApprovalStatus = "Pending"
+	StudyApprovalStatusRejected   StudyApprovalStatus = "Rejected"
+)
+
+// Valid indicates whether the value is a known member of the StudyApprovalStatus enum.
+func (e StudyApprovalStatus) Valid() bool {
+	switch e {
+	case StudyApprovalStatusApproved:
+		return true
+	case StudyApprovalStatusIncomplete:
+		return true
+	case StudyApprovalStatusPending:
+		return true
+	case StudyApprovalStatusRejected:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TrainingKind.
 const (
 	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
@@ -429,9 +459,6 @@ type AgreementConfirmation struct {
 
 // AgreementType defines model for AgreementType.
 type AgreementType string
-
-// ApprovalStatus Current approval status (used for studies, projects, etc.)
-type ApprovalStatus string
 
 // Asset defines model for Asset.
 type Asset struct {
@@ -752,8 +779,8 @@ type ProfileUpdate struct {
 
 // Project A project with base details (environment-agnostic)
 type Project struct {
-	// ApprovalStatus Current approval status (used for studies, projects, etc.)
-	ApprovalStatus ApprovalStatus `json:"approval_status"`
+	// ApprovalStatus Current approval status
+	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
 	CreatedAt string `json:"created_at"`
@@ -779,9 +806,6 @@ type Project struct {
 
 // ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
-	// ApprovalStatus Current approval status (used for studies, projects, etc.)
-	ApprovalStatus ApprovalStatus `json:"approval_status"`
-
 	// Assets List of assets associated with this project
 	Assets []Asset `json:"assets"`
 
@@ -801,7 +825,8 @@ type ProjectTRE struct {
 	Members []ProjectTREMember `json:"members"`
 
 	// Name Name of the project
-	Name string `json:"name"`
+	Name   string           `json:"name"`
+	Status ProjectTREStatus `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
@@ -838,6 +863,9 @@ type ProjectTRERequest struct {
 // ProjectTRERoleName Available TRE project roles
 type ProjectTRERoleName string
 
+// ProjectTREStatus defines model for ProjectTREStatus.
+type ProjectTREStatus string
+
 // ProjectTREUpdate Request payload for updating an existing TRE project (members and assets only)
 type ProjectTREUpdate struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
@@ -852,8 +880,8 @@ type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
-	// ApprovalStatus Current approval status (used for studies, projects, etc.)
-	ApprovalStatus ApprovalStatus `json:"approval_status"`
+	// ApprovalStatus Current approval status
+	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
 
 	// CagReference CAG reference number
 	CagReference *string `json:"cag_reference,omitempty"`
@@ -949,6 +977,9 @@ type StudyAgreements struct {
 	// Usernames Usernames of those that have agreed to the study agreement
 	Usernames []string `json:"usernames"`
 }
+
+// StudyApprovalStatus Current approval status
+type StudyApprovalStatus string
 
 // StudyBase Base study properties
 type StudyBase struct {
@@ -1080,8 +1111,8 @@ type StudyReview struct {
 	// Feedback Feedback for the study
 	Feedback *string `json:"feedback,omitempty"`
 
-	// Status Current approval status (used for studies, projects, etc.)
-	Status ApprovalStatus `json:"status"`
+	// Status Current approval status
+	Status StudyApprovalStatus `json:"status"`
 }
 
 // Token defines model for Token.
@@ -1181,7 +1212,7 @@ type UserIdParam = string
 // GetStudiesParams defines parameters for GetStudies.
 type GetStudiesParams struct {
 	// Status get studies by status
-	Status *ApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
+	Status *StudyApprovalStatus `form:"status,omitempty" json:"status,omitempty"`
 
 	// Query Flexible search query. Depending on the structure it will either search:
 	//   - caseref: If <= 5 digit number, with optional leading zeros
@@ -1331,13 +1362,13 @@ type ServerInterface interface {
 	PostProjectsTreAdminProjectIdApprove(c *gin.Context, projectId ProjectIdParam)
 
 	// (DELETE /projects/tre/{projectId})
-	DeleteProjectsTreProjectId(c *gin.Context, projectId string)
+	DeleteProjectsTreProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (GET /projects/tre/{projectId})
 	GetProjectsTreProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (PUT /projects/tre/{projectId})
-	PutProjectsTreProjectId(c *gin.Context, projectId string)
+	PutProjectsTreProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (PATCH /projects/tre/{projectId}/pending)
 	PatchProjectsTreProjectIdPending(c *gin.Context, projectId ProjectIdParam)
@@ -1670,7 +1701,7 @@ func (siw *ServerInterfaceWrapper) DeleteProjectsTreProjectId(c *gin.Context) {
 	_ = err
 
 	// ------------- Path parameter "projectId" -------------
-	var projectId string
+	var projectId ProjectIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
@@ -1720,7 +1751,7 @@ func (siw *ServerInterfaceWrapper) PutProjectsTreProjectId(c *gin.Context) {
 	_ = err
 
 	// ------------- Path parameter "projectId" -------------
-	var projectId string
+	var projectId ProjectIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {

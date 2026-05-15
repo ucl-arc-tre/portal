@@ -180,11 +180,10 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 
 	// Create Project record
 	project := types.Project{
-		Name:           projectTreData.Name,
-		CreatorUserID:  creator.ID,
-		StudyID:        studyUUID,
-		EnvironmentID:  treEnvironment.ID,
-		ApprovalStatus: string(openapi.Incomplete),
+		Name:          projectTreData.Name,
+		CreatorUserID: creator.ID,
+		StudyID:       studyUUID,
+		EnvironmentID: treEnvironment.ID,
 	}
 
 	if err := tx.Create(&project).Error; err != nil {
@@ -275,8 +274,8 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 func (s *Service) SubmitProject(projectId uuid.UUID) error {
 	result := s.db.Model(&types.Project{}).
 		Where("id = ?", projectId).
-		Where("approval_status = ?", openapi.Incomplete).
-		Update("approval_status", openapi.Pending)
+		Where("approval_status = ?", openapi.StudyApprovalStatusIncomplete).
+		Update("approval_status", openapi.StudyApprovalStatusPending)
 
 	if result.Error != nil {
 		return types.NewErrFromGorm(result.Error, "failed to submit project")
@@ -292,7 +291,7 @@ func (s *Service) SubmitProject(projectId uuid.UUID) error {
 func (s *Service) ApproveProject(projectId uuid.UUID) error {
 	err := s.db.Model(&types.Project{}).
 		Where("id = ?", projectId).
-		Update("approval_status", openapi.Approved).Error
+		Update("approval_status", openapi.StudyApprovalStatusApproved).Error
 
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to approve project")
@@ -386,6 +385,11 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to find project TRE")
+	}
+
+	if projectTRE.Status != types.ProjectTREStatusIncomplete {
+		tx.Rollback()
+		return types.NewErrInvalidObjectF("deletion must have a incomplete status. was [%v]", projectTRE.Status)
 	}
 
 	// Soft delete all ProjectTRERoleBindings for this project
