@@ -10,7 +10,7 @@ import AssetCard from "./AssetCard";
 import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
-import { AlertMessage, Alert } from "../shared/uikitExports";
+import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
 
 type AssetsProps = {
   study: Study;
@@ -25,6 +25,7 @@ export default function Assets(props: AssetsProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
     (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
     false;
+  const [calloutExpanded, setCalloutExpanded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
@@ -56,7 +57,12 @@ export default function Assets(props: AssetsProps) {
 
   return (
     <section className={styles["study-assets-container"]} data-cy="study-assets">
-      <h2 className="subtitle">Asset Management</h2>
+      <h2 className="subtitle">
+        Asset Management{" "}
+        <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
+          <InfoIcon className={styles.icon} />
+        </Button>
+      </h2>
 
       {error && (
         <Alert type="error">
@@ -64,19 +70,17 @@ export default function Assets(props: AssetsProps) {
         </Alert>
       )}
 
-      {canModify && (
+      {canModify && calloutExpanded && (
         <Callout definition>
-          <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
-
           <div className={styles["callout-info-paragraph"]}>
             Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
-            are owned by a <strong>study</strong>{" "}
+            are owned by a <strong>Study</strong>{" "}
             <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
-            <strong>projects</strong> <InfoTooltip text="Projects are owned by a study and can contain assets" />.
+            <strong>Projects</strong> <InfoTooltip text="Projects are owned by a study and can contain assets" />.
           </div>
 
           <div className={styles["callout-glossary-section"]}>
-            You can read more detailed information about assets in our
+            You can read more detailed information about Assets in our
             <Button href="/glossary" variant="tertiary" size="small" inline>
               Glossary
             </Button>

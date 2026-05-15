@@ -4,6 +4,8 @@
   display: grid;
   justify-self: center;
   margin: 1rem 0;
+  justify-items: center;
+  margin-inline: auto;
   padding: 1.5rem;
   background: var(--background);
   border-radius: 8px;
@@ -60,10 +62,6 @@
   font-size: 0.75rem;
   min-width: 1.5rem;
   text-align: center;
-}
-
-.callout-section {
-  margin-bottom: 1rem;
 }
 
 .callout-info-paragraph {
