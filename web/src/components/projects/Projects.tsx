@@ -95,8 +95,8 @@ export default function Projects({ userData }: Props) {
   if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isOpsStaff) {
     return (
       <div className={styles["no-projects-message"]}>
-        <h2>You don&apos;t have any approved studies</h2>
-        <p>Projects belong to studies. Please create a study and submit it for approval before creating a project.</p>
+        <h2>You don&apos;t have any approved Studies</h2>
+        <p>Projects belong to Studies. Please create a Study and submit it for approval before creating a Project.</p>
         <Button href="/studies" size="large">
           Go to Studies
         </Button>
@@ -109,7 +109,7 @@ export default function Projects({ userData }: Props) {
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
           <h2>UCL Staff Only</h2>
-          <p>Only UCL staff members can create projects.</p>
+          <p>Only UCL staff members can create Projects.</p>
           <p>If you believe this is an error, please contact your administrator.</p>
 
           <div className={styles["ucl-staff-modal-actions"]}>
@@ -130,17 +130,17 @@ export default function Projects({ userData }: Props) {
 
       {isOpsStaff && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
-          <h2>No projects are currently submitted for review</h2>
+          <h2>No Projects are currently submitted for review</h2>
           <p>Projects created by users will appear here for approval.</p>
         </div>
       ) : !isApprovedStaffResearcher && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
-          <h2>You haven&apos;t been added to any projects yet</h2>
-          <p>Any projects you are added to will appear here once they have been created by a member of staff.</p>
+          <h2>You haven&apos;t been added to any Projects yet</h2>
+          <p>Any Projects you are added to will appear here once they have been created by a member of staff.</p>
         </div>
       ) : projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
-          <h2>You haven&apos;t created any projects yet</h2>
+          <h2>You haven&apos;t created any Projects yet</h2>
 
           <Button onClick={handleCreateProjectClick} size="large">
             Create Your First Project
