@@ -13,11 +13,24 @@
   color: var(--color-text);
 }
 
-.description {
-  margin-bottom: 2rem;
-  color: var(--color-text-secondary);
-  font-size: 1rem;
-  line-height: 1.5;
+.contracts-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #495057;
+  font-weight: 500;
+  justify-content: center;
+}
+
+.contracts-count-badge {
+  background: var(--form-blue--light);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  min-width: 1.5rem;
+  text-align: center;
 }
 
 .error {
@@ -71,11 +84,7 @@
   margin-top: 1.5rem;
 }
 
-@media (width >= 768px) {
-  .container {
-    padding: 1.5rem;
-  }
-
+@media (width >=768px) {
   .header {
     flex-direction: row;
     justify-content: space-between;

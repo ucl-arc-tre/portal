@@ -5,8 +5,10 @@ import ContractCard from "./ContractCard";
 import { Contract, Study } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, InfoIcon } from "@/components/shared/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
+import Callout from "../ui/Callout";
+import { EntityTooltip } from "../shared/entityDefinitions";
 
 type ContractManagementProps = {
   study: Study;
@@ -24,6 +26,7 @@ export default function ContractManagement(props: ContractManagementProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const [calloutExpanded, setCalloutExpanded] = useState(false);
 
   const handleUploadSuccess = () => {
     setShowUploadModal(false);
@@ -35,18 +38,35 @@ export default function ContractManagement(props: ContractManagementProps) {
       {isStudyOwnerOrAdmin ? (
         <>
           <div className={styles.header}>
-            <h3>Contract Management</h3>
-            <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="add-contract">
+            <h2>
+              Contract Management{" "}
+              <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
+                <InfoIcon className={styles.icon} />
+              </Button>
+            </h2>
+            <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="add-contract">
               Add Contract
             </Button>
           </div>
-          <p className={styles.description}>
-            Manage contract documents for this study. Upload PDF contracts and track their status.
-          </p>
+          {calloutExpanded && (
+            <Callout definition>
+              Contracts can be uploaded as PDFs and can be linked to <EntityTooltip entity="asset" isPlural />,{" "}
+              <EntityTooltip entity="project" isPlural /> and users. If you collaborate with an external researcher you
+              must associate them with a contract
+            </Callout>
+          )}
+          <div className={styles["contracts-summary"]}>
+            <span>Number of associated Contracts:</span>
+            <span className={styles["contracts-count-badge"]}>{contracts.length}</span>
+          </div>
         </>
       ) : (
         <div className={styles.header}>
           <h3>Contracts</h3>
+          <div className={styles["contracts-summary"]}>
+            <span>Number of associated Contracts:</span>
+            <span className={styles["contracts-count-badge"]}>{contracts.length}</span>
+          </div>
         </div>
       )}
 
