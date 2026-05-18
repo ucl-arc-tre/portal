@@ -13,6 +13,7 @@ func TestNames(t *testing.T) {
 }
 
 func TestNameEqualityOpenaopi(t *testing.T) {
-	assert.Equal(t, string(TRE), openapi.ARCTrustedResearchEnvironment)
-	assert.Equal(t, string(DSH), openapi.DataSafeHaven)
+	// WARNING: these should not be modified
+	assert.Equal(t, string(TRE), string(openapi.ARCTrustedResearchEnvironment))
+	assert.Equal(t, string(DSH), string(openapi.DataSafeHaven))
 }
