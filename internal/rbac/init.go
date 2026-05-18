@@ -4,18 +4,26 @@ import (
 	"fmt"
 
 	"github.com/casbin/casbin/v3"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+var database *gorm.DB
 
 // Initialise the RBAC with roles and users
 func Init() {
 	log.Info().Msg("Seeding roles and static user role bindings")
 	enforcer := NewEnforcer()
 
+	seedPolicies(enforcer)
+}
+
+func seedPolicies(enforcer *casbin.Enforcer) {
 	addBasePolicies(enforcer)
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
@@ -29,6 +37,19 @@ func Init() {
 	addUserRoleBindings(config.DSHOpsStaffUsernames(), DSHOpsStaff)
 
 	runMigrations()
+}
+
+// Initialise the RBAC with roles and users, for integration tests
+func InitForTesting(testDatabase *gorm.DB) {
+
+	if testDatabase != nil {
+		database = testDatabase
+	}
+
+	adapter := must(gormadapter.NewAdapterByDB(database))
+	enforcer = must(casbin.NewEnforcer(makeCasbinModel(), adapter))
+
+	seedPolicies(enforcer)
 }
 
 func addBasePolicies(enforcer *casbin.Enforcer) {
