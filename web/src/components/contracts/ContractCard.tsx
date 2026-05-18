@@ -1,9 +1,8 @@
-import Button from "@/components/ui/Button";
 import { Contract } from "@/openapi";
 import styles from "./ContractCard.module.css";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import ExpiryWarning from "../ui/ExpiryWarning";
-import router from "next/router";
+import EntityCard from "../ui/Card";
 
 type ContractCardProps = {
   contract: Contract;
@@ -27,19 +26,21 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
   };
 
   return (
-    <div
-      className={`${styles.card} ${expiryUrgency ? `${styles[`card__expiry-urgency--${expiryUrgency.level}`]}` : ""}`}
-      data-cy="contract-card"
-    >
-      <div className={styles.header}>
-        <div className={styles.title}>
-          <h4>{contract.title}</h4>
+    <EntityCard
+      key={contract.id}
+      title={contract.title}
+      headerContent={
+        <div className={styles["status-indicator"]}>
+          <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
+            {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
+          </span>
         </div>
-        <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
-          {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
-        </span>
-      </div>
-
+      }
+      manageUrl={`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`}
+      canModify={true}
+      isWarning={!!expiryUrgency}
+      footerContent={expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />}
+    >
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Organisation Signatory: </span>
@@ -73,21 +74,6 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
           <span className={styles.value}>{contract.asset_ids.length || 0}</span>
         </div>
       </div>
-
-      <div className={styles.actions}>
-        {expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />}
-        <div className={styles["button-wrapper"]}>
-          <Button
-            onClick={() => {
-              router.push(`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`);
-            }}
-            size="small"
-            data-cy="manage-contract-button"
-          >
-            Manage
-          </Button>
-        </div>
-      </div>
-    </div>
+    </EntityCard>
   );
 }

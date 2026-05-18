@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
 import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
@@ -8,6 +7,7 @@ import Dialog from "@/components/ui/Dialog";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
 import styles from "./ProjectCardsList.module.css";
+import EntityCard from "../ui/Card";
 
 type Props = {
   projects: Project[];
@@ -24,7 +24,6 @@ const projectSortOrder: Record<ApprovalStatus, number> = {
 
 export default function ProjectCardsList(props: Props) {
   const { projects, isOpsStaff = false, fetchData } = props;
-  const router = useRouter();
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
@@ -80,39 +79,31 @@ export default function ProjectCardsList(props: Props) {
         {projects
           .sort((a, b) => projectSortOrder[a.approval_status] - projectSortOrder[b.approval_status])
           .map((project) => (
-            <div key={project.id} className={styles["project-card"]}>
-              <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.approval_status} type="project" />
-              </div>
-
-              <div className={styles["project-info"]}>
-                <h3 className={styles["project-title"]}>{project.name}</h3>
-                <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
-                <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
-              </div>
-
-              <div className={styles["project-actions"]}>
-                <Button
-                  onClick={() =>
-                    router.push(`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`)
-                  }
-                  size="small"
-                >
-                  {`Manage Project ${isOpsStaff ? "Approval" : ""}`}
-                </Button>
-                {!isOpsStaff && (
+            <EntityCard
+              key={project.id}
+              title={project.name}
+              manageUrl={`/projects/manage?projectId=${project.id}`}
+              canModify={true}
+              headerContent={<StatusBadge status={project.approval_status} type="project" />}
+              deleteButton={
+                !isOpsStaff && (
                   <Button
                     onClick={() => handleDeleteClick(project)}
                     size="small"
                     variant="secondary"
                     disabled={deletingProjectId === project.id}
-                    className="delete-button"
+                    className={`delete-button`}
                   >
                     {deletingProjectId === project.id ? "Deleting..." : "Delete"}
                   </Button>
-                )}
+                )
+              }
+            >
+              <div className={styles["project-info"]}>
+                <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
+                <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
               </div>
-            </div>
+            </EntityCard>
           ))}
       </div>
 

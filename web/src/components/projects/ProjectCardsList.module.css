@@ -31,39 +31,6 @@
   padding-top: 0.2rem;
 }
 
-.project-card {
-  background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.status-indicator {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
-}
-
-.project-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-3px);
-  border-color: var(--form-blue--light);
-}
-
-.project-info {
-  margin-bottom: 2rem;
-}
-
-.project-title {
-  margin: 0 0 0.75rem 0;
-  color: #333;
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
 .project-environment {
   margin: 0 0 0.5rem 0;
   color: #424242;
@@ -73,13 +40,6 @@
 .project-creator {
   margin: 0;
   color: #555555;
-}
-
-.project-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  align-items: center;
 }
 
 .delete-dialog {
@@ -121,15 +81,6 @@
   font-weight: 600;
 }
 
-.delete-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e1e5e9;
-}
-
 @media (max-width: 768px) {
   .project-selection {
     width: 100%;
@@ -145,9 +96,5 @@
 
   .delete-actions {
     flex-direction: column-reverse;
-  }
-
-  .delete-actions button {
-    width: 100%;
   }
 }

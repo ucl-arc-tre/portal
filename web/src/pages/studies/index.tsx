@@ -9,6 +9,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
+import { entityDefinitions, EntityTooltip } from "@/components/shared/entityDefinitions";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -26,11 +27,8 @@ export default function StudiesPage() {
       <Title text={"Studies"} centered />
 
       <Callout definition>
-        Studies are a top level entity. They can contain <strong>projects</strong>
-        <InfoTooltip text="Projects are owned by a study and can contain assets" />
-        and <strong>assets</strong>
-        <InfoTooltip text="Assets can be owned directly by a study or by a project within a study" />, for more detailed
-        information and an entity relationship diagram, look at our
+        {entityDefinitions.study} <EntityTooltip entity="asset" isPlural />
+        for more detailed information and an entity relationship diagram, look at our
         <Button href="/glossary" variant="tertiary" size="small" inline>
           Glossary
         </Button>
