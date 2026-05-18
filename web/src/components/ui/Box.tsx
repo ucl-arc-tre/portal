@@ -1,5 +1,5 @@
 import styles from "./Box.module.css";
 
-export default function Box({ children }: { children: React.ReactNode }) {
-  return <div className={styles.container}>{children}</div>;
+export default function Box({ children, isCard }: { children: React.ReactNode; isCard?: boolean }) {
+  return <div className={`${styles.container} ${isCard ? styles.card : ""}`}>{children}</div>;
 }

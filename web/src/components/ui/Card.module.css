@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.content {
+  margin-bottom: 1rem;
+}
+
+.footer {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+  }
+}
