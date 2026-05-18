@@ -93,7 +93,7 @@ export default function ProjectCardsList(props: Props) {
                 >
                   {`Manage Project ${isOpsStaff ? "Approval" : ""}`}
                 </Button>
-                {!isOpsStaff && (
+                {!isOpsStaff && project.status === "incomplete" && (
                   <Button
                     onClick={() => handleDeleteClick(project)}
                     size="small"

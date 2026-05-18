@@ -31,6 +31,7 @@ export default function ManageProjectPage() {
   const [isApproving, setIsApproving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [editingEnabled, setEditingEnabled] = useState(true);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
@@ -66,6 +67,9 @@ export default function ManageProjectPage() {
         return;
       }
       setProject(projectResponse.data);
+
+      const status = projectResponse.data.status;
+      setEditingEnabled(status === "incomplete" || status === "deployed");
     } catch (err) {
       console.error("Failed to fetch data:", err);
       setError("Failed to load project details");
@@ -217,7 +221,12 @@ export default function ManageProjectPage() {
             </p>
             <div className={styles["approval-actions"]}>
               {canEdit && (
-                <Button onClick={() => setShowEditForm(true)} size="small" variant="secondary">
+                <Button
+                  onClick={() => setShowEditForm(true)}
+                  size="small"
+                  variant="secondary"
+                  disabled={!editingEnabled}
+                >
                   Edit
                 </Button>
               )}
@@ -228,9 +237,9 @@ export default function ManageProjectPage() {
           </div>
         )}
 
-        {canEdit && project.status !== "incomplete" && (
+        {canEdit && (
           <div className={styles["approval-section"]}>
-            <Button onClick={() => setShowEditForm(true)} size="large">
+            <Button onClick={() => setShowEditForm(true)} size="small" disabled={!editingEnabled}>
               Edit
             </Button>
           </div>

@@ -40,8 +40,14 @@ func (s *Service) validateProjectTREData(projectTreData openapi.ProjectTREReques
 	return s.validateProjectTREAssetsAndMembers(projectTreData.AssetIds, projectTreData.Members, studyUUID)
 }
 
-func (s *Service) validateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, studyUUID uuid.UUID) error {
-	return s.validateProjectTREAssetsAndMembers(projectUpdateData.AssetIds, projectUpdateData.Members, studyUUID)
+func (s *Service) validateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, projectTre *types.ProjectTRE) error {
+	isIncomplete := projectTre.Status == types.ProjectTREStatusIncomplete
+	isDeployed := projectTre.Status == types.ProjectTREStatusDeployed
+	if !isIncomplete && !isDeployed {
+		return types.NewErrInvalidObjectF("cannot update tre project with [%v] status", projectTre.Status)
+	}
+
+	return s.validateProjectTREAssetsAndMembers(projectUpdateData.AssetIds, projectUpdateData.Members, projectTre.Project.StudyID)
 }
 
 func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) error {
@@ -195,6 +201,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	projectTRE := types.ProjectTRE{
 		ProjectID:                     project.ID,
 		EgressNumberRequiredApprovals: 2, // TODO: this needs follow up UI/UX and backend validation work, need to discuss with the team
+		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
 	if err := tx.Create(&projectTRE).Error; err != nil {
@@ -232,7 +239,7 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 	}
 
 	var projects []GenericProject
-	err := s.genericProjectsQuery().Where("projects.id IN ?", projectIds).Scan(&projects).Error
+	err := s.genericProjectsQuery().Where("projects.id IN ? AND projects.deleted_at IS NULL", projectIds).Scan(&projects).Error
 
 	return projects, types.NewErrFromGorm(err, "failed to retrieve projects")
 }
@@ -240,22 +247,22 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 // retrieves all projects (for admins and TRE ops staff)
 func (s *Service) AllProjects() ([]GenericProject, error) {
 	var projects []GenericProject
-	err := s.genericProjectsQuery().Scan(&projects).Error
+	err := s.genericProjectsQuery().Where("projects.deleted_at IS NULL").Scan(&projects).Error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
 }
 
 func (s *Service) genericProjectsQuery() *gorm.DB {
 	return s.db.Table("projects").
 		Select(`
-  		projects.id,
-        projects.study_id,
-  		projects.name,
-  		projects.created_at,
-  		projects.updated_at,
-  		users.username as creator_username,
-  		environments.name as environment_name,
-  		COALESCE(pt.status, '') as status
-  	`).Joins("join users on users.id = projects.creator_user_id").
+			projects.id,
+	  		projects.study_id,
+			projects.name,
+			projects.created_at,
+			projects.updated_at,
+			users.username as creator_username,
+			environments.name as environment_name,
+			COALESCE(pt.status, '') as status
+		`).Joins("join users on users.id = projects.creator_user_id").
 		Joins("join environments on environments.id = projects.environment_id").
 		Joins("left join project_tres pt on pt.project_id = projects.id")
 }
@@ -279,11 +286,11 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 	return &projectTRE, nil
 }
 
-func (s *Service) SubmitProject(projectId uuid.UUID) error {
-	result := s.db.Model(&types.Project{}).
-		Where("id = ?", projectId).
-		Where("approval_status = ?", openapi.StudyApprovalStatusIncomplete).
-		Update("approval_status", openapi.StudyApprovalStatusPending)
+func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("project_id = ?", projectId).
+		Where("status = ?", types.ProjectTREStatusIncomplete).
+		Update("status", types.ProjectTREStatusPendingApproval)
 
 	if result.Error != nil {
 		return types.NewErrFromGorm(result.Error, "failed to submit project")
@@ -297,15 +304,14 @@ func (s *Service) SubmitProject(projectId uuid.UUID) error {
 }
 
 func (s *Service) ApproveProject(projectId uuid.UUID) error {
-	err := s.db.Model(&types.Project{}).
-		Where("id = ?", projectId).
-		Update("approval_status", openapi.StudyApprovalStatusApproved).Error
-
-	if err != nil {
-		return types.NewErrFromGorm(err, "failed to approve project")
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("project_id = ?", projectId).
+		Where("status = ?", types.ProjectTREStatusPendingApproval).
+		Update("status", types.ProjectTREStatusPendingCreation)
+	if result.RowsAffected == 0 {
+		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
 	}
-
-	return nil
+	return types.NewErrFromGorm(result.Error, "failed to approve project")
 }
 
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {
@@ -359,12 +365,23 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 }
 
 func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateData openapi.ProjectTREUpdate) error {
-	if err := s.validateProjectTREUpdate(projectUpdateData, projectTRE.Project.StudyID); err != nil {
+	if err := s.validateProjectTREUpdate(projectUpdateData, projectTRE); err != nil {
 		return err
 	}
 
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
+
+	result := tx.Model(&types.ProjectTRE{}).
+		Where("id = ?", projectTRE.ID).
+		Update("status", types.ProjectTREStatusIncomplete)
+
+	if err := result.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(result.Error, "failed to update TRE project status")
+	} else if result.RowsAffected == 0 {
+		return types.NewErrInvalidObject("failed to find project TRE to update")
+	}
 
 	if err := s.createOrUpdateProjectAssets(tx, projectTRE.ProjectID, projectUpdateData); err != nil {
 		tx.Rollback()

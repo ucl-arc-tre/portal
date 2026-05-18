@@ -220,7 +220,7 @@ func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId s
 		return
 	}
 
-	err = h.projects.SubmitProject(projectUUID)
+	err = h.projects.SubmitProjectTre(projectUUID)
 	if err != nil {
 		setError(ctx, err, "Failed to submit project")
 		return

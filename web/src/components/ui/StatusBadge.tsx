@@ -33,7 +33,6 @@ function getProjectTREDescription(
   environment: EnvironmentName | undefined,
   isOpsStaff: boolean
 ): string {
-  console.log(status);
   switch (environment) {
     case "ARC Trusted Research Environment":
       switch (status) {
@@ -41,11 +40,11 @@ function getProjectTREDescription(
           return isOpsStaff
             ? "The project owner has not yet completed the project setup."
             : "Please complete the required project setup.";
-        case "pending-creation":
+        case "pending-approval":
           return isOpsStaff
             ? "This project is ready for approval."
             : "This project is awaiting approval from an administrator.";
-        case "approved":
+        case "pending-creation":
           return "This project has been approved and is awaiting deployment.";
         case "deployed":
           return "This project has been approved and deployed.";
@@ -59,19 +58,26 @@ function getProjectTREDescription(
   return "Status information not available.";
 }
 
+function getDescription(
+  type: "study" | "project",
+  status: string | undefined,
+  environment: EnvironmentName | undefined,
+  isOpsStaff: boolean
+): string {
+  switch (type) {
+    case "study":
+      return getStudyDescription(status as StudyApprovalStatus, isOpsStaff);
+    case "project":
+      return getProjectTREDescription(status, environment, isOpsStaff);
+  }
+}
+
 export default function StatusBadge(props: BadgeProps) {
   const { status, type, environment } = props;
   const { userData } = useAuth();
   const isOpsStaff = userData?.roles.includes("ig-ops-staff") ?? false;
 
-  let description;
-  switch (type) {
-    case "study":
-      description = getStudyDescription(status as StudyApprovalStatus, isOpsStaff);
-    case "project":
-      description = getProjectTREDescription(status, environment, isOpsStaff);
-  }
-
+  const description = getDescription(type, status, environment, isOpsStaff);
   return (
     <span className={`${styles["status-badge"]} ${styles[`status-${status?.toLowerCase()}`]}`} data-cy="status-badge">
       {status}

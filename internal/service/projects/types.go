@@ -18,4 +18,5 @@ type GenericProject struct {
 	CreatorUsername types.Username
 	Status          string
 	EnvironmentName string
+	IsDeletable     bool
 }
