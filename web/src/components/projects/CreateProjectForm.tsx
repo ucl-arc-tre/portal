@@ -699,17 +699,17 @@ export default function CreateProjectForm({
             )}
 
             {currentStep < totalSteps && (
-              <Button type="button" onClick={nextStep}>
+              <Button type="button" onClick={nextStep} cy="next-form-page-button">
                 Next →
               </Button>
             )}
 
             {currentStep === totalSteps && (
               <Button
-                className="create-project-button"
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleSubmit((data) => submitProject(data))}
+                cy="submit-project-button"
               >
                 {isSubmitting
                   ? editingProject
