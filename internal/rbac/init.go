@@ -7,6 +7,7 @@ import (
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -18,6 +19,7 @@ var database *gorm.DB
 func Init() {
 	log.Info().Msg("Seeding roles and static user role bindings")
 	enforcer := NewEnforcer()
+	database = graceful.NewDB()
 
 	seedPolicies(enforcer)
 }

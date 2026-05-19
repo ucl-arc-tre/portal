@@ -19,7 +19,8 @@ func (m *MockEntra) IsStaffMember(ctx context.Context, username types.Username) 
 }
 
 func (m *MockEntra) UserExists(ctx context.Context, username types.Username) (bool, error) {
-	panic("not implemented")
+	args := m.Called(ctx, username)
+	return args.Get(0).(bool), args.Error(1)
 }
 
 func (m *MockEntra) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*entra.InvitedUserData, error) {
