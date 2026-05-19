@@ -8,7 +8,7 @@ import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, InfoIcon } from "@/components/shared/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import Callout from "../ui/Callout";
-import { EntityTooltip } from "../shared/entityDefinitions";
+import { ContractDefinition } from "../shared/entityDefinitions";
 
 type ContractManagementProps = {
   study: Study;
@@ -50,9 +50,7 @@ export default function ContractManagement(props: ContractManagementProps) {
           </div>
           {calloutExpanded && (
             <Callout definition>
-              Contracts can be uploaded as PDFs and can be linked to <EntityTooltip entity="asset" isPlural />,{" "}
-              <EntityTooltip entity="project" isPlural /> and users. If you collaborate with an external researcher you
-              must associate them with a contract
+              <ContractDefinition />
             </Callout>
           )}
           <div className={styles["contracts-summary"]}>

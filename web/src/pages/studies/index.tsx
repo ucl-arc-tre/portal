@@ -4,12 +4,11 @@ import MetaHead from "@/components/meta/Head";
 import Studies from "@/components/studies/Studies";
 import Button from "@/components/ui/Button";
 import Title from "@/components/ui/Title";
-import InfoTooltip from "@/components/ui/InfoTooltip";
 import LoginFallback from "@/components/ui/LoginFallback";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
-import { entityDefinitions, EntityTooltip } from "@/components/shared/entityDefinitions";
+import { StudyDefinition } from "@/components/shared/entityDefinitions";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -27,8 +26,8 @@ export default function StudiesPage() {
       <Title text={"Studies"} centered />
 
       <Callout definition>
-        {entityDefinitions.study} <EntityTooltip entity="asset" isPlural />
-        for more detailed information and an entity relationship diagram, look at our
+        <StudyDefinition />
+        For more detailed information and an entity relationship diagram, look at our
         <Button href="/glossary" variant="tertiary" size="small" inline>
           Glossary
         </Button>

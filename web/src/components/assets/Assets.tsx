@@ -11,7 +11,7 @@ import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
 import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
 import Box from "../ui/Box";
-import { entityDefinitions, EntityTooltip } from "../shared/entityDefinitions";
+import { AssetDefinition } from "../shared/entityDefinitions";
 
 type AssetsProps = {
   study: Study;
@@ -87,9 +87,7 @@ export default function Assets(props: AssetsProps) {
         {calloutExpanded && (
           <Callout definition>
             <div className={styles["callout-info-paragraph"]}>
-              {entityDefinitions.asset}
-              They are owned by a <EntityTooltip entity="study" /> and can belong to a{" "}
-              <EntityTooltip entity="project" />.
+              <AssetDefinition />
             </div>
 
             <div className={styles["callout-glossary-section"]}>
