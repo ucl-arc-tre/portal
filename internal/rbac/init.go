@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/casbin/casbin/v3"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
@@ -18,8 +17,8 @@ var database *gorm.DB
 // Initialise the RBAC with roles and users
 func Init() {
 	log.Info().Msg("Seeding roles and static user role bindings")
-	enforcer := NewEnforcer()
 	database = graceful.NewDB()
+	enforcer := NewEnforcer(database)
 
 	seedPolicies(enforcer)
 }
@@ -42,13 +41,10 @@ func seedPolicies(enforcer *casbin.Enforcer) {
 
 // Initialise the RBAC with roles and users, for integration tests
 func InitForTesting(testDatabase *gorm.DB) {
-
 	if testDatabase != nil {
 		database = testDatabase
 	}
-
-	adapter := must(gormadapter.NewAdapterByDB(database))
-	enforcer = must(casbin.NewEnforcer(makeCasbinModel(), adapter))
+	enforcer := NewEnforcer(database)
 
 	seedPolicies(enforcer)
 }
