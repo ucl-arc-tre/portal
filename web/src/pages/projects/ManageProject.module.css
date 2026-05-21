@@ -87,7 +87,7 @@
 
 .member-item:hover {
   background: #f0f3f5;
-  border-color: var(--form-blue--light);
+  border-color: var(--form-purple--light);
 }
 
 .member-item:last-child {
@@ -109,7 +109,7 @@
 .role-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: var(--form-blue--light);
+  background: var(--form-purple--light);
   color: white;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -135,7 +135,7 @@
 
 .asset-item:hover {
   background: #f0f3f5;
-  border-color: var(--form-blue--light);
+  border-color: var(--form-purple--light);
 }
 
 .asset-item:last-child {
@@ -158,7 +158,7 @@
 .asset-tier {
   display: inline-block;
   padding: 0.2rem 0.6rem;
-  background: var(--form-blue--light);
+  background: var(--form-purple--light);
   color: white;
   border-radius: 4px;
   font-size: 0.75rem;

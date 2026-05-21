@@ -20,7 +20,7 @@
   left: 0;
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, var(--form-blue--light), #0056b3);
+  background: linear-gradient(90deg, var(--form-purple--light), #0056b3);
   margin-left: 0.4rem;
 }
 

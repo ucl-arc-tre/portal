@@ -24,7 +24,7 @@
 }
 
 .contracts-count-badge {
-  background: var(--form-blue--light);
+  background: var(--form-purple--light);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 12px;

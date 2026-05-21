@@ -30,8 +30,8 @@
 
         &:focus {
           outline: none;
-          border-color: var(--form-blue--light);
-          box-shadow: 0 0 0 2px var(--form-blue--shadow);
+          border-color: var(--form-purple--light);
+          box-shadow: 0 0 0 2px var(--form-purple--shadow);
         }
       }
 
