@@ -13,47 +13,50 @@ type MockEntra struct {
 	mock.Mock
 }
 
-func (f *MockEntra) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
+func (m *MockEntra) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
+	args := m.Called(ctx, username)
+	return args.Get(0).(bool), args.Error(1)
+}
+
+func (m *MockEntra) UserExists(ctx context.Context, username types.Username) (bool, error) {
+	args := m.Called(ctx, username)
+	return args.Get(0).(bool), args.Error(1)
+}
+
+func (m *MockEntra) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*entra.InvitedUserData, error) {
 	panic("not implemented")
 }
 
-func (f *MockEntra) UserExists(ctx context.Context, username types.Username) (bool, error) {
+func (m *MockEntra) AddtoInvitedUserGroup(ctx context.Context, user entra.InvitedUserData) error {
 	panic("not implemented")
 }
 
-func (f *MockEntra) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*entra.InvitedUserData, error) {
-	panic("not implemented")
-}
-
-func (f *MockEntra) AddtoInvitedUserGroup(ctx context.Context, user entra.InvitedUserData) error {
-	panic("not implemented")
-}
-
-func (f *MockEntra) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
-	args := f.Called(ctx, query)
+func (m *MockEntra) FindUsernames(ctx context.Context, query string) ([]types.Username, error) {
+	args := m.Called(ctx, query)
 	return args.Get(0).([]types.Username), args.Error(1)
 }
 
-func (f *MockEntra) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor) error {
 	panic("not implemented")
 }
 
-func (f *MockEntra) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
+func (m *MockEntra) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
 	panic("not implemented")
 }
 
-func (f *MockEntra) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
+func (m *MockEntra) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
 	panic("not implemented")
 }
 
-func (f *MockEntra) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
+func (m *MockEntra) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
 	panic("not implemented")
 }
 
-func (f *MockEntra) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
-	panic("not implemented")
+func (m *MockEntra) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
+	args := m.Called(ctx, email, studyTitle)
+	return args.Error(0)
 }
 
-func (f *MockEntra) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
+func (m *MockEntra) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
 	panic("not implemented")
 }

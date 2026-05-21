@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 )
 
@@ -17,7 +18,7 @@ type Authorizer struct {
 
 // New authorization middleware. Assumes user has been set
 func NewWebAuthz() gin.HandlerFunc {
-	authorizer := &Authorizer{rbac.NewEnforcer()}
+	authorizer := &Authorizer{rbac.NewEnforcer(graceful.NewDB())}
 	return authorizer.eval
 }
 
