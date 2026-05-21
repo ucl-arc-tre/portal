@@ -4,10 +4,10 @@ import { useAuth } from "@/hooks/useAuth";
 import dynamic from "next/dynamic";
 import Feedback from "../ui/Feedback";
 
-const Header = dynamic(() => import("uikit-react-public").then((mod) => mod.Header), {
+const Header = dynamic(() => import("uikit-react-public").then((mod) => mod.HeaderNew), {
   ssr: false,
 });
-const Footer = dynamic(() => import("uikit-react-public").then((mod) => mod.Footer), {
+const Footer = dynamic(() => import("uikit-react-public").then((mod) => mod.FooterNew), {
   ssr: false,
 });
 
