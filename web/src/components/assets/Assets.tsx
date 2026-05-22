@@ -66,7 +66,7 @@ export default function Assets(props: AssetsProps) {
               <InfoIcon className={styles.icon} />
             </Button>
           </h3>
-          {canModify && (
+          {canModify && assets.length > 1 && (
             <>
               <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
                 {showAssetForm ? "Cancel" : "Add Asset"}
