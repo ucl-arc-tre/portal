@@ -53,7 +53,7 @@ test-unit:  ## Run unit tests
 	go test ./internal/...
 
 test-integration:  ## Run integration tests
-	cd internal/testutil && \
+	cd internal/testutils && \
 	docker compose -p $(INTTEST_PROJECT_NAME) build && \
 	docker compose -p $(INTTEST_PROJECT_NAME) up -d postgres-test && \
 	docker compose -p $(INTTEST_PROJECT_NAME) run --rm integration-tests && \

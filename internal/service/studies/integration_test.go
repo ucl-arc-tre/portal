@@ -15,7 +15,9 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
-	"github.com/ucl-arc-tre/portal/internal/testutil"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mock_controllers"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mock_db"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mock_users"
 	"gorm.io/gorm"
 
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -52,9 +54,9 @@ func TestIntegration_CreateAsset(t *testing.T) {
 	t.Parallel()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mock_db.NewTestDBSchema(t, migrate)
 
-	svc := &Service{db: db, entra: &testutil.MockEntra{}}
+	svc := &Service{db: db, entra: &mock_controllers.MockEntra{}}
 
 	user := types.User{
 		Username: "username",
@@ -117,7 +119,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 	later := now.Add(24 * time.Hour)
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mock_db.NewTestDBSchema(t, migrate)
 
 	// set up test config
 	config.Init()
@@ -248,7 +250,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 			ctx := context.Background()
 
 			// set up mocks
-			mockEntra := new(testutil.MockEntra)
+			mockEntra := new(mock_controllers.MockEntra)
 			mockEntra.On("FindUsernames", ctx, base.OrganisationSignatory).
 				Return(curTest.mockUsers, nil)
 
@@ -275,17 +277,17 @@ func TestIntegration_CreateContract(t *testing.T) {
 	ctx := context.Background()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mock_db.NewTestDBSchema(t, migrate)
 
 	// stub entra + users + S3
-	entra := new(testutil.MockEntra)
-	users := new(testutil.MockUsers)
-	mockS3 := new(testutil.MockS3)
+	mockEntra := new(mock_controllers.MockEntra)
+	mockUsers := new(mock_users.MockUsers)
+	mockS3 := new(mock_controllers.MockS3)
 
 	svc := &Service{
 		db:    db,
-		entra: entra,
-		users: users,
+		entra: mockEntra,
+		users: mockUsers,
 		s3:    mockS3,
 	}
 
@@ -330,16 +332,16 @@ func TestIntegration_CreateContract(t *testing.T) {
 	}
 
 	// set up mocks
-	entra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
+	mockEntra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
 		Return([]types.Username{signatoryUser.Username}, nil)
 
-	users.On("PersistedUser", types.Username(contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
+	mockUsers.On("PersistedUser", types.Username(contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
 
 	contract, err := svc.CreateContract(ctx, studyID, contractBase, creator)
 	assert.NoError(t, err)
 	assert.NotNil(t, contract)
 
-	s3Object := testutil.MockS3Object("integration test contract")
+	s3Object := mock_controllers.MockS3Object("integration test contract")
 	contractObjectmetadata := types.ContractObjectMetadata{
 		Filename:   "contract.pdf",
 		ContractID: contract.ID,
@@ -383,7 +385,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 	t.Parallel()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mock_db.NewTestDBSchema(t, migrate)
 
 	creator := types.User{
 		Username: "bob@testIntegration.com",
@@ -570,7 +572,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 			ctx := context.Background()
 
 			// set up mocks
-			mockEntra := new(testutil.MockEntra)
+			mockEntra := new(mock_controllers.MockEntra)
 
 			// mock all admin checks
 			for _, username := range req.AdditionalStudyAdminUsernames {
@@ -606,12 +608,12 @@ func TestIntegration_CreateStudy(t *testing.T) {
 	ctx := context.Background()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mock_db.NewTestDBSchema(t, migrate)
 
 	rbac.InitForTesting(db)
 
-	mockUsers := new(testutil.MockUsers)
-	mockEntra := new(testutil.MockEntra)
+	mockUsers := new(mock_users.MockUsers)
+	mockEntra := new(mock_controllers.MockEntra)
 
 	service := &Service{
 		db:    db,

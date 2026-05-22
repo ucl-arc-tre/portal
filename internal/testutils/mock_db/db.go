@@ -1,4 +1,4 @@
-package testutil
+package mock_db
 
 import (
 	"context"
