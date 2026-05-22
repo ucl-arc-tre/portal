@@ -30,7 +30,7 @@ export default function EntityCard(props: EntityCardProps) {
   const router = useRouter();
   return (
     <Box isCard key={key} warning={isWarning}>
-      <a href={manageUrl}>
+      <a href={manageUrl} data-cy="entity-card">
         <div className={styles.header}>
           <h2 className={styles.title}>{title}</h2>
           {headerContent}
@@ -41,7 +41,12 @@ export default function EntityCard(props: EntityCardProps) {
           {footerContent}
           <div className={styles.actions}>
             {manageUrl && (
-              <Button onClick={() => router.push(manageUrl)} size="small" className={styles.manage}>
+              <Button
+                onClick={() => router.push(manageUrl)}
+                size="small"
+                className={styles.manage}
+                data-cy="manage-button"
+              >
                 {canModify ? "Manage" : "View"}
               </Button>
             )}

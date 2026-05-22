@@ -40,7 +40,6 @@ export default function StudyCardsList(props: Props) {
                 </div>
               }
               manageUrl={`/studies/manage?studyId=${study.id}`}
-              canModify={false}
             >
               <div className={styles["study-info"]}>
                 <span className={styles["study-caseref"]}>Case ref: {String(study.caseref).padStart(5, "0")}</span>
