@@ -4,13 +4,12 @@
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1rem;
-}
 
-.header h3 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text);
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
 }
 
 .contracts-summary {
@@ -21,6 +20,7 @@
   color: #495057;
   font-weight: 500;
   justify-content: center;
+  width: 100%;
 }
 
 .contracts-count-badge {
@@ -85,12 +85,6 @@
 }
 
 @media (width >=768px) {
-  .header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-
   .contracts-list {
     gap: 1.5rem;
   }

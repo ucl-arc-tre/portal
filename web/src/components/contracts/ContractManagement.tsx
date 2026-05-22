@@ -38,12 +38,12 @@ export default function ContractManagement(props: ContractManagementProps) {
       {isStudyOwnerOrAdmin ? (
         <>
           <div className={styles.header}>
-            <h2>
+            <h3>
               Contract Management{" "}
               <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
                 <InfoIcon className={styles.icon} />
               </Button>
-            </h2>
+            </h3>
             <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="add-contract">
               Add Contract
             </Button>

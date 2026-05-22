@@ -60,12 +60,12 @@ export default function Assets(props: AssetsProps) {
     <Box>
       <section className={styles["study-assets-container"]} data-cy="study-assets">
         <div className={styles.header}>
-          <h2 className="subtitle">
+          <h3>
             Asset Management{" "}
             <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
               <InfoIcon className={styles.icon} />
             </Button>
-          </h2>
+          </h3>
           {canModify && (
             <>
               <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
