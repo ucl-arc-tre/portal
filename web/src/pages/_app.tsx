@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <AuthProvider>
       <MetaHead title="ARC Services Portal | UCL" description="ARC Services Portal" />
 
-      <ThemeContextProvider initialTheme={lightTheme ? lightTheme : undefined}>
+      <ThemeContextProvider initialTheme={lightTheme}>
         <Layout>
           <Component {...pageProps} />
         </Layout>
