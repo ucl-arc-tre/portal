@@ -2,7 +2,6 @@ import Button from "./Button";
 import styles from "./Card.module.css";
 
 type CardProps = {
-  key: string | number;
   title: string;
   headerContent?: React.ReactNode;
   children: React.ReactNode;
