@@ -31,16 +31,6 @@
   padding-top: 0.2rem;
 }
 
-/* .status-indicator {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.4rem;
-} */
-
 .status-indicator {
   justify-self: flex-end;
 }
@@ -61,27 +51,10 @@
 }
 
 .study-title {
-  /* font-size: 1.4rem; */
   font-weight: 600;
   line-height: 1.3;
   align-self: center;
 }
-
-/* .study-caseref {
-  display: block;
-  font-size: 1rem;
-  color: #444;
-  margin-bottom: 0.5rem;
-} */
-
-/* .study-description {
-  margin: 0;
-  color: #666;
-  line-height: 1.6;
-  font-size: 1rem;
-  display: inline-block;
-  word-break: break-word;
-} */
 
 @media (max-width: 768px) {
   .study-selection {
