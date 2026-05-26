@@ -29,31 +29,24 @@ export default function Card(props: CardProps) {
   } = props;
   const router = useRouter();
   return (
-    <Box isCard key={key} warning={isWarning}>
-      <a href={manageUrl} data-cy="entity-card">
-        <div className={styles.header}>
-          <h2>{title}</h2>
-          {headerContent}
-        </div>
-        <div className={styles.content}>{children}</div>
+    <a href={manageUrl} data-cy="entity-card" className={`${styles.card} ${isWarning ? styles.warning : ""}`}>
+      <div className={styles.header}>
+        <h2>{title}</h2>
+        {headerContent}
+      </div>
+      <div className={styles.content}>{children}</div>
 
-        <div className={styles.footer}>
-          {footerContent}
-          <div className={styles.actions}>
-            {manageUrl && (
-              <Button
-                onClick={() => router.push(manageUrl)}
-                size="small"
-                className={styles.manage}
-                data-cy="manage-button"
-              >
-                {canModify ? "Manage" : "View"}
-              </Button>
-            )}
-            {deleteButton}
-          </div>
+      <div className={styles.footer}>
+        {footerContent}
+        <div className={styles.actions}>
+          {manageUrl && (
+            <Button size="small" className={styles.manage} data-cy="manage-button">
+              {canModify ? "Manage" : "View"}
+            </Button>
+          )}
+          {deleteButton}
         </div>
-      </a>
-    </Box>
+      </div>
+    </a>
   );
 }
