@@ -3,7 +3,7 @@ import Box from "./Box";
 import Button from "./Button";
 import styles from "./Card.module.css";
 
-type EntityCardProps = {
+type CardProps = {
   key: string | number;
   title: string;
   headerContent?: React.ReactNode;
@@ -15,7 +15,7 @@ type EntityCardProps = {
   deleteButton?: React.ReactNode;
 };
 
-export default function EntityCard(props: EntityCardProps) {
+export default function Card(props: CardProps) {
   const {
     key,
     headerContent,

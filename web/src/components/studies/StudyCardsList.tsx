@@ -3,7 +3,7 @@ import StatusBadge from "../ui/StatusBadge";
 import { studySignoffWarningRequired } from "../shared/exports";
 
 import styles from "./StudyCardsList.module.css";
-import EntityCard from "../ui/Card";
+import Card from "../ui/Card";
 
 type Props = {
   studies: Study[];
@@ -26,7 +26,7 @@ export default function StudyCardsList(props: Props) {
           .slice()
           .sort((a, b) => studySortOrder[a.approval_status] - studySortOrder[b.approval_status])
           .map((study) => (
-            <EntityCard
+            <Card
               key={study.id}
               title={study.title}
               headerContent={
@@ -45,7 +45,7 @@ export default function StudyCardsList(props: Props) {
                 <span className={styles["study-caseref"]}>Case ref: {String(study.caseref).padStart(5, "0")}</span>
                 <p className={styles["study-description"]}>{study.description}</p>
               </div>
-            </EntityCard>
+            </Card>
           ))}
       </div>
     </div>

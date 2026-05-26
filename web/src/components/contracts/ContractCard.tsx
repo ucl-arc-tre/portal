@@ -2,7 +2,7 @@ import { Contract } from "@/openapi";
 import styles from "./ContractCard.module.css";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import ExpiryWarning from "../ui/ExpiryWarning";
-import EntityCard from "../ui/Card";
+import Card from "../ui/Card";
 
 type ContractCardProps = {
   contract: Contract;
@@ -26,7 +26,7 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
   };
 
   return (
-    <EntityCard
+    <Card
       key={contract.id}
       title={contract.title}
       headerContent={
@@ -74,6 +74,6 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
           <span className={styles.value}>{contract.asset_ids.length || 0}</span>
         </div>
       </div>
-    </EntityCard>
+    </Card>
   );
 }

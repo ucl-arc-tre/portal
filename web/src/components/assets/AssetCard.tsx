@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 import ExpiryWarning from "../ui/ExpiryWarning";
-import EntityCard from "../ui/Card";
+import Card from "../ui/Card";
 
 type AssetCardProps = {
   asset: Asset;
@@ -58,7 +58,7 @@ export default function AssetCard(props: AssetCardProps) {
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
 
   return (
-    <EntityCard
+    <Card
       key={asset.id}
       manageUrl={`/assets/manage?studyId=${studyId}&assetId=${asset.id}`}
       canModify={canModify}
@@ -141,6 +141,6 @@ export default function AssetCard(props: AssetCardProps) {
           <AlertMessage>{error}</AlertMessage>
         </Alert>
       )}
-    </EntityCard>
+    </Card>
   );
 }

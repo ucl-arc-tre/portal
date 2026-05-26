@@ -7,7 +7,7 @@ import Dialog from "@/components/ui/Dialog";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
 import styles from "./ProjectCardsList.module.css";
-import EntityCard from "../ui/Card";
+import Card from "../ui/Card";
 
 type Props = {
   projects: Project[];
@@ -79,7 +79,7 @@ export default function ProjectCardsList(props: Props) {
         {projects
           .sort((a, b) => projectSortOrder[a.approval_status] - projectSortOrder[b.approval_status])
           .map((project) => (
-            <EntityCard
+            <Card
               key={project.id}
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}`}
@@ -103,7 +103,7 @@ export default function ProjectCardsList(props: Props) {
                 <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
                 <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
               </div>
-            </EntityCard>
+            </Card>
           ))}
       </div>
 
