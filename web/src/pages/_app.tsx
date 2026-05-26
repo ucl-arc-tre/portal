@@ -12,6 +12,9 @@ const ThemeContextProvider = dynamic(() => import("uikit-react-public").then((mo
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  // currently a workaround way to load the theme;
+  // it can't be imported as a variable for the same reason the components can't be imported (unclear)
+  //  but the dynamic method doesn't work for the theme (not a component)
   const [lightTheme, setLightTheme] = useState<ThemeType | undefined>(undefined);
 
   useEffect(() => {
