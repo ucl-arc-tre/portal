@@ -7,7 +7,7 @@ type CardProps = {
   headerContent?: React.ReactNode;
   children: React.ReactNode;
   footerContent?: React.ReactNode;
-  manageUrl: string;
+  manageUrl?: string;
   canModify?: boolean;
   isWarning?: boolean;
   deleteButton?: React.ReactNode;
@@ -28,7 +28,7 @@ export default function Card(props: CardProps) {
     <a href={manageUrl} data-cy="entity-card">
       <div className={`${styles.card} ${isWarning ? styles.warning : ""}`}>
         <div className={styles.header}>
-          <h2>{title}</h2>
+          <h3>{title}</h3>
           {headerContent}
         </div>
         <div className={styles.content}>{children}</div>

@@ -1,4 +1,5 @@
 .card {
+  margin: 1rem 0;
   padding: 1.5rem;
   background: var(--background);
   border-radius: 2px;
@@ -21,6 +22,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.75rem;
+
+  h3 {
+    font-size: 1.3rem;
+  }
 }
 
 .content {

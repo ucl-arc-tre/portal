@@ -59,7 +59,7 @@
   padding: 2rem 1rem;
   text-align: center;
   border: 2px dashed var(--color-border);
-  border-radius: 8px;
+  border-radius: 4px;
   background-color: var(--color-background-secondary);
 }
 
