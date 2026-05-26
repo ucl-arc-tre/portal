@@ -1,4 +1,4 @@
-package mock_users
+package mockusers
 
 import (
 	"context"

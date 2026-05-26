@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
-	"github.com/ucl-arc-tre/portal/internal/testutils/mock_controllers"
-	"github.com/ucl-arc-tre/portal/internal/testutils/mock_db"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -51,10 +51,10 @@ func createTestUser(t *testing.T, db *gorm.DB, username string) types.User {
 }
 
 func TestPersistedUser_CreatesUser(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
 		db: db,
@@ -70,10 +70,10 @@ func TestPersistedUser_CreatesUser(t *testing.T) {
 }
 
 func TestPersistedUser_ReturnsExistingUser(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	existing := createTestUser(t, db, "bob@testIntegration.com")
 
@@ -88,10 +88,10 @@ func TestPersistedUser_ReturnsExistingUser(t *testing.T) {
 }
 
 func TestPersistedUser_InvalidUsername(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
 		db: db,
@@ -105,10 +105,10 @@ func TestPersistedUser_InvalidUsername(t *testing.T) {
 }
 
 func TestPersistedExternalUser_CreatesNewUser(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
 		db: db,
@@ -130,10 +130,10 @@ func TestPersistedExternalUser_CreatesNewUser(t *testing.T) {
 }
 
 func TestPersistedExternalUser_UpdatesUsername(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	existing := createTestUser(t, db, "old_username")
 
@@ -166,7 +166,7 @@ func TestFind_ReturnsPortalAndEntraUsers(t *testing.T) {
 
 	// Note: Remove t.Parallel() from RBAC-dependent integration tests
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	rbac.InitForTesting(db)
 
@@ -177,7 +177,7 @@ func TestFind_ReturnsPortalAndEntraUsers(t *testing.T) {
 		ChosenName: "Alice Smith",
 	}).Error)
 
-	mockEntra := new(mock_controllers.MockEntra)
+	mockEntra := new(mockcontrollers.MockEntra)
 	svc := &Service{
 		db:    db,
 		entra: mockEntra,
@@ -196,10 +196,10 @@ func TestFind_ReturnsPortalAndEntraUsers(t *testing.T) {
 }
 
 func TestAllApprovedResearchers(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
 		db: db,
@@ -231,10 +231,10 @@ func TestAllApprovedResearchers(t *testing.T) {
 }
 
 func TestCreateUserSponsorship(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
 		db: db,
@@ -267,10 +267,10 @@ func TestCreateUserSponsorship(t *testing.T) {
 }
 
 func TestCreateNHSDTrainingRecord(t *testing.T) {
-	// Enable parallel test
+
 	t.Parallel()
 
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
 		db: db,

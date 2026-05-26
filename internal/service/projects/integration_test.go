@@ -14,8 +14,8 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
-	"github.com/ucl-arc-tre/portal/internal/testutils/mock_db"
-	"github.com/ucl-arc-tre/portal/internal/testutils/mock_users"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockusers"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -47,11 +47,11 @@ func TestCreateProjectTRE(t *testing.T) {
 	// Note: Remove t.Parallel() from RBAC-dependent integration tests
 
 	// Create unique schema for this test
-	db := mock_db.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	rbac.InitForTesting(db)
 
-	mockUsers := new(mock_users.MockUsers)
+	mockUsers := new(mockusers.MockUsers)
 
 	svc := &Service{
 		db:    db,
