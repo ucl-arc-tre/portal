@@ -27,8 +27,8 @@ const EntityTooltip = ({ entity, isPlural }: { entity: keyof typeof entityDefini
 export const StudyDefinition = () => {
   return (
     <>
-      Studies are a top level entity that can contain <EntityTooltip entity="asset" /> and{" "}
-      <EntityTooltip entity="contract" /> and own <EntityTooltip entity="project" />
+      Studies are a top level entity that can contain <EntityTooltip entity="asset" isPlural /> and{" "}
+      <EntityTooltip entity="contract" isPlural /> and own <EntityTooltip entity="project" isPlural />
     </>
   );
 };
