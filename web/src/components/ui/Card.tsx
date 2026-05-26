@@ -32,7 +32,7 @@ export default function Card(props: CardProps) {
     <Box isCard key={key} warning={isWarning}>
       <a href={manageUrl} data-cy="entity-card">
         <div className={styles.header}>
-          <h2 className={styles.title}>{title}</h2>
+          <h2>{title}</h2>
           {headerContent}
         </div>
         <div className={styles.content}>{children}</div>
