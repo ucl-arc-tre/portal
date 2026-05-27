@@ -10,9 +10,9 @@ import (
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"gorm.io/gorm"
 )
 
 const (
@@ -34,12 +34,12 @@ const (
 var enforcer *casbin.Enforcer
 
 // Get a casbin policy enforcer. Singleton is initalised if not already
-func NewEnforcer() *casbin.Enforcer {
+func NewEnforcer(db *gorm.DB) *casbin.Enforcer {
 	if enforcer != nil {
 		return enforcer
 	}
 	log.Debug().Msg("Creating casbin enforcer")
-	adapter := must(gormadapter.NewAdapterByDB(graceful.NewDB()))
+	adapter := must(gormadapter.NewAdapterByDB(db))
 	enforcer = must(casbin.NewEnforcer(makeCasbinModel(), adapter))
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)

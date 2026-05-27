@@ -4,6 +4,7 @@ package studies
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/testutil"
 	"gorm.io/gorm"
 
@@ -31,6 +33,7 @@ func migrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&types.User{},
 		&types.Study{},
+		&types.StudyAdmin{},
 		&types.Asset{},
 		&types.AssetLocation{},
 		&types.Contract{},
@@ -371,5 +374,315 @@ func TestIntegration_CreateContract(t *testing.T) {
 
 	assert.Equal(t, studyID, fetched.StudyID)
 	assert.Equal(t, creator.ID, fetched.CreatorUserID)
+
+}
+
+func TestIntegration_ValidateStudyData(t *testing.T) {
+
+	// Enable parallel test
+	t.Parallel()
+
+	// Create unique schema for this test
+	db := testutil.NewTestDBSchema(t, migrate)
+
+	creator := types.User{
+		Username: "bob@testIntegration.com",
+	}
+	assert.NoError(t, db.Create(&creator).Error)
+
+	study := types.Study{
+		OwnerUserID:    creator.ID,
+		Title:          "Existing Study",
+		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+	}
+	assert.NoError(t, db.Create(&study).Error)
+
+	baseRequest := openapi.StudyRequest{
+		Title:                         "Valid Study",
+		DataControllerOrganisation:    "Org",
+		Description:                   ptr("Valid description"),
+		AdditionalStudyAdminUsernames: []string{"admin1@testIntegration.com"},
+	}
+
+	tests := []struct {
+		name      string
+		modify    func(*openapi.StudyRequest)
+		isUpdate  bool
+		mockStaff bool
+		expectErr bool
+	}{
+		// =========================
+		//  VALID CASES
+		// =========================
+		{
+			name:      "valid study request (baseline)",
+			modify:    func(req *openapi.StudyRequest) {},
+			mockStaff: true,
+			expectErr: false,
+		},
+
+		// =========================
+		//  INVALID CASES
+		// =========================
+		{
+			name: "invalid title",
+			modify: func(req *openapi.StudyRequest) {
+				req.Title = "x"
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "missing organisation",
+			modify: func(req *openapi.StudyRequest) {
+				req.DataControllerOrganisation = "   "
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "description too long",
+			modify: func(req *openapi.StudyRequest) {
+				req.Description = ptr(strings.Repeat("a", 300))
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "DPO missing number",
+			modify: func(req *openapi.StudyRequest) {
+				req.IsDataProtectionOfficeRegistered = ptr(true)
+				req.DataProtectionNumber = nil
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "invalid DPO format",
+			modify: func(req *openapi.StudyRequest) {
+				req.IsDataProtectionOfficeRegistered = ptr(true)
+				req.DataProtectionNumber = ptr("BAD")
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "invalid CAG",
+			modify: func(req *openapi.StudyRequest) {
+				req.CagReference = ptr("BAD")
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "invalid NHS",
+			modify: func(req *openapi.StudyRequest) {
+				req.NhsEnglandReference = ptr("BAD")
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "too many admins",
+			modify: func(req *openapi.StudyRequest) {
+				req.AdditionalStudyAdminUsernames = []string{"a", "b", "c", "d", "e", "f"}
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "duplicate title on create",
+			modify: func(req *openapi.StudyRequest) {
+				req.Title = "Existing Study"
+			},
+			mockStaff: true,
+			expectErr: true,
+		},
+		{
+			name: "duplicate title allowed on update (same record)",
+			modify: func(req *openapi.StudyRequest) {
+				req.Title = "Existing Study"
+			},
+			isUpdate:  true,
+			mockStaff: true,
+			expectErr: false,
+		},
+		{
+			name: "admin not staff",
+			modify: func(req *openapi.StudyRequest) {
+				req.AdditionalStudyAdminUsernames = []string{"alice@test.com"}
+			},
+			mockStaff: false,
+			expectErr: true,
+		},
+		{
+			name: "no admins",
+			modify: func(req *openapi.StudyRequest) {
+				req.AdditionalStudyAdminUsernames = []string{}
+			},
+			mockStaff: true,
+			expectErr: false,
+		},
+
+		// =========================
+		//  EDGE CASES
+		// =========================
+		{
+			name: "title at min length",
+			modify: func(req *openapi.StudyRequest) {
+				req.Title = "Abcd"
+			},
+			mockStaff: true,
+			expectErr: false,
+		},
+		{
+			name: "description at max length",
+			modify: func(req *openapi.StudyRequest) {
+				req.Description = ptr(strings.Repeat("a", 255))
+			},
+			mockStaff: true,
+			expectErr: false,
+		},
+	}
+
+	for _, curTest := range tests {
+
+		// to avoid curTest being reused across iterations, expecially in parallel tests
+		curTest := curTest
+
+		t.Run(curTest.name, func(t *testing.T) {
+
+			req := baseRequest
+
+			// deep copying because req := baseRequest copies the container, not the contents
+			req.AdditionalStudyAdminUsernames = append(
+				[]string{},
+				baseRequest.AdditionalStudyAdminUsernames...,
+			)
+
+			if baseRequest.Description != nil {
+				desc := *baseRequest.Description
+				req.Description = &desc
+			}
+
+			curTest.modify(&req)
+
+			ctx := context.Background()
+
+			// set up mocks
+			mockEntra := new(testutil.MockEntra)
+
+			// mock all admin checks
+			for _, username := range req.AdditionalStudyAdminUsernames {
+				mockEntra.
+					On("IsStaffMember", ctx, types.Username(username)).
+					Return(curTest.mockStaff, nil).
+					Maybe() // allows zero calls if no admins
+			}
+
+			svc := &Service{
+				db:    db,
+				entra: mockEntra,
+			}
+
+			err := svc.validateStudyData(context.Background(), req, curTest.isUpdate)
+
+			if curTest.expectErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			mockEntra.AssertExpectations(t)
+
+		})
+	}
+}
+
+func TestIntegration_CreateStudy(t *testing.T) {
+
+	// Note: Remove t.Parallel() from RBAC-dependent integration tests
+
+	ctx := context.Background()
+
+	// Create unique schema for this test
+	db := testutil.NewTestDBSchema(t, migrate)
+
+	rbac.InitForTesting(db)
+
+	mockUsers := new(testutil.MockUsers)
+	mockEntra := new(testutil.MockEntra)
+
+	service := &Service{
+		db:    db,
+		entra: mockEntra,
+		users: mockUsers,
+	}
+
+	// Seed owner
+	owner := types.User{
+		Username: "bob@testIntegration.com",
+	}
+	require.NoError(t, db.Create(&owner).Error)
+	require.NotEqual(t, uuid.Nil, owner.ID)
+
+	// Seed admin users
+	admin1 := types.User{Username: "admin1@testIntegration.com"}
+	admin2 := types.User{Username: "admin2@testIntegration.com"}
+	require.NoError(t, db.Create(&admin1).Error)
+	require.NoError(t, db.Create(&admin2).Error)
+
+	studyData := openapi.StudyRequest{
+		Title:                      "Test Study",
+		DataControllerOrganisation: "Org",
+		AdditionalStudyAdminUsernames: []string{
+			string(admin1.Username),
+			string(admin2.Username),
+		},
+	}
+
+	// mock all admin checks
+	for _, username := range studyData.AdditionalStudyAdminUsernames {
+		mockEntra.
+			On("IsStaffMember", mock.Anything, types.Username(username)).
+			Return(true, nil).
+			Maybe() // allows zero calls if no admins
+
+		mockEntra.On("SendIaaAssignmentNotification", mock.Anything, username, studyData.Title).Return(nil)
+	}
+	mockUsers.On("PersistedUser", admin1.Username).Return(admin1, nil)
+	mockUsers.On("PersistedUser", admin2.Username).Return(admin2, nil)
+
+	// Execute
+	err := service.CreateStudy(ctx, owner, studyData)
+	require.NoError(t, err)
+
+	var studies []types.Study
+	require.NoError(t, db.Find(&studies).Error)
+
+	// Verify study created in db
+	var created types.Study
+	err = db.Where("owner_user_id = ?", owner.ID).First(&created).Error
+	require.NoError(t, err)
+
+	// Fetch using study ID
+	fetchedStudies, err := service.StudiesById(created.ID)
+	require.NoError(t, err)
+
+	require.Len(t, fetchedStudies, 1)
+
+	fetched := fetchedStudies[0]
+
+	assert.Equal(t, owner.ID, fetched.OwnerUserID)
+	assert.Equal(t, string(openapi.Incomplete), fetched.ApprovalStatus)
+	assert.Len(t, fetched.StudyAdmins, 2)
+
+	adminIDs := []uuid.UUID{}
+	for _, sa := range fetched.StudyAdmins {
+		adminIDs = append(adminIDs, sa.UserID)
+	}
+
+	assert.Contains(t, adminIDs, admin1.ID)
+	assert.Contains(t, adminIDs, admin2.ID)
 
 }

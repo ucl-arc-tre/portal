@@ -8,14 +8,22 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/types"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+var database *gorm.DB
 
 // Initialise the RBAC with roles and users
 func Init() {
 	log.Info().Msg("Seeding roles and static user role bindings")
-	enforcer := NewEnforcer()
+	database = graceful.NewDB()
+	enforcer := NewEnforcer(database)
 
+	seedPolicies(enforcer)
+}
+
+func seedPolicies(enforcer *casbin.Enforcer) {
 	addBasePolicies(enforcer)
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
@@ -29,6 +37,16 @@ func Init() {
 	addUserRoleBindings(config.DSHOpsStaffUsernames(), DSHOpsStaff)
 
 	runMigrations()
+}
+
+// Initialise the RBAC with roles and users, for integration tests
+func InitForTesting(testDatabase *gorm.DB) {
+	if testDatabase != nil {
+		database = testDatabase
+	}
+	enforcer := NewEnforcer(database)
+
+	seedPolicies(enforcer)
 }
 
 func addBasePolicies(enforcer *casbin.Enforcer) {
@@ -114,7 +132,7 @@ func addUserRoleBindings(usernames []types.Username, role RoleName) {
 }
 
 func persistedUsers(usernames []types.Username) []types.User {
-	db := graceful.NewDB()
+	db := database
 	users := []types.User{}
 	for _, username := range usernames {
 		if !username.IsValid() {
@@ -136,7 +154,7 @@ func persistedUsers(usernames []types.Username) []types.User {
 }
 
 func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role RoleName) {
-	db := graceful.NewDB()
+	db := database
 	outdatedUsers := []types.User{}
 
 	userIdsWithRole, err := userIdsWithRole(role)
