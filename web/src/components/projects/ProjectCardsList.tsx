@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
-import { useRouter } from "next/router";
 import { Project, deleteProjectsTreByProjectId } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
-import StatusBadge from "../ui/StatusBadge";
+// import StatusBadge from "../ui/StatusBadge";
 import Dialog from "@/components/ui/Dialog";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
@@ -78,7 +76,7 @@ export default function ProjectCardsList(props: Props) {
               key={project.id}
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
-              headerContent={<StatusBadge status={project.approval_status} type="project" />}
+              // headerContent={<StatusBadge status={project.approval_status} type="project" />}
               actions={
                 !isOpsStaff &&
                 project.status === "incomplete" && (
