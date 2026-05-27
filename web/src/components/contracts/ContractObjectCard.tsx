@@ -92,8 +92,8 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
     <Card
       title={filename}
       key={id}
-      footerContent={
-        <div className={styles["button-wrapper"]}>
+      actions={
+        <>
           <Button
             onClick={handleDownload}
             disabled={downloading}
@@ -106,19 +106,19 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
 
           {canModify && (
             <Button
-              className="delete-button"
               onClick={() => setShowDeleteModal(true)}
               size="small"
               data-cy="contract-object-delete-button"
+              variant="primary-destructive"
             >
               Delete
             </Button>
           )}
-        </div>
+        </>
       }
     >
       <>
-        <span className={styles.createdAt}>Created at: {createdAt}</span>
+        <span>Created at: {createdAt}</span>
         {error && (
           <Alert type="error">
             <AlertMessage>{error}</AlertMessage>

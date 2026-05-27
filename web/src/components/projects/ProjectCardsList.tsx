@@ -84,14 +84,13 @@ export default function ProjectCardsList(props: Props) {
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}`}
               headerContent={<StatusBadge status={project.approval_status} type="project" />}
-              deleteButton={
+              actions={
                 !isOpsStaff && (
                   <Button
                     onClick={() => handleDeleteClick(project)}
                     size="small"
-                    variant="secondary"
                     disabled={deletingProjectId === project.id}
-                    className={`delete-button`}
+                    variant="primary-destructive"
                   >
                     {deletingProjectId === project.id ? "Deleting..." : "Delete"}
                   </Button>
@@ -132,7 +131,7 @@ export default function ProjectCardsList(props: Props) {
               </Button>
               <Button
                 onClick={handleConfirmDelete}
-                variant="primary"
+                variant="primary-destructive"
                 disabled={!!deletingProjectId}
                 className={styles["delete-button-confirm"]}
               >
