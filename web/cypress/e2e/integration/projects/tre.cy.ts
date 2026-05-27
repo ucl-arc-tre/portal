@@ -70,4 +70,11 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[data-cy="next-form-page-button"]').click();
     cy.get('[data-cy="submit-project-button"]').click();
   });
+
+  it("staff member should be able to see the project once created", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/projects");
+    cy.contains(projectTitle).should("exist");
+  });
 });
