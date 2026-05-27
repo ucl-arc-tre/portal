@@ -1,4 +1,4 @@
-package testutil
+package mockusers
 
 import (
 	"context"
@@ -91,11 +91,13 @@ func (m *MockUsers) UserById(id uuid.UUID) (*types.User, error) {
 }
 
 func (m *MockUsers) UserByUsername(username types.Username) (*types.User, error) {
-	panic("not implemented")
+	args := m.Called(username)
+	return args.Get(0).(*types.User), args.Error(1)
 }
 
 func (m *MockUsers) UserIds(usernames ...types.Username) (map[types.Username]uuid.UUID, error) {
-	panic("not implemented")
+	args := m.Called(usernames)
+	return args.Get(0).(map[types.Username]uuid.UUID), args.Error(1)
 }
 
 func (m *MockUsers) Find(ctx context.Context, query string) ([]openapi.UserData, error) {
