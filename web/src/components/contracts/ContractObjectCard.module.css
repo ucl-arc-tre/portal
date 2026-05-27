@@ -1,5 +1,4 @@
 .button-wrapper {
-  grid-column: 2;
   display: flex;
   gap: 0.5rem;
 }
