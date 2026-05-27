@@ -417,7 +417,7 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 
 	if projectTRE.Status != types.ProjectTREStatusIncomplete {
 		tx.Rollback()
-		return types.NewErrInvalidObjectF("deletion must have a incomplete status. was [%v]", projectTRE.Status)
+		return types.NewErrInvalidObjectF("deletion must have an incomplete status. was [%v]", projectTRE.Status)
 	}
 
 	// Soft delete all ProjectTRERoleBindings for this project
