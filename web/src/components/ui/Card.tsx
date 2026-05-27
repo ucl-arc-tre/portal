@@ -17,7 +17,7 @@ export default function Card(props: CardProps) {
   const router = useRouter();
 
   const CardInner = (
-    <article data-cy="entity-card" className={`${styles.card} ${isWarning ? styles.warning : ""}`}>
+    <article className={`${styles.card} ${isWarning ? styles.warning : ""}`}>
       <div className={styles.header}>
         <h3>{title}</h3>
         {headerContent}

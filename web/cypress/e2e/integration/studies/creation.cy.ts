@@ -31,11 +31,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").click();
 
-    cy.contains(studyTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="manage-button"]').click();
-      });
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="agreement-agree"]').click();
 
     // step 2: add an asset to complete setup
@@ -76,7 +72,7 @@ describe("Study creation end-to-end", () => {
     cy.becomeApprovedResearcher();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="agreement-agree"]').click();
     cy.get('[data-cy="study-details"]').should("be.visible");
   });
@@ -85,7 +81,7 @@ describe("Study creation end-to-end", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
 
     // remove added study admin
     cy.get('[data-cy="edit-study-button"]').click();
@@ -105,10 +101,10 @@ describe("Study creation end-to-end", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="study-assets"]').click();
 
-    cy.contains('[data-cy="entity-card"]', assetTitle).contains("button", "Manage").click();
+    cy.contains(assetTitle).click();
 
     cy.get('[data-cy="asset-edit"]').click();
     cy.get("input#title").clear({ force: true }).type(`${assetTitle} edited`, { force: true });
@@ -122,7 +118,7 @@ describe("Study creation end-to-end", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="study-assets"]').click();
 
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
@@ -141,7 +137,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[name="status"]').select("active");
     cy.get("button[type='submit']").click();
 
-    cy.contains('[data-cy="entity-card"]', deleteAssetTitle).contains("button", "Manage").click();
+    cy.contains(deleteAssetTitle).click();
 
     cy.get('[data-cy="asset-delete"]').click();
     cy.contains("Delete Asset").should("be.visible");
@@ -156,7 +152,7 @@ describe("Study creation end-to-end", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="study-contracts"]').click();
 
     cy.get('[data-cy="add-contract"]').click();
@@ -183,7 +179,7 @@ describe("Study creation end-to-end", () => {
 
     cy.get("button[type='submit']").click();
 
-    cy.contains(contractTitle).closest('[data-cy="entity-card"]').contains("Manage").click();
+    cy.contains(contractTitle).click();
     cy.get('[data-cy="contract-edit"]').click();
     cy.get('[name="title"]').type("Test contract edited");
     cy.get('[data-cy="add-asset"]').click();
@@ -204,7 +200,7 @@ describe("Study creation end-to-end", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="study-contracts"]').click();
 
     cy.get('[data-cy="add-contract"]').click();
@@ -228,7 +224,7 @@ describe("Study creation end-to-end", () => {
     });
     cy.get("button[type='submit']").click();
 
-    cy.contains(deleteContractTitle).closest('[data-cy="entity-card"]').contains("Manage").click();
+    cy.contains(deleteContractTitle).click();
     cy.get('[data-cy="contract-delete"]').click();
     cy.contains("Delete Contract").should("be.visible");
     cy.contains("This operation cannot be undone.").should("be.visible");
@@ -245,14 +241,14 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="all-studies-tab-button"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
-    cy.contains("[data-cy='entity-card']", studyTitle).should("exist");
+    cy.contains("article", studyTitle).should("exist");
   });
 
   it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
-    cy.contains(studyTitle).closest('[data-cy="entity-card"]').contains("View").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="study-approve-button"]').click();
   });
 
@@ -260,13 +256,9 @@ describe("Study creation end-to-end", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
-    cy.contains(studyTitle).parent().get('[data-cy="status-badge"]').contains("Approved").should("exist");
+    cy.contains(studyTitle).get('[data-cy="status-badge"]').contains("Approved").should("exist");
 
-    cy.contains(studyTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="manage-button"]').click();
-      });
+    cy.contains(studyTitle).click();
     cy.contains("Last signed off").should("exist");
   });
 });
