@@ -72,14 +72,32 @@ function getDescription(
   }
 }
 
+function getStatusClassName(status: string | undefined): string {
+  status = status?.toLowerCase() || "";
+  if (status.includes("pending")) {
+    return styles["status-pending"];
+  } else if (status.includes("incomplete")) {
+    return styles["status-incomplete"];
+  } else if (status.includes("approve") || status.includes("deploy")) {
+    return styles["status-approved"];
+  } else if (status.includes("reject")) {
+    return styles["status-rejected"];
+  } else if (status.includes("delete")) {
+    return styles["status-deleted"];
+  }
+  return "";
+}
+
 export default function StatusBadge(props: BadgeProps) {
   const { status, type, environment } = props;
   const { userData } = useAuth();
   const isOpsStaff = userData?.roles.includes("ig-ops-staff") ?? false;
 
+  console.log(status, getStatusClassName(status));
+
   const description = getDescription(type, status, environment, isOpsStaff);
   return (
-    <span className={`${styles["status-badge"]} ${styles[`status-${status?.toLowerCase()}`]}`} data-cy="status-badge">
+    <span className={`${styles["status-badge"]} ${getStatusClassName(status)}`} data-cy="status-badge">
       {status}
       <span className={styles["tooltip-wrapper"]}>
         <InfoTooltip text={description} />
