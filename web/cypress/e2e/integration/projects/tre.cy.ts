@@ -64,8 +64,8 @@ describe("TRE project creation end-to-end", () => {
 
     cy.visit("/projects");
     cy.get('[data-cy="create-project-button"]').click();
-    cy.get('[name="studyId"]').select(1); // first study option
-    cy.get('[name="environmentId"]').select(1);
+    cy.get('[name="studyId"]').select(studyTitle);
+    cy.get('[name="environmentId"]').select("ARC Trusted Research Environment (Tier 3)");
     cy.get('[name="name"]').type(projectTitle);
     cy.get('[data-cy="next-form-page-button"]').click();
     cy.get('[data-cy="submit-project-button"]').click();
