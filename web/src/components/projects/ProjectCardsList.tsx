@@ -82,7 +82,7 @@ export default function ProjectCardsList(props: Props) {
             <Card
               key={project.id}
               title={project.name}
-              manageUrl={`/projects/manage?projectId=${project.id}`}
+              manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
               headerContent={<StatusBadge status={project.approval_status} type="project" />}
               actions={
                 !isOpsStaff && (
