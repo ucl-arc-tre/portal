@@ -37,7 +37,7 @@ export default function ConfirmDeleteModal({
             Cancel
           </Button>
 
-          <Button onClick={onConfirm} className="delete-button" disabled={isDeleting} cy="confirm-delete">
+          <Button onClick={onConfirm} variant="primary-destructive" disabled={isDeleting} cy="confirm-delete">
             {isDeleting ? "Deleting..." : "Delete"}
           </Button>
         </div>

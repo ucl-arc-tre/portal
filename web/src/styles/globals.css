@@ -11,6 +11,9 @@
   --green-100: #328543;
   --green-50: #64bb75;
 
+  --red-200: #c82333;
+  --red-100: #dc3545;
+
   --form-link: #5800cc;
   --form-link--hover: #470b9a;
   --form-purple--light: #7300ff;
@@ -128,29 +131,14 @@ dialog {
   }
 }
 
-.delete-button {
-  background-color: #dc3545 !important;
-  border-color: #dc3545 !important;
-  color: white !important;
-
-  &:hover:not(:disabled) {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
-  }
-
-  &:disabled {
-    opacity: 0.6 !important;
-  }
-}
-
 .delete-button-confirm {
-  background-color: #dc3545 !important;
-  border-color: #dc3545 !important;
+  background-color: var(--red-100) !important;
+  border-color: var(--red-100) !important;
   color: white !important;
 
   &hover:not(:disabled) {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
+    background-color: var(--red-200) !important;
+    border-color: var(--red-200) !important;
   }
 
   &:disabled {

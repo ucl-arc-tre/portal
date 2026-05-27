@@ -146,9 +146,8 @@ export default function DSHTokens() {
                       <Button
                         onClick={() => handleDelete(token.id)}
                         aria-label={`Delete ${token.name}`}
-                        variant="secondary"
+                        variant="primary-destructive"
                         size="small"
-                        className="delete-button"
                       >
                         Delete
                       </Button>
