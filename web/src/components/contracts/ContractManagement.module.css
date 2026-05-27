@@ -92,4 +92,10 @@
   .empty-state {
     padding: 3rem 2rem;
   }
+
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
