@@ -415,7 +415,7 @@ export default function CreateProjectForm({
                       {...field}
                       id="name"
                       type="text"
-                      placeholder="e.g., my-project"
+                      placeholder="e.g., myproject"
                       disabled={isSubmitting || !!editingProject}
                     />
                   )}
@@ -517,7 +517,7 @@ export default function CreateProjectForm({
           {currentStep === 2 && (
             <>
               <div className={styles["form-field"]}>
-                <span className={styles["section-label"]}>Additional Approved Researchers (optional):</span>
+                <span className={styles["section-label"]}>Project users (optional):</span>
                 <fieldset className="linkage-fieldset">
                   {researcherFields.map((field, index) => {
                     const researcher = watch(`additionalApprovedResearchers.${index}`);
@@ -699,17 +699,17 @@ export default function CreateProjectForm({
             )}
 
             {currentStep < totalSteps && (
-              <Button type="button" onClick={nextStep}>
+              <Button type="button" onClick={nextStep} cy="next-form-page-button">
                 Next →
               </Button>
             )}
 
             {currentStep === totalSteps && (
               <Button
-                className="create-project-button"
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleSubmit((data) => submitProject(data))}
+                cy="submit-project-button"
               >
                 {isSubmitting
                   ? editingProject

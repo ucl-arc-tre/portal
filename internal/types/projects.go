@@ -8,11 +8,10 @@ import (
 
 type Project struct {
 	ModelAuditable
-	Name           string    `gorm:"not null"`
-	CreatorUserID  uuid.UUID `gorm:"not null;index"`
-	StudyID        uuid.UUID `gorm:"index"`
-	EnvironmentID  uuid.UUID `gorm:"not null;index"`
-	ApprovalStatus string    `gorm:"not null"`
+	Name          string    `gorm:"not null"`
+	CreatorUserID uuid.UUID `gorm:"not null;index"`
+	StudyID       uuid.UUID `gorm:"index"`
+	EnvironmentID uuid.UUID `gorm:"not null;index"`
 
 	// Relationships
 	Study         Study          `gorm:"foreignKey:StudyID"`
@@ -23,13 +22,25 @@ type Project struct {
 
 type ProjectTRE struct {
 	ModelAuditable
-	ProjectID                     uuid.UUID `gorm:"not null;index"`
-	EgressNumberRequiredApprovals int       `gorm:"not null;default:1"`
+	ProjectID                     uuid.UUID        `gorm:"not null;index"`
+	EgressNumberRequiredApprovals int              `gorm:"not null;default:1"`
+	Status                        ProjectTREStatus `gorm:"not null;default:'incomplete'"`
 
 	// Relationships
 	Project         Project                 `gorm:"foreignKey:ProjectID"`
 	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
 }
+
+type ProjectTREStatus string
+
+const (
+	ProjectTREStatusIncomplete      ProjectTREStatus = "incomplete"       // Awaiting user submission
+	ProjectTREStatusPendingApproval ProjectTREStatus = "pending-approval" // Awaiting approval from TRE ops staff
+	ProjectTREStatusPendingCreation ProjectTREStatus = "pending-creation" // Approved awaiting creation
+	ProjectTREStatusDeployed        ProjectTREStatus = "deployed"         // Deployed and available to use
+	ProjectTREStatusPendingDeletion ProjectTREStatus = "pending-deletion" // Requested delete but not yet deleted
+	ProjectTREStatusDeleted         ProjectTREStatus = "deleted"          // Project and all its data has been deleted
+)
 
 type ProjectTRERoleName string
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Auth, Study, Project, getProjects, getStudies } from "@/openapi";
+import { Auth, Project, Study, getProjects, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import CreateProjectForm from "./CreateProjectForm";
@@ -142,7 +142,7 @@ export default function Projects({ userData }: Props) {
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t created any projects yet</h2>
 
-          <Button onClick={handleCreateProjectClick} size="large">
+          <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
             Create Your First Project
           </Button>
         </div>
@@ -150,7 +150,7 @@ export default function Projects({ userData }: Props) {
         <>
           {!isOpsStaff && (
             <div className={styles["create-project-section"]}>
-              <Button onClick={handleCreateProjectClick} size="large">
+              <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
                 Create New Project
               </Button>
             </div>

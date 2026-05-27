@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { ApprovalStatus, Project, deleteProjectsTreByProjectId } from "@/openapi";
+import { Project, deleteProjectsTreByProjectId } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import StatusBadge from "../ui/StatusBadge";
@@ -13,13 +13,6 @@ type Props = {
   projects: Project[];
   isOpsStaff: boolean;
   fetchData?: () => void;
-};
-
-const projectSortOrder: Record<ApprovalStatus, number> = {
-  Pending: 1,
-  Incomplete: 2,
-  Rejected: 3,
-  Approved: 4,
 };
 
 export default function ProjectCardsList(props: Props) {
@@ -78,11 +71,11 @@ export default function ProjectCardsList(props: Props) {
 
       <div className={styles["projects-list"]}>
         {projects
-          .sort((a, b) => projectSortOrder[a.approval_status] - projectSortOrder[b.approval_status])
+          .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))
           .map((project) => (
             <div key={project.id} className={styles["project-card"]}>
               <div className={styles["status-indicator"]}>
-                <StatusBadge status={project.approval_status} type="project" />
+                <StatusBadge status={project.status} type="project" environment={project.environment_name} />
               </div>
 
               <div className={styles["project-info"]}>
@@ -100,7 +93,7 @@ export default function ProjectCardsList(props: Props) {
                 >
                   {`Manage Project ${isOpsStaff ? "Approval" : ""}`}
                 </Button>
-                {!isOpsStaff && (
+                {!isOpsStaff && project.status === "incomplete" && (
                   <Button
                     onClick={() => handleDeleteClick(project)}
                     size="small"

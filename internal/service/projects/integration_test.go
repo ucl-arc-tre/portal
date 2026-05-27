@@ -80,7 +80,7 @@ func TestCreateProjectTRE(t *testing.T) {
 
 	study := types.Study{
 		OwnerUserID:    creator.ID,
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.ProjectTREStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 	assert.NoError(t, db.Create(&study).Error)
 

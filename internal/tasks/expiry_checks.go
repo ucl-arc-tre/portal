@@ -111,7 +111,7 @@ func (m *Manager) checkStudySignoffExpiry() error {
 	ctx := context.Background()
 
 	studies := []types.Study{}
-	result := m.db.Model(&types.Study{}).Where("approval_status = ?", openapi.Approved).Preload("Owner").Find(&studies)
+	result := m.db.Model(&types.Study{}).Where("approval_status = ?", openapi.StudyApprovalStatusApproved).Preload("Owner").Find(&studies)
 	if result.Error != nil {
 		return types.NewErrFromGorm(result.Error, "failed to get studies")
 	}

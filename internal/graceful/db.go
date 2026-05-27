@@ -56,6 +56,8 @@ func InitDB() {
 	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
+	migrateProjectStatus(db)
+
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
 	}
@@ -126,5 +128,16 @@ func mustExec(db *gorm.DB, sql string) {
 	err := db.Exec(sql).Error
 	if err != nil {
 		panic(err)
+	}
+}
+
+func migrateProjectStatus(db *gorm.DB) {
+	migrator := db.Migrator()
+
+	if migrator.HasColumn(&types.Project{}, "approval_status") {
+		err := migrator.DropColumn(&types.Project{}, "approval_status")
+		if err != nil {
+			panic(err)
+		}
 	}
 }
