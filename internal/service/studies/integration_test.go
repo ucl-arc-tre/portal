@@ -15,7 +15,9 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
-	"github.com/ucl-arc-tre/portal/internal/testutil"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mockusers"
 	"gorm.io/gorm"
 
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -48,13 +50,12 @@ func migrate(db *gorm.DB) error {
 
 func TestIntegration_CreateAsset(t *testing.T) {
 
-	// Enable parallel test
 	t.Parallel()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
-	svc := &Service{db: db, entra: &testutil.MockEntra{}}
+	svc := &Service{db: db, entra: &mockcontrollers.MockEntra{}}
 
 	user := types.User{
 		Username: "username",
@@ -64,7 +65,7 @@ func TestIntegration_CreateAsset(t *testing.T) {
 
 	study := types.Study{
 		OwnerUserID:    user.ID,
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.StudyApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 	err = db.Create(&study).Error
 	require.NoError(t, err)
@@ -110,14 +111,13 @@ func TestIntegration_CreateAsset(t *testing.T) {
 
 func TestIntegration_ValidateContract(t *testing.T) {
 
-	// Enable parallel test
 	t.Parallel()
 
 	now := time.Now()
 	later := now.Add(24 * time.Hour)
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	// set up test config
 	config.Init()
@@ -137,7 +137,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 	study := types.Study{
 		OwnerUserID:    creator.ID,
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.StudyApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 	assert.NoError(t, db.Create(&study).Error)
 	studyID := study.ID
@@ -248,7 +248,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 			ctx := context.Background()
 
 			// set up mocks
-			mockEntra := new(testutil.MockEntra)
+			mockEntra := new(mockcontrollers.MockEntra)
 			mockEntra.On("FindUsernames", ctx, base.OrganisationSignatory).
 				Return(curTest.mockUsers, nil)
 
@@ -269,23 +269,22 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 func TestIntegration_CreateContract(t *testing.T) {
 
-	// Enable parallel test
 	t.Parallel()
 
 	ctx := context.Background()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	// stub entra + users + S3
-	entra := new(testutil.MockEntra)
-	users := new(testutil.MockUsers)
-	mockS3 := new(testutil.MockS3)
+	mockEntra := new(mockcontrollers.MockEntra)
+	mockUsers := new(mockusers.MockUsers)
+	mockS3 := new(mockcontrollers.MockS3)
 
 	svc := &Service{
 		db:    db,
-		entra: entra,
-		users: users,
+		entra: mockEntra,
+		users: mockUsers,
 		s3:    mockS3,
 	}
 
@@ -308,7 +307,7 @@ func TestIntegration_CreateContract(t *testing.T) {
 
 	study := types.Study{
 		OwnerUserID:    creator.ID,
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.StudyApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 	assert.NoError(t, db.Create(&study).Error)
 	studyID := study.ID
@@ -330,16 +329,16 @@ func TestIntegration_CreateContract(t *testing.T) {
 	}
 
 	// set up mocks
-	entra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
+	mockEntra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
 		Return([]types.Username{signatoryUser.Username}, nil)
 
-	users.On("PersistedUser", types.Username(contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
+	mockUsers.On("PersistedUser", types.Username(contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
 
 	contract, err := svc.CreateContract(ctx, studyID, contractBase, creator)
 	assert.NoError(t, err)
 	assert.NotNil(t, contract)
 
-	s3Object := testutil.MockS3Object("integration test contract")
+	s3Object := mockcontrollers.MockS3Object("integration test contract")
 	contractObjectmetadata := types.ContractObjectMetadata{
 		Filename:   "contract.pdf",
 		ContractID: contract.ID,
@@ -379,11 +378,10 @@ func TestIntegration_CreateContract(t *testing.T) {
 
 func TestIntegration_ValidateStudyData(t *testing.T) {
 
-	// Enable parallel test
 	t.Parallel()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	creator := types.User{
 		Username: "bob@testIntegration.com",
@@ -393,7 +391,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 	study := types.Study{
 		OwnerUserID:    creator.ID,
 		Title:          "Existing Study",
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.StudyApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 	assert.NoError(t, db.Create(&study).Error)
 
@@ -570,7 +568,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 			ctx := context.Background()
 
 			// set up mocks
-			mockEntra := new(testutil.MockEntra)
+			mockEntra := new(mockcontrollers.MockEntra)
 
 			// mock all admin checks
 			for _, username := range req.AdditionalStudyAdminUsernames {
@@ -606,12 +604,12 @@ func TestIntegration_CreateStudy(t *testing.T) {
 	ctx := context.Background()
 
 	// Create unique schema for this test
-	db := testutil.NewTestDBSchema(t, migrate)
+	db := mockdb.NewTestDBSchema(t, migrate)
 
 	rbac.InitForTesting(db)
 
-	mockUsers := new(testutil.MockUsers)
-	mockEntra := new(testutil.MockEntra)
+	mockUsers := new(mockusers.MockUsers)
+	mockEntra := new(mockcontrollers.MockEntra)
 
 	service := &Service{
 		db:    db,
@@ -674,7 +672,7 @@ func TestIntegration_CreateStudy(t *testing.T) {
 	fetched := fetchedStudies[0]
 
 	assert.Equal(t, owner.ID, fetched.OwnerUserID)
-	assert.Equal(t, string(openapi.Incomplete), fetched.ApprovalStatus)
+	assert.Equal(t, string(openapi.StudyApprovalStatusIncomplete), fetched.ApprovalStatus)
 	assert.Len(t, fetched.StudyAdmins, 2)
 
 	adminIDs := []uuid.UUID{}

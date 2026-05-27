@@ -234,7 +234,7 @@ func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
 // Called by the study owner/researcher to submit their study for IG Ops review
 func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{
-		Status: openapi.Pending,
+		Status: openapi.StudyApprovalStatusPending,
 	}
 
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
@@ -339,7 +339,7 @@ func studyToOpenApiStudy(study types.Study) openapi.Study {
 		Description:                      study.Description,
 		OwnerUserId:                      &ownerUserIDStr,
 		OwnerUsername:                    &ownerUsernameStr,
-		ApprovalStatus:                   openapi.ApprovalStatus(study.ApprovalStatus),
+		ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
 		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
 		DataControllerOrganisation:       study.DataControllerOrganisation,
 		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,

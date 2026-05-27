@@ -849,12 +849,6 @@ Cypress.Commands.add("mockProjectsEmpty", () => {
   }).as("getProjectsEmpty");
 });
 
-Cypress.Commands.add("mockProjectTreIncomplete", () => {
-  cy.intercept("GET", "/web/api/v0/projects/tre/*", {
-    fixture: "project-tre-incomplete.json",
-  }).as("getProjectTre");
-});
-
 Cypress.Commands.add("mockStudiesWithApprovedStudy", () => {
   cy.intercept("GET", "/web/api/v0/studies", {
     fixture: "studies-with-approved-study.json",

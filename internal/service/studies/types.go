@@ -11,7 +11,7 @@ import (
 
 type QueryParams struct {
 	CaseRef        *int
-	ApprovalStatus *openapi.ApprovalStatus
+	ApprovalStatus *openapi.StudyApprovalStatus
 	FuzzyTitle     *string
 	OwnerUsername  *string
 	Limit          int

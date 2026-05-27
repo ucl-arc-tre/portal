@@ -2,7 +2,7 @@ import Box from "../../ui/Box";
 import { Alert, AlertMessage, Textarea } from "../../shared/uikitExports";
 import Button from "../../ui/Button";
 import { useState } from "react";
-import { ApprovalStatus, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import { StudyApprovalStatus, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./AdminReview.module.css";
@@ -14,7 +14,7 @@ type AdminReviewProps = {
 };
 
 export default function AdminReview({ study, unagreedAdminUsernames, onReviewComplete }: AdminReviewProps) {
-  const [loadingAction, setLoadingAction] = useState<ApprovalStatus | null>(null);
+  const [loadingAction, setLoadingAction] = useState<StudyApprovalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState(study.feedback ?? "");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
     if (event.target.value.length > 0) setFeedbackRequired(false);
   };
 
-  const handleStudyStatusUpdate = async (newStatus: ApprovalStatus, feedbackContent?: string) => {
+  const handleStudyStatusUpdate = async (newStatus: StudyApprovalStatus, feedbackContent?: string) => {
     if ((newStatus === "Rejected" || (newStatus === "Approved" && status === "Approved")) && !feedbackContent) {
       setFeedbackRequired(true);
       return;

@@ -338,7 +338,7 @@ paths:
           description: get studies by status
           required: false
           schema:
-            $ref: "#/components/schemas/ApprovalStatus"
+            $ref: "#/components/schemas/StudyApprovalStatus"
         - in: query
           name: query
           required: false
@@ -679,12 +679,7 @@ paths:
     put:
       description: Update a TRE project (members and assets only)
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       requestBody:
         required: true
         content:
@@ -711,12 +706,7 @@ paths:
     delete:
       description: Delete a TRE project (soft delete with cascading to related tables)
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          description: ID of the TRE project
-          schema:
-            type: string
+        - $ref: "#/components/parameters/ProjectIdParam"
       responses:
         "204":
           description: Project deleted successfully
@@ -1669,7 +1659,7 @@ components:
               type: string
               description: Time in RFC3339 format when the study was last updated
             approval_status:
-              $ref: "#/components/schemas/ApprovalStatus"
+              $ref: "#/components/schemas/StudyApprovalStatus"
             feedback:
               type: string
             last_signoff:
@@ -1831,14 +1821,24 @@ components:
         expiry_at:
           type: string
 
-    ApprovalStatus:
+    StudyApprovalStatus:
       type: string
       enum:
         - Incomplete
         - Pending
         - Approved
         - Rejected
-      description: Current approval status (used for studies, projects, etc.)
+      description: Current approval status
+
+    ProjectTREStatus:
+      type: string
+      enum:
+        - incomplete
+        - pending-approval
+        - pending-creation
+        - deployed
+        - pending-deletion
+        - deleted
 
     StudyReview:
       type: object
@@ -1846,7 +1846,7 @@ components:
         - status
       properties:
         status:
-          $ref: "#/components/schemas/ApprovalStatus"
+          $ref: "#/components/schemas/StudyApprovalStatus"
         feedback:
           type: string
           description: Feedback for the study
@@ -1948,6 +1948,12 @@ components:
           type: integer
           description: Maximum data tier this environment can handle (assets with tier <= this value can be used)
 
+    EnvironmentName:
+      type: string
+      enum:
+        - "ARC Trusted Research Environment"
+        - "Data Safe Haven"
+
     Project:
       type: object
       description: A project with base details (environment-agnostic)
@@ -1956,7 +1962,7 @@ components:
         - name
         - study_id
         - creator_username
-        - approval_status
+        - status
         - created_at
         - updated_at
         - environment_name
@@ -1973,8 +1979,8 @@ components:
         creator_username:
           type: string
           description: Username of the user who created the project
-        approval_status:
-          $ref: "#/components/schemas/ApprovalStatus"
+        status:
+          type: string
         created_at:
           type: string
           description: Time in RFC3339 format when the project was created
@@ -1982,8 +1988,7 @@ components:
           type: string
           description: Time in RFC3339 format when the project was last updated
         environment_name:
-          type: string
-          description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+          $ref: "#/components/schemas/EnvironmentName"
 
     ProjectTRE:
       type: object
@@ -1994,7 +1999,7 @@ components:
         - study_id
         - study_title
         - creator_username
-        - approval_status
+        - status
         - created_at
         - updated_at
         - environment_name
@@ -2016,8 +2021,8 @@ components:
         creator_username:
           type: string
           description: Username of the user who created the project
-        approval_status:
-          $ref: "#/components/schemas/ApprovalStatus"
+        status:
+          $ref: "#/components/schemas/ProjectTREStatus"
         created_at:
           type: string
           description: Time in RFC3339 format when the project was created
@@ -2025,8 +2030,7 @@ components:
           type: string
           description: Time in RFC3339 format when the project was last updated
         environment_name:
-          type: string
-          description: Name of the environment this project belongs to (e.g., "ARC Trusted Research Environment")
+          $ref: "#/components/schemas/EnvironmentName"
         assets:
           type: array
           description: List of assets associated with this project

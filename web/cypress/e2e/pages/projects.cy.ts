@@ -118,7 +118,7 @@ describe("Project form validation", () => {
     cy.contains("Project name is required").should("not.exist");
 
     // Verify we moved to step 2 (members section visible)
-    cy.contains("Additional Approved Researchers (optional)").should("be.visible");
+    cy.contains("Project users (optional)").should("be.visible");
   });
 
   it("should reject project names that violate TRE naming rules", () => {
@@ -140,20 +140,5 @@ describe("Project form validation", () => {
     cy.contains("label", "Project Name").parent().find("input").clear().type("my_project");
     cy.get("button").contains("Next").click();
     cy.contains("Must be 4-14 characters long and contain only lowercase letters and numbers").should("exist");
-  });
-});
-
-describe("Project submission flow", () => {
-  it("should show submit button on incomplete project manage page", () => {
-    cy.loginAsStaff();
-    cy.mockAuthAsBaseStaffApprovedResearcher();
-    cy.mockProjectTreIncomplete();
-
-    cy.visit("/projects/manage?projectId=test-project-id&environment=ARC Trusted Research Environment");
-    cy.waitForAuth();
-    cy.wait("@getProjectTre");
-
-    cy.contains("Create Project").should("be.visible");
-    cy.contains("Please review your project details below").should("be.visible");
   });
 });
