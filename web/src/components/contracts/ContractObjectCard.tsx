@@ -95,7 +95,6 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
       footerContent={
         <div className={styles["button-wrapper"]}>
           <Button
-            className={styles["download-button"]}
             onClick={handleDownload}
             disabled={downloading}
             size="small"
