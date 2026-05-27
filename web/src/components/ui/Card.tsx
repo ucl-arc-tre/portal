@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/components/navigation";
 import Button from "./Button";
 import styles from "./Card.module.css";
 
@@ -23,27 +24,34 @@ export default function Card(props: CardProps) {
     isWarning,
     deleteButton,
   } = props;
-  return (
-    <a href={manageUrl} data-cy="entity-card">
-      <div className={`${styles.card} ${isWarning ? styles.warning : ""}`}>
-        <div className={styles.header}>
-          <h3>{title}</h3>
-          {headerContent}
-        </div>
-        <div className={styles.content}>{children}</div>
+  const router = useRouter();
 
-        <div className={styles.footer}>
-          {footerContent}
+  const CardInner = (
+    <article data-cy="entity-card" className={`${styles.card} ${isWarning ? styles.warning : ""}`}>
+      <div className={styles.header}>
+        <h3>{title}</h3>
+        {headerContent}
+      </div>
+      <div className={styles.content}>{children}</div>
+
+      <div className={styles.footer}>
+        {footerContent}
+        {manageUrl && deleteButton && (
           <div className={styles.actions}>
-            {manageUrl && (
-              <Button size="small" className={styles.manage} data-cy="manage-button">
-                {canModify ? "Manage" : "View"}
-              </Button>
-            )}
+            <Button
+              size="small"
+              className={styles.manage}
+              data-cy="manage-button"
+              onClick={() => router.push(manageUrl)}
+            >
+              {canModify ? "Manage" : "View"}
+            </Button>
+
             {deleteButton}
           </div>
-        </div>
+        )}
       </div>
-    </a>
+    </article>
   );
+  return manageUrl && !deleteButton ? <a href={manageUrl}>{CardInner}</a> : CardInner;
 }
