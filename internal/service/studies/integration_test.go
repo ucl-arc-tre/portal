@@ -393,7 +393,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 	study := types.Study{
 		OwnerUserID:    creator.ID,
 		Title:          "Existing Study",
-		ApprovalStatus: string(openapi.Incomplete), // Initial status is "Incomplete" until the contract and assets are created
+		ApprovalStatus: string(openapi.StudyApprovalStatusIncomplete), // Initial status is "Incomplete" until the contract and assets are created
 	}
 	assert.NoError(t, db.Create(&study).Error)
 
@@ -674,7 +674,7 @@ func TestIntegration_CreateStudy(t *testing.T) {
 	fetched := fetchedStudies[0]
 
 	assert.Equal(t, owner.ID, fetched.OwnerUserID)
-	assert.Equal(t, string(openapi.Incomplete), fetched.ApprovalStatus)
+	assert.Equal(t, string(openapi.StudyApprovalStatusIncomplete), fetched.ApprovalStatus)
 	assert.Len(t, fetched.StudyAdmins, 2)
 
 	adminIDs := []uuid.UUID{}
