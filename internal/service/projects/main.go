@@ -18,7 +18,7 @@ import (
 
 type Service struct {
 	db    *gorm.DB
-	users *users.Service
+	users users.Interface
 }
 
 func New() *Service {
