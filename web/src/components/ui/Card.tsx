@@ -8,22 +8,12 @@ type CardProps = {
   children: React.ReactNode;
   footerContent?: React.ReactNode;
   manageUrl?: string;
-  canModify?: boolean;
   isWarning?: boolean;
   deleteButton?: React.ReactNode;
 };
 
 export default function Card(props: CardProps) {
-  const {
-    headerContent,
-    title,
-    children,
-    footerContent,
-    manageUrl,
-    canModify = false,
-    isWarning,
-    deleteButton,
-  } = props;
+  const { headerContent, title, children, footerContent, manageUrl, isWarning, deleteButton } = props;
   const router = useRouter();
 
   const CardInner = (
@@ -44,7 +34,7 @@ export default function Card(props: CardProps) {
               data-cy="manage-button"
               onClick={() => router.push(manageUrl)}
             >
-              {canModify ? "Manage" : "View"}
+              Manage
             </Button>
 
             {deleteButton}

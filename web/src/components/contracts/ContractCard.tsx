@@ -37,7 +37,6 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
         </div>
       }
       manageUrl={`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`}
-      canModify={true}
       isWarning={!!expiryUrgency}
       footerContent={expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />}
     >

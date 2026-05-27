@@ -83,7 +83,6 @@ export default function ProjectCardsList(props: Props) {
               key={project.id}
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}`}
-              canModify={true}
               headerContent={<StatusBadge status={project.approval_status} type="project" />}
               deleteButton={
                 !isOpsStaff && (

@@ -129,7 +129,7 @@ export default function Assets(props: AssetsProps) {
 
             <div className={styles["assets-grid"]}>
               {assets.map((asset) => (
-                <AssetCard key={asset.id} studyId={study.id} asset={asset} canModify={canModify} />
+                <AssetCard key={asset.id} studyId={study.id} asset={asset} />
               ))}
             </div>
           </div>

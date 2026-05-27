@@ -12,7 +12,6 @@ import Card from "../ui/Card";
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  canModify: boolean;
 };
 
 const formatClassification = (classification: string) => {
@@ -37,7 +36,7 @@ const getClassificationClass = (classification: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, canModify } = props;
+  const { studyId, asset } = props;
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +60,6 @@ export default function AssetCard(props: AssetCardProps) {
     <Card
       key={asset.id}
       manageUrl={`/assets/manage?studyId=${studyId}&assetId=${asset.id}`}
-      canModify={canModify}
       isWarning={!isCompleted || !!expiryUrgency}
       title={asset.title}
       headerContent={
