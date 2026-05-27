@@ -80,16 +80,8 @@ export default function ProjectCardsList(props: Props) {
               manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
               headerContent={<StatusBadge status={project.approval_status} type="project" />}
               actions={
-              {isOpsStaff &&
-                <Button
-                  onClick={() =>
-                    router.push(`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`)
-                  }
-                  size="small"
-                >
-                  Manage Project Approval
-                </Button>}
-                {!isOpsStaff && project.status === "incomplete" && (
+                !isOpsStaff &&
+                project.status === "incomplete" && (
                   <Button
                     onClick={() => handleDeleteClick(project)}
                     size="small"

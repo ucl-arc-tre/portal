@@ -5,7 +5,6 @@ import {
 import { Alert, AlertMessage } from "../shared/uikitExports";
 import Button from "../ui/Button";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
-import styles from "./ContractObjectCard.module.css";
 import { useState } from "react";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Card from "../ui/Card";
