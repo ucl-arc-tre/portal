@@ -76,7 +76,9 @@ export default function ProjectCardsList(props: Props) {
               key={project.id}
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
-              headerContent={<StatusBadge status={project.status} type="project" />}
+              headerContent={
+                <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+              }
               actions={
                 !isOpsStaff &&
                 project.status === "incomplete" && (
