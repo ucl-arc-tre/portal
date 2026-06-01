@@ -1,5 +1,4 @@
 import { Asset } from "@/openapi";
-import { useRouter } from "next/router";
 import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
