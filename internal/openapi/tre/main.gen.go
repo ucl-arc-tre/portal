@@ -15,6 +15,33 @@ const (
 	BasicAuthScopes basicAuthContextKey = "basicAuth.Scopes"
 )
 
+// Defines values for ProjectStatusUpdateStatus.
+const (
+	Deleted  ProjectStatusUpdateStatus = "deleted"
+	Deployed ProjectStatusUpdateStatus = "deployed"
+)
+
+// Valid indicates whether the value is a known member of the ProjectStatusUpdateStatus enum.
+func (e ProjectStatusUpdateStatus) Valid() bool {
+	switch e {
+	case Deleted:
+		return true
+	case Deployed:
+		return true
+	default:
+		return false
+	}
+}
+
+// ProjectStatusUpdate defines model for ProjectStatusUpdate.
+type ProjectStatusUpdate struct {
+	// Status Current status of the project in the TRE
+	Status ProjectStatusUpdateStatus `json:"status"`
+}
+
+// ProjectStatusUpdateStatus Current status of the project in the TRE
+type ProjectStatusUpdateStatus string
+
 // UserStatus defines model for UserStatus.
 type UserStatus struct {
 	// IsApprovedResearcher Is the user an approved researcher?
@@ -33,8 +60,14 @@ type GetUserStatusParams struct {
 	Username string `form:"username" json:"username"`
 }
 
+// PostProjectsProjectNameStatusJSONRequestBody defines body for PostProjectsProjectNameStatus for application/json ContentType.
+type PostProjectsProjectNameStatusJSONRequestBody = ProjectStatusUpdate
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (POST /projects/{projectName}/status)
+	PostProjectsProjectNameStatus(c *gin.Context, projectName string)
 
 	// (GET /user-status)
 	GetUserStatus(c *gin.Context, params GetUserStatusParams)
@@ -48,6 +81,33 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// PostProjectsProjectNameStatus operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsProjectNameStatus(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectName" -------------
+	var projectName string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectName", c.Param("projectName"), &projectName, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectName: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(string(BasicAuthScopes), []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsProjectNameStatus(c, projectName)
+}
 
 // GetUserStatus operation middleware
 func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
@@ -105,5 +165,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.POST(options.BaseURL+"/projects/:projectName/status", wrapper.PostProjectsProjectNameStatus)
 	router.GET(options.BaseURL+"/user-status", wrapper.GetUserStatus)
 }
