@@ -79,23 +79,11 @@ export default function AssetCard(props: AssetCardProps) {
           {expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="asset" />}
 
           {!isCompleted && (
-            <>
-              <small className={styles["asset-incomplete__message"]}>
-                <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
-                This asset requires a contract that has not yet been added. You can manage contracts under the Contracts
-                tab.
-              </small>
-              <Button
-                onClick={() => {
-                  router.push({ query: { ...router.query, tab: "contracts" } }, undefined, { shallow: true });
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                variant="secondary"
-                size="small"
-              >
-                Contracts
-              </Button>
-            </>
+            <small className={styles["asset-incomplete__message"]}>
+              <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
+              This asset requires a contract that has not yet been added. You can manage contracts under the Contracts
+              tab.
+            </small>
           )}
         </>
       }
