@@ -36,7 +36,6 @@ const getClassificationClass = (classification: string) => {
 
 export default function AssetCard(props: AssetCardProps) {
   const { studyId, asset } = props;
-  const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
