@@ -31,6 +31,35 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+  /projects/{projectName}/status:
+    parameters:
+      - in: path
+        name: projectName
+        description: TRE project name which is unique
+        required: true
+        schema:
+          type: string
+    post:
+      description: Update the status of a TRE project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectStatusUpdate"
+      responses:
+        "204":
+          description: Successfully updated status
+        "401":
+          description: Unauthenticated
+        "404":
+          description: Not found
+        "406":
+          description: Invalid request
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
 components:
   securitySchemes:
@@ -50,6 +79,18 @@ components:
         nhsd_training_expires_at:
           type: string
           description: Instanc at which the user's training expires in RFC3339 format
+
+    ProjectStatusUpdate:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Current status of the project in the TRE
+          enum:
+            - deployed
+            - deleted
 
 security:
   - basicAuth: []

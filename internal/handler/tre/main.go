@@ -9,17 +9,19 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 type Handler struct {
-	users *users.Service
+	users    *users.Service
+	projects *projects.Service
 }
 
 func New() *Handler {
 	log.Info().Msg("Creating TRE handler")
-	return &Handler{users: users.New()}
+	return &Handler{users: users.New(), projects: projects.New()}
 }
 
 func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusParams) {
@@ -47,11 +49,31 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 		ctx.Status(http.StatusInternalServerError)
 		return
 	} else {
-		userStatus.NhsdTrainingExpiresAt = ptr(expiresAt.Format(config.TimeFormat))
+		userStatus.NhsdTrainingExpiresAt = new(expiresAt.Format(config.TimeFormat))
 	}
 	ctx.JSON(http.StatusOK, userStatus)
 }
 
-func ptr[T any](value T) *T {
-	return &value
+func (h *Handler) PostProjectsProjectNameStatus(ctx *gin.Context, projectName string) {
+	data := openapi.ProjectStatusUpdate{}
+	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
+		log.Err(err).Str("projectName", projectName).Msg("Failed to bind ProjectStatusUpdate")
+		ctx.Status(http.StatusNotAcceptable)
+		return
+	}
+	status := types.ProjectTREStatus(data.Status)
+	if !data.Status.Valid() {
+		ctx.Status(http.StatusNotAcceptable)
+		return
+	} else if status != types.ProjectTREStatusDeployed && status != types.ProjectTREStatusDeleted {
+		setError(ctx, types.NewErrInvalidObjectF("Status can only be deployed or deleted, was [%s]", status))
+		return
+	}
+
+	err := h.projects.UpdateProjectTREStatus(projectName, status)
+	if err != nil {
+		setError(ctx, err)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }
