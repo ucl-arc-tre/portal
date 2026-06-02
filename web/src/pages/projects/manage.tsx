@@ -7,6 +7,7 @@ import {
   postProjectsTreAdminByProjectIdApprove,
   patchProjectsTreByProjectIdPending,
   Study,
+  deleteProjectsTreByProjectId,
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
@@ -20,6 +21,8 @@ import CreateProjectForm from "@/components/projects/CreateProjectForm";
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import Dialog from "@/components/ui/Dialog";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -32,12 +35,17 @@ export default function ManageProjectPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingEnabled, setEditingEnabled] = useState(true);
+  const [deleting, setDeleting] = useState<boolean>(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isAdmin = userData?.roles.includes("admin");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const canApprove = isAdmin || isTreOpsStaff;
-  const canEdit = (userData?.roles as string[]).includes(`project_${projectId}_owner`);
+  const canEdit =
+    project?.creator_username == userData?.username ||
+    (userData?.roles as string[]).includes(`project_${projectId}_owner`);
 
   // prepare the approved study for edit form
   const approvedStudy = project ? [{ id: project.study_id, title: project.study_title } as Study] : [];
@@ -145,6 +153,43 @@ export default function ManageProjectPage() {
     setShowEditForm(false);
   };
 
+  const handleConfirmDelete = async () => {
+    if (!projectId) return;
+
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const response = await deleteProjectsTreByProjectId({
+        path: { projectId: projectId as string },
+      });
+
+      if (responseIsError(response)) {
+        const errorMsg = extractErrorMessage(response);
+        setDeleteError(`Failed to delete project: ${errorMsg}`);
+        return;
+      }
+
+      setShowDeleteConfirm(false);
+      router.push("/projects");
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      setDeleteError("Failed to delete project. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteError(null);
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+    setDeleteError(null);
+  };
+
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
   if (loading) return <Loading />;
@@ -230,6 +275,12 @@ export default function ManageProjectPage() {
                   Edit
                 </Button>
               )}
+              {canEdit && (
+                <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
+                  {deleting ? "Deleting..." : "Delete"}
+                </Button>
+              )}
+
               <Button onClick={handleSubmit} disabled={isSubmitting} size="small">
                 {isSubmitting ? "Submitting..." : "Mark Ready for Review"}
               </Button>
@@ -237,7 +288,7 @@ export default function ManageProjectPage() {
           </div>
         )}
 
-        {canEdit && (
+        {canEdit && project.status !== "incomplete" && (
           <div className={styles["approval-section"]}>
             <Button onClick={() => setShowEditForm(true)} size="small" disabled={!editingEnabled}>
               Edit
@@ -334,6 +385,43 @@ export default function ManageProjectPage() {
             handleProjectCreated={() => handleProjectCreated()}
             handleCancelCreate={() => handleCancelCreate()}
           />
+        )}
+
+        {showDeleteConfirm && (
+          <Dialog setDialogOpen={handleCancelDelete}>
+            <div className={styles["delete-dialog"]}>
+              <h2>Delete Project</h2>
+              <p>
+                Are you sure you want to delete project <strong>{project.name}</strong>?
+              </p>
+              <p>This action will delete the project and remove the links to its associated data including:</p>
+              <ul>
+                <li>Project members and their roles</li>
+                <li>Linked assets</li>
+                <li>Project configuration</li>
+              </ul>
+
+              {deleteError && (
+                <Alert type="error">
+                  <AlertMessage>{deleteError}</AlertMessage>
+                </Alert>
+              )}
+
+              <div className={styles["delete-actions"]}>
+                <Button onClick={handleCancelDelete} variant="secondary" disabled={!!deleting}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleConfirmDelete}
+                  variant="primary-destructive"
+                  disabled={!!deleting}
+                  className={styles["delete-button-confirm"]}
+                >
+                  {deleting ? "Deleting..." : "Delete Project"}
+                </Button>
+              </div>
+            </div>
+          </Dialog>
         )}
       </div>
     </>
