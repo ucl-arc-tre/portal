@@ -1,16 +1,18 @@
 .study-assets-container {
-  width: 100%;
   max-width: 1200px;
-  display: grid;
-  justify-self: center;
-  margin: 1rem 0;
-  padding: 1.5rem;
-  background: var(--background);
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+}
 
-  h2 {
-    text-align: center;
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
   }
 }
 
@@ -18,7 +20,7 @@
   color: #6c757d;
   padding: 12px;
   border: 1px solid #dee2e6;
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: #f8f9fa;
   margin-bottom: 16px;
   text-align: center;
@@ -29,12 +31,6 @@
 
 .no-assets-message button {
   margin-top: 1rem;
-}
-
-.asset-actions {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
 }
 
 .assets-grid {
@@ -50,10 +46,11 @@
   margin-bottom: 1rem;
   color: #495057;
   font-weight: 500;
+  justify-content: center;
 }
 
 .assets-count-badge {
-  background: var(--form-blue--light);
+  background: var(--form-purple--light);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
@@ -62,14 +59,22 @@
   text-align: center;
 }
 
-.callout-section {
-  margin-bottom: 1rem;
-}
-
 .callout-info-paragraph {
   margin-bottom: 1rem;
 }
 
 .callout-glossary-section {
   margin-bottom: 1rem;
+}
+
+@media (width >=768px) {
+  .empty-state {
+    padding: 3rem 2rem;
+  }
+
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }

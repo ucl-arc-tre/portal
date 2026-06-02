@@ -5,9 +5,9 @@ import {
 import { Alert, AlertMessage } from "../shared/uikitExports";
 import Button from "../ui/Button";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
-import styles from "./ContractObjectCard.module.css";
 import { useState } from "react";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
+import Card from "../ui/Card";
 
 type ContractObjectCardProps = {
   studyId: string;
@@ -88,61 +88,55 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
   if (isDeleted) return null;
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <h4>{filename}</h4>
-      </div>
-
-      <div className={styles.details}>
-        <div className={styles["detail-item"]}>
-          <span className={styles.label}>Created at: </span>
-          <span className={styles.value}>{createdAt}</span>
-        </div>
-      </div>
-
-      <div className={styles["button-wrapper"]}>
-        <Button
-          className={styles["download-button"]}
-          onClick={handleDownload}
-          disabled={downloading}
-          size="small"
-          variant="secondary"
-          cy="contract-object-download-button"
-        >
-          {downloading ? "Downloading..." : "Download"}
-        </Button>
-
-        {canModify && (
+    <Card
+      title={filename}
+      key={id}
+      actions={
+        <>
           <Button
-            className="delete-button"
-            onClick={() => setShowDeleteModal(true)}
+            onClick={handleDownload}
+            disabled={downloading}
             size="small"
-            data-cy="contract-object-delete-button"
+            variant="secondary"
+            cy="contract-object-download-button"
           >
-            Delete
+            {downloading ? "Downloading..." : "Download"}
           </Button>
+
+          {canModify && (
+            <Button
+              onClick={() => setShowDeleteModal(true)}
+              size="small"
+              data-cy="contract-object-delete-button"
+              variant="primary-destructive"
+            >
+              Delete
+            </Button>
+          )}
+        </>
+      }
+    >
+      <>
+        <span>Created at: {createdAt}</span>
+        {error && (
+          <Alert type="error">
+            <AlertMessage>{error}</AlertMessage>
+          </Alert>
         )}
-      </div>
-
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
-
-      {showDeleteModal && (
-        <ConfirmDeleteModal
-          title="Delete File"
-          message="Are you sure you want to delete this file? This operation cannot be undone."
-          onConfirm={handleDelete}
-          onCancel={() => {
-            setShowDeleteModal(false);
-            setError(null);
-          }}
-          isDeleting={isDeleting}
-          error={error}
-        />
-      )}
-    </div>
+        {showDeleteModal && (
+          <ConfirmDeleteModal
+            title="Delete File"
+            message="Are you sure you want to delete this file? This operation cannot be undone."
+            onConfirm={handleDelete}
+            onCancel={() => {
+              setShowDeleteModal(false);
+              setError(null);
+            }}
+            isDeleting={isDeleting}
+            error={error}
+          />
+        )}{" "}
+      </>
+    </Card>
   );
 }

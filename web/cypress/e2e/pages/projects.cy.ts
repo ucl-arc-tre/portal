@@ -24,7 +24,7 @@ describe("Projects page content", () => {
     cy.wait("@getProjectsEmpty");
     cy.wait("@getStudiesEmpty");
 
-    cy.contains("You don't have any approved studies").should("be.visible");
+    cy.contains("You don't have any approved Studies").should("be.visible");
     cy.contains("Go to Studies").should("be.visible");
   });
 
@@ -39,7 +39,7 @@ describe("Projects page content", () => {
     cy.wait("@getProjectsEmpty");
     cy.wait("@getStudiesWithApproved");
 
-    cy.contains("You haven't created any projects yet").should("be.visible");
+    cy.contains("You haven't created any Projects yet").should("be.visible");
     cy.contains("Create Your First Project").should("be.visible");
   });
 
@@ -54,7 +54,7 @@ describe("Projects page content", () => {
     cy.wait("@getProjectsEmpty");
     cy.wait("@getStudiesWithApproved");
 
-    cy.contains("You haven't been added to any projects yet").should("be.visible");
+    cy.contains("You haven't been added to any Projects yet").should("be.visible");
     cy.contains("Create Your First Project").should("not.exist");
   });
 });

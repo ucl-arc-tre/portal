@@ -8,6 +8,7 @@ import Callout from "@/components/ui/Callout";
 import Title from "@/components/ui/Title";
 
 import styles from "./ProjectsPage.module.css";
+import { ProjectDefinition } from "@/components/shared/entityDefinitions";
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -51,7 +52,8 @@ export default function ProjectsPage() {
       <Title text={"Projects"} centered />
 
       <Callout definition>
-        A project belongs to a study and can contain multiple assets. Have a look at our
+        <ProjectDefinition />
+        Have a look at our
         <Button href="/glossary" variant="tertiary" size="small" inline>
           Glossary
         </Button>
@@ -59,7 +61,7 @@ export default function ProjectsPage() {
       </Callout>
 
       <Callout construction>
-        Not all project features work yet. We&apos;re actively working on adding more functionality!
+        Not all Project features work yet. We&apos;re actively working on adding more functionality!
       </Callout>
 
       <Projects userData={userData} />

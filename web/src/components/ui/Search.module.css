@@ -1,6 +1,6 @@
 .search {
   input:focus-visible {
-    outline: var(--form-blue--shadow) !important;
-    box-shadow: 0px 0px 0px 2px var(--form-blue--shadow) !important;
+    outline: var(--form-purple--shadow) !important;
+    box-shadow: 0px 0px 0px 2px var(--form-purple--shadow) !important;
   }
 }

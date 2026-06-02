@@ -166,7 +166,7 @@ export default function ManageContractPage() {
                 Edit
               </Button>
 
-              <Button onClick={() => setShowDeleteModal(true)} className="delete-button" cy="contract-delete">
+              <Button onClick={() => setShowDeleteModal(true)} variant="primary-destructive" cy="contract-delete">
                 Delete
               </Button>
             </div>

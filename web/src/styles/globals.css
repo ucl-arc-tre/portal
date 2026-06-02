@@ -1,4 +1,4 @@
-@import url(./form-globals.css);
+@import url(./form.css);
 
 :root {
   --background: #ffffff;
@@ -11,16 +11,23 @@
   --green-100: #328543;
   --green-50: #64bb75;
 
-  --form-link: #0066cc;
-  --form-link--hover: #004499;
-  --form-blue--light: #007bff;
-  --form-blue--shadow: rgba(0, 123, 255, 0.25);
+  --red-200: #c82333;
+  --red-100: #dc3545;
+
+  --form-link: #5800cc;
+  --form-link--hover: #470b9a;
+  --form-purple--light: #7300ff;
+  --form-purple--shadow: rgba(128, 0, 255, 0.25);
 
   --grey-border--light: #ced1d7;
 
   --expiry-urgency--high: #b80f0f;
   --expiry-urgency--medium: #b75301;
   --expiry-urgency--low: #457100;
+
+  --ucl-accent: #9a3bff;
+  --ucl-dark: #2c0442;
+  --ucl-mid: #500778;
 }
 
 html,
@@ -99,12 +106,14 @@ dialog {
   .tab {
     border: none;
     border-bottom: 2px solid var(--grey-border--light);
+    background-color: var(--background) !important;
     transition: all 0.3s ease;
     height: 2.5rem;
 
     &:hover {
-      color: var(--form-blue--light);
-      border-bottom-color: var(--form-blue--light);
+      color: var(--form-purple--light);
+      border-bottom-color: var(--form-purple--light);
+      background-color: var(--background) !important;
     }
 
     &:focus-visible {
@@ -112,39 +121,24 @@ dialog {
     }
 
     &.active {
-      color: #004499;
+      color: var(--ucl-accent);
       border: 1px solid var(--grey-border--light);
       border-top-left-radius: 5px;
       border-top-right-radius: 5px;
-      border-block: 2px solid #5fa7f5;
+      border-block: 2px solid color-mix(in srgb, var(--grey-border--light) 20%, var(--ucl-accent) 80%);
       border-bottom: none;
     }
   }
 }
 
-.delete-button {
-  background-color: #dc3545 !important;
-  border-color: #dc3545 !important;
-  color: white !important;
-
-  &:hover:not(:disabled) {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
-  }
-
-  &:disabled {
-    opacity: 0.6 !important;
-  }
-}
-
 .delete-button-confirm {
-  background-color: #dc3545 !important;
-  border-color: #dc3545 !important;
+  background-color: var(--red-100) !important;
+  border-color: var(--red-100) !important;
   color: white !important;
 
   &hover:not(:disabled) {
-    background-color: #c82333 !important;
-    border-color: #bd2130 !important;
+    background-color: var(--red-200) !important;
+    border-color: var(--red-200) !important;
   }
 
   &:disabled {
@@ -153,7 +147,6 @@ dialog {
 }
 
 .expiry-urgency--low {
-  margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--expiry-urgency--low);
@@ -161,14 +154,12 @@ dialog {
 
 .expiry-urgency--high,
 .expiry-urgency--critical {
-  margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--expiry-urgency--high);
 }
 
 .expiry-urgency--medium {
-  margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--expiry-urgency--medium);

@@ -93,8 +93,6 @@ export default function StatusBadge(props: BadgeProps) {
   const { userData } = useAuth();
   const isOpsStaff = userData?.roles.includes("ig-ops-staff") ?? false;
 
-  console.log(status, getStatusClassName(status));
-
   const description = getDescription(type, status, environment, isOpsStaff);
   return (
     <span className={`${styles["status-badge"]} ${getStatusClassName(status)}`} data-cy="status-badge">

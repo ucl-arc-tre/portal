@@ -197,7 +197,7 @@ export default function ManageAssetPage() {
               <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
                 Edit
               </Button>
-              <Button onClick={() => setShowDeleteModal(true)} className="delete-button" cy="asset-delete">
+              <Button onClick={() => setShowDeleteModal(true)} variant="primary-destructive" cy="asset-delete">
                 Delete
               </Button>
             </div>

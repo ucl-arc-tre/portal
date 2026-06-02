@@ -1,5 +1,12 @@
+.btn {
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease !important;
+}
+
 .submit {
-  width: 100%;
+  width: 100% !important;
   margin-top: 1rem;
   cursor: pointer;
 }

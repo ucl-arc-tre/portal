@@ -21,12 +21,7 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").click();
 
-    cy.contains(studyTitle)
-      .parent()
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="manage-study-button"]').click();
-      });
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="agreement-agree"]').click();
 
     // add an asset to complete setup
@@ -55,7 +50,7 @@ describe("TRE project creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
-    cy.contains(studyTitle).parents('[data-cy="study-card"]').contains("Manage Study").click();
+    cy.contains(studyTitle).click();
     cy.get('[data-cy="study-approve-button"]').click();
   });
 
