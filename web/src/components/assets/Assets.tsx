@@ -9,8 +9,9 @@ import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
 import Callout from "../ui/Callout";
-import InfoTooltip from "../ui/InfoTooltip";
-import { AlertMessage, Alert } from "../shared/uikitExports";
+import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
+import Box from "../ui/Box";
+import { AssetDefinition } from "../shared/entityDefinitions";
 
 type AssetsProps = {
   study: Study;
@@ -25,6 +26,7 @@ export default function Assets(props: AssetsProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
     (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
     false;
+  const [calloutExpanded, setCalloutExpanded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
@@ -55,84 +57,84 @@ export default function Assets(props: AssetsProps) {
   };
 
   return (
-    <section className={styles["study-assets-container"]} data-cy="study-assets">
-      <h2 className="subtitle">Asset Management</h2>
-
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
-
-      {canModify && (
-        <Callout definition>
-          <div className={styles["callout-section"]}>Use this section to view and add assets linked to your study.</div>
-
-          <div className={styles["callout-info-paragraph"]}>
-            Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They
-            are owned by a <strong>study</strong>{" "}
-            <InfoTooltip text="Studies are a top level entity that can contain own and projects" /> and can belong to{" "}
-            <strong>projects</strong> <InfoTooltip text="Projects are owned by a study and can contain assets" />.
-          </div>
-
-          <div className={styles["callout-glossary-section"]}>
-            You can read more detailed information about assets in our
-            <Button href="/glossary" variant="tertiary" size="small" inline>
-              Glossary
+    <Box>
+      <section className={styles["study-assets-container"]} data-cy="study-assets">
+        <div className={styles.header}>
+          <h3>
+            Asset Management{" "}
+            <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
+              <InfoIcon className={styles.icon} />
             </Button>
-            and the{" "}
-            <a
-              href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              The National Archives guide on information assets.
-            </a>
-          </div>
-        </Callout>
-      )}
-
-      {assets.length === 0 && canModify ? (
-        <div>
-          <div className={styles["no-assets-message"]}>
-            <p>No assets have been created for this study yet.</p>
-            <Button onClick={() => setShowAssetForm(true)} variant="primary" data-cy="add-asset-button">
-              Add First Asset
-            </Button>
-          </div>
-
-          {showAssetForm && (
-            <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
-          )}
-        </div>
-      ) : (
-        <div>
-          <div className={styles["assets-summary"]}>
-            <span>Assets for this study:</span>
-            <span className={styles["assets-count-badge"]}>{assets.length}</span>
-          </div>
-
-          {canModify && (
+          </h3>
+          {canModify && assets.length > 0 && (
             <>
-              <div className={styles["asset-actions"]}>
-                <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
-                  {showAssetForm ? "Cancel" : "Add Asset"}
-                </Button>
-              </div>
+              <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
+                {showAssetForm ? "Cancel" : "Add Asset"}
+              </Button>
 
               {showAssetForm && (
                 <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
               )}
             </>
           )}
-
-          <div className={styles["assets-grid"]}>
-            {assets.map((asset) => (
-              <AssetCard key={asset.id} studyId={study.id} asset={asset} canModify={canModify} />
-            ))}
-          </div>
         </div>
-      )}
-    </section>
+        {error && (
+          <Alert type="error">
+            <AlertMessage>{error}</AlertMessage>
+          </Alert>
+        )}
+
+        {calloutExpanded && (
+          <Callout definition>
+            <div className={styles["callout-info-paragraph"]}>
+              <AssetDefinition />
+            </div>
+
+            <div className={styles["callout-glossary-section"]}>
+              You can read more detailed information about Assets in our
+              <Button href="/glossary" variant="tertiary" size="small" inline>
+                Glossary
+              </Button>
+              and the{" "}
+              <a
+                href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                The National Archives guide on information assets.
+              </a>
+            </div>
+          </Callout>
+        )}
+
+        {assets.length === 0 && canModify ? (
+          <div>
+            <div className={styles["no-assets-message"]}>
+              <p>No assets have been created for this study yet.</p>
+              <Button onClick={() => setShowAssetForm(true)} variant="primary" data-cy="add-asset-button">
+                Add First Asset
+              </Button>
+            </div>
+
+            {showAssetForm && (
+              <AssetCreationForm handleAssetSubmit={handleAssetSubmit} closeModal={() => setShowAssetForm(false)} />
+            )}
+          </div>
+        ) : (
+          <div>
+            <div className={styles["assets-summary"]}>
+              <span>Number of associated Assets:</span>
+              <span className={styles["assets-count-badge"]}>{assets.length}</span>
+            </div>
+
+            <div className={styles["assets-grid"]}>
+              {assets.map((asset) => (
+                <AssetCard key={asset.id} studyId={study.id} asset={asset} />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    </Box>
   );
 }

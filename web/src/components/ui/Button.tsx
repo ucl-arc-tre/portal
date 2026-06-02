@@ -21,7 +21,7 @@ export default function Button(props: Props) {
   return (
     <UCLButton
       data-cy={props.cy}
-      className={`${props.type === "submit" ? styles.submit : ""} ${props.inline ? styles.inline : ""} ${props.className || ""} `}
+      className={`${styles.btn} ${props.type === "submit" ? styles.submit : ""} ${props.inline ? styles.inline : ""} ${props.className || ""} `}
       type={props.type || "button"}
       onClick={props.onClick}
       disabled={props.disabled}

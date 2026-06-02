@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
 import { Project, deleteProjectsTreByProjectId } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
@@ -8,6 +7,7 @@ import Dialog from "@/components/ui/Dialog";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
 import styles from "./ProjectCardsList.module.css";
+import Card from "../ui/Card";
 
 type Props = {
   projects: Project[];
@@ -17,7 +17,6 @@ type Props = {
 
 export default function ProjectCardsList(props: Props) {
   const { projects, isOpsStaff = false, fetchData } = props;
-  const router = useRouter();
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
@@ -73,39 +72,32 @@ export default function ProjectCardsList(props: Props) {
         {projects
           .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))
           .map((project) => (
-            <div key={project.id} className={styles["project-card"]}>
-              <div className={styles["status-indicator"]}>
+            <Card
+              key={project.id}
+              title={project.name}
+              manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
+              headerContent={
                 <StatusBadge status={project.status} type="project" environment={project.environment_name} />
-              </div>
-
-              <div className={styles["project-info"]}>
-                <h3 className={styles["project-title"]}>{project.name}</h3>
-                <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
-                <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
-              </div>
-
-              <div className={styles["project-actions"]}>
-                <Button
-                  onClick={() =>
-                    router.push(`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`)
-                  }
-                  size="small"
-                >
-                  {`Manage Project ${isOpsStaff ? "Approval" : ""}`}
-                </Button>
-                {!isOpsStaff && project.status === "incomplete" && (
+              }
+              actions={
+                !isOpsStaff &&
+                project.status === "incomplete" && (
                   <Button
                     onClick={() => handleDeleteClick(project)}
                     size="small"
-                    variant="secondary"
                     disabled={deletingProjectId === project.id}
-                    className="delete-button"
+                    variant="primary-destructive"
                   >
                     {deletingProjectId === project.id ? "Deleting..." : "Delete"}
                   </Button>
-                )}
+                )
+              }
+            >
+              <div className={styles["project-info"]}>
+                <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
+                <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
               </div>
-            </div>
+            </Card>
           ))}
       </div>
 
@@ -135,7 +127,7 @@ export default function ProjectCardsList(props: Props) {
               </Button>
               <Button
                 onClick={handleConfirmDelete}
-                variant="primary"
+                variant="primary-destructive"
                 disabled={!!deletingProjectId}
                 className={styles["delete-button-confirm"]}
               >

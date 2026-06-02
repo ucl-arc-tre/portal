@@ -17,7 +17,7 @@
       margin-bottom: 1.5rem;
       padding: 1rem;
       border: 1px solid #ddd;
-      border-radius: 8px;
+      border-radius: 4px;
       background-color: #fafafa;
 
       select,
@@ -30,8 +30,8 @@
 
         &:focus {
           outline: none;
-          border-color: var(--form-blue--light);
-          box-shadow: 0 0 0 2px var(--form-blue--shadow);
+          border-color: var(--form-purple--light);
+          box-shadow: 0 0 0 2px var(--form-purple--shadow);
         }
       }
 
