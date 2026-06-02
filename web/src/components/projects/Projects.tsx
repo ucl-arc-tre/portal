@@ -156,7 +156,7 @@ export default function Projects({ userData }: Props) {
             </div>
           )}
 
-          <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} fetchData={fetchData} />
+          <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} />
         </>
       )}
     </>
