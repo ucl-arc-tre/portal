@@ -3,6 +3,11 @@ import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
+import Button from "../ui/Button";
+import { InfoIcon } from "../shared/uikitExports";
+import { useState } from "react";
+import Callout from "../ui/Callout";
+import { ProjectDefinition } from "../shared/entityDefinitions";
 
 type Props = {
   projects: Project[];
@@ -12,9 +17,25 @@ type Props = {
 export default function ProjectCardsList(props: Props) {
   const { projects, isOpsStaff = false } = props;
 
+  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
+
   return (
     <div className={styles["project-selection"]}>
-      <h2 className={styles["projects-heading"]}>{isOpsStaff ? "All Projects pending review" : "Your Projects"}</h2>
+      <h2 className={styles["projects-heading"]}>
+        {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
+        <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
+          <InfoIcon />
+        </Button>
+      </h2>
+
+      {infoCalloutExpanded && (
+        <Callout definition>
+          <ProjectDefinition />. You can read more detailed information about Projects in our
+          <Button href="/glossary" variant="tertiary" size="small" inline>
+            Glossary
+          </Button>
+        </Callout>
+      )}
 
       <div className={styles["projects-list"]}>
         {projects

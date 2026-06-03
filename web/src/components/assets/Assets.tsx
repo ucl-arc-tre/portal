@@ -26,7 +26,7 @@ export default function Assets(props: AssetsProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
     (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
     false;
-  const [calloutExpanded, setCalloutExpanded] = useState(false);
+  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
@@ -62,8 +62,8 @@ export default function Assets(props: AssetsProps) {
         <div className={styles.header}>
           <h3>
             Asset Management{" "}
-            <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
-              <InfoIcon className={styles.icon} />
+            <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
+              <InfoIcon />
             </Button>
           </h3>
           {canModify && assets.length > 0 && (
@@ -84,7 +84,7 @@ export default function Assets(props: AssetsProps) {
           </Alert>
         )}
 
-        {calloutExpanded && (
+        {infoCalloutExpanded && (
           <Callout definition>
             <div className={styles["callout-info-paragraph"]}>
               <AssetDefinition />
