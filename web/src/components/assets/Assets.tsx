@@ -8,7 +8,6 @@ import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
-import Callout from "../ui/Callout";
 import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
 import Box from "../ui/Box";
 import { AssetDefinition } from "../shared/entityDefinitions";
@@ -84,28 +83,7 @@ export default function Assets(props: AssetsProps) {
           </Alert>
         )}
 
-        {infoCalloutExpanded && (
-          <Callout definition>
-            <div className={styles["callout-info-paragraph"]}>
-              <AssetDefinition />
-            </div>
-
-            <div className={styles["callout-glossary-section"]}>
-              You can read more detailed information about Assets in our
-              <Button href="/glossary" variant="tertiary" size="small" inline>
-                Glossary
-              </Button>
-              and the{" "}
-              <a
-                href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                The National Archives guide on information assets.
-              </a>
-            </div>
-          </Callout>
-        )}
+        {infoCalloutExpanded && <AssetDefinition />}
 
         {assets.length === 0 && canModify ? (
           <div>

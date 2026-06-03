@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Button from "../ui/Button";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
@@ -31,10 +32,7 @@ export const StudyDefinition = () => {
     <Callout definition>
       Studies are a top level entity that can contain <EntityTooltip entity="asset" isPlural /> and{" "}
       <EntityTooltip entity="contract" isPlural /> and own <EntityTooltip entity="project" isPlural />. For more
-      detailed information and an entity relationship diagram, look at our
-      <Button href="/glossary" variant="tertiary" size="small" inline>
-        Glossary
-      </Button>
+      detailed information and an entity relationship diagram, look at our <Link href="/glossary">Glossary</Link>.
     </Callout>
   );
 };
@@ -43,11 +41,15 @@ export const AssetDefinition = () => {
   return (
     <Callout definition>
       Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They are
-      owned by a <EntityTooltip entity="study" /> and can belong to a <EntityTooltip entity="project" />. For more
-      detailed information and an entity relationship diagram, look at our
-      <Button href="/glossary" variant="tertiary" size="small" inline>
-        Glossary
-      </Button>
+      owned by a <EntityTooltip entity="study" /> and can belong to a <EntityTooltip entity="project" />. You can read
+      more detailed information about Assets in our <Link href="/glossary">Glossary</Link> and the{" "}
+      <a
+        href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        The National Archives guide on information assets.
+      </a>
     </Callout>
   );
 };
@@ -57,11 +59,8 @@ export const ProjectDefinition = () => {
     <Callout definition>
       Projects are owned by a <EntityTooltip entity="study" /> and can contain <EntityTooltip entity="asset" isPlural />{" "}
       and <EntityTooltip entity="contract" isPlural />. They can be associated with an{" "}
-      <EntityTooltip entity="environment" />
-      For more detailed information and an entity relationship diagram, look at our
-      <Button href="/glossary" variant="tertiary" size="small" inline>
-        Glossary
-      </Button>
+      <EntityTooltip entity="environment" />. For more detailed information and an entity relationship diagram, look at
+      our <Link href="/glossary">Glossary</Link>.
     </Callout>
   );
 };
@@ -71,10 +70,8 @@ export const ContractDefinition = () => {
     <Callout definition>
       Contracts can be uploaded as PDFs and can be linked to <EntityTooltip entity="asset" isPlural />,{" "}
       <EntityTooltip entity="project" isPlural /> and users. If you collaborate with an external researcher you must
-      associate them with a contract. For more detailed information and an entity relationship diagram, look at our
-      <Button href="/glossary" variant="tertiary" size="small" inline>
-        Glossary
-      </Button>
+      associate them with a contract. For more detailed information and an entity relationship diagram, look at our{" "}
+      <Link href="/glossary">Glossary</Link>.
     </Callout>
   );
 };
