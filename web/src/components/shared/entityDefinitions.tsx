@@ -1,12 +1,10 @@
 import Link from "next/link";
-import Button from "../ui/Button";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
 
 const entityDefinitions = {
   study: "Studies are a top level entity that can contain Assets and Contracts and own Projects",
-  project:
-    "Projects are owned by a Study and can contain Assets and Contracts. They can be associated with an Environment",
+  project: "Projects are owned by a Study and contain people with roles. They are associated with an Environment",
   asset:
     "Assets are any kind of data or information entity (e.g. consent forms, physical study materials etc.). They are owned by a Study and can belong to a Project.",
   contract:
@@ -58,9 +56,8 @@ export const ProjectDefinition = () => {
   return (
     <Callout definition>
       Projects are owned by a <EntityTooltip entity="study" /> and can contain <EntityTooltip entity="asset" isPlural />{" "}
-      and <EntityTooltip entity="contract" isPlural />. They can be associated with an{" "}
-      <EntityTooltip entity="environment" />. For more detailed information and an entity relationship diagram, look at
-      our <Link href="/glossary">Glossary</Link>.
+      . They are associated with an <EntityTooltip entity="environment" />. For more detailed information and an entity
+      relationship diagram, look at our <Link href="/glossary">Glossary</Link>.
     </Callout>
   );
 };
