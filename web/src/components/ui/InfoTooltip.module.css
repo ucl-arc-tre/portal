@@ -14,7 +14,7 @@
     z-index: 2;
     background-color: var(--background);
     border: 1px solid var(--green-50);
-    border-radius: 8px;
+    border-radius: var(--default-border-radius);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     color: var(--foreground);

@@ -24,7 +24,7 @@
   padding: 3rem 2rem;
   background: #fff5f5;
   border: 1px solid #fed7d7;
-  border-radius: 8px;
+  border-radius: var(--default-border-radius);
   margin: 2rem 0;
 }
 

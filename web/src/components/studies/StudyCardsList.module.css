@@ -39,7 +39,7 @@
   background: #fff3cd;
   color: #856404;
   border: 1px solid #ffc107;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;

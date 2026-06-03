@@ -18,7 +18,7 @@
 .section {
   background: #f8f9fa;
   padding: 1.5rem;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   border: 1px solid #e9ecef;
 }
 
@@ -47,7 +47,7 @@
 
 .status {
   padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   font-size: 0.875rem;
   font-weight: 500;
   background: #d4edda;
@@ -88,7 +88,7 @@
   color: #dc3545;
   background: #f8d7da;
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   border: 1px solid #f5c6cb;
   margin: 1rem 0;
 }

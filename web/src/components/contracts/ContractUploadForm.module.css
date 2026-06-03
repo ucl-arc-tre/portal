@@ -12,7 +12,7 @@
   gap: 1rem;
   padding: 1.5rem;
   border: 2px dashed #dee2e6;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   background-color: #f8f9fa;
 }
 
@@ -39,7 +39,7 @@
   justify-content: center;
   padding: 2rem;
   border: 2px dashed var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   background-color: var(--color-background-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -61,7 +61,7 @@
   justify-content: space-between;
   padding: 1rem;
   background-color: var(--color-background-secondary);
-  border-radius: 6px;
+  border-radius: var(--default-border-radius);
   border: 1px solid var(--color-border);
 }
 
@@ -82,7 +82,7 @@
   padding: 0.75rem;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
 }
 
 .success {
@@ -91,7 +91,7 @@
   padding: 0.5rem;
   background-color: var(--color-success-light);
   border: 1px solid var(--color-success);
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
 }
 
 .form-section {
@@ -123,7 +123,7 @@
 .form-select {
   padding: 0.75rem;
   border: 1px solid #ced4da;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   background: #fff;
   font-size: 1rem;
   transition: border-color 0.2s ease;

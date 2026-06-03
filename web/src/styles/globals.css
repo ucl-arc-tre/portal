@@ -28,6 +28,9 @@
   --ucl-accent: #9a3bff;
   --ucl-dark: #2c0442;
   --ucl-mid: #500778;
+
+  --default-border-radius: 2px;
+  --button-border-radius: 4px;
 }
 
 html,
@@ -91,7 +94,7 @@ dialog {
   color: #d32f2f;
   background-color: #fdeaea;
   border: 1px solid #f5c6cb;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   padding: 12px;
   margin-bottom: 16px;
 }

@@ -1,7 +1,7 @@
 .container {
   background: var(--background);
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: var(--default-border-radius);
   padding: 2rem;
   margin: 2rem 0;
   max-width: 50vw;
@@ -37,7 +37,7 @@
   padding: 1.5rem;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: var(--default-border-radius);
 }
 
 .researcher-prompt p {
@@ -51,7 +51,7 @@
   padding: 1.5rem;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
-  border-radius: 6px;
+  border-radius: var(--default-border-radius);
 
   p {
     padding-block: 0.6rem;

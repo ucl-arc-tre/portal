@@ -1,7 +1,7 @@
 .profile-summary-container {
   width: 100%;
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   padding: 1.5rem;
   margin: 1.5rem 0;
 }
@@ -91,7 +91,7 @@
 .edit-icon-button:focus {
   outline: 2px solid var(--form-purple--light);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
 }
 
 .roles {
