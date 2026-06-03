@@ -285,10 +285,10 @@ export default function CreateProjectForm({
           </Alert>
         )}
 
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form className="form" onSubmit={(e) => e.preventDefault()}>
           {currentStep === 1 && (
             <>
-              <div className={styles["form-field"]}>
+              <div className="field">
                 <label htmlFor="studyId">Study *</label>
                 <select
                   id="studyId"
@@ -313,7 +313,7 @@ export default function CreateProjectForm({
                 <HelperText>Select the study this project will belong to</HelperText>
               </div>
 
-              <div className={styles["form-field"]}>
+              <div className="field">
                 <label htmlFor="environmentId">Environment *</label>
                 <select
                   id="environmentId"
@@ -383,7 +383,7 @@ export default function CreateProjectForm({
                   })()}
               </div>
 
-              <div className={styles["form-field"]}>
+              <div className="field">
                 <label htmlFor="name">Project Name *</label>
                 <Controller
                   name="name"
@@ -435,7 +435,7 @@ export default function CreateProjectForm({
                 </HelperText>
               </div>
 
-              <div className={styles["form-field"]}>
+              <div className="field">
                 <span className={styles["section-label"]}>Add assets (optional):</span>
                 <fieldset className="linkage-fieldset">
                   {assetFields.map((field, index) => (
@@ -516,7 +516,7 @@ export default function CreateProjectForm({
 
           {currentStep === 2 && (
             <>
-              <div className={styles["form-field"]}>
+              <div className="field">
                 <span className={styles["section-label"]}>Project users (optional):</span>
                 <fieldset className="linkage-fieldset">
                   {researcherFields.map((field, index) => {
@@ -667,7 +667,7 @@ export default function CreateProjectForm({
                         <button
                           type="button"
                           onClick={() => removeResearcher(index)}
-                          className={styles["remove-button"]}
+                          className="remove-button"
                           aria-label={`Remove researcher ${index + 1}`}
                         >
                           ×

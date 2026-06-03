@@ -35,35 +35,6 @@
   background-color: #28a745;
 }
 
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.form-field label,
-.field-label {
-  font-weight: 700;
-}
-
-.form-field input,
-.form-field textarea,
-.form-field select {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: var(--default-border-radius);
-  font-size: 1rem;
-}
-
-.form-field input:focus,
-.form-field textarea:focus,
-.form-field select:focus {
-  outline: none;
-  border-color: var(--form-purple--light);
-  box-shadow: 0 0 0 2px var(--form-purple--shadow);
-}
-
 .section-label {
   font-weight: bold;
 }
