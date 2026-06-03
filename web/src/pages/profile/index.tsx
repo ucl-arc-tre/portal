@@ -2,7 +2,6 @@ import { useAuth } from "@/hooks/useAuth";
 import MetaHead from "@/components/meta/Head";
 import Profile from "@/components/profile/Profile";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Title from "@/components/ui/Title";
 import DSHTokens from "@/components/profile/DSHTokens";
 
 export default function ProfilePage() {
@@ -21,8 +20,6 @@ export default function ProfilePage() {
       />
 
       <div className="content">
-        <Title text={"Profile"} centered />
-
         <Profile userData={userData} refreshAuth={refreshAuth} />
 
         {canSeeDSHTokens && <DSHTokens />}
