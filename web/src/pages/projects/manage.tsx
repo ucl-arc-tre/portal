@@ -256,8 +256,6 @@ export default function ManageProjectPage() {
       />
 
       <div className="content">
-        <Title text={canApprove ? "Manage Project Approval" : `Manage Project: ${project.name}`} centered />
-
         {!canApprove && project.status === "incomplete" && (
           <div className={styles["approval-section"]}>
             <p className={styles["approval-info"]}>
@@ -288,14 +286,6 @@ export default function ManageProjectPage() {
           </div>
         )}
 
-        {canEdit && project.status !== "incomplete" && (
-          <div className={styles["approval-section"]}>
-            <Button onClick={() => setShowEditForm(true)} size="small" disabled={!editingEnabled}>
-              Edit
-            </Button>
-          </div>
-        )}
-
         {canApprove && project.status === "pending-approval" && (
           <div className={styles["approval-section"]}>
             <p className={styles["approval-info"]}>
@@ -310,11 +300,22 @@ export default function ManageProjectPage() {
         )}
 
         <Box>
-          <h2 className={styles["section-title"]}>Project Details</h2>
-          <div className={styles.field}>
-            <label>Name:</label>
-            <span>{project.name}</span>
+          <div className={styles.header}>
+            <h2>Project: {project.name}</h2>
+            {canEdit && project.status !== "incomplete" && (
+              <div>
+                <Button
+                  onClick={() => setShowEditForm(true)}
+                  size="medium"
+                  variant="secondary"
+                  disabled={!editingEnabled}
+                >
+                  Edit Project
+                </Button>
+              </div>
+            )}
           </div>
+
           <div className={styles.field}>
             <label>Environment:</label>
             <span>{project.environment_name}</span>
@@ -335,47 +336,47 @@ export default function ManageProjectPage() {
             <label>Study:</label>
             <span>{project.study_title}</span>
           </div>
-        </Box>
 
-        <Box>
-          <h2 className={styles["section-title"]}>Project Members</h2>
-          {project.members && project.members.length > 0 ? (
-            <ul className={styles["members-list"]}>
-              {project.members.map((member, index) => (
-                <li key={index} className={styles["member-item"]}>
-                  <span className={styles["member-username"]}>{member.username}</span>
-                  <div className={styles["member-roles"]}>
-                    {member.roles.map((role, roleIndex) => (
-                      <span key={roleIndex} className={styles["role-badge"]}>
-                        {role.replace(/_/g, " ")}
-                      </span>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
-          )}
-        </Box>
+          <div className={styles.field}>
+            <label>Members:</label>
+            {project.members && project.members.length > 0 ? (
+              <ul className={styles["members-list"]}>
+                {project.members.map((member, index) => (
+                  <li key={index} className={styles["member-item"]}>
+                    <span className={styles["member-username"]}>{member.username}</span>
+                    <div className={styles["member-roles"]}>
+                      {member.roles.map((role, roleIndex) => (
+                        <span key={roleIndex} className={styles["role-badge"]}>
+                          {role.replace(/_/g, " ")}
+                        </span>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
+            )}
+          </div>
 
-        <Box>
-          <h2 className={styles["section-title"]}>Assets</h2>
-          {project.assets && project.assets.length > 0 ? (
-            <ul className={styles["assets-list"]}>
-              {project.assets.map((asset) => (
-                <li key={asset.id} className={styles["asset-item"]}>
-                  <div className={styles["asset-info"]}>
-                    <strong>{asset.title}</strong>
-                    <p>{asset.description}</p>
-                    <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
-          )}
+          <div className={styles.field}>
+            <label>Assets:</label>
+            {project.assets && project.assets.length > 0 ? (
+              <ul className={styles["assets-list"]}>
+                {project.assets.map((asset) => (
+                  <li key={asset.id} className={styles["asset-item"]}>
+                    <div className={styles["asset-info"]}>
+                      <strong>{asset.title}</strong>
+                      <p>{asset.description}</p>
+                      <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
+            )}
+          </div>
         </Box>
 
         {showEditForm && project && (
