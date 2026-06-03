@@ -8,7 +8,13 @@ import { useAuth } from "@/hooks/useAuth";
 
 import styles from "./ResearcherStudies.module.css";
 
-export default function ResearcherStudies() {
+type Props = {
+  refreshToken: number;
+};
+
+export default function ResearcherStudies(props: Props) {
+  const { refreshToken } = props;
+
   const { userData } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
@@ -39,7 +45,7 @@ export default function ResearcherStudies() {
 
   useEffect(() => {
     fetchStudies();
-  }, []);
+  }, [refreshToken]);
 
   if (!userData) return null;
 

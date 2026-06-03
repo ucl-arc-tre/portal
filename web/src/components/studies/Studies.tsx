@@ -5,7 +5,7 @@ import styles from "./Studies.module.css";
 import Button from "../ui/Button";
 import { InfoIcon } from "../shared/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
 export default function Studies() {
@@ -13,6 +13,7 @@ export default function Studies() {
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
 
   const isOpsStaff = userData?.roles.includes("ig-ops-staff") ?? false;
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
@@ -33,7 +34,10 @@ export default function Studies() {
           <StudyForm
             username={userData.username}
             setIsFormOpen={setIsFormOpen}
-            onComplete={() => setIsFormOpen(false)}
+            onComplete={() => {
+              setIsFormOpen(false);
+              refreshStudies();
+            }}
           />
         )}
 
@@ -49,7 +53,7 @@ export default function Studies() {
 
       {infoCalloutExpanded && <StudyDefinition />}
 
-      {isOpsStaff ? <IGOpsStudies /> : <ResearcherStudies />}
+      {isOpsStaff ? <IGOpsStudies refreshToken={refreshToken} /> : <ResearcherStudies refreshToken={refreshToken} />}
     </div>
   );
 }
