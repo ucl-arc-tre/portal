@@ -23,6 +23,7 @@ import ContractUploadForm from "@/components/contracts/ContractUploadForm";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ContractObjectCard from "@/components/contracts/ContractObjectCard";
 import { formatDate } from "@/components/shared/exports";
+import Box from "@/components/ui/Box";
 
 export default function ManageContractPage() {
   const router = useRouter();
@@ -158,73 +159,68 @@ export default function ManageContractPage() {
       />
 
       <div className="content">
-        <div className={styles.header}>
-          <Title text={`Manage Contract: ${contract.title}`} />
-          {canModify && (
-            <div className={styles["header-actions"]}>
-              <Button onClick={() => setShowUploadModal(true)} variant="primary" cy="contract-edit">
-                Edit
-              </Button>
+        <Box>
+          <div className={styles.header}>
+            <h2>{`Contract: ${contract.title}`} </h2>
+            {canModify && (
+              <div className={styles["header-actions"]}>
+                <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="contract-edit">
+                  Edit
+                </Button>
 
-              <Button onClick={() => setShowDeleteModal(true)} variant="primary-destructive" cy="contract-delete">
-                Delete
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className={styles.info}>
-          <div className={styles.section}>
-            <h3>Contract Details</h3>
-            <div className={styles.field}>
-              <label>Title:</label>
-              <span>{contract.title}</span>
-            </div>
-
-            <div className={styles.field}>
-              <label>Signatory:</label>
-              <span>{contract.organisation_signatory}</span>
-            </div>
-
-            <div className={styles.field}>
-              <label>Third Party:</label>
-              <span>{contract.third_party_name}</span>
-            </div>
-
-            {contract.other_signatories && (
-              <div className={styles.field}>
-                <label>Other Signatories:</label>
-                <span>{contract.other_signatories}</span>
-              </div>
-            )}
-
-            {contract.start_date && (
-              <div className={styles.field}>
-                <label>Start date:</label>
-                <span>{formatDate(contract.start_date)}</span>
-              </div>
-            )}
-
-            {contract.expiry_date && (
-              <div className={styles.field}>
-                <label>Expiry date:</label>
-                <span>{formatDate(contract.expiry_date)}</span>
+                <Button onClick={() => setShowDeleteModal(true)} variant="secondary-destructive" cy="contract-delete">
+                  Delete
+                </Button>
               </div>
             )}
           </div>
-        </div>
 
-        {contract.objects_metadata.map((obj) => (
-          <ContractObjectCard
-            key={obj.id}
-            id={obj.id}
-            contractId={contract.id}
-            studyId={study.id}
-            filename={obj.filename}
-            createdAt={formatDate(obj.created_at)}
-            canModify={canModify}
-          />
-        ))}
+          <div className={styles.field}>
+            <label>Signatory:</label>
+            <span>{contract.organisation_signatory}</span>
+          </div>
+
+          <div className={styles.field}>
+            <label>Third Party:</label>
+            <span>{contract.third_party_name}</span>
+          </div>
+
+          {contract.other_signatories && (
+            <div className={styles.field}>
+              <label>Other Signatories:</label>
+              <span>{contract.other_signatories}</span>
+            </div>
+          )}
+
+          {contract.start_date && (
+            <div className={styles.field}>
+              <label>Start date:</label>
+              <span>{formatDate(contract.start_date)}</span>
+            </div>
+          )}
+
+          {contract.expiry_date && (
+            <div className={styles.field}>
+              <label>Expiry date:</label>
+              <span>{formatDate(contract.expiry_date)}</span>
+            </div>
+          )}
+
+          <div className={styles.field}>
+            <label>Files:</label>
+            {contract.objects_metadata.map((obj) => (
+              <ContractObjectCard
+                key={obj.id}
+                id={obj.id}
+                contractId={contract.id}
+                studyId={study.id}
+                filename={obj.filename}
+                createdAt={formatDate(obj.created_at)}
+                canModify={canModify}
+              />
+            ))}
+          </div>
+        </Box>
 
         {showEditModal && (
           <ContractUploadForm
