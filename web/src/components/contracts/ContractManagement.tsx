@@ -50,7 +50,7 @@ export default function ContractManagement(props: ContractManagementProps) {
                 <InfoIcon className={styles.icon} />
               </Button>
             </h3>
-            <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="add-contract">
+            <Button onClick={() => setShowUploadModal(true)} variant="secondary" size="small" cy="add-contract">
               Add Contract
             </Button>
           </div>

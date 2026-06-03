@@ -1,5 +1,4 @@
 import { Study } from "@/openapi";
-import Box from "../../ui/Box";
 import { Alert } from "../../shared/uikitExports";
 import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
@@ -16,7 +15,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
   const standardRiskScoreStatement = "increases risk score by 5";
 
   return (
-    <Box>
+    <>
       <div className={styles["pre-description"]} data-cy="study-details">
         <span>
           Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
@@ -195,6 +194,6 @@ export default function StudyDetails(props: StudyOverviewProps) {
           </Alert>
         )}
       </div>
-    </Box>
+    </>
   );
 }

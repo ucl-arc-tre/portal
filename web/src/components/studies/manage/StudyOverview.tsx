@@ -9,6 +9,7 @@ import { storageDefinitions } from "../../shared/storageDefinitions";
 
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
+import Box from "@/components/ui/Box";
 
 type StudyOverviewProps = {
   study: Study;
@@ -85,7 +86,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   };
 
   return (
-    <>
+    <Box>
       {isFormOpen && userData && (
         <StudyForm
           username={userData.username}
@@ -118,7 +119,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       )}
 
       {isStudyOwnerOrAdmin && (
-        <div className={styles["study-actions"]}>
+        <div className={styles["header"]}>
+          <h2>Study: {study.title}</h2>
           <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
             Edit Study
           </Button>
@@ -145,6 +147,6 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       )}
 
       <StudyDetails study={study} riskScore={riskScore} />
-    </>
+    </Box>
   );
 }

@@ -149,8 +149,6 @@ export default function ManageStudyPage() {
         ]}
       />
 
-      <Title text={`Manage Study: ${study.title}`} centered />
-
       <div className="content">
         <ManageStudy study={study} fetchStudy={fetchStudy} />
       </div>

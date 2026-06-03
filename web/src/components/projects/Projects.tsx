@@ -119,9 +119,9 @@ export default function Projects({ userData }: Props) {
             <InfoIcon />
           </Button>
         </h2>
-        {isApprovedStaffResearcher && (
-          <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
-            Create
+        {isApprovedStaffResearcher && projects.length > 0 && (
+          <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
+            Create Project
           </Button>
         )}
       </div>

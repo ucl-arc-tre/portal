@@ -39,8 +39,8 @@ export default function Studies() {
 
         {isApprovedStaffResearcher && process.env.NEXT_PUBLIC_ENABLE_STUDY_CREATION === "true" && (
           <div className={styles["create-study-section"]}>
-            <Button onClick={() => setIsFormOpen(true)} size="large" data-cy="create-study-button">
-              Create
+            <Button onClick={() => setIsFormOpen(true)} size="medium" data-cy="create-study-button">
+              Create Study
             </Button>
           </div>
         )}

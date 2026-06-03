@@ -67,7 +67,12 @@ export default function Assets(props: AssetsProps) {
           </h3>
           {canModify && assets.length > 0 && (
             <>
-              <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
+              <Button
+                onClick={() => setShowAssetForm(!showAssetForm)}
+                variant="secondary"
+                size="small"
+                data-cy="add-asset-button"
+              >
                 {showAssetForm ? "Cancel" : "Add Asset"}
               </Button>
 
