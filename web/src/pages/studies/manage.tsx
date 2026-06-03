@@ -6,7 +6,6 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import ManageStudy from "@/components/studies/manage/ManageStudy";
-import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";

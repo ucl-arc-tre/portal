@@ -48,9 +48,6 @@ export default function Projects({ userData }: Props) {
 
       setProjects(projectsResponse.data);
       setStudies(studiesResponse.data);
-      if (projectsResponse.data.length === 0) {
-        setInfoCalloutExpanded(true);
-      }
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setError("Failed to load projects and studies. Please try again later.");
@@ -112,20 +109,29 @@ export default function Projects({ userData }: Props) {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>
-          {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
-          <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
-            <InfoIcon />
-          </Button>
-        </h2>
-        {isApprovedStaffResearcher && projects.length > 0 && (
-          <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
-            Create Project
-          </Button>
-        )}
-      </div>
-      <div className={styles.line}></div>
+      {projects.length > 0 && (
+        <>
+          <div className={styles.header}>
+            <h2>
+              {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
+              <Button
+                onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+                variant="tertiary"
+                size="small"
+                inline
+              >
+                <InfoIcon />
+              </Button>
+            </h2>
+            {isApprovedStaffResearcher && projects.length > 0 && (
+              <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
+                Create Project
+              </Button>
+            )}
+          </div>
+          <div className={styles.line}></div>
+        </>
+      )}
 
       {infoCalloutExpanded && <ProjectDefinition />}
 
