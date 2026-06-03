@@ -25,13 +25,7 @@ export default function StudiesPage() {
       />
       <Title text={"Studies"} centered />
 
-      <Callout definition>
-        <StudyDefinition />
-        For more detailed information and an entity relationship diagram, look at our
-        <Button href="/glossary" variant="tertiary" size="small" inline>
-          Glossary
-        </Button>
-      </Callout>
+      <StudyDefinition />
 
       {process.env.NEXT_PUBLIC_ENABLE_STUDY_CREATION !== "true" && (
         <Callout construction>

@@ -6,7 +6,6 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 import { InfoIcon } from "../shared/uikitExports";
 import { useState } from "react";
-import Callout from "../ui/Callout";
 import { ProjectDefinition } from "../shared/entityDefinitions";
 
 type Props = {
@@ -28,14 +27,7 @@ export default function ProjectCardsList(props: Props) {
         </Button>
       </h2>
 
-      {infoCalloutExpanded && (
-        <Callout definition>
-          <ProjectDefinition />. You can read more detailed information about Projects in our
-          <Button href="/glossary" variant="tertiary" size="small" inline>
-            Glossary
-          </Button>
-        </Callout>
-      )}
+      {infoCalloutExpanded && <ProjectDefinition />}
 
       <div className={styles["projects-list"]}>
         {projects

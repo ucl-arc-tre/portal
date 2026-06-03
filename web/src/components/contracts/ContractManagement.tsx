@@ -7,7 +7,6 @@ import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, InfoIcon } from "@/components/shared/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
-import Callout from "../ui/Callout";
 import { ContractDefinition } from "../shared/entityDefinitions";
 
 type ContractManagementProps = {
@@ -55,11 +54,7 @@ export default function ContractManagement(props: ContractManagementProps) {
               Add Contract
             </Button>
           </div>
-          {calloutExpanded && (
-            <Callout definition>
-              <ContractDefinition />
-            </Callout>
-          )}
+          {calloutExpanded && <ContractDefinition />}
           {ContractSummary}
         </>
       ) : (

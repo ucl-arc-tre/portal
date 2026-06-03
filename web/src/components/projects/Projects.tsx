@@ -8,6 +8,7 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
+import { ProjectDefinition } from "../shared/entityDefinitions";
 
 type Props = {
   userData: Auth;
@@ -141,7 +142,7 @@ export default function Projects({ userData }: Props) {
       ) : projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t created any Projects yet</h2>
-
+          <ProjectDefinition />
           <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
             Create Your First Project
           </Button>
