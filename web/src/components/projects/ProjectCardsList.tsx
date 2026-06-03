@@ -3,10 +3,6 @@ import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
-import Button from "../ui/Button";
-import { InfoIcon } from "../shared/uikitExports";
-import { useState } from "react";
-import { ProjectDefinition } from "../shared/entityDefinitions";
 
 type Props = {
   projects: Project[];
@@ -14,21 +10,10 @@ type Props = {
 };
 
 export default function ProjectCardsList(props: Props) {
-  const { projects, isOpsStaff = false } = props;
-
-  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
+  const { projects } = props;
 
   return (
     <div className={styles["project-selection"]}>
-      <h2 className={styles["projects-heading"]}>
-        {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
-        <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
-          <InfoIcon />
-        </Button>
-      </h2>
-
-      {infoCalloutExpanded && <ProjectDefinition />}
-
       <div className={styles["projects-list"]}>
         {projects
           .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))
