@@ -18,7 +18,7 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
   return (
     <div className={styles["profile-summary-container"]}>
       <div className={styles.header}>
-        <h3 className={styles.title}>Profile Information</h3>
+        <h2>Profile Information</h2>
       </div>
 
       <div className={styles.content}>
