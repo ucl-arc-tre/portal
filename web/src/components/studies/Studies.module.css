@@ -1,0 +1,25 @@
+.studies-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 1rem 0;
+  position: relative;
+  padding-bottom: 0.8rem;
+}
+
+.studies-heading::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--form-purple--light), #0056b3);
+  margin-left: 0.4rem;
+}
+
+.container {
+  width: 55vw;
+  margin-top: 2rem;
+  margin-inline: 8vw;
+}

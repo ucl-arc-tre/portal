@@ -131,8 +131,6 @@ export default function IGOpsStudies() {
 
   return (
     <>
-      <h2>{tab === "pending" ? "Studies to Review" : "All Studies"}</h2>
-
       <div className={"tab-collection"}>
         <Button
           onClick={() => setTab("pending")}
