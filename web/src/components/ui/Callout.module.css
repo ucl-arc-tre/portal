@@ -5,7 +5,7 @@
   padding: 1.5rem;
   background-color: #f8f9fa;
   border-left: 4px solid #0066cc;
-  border-radius: 2px;
+  border-radius: var(--default-border-radius);
   margin-inline: 3vw;
 
   p {

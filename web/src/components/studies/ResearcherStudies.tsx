@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
-import StudyForm from "./study-form/StudyForm";
-import Button from "@/components/ui/Button";
 import Loading from "../ui/Loading";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -10,12 +8,17 @@ import { useAuth } from "@/hooks/useAuth";
 
 import styles from "./ResearcherStudies.module.css";
 
-export default function ResearcherStudies() {
+type Props = {
+  refreshToken: number;
+};
+
+export default function ResearcherStudies(props: Props) {
+  const { refreshToken } = props;
+
   const { userData } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
 
@@ -42,12 +45,7 @@ export default function ResearcherStudies() {
 
   useEffect(() => {
     fetchStudies();
-  }, []);
-
-  const onComplete = () => {
-    setIsFormOpen(false);
-    fetchStudies();
-  };
+  }, [refreshToken]);
 
   if (!userData) return null;
 
@@ -65,18 +63,6 @@ export default function ResearcherStudies() {
 
   return (
     <>
-      {isApprovedStaffResearcher && isFormOpen && (
-        <StudyForm username={userData.username} setIsFormOpen={setIsFormOpen} onComplete={onComplete} />
-      )}
-
-      {isApprovedStaffResearcher && process.env.NEXT_PUBLIC_ENABLE_STUDY_CREATION === "true" && (
-        <div className={styles["create-study-section"]}>
-          <Button onClick={() => setIsFormOpen(true)} size="large" data-cy="create-study-button">
-            Create New Study
-          </Button>
-        </div>
-      )}
-
       {studies.length === 0 && isApprovedStaffResearcher && (
         <div className={styles["no-studies-message"]}>
           <h2>No studies found</h2>

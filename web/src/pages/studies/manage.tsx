@@ -6,7 +6,6 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
 import ManageStudy from "@/components/studies/manage/ManageStudy";
-import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
@@ -148,8 +147,6 @@ export default function ManageStudyPage() {
           { title: study.title, url: `/studies/manage?studyId=${study.id}` },
         ]}
       />
-
-      <Title text={`Manage Study: ${study.title}`} centered />
 
       <div className="content">
         <ManageStudy study={study} fetchStudy={fetchStudy} />

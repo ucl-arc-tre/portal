@@ -3,12 +3,10 @@ import { useAuth } from "@/hooks/useAuth";
 import MetaHead from "@/components/meta/Head";
 import Studies from "@/components/studies/Studies";
 import Button from "@/components/ui/Button";
-import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 
 import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
-import { StudyDefinition } from "@/components/shared/entityDefinitions";
 
 export default function StudiesPage() {
   const { authInProgress, isAuthed, userData } = useAuth();
@@ -23,15 +21,6 @@ export default function StudiesPage() {
         title="Studies | ARC Services Portal"
         description="View and modify studies in the ARC Services Portal"
       />
-      <Title text={"Studies"} centered />
-
-      <Callout definition>
-        <StudyDefinition />
-        For more detailed information and an entity relationship diagram, look at our
-        <Button href="/glossary" variant="tertiary" size="small" inline>
-          Glossary
-        </Button>
-      </Callout>
 
       {process.env.NEXT_PUBLIC_ENABLE_STUDY_CREATION !== "true" && (
         <Callout construction>

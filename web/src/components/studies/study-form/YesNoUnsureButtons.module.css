@@ -13,12 +13,12 @@
 }
 
 .button-group button.yes {
-  border-radius: 5px 0 0 5px;
+  border-radius: var(--button-border-radius) 0 0 var(--button-border-radius);
   border-right: none;
 }
 
 .button-group button.no {
-  border-radius: 0 5px 5px 0;
+  border-radius: 0 var(--button-border-radius) var(--button-border-radius) 0;
   border-left: none;
 }
 
@@ -29,11 +29,11 @@
 }
 
 .button-group button.selected:nth-child(1) {
-  border-radius: 5px 0 0 5px;
+  border-radius: var(--button-border-radius) 0 0 var(--button-border-radius);
   border-right: none;
 }
 
 .button-group button.selected:nth-child(3) {
-  border-radius: 0 5px 5px 0;
+  border-radius: 0 var(--button-border-radius) var(--button-border-radius) 0;
   border-left: none;
 }

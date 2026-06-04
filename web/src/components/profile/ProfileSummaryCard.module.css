@@ -1,7 +1,7 @@
 .profile-summary-container {
   width: 100%;
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   padding: 1.5rem;
   margin: 1.5rem 0;
 }
@@ -11,13 +11,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-}
-
-.title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--foreground);
 }
 
 .username-change-link {
@@ -61,6 +54,7 @@
   gap: 0.5rem;
   flex: 1;
   min-width: 300px;
+  margin-right: 2rem;
 }
 
 .label {
@@ -97,7 +91,7 @@
 .edit-icon-button:focus {
   outline: 2px solid var(--form-purple--light);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
 }
 
 .roles {

@@ -2,7 +2,7 @@
   text-align: center;
   padding: 3rem 2rem;
   background: #f8f9fa;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   margin: 2rem 0;
 }
 

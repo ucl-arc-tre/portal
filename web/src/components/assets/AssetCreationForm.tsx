@@ -132,7 +132,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       <h2>{editingAsset ? "Edit Asset" : "Create New Asset"}</h2>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="form">
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="title">Title *</Label>
           <input
             id="title"
@@ -152,7 +152,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="description">Description *</Label>
           <textarea
             id="description"
@@ -172,7 +172,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="classification_impact">Classification Impact *</Label>
           <div className={styles["info-text"]}>
             <p>
@@ -209,7 +209,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         {showTierSelection && (
-          <div className={styles.field}>
+          <div className="field">
             <Label htmlFor="tier">Security Tier *</Label>
             <div className={styles["info-text"]}>
               <p>
@@ -245,7 +245,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </div>
         )}
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="protection">What protection is applied to this asset in the form described here? *</Label>
           <select
             id="protection"
@@ -285,7 +285,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="legal_basis">What is the legal basis for holding this asset? *</Label>
           <div className={styles["info-text"]}>
             <p>
@@ -341,7 +341,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="format">What format is the asset in? *</Label>
           <select
             id="format"
@@ -363,7 +363,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="has_expiry_date">Does this asset have a retention expiry date? *</Label>
           <div className={styles["radio-group"]}>
             <label className={styles["radio-label"]}>
@@ -397,7 +397,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         </div>
 
         {showExpiryDate && (
-          <div className={styles.field}>
+          <div className="field">
             <Label htmlFor="expires_at">What is the asset&apos;s retention expiry date? *</Label>
             <input
               id="expires_at"
@@ -416,7 +416,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </div>
         )}
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="location">
             Where will these files/items be saved/stored and how will they be moved? Select all of the touchpoints that
             are relevant including backups. *{" "}
@@ -453,7 +453,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="requires_contract">Does this asset require a contract? *</Label>
           <p>Answering yes will require you to add a contract document in a later step</p>
           <div className={styles["radio-group"]}>
@@ -488,7 +488,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="has_dspt">
             Is this information provided under condition of there being an up to date Data Security & Protection Toolkit
             in place at the organisation? *
@@ -525,7 +525,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="stored_outside_uk_eea">
             Is this asset stored or processed outside of the UK and the European Economic Area at all? *
           </Label>
@@ -561,7 +561,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className={styles.field}>
+        <div className="field">
           <Label htmlFor="status">Status *</Label>
           <select
             id="status"

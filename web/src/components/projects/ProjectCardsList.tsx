@@ -10,12 +10,10 @@ type Props = {
 };
 
 export default function ProjectCardsList(props: Props) {
-  const { projects, isOpsStaff = false } = props;
+  const { projects } = props;
 
   return (
     <div className={styles["project-selection"]}>
-      <h2 className={styles["projects-heading"]}>{isOpsStaff ? "All Projects pending review" : "Your Projects"}</h2>
-
       <div className={styles["projects-list"]}>
         {projects
           .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at))

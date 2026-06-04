@@ -4,8 +4,19 @@
   padding: 2rem;
 }
 
-.section-title {
-  margin-bottom: 1rem;
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 2rem;
+
+  h2 {
+    padding-top: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+  }
 }
 
 .not-approved-section {
@@ -14,7 +25,7 @@
   padding: 2rem;
   text-align: center;
   background: #f8f9fa;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   border: 1px solid #e1e5e9;
 }
 
@@ -38,9 +49,7 @@
   display: grid;
   grid-template-columns: 150px 1fr;
   gap: 1rem;
-  margin-bottom: 1rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .field:last-child {
@@ -59,7 +68,7 @@
 .status {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   font-size: 0.875rem;
   font-weight: 500;
   background: #e3f2fd;
@@ -81,7 +90,7 @@
   margin-bottom: 0.75rem;
   background: #f8f9fa;
   border: 1px solid #e1e5e9;
-  border-radius: 6px;
+  border-radius: var(--default-border-radius);
   transition: all 0.2s ease;
 }
 
@@ -110,8 +119,8 @@
   display: inline-block;
   padding: 0.25rem 0.75rem;
   background: var(--form-purple--light);
-  color: white;
-  border-radius: 12px;
+  color: white !important;
+  border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: capitalize;
@@ -129,7 +138,7 @@
   margin-bottom: 1rem;
   background: #f8f9fa;
   border: 1px solid #e1e5e9;
-  border-radius: 6px;
+  border-radius: var(--default-border-radius);
   transition: all 0.2s ease;
 }
 
@@ -159,8 +168,8 @@
   display: inline-block;
   padding: 0.2rem 0.6rem;
   background: var(--form-purple--light);
-  color: white;
-  border-radius: 4px;
+  color: white !important;
+  border-radius: var(--default-border-radius);
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -172,7 +181,7 @@
   padding: 1rem;
   text-align: center;
   background: #f8f9fa;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
 }
 
 .approval-section {
@@ -181,7 +190,7 @@
   text-align: center;
   background: #e9ecef;
   border: 1px solid #e1e5e9;
-  border-radius: 6px;
+  border-radius: var(--default-border-radius);
 }
 
 .approval-section h2 {

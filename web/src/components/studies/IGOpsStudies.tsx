@@ -8,7 +8,13 @@ import Loading from "../ui/Loading";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Search from "../ui/Search";
 
-export default function IGOpsStudies() {
+type Props = {
+  refreshToken: number;
+};
+
+export default function IGOpsStudies(props: Props) {
+  const { refreshToken } = props;
+
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
   const [studies, setStudies] = useState<Study[]>([]);
@@ -125,14 +131,12 @@ export default function IGOpsStudies() {
 
   useEffect(() => {
     fetchStudies();
-  }, [tab]);
+  }, [tab, refreshToken]);
 
   const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
 
   return (
     <>
-      <h2>{tab === "pending" ? "Studies to Review" : "All Studies"}</h2>
-
       <div className={"tab-collection"}>
         <Button
           onClick={() => setTab("pending")}

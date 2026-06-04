@@ -8,6 +8,8 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
+import { ProjectDefinition } from "../shared/entityDefinitions";
+import { InfoIcon } from "../shared/uikitExports";
 
 type Props = {
   userData: Auth;
@@ -20,6 +22,7 @@ export default function Projects({ userData }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
+  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
   const isApprovedStaffResearcher = !!userData?.roles?.includes("approved-staff-researcher");
   const isOpsStaff = !!userData?.roles?.includes("tre-ops-staff");
@@ -105,7 +108,33 @@ export default function Projects({ userData }: Props) {
   }
 
   return (
-    <>
+    <div className={styles.container}>
+      {projects.length > 0 && (
+        <>
+          <div className={styles.header}>
+            <h2>
+              {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
+              <Button
+                onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+                variant="tertiary"
+                size="small"
+                inline
+              >
+                <InfoIcon />
+              </Button>
+            </h2>
+            {isApprovedStaffResearcher && projects.length > 0 && (
+              <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
+                Create Project
+              </Button>
+            )}
+          </div>
+          <div className={styles.line}></div>
+        </>
+      )}
+
+      {infoCalloutExpanded && <ProjectDefinition />}
+
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
           <h2>UCL Staff Only</h2>
@@ -141,24 +170,14 @@ export default function Projects({ userData }: Props) {
       ) : projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t created any Projects yet</h2>
-
+          <ProjectDefinition />
           <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
             Create Your First Project
           </Button>
         </div>
       ) : (
-        <>
-          {!isOpsStaff && (
-            <div className={styles["create-project-section"]}>
-              <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
-                Create New Project
-              </Button>
-            </div>
-          )}
-
-          <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} />
-        </>
+        <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} />
       )}
-    </>
+    </div>
   );
 }

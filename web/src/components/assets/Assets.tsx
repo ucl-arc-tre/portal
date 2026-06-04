@@ -8,7 +8,6 @@ import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
-import Callout from "../ui/Callout";
 import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
 import Box from "../ui/Box";
 import { AssetDefinition } from "../shared/entityDefinitions";
@@ -26,7 +25,7 @@ export default function Assets(props: AssetsProps) {
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
     (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
     false;
-  const [calloutExpanded, setCalloutExpanded] = useState(false);
+  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
@@ -62,13 +61,18 @@ export default function Assets(props: AssetsProps) {
         <div className={styles.header}>
           <h3>
             Asset Management{" "}
-            <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
-              <InfoIcon className={styles.icon} />
+            <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
+              <InfoIcon />
             </Button>
           </h3>
           {canModify && assets.length > 0 && (
             <>
-              <Button onClick={() => setShowAssetForm(!showAssetForm)} variant="secondary" data-cy="add-asset-button">
+              <Button
+                onClick={() => setShowAssetForm(!showAssetForm)}
+                variant="secondary"
+                size="small"
+                data-cy="add-asset-button"
+              >
                 {showAssetForm ? "Cancel" : "Add Asset"}
               </Button>
 
@@ -84,28 +88,7 @@ export default function Assets(props: AssetsProps) {
           </Alert>
         )}
 
-        {calloutExpanded && (
-          <Callout definition>
-            <div className={styles["callout-info-paragraph"]}>
-              <AssetDefinition />
-            </div>
-
-            <div className={styles["callout-glossary-section"]}>
-              You can read more detailed information about Assets in our
-              <Button href="/glossary" variant="tertiary" size="small" inline>
-                Glossary
-              </Button>
-              and the{" "}
-              <a
-                href="http://www.nationalarchives.gov.uk/documents/information-management/information-assets-factsheet.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                The National Archives guide on information assets.
-              </a>
-            </div>
-          </Callout>
-        )}
+        {infoCalloutExpanded && <AssetDefinition />}
 
         {assets.length === 0 && canModify ? (
           <div>

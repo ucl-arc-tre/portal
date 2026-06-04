@@ -10,7 +10,6 @@ import type { ThemeType } from "uikit-react-public";
 const ThemeContextProvider = dynamic(() => import("uikit-react-public").then((mod) => mod.ThemeContextProvider), {
   ssr: false,
 });
-
 export default function App({ Component, pageProps }: AppProps) {
   // currently a workaround way to load the theme;
   // it can't be imported as a variable for the same reason the components can't be imported (unclear)
@@ -27,14 +26,16 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <AuthProvider>
-      <MetaHead title="ARC Services Portal | UCL" description="ARC Services Portal" />
+    lightTheme && (
+      <AuthProvider>
+        <MetaHead title="ARC Services Portal | UCL" description="ARC Services Portal" />
 
-      <ThemeContextProvider initialTheme={lightTheme}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeContextProvider>
-    </AuthProvider>
+        <ThemeContextProvider initialTheme={lightTheme}>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeContextProvider>
+      </AuthProvider>
+    )
   );
 }

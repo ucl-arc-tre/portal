@@ -7,7 +7,6 @@ import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, InfoIcon } from "@/components/shared/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
-import Callout from "../ui/Callout";
 import { ContractDefinition } from "../shared/entityDefinitions";
 
 type ContractManagementProps = {
@@ -51,15 +50,11 @@ export default function ContractManagement(props: ContractManagementProps) {
                 <InfoIcon className={styles.icon} />
               </Button>
             </h3>
-            <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="add-contract">
+            <Button onClick={() => setShowUploadModal(true)} variant="secondary" size="small" cy="add-contract">
               Add Contract
             </Button>
           </div>
-          {calloutExpanded && (
-            <Callout definition>
-              <ContractDefinition />
-            </Callout>
-          )}
+          {calloutExpanded && <ContractDefinition />}
           {ContractSummary}
         </>
       ) : (

@@ -9,6 +9,7 @@ import { storageDefinitions } from "../../shared/storageDefinitions";
 
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
+import Box from "@/components/ui/Box";
 
 type StudyOverviewProps = {
   study: Study;
@@ -85,7 +86,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   };
 
   return (
-    <>
+    <Box>
       {isFormOpen && userData && (
         <StudyForm
           username={userData.username}
@@ -117,34 +118,34 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         </Alert>
       )}
 
-      {isStudyOwnerOrAdmin && (
-        <div className={styles["study-actions"]}>
+      <div className={styles["header"]}>
+        <h2>Study: {study.title}</h2>
+        {isStudyOwnerOrAdmin && (
           <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
             Edit Study
           </Button>
-
-          {canRequestReview && (
-            <>
-              {study.approval_status !== "Pending" ? (
-                <Button
-                  onClick={handleMarkReadyForReview}
-                  disabled={isSubmittingReview || hasUnagreedAdmins}
-                  size="small"
-                  data-cy="study-ready-for-review-button"
-                >
-                  {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
-                </Button>
-              ) : (
-                <Button disabled size="small">
-                  Submitted for Review
-                </Button>
-              )}
-            </>
-          )}
-        </div>
-      )}
+        )}
+        {canRequestReview && (
+          <>
+            {study.approval_status !== "Pending" ? (
+              <Button
+                onClick={handleMarkReadyForReview}
+                disabled={isSubmittingReview || hasUnagreedAdmins}
+                size="small"
+                data-cy="study-ready-for-review-button"
+              >
+                {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
+              </Button>
+            ) : (
+              <Button disabled size="small">
+                Submitted for Review
+              </Button>
+            )}
+          </>
+        )}
+      </div>
 
       <StudyDetails study={study} riskScore={riskScore} />
-    </>
+    </Box>
   );
 }

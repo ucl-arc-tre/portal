@@ -20,7 +20,7 @@
   color: #6c757d;
   padding: 12px;
   border: 1px solid #dee2e6;
-  border-radius: 2px;
+  border-radius: var(--default-border-radius);
   background-color: #f8f9fa;
   margin-bottom: 16px;
   text-align: center;
@@ -53,14 +53,10 @@
   background: var(--form-purple--light);
   color: white;
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: 1rem;
   font-size: 0.75rem;
   min-width: 1.5rem;
   text-align: center;
-}
-
-.callout-info-paragraph {
-  margin-bottom: 1rem;
 }
 
 .callout-glossary-section {

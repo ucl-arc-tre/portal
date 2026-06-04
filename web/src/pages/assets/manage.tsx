@@ -29,6 +29,7 @@ import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports";
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
+import Box from "@/components/ui/Box";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -189,34 +190,29 @@ export default function ManageAssetPage() {
       />
 
       <div className="content">
-        <div className={styles.header}>
-          <Title text={`Manage Asset: ${asset.title}`} />
-
-          {canModify && (
-            <div className={styles["header-actions"]}>
-              <Button onClick={() => setShowEditModal(true)} variant="primary" cy="asset-edit">
-                Edit
-              </Button>
-              <Button onClick={() => setShowDeleteModal(true)} variant="primary-destructive" cy="asset-delete">
-                Delete
-              </Button>
-            </div>
-          )}
-        </div>
-
         {expiryUrgency && (
           <div className={styles["expiry-warning"]}>
             <ExpiryWarning expiryUrgency={expiryUrgency} entityName="asset" />
           </div>
         )}
 
-        <div className={styles["asset-info"]}>
+        <Box>
+          <div className={styles.header}>
+            <h2>Asset: {asset.title}</h2>
+
+            {canModify && (
+              <div className={styles["header-actions"]}>
+                <Button onClick={() => setShowEditModal(true)} variant="secondary" cy="asset-edit">
+                  Edit
+                </Button>
+                <Button onClick={() => setShowDeleteModal(true)} variant="secondary-destructive" cy="asset-delete">
+                  Delete
+                </Button>
+              </div>
+            )}
+          </div>
+
           <div className={styles.section}>
-            <h3>Asset Details</h3>
-            <div className={styles.field}>
-              <label>Title:</label>
-              <span>{asset.title}</span>
-            </div>
             <div className={styles.field}>
               <label>Description:</label>
               <span>{asset.description}</span>
@@ -286,7 +282,7 @@ export default function ManageAssetPage() {
               </div>
             )}
           </div>
-        </div>
+        </Box>
 
         {showEditModal && (
           <AssetCreationForm

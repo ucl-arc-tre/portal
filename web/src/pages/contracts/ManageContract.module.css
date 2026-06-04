@@ -4,6 +4,26 @@
   padding: 1rem;
 }
 
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 2rem;
+
+  h2 {
+    padding-top: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
 .info {
   margin-top: 1rem;
   display: flex;
@@ -14,7 +34,7 @@
 .section {
   background: #f8f9fa;
   padding: 1.5rem;
-  border-radius: 4px;
+  border-radius: var(--default-border-radius);
   border: 1px solid #e9ecef;
 }
 
@@ -39,22 +59,6 @@
 
 .field span {
   color: #212529;
-}
-
-.header {
-  display: flex;
-  gap: 0.5rem;
-  padding-top: 1rem;
-
-  button {
-    margin-left: auto;
-  }
-}
-
-.header-actions {
-  display: flex;
-  gap: 1rem;
-  margin-left: auto;
 }
 
 @media (width >=768px) {
