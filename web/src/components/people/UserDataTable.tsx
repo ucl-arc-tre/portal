@@ -10,13 +10,13 @@ import ChosenNameForm from "./ChosenNameForm";
 import { convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind } from "../shared/exports";
 
 type Props = {
-  canEdit: boolean;
+  canEditTraining: boolean;
   users: Array<UserData>;
   setUsers: (users: Array<UserData>) => void;
   isLoading: boolean;
 };
 export default function UserDataTable(Props: Props) {
-  const { canEdit, users, setUsers, isLoading } = Props;
+  const { canEditTraining, users, setUsers, isLoading } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
   const [chosenNameDialogOpen, setChosenNameDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -113,7 +113,7 @@ export default function UserDataTable(Props: Props) {
               <td className={styles.chosenName}>
                 <div className={styles.chosenNameContainer}>
                   <div>{userData.chosen_name || <em>Not set</em>}</div>
-                  {canEdit && (
+                  {canEditTraining && (
                     <Button
                       variant="tertiary"
                       size="small"
@@ -163,7 +163,7 @@ export default function UserDataTable(Props: Props) {
                     </div>
                   ))}{" "}
                 </div>
-                {canEdit && (
+                {canEditTraining && (
                   <Button
                     variant="tertiary"
                     size="small"

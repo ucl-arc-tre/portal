@@ -64,7 +64,7 @@ export default function Nav() {
 
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGOpsStaff;
   const canSeeProjects = isApprovedResearcher || isTreOpsStaff || isAdmin;
-  const canSeePeople = isIAO || isTreOpsStaff || isAdmin;
+  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGOpsStaff;
   const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;
   const canSeeMetrics = isAdmin || isIGOpsStaff;
 
