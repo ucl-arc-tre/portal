@@ -8,6 +8,7 @@ import { storageDefinitions } from "@/components/shared/storageDefinitions";
 import styles from "./AssetCreationForm.module.css";
 import { Alert, AlertMessage, Label } from "../shared/uikitExports";
 import { Asset } from "@/openapi";
+import InfoTooltip from "../ui/InfoTooltip";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
@@ -442,6 +443,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   className={styles.checkbox}
                 />
                 {storage.name}
+                <InfoTooltip text={storage.definition} />
               </label>
             ))}
           </div>
