@@ -1,6 +1,7 @@
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
 import styles from "./GlossaryPage.module.css";
+import Callout from "@/components/ui/Callout";
 
 export default function GlossaryPage() {
   return (
@@ -10,6 +11,8 @@ export default function GlossaryPage() {
         description="Definitions and diagrams for terminology used in the ARC Services Portal"
       />
       <Title text={"Glossary"} centered description={" Below is a basic diagram of how our entities are related"} />
+
+      <Callout construction />
 
       <img
         src={"/entity_diagram.drawio.svg"}
