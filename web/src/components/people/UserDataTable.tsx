@@ -10,13 +10,13 @@ import ChosenNameForm from "./ChosenNameForm";
 import { convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind } from "../shared/exports";
 
 type Props = {
-  canEditTraining: boolean;
+  canEditTrainingOrName: boolean;
   users: Array<UserData>;
   setUsers: (users: Array<UserData>) => void;
   isLoading: boolean;
 };
 export default function UserDataTable(Props: Props) {
-  const { canEditTraining, users, setUsers, isLoading } = Props;
+  const { canEditTrainingOrName: canEditTraining, users, setUsers, isLoading } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
   const [chosenNameDialogOpen, setChosenNameDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");

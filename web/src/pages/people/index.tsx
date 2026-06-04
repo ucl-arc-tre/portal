@@ -150,7 +150,7 @@ export default function PeoplePage() {
           <>
             <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
             <UserDataTable
-              canEditTraining={(isAdmin || isIGOps) ?? false}
+              canEditTrainingOrName={(isAdmin || isIGOps) ?? false}
               users={users}
               setUsers={setUsers}
               isLoading={isLoading}
