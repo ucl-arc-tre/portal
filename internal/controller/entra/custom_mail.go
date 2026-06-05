@@ -83,7 +83,7 @@ func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails
 
 	// set up the recipients
 	recipients := []graphmodels.Recipientable{}
-	for _, email := range emails {
+	for _, email := range unique(emails) {
 		recipient := graphmodels.NewRecipient()
 		emailAddress := graphmodels.NewEmailAddress()
 		emailAddress.SetAddress(&email)
