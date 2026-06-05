@@ -206,10 +206,7 @@ func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {
 		return false
 	}
 	daysUntilExpiry := DaysUntilTrainingExpiry(trainingRecord)
-	if daysUntilExpiry < -7 { // don't notify very expired training
-		return false
-	}
-	return daysUntilExpiry <= 1 || daysUntilExpiry == 7 || daysUntilExpiry == 14 || daysUntilExpiry == 21
+	return shouldNotifyExpiry(daysUntilExpiry)
 }
 
 func DaysUntilStudySignoffExpiry(study *types.Study) Days {
@@ -225,10 +222,7 @@ func ShouldNotifyStudySignoffExpiry(study *types.Study) bool {
 		return false
 	}
 	daysUntilExpiry := DaysUntilStudySignoffExpiry(study)
-	if daysUntilExpiry < -7 { // don't notify very expired studies
-		return false
-	}
-	return daysUntilExpiry <= 1 || daysUntilExpiry == 7 || daysUntilExpiry == 14
+	return shouldNotifyExpiry(daysUntilExpiry)
 }
 
 func DaysUntilContractExpiry(contract types.Contract) *int {
@@ -242,8 +236,31 @@ func ShouldNotifyContractExpiry(contract types.Contract) bool {
 	daysUntilExpiry := DaysUntilContractExpiry(contract)
 	if daysUntilExpiry == nil {
 		return false
-	} else if *daysUntilExpiry < -7 {
-		return false // don't notify very expired contracts
 	}
-	return *daysUntilExpiry <= 1 || *daysUntilExpiry == 7 || *daysUntilExpiry == 14 || *daysUntilExpiry == 30
+	return shouldNotifyExpiry(*daysUntilExpiry)
+}
+
+func DaysUntilAssetExpiry(asset types.Asset) *int {
+	if asset.ExpiresAt == nil {
+		return nil
+	}
+	return new(daysUntil(*asset.ExpiresAt))
+}
+
+func ShouldNotifyAssetExpiry(asset types.Asset) bool {
+	if asset.IsDestroyed() {
+		return false
+	}
+	daysUntilExpiry := DaysUntilAssetExpiry(asset)
+	if daysUntilExpiry == nil {
+		return false
+	}
+	return shouldNotifyExpiry(*daysUntilExpiry)
+}
+
+func shouldNotifyExpiry(daysUntilExpiry Days) bool {
+	if daysUntilExpiry < -7 {
+		return false // don't notify very expired
+	}
+	return daysUntilExpiry <= 1 || daysUntilExpiry == 7 || daysUntilExpiry == 14 || daysUntilExpiry == 21 || daysUntilExpiry == 30
 }

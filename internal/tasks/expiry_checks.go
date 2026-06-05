@@ -15,9 +15,43 @@ const (
 )
 
 func (m *Manager) scheduleDailyChecks() {
+	m.mustEvery(day, m.checkAssetsExpiry, "checkAssetsExpiry")
 	m.mustEvery(day, m.checkContractsExpiry, "checkContractsExpiry")
 	m.mustEvery(day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
 	m.mustEvery(day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
+}
+
+func (m *Manager) checkAssetsExpiry() error {
+	if !config.NotificationsEnabled() {
+		return nil
+	}
+
+	studies := []types.Study{}
+	result := m.db.Model(&types.Study{}).Preload("Owner").Preload("StudyAdmins.User").Preload("Assets").Find(&studies)
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get studies")
+	}
+
+	ctx := context.Background()
+
+	for _, study := range studies {
+		assetsShouldNotify := []types.Asset{}
+		for _, asset := range study.Assets {
+			if config.ShouldNotifyAssetExpiry(asset) {
+				assetsShouldNotify = append(assetsShouldNotify, asset)
+			}
+		}
+		if len(assetsShouldNotify) == 0 {
+			continue
+		}
+
+		log.Debug().Str("study", study.Title).Msg("Notifying assets expiry")
+		err := m.entra.SendAssetExpiryNotification(ctx, assetsShouldNotify, study)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (m *Manager) checkContractsExpiry() error {
@@ -35,18 +69,13 @@ func (m *Manager) checkContractsExpiry() error {
 
 	for _, study := range studies {
 
-		recipients := []string{string(study.Owner.Username)}
-		for _, studyAdmin := range study.StudyAdmins {
-			recipients = append(recipients, string(studyAdmin.User.Username))
-		}
-
 		contract := earliestExpringContractShouldNotifyExpiry(study)
 		if contract == nil {
 			continue
 		}
 
 		log.Debug().Str("study", study.Title).Str("contract", contract.Title).Msg("Notifying contract expiry")
-		err := m.entra.SendContractExpiryNotification(ctx, recipients, *contract, study)
+		err := m.entra.SendContractExpiryNotification(ctx, *contract, study)
 		if err != nil {
 			return err
 		}

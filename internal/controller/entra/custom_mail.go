@@ -143,7 +143,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 	return c.sendCustomEmail(ctx, subject, emails, content)
 }
 
-func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
+func (c *Controller) SendContractExpiryNotification(ctx context.Context, contract types.Contract, study types.Study) error {
 	days := config.DaysUntilContractExpiry(contract)
 	if days == nil {
 		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
@@ -160,7 +160,7 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, emails 
 	}
 
 	subject := "Notification: Study contract expiry"
-	return c.sendCustomEmail(ctx, subject, emails, content)
+	return c.sendCustomEmail(ctx, subject, study.NotificationRecipients(), content)
 }
 
 func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
@@ -205,4 +205,31 @@ func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, ema
 
 	subject := "Notification: Study attestation expiry"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
+}
+
+func (c *Controller) SendAssetExpiryNotification(ctx context.Context, assets []types.Asset, study types.Study) error {
+	if len(assets) == 0 {
+		return fmt.Errorf("Cannot notify asset expiry with no assets in [%s]", study.Title)
+	}
+
+	content := "There are assets in your Study '" + study.Title + "' that are close to expiring or have expired.\n"
+
+	for _, asset := range assets {
+		days := config.DaysUntilAssetExpiry(asset)
+		if days == nil {
+			log.Error().Str("study", study.Title).Msg("Attempted to send asset expiry notification with nil expiry")
+			continue
+		}
+		content += "- '" + asset.Title + "'"
+		if *days < 0 {
+			content += fmt.Sprintf(" expired %d days ago.\n", -(*days))
+		} else {
+			content += fmt.Sprintf(" expires in %d days.\n", *days)
+		}
+	}
+
+	content += "Please take action to extend the asset expiry, or delete the asset and update its status in the Portal to 'Destroyed'."
+
+	subject := "Notification: Asset expiry"
+	return c.sendCustomEmail(ctx, subject, study.NotificationRecipients(), content)
 }

@@ -1,10 +1,13 @@
 package types
 
 import (
-	"time"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-const (
-	day   = 24 * time.Hour
-	month = 30 * day
-)
+func TestAssetDestroyed(t *testing.T) {
+	assert.False(t, Asset{}.IsDestroyed())
+	assert.False(t, Asset{Status: AssetStatusActive}.IsDestroyed())
+	assert.True(t, Asset{Status: "destroyed"}.IsDestroyed())
+}
