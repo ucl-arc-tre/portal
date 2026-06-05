@@ -16,7 +16,7 @@ type Props = {
   isLoading: boolean;
 };
 export default function UserDataTable(Props: Props) {
-  const { canEditTrainingOrName: canEditTraining, users, setUsers, isLoading } = Props;
+  const { canEditTrainingOrName, users, setUsers, isLoading } = Props;
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
   const [chosenNameDialogOpen, setChosenNameDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -113,7 +113,7 @@ export default function UserDataTable(Props: Props) {
               <td className={styles.chosenName}>
                 <div className={styles.chosenNameContainer}>
                   <div>{userData.chosen_name || <em>Not set</em>}</div>
-                  {canEditTraining && (
+                  {canEditTrainingOrName && (
                     <Button
                       variant="tertiary"
                       size="small"
@@ -163,7 +163,7 @@ export default function UserDataTable(Props: Props) {
                     </div>
                   ))}{" "}
                 </div>
-                {canEditTraining && (
+                {canEditTrainingOrName && (
                   <Button
                     variant="tertiary"
                     size="small"
