@@ -212,7 +212,7 @@ func (c *Controller) SendAssetExpiryNotification(ctx context.Context, assets []t
 		return fmt.Errorf("Cannot notify asset expiry with no assets in [%s]", study.Title)
 	}
 
-	content := "There are assets in your Study '" + study.Title + "' that are close to expiring. "
+	content := "There are assets in your Study '" + study.Title + "' that are close to expiring or have expired.\n"
 
 	for _, asset := range assets {
 		days := config.DaysUntilAssetExpiry(asset)
@@ -228,7 +228,7 @@ func (c *Controller) SendAssetExpiryNotification(ctx context.Context, assets []t
 		}
 	}
 
-	content += "Please take action to extend the asset expiry."
+	content += "Please take action to extend the asset expiry, or delete the asset and update its status in the Portal to 'Destroyed'."
 
 	subject := "Notification: Asset expiry"
 	return c.sendCustomEmail(ctx, subject, study.NotificationRecipients(), content)
