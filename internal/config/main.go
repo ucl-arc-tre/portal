@@ -198,7 +198,7 @@ func ProcessIdentity() string {
 
 func DaysUntilTrainingExpiry(trainingRecord types.UserTrainingRecord) Days {
 	expiresAt := trainingRecord.CompletedAt.Add(TrainingValidity)
-	return int(time.Until(expiresAt).Hours() / 24)
+	return daysUntil(expiresAt)
 }
 
 func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {
@@ -217,7 +217,7 @@ func DaysUntilStudySignoffExpiry(study *types.Study) Days {
 		log.Warn().Msg("nil study or lastSignoff - no days until expiry")
 		return 0
 	}
-	return int(time.Until(study.LastSignoff.Add(StudySignoffValidity)).Hours() / 24)
+	return daysUntil(study.LastSignoff.Add(StudySignoffValidity))
 }
 
 func ShouldNotifyStudySignoffExpiry(study *types.Study) bool {
@@ -235,8 +235,7 @@ func DaysUntilContractExpiry(contract types.Contract) *int {
 	if contract.ExpiryDate == nil {
 		return nil
 	}
-	expiryDays := int(time.Until(*contract.ExpiryDate).Hours() / 24)
-	return &expiryDays
+	return new(daysUntil(*contract.ExpiryDate))
 }
 
 func ShouldNotifyContractExpiry(contract types.Contract) bool {
