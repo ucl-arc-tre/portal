@@ -10,9 +10,10 @@ export default function GlossaryPage() {
         title="Glossary | ARC Services Portal"
         description="Definitions and diagrams for terminology used in the ARC Services Portal"
       />
-      <Title text={"Glossary"} centered description={" Below is a basic diagram of how our entities are related"} />
 
       <Callout construction />
+
+      <Title text={"Glossary"} centered description={" Below is a basic diagram of how our entities are related"} />
 
       <img
         src={"/entity_diagram.drawio.svg"}

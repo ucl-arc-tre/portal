@@ -36,7 +36,7 @@ export default function PeoplePage() {
   const isIAO = userData?.roles.includes("information-asset-owner");
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff");
-  const canSearch = isTreOpsStaff || isAdmin || isIGOps || isDSHOpsStaff;
+  const canSearch = isTreOpsStaff || isAdmin || isIGOps || isDSHOpsStaff || isIGOps;
 
   const handleUserSearch = async (query: string) => {
     setIsLoading(true);
@@ -92,13 +92,15 @@ export default function PeoplePage() {
         title="People | ARC Services Portal"
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
+      <Callout construction />
+
       <Title
         text={"People"}
         centered
         description={
           isAdmin
             ? "View and manage portal users, including adding via invitation or upload"
-            : isTreOpsStaff || isDSHOpsStaff
+            : isTreOpsStaff || isDSHOpsStaff || isIGOps
               ? "View approved researchers"
               : isIAO
                 ? "View users in your projects or invite a collaborator"
@@ -133,8 +135,6 @@ export default function PeoplePage() {
         </Alert>
       )}
 
-      <Callout construction />
-
       {canSearch &&
         searchTerm.length > 0 &&
         !searchErrorMessage &&
@@ -149,7 +149,12 @@ export default function PeoplePage() {
         ) : (
           <>
             <h3 className={styles["results-heading"]}>Results for &ldquo;{searchTerm}&rdquo;</h3>
-            <UserDataTable canEdit={isAdmin!} users={users} setUsers={setUsers} isLoading={isLoading} />
+            <UserDataTable
+              canEditTrainingOrName={(isAdmin || isIGOps) ?? false}
+              users={users}
+              setUsers={setUsers}
+              isLoading={isLoading}
+            />
           </>
         ))}
     </>
