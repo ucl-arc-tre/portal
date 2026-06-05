@@ -40,7 +40,7 @@ func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, email stri
 	panic("not implemented")
 }
 
-func (m *MockEntra) SendContractExpiryNotification(ctx context.Context, emails []string, contract types.Contract, study types.Study) error {
+func (m *MockEntra) SendContractExpiryNotification(ctx context.Context, contract types.Contract, study types.Study) error {
 	panic("not implemented")
 }
 
@@ -58,5 +58,9 @@ func (m *MockEntra) SendIaaAssignmentNotification(ctx context.Context, email str
 }
 
 func (m *MockEntra) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
+	panic("not implemented")
+}
+
+func (m *MockEntra) SendAssetExpiryNotification(ctx context.Context, assets []types.Asset, study types.Study) error {
 	panic("not implemented")
 }

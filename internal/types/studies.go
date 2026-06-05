@@ -61,6 +61,14 @@ func (s Study) AdminUsernames() []string {
 	return usernames
 }
 
+func (s Study) NotificationRecipients() []string {
+	recipients := []string{string(s.Owner.Username)}
+	for _, studyAdmin := range s.StudyAdmins {
+		recipients = append(recipients, string(studyAdmin.User.Username))
+	}
+	return recipients
+}
+
 type StudyAdmin struct {
 	ModelAuditable
 	StudyID uuid.UUID `gorm:"not null;index"`
@@ -75,6 +83,14 @@ func (s StudyAdmin) IsDeleted() bool {
 	return s.DeletedAt.Valid
 }
 
+type AssetStatus = string
+
+const (
+	AssetStatusActive    = "active"
+	AssetStatusAwaiting  = "awaiting"
+	AssetStatusDestroyed = "destroyed"
+)
+
 type Asset struct {
 	ModelAuditable
 	CreatorUserID        uuid.UUID `gorm:"not null;index"`
@@ -87,10 +103,10 @@ type Asset struct {
 	LegalBasis           string    `gorm:"not null"`
 	Format               string    `gorm:"not null"`
 	ExpiresAt            *time.Time
-	RequiresContract     bool   `gorm:"not null;default:false"`
-	HasDspt              bool   `gorm:"not null;default:false"`
-	StoredOutsideUkEea   bool   `gorm:"not null;default:false"`
-	Status               string `gorm:"not null"`
+	RequiresContract     bool        `gorm:"not null;default:false"`
+	HasDspt              bool        `gorm:"not null;default:false"`
+	StoredOutsideUkEea   bool        `gorm:"not null;default:false"`
+	Status               AssetStatus `gorm:"not null"`
 
 	// Relationships
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
@@ -105,6 +121,10 @@ func (a Asset) LocationStrings() []string {
 		locationsStrings = append(locationsStrings, location.Location)
 	}
 	return locationsStrings
+}
+
+func (a Asset) IsDestroyed() bool {
+	return a.Status == AssetStatusDestroyed
 }
 
 type AssetLocation struct {
