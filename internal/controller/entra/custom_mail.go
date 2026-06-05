@@ -208,6 +208,10 @@ func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, ema
 }
 
 func (c *Controller) SendAssetExpiryNotification(ctx context.Context, assets []types.Asset, study types.Study) error {
+	if len(assets) == 0 {
+		return fmt.Errorf("Cannot notify asset expiry with no assets in [%s]", study.Title)
+	}
+
 	content := "There are assets in your Study '" + study.Title + "' that are close to expiring. "
 
 	for _, asset := range assets {
