@@ -45,6 +45,7 @@ func (m *Manager) mustEvery(delay time.Duration, function func() error, name str
 	job, err := m.scheduler.NewJob(
 		gocron.DurationJob(delay),
 		gocron.NewTask(function),
+		// gocron.WithStartAt(gocron.WithStartDateTime(time.Now().Add(1*time.Minute))), // comment in for debug
 		gocron.WithStartAt(gocron.WithStartDateTime(timeBoundary(delay))),
 		gocron.WithName(name),
 		gocron.WithSingletonMode(gocron.LimitModeReschedule), // prevent parallel execution

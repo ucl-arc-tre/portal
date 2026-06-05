@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -43,11 +44,12 @@ func (m *Manager) checkContractsExpiry() error {
 		if contract == nil {
 			continue
 		}
+
+		log.Debug().Str("study", study.Title).Str("contract", contract.Title).Msg("Notifying contract expiry")
 		err := m.entra.SendContractExpiryNotification(ctx, recipients, *contract, study)
 		if err != nil {
 			return err
 		}
-
 	}
 
 	return nil
@@ -87,17 +89,16 @@ func (m *Manager) checkTrainingCertificatesExpiry() error {
 	}
 
 	for _, trainingRecord := range trainingRecords {
-		recipient := string(trainingRecord.User.Username)
-
 		if !config.ShouldNotifyTrainingExpiry(trainingRecord) {
 			continue
 		}
 
+		recipient := string(trainingRecord.User.Username)
+		log.Debug().Any("username", recipient).Msg("Notifying training expiry")
 		err := m.entra.SendTrainingExpiryNotification(ctx, recipient, trainingRecord)
 		if err != nil {
 			return err
 		}
-
 	}
 
 	return nil
@@ -121,6 +122,7 @@ func (m *Manager) checkStudySignoffExpiry() error {
 			continue
 		}
 
+		log.Debug().Str("study", study.Title).Any("owner", study.Owner.Username).Msg("Notifying study signoff")
 		err := m.entra.SendStudySignoffExpiryNotification(ctx, string(study.Owner.Username), study)
 		if err != nil {
 			return err
