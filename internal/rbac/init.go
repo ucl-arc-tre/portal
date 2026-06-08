@@ -99,6 +99,8 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id/training", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id/attributes", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/metrics", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/users/invite", Action: WriteAction},
+
 		Policy{RoleName: IGOpsStaff, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},
