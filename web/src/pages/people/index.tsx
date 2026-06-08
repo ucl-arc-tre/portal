@@ -107,7 +107,7 @@ export default function PeoplePage() {
                 : "You do not have permission to view this page"
         }
       />
-      {(isAdmin || isIAO) && (
+      {(isAdmin || isIAO || isIGOps) && (
         <div className={styles["button-container"]}>
           {isAdmin && <ApprovedResearcherImport />}
           <ExternalInvite />
