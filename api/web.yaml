@@ -2074,6 +2074,10 @@ components:
           type: string
           description: Contract expiry date in YYYY-MM-DD format
           example: "2025-12-31"
+        retention_period:
+          type: string
+          description: Contract retention period after end date
+          example: "10 years"
         asset_ids:
           type: array
           description: List of assets associated with this contract

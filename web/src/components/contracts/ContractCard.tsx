@@ -62,6 +62,10 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
           <span className={styles.label}>Expiry Date: </span>
           <span className={styles.value}>{contract.expiry_date ? formatDate(contract.expiry_date) : "None"}</span>
         </div>
+        <div className={styles["detail-item"]}>
+          <span className={styles.label}>Retention Period: </span>
+          <span className={styles.value}>{contract.retention_period || "None"}</span>
+        </div>
 
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Uploaded: </span>
