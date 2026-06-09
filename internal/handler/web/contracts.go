@@ -239,7 +239,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		AssetIds:              []string{},
 		StartDate:             openapi.FormatOptionalDate(contract.StartDate),
 		ExpiryDate:            openapi.FormatOptionalDate(contract.ExpiryDate),
-		RetentionPeriod:       contract.RetentionPeriod,
+		RetentionEndDate:      openapi.FormatOptionalDate(contract.RetentionEndDate),
 	}
 	for _, asset := range contract.Assets {
 		data.AssetIds = append(data.AssetIds, asset.ID.String())

@@ -674,8 +674,8 @@ type Contract struct {
 	// OtherSignatories Other signatories to the contract. Could be name(s) or email(s)
 	OtherSignatories *string `json:"other_signatories,omitempty"`
 
-	// RetentionPeriod Contract retention period after end date
-	RetentionPeriod *string `json:"retention_period,omitempty"`
+	// RetentionEndDate Contract retention end date in YYYY-MM-DD format
+	RetentionEndDate *string `json:"retention_end_date,omitempty"`
 
 	// StartDate Contract start date in YYYY-MM-DD format
 	StartDate *string `json:"start_date,omitempty"`
@@ -713,8 +713,8 @@ type ContractBase struct {
 	// OtherSignatories Other signatories to the contract. Could be name(s) or email(s)
 	OtherSignatories *string `json:"other_signatories,omitempty"`
 
-	// RetentionPeriod Contract retention period after end date
-	RetentionPeriod *string `json:"retention_period,omitempty"`
+	// RetentionEndDate Contract retention end date in YYYY-MM-DD format
+	RetentionEndDate *string `json:"retention_end_date,omitempty"`
 
 	// StartDate Contract start date in YYYY-MM-DD format
 	StartDate *string `json:"start_date,omitempty"`

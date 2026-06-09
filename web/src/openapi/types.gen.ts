@@ -631,9 +631,9 @@ export type ContractBase = {
      */
     expiry_date?: string;
     /**
-     * Contract retention period after end date
+     * Contract retention end date in YYYY-MM-DD format
      */
-    retention_period?: string;
+    retention_end_date?: string;
     /**
      * List of assets associated with this contract
      */

@@ -21,7 +21,8 @@ type ContractFormData = {
   organisationSignatory: string;
   thirdPartyName: string;
   otherSignatories: string | undefined;
-  status: "proposed" | "active" | "expired";
+  status: "proposed" | "active" | "expired" | "closed";
+  retentionEndDate: string;
   startDate: string;
   expiryDate: string;
   assets: { value: string }[];
@@ -92,6 +93,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         status: editingContract.status,
         startDate: editingContract.start_date,
         expiryDate: editingContract.expiry_date,
+        retentionEndDate: editingContract.retention_end_date,
         assets: editingContract.asset_ids.map((id) => ({ value: id })),
       });
     } else {
@@ -102,6 +104,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
+        retentionEndDate: "",
         otherSignatories: undefined,
         assets: [],
       });
@@ -178,6 +181,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
+      retention_end_date: formData.retentionEndDate,
       other_signatories: formData.otherSignatories,
       asset_ids: formData.assets.map((asset) => asset.value).filter((id) => id !== "") as string[],
     };
@@ -356,6 +360,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               <option value="proposed">Proposed</option>
               <option value="active">Active</option>
               <option value="expired">Expired</option>
+              <option value="closed">Closed</option>
             </select>
             {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
           </div>
@@ -384,6 +389,17 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
             />
             {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
+          </div>
+
+          <div className={styles["form-group"]}>
+            <Label htmlFor="retentionEndDate">Retention Period End Date</Label>
+            <input
+              id="retentionEndDate"
+              type="date"
+              {...register("retentionEndDate", {})}
+              className={styles["form-input"]}
+            />{" "}
+            {errors.retentionEndDate && <span className={styles["form-error"]}>{errors.retentionEndDate.message}</span>}
           </div>
         </div>
 

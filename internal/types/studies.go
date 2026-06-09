@@ -148,7 +148,7 @@ type Contract struct {
 	Status           string  // proposed, active, expired, closed
 	StartDate        *time.Time
 	ExpiryDate       *time.Time
-	RetentionPeriod  *string // free text: e.g. "10 years", "6 months"
+	RetentionEndDate *time.Time // free text: e.g. "10 years", "6 months"
 
 	// Relationships
 	Study         Study                    `gorm:"foreignKey:StudyID"`
