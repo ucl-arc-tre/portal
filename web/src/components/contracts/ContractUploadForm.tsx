@@ -399,6 +399,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               {...register("retentionEndDate", {})}
               className={styles["form-input"]}
             />{" "}
+            <HelperText>
+              This is the date until when you are required to keep the contract. eg. if the period is 5 years, enter the
+              date 5 years from the expiry date
+            </HelperText>
             {errors.retentionEndDate && <span className={styles["form-error"]}>{errors.retentionEndDate.message}</span>}
           </div>
         </div>
