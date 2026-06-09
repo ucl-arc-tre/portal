@@ -87,17 +87,16 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
         </Label>
 
         <Label>
-          Additional Study Administrators (optional):
+          Additional Study Administrator (optional):
           <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
-              Add UCL staff members who will help administrate this study. <strong>Must</strong> be valid UCL staff
+              Add a UCL staff members who will help administrate this study. <strong>Must</strong> be valid UCL staff
               usernames.
             </HelperText>
 
             {fields.map((field, index) => (
               <div key={field.id} className={styles["admin-wrapper"]}>
                 <Label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
-                  Administrator {index + 1}:
                   <Controller
                     name={`additionalStudyAdminUsernames.${index}.value` as const}
                     control={control}
@@ -156,16 +155,18 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
               </div>
             ))}
 
-            <Button
-              type="button"
-              variant="secondary"
-              size="small"
-              onClick={() => append({ value: "" })}
-              style={{ marginTop: "0.5rem" }}
-              data-cy="add-study-admin-button"
-            >
-              Add Administrator
-            </Button>
+            {getValues(`additionalStudyAdminUsernames`).length < 1 && (
+              <Button
+                type="button"
+                variant="secondary"
+                size="small"
+                onClick={() => append({ value: "" })}
+                style={{ marginTop: "0.5rem" }}
+                data-cy="add-study-admin-button"
+              >
+                Add Administrator
+              </Button>
+            )}
           </fieldset>
         </Label>
 
