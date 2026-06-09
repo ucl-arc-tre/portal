@@ -21,7 +21,7 @@ type ContractFormData = {
   organisationSignatory: string;
   thirdPartyName: string;
   otherSignatories: string | undefined;
-  status: "active" | "expired" | "closed";
+  status: "active" | "closed";
   retentionEndDate: string;
   startDate: string;
   expiryDate: string;
