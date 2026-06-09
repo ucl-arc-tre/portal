@@ -16,7 +16,7 @@ import (
 
 const (
 	isValidPattern  = `This is to certify that.*completed the (?:course|programme) Data Security Awareness`
-	issuedAtPattern = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})`
+	issuedAtPattern = `Data Security Awareness.*On\s*(\d{1,2} \w+ \d{4})\s*This document is a record of completion`
 	namePattern     = `certify that[\s]*([\w+'’\s?]+)(:? GMC: \d+)? completed the`
 
 	nhsdCertificateDateFormat = "02 January 2006"
