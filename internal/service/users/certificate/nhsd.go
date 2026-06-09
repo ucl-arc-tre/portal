@@ -18,7 +18,3 @@ var (
 		dateFormatOptions: []string{"02 January 2006"},
 	}
 )
-
-func ParseNHSDCertificate(contentBase64 string) (*TrainingCertificate, error) {
-	return parseCertificate(nhsdMatch, contentBase64)
-}

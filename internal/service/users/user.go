@@ -12,6 +12,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
+	"gorm.io/gorm"
 )
 
 func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
@@ -224,11 +225,7 @@ func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, e
 func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error) {
 	records := []ApprovedResearcherExportRecord{}
 
-	result := s.db.Model(&types.User{}).
-		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
-		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
-		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
-		Where("agreements.type = ? AND user_training_records.kind = ?", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+	result := s.dbApprovedResearcherJoins().
 		Select(
 			"users.username, " +
 				"MAX(user_training_records.completed_at) as training_complete_at, " +
@@ -240,4 +237,12 @@ func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, er
 		return nil, types.NewErrFromGorm(result.Error, "failed to count approved researchers")
 	}
 	return records, nil
+}
+
+func (s *Service) dbApprovedResearcherJoins() *gorm.DB {
+	return s.db.Model(&types.User{}).
+		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
+		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
+		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
+		Where("agreements.type = ? AND (user_training_records.kind = ? OR user_training_records.kind = ?)", agreements.ApprovedResearcherType, types.TrainingKindNHSD, types.TrainingKindUCLHIg)
 }

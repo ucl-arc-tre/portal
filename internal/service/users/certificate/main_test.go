@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func TestKind(t *testing.T) {
@@ -14,5 +14,5 @@ func TestKind(t *testing.T) {
 	assert.NoError(t, err)
 	kind, err := Kind(base64.StdEncoding.EncodeToString(content))
 	assert.NoError(t, err)
-	assert.Equal(t, openapi.TrainingKindNhsd, kind)
+	assert.Equal(t, types.TrainingKindNHSD, kind)
 }

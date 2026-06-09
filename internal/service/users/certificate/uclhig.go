@@ -19,7 +19,3 @@ var (
 		},
 	}
 )
-
-func ParseUclhIgCertificate(contentBase64 string) (*TrainingCertificate, error) {
-	return parseCertificate(uclhIgMatch, contentBase64)
-}

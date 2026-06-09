@@ -3,6 +3,8 @@ package certificate
 import (
 	"regexp"
 	"time"
+
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 type MatchConfig struct {
@@ -16,6 +18,7 @@ type TrainingCertificate struct {
 	IsValid  bool
 	Name     string
 	IssuedAt time.Time
+	Kind     types.TrainingKind
 }
 
 func (t *TrainingCertificate) NameMatches(value string) bool {

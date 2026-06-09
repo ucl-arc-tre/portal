@@ -20,7 +20,8 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
     agreementsData.confirmed_agreements.some((a) => a.agreement_type === "approved-researcher")
   );
   const [trainingCertificateCompleted, setTrainingCertificateCompleted] = useState(
-    trainingData.training_records.find((record) => record.kind === "training_kind_nhsd")?.is_valid || false
+    trainingData.training_records.find((record) => record.kind === "training_kind_nhsd" || record.is_ig_kind)
+      ?.is_valid || false
   );
 
   const hasChosenName = !!chosenName;

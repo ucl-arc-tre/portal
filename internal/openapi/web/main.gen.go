@@ -1164,6 +1164,9 @@ type TrainingRecord struct {
 	// CompletedAt Time in RFC3339 format when the training was completed
 	CompletedAt *string `json:"completed_at,omitempty"`
 
+	// IsIgKind Whether this kind of training is approved by information governance to support an approved researcher status
+	IsIgKind *bool `json:"is_ig_kind,omitempty"`
+
 	// IsValid Whether this training certification is currently valid
 	IsValid bool         `json:"is_valid"`
 	Kind    TrainingKind `json:"kind"`

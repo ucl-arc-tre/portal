@@ -23,7 +23,9 @@ const getExpiryDate = (completedAt: string) => {
 export default function CertificateReupload({ trainingData, expiryUrgency, onReupload }: Props) {
   const [showCertReupload, setShowCertReupload] = useState(false);
 
-  const nhsdTraining = trainingData?.training_records.find((record) => record.kind === "training_kind_nhsd");
+  const nhsdTraining = trainingData?.training_records.find(
+    (record) => record.kind === "training_kind_nhsd" || record.is_ig_kind
+  );
 
   return (
     <div className={styles["reupload-option"]}>

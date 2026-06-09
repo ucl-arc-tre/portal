@@ -92,6 +92,10 @@ export type TrainingRecord = {
      */
     is_valid: boolean;
     /**
+     * Whether this kind of training is approved by information governance to support an approved researcher status
+     */
+    is_ig_kind?: boolean;
+    /**
      * Time in RFC3339 format when the training was completed
      */
     completed_at?: string;

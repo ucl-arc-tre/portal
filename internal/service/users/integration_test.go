@@ -279,7 +279,7 @@ func TestCreateNHSDTrainingRecord(t *testing.T) {
 
 	completedAt := time.Now().UTC()
 
-	err := service.CreateNHSDTrainingRecord(user, completedAt)
+	err := service.CreateTrainingRecord(user, types.TrainingKindNHSD, completedAt)
 
 	require.NoError(t, err)
 

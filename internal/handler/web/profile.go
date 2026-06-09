@@ -87,6 +87,7 @@ func (h *Handler) PostProfileTraining(ctx *gin.Context) {
 		return
 	}
 	result, err := h.users.UpdateTraining(user, data)
+
 	if err != nil {
 		setError(ctx, err, "Failed to update users training")
 		return

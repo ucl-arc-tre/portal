@@ -29,6 +29,10 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 	if err := bindJSONOrSetError(ctx, &update); err != nil {
 		return
 	}
+	if !update.TrainingKind.Valid() {
+		setError(ctx, types.NewErrClientInvalidObjectF("invalid training kind"), "Invalid training kind")
+		return
+	}
 
 	trainingDate, err := time.Parse(config.TimeFormat, update.TrainingDate)
 	if err != nil {
@@ -47,14 +51,9 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 		return
 	}
 
-	switch update.TrainingKind {
-	case openapi.TrainingKindNhsd:
-		if err := h.users.CreateNHSDTrainingRecord(*user, trainingDate); err != nil {
-			setError(ctx, err, "Failed to update training validity")
-			return
-		}
-	default:
-		panic("unsupported training kind")
+	if err := h.users.CreateTrainingRecord(*user, update.TypesTrainingKind(), trainingDate); err != nil {
+		setError(ctx, err, "Failed to update training validity")
+		return
 	}
 
 	ctx.JSON(http.StatusOK, openapi.TrainingRecord{

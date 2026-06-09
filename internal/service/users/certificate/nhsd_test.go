@@ -10,11 +10,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func TestValidNHSDCertificateParse(t *testing.T) {
 	contentBase64 := mustBase64Encode(t, "testdata/valid_nhsd.pdf")
-	certificate, err := ParseNHSDCertificate(contentBase64)
+	certificate, err := Parse(types.TrainingKindNHSD, contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.True(t, certificate.IsValid)
@@ -26,7 +27,7 @@ func TestValidNHSDCertificateParse(t *testing.T) {
 
 func TestInvalidNHSDCertificateParse(t *testing.T) {
 	contentBase64 := mustBase64Encode(t, "testdata/invalid.pdf")
-	certificate, err := ParseNHSDCertificate(contentBase64)
+	certificate, err := Parse(types.TrainingKindNHSD, contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.False(t, certificate.IsValid)

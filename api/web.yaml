@@ -1333,6 +1333,9 @@ components:
         is_valid:
           type: boolean
           description: Whether this training certification is currently valid
+        is_ig_kind:
+          type: boolean
+          description: Whether this kind of training is approved by information governance to support an approved researcher status
         completed_at:
           type: string
           description: Time in RFC3339 format when the training was completed
