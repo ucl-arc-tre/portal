@@ -206,10 +206,10 @@ export default function ManageContractPage() {
             </div>
           )}
 
-          {contract.retention_period && (
+          {contract.retention_end_date && (
             <div className={styles.field}>
-              <label>Retention Period:</label>
-              <span>{contract.retention_period}</span>
+              <label>Retention Period End Date:</label>
+              <span>{formatDate(contract.retention_end_date)}</span>
             </div>
           )}
 
