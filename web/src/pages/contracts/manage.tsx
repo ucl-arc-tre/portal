@@ -42,6 +42,9 @@ export default function ManageContractPage() {
     (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
   const canModify = isStudyOwner || isStudyAdmin;
+  const canDelete = contract?.retention_end_date
+    ? new Date(contract.retention_end_date) < new Date() && canModify
+    : canModify;
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
@@ -167,10 +170,11 @@ export default function ManageContractPage() {
                 <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="contract-edit">
                   Edit
                 </Button>
-
-                <Button onClick={() => setShowDeleteModal(true)} variant="secondary-destructive" cy="contract-delete">
-                  Delete
-                </Button>
+                {canDelete && (
+                  <Button onClick={() => setShowDeleteModal(true)} variant="secondary-destructive" cy="contract-delete">
+                    Delete
+                  </Button>
+                )}
               </div>
             )}
           </div>
