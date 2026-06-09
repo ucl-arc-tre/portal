@@ -41,7 +41,8 @@
   border: 1px solid #f87171;
 }
 
-.status-deleted {
+.status-deleted,
+.status-closed {
   background-color: #fee2e2;
   color: #b5b1b1;
   border: 1px solid #5e5d5d;

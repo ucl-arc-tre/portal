@@ -8,22 +8,22 @@ type ContractCardProps = {
   contract: Contract;
   studyId: string;
 };
-
+export const getStatusColor = (status: string) => {
+  switch (status) {
+    case "active":
+      return styles["status-active"];
+    case "proposed":
+      return styles["status-proposed"];
+    case "expired":
+      return styles["status-expired"];
+    case "closed":
+      return styles["status-closed"];
+    default:
+      return styles["status-default"];
+  }
+};
 export default function ContractCard({ studyId, contract }: ContractCardProps) {
   const expiryUrgency = contract.expiry_date ? calculateExpiryUrgency(new Date(contract.expiry_date)) : null;
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return styles["status-active"];
-      case "proposed":
-        return styles["status-proposed"];
-      case "expired":
-        return styles["status-expired"];
-      default:
-        return styles["status-default"];
-    }
-  };
 
   return (
     <Card

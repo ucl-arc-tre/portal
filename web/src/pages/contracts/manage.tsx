@@ -164,7 +164,7 @@ export default function ManageContractPage() {
       <div className="content">
         <Box>
           <div className={styles.header}>
-            <h2>{`Contract: ${contract.title}`} </h2>
+            <h2>{`Contract: ${contract.title}`} </h2>{" "}
             {canModify && (
               <div className={styles["header-actions"]}>
                 <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="contract-edit">
@@ -179,6 +179,10 @@ export default function ManageContractPage() {
             )}
           </div>
 
+          <div className={styles.field}>
+            <label>Status:</label>
+            <span>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</span>
+          </div>
           <div className={styles.field}>
             <label>Signatory:</label>
             <span>{contract.organisation_signatory}</span>
