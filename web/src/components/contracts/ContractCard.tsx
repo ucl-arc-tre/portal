@@ -37,8 +37,11 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
         </div>
       }
       manageUrl={`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`}
-      isWarning={!!expiryUrgency}
-      footerContent={expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />}
+      isWarning={!!expiryUrgency && contract.status !== "closed"}
+      footerContent={
+        contract.status !== "closed" &&
+        expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />
+      }
     >
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
