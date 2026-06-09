@@ -621,7 +621,7 @@ export type ContractBase = {
     /**
      * Current status of the contract
      */
-    status: 'proposed' | 'active' | 'expired';
+    status: 'proposed' | 'active' | 'expired' | 'closed';
     /**
      * Contract start date in YYYY-MM-DD format
      */
@@ -630,6 +630,10 @@ export type ContractBase = {
      * Contract expiry date in YYYY-MM-DD format
      */
     expiry_date?: string;
+    /**
+     * Contract retention end date in YYYY-MM-DD format
+     */
+    retention_end_date?: string;
     /**
      * List of assets associated with this contract
      */

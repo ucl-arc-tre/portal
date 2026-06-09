@@ -9,21 +9,22 @@ type ContractCardProps = {
   studyId: string;
 };
 
+export const getStatusColor = (status: string) => {
+  switch (status) {
+    case "active":
+      return styles["status-active"];
+    case "proposed":
+      return styles["status-proposed"];
+    case "expired":
+      return styles["status-expired"];
+    case "closed":
+      return styles["status-closed"];
+    default:
+      return styles["status-default"];
+  }
+};
 export default function ContractCard({ studyId, contract }: ContractCardProps) {
   const expiryUrgency = contract.expiry_date ? calculateExpiryUrgency(new Date(contract.expiry_date)) : null;
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return styles["status-active"];
-      case "proposed":
-        return styles["status-proposed"];
-      case "expired":
-        return styles["status-expired"];
-      default:
-        return styles["status-default"];
-    }
-  };
 
   return (
     <Card
@@ -37,8 +38,11 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
         </div>
       }
       manageUrl={`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`}
-      isWarning={!!expiryUrgency}
-      footerContent={expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />}
+      isWarning={!!expiryUrgency && contract.status !== "closed"}
+      footerContent={
+        contract.status !== "closed" &&
+        expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />
+      }
     >
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
@@ -61,6 +65,12 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Expiry Date: </span>
           <span className={styles.value}>{contract.expiry_date ? formatDate(contract.expiry_date) : "None"}</span>
+        </div>
+        <div className={styles["detail-item"]}>
+          <span className={styles.label}>Retention End Date: </span>
+          <span className={styles.value}>
+            {contract.retention_end_date ? formatDate(contract.retention_end_date) : "None"}
+          </span>
         </div>
 
         <div className={styles["detail-item"]}>

@@ -150,13 +150,13 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, contrac
 	}
 	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
 	if *days < 0 {
-		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract."
+		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract or update its status."
 	} else if *days == 0 {
-		content += "today. Please sign in to the Portal to upload a new contract."
+		content += "today. Please sign in to the Portal to upload a new contract or update its status."
 	} else if *days == 1 {
-		content += "tomorrow. Please sign in to the Portal to upload a new contract."
+		content += "tomorrow. Please sign in to the Portal to upload a new contract or update its status."
 	} else {
-		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract."
+		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract or update its status."
 	}
 
 	subject := "Notification: Study contract expiry"

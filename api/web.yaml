@@ -2064,7 +2064,7 @@ components:
           description: Name of the third party organization
         status:
           type: string
-          enum: [proposed, active, expired]
+          enum: [proposed, active, expired, closed]
           description: Current status of the contract
         start_date:
           type: string
@@ -2074,6 +2074,10 @@ components:
           type: string
           description: Contract expiry date in YYYY-MM-DD format
           example: "2025-12-31"
+        retention_end_date:
+          type: string
+          description: Contract retention end date in YYYY-MM-DD format
+          example: "2035-12-31"
         asset_ids:
           type: array
           description: List of assets associated with this contract
