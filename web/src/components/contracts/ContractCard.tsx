@@ -8,6 +8,7 @@ type ContractCardProps = {
   contract: Contract;
   studyId: string;
 };
+
 export const getStatusColor = (status: string) => {
   switch (status) {
     case "active":
