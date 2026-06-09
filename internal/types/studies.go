@@ -136,6 +136,15 @@ type AssetLocation struct {
 	Asset Asset `gorm:"foreignKey:AssetID"`
 }
 
+type ContractStatus = string
+
+const (
+	ContractStatusProposed = ContractStatus("proposed")
+	ContractStatusActive   = ContractStatus("active")
+	ContractStatusExpired  = ContractStatus("expired")
+	ContractStatusClosed   = ContractStatus("closed")
+)
+
 // Contract represents a PDF contract document associated with an asset
 type Contract struct {
 	ModelAuditable
@@ -145,9 +154,10 @@ type Contract struct {
 	Title            string
 	ThirdPartyName   *string
 	OtherSignatories *string // free text: could be name(s), email(s), UPN(s), organisations
-	Status           string  // proposed, active, expired
+	Status           ContractStatus
 	StartDate        *time.Time
 	ExpiryDate       *time.Time
+	RetentionEndDate *time.Time
 
 	// Relationships
 	Study         Study                    `gorm:"foreignKey:StudyID"`

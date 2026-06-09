@@ -34,6 +34,12 @@
   border: 1px solid var(--color-border);
 }
 
+.status-closed {
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid #5e5d5d;
+}
+
 .details {
   display: flex;
   flex-direction: column;

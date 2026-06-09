@@ -233,6 +233,9 @@ func DaysUntilContractExpiry(contract types.Contract) *int {
 }
 
 func ShouldNotifyContractExpiry(contract types.Contract) bool {
+	if contract.Status == "closed" {
+		return false
+	}
 	daysUntilExpiry := DaysUntilContractExpiry(contract)
 	if daysUntilExpiry == nil {
 		return false

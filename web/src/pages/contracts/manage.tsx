@@ -42,6 +42,9 @@ export default function ManageContractPage() {
     (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
   const canModify = isStudyOwner || isStudyAdmin;
+  const canDelete = contract?.retention_end_date
+    ? new Date(contract.retention_end_date) < new Date() && canModify
+    : canModify;
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
@@ -161,20 +164,25 @@ export default function ManageContractPage() {
       <div className="content">
         <Box>
           <div className={styles.header}>
-            <h2>{`Contract: ${contract.title}`} </h2>
+            <h2>{`Contract: ${contract.title}`} </h2>{" "}
             {canModify && (
               <div className={styles["header-actions"]}>
                 <Button onClick={() => setShowUploadModal(true)} variant="secondary" cy="contract-edit">
                   Edit
                 </Button>
-
-                <Button onClick={() => setShowDeleteModal(true)} variant="secondary-destructive" cy="contract-delete">
-                  Delete
-                </Button>
+                {canDelete && (
+                  <Button onClick={() => setShowDeleteModal(true)} variant="secondary-destructive" cy="contract-delete">
+                    Delete
+                  </Button>
+                )}
               </div>
             )}
           </div>
 
+          <div className={styles.field}>
+            <label>Status:</label>
+            <span>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</span>
+          </div>
           <div className={styles.field}>
             <label>Signatory:</label>
             <span>{contract.organisation_signatory}</span>
@@ -203,6 +211,13 @@ export default function ManageContractPage() {
             <div className={styles.field}>
               <label>Expiry date:</label>
               <span>{formatDate(contract.expiry_date)}</span>
+            </div>
+          )}
+
+          {contract.retention_end_date && (
+            <div className={styles.field}>
+              <label>Retention Period End Date:</label>
+              <span>{formatDate(contract.retention_end_date)}</span>
             </div>
           )}
 
