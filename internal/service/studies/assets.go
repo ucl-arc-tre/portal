@@ -16,7 +16,7 @@ import (
 
 func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
-		return types.NewErrClientInvalidObjectF("asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
+		return types.NewErrClientInvalidObjectF("asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, hyphens and apostrophes")
 	}
 
 	if !validation.AssetDescriptionPattern.MatchString(assetData.Description) {

@@ -282,7 +282,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
       <form onSubmit={handleSubmit(onSubmit)} className="form">
         <div className={styles["form-section"]}>
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="title">Title *</Label>
             <input
               id="title"
@@ -298,7 +298,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             {errors.title && <span className={styles["form-error"]}>{errors.title.message}</span>}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="organisationSignatoryEmail">{organisationName} Signatory *</Label>
             <input
               id="organisationSignatoryEmail"
@@ -318,7 +318,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             )}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="title">Other Signatories</Label>
             <input
               id="otherSignatories"
@@ -332,7 +332,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             {errors.otherSignatories && <span className={styles["form-error"]}>{errors.otherSignatories.message}</span>}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="thirdPartyName">Third Party Name *</Label>
             <input
               id="thirdPartyName"
@@ -348,7 +348,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             {errors.thirdPartyName && <span className={styles["form-error"]}>{errors.thirdPartyName.message}</span>}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="status">Contract Status *</Label>
             <select
               id="status"
@@ -365,7 +365,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="startDate">Start Date *</Label>
             <input
               id="startDate"
@@ -378,7 +378,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             {errors.startDate && <span className={styles["form-error"]}>{errors.startDate.message}</span>}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="expiryDate">Expiry Date *</Label>
             <input
               id="expiryDate"
@@ -391,7 +391,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
           </div>
 
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <Label htmlFor="retentionEndDate">Retention Period End Date</Label>
             <input
               id="retentionEndDate"
@@ -409,7 +409,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
         <div className={styles["form-section"]}>
           <h4>Link Assets (optional)</h4>
-          <div className={styles["form-group"]}>
+          <div className={"field"}>
             <fieldset className="linkage-fieldset">
               {assetFields.map((field, index) => (
                 <div key={field.id} className="item-wrapper">

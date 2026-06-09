@@ -31,9 +31,9 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
             rules={{
               required: "This field is required",
               pattern: {
-                value: /^\w[\w\s\-]{2,48}\w$/,
+                value: /^\w[\w\s\-']{2,48}\w$/,
                 message:
-                  "Study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens",
+                  "Study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, hyphens and apostrophes",
               },
             }}
             render={({ field }) => <Input {...field} type="text" id="studyName" />}
@@ -50,11 +50,12 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
         </Label>
 
         <Label htmlFor="description">
-          Study Description:
+          Study Description*:
           <Controller
             name="description"
             control={control}
             rules={{
+              required: "This field is required",
               pattern: {
                 value: /^[\s\S]{0,255}$/,
                 message: "Description must be at most 255 characters",
