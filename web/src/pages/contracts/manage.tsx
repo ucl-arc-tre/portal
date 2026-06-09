@@ -206,6 +206,13 @@ export default function ManageContractPage() {
             </div>
           )}
 
+          {contract.retention_period && (
+            <div className={styles.field}>
+              <label>Retention Period:</label>
+              <span>{contract.retention_period}</span>
+            </div>
+          )}
+
           <div className={styles.field}>
             <label>Files:</label>
             {contract.objects_metadata.map((obj) => (

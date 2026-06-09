@@ -145,9 +145,10 @@ type Contract struct {
 	Title            string
 	ThirdPartyName   *string
 	OtherSignatories *string // free text: could be name(s), email(s), UPN(s), organisations
-	Status           string  // proposed, active, expired
+	Status           string  // proposed, active, expired, closed
 	StartDate        *time.Time
 	ExpiryDate       *time.Time
+	RetentionPeriod  *string // free text: e.g. "10 years", "6 months"
 
 	// Relationships
 	Study         Study                    `gorm:"foreignKey:StudyID"`

@@ -306,6 +306,7 @@ func (e AuthRoles) Valid() bool {
 // Defines values for ContractStatus.
 const (
 	ContractStatusActive   ContractStatus = "active"
+	ContractStatusClosed   ContractStatus = "closed"
 	ContractStatusExpired  ContractStatus = "expired"
 	ContractStatusProposed ContractStatus = "proposed"
 )
@@ -314,6 +315,8 @@ const (
 func (e ContractStatus) Valid() bool {
 	switch e {
 	case ContractStatusActive:
+		return true
+	case ContractStatusClosed:
 		return true
 	case ContractStatusExpired:
 		return true
@@ -327,6 +330,7 @@ func (e ContractStatus) Valid() bool {
 // Defines values for ContractBaseStatus.
 const (
 	ContractBaseStatusActive   ContractBaseStatus = "active"
+	ContractBaseStatusClosed   ContractBaseStatus = "closed"
 	ContractBaseStatusExpired  ContractBaseStatus = "expired"
 	ContractBaseStatusProposed ContractBaseStatus = "proposed"
 )
@@ -335,6 +339,8 @@ const (
 func (e ContractBaseStatus) Valid() bool {
 	switch e {
 	case ContractBaseStatusActive:
+		return true
+	case ContractBaseStatusClosed:
 		return true
 	case ContractBaseStatusExpired:
 		return true
