@@ -1297,11 +1297,10 @@ components:
       type: string
       enum:
         - training_kind_nhsd
+        - training_kind_uclh_ig
 
     ProfileTrainingUpdate:
       type: object
-      required:
-        - kind
       properties:
         kind:
           $ref: "#/components/schemas/TrainingKind"

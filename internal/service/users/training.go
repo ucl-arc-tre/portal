@@ -14,51 +14,54 @@ import (
 func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
 	if data.CertificateContentPdfBase64 == nil {
 		log.Debug().Any("username", user.Username).Msg("Empty certificate content")
-		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
+		return openapi.ProfileTrainingResponse{CertificateIsValid: new(false)}, nil
 	}
-	switch data.Kind {
-	case openapi.TrainingKindNhsd:
-		return s.updateNHSD(user, data)
-	default:
-		err := fmt.Errorf("unsupported training kind [%v]", data.Kind)
-		return openapi.ProfileTrainingResponse{}, types.NewErrInvalidObject(err)
+	kind, err := certificate.Kind(*data.CertificateContentPdfBase64)
+	if err != nil {
+		return openapi.ProfileTrainingResponse{
+			CertificateIsValid: new(false),
+			CertificateMessage: new("Failed to parse training kind"),
+		}, err
 	}
-}
 
-func (s *Service) updateNHSD(
-	user types.User,
-	data openapi.ProfileTrainingUpdate,
-) (openapi.ProfileTrainingResponse, error) {
-	certificate, err := certificate.ParseNHSDCertificate(*data.CertificateContentPdfBase64)
+	var parse func(contentBase64 string) (*certificate.TrainingCertificate, error)
+	switch kind {
+	case openapi.TrainingKindNhsd:
+		parse = certificate.ParseNHSDCertificate
+	case openapi.TrainingKindUclhIg:
+		parse = certificate.ParseUclhIgCertificate
+	}
+	cert, err := parse(*data.CertificateContentPdfBase64)
+
 	response := openapi.ProfileTrainingResponse{
-		CertificateIsValid: ptr(false),
+		CertificateIsValid: new(false),
 	}
 	if err != nil {
-		response.CertificateMessage = ptr("Failed to parse certificate.")
+		response.CertificateMessage = new("Failed to parse certificate.")
 		return response, err
 	}
-	if !certificate.HasIssuedAt() {
-		response.CertificateMessage = ptr("Certificate was missing an issued at date.")
+	if !cert.HasIssuedAt() {
+		response.CertificateMessage = new("Certificate was missing an issued at date.")
 		return response, nil
 	}
-	if !NHSDTrainingIsValid(certificate.IssuedAt) {
+	if !TrainingIsValid(cert.IssuedAt) {
 		message := fmt.Sprintf("Certificate was issued more than %v years in the past.", config.TrainingValidityYears)
-		response.CertificateMessage = ptr(message)
+		response.CertificateMessage = new(message)
 		return response, nil
 	}
 	chosenName, err := s.userChosenName(user)
 	if err != nil || chosenName == "" {
-		response.CertificateMessage = ptr("Failed to get user's chosen name, or it was unset.")
+		response.CertificateMessage = new("Failed to get user's chosen name, or it was unset.")
 		return response, err
 	}
-	if !certificate.NameMatches(string(chosenName)) {
-		response.CertificateMessage = ptr(fmt.Sprintf("Name '%v' does not match '%v'.", certificate.Name, chosenName))
+	if !cert.NameMatches(string(chosenName)) {
+		response.CertificateMessage = new(fmt.Sprintf("Name '%v' does not match '%v'.", cert.Name, chosenName))
 		return response, err
 	}
-	response.CertificateIsValid = &certificate.IsValid
-	if certificate.IsValid {
-		response.CertificateIssuedAt = ptr(certificate.IssuedAt.Format(config.TimeFormat))
-		if err := s.CreateNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
+	response.CertificateIsValid = &cert.IsValid
+	if cert.IsValid {
+		response.CertificateIssuedAt = new(cert.IssuedAt.Format(config.TimeFormat))
+		if err := s.CreateNHSDTrainingRecord(user, cert.IssuedAt); err != nil {
 			return response, err
 		}
 	}
@@ -76,7 +79,7 @@ func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
 	} else if result.Error != nil {
 		return false, types.NewErrFromGorm(result.Error)
 	}
-	return NHSDTrainingIsValid(record.CompletedAt), nil
+	return TrainingIsValid(record.CompletedAt), nil
 }
 
 // Create a NHSD training record for a user and update the approved researcher status if required
@@ -112,7 +115,7 @@ func (s *Service) TrainingRecords(user types.User) ([]openapi.TrainingRecord, er
 			trainingRecords = append(trainingRecords, openapi.TrainingRecord{
 				Kind:        openapi.TrainingKindNhsd,
 				CompletedAt: &completedAt,
-				IsValid:     NHSDTrainingIsValid(record.CompletedAt),
+				IsValid:     TrainingIsValid(record.CompletedAt),
 			})
 		default:
 			panic("unsupported training type")
@@ -137,10 +140,6 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 	return &expiresAt, nil
 }
 
-func NHSDTrainingIsValid(completedAt time.Time) bool {
+func TrainingIsValid(completedAt time.Time) bool {
 	return time.Since(completedAt) < config.TrainingValidity
-}
-
-func ptr[T any](value T) *T {
-	return &value
 }

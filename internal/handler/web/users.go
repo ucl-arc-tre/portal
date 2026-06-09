@@ -60,7 +60,7 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 	ctx.JSON(http.StatusOK, openapi.TrainingRecord{
 		Kind:        update.TrainingKind,
 		CompletedAt: &update.TrainingDate,
-		IsValid:     users.NHSDTrainingIsValid(trainingDate),
+		IsValid:     users.TrainingIsValid(trainingDate),
 	})
 }
 

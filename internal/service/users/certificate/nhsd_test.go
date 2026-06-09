@@ -1,4 +1,4 @@
-//go:build !integration
+// //go:build !integration
 
 package certificate
 
@@ -13,7 +13,7 @@ import (
 )
 
 func TestValidNHSDCertificateParse(t *testing.T) {
-	contentBase64 := mustBase64Encode(t, "testdata/valid.pdf")
+	contentBase64 := mustBase64Encode(t, "testdata/valid_nhsd.pdf")
 	certificate, err := ParseNHSDCertificate(contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
@@ -39,7 +39,7 @@ func TestValidRegex(t *testing.T) {
 		"This is to certify that Alice Jones GMC: 7562896 completed the course Data Security Awareness On 10 September 2025",
 	}
 	for _, text := range validTexts {
-		assert.True(t, isValidRegex.MatchString(text))
+		assert.True(t, nhsdMatch.isValid.MatchString(text))
 	}
 }
 

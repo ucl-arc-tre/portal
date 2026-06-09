@@ -79,7 +79,6 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
 
       const res = await postProfileTraining({
         body: {
-          kind: "training_kind_nhsd",
           certificate_content_pdf_base64: content.replace("data:application/pdf;base64,", ""),
         },
       });
@@ -151,7 +150,8 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
             NHS Digital Data Security Awareness Level 1 course
           </a>{" "}
           provided by e-Learning for Health. When asked, you can register your role as a &quot;Further Education and
-          Higher Education Researcher (Education)&quot; which should provide you access to the course.
+          Higher Education Researcher (Education)&quot; which should provide you access to the course. We also accept
+          Information Governance training from UCLH.
           <br />
           <br />
           <strong>Please complete the course and verify the PDF certificate below.</strong>
@@ -170,7 +170,7 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
             required
             onChange={checkIsPDF}
           />
-          <Button size="large" type="submit" cy="training-certificate-sumbit" disabled={!isPDF || isSubmitting}>
+          <Button size="large" type="submit" cy="training-certificate-submit" disabled={!isPDF || isSubmitting}>
             Submit
           </Button>
         </form>

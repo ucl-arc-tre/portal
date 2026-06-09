@@ -1,8 +1,16 @@
 package certificate
 
 import (
+	"regexp"
 	"time"
 )
+
+type MatchConfig struct {
+	isValid           *regexp.Regexp
+	issuedAt          *regexp.Regexp
+	name              *regexp.Regexp
+	dateFormatOptions []string
+}
 
 type TrainingCertificate struct {
 	IsValid  bool

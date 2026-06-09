@@ -60,10 +60,10 @@ export type StudyAgreements = {
     usernames: Array<string>;
 };
 
-export type TrainingKind = 'training_kind_nhsd';
+export type TrainingKind = 'training_kind_nhsd' | 'training_kind_uclh_ig';
 
 export type ProfileTrainingUpdate = {
-    kind: TrainingKind;
+    kind?: TrainingKind;
     /**
      * Base64 encoded PDF file data of the certificate
      */

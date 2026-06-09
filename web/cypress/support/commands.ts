@@ -878,7 +878,7 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
     cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
     cy.get("[data-cy='agreement-agree']").click();
     cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-    cy.get("[data-cy='training-certificate-sumbit']").click();
+    cy.get("[data-cy='training-certificate-submit']").click();
   });
 
   cy.contains("Verify another certificate").should("be.visible");
