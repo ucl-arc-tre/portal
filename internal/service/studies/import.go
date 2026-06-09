@@ -116,6 +116,10 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 			tx.Rollback()
 			return nil, types.NewErrFromGorm(err, "failed to agree owner agreement")
 		}
+		if _, err := rbac.AddRole(owner, rbac.InformationAssetOwner); err != nil {
+			tx.Rollback()
+			return nil, types.NewErrFromGorm(err, "failed to add IAO role")
+		}
 	}
 
 	if data.AdditionalStudyAdminUsername != nil {
@@ -152,6 +156,10 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 			if err := tx.Where(&adminSignature).FirstOrCreate(&adminSignature).Error; err != nil {
 				tx.Rollback()
 				return nil, types.NewErrFromGorm(err, "failed to agree admin agreement")
+			}
+			if _, err := rbac.AddRole(admin, rbac.InformationAssetAdministrator); err != nil {
+				tx.Rollback()
+				return nil, types.NewErrFromGorm(err, "failed to add IAA role")
 			}
 		}
 
