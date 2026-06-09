@@ -13,8 +13,6 @@ export const getStatusColor = (status: string) => {
   switch (status) {
     case "active":
       return styles["status-active"];
-    case "proposed":
-      return styles["status-proposed"];
     case "expired":
       return styles["status-expired"];
     case "closed":
