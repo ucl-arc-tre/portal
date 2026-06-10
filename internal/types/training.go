@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	TrainingKindNHSD = TrainingKind("nhsd") // FIXED
+	TrainingKindNHSD   = TrainingKind("nhsd")    // FIXED
+	TrainingKindUCLHIg = TrainingKind("uclh_ig") // FIXED
 )
 
 type TrainingKind string

@@ -3,7 +3,6 @@ package users
 import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -14,18 +13,19 @@ func (s *Service) Metrics() (*openapi.UserMetrics, error) {
 		ApprovedInvalid int64 `gorm:"column:invalid"`
 	}{}
 
-	result := s.db.Model(&types.User{}).
-		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
-		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
-		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
-		Where("agreements.type = ? AND user_training_records.kind = ?", agreements.ApprovedResearcherType, types.TrainingKindNHSD).
+	approvedResearchers := s.dbApprovedResearcherJoins().
+		Select("users.id, MAX(user_training_records.completed_at) AS latest_training_completed_at").
+		Group("users.id")
+
+	result := s.db.Table("(?) AS approved_researchers", approvedResearchers).
 		Select(
-			"count(case when user_training_records.completed_at > (now() - interval '1 year' * ?) then 1 end) as valid, "+
-				"count(case when user_training_records.completed_at <= (now() - interval '1 year' * ?) then 1 end) as invalid",
+			"count(*) FILTER (WHERE latest_training_completed_at > (now() - interval '1 year' * ?)) AS valid, "+
+				"count(*) FILTER (WHERE latest_training_completed_at <= (now() - interval '1 year' * ?)) AS invalid",
 			config.TrainingValidityYears,
 			config.TrainingValidityYears,
 		).
 		Scan(&counts)
+
 	if result.Error != nil {
 		return nil, types.NewErrFromGorm(result.Error, "failed to count trained users")
 	}

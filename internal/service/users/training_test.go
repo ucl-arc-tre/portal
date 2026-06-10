@@ -12,6 +12,6 @@ import (
 
 func TestNHSDTrainingIsValid(t *testing.T) {
 	now := time.Now()
-	assert.True(t, NHSDTrainingIsValid(now))
-	assert.False(t, NHSDTrainingIsValid(now.Add(-config.TrainingValidity).Add(-1*time.Second)))
+	assert.True(t, TrainingIsValid(now))
+	assert.False(t, TrainingIsValid(now.Add(-config.TrainingValidity).Add(-1*time.Second)))
 }

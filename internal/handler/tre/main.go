@@ -42,7 +42,7 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 	} else {
 		userStatus.IsApprovedResearcher = isApprovedResearcher
 	}
-	if expiresAt, err := h.users.NHSDTrainingExpiresAt(*user); errors.Is(err, types.ErrNotFound) {
+	if expiresAt, err := h.users.TrainingExpiresAt(*user, types.TrainingKindNHSD); errors.Is(err, types.ErrNotFound) {
 		log.Trace().Msg("User missing NHSD training date")
 	} else if err != nil {
 		log.Err(err).Any("username", user.Username).Msg("Failed to get training expiry for user")
