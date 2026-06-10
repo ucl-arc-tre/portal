@@ -23,7 +23,7 @@ export const calculatRiskScorePerAsset = (asset: Asset, involvesNhsEngland: bool
   let assetScore = 0;
 
   asset.locations.forEach((assetLocation) => {
-    const location = storageDefinitions.find((def) => def.value === assetLocation);
+    const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
     if (!location) return;
     assetScore += involvesNhsEngland
       ? asset.tier * nhs_multiplier * location.riskScore
