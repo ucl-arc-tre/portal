@@ -167,7 +167,8 @@ export default function ManageAssetPage() {
     );
   }
 
-  const expiryUrgency = asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
+  const expiryUrgency =
+    asset.status === "active" && asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
 
   return (
     <>
