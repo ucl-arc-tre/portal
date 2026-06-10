@@ -77,7 +77,7 @@ func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types
 
 func (s *Service) validateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) error {
 	if !validation.StudyTitlePattern.MatchString(studyData.Title) {
-		return types.NewErrClientInvalidObjectF("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, and hyphens")
+		return types.NewErrClientInvalidObjectF("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, hyphens and apostrophes")
 	}
 
 	if strings.TrimSpace(studyData.DataControllerOrganisation) == "" {
