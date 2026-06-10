@@ -87,7 +87,6 @@ type AssetStatus = string
 
 const (
 	AssetStatusActive    = "active"
-	AssetStatusAwaiting  = "awaiting"
 	AssetStatusDestroyed = "destroyed"
 )
 

@@ -129,7 +129,6 @@ func (e AssetProtection) Valid() bool {
 // Defines values for AssetStatus.
 const (
 	AssetStatusActive    AssetStatus = "active"
-	AssetStatusAwaiting  AssetStatus = "awaiting"
 	AssetStatusDestroyed AssetStatus = "destroyed"
 )
 
@@ -137,8 +136,6 @@ const (
 func (e AssetStatus) Valid() bool {
 	switch e {
 	case AssetStatusActive:
-		return true
-	case AssetStatusAwaiting:
 		return true
 	case AssetStatusDestroyed:
 		return true
@@ -243,7 +240,6 @@ func (e AssetBaseProtection) Valid() bool {
 // Defines values for AssetBaseStatus.
 const (
 	AssetBaseStatusActive    AssetBaseStatus = "active"
-	AssetBaseStatusAwaiting  AssetBaseStatus = "awaiting"
 	AssetBaseStatusDestroyed AssetBaseStatus = "destroyed"
 )
 
@@ -251,8 +247,6 @@ const (
 func (e AssetBaseStatus) Valid() bool {
 	switch e {
 	case AssetBaseStatusActive:
-		return true
-	case AssetBaseStatusAwaiting:
 		return true
 	case AssetBaseStatusDestroyed:
 		return true
