@@ -305,10 +305,8 @@ func (e AuthRoles) Valid() bool {
 
 // Defines values for ContractStatus.
 const (
-	ContractStatusActive   ContractStatus = "active"
-	ContractStatusClosed   ContractStatus = "closed"
-	ContractStatusExpired  ContractStatus = "expired"
-	ContractStatusProposed ContractStatus = "proposed"
+	ContractStatusActive ContractStatus = "active"
+	ContractStatusClosed ContractStatus = "closed"
 )
 
 // Valid indicates whether the value is a known member of the ContractStatus enum.
@@ -318,10 +316,6 @@ func (e ContractStatus) Valid() bool {
 		return true
 	case ContractStatusClosed:
 		return true
-	case ContractStatusExpired:
-		return true
-	case ContractStatusProposed:
-		return true
 	default:
 		return false
 	}
@@ -329,10 +323,8 @@ func (e ContractStatus) Valid() bool {
 
 // Defines values for ContractBaseStatus.
 const (
-	ContractBaseStatusActive   ContractBaseStatus = "active"
-	ContractBaseStatusClosed   ContractBaseStatus = "closed"
-	ContractBaseStatusExpired  ContractBaseStatus = "expired"
-	ContractBaseStatusProposed ContractBaseStatus = "proposed"
+	ContractBaseStatusActive ContractBaseStatus = "active"
+	ContractBaseStatusClosed ContractBaseStatus = "closed"
 )
 
 // Valid indicates whether the value is a known member of the ContractBaseStatus enum.
@@ -341,10 +333,6 @@ func (e ContractBaseStatus) Valid() bool {
 	case ContractBaseStatusActive:
 		return true
 	case ContractBaseStatusClosed:
-		return true
-	case ContractBaseStatusExpired:
-		return true
-	case ContractBaseStatusProposed:
 		return true
 	default:
 		return false

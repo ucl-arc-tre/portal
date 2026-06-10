@@ -21,7 +21,7 @@ type ContractFormData = {
   organisationSignatory: string;
   thirdPartyName: string;
   otherSignatories: string | undefined;
-  status: "proposed" | "active" | "expired" | "closed";
+  status: "active" | "closed";
   retentionEndDate: string;
   startDate: string;
   expiryDate: string;
@@ -66,7 +66,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     control,
   } = useForm<ContractFormData>({
     defaultValues: {
-      status: "proposed",
+      status: "active",
     },
   });
 
@@ -99,7 +99,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     } else {
       // reset to defaults when not editing
       reset({
-        status: "proposed",
+        status: "active",
         organisationSignatory: "",
         thirdPartyName: "",
         startDate: "",
@@ -357,9 +357,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               })}
               className={styles["form-select"]}
             >
-              <option value="proposed">Proposed</option>
               <option value="active">Active</option>
-              <option value="expired">Expired</option>
               <option value="closed">Closed</option>
             </select>
             {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
