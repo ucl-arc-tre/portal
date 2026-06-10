@@ -17,21 +17,25 @@ export default function StudyDetails(props: StudyOverviewProps) {
   return (
     <>
       <div className={styles["pre-description"]} data-cy="study-details">
-        <span>
+        <span className={styles["detail-item"]}>
           Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
         </span>
 
-        <span>
+        <span className={styles["detail-item"]}>
+          Created: <span className={styles["grey-value"]}>{formatDate(study.created_at)}</span>
+        </span>
+
+        <span className={styles["detail-item"]}>
           Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
         </span>
 
         {study.last_signoff && (
-          <span>
+          <span className={styles["detail-item"]}>
             Last signed off: <span className={styles["grey-value"]}>{formatDate(study.last_signoff)}</span>
           </span>
         )}
 
-        <span>
+        <span className={styles["detail-item"]}>
           Risk Score:
           <span className={styles["risk-score"]}> {riskScore}</span>
         </span>
@@ -47,7 +51,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
             Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
           </dd>
 
-          <dd>
+          <dd className={styles["detail-item"]}>
             Admins:
             {study.additional_study_admin_usernames.map((username) => (
               <li key={username}>
@@ -56,7 +60,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
             ))}
           </dd>
 
-          <dd>
+          <dd className={styles["detail-item"]}>
             Data Controller:
             <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
           </dd>
