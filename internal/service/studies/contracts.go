@@ -37,7 +37,7 @@ func (s *Service) validateContract(ctx context.Context, studyId uuid.UUID, data 
 	}
 
 	if !data.Status.Valid() {
-		return types.NewErrClientInvalidObjectF("Status must be proposed, active, or expired")
+		return types.NewErrClientInvalidObjectF("Status must be active, or closed")
 	}
 
 	if data.StartDate == nil {

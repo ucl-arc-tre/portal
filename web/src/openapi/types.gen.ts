@@ -625,7 +625,7 @@ export type ContractBase = {
     /**
      * Current status of the contract
      */
-    status: 'proposed' | 'active' | 'expired' | 'closed';
+    status: 'active' | 'closed';
     /**
      * Contract start date in YYYY-MM-DD format
      */

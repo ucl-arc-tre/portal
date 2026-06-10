@@ -16,12 +16,6 @@
   border: 1px solid #c3e6cb;
 }
 
-.status-proposed {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
 .status-expired {
   background-color: #f8d7da;
   color: #721c24;

@@ -16,6 +16,7 @@ describe("TRE project creation end-to-end", () => {
     // Create a study
     cy.get('[data-cy="create-study-button"]').click();
     cy.get('[name="title"]').type(studyTitle);
+    cy.get('[name="description"]').type("Test study");
     cy.get('[name="dataControllerOrganisation"]').type("UCL");
     cy.get('[data-cy="next"]').click();
     cy.get('[data-cy="next"]').click();
