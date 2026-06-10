@@ -18,18 +18,24 @@ type StudyOverviewProps = {
   unagreedAdminUsernames: string[];
 };
 
+export const calculatRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boolean | undefined | null) => {
+  const nhs_multiplier = 3;
+  let assetScore = 0;
+
+  asset.locations.forEach((assetLocation) => {
+    const location = storageDefinitions.find((def) => def.value === assetLocation);
+    if (!location) return;
+    assetScore += involvesNhsEngland
+      ? asset.tier * nhs_multiplier * location.riskScore
+      : asset.tier * location.riskScore;
+  });
+  return assetScore;
+};
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
   let assetsRiskScore = 0;
-  const nhs_multiplier = 3;
 
   for (const asset of assets) {
-    asset.locations.forEach((assetLocation) => {
-      const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
-      if (!location) return;
-      assetsRiskScore += involvesNhsEngland
-        ? asset.tier * nhs_multiplier * location.riskScore
-        : asset.tier * location.riskScore;
-    });
+    assetsRiskScore += calculatRiskScorePerAsset(asset, involvesNhsEngland);
   }
 
   return score + assetsRiskScore;
