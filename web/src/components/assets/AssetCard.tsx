@@ -7,6 +7,7 @@ import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/asse
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
 import { calculatRiskScorePerAsset } from "../studies/manage/StudyOverview";
+import Badge from "../ui/Badge";
 
 type AssetCardProps = {
   asset: Asset;
@@ -64,12 +65,13 @@ export default function AssetCard(props: AssetCardProps) {
       headerContent={
         <>
           <div className={styles["asset-meta"]}>
-            <span className={`${styles["asset-badge"]} ${getClassificationClass(asset.classification_impact)}`}>
+            <Badge className={getClassificationClass(asset.classification_impact)} cy="asset-classification-badge">
               {formatClassification(asset.classification_impact)}
-            </span>
-            <span className={`${styles["asset-badge"]} ${styles["asset-protection"]}`}>
+            </Badge>
+
+            <Badge className={styles["asset-protection"]} cy="asset-protection-badge">
               {formatProtection(asset.protection)}
-            </span>
+            </Badge>
           </div>
         </>
       }

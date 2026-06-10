@@ -14,11 +14,11 @@ type StudyOverviewProps = {
 function getRiskClassification(score: number): string {
   if (score < 10) {
     return "low";
-  } else if (score >= 10 && score < 20) {
+  } else if (score >= 10 && score < 30) {
     return "moderate";
-  } else if (score >= 20 && score < 50) {
+  } else if (score >= 30 && score < 50) {
     return "high";
-  } else if (score > 50) {
+  } else if (score >= 50) {
     return "very-high";
   }
   return "default";
@@ -28,7 +28,6 @@ export default function StudyDetails(props: StudyOverviewProps) {
   const { study, riskScore } = props;
   const standardRiskScoreStatement = "increases risk score by 5";
 
-  const greyValueClass = `${styles["value"]} ${styles["grey"]}`;
   const riskClassification = getRiskClassification(riskScore);
   const riskScoreStyle = styles[`risk-score-${riskClassification}`];
 
@@ -36,20 +35,20 @@ export default function StudyDetails(props: StudyOverviewProps) {
     <>
       <div className={styles["pre-description"]} data-cy="study-details">
         <span className={styles["detail-item"]}>
-          Case ref: <span className={greyValueClass}>{String(study.caseref).padStart(5, "0")}</span>
+          Case ref: <span className={styles["grey-value"]}>{String(study.caseref).padStart(5, "0")}</span>
         </span>
 
         <span className={styles["detail-item"]}>
-          Created: <span className={greyValueClass}>{formatDate(study.created_at)}</span>
+          Created: <span className={styles["grey-value"]}>{formatDate(study.created_at)}</span>
         </span>
 
         <span className={styles["detail-item"]}>
-          Last updated: <span className={greyValueClass}>{formatDate(study.updated_at)}</span>
+          Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
         </span>
 
         {study.last_signoff && (
           <span className={styles["detail-item"]}>
-            Last signed off: <span className={greyValueClass}>{formatDate(study.last_signoff)}</span>
+            Last signed off: <span className={styles["grey-value"]}>{formatDate(study.last_signoff)}</span>
           </span>
         )}
 
@@ -70,21 +69,21 @@ export default function StudyDetails(props: StudyOverviewProps) {
       <div>
         <dl className={styles.ownership}>
           <dd>
-            Owner: <span className={greyValueClass}>{study.owner_username}</span>
+            Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
           </dd>
 
           <dd className={styles["detail-item"]}>
             Admins:
             {study.additional_study_admin_usernames.map((username) => (
               <li key={username}>
-                <span className={greyValueClass}>{username}</span>
+                <span className={styles["grey-value"]}>{username}</span>
               </li>
             ))}
           </dd>
 
           <dd className={styles["detail-item"]}>
             Data Controller:
-            <span className={greyValueClass}>{study.data_controller_organisation.toUpperCase()}</span>
+            <span className={styles["grey-value"]}>{study.data_controller_organisation.toUpperCase()}</span>
           </dd>
         </dl>
 
