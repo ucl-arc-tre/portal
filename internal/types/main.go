@@ -17,3 +17,7 @@ type ModelAuditable struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+func (m ModelAuditable) IsDeleted() bool {
+	return m.DeletedAt.Valid
+}

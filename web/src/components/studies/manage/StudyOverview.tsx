@@ -5,7 +5,7 @@ import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";
-import { storageDefinitions } from "../../shared/storageDefinitions";
+import { storageLocationDefinitions } from "../../shared/storageDefinitions";
 
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
@@ -23,7 +23,7 @@ export const calculatRiskScorePerAsset = (asset: Asset, involvesNhsEngland: bool
   let assetScore = 0;
 
   asset.locations.forEach((assetLocation) => {
-    const location = storageDefinitions.find((def) => def.value === assetLocation);
+    const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
     if (!location) return;
     assetScore += involvesNhsEngland
       ? asset.tier * nhs_multiplier * location.riskScore

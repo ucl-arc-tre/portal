@@ -219,6 +219,10 @@ export default function ManageAssetPage() {
               <span>{asset.description}</span>
             </div>
             <div className={styles.field}>
+              <label>Source:</label>
+              <span>{asset.source || "Unset"}</span>
+            </div>
+            <div className={styles.field}>
               <label>Status:</label>
               <span
                 className={`${styles.status} ${asset.status === "active" ? styles["status-active"] : styles["status-destroyed"]}`}
@@ -253,6 +257,11 @@ export default function ManageAssetPage() {
             <div className={styles.field}>
               <label>Locations:</label>
               <span>{asset.locations.map((location) => location.replace(/_/g, " ")).join(", ")}</span>
+            </div>
+
+            <div className={styles.field}>
+              <label>Data types:</label>
+              <span>{asset.data_types.map((data_type) => data_type.replace(/_/g, " ")).join(", ")}</span>
             </div>
 
             <div className={styles.field}>

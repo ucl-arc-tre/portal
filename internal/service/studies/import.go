@@ -241,11 +241,19 @@ func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*typ
 			AssetID:  asset.ID,
 			Location: locationStr,
 		}
-		if err := tx.Where("asset_id = ? AND location = ?", asset.ID, locationStr).FirstOrCreate(&assetLocation).Error; err != nil {
-			tx.Rollback()
-			return nil, types.NewErrFromGorm(err, "failed to create asset location")
-		}
 		asset.Locations = append(asset.Locations, assetLocation)
+	}
+
+	existingLocations := []types.AssetLocation{}
+	if err := tx.Unscoped().
+		Where("asset_id = ?", asset.ID).
+		Find(&existingLocations).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to list existing asset locations")
+	}
+	if err := graceful.UpdateManyExisting(tx, existingLocations, asset.Locations); err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to update asset locations")
 	}
 
 	return &asset, commitTransaction(tx)
