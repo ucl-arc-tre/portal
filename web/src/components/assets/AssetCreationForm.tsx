@@ -444,8 +444,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         )}
 
         <div className="field">
-          <Label htmlFor="location">What data types are included in this asset. Please check all that apply</Label>
-
+          <Label htmlFor="location">Which data types are included in this asset? Please check all that apply</Label>
           <div className={styles["checkbox-group"]}>
             {assetDataTypeDefinitions.map((dataType) => (
               <label key={dataType.value} className={styles["checkbox-label"]}>
