@@ -24,9 +24,9 @@ type Interface interface {
 	CreateUserSponsorship(user types.User, sponsor types.User) (types.UserSponsorship, error)
 	Metrics() (*openapi.UserMetrics, error)
 	UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error)
-	CreateNHSDTrainingRecord(user types.User, completedAt time.Time) error
+	CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error
 	TrainingRecords(user types.User) ([]openapi.TrainingRecord, error)
-	NHSDTrainingExpiresAt(user types.User) (*time.Time, error)
+	TrainingExpiresAt(user types.User, kind types.TrainingKind) (*time.Time, error)
 	PersistedUser(username types.Username) (types.User, error)
 	PersistedExternalUser(username types.Username, email Email) (types.User, error)
 	UserExistsWithEmailOrUsername(ctx context.Context, value string) (bool, error)

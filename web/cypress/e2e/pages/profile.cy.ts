@@ -115,7 +115,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
     // Upload invalid certificate
     cy.get("input[type=file]").selectFile("cypress/fixtures/invalid_nhsd_certificate.pdf");
-    cy.get("[data-cy='training-certificate-sumbit']").click();
+    cy.get("[data-cy='training-certificate-submit']").click();
 
     // Should show error message
     cy.contains("Certificate was not valid").should("be.visible");
@@ -148,7 +148,7 @@ describe(`Profile Page Step Workflow UI`, () => {
 
     // Upload valid certificate (matches "Tom Young")
     cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-    cy.get("[data-cy='training-certificate-sumbit']").click();
+    cy.get("[data-cy='training-certificate-submit']").click();
 
     // Should show error message
     cy.contains("Certificate was not valid. Name 'Tom Young' does not match 'Test Name'.").should("be.visible");
