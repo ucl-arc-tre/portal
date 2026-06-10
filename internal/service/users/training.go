@@ -14,76 +14,73 @@ import (
 func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error) {
 	if data.CertificateContentPdfBase64 == nil {
 		log.Debug().Any("username", user.Username).Msg("Empty certificate content")
-		return openapi.ProfileTrainingResponse{CertificateIsValid: ptr(false)}, nil
+		return openapi.ProfileTrainingResponse{CertificateIsValid: new(false)}, nil
 	}
-	switch data.Kind {
-	case openapi.TrainingKindNhsd:
-		return s.updateNHSD(user, data)
-	default:
-		err := fmt.Errorf("unsupported training kind [%v]", data.Kind)
-		return openapi.ProfileTrainingResponse{}, types.NewErrInvalidObject(err)
+	kind, err := certificate.Kind(*data.CertificateContentPdfBase64)
+	if err != nil {
+		log.Debug().Any("username", user.Username).Msg("Failed to parse training kind for user")
+		return openapi.ProfileTrainingResponse{
+			CertificateIsValid: new(false),
+			CertificateMessage: new("Failed to parse training kind."),
+		}, nil
 	}
-}
 
-func (s *Service) updateNHSD(
-	user types.User,
-	data openapi.ProfileTrainingUpdate,
-) (openapi.ProfileTrainingResponse, error) {
-	certificate, err := certificate.ParseNHSDCertificate(*data.CertificateContentPdfBase64)
+	cert, err := certificate.Parse(kind, *data.CertificateContentPdfBase64)
 	response := openapi.ProfileTrainingResponse{
-		CertificateIsValid: ptr(false),
+		CertificateIsValid: new(false),
 	}
 	if err != nil {
-		response.CertificateMessage = ptr("Failed to parse certificate.")
 		return response, err
 	}
-	if !certificate.HasIssuedAt() {
-		response.CertificateMessage = ptr("Certificate was missing an issued at date.")
+	if !cert.HasIssuedAt() {
+		response.CertificateMessage = new("Certificate was missing an issued at date.")
 		return response, nil
 	}
-	if !NHSDTrainingIsValid(certificate.IssuedAt) {
+	if !TrainingIsValid(cert.IssuedAt) {
 		message := fmt.Sprintf("Certificate was issued more than %v years in the past.", config.TrainingValidityYears)
-		response.CertificateMessage = ptr(message)
+		response.CertificateMessage = new(message)
 		return response, nil
 	}
 	chosenName, err := s.userChosenName(user)
 	if err != nil || chosenName == "" {
-		response.CertificateMessage = ptr("Failed to get user's chosen name, or it was unset.")
+		response.CertificateMessage = new("Failed to get user's chosen name, or it was unset.")
 		return response, err
 	}
-	if !certificate.NameMatches(string(chosenName)) {
-		response.CertificateMessage = ptr(fmt.Sprintf("Name '%v' does not match '%v'.", certificate.Name, chosenName))
-		return response, err
+	if !cert.NameMatches(string(chosenName)) {
+		response.CertificateMessage = new(fmt.Sprintf("Name '%v' does not match '%v'.", cert.Name, chosenName))
+		return response, nil
 	}
-	response.CertificateIsValid = &certificate.IsValid
-	if certificate.IsValid {
-		response.CertificateIssuedAt = ptr(certificate.IssuedAt.Format(config.TimeFormat))
-		if err := s.CreateNHSDTrainingRecord(user, certificate.IssuedAt); err != nil {
+	response.CertificateIsValid = &cert.IsValid
+	if cert.IsValid {
+		response.CertificateIssuedAt = new(cert.IssuedAt.Format(config.TimeFormat))
+		if err := s.CreateTrainingRecord(user, types.TrainingKind(kind), cert.IssuedAt); err != nil {
 			return response, err
 		}
 	}
 	return response, nil
 }
 
-func (s *Service) hasValidNHSDTrainingRecord(user types.User) (bool, error) {
+func (s *Service) hasValidApprovedResearcherTrainingRecord(user types.User) (bool, error) {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
 		Kind:   types.TrainingKindNHSD,
 	}
-	result := s.db.Order("completed_at desc").Where(&record).Find(&record)
+	result := s.db.Order("completed_at desc").
+		Where("user_id = ? AND (kind = ? OR kind = ?)", user.ID, types.TrainingKindNHSD, types.TrainingKindUCLHIg).
+		Find(&record)
 	if result.RowsAffected == 0 {
 		return false, nil
 	} else if result.Error != nil {
 		return false, types.NewErrFromGorm(result.Error)
 	}
-	return NHSDTrainingIsValid(record.CompletedAt), nil
+	return TrainingIsValid(record.CompletedAt), nil
 }
 
 // Create a NHSD training record for a user and update the approved researcher status if required
-func (s *Service) CreateNHSDTrainingRecord(user types.User, completedAt time.Time) error {
+func (s *Service) CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
-		Kind:   types.TrainingKindNHSD,
+		Kind:   kind,
 	}
 	result := s.db.Where(&record).Assign(types.UserTrainingRecord{
 		Model:       types.Model{CreatedAt: time.Now()},
@@ -106,26 +103,30 @@ func (s *Service) TrainingRecords(user types.User) ([]openapi.TrainingRecord, er
 	}
 
 	for _, record := range records {
+		trainingRecord := openapi.TrainingRecord{
+			CompletedAt: new(record.CompletedAt.Format(config.TimeFormat)),
+			IsValid:     TrainingIsValid(record.CompletedAt),
+		}
 		switch record.Kind {
 		case types.TrainingKindNHSD:
-			completedAt := record.CompletedAt.Format(config.TimeFormat)
-			trainingRecords = append(trainingRecords, openapi.TrainingRecord{
-				Kind:        openapi.TrainingKindNhsd,
-				CompletedAt: &completedAt,
-				IsValid:     NHSDTrainingIsValid(record.CompletedAt),
-			})
+			trainingRecord.Kind = openapi.TrainingKindNhsd
+			trainingRecord.IsIgKind = new(true)
+		case types.TrainingKindUCLHIg:
+			trainingRecord.Kind = openapi.TrainingKindUclhIg
+			trainingRecord.IsIgKind = new(true)
 		default:
-			panic("unsupported training type")
+			log.Error().Any("kind", record.Kind).Msg("Invalid training kind")
 		}
+		trainingRecords = append(trainingRecords, trainingRecord)
 	}
 	return trainingRecords, nil
 }
 
 // Get the time at which a users NHSD training expires. Optional
-func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
+func (s *Service) TrainingExpiresAt(user types.User, kind types.TrainingKind) (*time.Time, error) {
 	record := types.UserTrainingRecord{
 		UserID: user.ID,
-		Kind:   types.TrainingKindNHSD,
+		Kind:   kind,
 	}
 	result := s.db.Order("completed_at desc").Where(&record).Find(&record)
 	if result.RowsAffected == 0 {
@@ -137,10 +138,6 @@ func (s *Service) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
 	return &expiresAt, nil
 }
 
-func NHSDTrainingIsValid(completedAt time.Time) bool {
+func TrainingIsValid(completedAt time.Time) bool {
 	return time.Since(completedAt) < config.TrainingValidity
-}
-
-func ptr[T any](value T) *T {
-	return &value
 }

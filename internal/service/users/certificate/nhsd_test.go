@@ -1,4 +1,4 @@
-//go:build !integration
+// //go:build !integration
 
 package certificate
 
@@ -10,11 +10,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 func TestValidNHSDCertificateParse(t *testing.T) {
-	contentBase64 := mustBase64Encode(t, "testdata/valid.pdf")
-	certificate, err := ParseNHSDCertificate(contentBase64)
+	contentBase64 := mustBase64Encode(t, "testdata/valid_nhsd.pdf")
+	certificate, err := Parse(types.TrainingKindNHSD, contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.True(t, certificate.IsValid)
@@ -26,7 +27,7 @@ func TestValidNHSDCertificateParse(t *testing.T) {
 
 func TestInvalidNHSDCertificateParse(t *testing.T) {
 	contentBase64 := mustBase64Encode(t, "testdata/invalid.pdf")
-	certificate, err := ParseNHSDCertificate(contentBase64)
+	certificate, err := Parse(types.TrainingKindNHSD, contentBase64)
 	assert.NoError(t, err)
 	assert.NotNil(t, certificate)
 	assert.False(t, certificate.IsValid)
@@ -39,7 +40,7 @@ func TestValidRegex(t *testing.T) {
 		"This is to certify that Alice Jones GMC: 7562896 completed the course Data Security Awareness On 10 September 2025",
 	}
 	for _, text := range validTexts {
-		assert.True(t, isValidRegex.MatchString(text))
+		assert.True(t, nhsdMatch.isValid.MatchString(text))
 	}
 }
 

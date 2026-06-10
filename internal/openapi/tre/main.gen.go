@@ -47,7 +47,7 @@ type UserStatus struct {
 	// IsApprovedResearcher Is the user an approved researcher?
 	IsApprovedResearcher bool `json:"is_approved_researcher"`
 
-	// NhsdTrainingExpiresAt Instanc at which the user's training expires in RFC3339 format
+	// NhsdTrainingExpiresAt Instant at which the user's training expires in RFC3339 format
 	NhsdTrainingExpiresAt *string `json:"nhsd_training_expires_at,omitempty"`
 }
 

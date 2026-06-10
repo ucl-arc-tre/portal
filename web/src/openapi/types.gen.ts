@@ -60,10 +60,10 @@ export type StudyAgreements = {
     usernames: Array<string>;
 };
 
-export type TrainingKind = 'training_kind_nhsd';
+export type TrainingKind = 'training_kind_nhsd' | 'training_kind_uclh_ig';
 
 export type ProfileTrainingUpdate = {
-    kind: TrainingKind;
+    kind?: TrainingKind;
     /**
      * Base64 encoded PDF file data of the certificate
      */
@@ -91,6 +91,10 @@ export type TrainingRecord = {
      * Whether this training certification is currently valid
      */
     is_valid: boolean;
+    /**
+     * Whether this kind of training is approved by information governance to support an approved researcher status
+     */
+    is_ig_kind?: boolean;
     /**
      * Time in RFC3339 format when the training was completed
      */

@@ -5,7 +5,7 @@
   height: 4rem;
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: auto auto;
+  grid-template-columns: repeat(auto-fill, 1fr);
   margin-block: 0.8rem;
 }
 

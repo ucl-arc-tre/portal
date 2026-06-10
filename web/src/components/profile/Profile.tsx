@@ -69,7 +69,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
       }
 
       const nhsdTraining = trainingResponse.data.training_records.find(
-        (record) => record.kind === "training_kind_nhsd"
+        (record) => record.kind === "training_kind_nhsd" || record.is_ig_kind
       );
       const trainingExpiryUrgency = nhsdTraining?.completed_at ? computeExpiryUrgency(nhsdTraining.completed_at) : null;
       setExpiryUrgency(trainingExpiryUrgency);

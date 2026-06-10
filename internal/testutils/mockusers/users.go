@@ -57,7 +57,7 @@ func (m *MockUsers) UpdateTraining(user types.User, data openapi.ProfileTraining
 	panic("not implemented")
 }
 
-func (m *MockUsers) CreateNHSDTrainingRecord(user types.User, completedAt time.Time) error {
+func (m *MockUsers) CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error {
 	panic("not implemented")
 }
 
@@ -65,7 +65,7 @@ func (m *MockUsers) TrainingRecords(user types.User) ([]openapi.TrainingRecord, 
 	panic("not implemented")
 }
 
-func (m *MockUsers) NHSDTrainingExpiresAt(user types.User) (*time.Time, error) {
+func (m *MockUsers) TrainingExpiresAt(user types.User, kind types.TrainingKind) (*time.Time, error) {
 	panic("not implemented")
 }
 

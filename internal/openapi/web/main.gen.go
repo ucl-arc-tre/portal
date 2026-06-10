@@ -443,13 +443,16 @@ func (e StudyApprovalStatus) Valid() bool {
 
 // Defines values for TrainingKind.
 const (
-	TrainingKindNhsd TrainingKind = "training_kind_nhsd"
+	TrainingKindNhsd   TrainingKind = "training_kind_nhsd"
+	TrainingKindUclhIg TrainingKind = "training_kind_uclh_ig"
 )
 
 // Valid indicates whether the value is a known member of the TrainingKind enum.
 func (e TrainingKind) Valid() bool {
 	switch e {
 	case TrainingKindNhsd:
+		return true
+	case TrainingKindUclhIg:
 		return true
 	default:
 		return false
@@ -789,8 +792,8 @@ type ProfileTrainingResponse struct {
 // ProfileTrainingUpdate defines model for ProfileTrainingUpdate.
 type ProfileTrainingUpdate struct {
 	// CertificateContentPdfBase64 Base64 encoded PDF file data of the certificate
-	CertificateContentPdfBase64 *string      `json:"certificate_content_pdf_base64,omitempty"`
-	Kind                        TrainingKind `json:"kind"`
+	CertificateContentPdfBase64 *string       `json:"certificate_content_pdf_base64,omitempty"`
+	Kind                        *TrainingKind `json:"kind,omitempty"`
 }
 
 // ProfileUpdate defines model for ProfileUpdate.
@@ -1160,6 +1163,9 @@ type TrainingKind string
 type TrainingRecord struct {
 	// CompletedAt Time in RFC3339 format when the training was completed
 	CompletedAt *string `json:"completed_at,omitempty"`
+
+	// IsIgKind Whether this kind of training is approved by information governance to support an approved researcher status
+	IsIgKind *bool `json:"is_ig_kind,omitempty"`
 
 	// IsValid Whether this training certification is currently valid
 	IsValid bool         `json:"is_valid"`
