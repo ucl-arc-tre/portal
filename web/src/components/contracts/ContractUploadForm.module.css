@@ -107,18 +107,6 @@
   color: var(--color-text);
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-weight: 500;
-  color: var(--color-text);
-  font-size: 1rem;
-}
-
 .form-input,
 .form-select {
   padding: 0.75rem;

@@ -9,22 +9,24 @@ type ContractCardProps = {
   studyId: string;
 };
 
-export const getStatusColor = (status: string) => {
-  switch (status) {
-    case "active":
-      return styles["status-active"];
-    case "proposed":
-      return styles["status-proposed"];
-    case "expired":
-      return styles["status-expired"];
-    case "closed":
-      return styles["status-closed"];
-    default:
-      return styles["status-default"];
-  }
-};
 export default function ContractCard({ studyId, contract }: ContractCardProps) {
-  const expiryUrgency = contract.expiry_date ? calculateExpiryUrgency(new Date(contract.expiry_date)) : null;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        if (contract.expiry_date && new Date(contract.expiry_date) < new Date()) {
+          return styles["status-expired"];
+        } else return styles["status-active"];
+
+      case "closed":
+        return styles["status-closed"];
+      default:
+        return styles["status-default"];
+    }
+  };
+  const expiryUrgency =
+    contract.status === "active" && contract.expiry_date
+      ? calculateExpiryUrgency(new Date(contract.expiry_date))
+      : null;
 
   return (
     <Card
@@ -38,9 +40,9 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
         </div>
       }
       manageUrl={`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`}
-      isWarning={!!expiryUrgency && contract.status !== "closed"}
+      isWarning={!!expiryUrgency}
       footerContent={
-        contract.status !== "closed" &&
+        contract.status === "active" &&
         expiryUrgency && <ExpiryWarning expiryUrgency={expiryUrgency} entityName="contract" />
       }
     >
