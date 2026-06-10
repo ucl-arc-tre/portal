@@ -90,7 +90,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
           Additional Study Administrator (optional):
           <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
-              Add a UCL staff members who will help administrate this study. <strong>Must</strong> be valid UCL staff
+              Add a UCL staff member who will help administrate this study. <strong>Must</strong> be valid UCL staff
               usernames.
             </HelperText>
 
