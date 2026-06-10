@@ -111,11 +111,16 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 	for _, contract := range asset.Contracts {
 		contractIds = append(contractIds, contract.ID.String())
 	}
+	dataTypes := []openapi.AssetDataTypes{}
+	for _, dataType := range asset.DataTypes {
+		dataTypes = append(dataTypes, openapi.AssetDataTypes(dataType.Name))
+	}
 	return openapi.Asset{
 		Id:                   asset.ID.String(),
 		CreatorUserId:        asset.CreatorUserID.String(),
 		StudyId:              asset.StudyID.String(),
 		Title:                asset.Title,
+		Source:               asset.Source,
 		Description:          asset.Description,
 		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
 		Tier:                 asset.Tier,
@@ -124,6 +129,7 @@ func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
 		Format:               openapi.AssetFormat(asset.Format),
 		ExpiresAt:            openapi.FormatOptionalTime(asset.ExpiresAt),
 		Locations:            asset.LocationStrings(),
+		DataTypes:            dataTypes,
 		RequiresContract:     asset.RequiresContract,
 		HasDspt:              asset.HasDspt,
 		StoredOutsideUkEea:   asset.StoredOutsideUkEea,

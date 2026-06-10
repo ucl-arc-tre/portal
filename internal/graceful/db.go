@@ -36,6 +36,7 @@ func InitDB() {
 		&types.StudyAgreementSignature{},
 		&types.Asset{},
 		&types.AssetLocation{},
+		&types.AssetDataType{},
 		&types.Contract{},
 		&types.ContractObjectMetadata{},
 		&types.UserSponsorship{},

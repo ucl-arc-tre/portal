@@ -1,7 +1,7 @@
 export const TrainingKindOptions = {
   //  is there a better way of doing this? Won't let me use type as a value
-  nhsd: "training_kind_nhsd",
-  uclhig: "training_kind_uclh_ig",
+  "NHS Digital E-learning for Health": "training_kind_nhsd",
+  "UCLH Information Governance": "training_kind_uclh_ig",
 };
 
 // UTILITY FUNCTIONS

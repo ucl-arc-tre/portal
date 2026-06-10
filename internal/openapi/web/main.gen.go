@@ -54,6 +54,57 @@ func (e AssetClassificationImpact) Valid() bool {
 	}
 }
 
+// Defines values for AssetDataTypes.
+const (
+	AssetDataTypesAdministrativeOperations AssetDataTypes = "administrative_operations"
+	AssetDataTypesAudio                    AssetDataTypes = "audio"
+	AssetDataTypesCommerciallyConfidential AssetDataTypes = "commercially_confidential"
+	AssetDataTypesDocumentation            AssetDataTypes = "documentation"
+	AssetDataTypesFinancial                AssetDataTypes = "financial"
+	AssetDataTypesImages                   AssetDataTypes = "images"
+	AssetDataTypesOther                    AssetDataTypes = "other"
+	AssetDataTypesPersonal                 AssetDataTypes = "personal"
+	AssetDataTypesResearch                 AssetDataTypes = "research"
+	AssetDataTypesResearchOutput           AssetDataTypes = "research_output"
+	AssetDataTypesSoftware                 AssetDataTypes = "software"
+	AssetDataTypesSpecialCategoryPersonal  AssetDataTypes = "special_category_personal"
+	AssetDataTypesVideo                    AssetDataTypes = "video"
+)
+
+// Valid indicates whether the value is a known member of the AssetDataTypes enum.
+func (e AssetDataTypes) Valid() bool {
+	switch e {
+	case AssetDataTypesAdministrativeOperations:
+		return true
+	case AssetDataTypesAudio:
+		return true
+	case AssetDataTypesCommerciallyConfidential:
+		return true
+	case AssetDataTypesDocumentation:
+		return true
+	case AssetDataTypesFinancial:
+		return true
+	case AssetDataTypesImages:
+		return true
+	case AssetDataTypesOther:
+		return true
+	case AssetDataTypesPersonal:
+		return true
+	case AssetDataTypesResearch:
+		return true
+	case AssetDataTypesResearchOutput:
+		return true
+	case AssetDataTypesSoftware:
+		return true
+	case AssetDataTypesSpecialCategoryPersonal:
+		return true
+	case AssetDataTypesVideo:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for AssetFormat.
 const (
 	AssetFormatElectronic AssetFormat = "electronic"
@@ -162,6 +213,57 @@ func (e AssetBaseClassificationImpact) Valid() bool {
 	case AssetBaseClassificationImpactHighlyConfidential:
 		return true
 	case AssetBaseClassificationImpactPublic:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AssetBaseDataTypes.
+const (
+	AssetBaseDataTypesAdministrativeOperations AssetBaseDataTypes = "administrative_operations"
+	AssetBaseDataTypesAudio                    AssetBaseDataTypes = "audio"
+	AssetBaseDataTypesCommerciallyConfidential AssetBaseDataTypes = "commercially_confidential"
+	AssetBaseDataTypesDocumentation            AssetBaseDataTypes = "documentation"
+	AssetBaseDataTypesFinancial                AssetBaseDataTypes = "financial"
+	AssetBaseDataTypesImages                   AssetBaseDataTypes = "images"
+	AssetBaseDataTypesOther                    AssetBaseDataTypes = "other"
+	AssetBaseDataTypesPersonal                 AssetBaseDataTypes = "personal"
+	AssetBaseDataTypesResearch                 AssetBaseDataTypes = "research"
+	AssetBaseDataTypesResearchOutput           AssetBaseDataTypes = "research_output"
+	AssetBaseDataTypesSoftware                 AssetBaseDataTypes = "software"
+	AssetBaseDataTypesSpecialCategoryPersonal  AssetBaseDataTypes = "special_category_personal"
+	AssetBaseDataTypesVideo                    AssetBaseDataTypes = "video"
+)
+
+// Valid indicates whether the value is a known member of the AssetBaseDataTypes enum.
+func (e AssetBaseDataTypes) Valid() bool {
+	switch e {
+	case AssetBaseDataTypesAdministrativeOperations:
+		return true
+	case AssetBaseDataTypesAudio:
+		return true
+	case AssetBaseDataTypesCommerciallyConfidential:
+		return true
+	case AssetBaseDataTypesDocumentation:
+		return true
+	case AssetBaseDataTypesFinancial:
+		return true
+	case AssetBaseDataTypesImages:
+		return true
+	case AssetBaseDataTypesOther:
+		return true
+	case AssetBaseDataTypesPersonal:
+		return true
+	case AssetBaseDataTypesResearch:
+		return true
+	case AssetBaseDataTypesResearchOutput:
+		return true
+	case AssetBaseDataTypesSoftware:
+		return true
+	case AssetBaseDataTypesSpecialCategoryPersonal:
+		return true
+	case AssetBaseDataTypesVideo:
 		return true
 	default:
 		return false
@@ -489,6 +591,9 @@ type Asset struct {
 	// CreatorUserId Unique identifier of the user who created the asset
 	CreatorUserId string `json:"creator_user_id"`
 
+	// DataTypes Types of data that are present in the asset
+	DataTypes []AssetDataTypes `json:"data_types"`
+
 	// Description Description of the asset
 	Description string `json:"description"`
 
@@ -516,6 +621,9 @@ type Asset struct {
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
 
+	// Source Source of the data. e.g. 'NHS Trust X'
+	Source *string `json:"source,omitempty"`
+
 	// Status Status of the asset
 	Status AssetStatus `json:"status"`
 
@@ -538,6 +646,9 @@ type Asset struct {
 // AssetClassificationImpact Classification level of the asset
 type AssetClassificationImpact string
 
+// AssetDataTypes defines model for Asset.DataTypes.
+type AssetDataTypes string
+
 // AssetFormat Format of the asset
 type AssetFormat string
 
@@ -554,6 +665,9 @@ type AssetStatus string
 type AssetBase struct {
 	// ClassificationImpact Classification level of the asset
 	ClassificationImpact AssetBaseClassificationImpact `json:"classification_impact"`
+
+	// DataTypes Types of data that are present in the asset
+	DataTypes []AssetBaseDataTypes `json:"data_types"`
 
 	// Description Description of the asset
 	Description string `json:"description"`
@@ -579,6 +693,9 @@ type AssetBase struct {
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
 
+	// Source Source of the data. e.g. 'NHS Trust X'
+	Source *string `json:"source,omitempty"`
+
 	// Status Status of the asset
 	Status AssetBaseStatus `json:"status"`
 
@@ -594,6 +711,9 @@ type AssetBase struct {
 
 // AssetBaseClassificationImpact Classification level of the asset
 type AssetBaseClassificationImpact string
+
+// AssetBaseDataTypes defines model for AssetBase.DataTypes.
+type AssetBaseDataTypes string
 
 // AssetBaseFormat Format of the asset
 type AssetBaseFormat string
@@ -1428,7 +1548,7 @@ type ServerInterface interface {
 	GetStudiesStudyIdAssets(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/{studyId}/assets)
-	PostStudiesStudyIdAssets(c *gin.Context, studyId string)
+	PostStudiesStudyIdAssets(c *gin.Context, studyId StudyIdParam)
 
 	// (DELETE /studies/{studyId}/assets/{assetId})
 	DeleteStudiesStudyIdAssetsAssetId(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
@@ -2123,7 +2243,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	_ = err
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
