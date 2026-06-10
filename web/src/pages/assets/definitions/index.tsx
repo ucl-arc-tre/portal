@@ -1,6 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
-import { storageDefinitions } from "@/components/shared/storageDefinitions";
+import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./definitions.module.css";
 import Callout from "@/components/ui/Callout";
@@ -23,7 +23,7 @@ export default function AssetDefinitionsPage() {
         />
 
         <div className={styles.definitions}>
-          {storageDefinitions.map((item, index) => (
+          {storageLocationDefinitions.map((item, index) => (
             <div key={index} className={styles.definition}>
               <h3 className={styles.name}>{item.name}</h3>
               <p className={styles.description}>{item.definition}</p>

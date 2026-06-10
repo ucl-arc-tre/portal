@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -80,7 +81,7 @@ type StudyAdmin struct {
 }
 
 func (s StudyAdmin) IsDeleted() bool {
-	return s.DeletedAt.Valid
+	return s.ModelAuditable.IsDeleted()
 }
 
 type AssetStatus = string
@@ -107,12 +108,14 @@ type Asset struct {
 	HasDspt              bool        `gorm:"not null;default:false"`
 	StoredOutsideUkEea   bool        `gorm:"not null;default:false"`
 	Status               AssetStatus `gorm:"not null"`
+	Source               *string     // Data source location
 
 	// Relationships
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`
 	Study       Study           `gorm:"foreignKey:StudyID"`
 	Locations   []AssetLocation `gorm:"foreignKey:AssetID"`
 	Contracts   []Contract      `gorm:"many2many:contract_assets;"`
+	DataTypes   []AssetDataType `gorm:"foreignKey:AssetID"`
 }
 
 func (a Asset) LocationStrings() []string {
@@ -128,12 +131,37 @@ func (a Asset) IsDestroyed() bool {
 }
 
 type AssetLocation struct {
-	Model
+	ModelAuditable
 	AssetID  uuid.UUID `gorm:"not null;index"`
 	Location string    `gorm:"not null"`
 
 	// Relationships
 	Asset Asset `gorm:"foreignKey:AssetID"`
+}
+
+func (a AssetLocation) UniqueKey() string {
+	return fmt.Sprintf("%v%v", a.AssetID, a.Location)
+}
+
+func (a AssetLocation) IsDeleted() bool {
+	return a.ModelAuditable.IsDeleted()
+}
+
+type AssetDataType struct {
+	ModelAuditable
+	AssetID uuid.UUID `gorm:"not null;index"`
+	Name    string    `gorm:"not null"` // e.g. Research data
+
+	// Relationships
+	Asset Asset `gorm:"foreignKey:AssetID"`
+}
+
+func (a AssetDataType) UniqueKey() string {
+	return fmt.Sprintf("%v%v", a.AssetID, a.Name)
+}
+
+func (a AssetDataType) IsDeleted() bool {
+	return a.ModelAuditable.IsDeleted()
 }
 
 type ContractStatus = string

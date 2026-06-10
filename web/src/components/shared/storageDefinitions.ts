@@ -1,4 +1,4 @@
-export type StorageDefinition = {
+export type StorageLocationDefinition = {
   name: string;
   value: string;
   definition: string;
@@ -9,7 +9,7 @@ export type StorageDefinition = {
   riskScore: number; // 1-5
 };
 
-export const storageDefinitions: StorageDefinition[] = [
+export const storageLocationDefinitions: StorageLocationDefinition[] = [
   {
     name: "ARC Trusted Research Environment (TRE)",
     value: "arc_tre",

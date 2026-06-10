@@ -51,6 +51,12 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 		return types.NewErrClientInvalidObjectF("invalid status")
 	}
 
+	for _, dataType := range assetData.DataTypes {
+		if !dataType.Valid() {
+			return types.NewErrClientInvalidObjectF("data type [%v] was not valid", dataType)
+		}
+	}
+
 	// Validate expiry field if provided
 	if assetData.ExpiresAt != nil {
 		if _, err := time.Parse(config.DateFormat, *assetData.ExpiresAt); err != nil {
@@ -61,12 +67,11 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 	return nil
 }
 
-// handles the database transaction for creating a study asset
 func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
-
 	asset := &types.Asset{
 		Title:                assetData.Title,
 		Description:          assetData.Description,
+		Source:               assetData.Source,
 		ClassificationImpact: string(assetData.ClassificationImpact),
 		Tier:                 assetData.Tier,
 		Protection:           string(assetData.Protection),
@@ -136,6 +141,17 @@ func (s *Service) CreateAsset(creator types.User, assetData openapi.AssetBase, s
 		}
 	}
 
+	for _, dataTypeStr := range assetData.DataTypes {
+		assetDataType := types.AssetDataType{
+			AssetID: asset.ID,
+			Name:    string(dataTypeStr),
+		}
+		if err := tx.Create(&assetDataType).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create asset data type")
+		}
+	}
+
 	return commitTransaction(tx)
 }
 
@@ -168,20 +184,42 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 		return nil, types.NewErrFromGorm(err, "failed to update asset")
 	}
 
-	if err := tx.Where("asset_id = ?", assetID).Delete(&types.AssetLocation{}).Error; err != nil {
+	existingLocations := []types.AssetLocation{}
+	if err := tx.Unscoped().
+		Where("asset_id = ?", assetID).
+		Find(&existingLocations).Error; err != nil {
 		tx.Rollback()
-		return nil, types.NewErrFromGorm(err, "failed to delete asset locations")
+		return nil, types.NewErrFromGorm(err, "failed to list existing asset locations")
 	}
-
+	newLocations := []types.AssetLocation{}
 	for _, locationStr := range assetData.Locations {
-		assetLocation := types.AssetLocation{
+		newLocations = append(newLocations, types.AssetLocation{
 			AssetID:  assetID,
 			Location: locationStr,
-		}
-		if err := tx.Create(&assetLocation).Error; err != nil {
-			tx.Rollback()
-			return nil, types.NewErrFromGorm(err, "failed to create asset location")
-		}
+		})
+	}
+	if err := graceful.UpdateManyExisting(tx, existingLocations, newLocations); err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to update asset locations")
+	}
+
+	existingDataTypes := []types.AssetDataType{}
+	if err := tx.Unscoped().
+		Where("asset_id = ?", assetID).
+		Find(&existingDataTypes).Error; err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to list existing asset data types")
+	}
+	newDataTypes := []types.AssetDataType{}
+	for _, dataTypeStr := range assetData.DataTypes {
+		newDataTypes = append(newDataTypes, types.AssetDataType{
+			AssetID: assetID,
+			Name:    string(dataTypeStr),
+		})
+	}
+	if err := graceful.UpdateManyExisting(tx, existingDataTypes, newDataTypes); err != nil {
+		tx.Rollback()
+		return nil, types.NewErrFromGorm(err, "failed to update asset data types")
 	}
 
 	if err := commitTransaction(tx); err != nil {
@@ -231,14 +269,14 @@ func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) error {
 // retrieves all assets for a study
 func (s *Service) Assets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
-	err := s.db.Preload("Locations").Preload("Contracts.Assets").Where("study_id = ?", studyID).Find(&assets).Error
+	err := s.db.Preload("Locations").Preload("DataTypes").Preload("Contracts.Assets").Where("study_id = ?", studyID).Find(&assets).Error
 	return assets, types.NewErrFromGorm(err, "failed to get assets")
 }
 
 // retrieves a specific asset within a study
 func (s *Service) AssetById(studyID uuid.UUID, assetID uuid.UUID) (types.Asset, error) {
 	asset := types.Asset{}
-	err := s.db.Preload("Locations").Preload("Contracts.Assets").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
+	err := s.db.Preload("Locations").Preload("DataTypes").Preload("Contracts.Assets").Where("study_id = ? AND id = ?", studyID, assetID).First(&asset).Error
 	return asset, types.NewErrFromGorm(err, "failed to get asset by id")
 }
 

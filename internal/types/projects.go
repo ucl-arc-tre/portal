@@ -78,7 +78,7 @@ func (p ProjectTRERoleBinding) UniqueKey() string {
 }
 
 func (p ProjectTRERoleBinding) IsDeleted() bool {
-	return p.DeletedAt.Valid
+	return p.ModelAuditable.IsDeleted()
 }
 
 type ProjectAsset struct {
@@ -96,5 +96,5 @@ func (p ProjectAsset) UniqueKey() string {
 }
 
 func (p ProjectAsset) IsDeleted() bool {
-	return p.DeletedAt.Valid
+	return p.ModelAuditable.IsDeleted()
 }

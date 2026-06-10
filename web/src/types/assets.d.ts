@@ -1,6 +1,7 @@
 type AssetFormData = {
   title: string;
   description: string;
+  source?: string | undefined;
   classification_impact: string;
   tier: number | string; // Can be string from form, converted to number
   protection: string;
@@ -8,6 +9,7 @@ type AssetFormData = {
   format: string;
   has_expiry_date: boolean | string;
   expires_at: string | null;
+  data_types: string[];
   locations: string[];
   requires_contract: boolean | string; // Can be string from form, converted to boolean
   has_dspt: boolean | string; // Can be string from form, converted to boolean

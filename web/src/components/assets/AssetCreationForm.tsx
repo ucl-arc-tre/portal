@@ -3,12 +3,13 @@ import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
-import { storageDefinitions } from "@/components/shared/storageDefinitions";
+import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
-import { Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
 import { Asset } from "@/openapi";
 import InfoTooltip from "../ui/InfoTooltip";
+import { assetDataTypeDefinitions } from "../shared/assetDataTypeDefinitions";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
@@ -33,6 +34,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
     defaultValues: {
       title: "",
       description: "",
+      source: undefined,
       classification_impact: "",
       tier: "",
       protection: "",
@@ -41,6 +43,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       has_expiry_date: false,
       expires_at: null,
       locations: [],
+      data_types: [],
       requires_contract: false,
       has_dspt: false,
       stored_outside_uk_eea: false,
@@ -53,6 +56,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       reset({
         title: editingAsset.title,
         description: editingAsset.description,
+        source: editingAsset.source,
         classification_impact: editingAsset.classification_impact,
         tier: editingAsset.tier,
         protection: editingAsset.protection,
@@ -61,6 +65,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         has_expiry_date: editingAsset.expires_at ? "true" : "false",
         expires_at: editingAsset.expires_at ? editingAsset.expires_at.split("T")[0] : null,
         locations: editingAsset.locations,
+        data_types: editingAsset.data_types,
         requires_contract: String(editingAsset.requires_contract),
         has_dspt: String(editingAsset.has_dspt),
         stored_outside_uk_eea: String(editingAsset.stored_outside_uk_eea),
@@ -70,6 +75,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       reset({
         title: "",
         description: "",
+        source: undefined,
         classification_impact: "",
         tier: "",
         protection: "",
@@ -78,6 +84,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         has_expiry_date: false,
         expires_at: null,
         locations: [],
+        data_types: [],
         requires_contract: false,
         has_dspt: false,
         stored_outside_uk_eea: false,
@@ -169,6 +176,25 @@ export default function AssetCreationForm(props: AssetFormProps) {
           {errors.description && (
             <Alert type="error">
               <AlertMessage>{errors.description.message}</AlertMessage>
+            </Alert>
+          )}
+        </div>
+
+        <div className="field">
+          <Label htmlFor="source">Data source</Label>
+          <input
+            id="source"
+            {...register("source", {
+              minLength: { value: 3, message: "Source must be at least 3 characters" },
+              maxLength: { value: 255, message: "Source must be less than 255 characters" },
+            })}
+            aria-invalid={!!errors.source}
+            className={errors.source ? styles.error : ""}
+          />
+          <HelperText>Please add where the data asset has come from.</HelperText>
+          {errors.source && (
+            <Alert type="error">
+              <AlertMessage>{errors.source.message}</AlertMessage>
             </Alert>
           )}
         </div>
@@ -418,6 +444,31 @@ export default function AssetCreationForm(props: AssetFormProps) {
         )}
 
         <div className="field">
+          <Label htmlFor="location">What data types are included in this asset. Please check all that apply</Label>
+
+          <div className={styles["checkbox-group"]}>
+            {assetDataTypeDefinitions.map((dataType) => (
+              <label key={dataType.value} className={styles["checkbox-label"]}>
+                <input
+                  type="checkbox"
+                  value={dataType.value}
+                  {...register("data_types", {})}
+                  className={styles.checkbox}
+                />
+                {dataType.name}
+                {dataType.definition && <InfoTooltip text={dataType.definition!} />}
+              </label>
+            ))}
+          </div>
+
+          {errors.data_types && (
+            <Alert type="error">
+              <AlertMessage>{errors.data_types.message}</AlertMessage>
+            </Alert>
+          )}
+        </div>
+
+        <div className="field">
           <Label htmlFor="location">
             Where will these files/items be saved/stored and how will they be moved? Select all of the touchpoints that
             are relevant including backups. *{" "}
@@ -432,7 +483,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </Label>
 
           <div className={styles["checkbox-group"]}>
-            {storageDefinitions.map((storage) => (
+            {storageLocationDefinitions.map((storage) => (
               <label key={storage.value} className={styles["checkbox-label"]}>
                 <input
                   type="checkbox"

@@ -148,6 +148,10 @@ export type AssetBase = {
      */
     description: string;
     /**
+     * Source of the data. e.g. 'NHS Trust X'
+     */
+    source?: string;
+    /**
      * Classification level of the asset
      */
     classification_impact: 'public' | 'confidential' | 'highly_confidential';
@@ -159,6 +163,10 @@ export type AssetBase = {
      * Storage locations and touchpoints for the asset
      */
     locations: Array<string>;
+    /**
+     * Types of data that are present in the asset
+     */
+    data_types: Array<'personal' | 'special_category_personal' | 'commercially_confidential' | 'research' | 'administrative_operations' | 'financial' | 'audio' | 'video' | 'images' | 'software' | 'documentation' | 'research_output' | 'other'>;
     /**
      * Type of protection applied to the asset
      */
@@ -1904,7 +1912,7 @@ export type PostStudiesByStudyIdAssetsData = {
     body: AssetBase;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };

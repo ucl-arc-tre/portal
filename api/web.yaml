@@ -778,12 +778,7 @@ paths:
     post:
       description: Create a new asset for a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
@@ -1418,6 +1413,7 @@ components:
         - classification_impact
         - tier
         - locations
+        - data_types
         - protection
         - legal_basis
         - format
@@ -1434,6 +1430,9 @@ components:
         description:
           type: string
           description: Description of the asset
+        source:
+          type: string
+          description: Source of the data. e.g. 'NHS Trust X'
         classification_impact:
           type: string
           enum:
@@ -1451,6 +1450,25 @@ components:
           items:
             type: string
           description: Storage locations and touchpoints for the asset
+        data_types:
+          type: array
+          items:
+            type: string
+            enum:
+              - "personal"
+              - "special_category_personal"
+              - "commercially_confidential"
+              - "research"
+              - "administrative_operations"
+              - "financial"
+              - "audio"
+              - "video"
+              - "images"
+              - "software"
+              - "documentation"
+              - "research_output"
+              - "other"
+          description: Types of data that are present in the asset
         protection:
           type: string
           enum:
