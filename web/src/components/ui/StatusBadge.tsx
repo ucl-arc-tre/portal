@@ -2,6 +2,7 @@ import { EnvironmentName, StudyApprovalStatus } from "@/openapi";
 import { useAuth } from "@/hooks/useAuth";
 import InfoTooltip from "./InfoTooltip";
 import styles from "./StatusBadge.module.css";
+import Badge from "./Badge";
 
 type BadgeProps = {
   status: StudyApprovalStatus | string | undefined;
@@ -95,11 +96,11 @@ export default function StatusBadge(props: BadgeProps) {
 
   const description = getDescription(type, status, environment, isOpsStaff);
   return (
-    <span className={`${styles["status-badge"]} ${getStatusClassName(status)}`} data-cy="status-badge">
+    <Badge className={getStatusClassName(status)} cy="status-badge">
       {status}
       <span className={styles["tooltip-wrapper"]}>
         <InfoTooltip text={description} />
       </span>
-    </span>
+    </Badge>
   );
 }
