@@ -118,7 +118,7 @@ export default function PeoplePage() {
         <div className={styles["search-wrapper"]}>
           <Search placeholder="Search users..." onSearch={handleUserSearch} id="user-search" />
           <HelperText>
-            <small>Search by email address or user principal</small>
+            <small>Search by user&apos;s name, email address or user principal</small>
           </HelperText>
         </div>
       )}
