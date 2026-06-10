@@ -2064,7 +2064,7 @@ components:
           description: Name of the third party organization
         status:
           type: string
-          enum: [proposed, active, expired, closed]
+          enum: [active, closed]
           description: Current status of the contract
         start_date:
           type: string

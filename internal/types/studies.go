@@ -139,10 +139,8 @@ type AssetLocation struct {
 type ContractStatus = string
 
 const (
-	ContractStatusProposed = ContractStatus("proposed")
-	ContractStatusActive   = ContractStatus("active")
-	ContractStatusExpired  = ContractStatus("expired")
-	ContractStatusClosed   = ContractStatus("closed")
+	ContractStatusActive = ContractStatus("active")
+	ContractStatusClosed = ContractStatus("closed")
 )
 
 // Contract represents a PDF contract document associated with an asset
