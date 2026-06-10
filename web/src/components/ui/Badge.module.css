@@ -1,0 +1,12 @@
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid;
+  height: 1.5rem;
+}
