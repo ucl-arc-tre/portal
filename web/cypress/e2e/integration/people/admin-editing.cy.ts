@@ -12,7 +12,7 @@ describe("Admin can edit people", () => {
       cy.get("[data-testid='ucl-uikit-search-search-btn']").click();
       cy.contains("tr", botBaseUsername).find("[data-cy='training']").contains("Edit").click();
 
-      cy.get("select[name='training_kind']").select("nhsd");
+      cy.get("select[name='training_kind']").select("NHS Digital E-learning for Health");
       cy.get("[data-cy=set-to-today]").click();
       cy.get("[name='training_date']").should("not.be.visible");
       cy.get("button").contains("Submit").click();
