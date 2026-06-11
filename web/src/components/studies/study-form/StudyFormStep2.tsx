@@ -13,7 +13,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
   const showCagRef = useWatch({ name: "involvesCag", control });
   const showIrasId = useWatch({ name: "involvesHraApproval", control });
   const showNhsRelated = useWatch({ name: "isNhsAssociated", control });
-  const showNhsEnglandRef = false; // ML thinks we don't need this field so hiding for now, can be added back if needed by uncommenting the relevant code in StudyFormStep2 and StudyForm.tsx
+  const showNhsEnglandRef = false; // ML thinks we don't need this field so hiding for now (see 1.1.7 in UAt doc), can be added back if needed
 
   return (
     <>
