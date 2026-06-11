@@ -174,7 +174,11 @@ export type AssetBase = {
     /**
      * Legal basis for holding the asset
      */
-    legal_basis: 'consent' | 'contract' | 'legal_obligation' | 'vital_interests' | 'public_task' | 'legitimate_interests';
+    legal_basis?: 'consent' | 'contract' | 'legal_obligation' | 'vital_interests' | 'public_task' | 'legitimate_interests';
+    /**
+     * Additional Condition for Special Category Data
+     */
+    legal_basis_special?: 'archiving_research_statistical' | 'consent' | 'law' | 'vital_interests' | 'made_public' | 'legal' | 'public_interest' | 'health' | 'public_health';
     /**
      * Format of the asset
      */
@@ -423,7 +427,7 @@ export type AssetImport = {
     tier: number;
     locations: Array<string>;
     protection: string;
-    legal_basis: string;
+    legal_basis?: string;
     format: string;
     expires_at: string;
     requires_contract: boolean;

@@ -78,7 +78,7 @@ func TestIntegration_CreateAsset(t *testing.T) {
 		Tier:                 2,
 		Locations:            []string{"UK", "EU"},
 		Protection:           openapi.AssetBaseProtectionAnonymisation,
-		LegalBasis:           openapi.AssetBaseLegalBasisConsent,
+		LegalBasis:           new(openapi.AssetBaseLegalBasisConsent),
 		Format:               openapi.AssetBaseFormatElectronic,
 		ExpiresAt:            ptr(time.Now().AddDate(1, 0, 0).Format("2006-01-02")),
 		Status:               openapi.AssetBaseStatusActive,

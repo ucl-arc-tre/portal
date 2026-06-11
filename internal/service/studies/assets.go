@@ -39,8 +39,12 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 		return types.NewErrClientInvalidObjectF("protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation")
 	}
 
-	if !assetData.LegalBasis.Valid() {
+	if assetData.LegalBasis != nil && !assetData.LegalBasis.Valid() {
 		return types.NewErrClientInvalidObjectF("invalid legal basis")
+	}
+
+	if assetData.LegalBasisSpecial != nil && !assetData.LegalBasisSpecial.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid special legal basis")
 	}
 
 	if !assetData.Format.Valid() {
@@ -67,26 +71,30 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 	return nil
 }
 
-func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
+func assetFromBase(data openapi.AssetBase) (*types.Asset, error) {
 	asset := &types.Asset{
-		Title:                assetData.Title,
-		Description:          assetData.Description,
-		Source:               assetData.Source,
-		ClassificationImpact: string(assetData.ClassificationImpact),
-		Tier:                 assetData.Tier,
-		Protection:           string(assetData.Protection),
-		LegalBasis:           string(assetData.LegalBasis),
-		Format:               string(assetData.Format),
-		HasDspt:              assetData.HasDspt,
-		RequiresContract:     assetData.RequiresContract,
-		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
-		Status:               string(assetData.Status),
+		Title:                data.Title,
+		Description:          data.Description,
+		Source:               data.Source,
+		ClassificationImpact: string(data.ClassificationImpact),
+		Tier:                 data.Tier,
+		Protection:           string(data.Protection),
+		Format:               string(data.Format),
+		HasDspt:              data.HasDspt,
+		RequiresContract:     data.RequiresContract,
+		StoredOutsideUkEea:   data.StoredOutsideUkEea,
+		Status:               string(data.Status),
 	}
-
-	if assetData.ExpiresAt != nil {
-		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
+	if data.LegalBasis != nil {
+		asset.LegalBasis = new(string(*data.LegalBasis))
+	}
+	if data.LegalBasisSpecial != nil {
+		asset.LegalBasisSpecial = new(string(*data.LegalBasisSpecial))
+	}
+	if data.ExpiresAt != nil {
+		parsedDateTime, err := time.Parse(config.DateFormat, *data.ExpiresAt)
 		if err != nil {
-			return nil, types.NewErrInvalidObjectF("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err)
+			return nil, types.NewErrInvalidObjectF("failed to parse validated expiry date %s: %v", *data.ExpiresAt, err)
 		}
 		asset.ExpiresAt = &parsedDateTime
 	}

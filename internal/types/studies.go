@@ -100,7 +100,6 @@ type Asset struct {
 	ClassificationImpact string    `gorm:"not null"`
 	Tier                 int       `gorm:"not null;default:0"`
 	Protection           string    `gorm:"not null"`
-	LegalBasis           string    `gorm:"not null"`
 	Format               string    `gorm:"not null"`
 	ExpiresAt            *time.Time
 	RequiresContract     bool        `gorm:"not null;default:false"`
@@ -108,6 +107,8 @@ type Asset struct {
 	StoredOutsideUkEea   bool        `gorm:"not null;default:false"`
 	Status               AssetStatus `gorm:"not null"`
 	Source               *string     // Data source location
+	LegalBasis           *string     // GDPR
+	LegalBasisSpecial    *string     // Additional condition(s) for Special Category Data e.g. "Explicit consent"
 
 	// Relationships
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`

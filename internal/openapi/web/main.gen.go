@@ -156,6 +156,45 @@ func (e AssetLegalBasis) Valid() bool {
 	}
 }
 
+// Defines values for AssetLegalBasisSpecial.
+const (
+	AssetLegalBasisSpecialArchivingResearchStatistical AssetLegalBasisSpecial = "archiving_research_statistical"
+	AssetLegalBasisSpecialConsent                      AssetLegalBasisSpecial = "consent"
+	AssetLegalBasisSpecialHealth                       AssetLegalBasisSpecial = "health"
+	AssetLegalBasisSpecialLaw                          AssetLegalBasisSpecial = "law"
+	AssetLegalBasisSpecialLegal                        AssetLegalBasisSpecial = "legal"
+	AssetLegalBasisSpecialMadePublic                   AssetLegalBasisSpecial = "made_public"
+	AssetLegalBasisSpecialPublicHealth                 AssetLegalBasisSpecial = "public_health"
+	AssetLegalBasisSpecialPublicInterest               AssetLegalBasisSpecial = "public_interest"
+	AssetLegalBasisSpecialVitalInterests               AssetLegalBasisSpecial = "vital_interests"
+)
+
+// Valid indicates whether the value is a known member of the AssetLegalBasisSpecial enum.
+func (e AssetLegalBasisSpecial) Valid() bool {
+	switch e {
+	case AssetLegalBasisSpecialArchivingResearchStatistical:
+		return true
+	case AssetLegalBasisSpecialConsent:
+		return true
+	case AssetLegalBasisSpecialHealth:
+		return true
+	case AssetLegalBasisSpecialLaw:
+		return true
+	case AssetLegalBasisSpecialLegal:
+		return true
+	case AssetLegalBasisSpecialMadePublic:
+		return true
+	case AssetLegalBasisSpecialPublicHealth:
+		return true
+	case AssetLegalBasisSpecialPublicInterest:
+		return true
+	case AssetLegalBasisSpecialVitalInterests:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for AssetProtection.
 const (
 	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
@@ -312,6 +351,45 @@ func (e AssetBaseLegalBasis) Valid() bool {
 	case AssetBaseLegalBasisPublicTask:
 		return true
 	case AssetBaseLegalBasisVitalInterests:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AssetBaseLegalBasisSpecial.
+const (
+	AssetBaseLegalBasisSpecialArchivingResearchStatistical AssetBaseLegalBasisSpecial = "archiving_research_statistical"
+	AssetBaseLegalBasisSpecialConsent                      AssetBaseLegalBasisSpecial = "consent"
+	AssetBaseLegalBasisSpecialHealth                       AssetBaseLegalBasisSpecial = "health"
+	AssetBaseLegalBasisSpecialLaw                          AssetBaseLegalBasisSpecial = "law"
+	AssetBaseLegalBasisSpecialLegal                        AssetBaseLegalBasisSpecial = "legal"
+	AssetBaseLegalBasisSpecialMadePublic                   AssetBaseLegalBasisSpecial = "made_public"
+	AssetBaseLegalBasisSpecialPublicHealth                 AssetBaseLegalBasisSpecial = "public_health"
+	AssetBaseLegalBasisSpecialPublicInterest               AssetBaseLegalBasisSpecial = "public_interest"
+	AssetBaseLegalBasisSpecialVitalInterests               AssetBaseLegalBasisSpecial = "vital_interests"
+)
+
+// Valid indicates whether the value is a known member of the AssetBaseLegalBasisSpecial enum.
+func (e AssetBaseLegalBasisSpecial) Valid() bool {
+	switch e {
+	case AssetBaseLegalBasisSpecialArchivingResearchStatistical:
+		return true
+	case AssetBaseLegalBasisSpecialConsent:
+		return true
+	case AssetBaseLegalBasisSpecialHealth:
+		return true
+	case AssetBaseLegalBasisSpecialLaw:
+		return true
+	case AssetBaseLegalBasisSpecialLegal:
+		return true
+	case AssetBaseLegalBasisSpecialMadePublic:
+		return true
+	case AssetBaseLegalBasisSpecialPublicHealth:
+		return true
+	case AssetBaseLegalBasisSpecialPublicInterest:
+		return true
+	case AssetBaseLegalBasisSpecialVitalInterests:
 		return true
 	default:
 		return false
@@ -604,7 +682,10 @@ type Asset struct {
 	Id string `json:"id"`
 
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis AssetLegalBasis `json:"legal_basis"`
+	LegalBasis *AssetLegalBasis `json:"legal_basis,omitempty"`
+
+	// LegalBasisSpecial Additional Condition for Special Category Data
+	LegalBasisSpecial *AssetLegalBasisSpecial `json:"legal_basis_special,omitempty"`
 
 	// Locations Storage locations and touchpoints for the asset
 	Locations []string `json:"locations"`
@@ -649,6 +730,9 @@ type AssetFormat string
 // AssetLegalBasis Legal basis for holding the asset
 type AssetLegalBasis string
 
+// AssetLegalBasisSpecial Additional Condition for Special Category Data
+type AssetLegalBasisSpecial string
+
 // AssetProtection Type of protection applied to the asset
 type AssetProtection string
 
@@ -676,7 +760,10 @@ type AssetBase struct {
 	HasDspt bool `json:"has_dspt"`
 
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis AssetBaseLegalBasis `json:"legal_basis"`
+	LegalBasis *AssetBaseLegalBasis `json:"legal_basis,omitempty"`
+
+	// LegalBasisSpecial Additional Condition for Special Category Data
+	LegalBasisSpecial *AssetBaseLegalBasisSpecial `json:"legal_basis_special,omitempty"`
 
 	// Locations Storage locations and touchpoints for the asset
 	Locations []string `json:"locations"`
@@ -715,6 +802,9 @@ type AssetBaseFormat string
 // AssetBaseLegalBasis Legal basis for holding the asset
 type AssetBaseLegalBasis string
 
+// AssetBaseLegalBasisSpecial Additional Condition for Special Category Data
+type AssetBaseLegalBasisSpecial string
+
 // AssetBaseProtection Type of protection applied to the asset
 type AssetBaseProtection string
 
@@ -728,7 +818,7 @@ type AssetImport struct {
 	ExpiresAt          string   `json:"expires_at"`
 	Format             string   `json:"format"`
 	HasDspt            bool     `json:"has_dspt"`
-	LegalBasis         string   `json:"legal_basis"`
+	LegalBasis         *string  `json:"legal_basis,omitempty"`
 	Locations          []string `json:"locations"`
 	Protection         string   `json:"protection"`
 	RequiresContract   bool     `json:"requires_contract"`
