@@ -14,20 +14,20 @@ type StudyAffirmationProps = {
 export default function StudyAffirmation(props: StudyAffirmationProps) {
   const { studyId, successCallback, isReaffirmation } = props;
 
-  const [attestationChecked, setAttestationChecked] = useState(false);
+  const [affirmationChecked, setAffirmationChecked] = useState(false);
   const [isAttesting, setIsAttesting] = useState(false);
-  const [attestationError, setAttestationError] = useState<string | null>(null);
+  const [affirmationError, setAffirmationError] = useState<string | null>(null);
 
   const title = isReaffirmation ? "Study reaffirmation" : "Study affirmation";
 
   const handleSignoff = async () => {
-    setAttestationError(null);
+    setAffirmationError(null);
     setIsAttesting(true);
     const response = await postStudiesByStudyIdSignoff({ path: { studyId: studyId } });
     if (responseIsError(response)) {
-      setAttestationError(extractErrorMessage(response));
+      setAffirmationError(extractErrorMessage(response));
     } else {
-      setAttestationChecked(false);
+      setAffirmationChecked(false);
       await successCallback();
     }
     setIsAttesting(false);
@@ -70,22 +70,22 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
           <label>
             <input
               type="checkbox"
-              checked={attestationChecked}
-              onChange={(e) => setAttestationChecked(e.target.checked)}
+              checked={affirmationChecked}
+              onChange={(e) => setAffirmationChecked(e.target.checked)}
               disabled={isAttesting}
             />{" "}
             I confirm the above details are correct.
           </label>
         </div>
 
-        {attestationError && (
+        {affirmationError && (
           <Alert type="error">
-            <AlertMessage>{attestationError}</AlertMessage>
+            <AlertMessage>{affirmationError}</AlertMessage>
           </Alert>
         )}
 
         <div className={styles["signoff-button-container"]}>
-          <Button onClick={handleSignoff} disabled={!attestationChecked || isAttesting} size="small">
+          <Button onClick={handleSignoff} disabled={!affirmationChecked || isAttesting} size="small">
             {isAttesting ? "Submitting..." : "Confirm Details"}
           </Button>
         </div>

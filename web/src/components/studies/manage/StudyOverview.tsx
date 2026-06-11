@@ -72,7 +72,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const canRequestReview =
-    study.approval_status !== "Approved" && isStudyOwnerOrAdmin && !userData?.roles.includes("ig-ops-staff");
+    study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const riskScore = calculateRiskScore(study, assets);
@@ -92,6 +92,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       await fetchStudy(study.id);
     }
     setIsSubmittingReview(false);
+    setAffirmationDialogOpen(false);
   };
 
   return (
