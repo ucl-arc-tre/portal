@@ -13,35 +13,28 @@
   align-items: flex-end;
 }
 
-.asset-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .asset-classification-public {
   background: #d4edda;
   color: #155724;
+  border-color: #155724;
 }
 
 .asset-classification-confidential {
   background: #fff3cd;
   color: #856404;
+  border-color: #856404;
 }
 
 .asset-classification-highly-confidential {
   background: #f8d7da;
   color: #721c24;
+  border-color: #721c24;
 }
 
 .asset-protection {
   background: #e7f3ff;
   color: #0c5aa6;
+  border-color: #0c5aa6;
 }
 
 .asset-description {
