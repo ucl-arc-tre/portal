@@ -57,7 +57,7 @@ export default function Assets(props: AssetsProps) {
 
   return (
     <Box>
-      <section className={styles["study-assets-container"]} data-cy="study-assets">
+      <section data-cy="study-assets">
         <div className={styles.header}>
           <h3>
             Asset Management{" "}
