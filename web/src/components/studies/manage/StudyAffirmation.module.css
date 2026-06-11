@@ -2,6 +2,10 @@
   margin: 0 auto 1rem auto;
   line-height: 1.5rem;
 
+  h3 {
+    padding-bottom: 1rem;
+  }
+
   ul {
     padding-left: 1rem;
   }
@@ -23,18 +27,4 @@
   display: flex;
   justify-content: center;
   margin-top: 1rem;
-}
-
-.manage-study {
-  padding: 2rem 0;
-}
-
-.manage-study h2 {
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.manage-study p {
-  color: #666;
-  font-size: 1.1rem;
 }
