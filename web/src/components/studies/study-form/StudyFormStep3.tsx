@@ -26,9 +26,21 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
-
       <div className={sharedStyles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
-        The research is already registered with the UCL Data Protection Office
+        <div>
+          The research is already registered with the UCL Data Protection Office
+          <HelperText>
+            <div className={styles["ucl-guidance"]}>
+              <p>
+                All research involving personal data must be registered before any processing begins. See{" "}
+                <a href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/research/research-registration-guidance">
+                  guidance
+                </a>
+                .{" "}
+              </p>
+            </div>
+          </HelperText>
+        </div>
         <Controller
           name="isDataProtectionOfficeRegistered"
           control={control}
@@ -39,15 +51,6 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
 
       {showDataProtectionNumber === true && (
         <>
-          <div className={styles["ucl-guidance"]}>
-            <p>
-              All research involving personal data must be registered before any processing begins. See{" "}
-              <a href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/research/research-registration-guidance">
-                guidance
-              </a>
-              .{" "}
-            </p>
-          </div>
           <Label htmlFor="dataProtectionNumber">
             Data Protection Registration Number*:
             <HelperText>
