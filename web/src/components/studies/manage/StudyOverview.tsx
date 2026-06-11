@@ -10,6 +10,8 @@ import { storageLocationDefinitions } from "../../shared/storageDefinitions";
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
 import Box from "@/components/ui/Box";
+import Dialog from "@/components/ui/Dialog";
+import StudyAffirmation from "./StudyAffirmation";
 
 type StudyOverviewProps = {
   study: Study;
@@ -18,7 +20,7 @@ type StudyOverviewProps = {
   unagreedAdminUsernames: string[];
 };
 
-export const calculatRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boolean | undefined | null) => {
+export const calculateRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boolean | undefined | null) => {
   const nhs_multiplier = 3;
   let assetScore = 0;
 
@@ -35,7 +37,7 @@ const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEng
   let assetsRiskScore = 0;
 
   for (const asset of assets) {
-    assetsRiskScore += calculatRiskScorePerAsset(asset, involvesNhsEngland);
+    assetsRiskScore += calculateRiskScorePerAsset(asset, involvesNhsEngland);
   }
 
   return score + assetsRiskScore;
@@ -61,6 +63,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -69,7 +72,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const canRequestReview =
-    study.approval_status !== "Approved" && isStudyOwnerOrAdmin && !userData?.roles.includes("ig-ops-staff");
+    study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const riskScore = calculateRiskScore(study, assets);
@@ -89,6 +92,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       await fetchStudy(study.id);
     }
     setIsSubmittingReview(false);
+    setAffirmationDialogOpen(false);
   };
 
   return (
@@ -133,9 +137,15 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         )}
         {canRequestReview && (
           <>
+            {affirmationDialogOpen && (
+              <Dialog setDialogOpen={setAffirmationDialogOpen}>
+                <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
+              </Dialog>
+            )}
+
             {study.approval_status !== "Pending" ? (
               <Button
-                onClick={handleMarkReadyForReview}
+                onClick={() => setAffirmationDialogOpen(true)}
                 disabled={isSubmittingReview || hasUnagreedAdmins}
                 size="small"
                 data-cy="study-ready-for-review-button"

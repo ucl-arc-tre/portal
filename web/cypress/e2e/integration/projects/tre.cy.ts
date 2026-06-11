@@ -43,6 +43,8 @@ describe("TRE project creation end-to-end", () => {
     cy.get("button[type='submit']").click();
 
     cy.get('[data-cy="study-ready-for-review-button"]').click();
+    cy.get('[data-cy="study-affirmation-confirm-checkbox"]').check();
+    cy.get('[data-cy="study-affirmation-confirm-button"]').click();
   });
 
   it("ig ops staff should approve the study", () => {
