@@ -28,7 +28,7 @@
 
 .step-dot.active {
   background-color: var(--ucl-accent);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(123, 0, 255, 0.25);
 }
 
 .step-dot.completed {
@@ -86,10 +86,10 @@
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
   background-color: #e7f3ff;
-  border: 1px solid #007bff;
+  border: 1px solid var(--ucl-accent);
   border-radius: var(--default-border-radius);
   font-size: 0.875rem;
-  color: #007bff;
+  color: var(--ucl-accent);
 }
 
 .role-tooltip span[class*="tooltip__content"] {
@@ -101,7 +101,7 @@
 .role-tag-remove {
   background: none;
   border: none;
-  color: #007bff;
+  color: var(--ucl-accent);
   cursor: pointer;
   padding: 0;
   font-size: 1.25rem;
@@ -110,7 +110,7 @@
 }
 
 .role-tag-remove:hover {
-  color: #0056b3;
+  color: var(--ucl-mid);
 }
 
 .role-dropdown {
