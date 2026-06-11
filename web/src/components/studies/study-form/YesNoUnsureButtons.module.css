@@ -6,10 +6,11 @@
 }
 
 .button-group button {
+  background-color: #fff;
   padding: 0.4rem 0.55rem;
   cursor: pointer;
-  border: 2px solid #0d68cf;
-  color: #0d4b92;
+  border: 2px solid var(--ucl-mid);
+  color: var(--ucl-dark);
 }
 
 .button-group button.yes {
@@ -23,7 +24,7 @@
 }
 
 .button-group button.selected {
-  background-color: #0d68cf;
+  background-color: var(--ucl-dark);
   color: #fff;
   font-weight: bolder;
 }
