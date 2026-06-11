@@ -5,5 +5,4 @@
   background: var(--background);
   border-radius: var(--default-border-radius);
   border: 1px solid var(--grey-border--light);
-  max-width: 1200px;
 }

@@ -21,7 +21,7 @@ describe("Study signoff warning", () => {
   });
 
   it("shows the signoff warning for a study owner when confirmation is due", () => {
-    cy.contains("As Study Owner you're required to confirm that your study").should("exist");
+    cy.contains("As Study Owner you are required to confirm that your study").should("exist");
     cy.contains("Confirm Details").should("be.disabled");
   });
 

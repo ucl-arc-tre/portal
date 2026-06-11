@@ -1,6 +1,14 @@
 .signoff-warning {
-  max-width: 600px;
   margin: 0 auto 1rem auto;
+  line-height: 1.5rem;
+
+  ul {
+    padding-left: 1rem;
+  }
+
+  li {
+    padding-left: 1rem;
+  }
 }
 
 .signoff-confirm-text {
