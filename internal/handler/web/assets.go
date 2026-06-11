@@ -126,6 +126,8 @@ func assetToOpenApiAsset(data types.Asset) openapi.Asset {
 		Status:               openapi.AssetStatus(data.Status),
 		CreatedAt:            openapi.FormatTime(data.CreatedAt),
 		UpdatedAt:            openapi.FormatTime(data.UpdatedAt),
+		ContractIds:          []string{},
+		DataTypes:            []openapi.AssetDataTypes{},
 	}
 	for _, contract := range data.Contracts {
 		asset.ContractIds = append(asset.ContractIds, contract.ID.String())
