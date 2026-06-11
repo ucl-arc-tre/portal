@@ -6,7 +6,6 @@ import {
   getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdContracts,
-  postStudiesByStudyIdSignoff,
   Study,
 } from "@/openapi";
 import StudyOverview from "./StudyOverview";
@@ -19,9 +18,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
 import Loading from "../../ui/Loading";
-import Button from "../../ui/Button";
 import { studySignoffWarningRequired } from "../../shared/exports";
-import styles from "./ManageStudy.module.css";
+import StudyAffirmation from "./StudyAffirmation";
 
 type ManageStudyProps = {
   study: Study;
@@ -35,9 +33,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [unagreedAdminUsernames, setUnagreedAdminUsernames] = useState<string[]>([]);
   const [studyStepsCompleted, setStudyStepsCompleted] = useState(false);
-  const [attestationChecked, setAttestationChecked] = useState(false);
-  const [isAttesting, setIsAttesting] = useState(false);
-  const [attestationError, setAttestationError] = useState<string | null>(null);
 
   const router = useRouter();
   const tab = (router.query.tab as string) ?? "study";
@@ -104,19 +99,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     }
   }, [study.id, checkStudyAdminAgreements]);
 
-  const handleSignoff = async () => {
-    setAttestationError(null);
-    setIsAttesting(true);
-    const response = await postStudiesByStudyIdSignoff({ path: { studyId: study.id } });
-    if (responseIsError(response)) {
-      setAttestationError(extractErrorMessage(response));
-    } else {
-      setAttestationChecked(false);
-      await fetchStudy(study.id);
-    }
-    setIsAttesting(false);
-  };
-
   useEffect(() => {
     if (study.id) {
       fetchStudyContents();
@@ -151,62 +133,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   return (
     <>
       {showSignoffWarning && (
-        <div className={styles["signoff-warning"]}>
-          <Alert type="warning">
-            <AlertMessage>As Study Owner you are required to confirm that your study:</AlertMessage>
-            <ul>
-              <li>Is still ongoing.</li>
-              <li>Has the correct Study Administrators assigned.</li>
-              <li>Has the correct roles assigned to project users.</li>
-              <li>Has all the correct information and references.</li>
-              <li>Has all relevant contracts and assets required within their retention periods.</li>
-            </ul>
-
-            <br />
-            <p>You must also confirm that:</p>
-            <ul>
-              <li>You accept the risk identified for this study.</li>
-              <li>
-                You accept that compliance with contracts in relation to confidential information and that having
-                adequate contracts with third parties are the responsibility of your team, which you are specifically
-                accountable for.
-              </li>
-              <li>
-                You agree that the study may be subject to an audit of the confidentiality policies and procedures
-                within the Information Governance Framework, in order to seek further assurance and to comply with the
-                university&apos;s regulatory requirements.
-              </li>
-            </ul>
-
-            <p className={styles["signoff-confirm-text"]}>
-              Confirm these statements are correct or update your Study as necessary.
-            </p>
-
-            <div className={styles["signoff-checkbox"]}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={attestationChecked}
-                  onChange={(e) => setAttestationChecked(e.target.checked)}
-                  disabled={isAttesting}
-                />{" "}
-                I confirm the above details are correct.
-              </label>
-            </div>
-
-            {attestationError && (
-              <Alert type="error">
-                <AlertMessage>{attestationError}</AlertMessage>
-              </Alert>
-            )}
-
-            <div className={styles["signoff-button-container"]}>
-              <Button onClick={handleSignoff} disabled={!attestationChecked || isAttesting} size="small">
-                {isAttesting ? "Submitting..." : "Confirm Details"}
-              </Button>
-            </div>
-          </Alert>
-        </div>
+        <StudyAffirmation title="Study reaffirmation" studyId={study.id} successCallback={() => fetchStudy(study.id)} />
       )}
       {isIGOpsStaff && study.approval_status !== "Incomplete" && (
         <AdminReview
