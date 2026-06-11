@@ -73,6 +73,7 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
               checked={affirmationChecked}
               onChange={(e) => setAffirmationChecked(e.target.checked)}
               disabled={isAttesting}
+              data-cy="study-affirmation-confirm-checkbox"
             />{" "}
             I confirm the above details are correct.
           </label>
@@ -85,7 +86,12 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
         )}
 
         <div className={styles["signoff-button-container"]}>
-          <Button onClick={handleSignoff} disabled={!affirmationChecked || isAttesting} size="small">
+          <Button
+            onClick={handleSignoff}
+            disabled={!affirmationChecked || isAttesting}
+            size="small"
+            cy="study-affirmation-confirm-button"
+          >
             {isAttesting ? "Submitting..." : "Confirm Details"}
           </Button>
         </div>
