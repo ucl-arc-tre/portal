@@ -18,7 +18,8 @@
   }
 
   a {
-    font-weight: 600;
+    text-decoration: underline;
+    color: var(--ucl-accent);
     &:hover {
       color: var(--ucl-mid);
     }
