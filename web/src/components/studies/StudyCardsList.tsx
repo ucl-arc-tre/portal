@@ -4,6 +4,7 @@ import { studySignoffWarningRequired } from "../shared/exports";
 
 import styles from "./StudyCardsList.module.css";
 import Card from "../ui/Card";
+import Badge from "../ui/Badge";
 
 type Props = {
   studies: Study[];
@@ -35,7 +36,9 @@ export default function StudyCardsList(props: Props) {
                   {study.approval_status === "Approved" &&
                     study.last_signoff != null &&
                     studySignoffWarningRequired(study.last_signoff) && (
-                      <span className={styles["signoff-warning-tag"]}>Study Confirmation due</span>
+                      <Badge className={styles["signoff-warning-tag"]} cy="study-confirmation-badge">
+                        Study Confirmation due
+                      </Badge>
                     )}
                 </div>
               }

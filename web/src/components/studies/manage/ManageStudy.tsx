@@ -153,17 +153,33 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {showSignoffWarning && (
         <div className={styles["signoff-warning"]}>
           <Alert type="warning">
-            <AlertMessage>As Study Owner you&apos;re required to confirm that your study:</AlertMessage>
+            <AlertMessage>As Study Owner you are required to confirm that your study:</AlertMessage>
             <ul>
-              <li>is still ongoing</li>
-              <li>has the correct Study Administrators assigned</li>
-              <li>has the correct roles assigned to project users</li>
-              <li>has all the correct information and references</li>
-              <li>has all relevant documents (contracts and assets) required within their retention periods</li>
+              <li>Is still ongoing.</li>
+              <li>Has the correct Study Administrators assigned.</li>
+              <li>Has the correct roles assigned to project users.</li>
+              <li>Has all the correct information and references.</li>
+              <li>Has all relevant contracts and assets required within their retention periods.</li>
+            </ul>
+
+            <br />
+            <p>You must also confirm that:</p>
+            <ul>
+              <li>You accept the risk identified for this study.</li>
+              <li>
+                You accept that compliance with contracts in relation to confidential information and that having
+                adequate contracts with third parties are the responsibility of your team, which you are specifically
+                accountable for.
+              </li>
+              <li>
+                You agree that the study may be subject to an audit of the confidentiality policies and procedures
+                within the Information Governance Framework, in order to seek further assurance and to comply with the
+                university&apos;s regulatory requirements.
+              </li>
             </ul>
 
             <p className={styles["signoff-confirm-text"]}>
-              Confirm these details are correct or update your Study as necessary.
+              Confirm these statements are correct or update your Study as necessary.
             </p>
 
             <div className={styles["signoff-checkbox"]}>
