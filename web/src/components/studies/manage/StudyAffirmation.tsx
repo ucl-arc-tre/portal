@@ -6,17 +6,19 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 
 type StudyAffirmationProps = {
-  title: string;
   studyId: string;
   successCallback: () => Promise<void>;
+  isReaffirmation?: boolean | undefined;
 };
 
 export default function StudyAffirmation(props: StudyAffirmationProps) {
-  const { title, studyId, successCallback } = props;
+  const { studyId, successCallback, isReaffirmation } = props;
 
   const [attestationChecked, setAttestationChecked] = useState(false);
   const [isAttesting, setIsAttesting] = useState(false);
   const [attestationError, setAttestationError] = useState<string | null>(null);
+
+  const title = isReaffirmation ? "Study reaffirmation" : "Study affirmation";
 
   const handleSignoff = async () => {
     setAttestationError(null);
@@ -37,7 +39,7 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
         <h3>{title}</h3>
         <p>As Study Owner you are required to confirm that your study:</p>
         <ul>
-          <li>Is still ongoing.</li>
+          {isReaffirmation && <li>Is still ongoing.</li>}
           <li>Has the correct Study Administrators assigned.</li>
           <li>Has the correct roles assigned to project users.</li>
           <li>Has all the correct information and references.</li>

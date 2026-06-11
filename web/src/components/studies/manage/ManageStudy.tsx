@@ -133,7 +133,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   return (
     <>
       {showSignoffWarning && (
-        <StudyAffirmation title="Study reaffirmation" studyId={study.id} successCallback={() => fetchStudy(study.id)} />
+        <StudyAffirmation studyId={study.id} successCallback={() => fetchStudy(study.id)} isReaffirmation />
       )}
       {isIGOpsStaff && study.approval_status !== "Incomplete" && (
         <AdminReview
