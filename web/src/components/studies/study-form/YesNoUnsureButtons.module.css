@@ -6,9 +6,10 @@
 }
 
 .button-group button {
+  background-color: #fff;
   padding: 0.4rem 0.55rem;
   cursor: pointer;
-  border: 2px solid var(--ucl-accent);
+  border: 2px solid var(--ucl-mid);
   color: var(--ucl-dark);
 }
 
@@ -23,7 +24,7 @@
 }
 
 .button-group button.selected {
-  background-color: var(--ucl-mid);
+  background-color: var(--ucl-dark);
   color: #fff;
   font-weight: bolder;
 }
