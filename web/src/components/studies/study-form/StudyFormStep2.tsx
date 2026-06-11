@@ -13,7 +13,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
   const showCagRef = useWatch({ name: "involvesCag", control });
   const showIrasId = useWatch({ name: "involvesHraApproval", control });
   const showNhsRelated = useWatch({ name: "isNhsAssociated", control });
-  const showNhsEnglandRef = useWatch({ name: "involvesNhsEngland", control });
+  const showNhsEnglandRef = false; // ML thinks we don't need this field so hiding for now, can be added back if needed by uncommenting the relevant code in StudyFormStep2 and StudyForm.tsx
 
   return (
     <>
@@ -184,7 +184,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
               />
             </div>
-            {showNhsEnglandRef === true && (
+            {showNhsEnglandRef !== false && (
               <Label htmlFor="nhsEnglandRef">
                 NHSE{" "}
                 <a
