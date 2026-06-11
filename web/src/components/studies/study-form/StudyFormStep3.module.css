@@ -10,3 +10,29 @@
   margin: 5px;
   padding: 5px;
 }
+
+.ucl-guidance {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: var(--default-border-radius);
+}
+
+.ucl-guidance p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #856404;
+  line-height: 1.4;
+}
+
+.ucl-guidance a {
+  color: #856404;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.ucl-guidance a:hover {
+  color: #533f03;
+  text-decoration: none;
+}
