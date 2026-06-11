@@ -10,11 +10,11 @@
   height: 0.8rem;
   border-radius: 50%;
   margin: 0 0.5rem;
-  background-color: var(--green-100);
+  background-color: var(--ucl-accent);
   opacity: 0.4;
 }
 
 .step-dot.active {
-  background-color: var(--green-100);
+  background-color: var(--ucl-mid);
   opacity: 1;
 }

@@ -9,7 +9,7 @@
   padding: 0.4rem 0.55rem;
   cursor: pointer;
   border: 2px solid var(--ucl-accent);
-  color: var(--ucl-mid);
+  color: var(--ucl-dark);
 }
 
 .button-group button.yes {

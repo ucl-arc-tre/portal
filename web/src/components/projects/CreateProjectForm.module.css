@@ -27,12 +27,12 @@
 }
 
 .step-dot.active {
-  background-color: #007bff;
+  background-color: var(--ucl-accent);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .step-dot.completed {
-  background-color: #28a745;
+  background-color: var(--ucl-mid);
 }
 
 .section-label {
