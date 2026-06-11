@@ -41,7 +41,8 @@ export default function AssetCard(props: AssetCardProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const expiryUrgency = asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
+  const expiryUrgency =
+    asset.status == "active" && asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
 
   useEffect(() => {
     const isAssetCompleted = async () => {

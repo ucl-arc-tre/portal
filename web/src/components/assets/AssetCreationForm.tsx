@@ -625,7 +625,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
           >
             <option value="">Select status</option>
             <option value="active">Active: asset is in environment</option>
-            <option value="awaiting">Awaiting: asset awaiting creation in environment</option>
             <option value="destroyed">Destroyed: asset has been destroyed in environment</option>
           </select>
           {errors.status && (

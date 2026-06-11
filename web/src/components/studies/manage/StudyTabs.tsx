@@ -18,7 +18,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
 
   const assetsNeedAttention = assets.some((asset) => {
     if (asset.requires_contract && asset.contract_ids.length === 0) return true;
-    if (asset.expires_at) {
+    if (asset.status === "active" && asset.expires_at) {
       const urgency = calculateExpiryUrgency(new Date(asset.expires_at));
       if (urgency !== null && urgency.level !== "low") return true;
     }
