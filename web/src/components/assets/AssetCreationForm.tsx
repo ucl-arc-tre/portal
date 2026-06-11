@@ -18,6 +18,31 @@ type AssetFormProps = {
   editingAsset?: Asset;
 };
 
+function calculateTier(data: AssetFormData): number {
+  if (data.classification_impact === "public") {
+    return 0;
+  } else if (data.classification_impact === "confidential") {
+    return 1;
+  } else if (data.classification_impact !== "highly_confidential") {
+    console.error("unexpected classification_impact value. assuming highly_confidential", data.classification_impact);
+  }
+
+  const is_impact_4_or_5 =
+    data.is_leak_major_disruption || data.is_leak_major_financial_loss || data.is_leak_reputational_damage;
+  const is_personal = data.data_types.includes("personal");
+  const is_special_category_personal = data.data_types.includes("special_category_personal");
+  const is_strongly_protected = data.protection == "anonymisation" || data.protection == "pseudonymisation";
+
+  if (is_impact_4_or_5 || is_special_category_personal || data.requires_tre) {
+    return data.has_targeted_threat_actors ? 4 : 3;
+  }
+
+  if ((is_impact_4_or_5 || is_special_category_personal || is_personal) && is_strongly_protected) {
+    return 2;
+  }
+  return 3;
+}
+
 export default function AssetCreationForm(props: AssetFormProps) {
   const { handleAssetSubmit, isSubmitting = false, closeModal, editingAsset } = props;
 
@@ -37,8 +62,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
       source: undefined,
       classification_impact: "",
       tier: "",
-      protection: "",
-      legal_basis: "",
+      protection: undefined,
+      legal_basis: undefined,
+      legal_basis_special: undefined,
       format: "",
       has_expiry_date: false,
       expires_at: null,
@@ -48,6 +74,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
       has_dspt: false,
       stored_outside_uk_eea: false,
       status: "",
+      is_leak_major_disruption: false,
+      is_leak_major_financial_loss: false,
+      is_leak_reputational_damage: false,
     },
   });
 
@@ -61,6 +90,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         tier: editingAsset.tier,
         protection: editingAsset.protection,
         legal_basis: editingAsset.legal_basis,
+        legal_basis_special: editingAsset.legal_basis_special,
         format: editingAsset.format,
         has_expiry_date: editingAsset.expires_at ? "true" : "false",
         expires_at: editingAsset.expires_at ? editingAsset.expires_at.split("T")[0] : null,
@@ -78,8 +108,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
         source: undefined,
         classification_impact: "",
         tier: "",
-        protection: "",
-        legal_basis: "",
+        protection: undefined,
+        legal_basis: undefined,
+        legal_basis_special: undefined,
         format: "",
         has_expiry_date: false,
         expires_at: null,
@@ -93,11 +124,10 @@ export default function AssetCreationForm(props: AssetFormProps) {
     }
   }, [editingAsset, reset]);
 
+  const dataTypesValue = watch("data_types");
   const protectionValue = watch("protection");
-  const classificationValue = watch("classification_impact");
   const hasExpiryDateValue = watch("has_expiry_date");
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
-  const showTierSelection = classificationValue === "highly_confidential";
   const showExpiryDate = hasExpiryDateValue === "true" || hasExpiryDateValue === true;
 
   const onFormSubmit = async (data: AssetFormData) => {
@@ -105,21 +135,10 @@ export default function AssetCreationForm(props: AssetFormProps) {
       setErrorMessage(null);
       setSuccessMessage(null);
 
-      // Set tier based on classification_impact
-      let tier: number;
-      if (data.classification_impact === "public") {
-        tier = 0;
-      } else if (data.classification_impact === "confidential") {
-        tier = 1;
-      } else {
-        // For highly_confidential, convert the user-selected tier to number (2, 3, or 4)
-        tier = typeof data.tier === "string" ? parseInt(data.tier, 10) : data.tier;
-      }
-
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {
         ...data,
-        tier,
+        tier: calculateTier(data),
         expires_at: showExpiryDate ? data.expires_at : null,
         requires_contract: data.requires_contract === "true" || data.requires_contract === true,
         has_dspt: data.has_dspt === "true" || data.has_dspt === true,
@@ -235,138 +254,163 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        {showTierSelection && (
-          <div className="field">
-            <Label htmlFor="tier">Security Tier *</Label>
-            <div className={styles["info-text"]}>
-              <p>
-                Please select the appropriate security tier based on{" "}
-                <a
-                  href="https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#5environment-tier-definition"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  UCL ARC Data Classification and Environment Tiering Policy
-                </a>
-                .
-              </p>
+        <div className="field">
+          <Label htmlFor="location">Which data types are included in this asset? Please check all that apply</Label>
+          <div className={styles["checkbox-group"]}>
+            {assetDataTypeDefinitions.map((dataType) => (
+              <label key={dataType.value} className={styles["checkbox-label"]}>
+                <input
+                  type="checkbox"
+                  value={dataType.value}
+                  {...register("data_types", {})}
+                  className={styles.checkbox}
+                />
+                {dataType.name}
+                {dataType.definition && <InfoTooltip text={dataType.definition!} />}
+              </label>
+            ))}
+          </div>
+
+          {errors.data_types && (
+            <Alert type="error">
+              <AlertMessage>{errors.data_types.message}</AlertMessage>
+            </Alert>
+          )}
+        </div>
+
+        {dataTypesValue.includes("personal") && (
+          <>
+            <div className="field">
+              <Label htmlFor="protection">What protection is applied to this asset in the form described here? *</Label>
+              <select
+                id="protection"
+                {...register("protection", {
+                  required: "Protection type is required",
+                })}
+                aria-invalid={!!errors.protection}
+                className={errors.protection ? styles.error : ""}
+              >
+                <option value="">Select protection</option>
+                <option value="anonymisation">Anonymisation</option>
+                <option value="pseudonymisation">Pseudonymisation</option>
+                <option value="identifiable_low_confidence_pseudonymisation">
+                  Identifiable or low confidence of pseudonymisation
+                </option>
+              </select>
+              {errors.protection && (
+                <Alert type="error">
+                  <AlertMessage>{errors.protection.message}</AlertMessage>
+                </Alert>
+              )}
+
+              {showUCLGuidanceText && (
+                <div className={styles["ucl-guidance"]}>
+                  <p>
+                    Confirm that{" "}
+                    <a
+                      href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/practical-data-protection-guidance-notices/anonymisation-and"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      UCL guidance on anonymisation and pseudonymisation
+                    </a>{" "}
+                    has been applied.
+                  </p>
+                </div>
+              )}
             </div>
+
+            <div className="field">
+              <Label htmlFor="legal_basis">What is the legal basis for holding this asset? *</Label>
+              <div className={styles["info-text"]}>
+                <p>
+                  Select the most relevant legal basis from the six options available. To learn more about the legal
+                  basis requirements refer to{" "}
+                  <a
+                    href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    UK GDPR guidance
+                  </a>
+                </p>
+              </div>
+              <select
+                id="legal_basis"
+                {...register("legal_basis", {
+                  required: "Legal basis is required",
+                })}
+                aria-invalid={!!errors.legal_basis}
+                className={`${styles["legal-basis"]} ${errors.legal_basis ? styles.error : ""}`}
+              >
+                <option value="">Select legal basis</option>
+                <option value="consent">
+                  Consent: the individual has given clear consent for you to process their personal data for a specific
+                  purpose
+                </option>
+                <option value="contract">
+                  Contract: the processing is necessary for a contract you have with the individual, or because they
+                  have asked you to take specific steps before entering into a contract
+                </option>
+                <option value="legal_obligation">
+                  Legal obligation: the processing is necessary for you to comply with the law (not including
+                  contractual obligations)
+                </option>
+                <option value="vital_interests">
+                  Vital interests: the processing is necessary to protect someone&apos;s life
+                </option>
+                <option value="public_task">
+                  Public task: the processing is necessary for you to perform a task in the public interest or for your
+                  official functions, and the task or function has a clear basis in law
+                </option>
+                <option value="legitimate_interests">
+                  Legitimate interests: the processing is necessary for your legitimate interests or the legitimate
+                  interests of a third party, unless there is a good reason to protect the individual&apos;s personal
+                  data which overrides those legitimate interests
+                </option>
+              </select>
+              {errors.legal_basis && (
+                <Alert type="error">
+                  <AlertMessage>{errors.legal_basis.message}</AlertMessage>
+                </Alert>
+              )}
+            </div>
+          </>
+        )}
+
+        {dataTypesValue.includes("special_category_personal") && (
+          <div className="field">
+            <Label htmlFor="legal_basis_special">
+              What is the additional condition (GDPR Article 9) for holding this asset? *
+            </Label>
             <select
-              id="tier"
-              {...register("tier", {
-                required: showTierSelection ? "Security tier is required for highly confidential assets" : false,
+              id="legal_basis_special"
+              {...register("legal_basis_special", {
+                required: "Special condition is required",
               })}
-              aria-invalid={!!errors.tier}
-              className={errors.tier ? styles.error : ""}
+              aria-invalid={!!errors.legal_basis_special}
+              className={errors.legal_basis_special ? styles.error : ""}
             >
-              <option value="">Select security tier</option>
-              <option value={2}>Tier 2</option>
-              <option value={3}>Tier 3</option>
-              <option value={4}>Tier 4</option>
+              <option value={undefined}>Select additional condition</option>
+              <option value="archiving_research_statistical">
+                Archiving, research, or statistical purposes (with safeguards)
+              </option>
+              <option value="consent">Explicit consent</option>
+              <option value="law">Employment / social security law</option>
+              <option value="vital_interests">Vital interests</option>
+              <option value="made_public">Data made public by the individual</option>
+              <option value="public_interest">Substantial public interest</option>
+              <option value="health">Health or social care purposes</option>
+              <option value="public_health">Public health</option>
+              <option value="legal">Legal claims</option>
             </select>
-            {errors.tier && (
+            {errors.legal_basis_special && (
               <Alert type="error">
-                <AlertMessage>{errors.tier.message}</AlertMessage>
+                <AlertMessage>{errors.legal_basis_special.message}</AlertMessage>
               </Alert>
             )}
           </div>
         )}
-
-        <div className="field">
-          <Label htmlFor="protection">What protection is applied to this asset in the form described here? *</Label>
-          <select
-            id="protection"
-            {...register("protection", {
-              required: "Protection type is required",
-            })}
-            aria-invalid={!!errors.protection}
-            className={errors.protection ? styles.error : ""}
-          >
-            <option value="">Select protection</option>
-            <option value="anonymisation">Anonymisation</option>
-            <option value="pseudonymisation">Pseudonymisation</option>
-            <option value="identifiable_low_confidence_pseudonymisation">
-              Identifiable or low confidence of pseudonymisation
-            </option>
-          </select>
-          {errors.protection && (
-            <Alert type="error">
-              <AlertMessage>{errors.protection.message}</AlertMessage>
-            </Alert>
-          )}
-
-          {showUCLGuidanceText && (
-            <div className={styles["ucl-guidance"]}>
-              <p>
-                Confirm that{" "}
-                <a
-                  href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/practical-data-protection-guidance-notices/anonymisation-and"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  UCL guidance on anonymisation and pseudonymisation
-                </a>{" "}
-                has been applied.
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="field">
-          <Label htmlFor="legal_basis">What is the legal basis for holding this asset? *</Label>
-          <div className={styles["info-text"]}>
-            <p>
-              Select the most relevant legal basis from the six options available. To learn more about the legal basis
-              requirements refer to{" "}
-              <a
-                href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                UK GDPR guidance
-              </a>
-            </p>
-          </div>
-          <select
-            id="legal_basis"
-            {...register("legal_basis", {
-              required: "Legal basis is required",
-            })}
-            aria-invalid={!!errors.legal_basis}
-            className={errors.legal_basis ? styles.error : ""}
-          >
-            <option value="">Select legal basis</option>
-            <option value="consent">
-              Consent: the individual has given clear consent for you to process their personal data for a specific
-              purpose
-            </option>
-            <option value="contract">
-              Contract: the processing is necessary for a contract you have with the individual, or because they have
-              asked you to take specific steps before entering into a contract
-            </option>
-            <option value="legal_obligation">
-              Legal obligation: the processing is necessary for you to comply with the law (not including contractual
-              obligations)
-            </option>
-            <option value="vital_interests">
-              Vital interests: the processing is necessary to protect someone&apos;s life
-            </option>
-            <option value="public_task">
-              Public task: the processing is necessary for you to perform a task in the public interest or for your
-              official functions, and the task or function has a clear basis in law
-            </option>
-            <option value="legitimate_interests">
-              Legitimate interests: the processing is necessary for your legitimate interests or the legitimate
-              interests of a third party, unless there is a good reason to protect the individual&apos;s personal data
-              which overrides those legitimate interests
-            </option>
-          </select>
-          {errors.legal_basis && (
-            <Alert type="error">
-              <AlertMessage>{errors.legal_basis.message}</AlertMessage>
-            </Alert>
-          )}
-        </div>
 
         <div className="field">
           <Label htmlFor="format">What format is the asset in? *</Label>
@@ -442,30 +486,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
             )}
           </div>
         )}
-
-        <div className="field">
-          <Label htmlFor="location">Which data types are included in this asset? Please check all that apply</Label>
-          <div className={styles["checkbox-group"]}>
-            {assetDataTypeDefinitions.map((dataType) => (
-              <label key={dataType.value} className={styles["checkbox-label"]}>
-                <input
-                  type="checkbox"
-                  value={dataType.value}
-                  {...register("data_types", {})}
-                  className={styles.checkbox}
-                />
-                {dataType.name}
-                {dataType.definition && <InfoTooltip text={dataType.definition!} />}
-              </label>
-            ))}
-          </div>
-
-          {errors.data_types && (
-            <Alert type="error">
-              <AlertMessage>{errors.data_types.message}</AlertMessage>
-            </Alert>
-          )}
-        </div>
 
         <div className="field">
           <Label htmlFor="location">
@@ -624,8 +644,8 @@ export default function AssetCreationForm(props: AssetFormProps) {
             className={errors.status ? styles.error : ""}
           >
             <option value="">Select status</option>
-            <option value="active">Active: asset is in environment</option>
-            <option value="destroyed">Destroyed: asset has been destroyed in environment</option>
+            <option value="active">Active</option>
+            <option value="destroyed">Destroyed</option>
           </select>
           {errors.status && (
             <Alert type="error">
