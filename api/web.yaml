@@ -1510,7 +1510,6 @@ components:
           type: string
           enum:
             - active
-            - awaiting
             - destroyed
           description: Status of the asset
     Asset:

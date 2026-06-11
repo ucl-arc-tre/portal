@@ -198,7 +198,7 @@ export type AssetBase = {
     /**
      * Status of the asset
      */
-    status: 'active' | 'awaiting' | 'destroyed';
+    status: 'active' | 'destroyed';
 };
 
 /**

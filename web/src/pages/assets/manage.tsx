@@ -167,7 +167,8 @@ export default function ManageAssetPage() {
     );
   }
 
-  const expiryUrgency = asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
+  const expiryUrgency =
+    asset.status === "active" && asset.expires_at ? calculateExpiryUrgency(new Date(asset.expires_at)) : null;
 
   return (
     <>
@@ -223,7 +224,11 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Status:</label>
-              <span className={styles.status}>{asset.status}</span>
+              <span
+                className={`${styles.status} ${asset.status === "active" ? styles["status-active"] : styles["status-destroyed"]}`}
+              >
+                {asset.status}
+              </span>
             </div>
             <div className={styles.field}>
               <label>Classification:</label>
