@@ -334,7 +334,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        {dataTypesValue.includes("personal") && !isPublic && (
+        {(dataTypesValue.includes("personal") || dataTypesValue.includes("special_category_personal")) && (
           <>
             <div className="field">
               <Label htmlFor="protection">What protection is applied to this asset in the form described here? *</Label>
