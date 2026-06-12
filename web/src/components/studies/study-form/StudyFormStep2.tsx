@@ -90,16 +90,6 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
           </Label>
         )}
 
-        <div className={sharedStyles["option-field"]} data-cy="involvesEthicsApproval">
-          We will be seeking/have sought Research Ethics Committee approval for this research
-          <Controller
-            name="involvesEthicsApproval"
-            control={control}
-            defaultValue={undefined}
-            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
-          />
-        </div>
-
         <div className={sharedStyles["option-field"]} data-cy="involvesHraApproval">
           <span>
             We will be seeking/have sought{" "}
@@ -107,12 +97,23 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
               className={sharedStyles["form-link"]}
               href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/"
             >
-              Health Research Authority
+              Health Research Authority REC
             </a>{" "}
             approval of this research
           </span>
           <Controller
             name="involvesHraApproval"
+            control={control}
+            defaultValue={undefined}
+            render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          />
+        </div>
+
+        <div className={sharedStyles["option-field"]} data-cy="involvesEthicsApproval">
+          We will be seeking/have sought local or other external body Research Ethics Committee approval for this
+          research
+          <Controller
+            name="involvesEthicsApproval"
             control={control}
             defaultValue={undefined}
             render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
