@@ -45,9 +45,9 @@ type AssetFormData = {
   has_dspt: boolean | string; // Can be string from form, converted to boolean
   stored_outside_uk_eea: boolean | string; // Can be string from form, converted to boolean
   status: string;
-  is_leak_major_financial_loss: boolean;
-  is_leak_reputational_damage: boolean;
-  is_leak_major_disruption: boolean;
-  requires_tre: boolean;
-  has_targeted_threat_actors: boolean;
+  is_leak_major_financial_loss: boolean | string; // Can be string from form, converted to boolean
+  is_leak_major_reputational_damage: boolean | string; // Can be string from form, converted to boolean
+  is_leak_major_disruption: boolean | string; // Can be string from form, converted to boolean
+  requires_tre: boolean | string; // Can be string from form, converted to boolean
+  has_targeted_threat_actors: boolean | string; // Can be string from form, converted to boolean
 };

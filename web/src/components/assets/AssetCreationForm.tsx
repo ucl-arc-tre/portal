@@ -18,7 +18,30 @@ type AssetFormProps = {
   editingAsset?: Asset;
 };
 
-function calculateTier(data: AssetFormData): number {
+type AssetTierData = {
+  classification_impact: string;
+  is_leak_major_disruption: boolean | string;
+  is_leak_major_financial_loss: boolean | string;
+  is_leak_major_reputational_damage: boolean | string;
+  data_types: AssetDataType[];
+  protection: string;
+  has_targeted_threat_actors: boolean | string;
+  requires_tre: boolean | string;
+};
+
+function isTrue(value: string | boolean): boolean {
+  return value === true || value === "true";
+}
+
+function anyTrue(...values: (string | boolean)[]): boolean {
+  return values.some((value) => isTrue(value));
+}
+
+// See: https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/
+function calculateTier(data: AssetTierData): number | undefined {
+  if (!data.classification_impact) {
+    return undefined;
+  }
   if (data.classification_impact === "public") {
     return 0;
   } else if (data.classification_impact === "confidential") {
@@ -27,17 +50,20 @@ function calculateTier(data: AssetFormData): number {
     console.error("unexpected classification_impact value. assuming highly_confidential", data.classification_impact);
   }
 
-  const is_impact_4_or_5 =
-    data.is_leak_major_disruption || data.is_leak_major_financial_loss || data.is_leak_reputational_damage;
+  const is_impact_4_or_5 = anyTrue(
+    data.is_leak_major_disruption,
+    data.is_leak_major_financial_loss,
+    data.is_leak_major_reputational_damage
+  );
   const is_personal = data.data_types.includes("personal");
   const is_special_category_personal = data.data_types.includes("special_category_personal");
   const is_strongly_protected = data.protection == "anonymisation" || data.protection == "pseudonymisation";
 
-  if (is_impact_4_or_5 || is_special_category_personal || data.requires_tre) {
+  if (anyTrue(is_impact_4_or_5, is_special_category_personal, data.requires_tre)) {
     return data.has_targeted_threat_actors ? 4 : 3;
   }
 
-  if ((is_impact_4_or_5 || is_special_category_personal || is_personal) && is_strongly_protected) {
+  if (anyTrue(is_impact_4_or_5, is_special_category_personal, is_personal) && is_strongly_protected) {
     return 2;
   }
   return 3;
@@ -76,12 +102,15 @@ export default function AssetCreationForm(props: AssetFormProps) {
       status: "",
       is_leak_major_disruption: false,
       is_leak_major_financial_loss: false,
-      is_leak_reputational_damage: false,
+      is_leak_major_reputational_damage: false,
+      requires_tre: false,
+      has_targeted_threat_actors: false,
     },
   });
 
   useEffect(() => {
     if (editingAsset) {
+      console.log(editingAsset); // todo
       reset({
         title: editingAsset.title,
         description: editingAsset.description,
@@ -100,6 +129,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
         has_dspt: String(editingAsset.has_dspt),
         stored_outside_uk_eea: String(editingAsset.stored_outside_uk_eea),
         status: editingAsset.status,
+        is_leak_major_disruption: String(editingAsset.is_leak_major_disruption),
+        is_leak_major_reputational_damage: String(editingAsset.is_leak_major_reputational_damage),
+        is_leak_major_financial_loss: String(editingAsset.is_leak_major_financial_loss),
+        requires_tre: String(editingAsset.requires_tre),
+        has_targeted_threat_actors: String(editingAsset.has_targeted_threat_actors),
       });
     } else {
       reset({
@@ -120,6 +154,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
         has_dspt: false,
         stored_outside_uk_eea: false,
         status: "",
+        is_leak_major_disruption: false,
+        is_leak_major_financial_loss: false,
+        is_leak_major_reputational_damage: false,
+        requires_tre: false,
+        has_targeted_threat_actors: false,
       });
     }
   }, [editingAsset, reset]);
@@ -127,8 +166,19 @@ export default function AssetCreationForm(props: AssetFormProps) {
   const dataTypesValue = watch("data_types");
   const protectionValue = watch("protection");
   const hasExpiryDateValue = watch("has_expiry_date");
+  const requiresTRE = isTrue(watch("requires_tre"));
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
-  const showExpiryDate = hasExpiryDateValue === "true" || hasExpiryDateValue === true;
+  const showExpiryDate = isTrue(hasExpiryDateValue);
+  const tier = calculateTier({
+    classification_impact: watch("classification_impact"),
+    is_leak_major_disruption: watch("is_leak_major_disruption"),
+    is_leak_major_financial_loss: watch("is_leak_major_financial_loss"),
+    is_leak_major_reputational_damage: watch("is_leak_major_reputational_damage"),
+    data_types: dataTypesValue,
+    protection: protectionValue,
+    has_targeted_threat_actors: watch("has_targeted_threat_actors"),
+    requires_tre: requiresTRE,
+  });
 
   const onFormSubmit = async (data: AssetFormData) => {
     try {
@@ -138,11 +188,16 @@ export default function AssetCreationForm(props: AssetFormProps) {
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {
         ...data,
-        tier: calculateTier(data),
+        tier: calculateTier(data)!,
         expires_at: showExpiryDate ? data.expires_at : null,
-        requires_contract: data.requires_contract === "true" || data.requires_contract === true,
-        has_dspt: data.has_dspt === "true" || data.has_dspt === true,
+        requires_contract: isTrue(data.requires_contract),
+        has_dspt: isTrue(data.has_dspt),
         stored_outside_uk_eea: data.stored_outside_uk_eea === "true" || data.stored_outside_uk_eea === true,
+        is_leak_major_disruption: isTrue(data.is_leak_major_disruption),
+        is_leak_major_financial_loss: isTrue(data.is_leak_major_financial_loss),
+        is_leak_major_reputational_damage: isTrue(data.is_leak_major_reputational_damage),
+        requires_tre: isTrue(data.requires_tre),
+        has_targeted_threat_actors: isTrue(data.has_targeted_threat_actors),
       };
 
       await handleAssetSubmit(transformedAssetData);
@@ -407,6 +462,192 @@ export default function AssetCreationForm(props: AssetFormProps) {
             {errors.legal_basis_special && (
               <Alert type="error">
                 <AlertMessage>{errors.legal_basis_special.message}</AlertMessage>
+              </Alert>
+            )}
+          </div>
+        )}
+
+        {!dataTypesValue.includes("personal") && !dataTypesValue.includes("special_category_personal") && (
+          <div className="field">
+            <Label htmlFor="requires_tre">
+              Does this asset require an ISO27001 certified Trusted Research Environment to be stored or processed? *
+            </Label>
+            <div className={styles["radio-group"]}>
+              <label className={styles["radio-label"]}>
+                <input
+                  type="radio"
+                  value="true"
+                  {...register("requires_tre", {
+                    required: "Please select yes or no",
+                  })}
+                  className={styles.radio}
+                />
+                Yes
+              </label>
+              <label className={styles["radio-label"]}>
+                <input
+                  type="radio"
+                  value="false"
+                  {...register("requires_tre", {
+                    required: "Please select yes or no",
+                  })}
+                  className={styles.radio}
+                />
+                No
+              </label>
+            </div>
+            {errors.requires_tre && (
+              <Alert type="error">
+                <AlertMessage>{errors.requires_tre.message}</AlertMessage>
+              </Alert>
+            )}
+          </div>
+        )}
+
+        {!dataTypesValue.includes("personal") &&
+          !dataTypesValue.includes("special_category_personal") &&
+          !requiresTRE && (
+            <>
+              <div className="field">
+                <Label htmlFor="is_leak_major_financial_loss">
+                  Would disclosure of this asset result in significant financial loss? *
+                </Label>
+                <div className={styles["radio-group"]}>
+                  <label className={styles["radio-label"]}>
+                    <input
+                      type="radio"
+                      value="true"
+                      {...register("is_leak_major_financial_loss", {
+                        required: "Please select yes or no",
+                      })}
+                      className={styles.radio}
+                    />
+                    Yes
+                  </label>
+                  <label className={styles["radio-label"]}>
+                    <input
+                      type="radio"
+                      value="false"
+                      {...register("is_leak_major_financial_loss", {
+                        required: "Please select yes or no",
+                      })}
+                      className={styles.radio}
+                    />
+                    No
+                  </label>
+                </div>
+                {errors.is_leak_major_financial_loss && (
+                  <Alert type="error">
+                    <AlertMessage>{errors.is_leak_major_financial_loss.message}</AlertMessage>
+                  </Alert>
+                )}
+              </div>
+
+              <div className="field">
+                <Label htmlFor="is_leak_major_disruption">
+                  Would disclosure of this asset result in major disruption to UCL? *
+                </Label>
+                <div className={styles["radio-group"]}>
+                  <label className={styles["radio-label"]}>
+                    <input
+                      type="radio"
+                      value="true"
+                      {...register("is_leak_major_disruption", {
+                        required: "Please select yes or no",
+                      })}
+                      className={styles.radio}
+                    />
+                    Yes
+                  </label>
+                  <label className={styles["radio-label"]}>
+                    <input
+                      type="radio"
+                      value="false"
+                      {...register("is_leak_major_disruption", {
+                        required: "Please select yes or no",
+                      })}
+                      className={styles.radio}
+                    />
+                    No
+                  </label>
+                </div>
+                {errors.is_leak_major_disruption && (
+                  <Alert type="error">
+                    <AlertMessage>{errors.is_leak_major_disruption.message}</AlertMessage>
+                  </Alert>
+                )}
+              </div>
+
+              <div className="field">
+                <Label htmlFor="is_leak_major_reputational_damage">
+                  Would disclosure of this asset result in significant reputational damage to UCL? *
+                </Label>
+                <div className={styles["radio-group"]}>
+                  <label className={styles["radio-label"]}>
+                    <input
+                      type="radio"
+                      value="true"
+                      {...register("is_leak_major_reputational_damage", {
+                        required: "Please select yes or no",
+                      })}
+                      className={styles.radio}
+                    />
+                    Yes
+                  </label>
+                  <label className={styles["radio-label"]}>
+                    <input
+                      type="radio"
+                      value="false"
+                      {...register("is_leak_major_reputational_damage", {
+                        required: "Please select yes or no",
+                      })}
+                      className={styles.radio}
+                    />
+                    No
+                  </label>
+                </div>
+                {errors.is_leak_major_reputational_damage && (
+                  <Alert type="error">
+                    <AlertMessage>{errors.is_leak_major_reputational_damage.message}</AlertMessage>
+                  </Alert>
+                )}
+              </div>
+            </>
+          )}
+
+        {tier && tier >= 3 && (
+          <div className="field">
+            <Label htmlFor="has_targeted_threat_actors">
+              Is the asset likely to be targeted by sophisticated, well-resourced, and determined actors, such as
+              serious organised crime groups and state actors? *
+            </Label>
+            <div className={styles["radio-group"]}>
+              <label className={styles["radio-label"]}>
+                <input
+                  type="radio"
+                  value="true"
+                  {...register("has_targeted_threat_actors", {
+                    required: "Please select yes or no",
+                  })}
+                  className={styles.radio}
+                />
+                Yes
+              </label>
+              <label className={styles["radio-label"]}>
+                <input
+                  type="radio"
+                  value="false"
+                  {...register("has_targeted_threat_actors", {
+                    required: "Please select yes or no",
+                  })}
+                  className={styles.radio}
+                />
+                No
+              </label>
+            </div>
+            {errors.has_targeted_threat_actors && (
+              <Alert type="error">
+                <AlertMessage>{errors.has_targeted_threat_actors.message}</AlertMessage>
               </Alert>
             )}
           </div>

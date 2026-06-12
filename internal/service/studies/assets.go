@@ -73,17 +73,22 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 
 func assetFromBase(data openapi.AssetBase) (*types.Asset, error) {
 	asset := &types.Asset{
-		Title:                data.Title,
-		Description:          data.Description,
-		Source:               data.Source,
-		ClassificationImpact: string(data.ClassificationImpact),
-		Tier:                 data.Tier,
-		Protection:           string(data.Protection),
-		Format:               string(data.Format),
-		HasDspt:              data.HasDspt,
-		RequiresContract:     data.RequiresContract,
-		StoredOutsideUkEea:   data.StoredOutsideUkEea,
-		Status:               string(data.Status),
+		Title:                         data.Title,
+		Description:                   data.Description,
+		Source:                        data.Source,
+		ClassificationImpact:          string(data.ClassificationImpact),
+		Tier:                          data.Tier,
+		Protection:                    string(data.Protection),
+		Format:                        string(data.Format),
+		HasDspt:                       data.HasDspt,
+		RequiresContract:              data.RequiresContract,
+		StoredOutsideUkEea:            data.StoredOutsideUkEea,
+		Status:                        string(data.Status),
+		IsLeakMajorDisruption:         data.IsLeakMajorDisruption,
+		IsLeakMajorFinancialLoss:      data.IsLeakMajorFinancialLoss,
+		IsLeakMajorReputationalDamage: data.IsLeakMajorReputationalDamage,
+		RequiresTre:                   data.RequiresTre,
+		HasTargetedThreatActors:       data.HasTargetedThreatActors,
 	}
 	if data.LegalBasis != nil {
 		asset.LegalBasis = new(string(*data.LegalBasis))

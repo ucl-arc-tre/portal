@@ -1524,6 +1524,21 @@ components:
             - active
             - destroyed
           description: Status of the asset
+        is_leak_major_disruption:
+          type: boolean
+          description: Whether disclosure of this asset result in major disruption to UCL
+        is_leak_major_financial_loss:
+          type: boolean
+          description: Whether disclosure of this asset would result in major financial loss
+        is_leak_major_reputational_damage:
+          type: boolean
+          description: Whether disclosure of this asset would result in major reputational damage
+        requires_tre:
+          type: boolean
+          description: Whether this asset is required to be held in a ISO27001 certified TRE
+        has_targeted_threat_actors:
+          type: boolean
+          description: The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
     Asset:
       allOf:
         - $ref: "#/components/schemas/AssetBase"

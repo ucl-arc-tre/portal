@@ -678,8 +678,20 @@ type Asset struct {
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
 
+	// HasTargetedThreatActors The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
+	HasTargetedThreatActors *bool `json:"has_targeted_threat_actors,omitempty"`
+
 	// Id Unique identifier for the asset
 	Id string `json:"id"`
+
+	// IsLeakMajorDisruption Whether disclosure of this asset result in major disruption to UCL
+	IsLeakMajorDisruption *bool `json:"is_leak_major_disruption,omitempty"`
+
+	// IsLeakMajorFinancialLoss Whether disclosure of this asset would result in major financial loss
+	IsLeakMajorFinancialLoss *bool `json:"is_leak_major_financial_loss,omitempty"`
+
+	// IsLeakMajorReputationalDamage Whether disclosure of this asset would result in major reputational damage
+	IsLeakMajorReputationalDamage *bool `json:"is_leak_major_reputational_damage,omitempty"`
 
 	// LegalBasis Legal basis for holding the asset
 	LegalBasis *AssetLegalBasis `json:"legal_basis,omitempty"`
@@ -695,6 +707,9 @@ type Asset struct {
 
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
+
+	// RequiresTre Whether this asset is required to be held in a ISO27001 certified TRE
+	RequiresTre *bool `json:"requires_tre,omitempty"`
 
 	// Source Source of the data. e.g. 'NHS Trust X'
 	Source *string `json:"source,omitempty"`
@@ -759,6 +774,18 @@ type AssetBase struct {
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
 
+	// HasTargetedThreatActors The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
+	HasTargetedThreatActors *bool `json:"has_targeted_threat_actors,omitempty"`
+
+	// IsLeakMajorDisruption Whether disclosure of this asset result in major disruption to UCL
+	IsLeakMajorDisruption *bool `json:"is_leak_major_disruption,omitempty"`
+
+	// IsLeakMajorFinancialLoss Whether disclosure of this asset would result in major financial loss
+	IsLeakMajorFinancialLoss *bool `json:"is_leak_major_financial_loss,omitempty"`
+
+	// IsLeakMajorReputationalDamage Whether disclosure of this asset would result in major reputational damage
+	IsLeakMajorReputationalDamage *bool `json:"is_leak_major_reputational_damage,omitempty"`
+
 	// LegalBasis Legal basis for holding the asset
 	LegalBasis *AssetBaseLegalBasis `json:"legal_basis,omitempty"`
 
@@ -773,6 +800,9 @@ type AssetBase struct {
 
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
+
+	// RequiresTre Whether this asset is required to be held in a ISO27001 certified TRE
+	RequiresTre *bool `json:"requires_tre,omitempty"`
 
 	// Source Source of the data. e.g. 'NHS Trust X'
 	Source *string `json:"source,omitempty"`

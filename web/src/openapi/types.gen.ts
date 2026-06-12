@@ -203,6 +203,26 @@ export type AssetBase = {
      * Status of the asset
      */
     status: 'active' | 'destroyed';
+    /**
+     * Whether disclosure of this asset result in major disruption to UCL
+     */
+    is_leak_major_disruption?: boolean;
+    /**
+     * Whether disclosure of this asset would result in major financial loss
+     */
+    is_leak_major_financial_loss?: boolean;
+    /**
+     * Whether disclosure of this asset would result in major reputational damage
+     */
+    is_leak_major_reputational_damage?: boolean;
+    /**
+     * Whether this asset is required to be held in a ISO27001 certified TRE
+     */
+    requires_tre?: boolean;
+    /**
+     * The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
+     */
+    has_targeted_threat_actors?: boolean;
 };
 
 /**
