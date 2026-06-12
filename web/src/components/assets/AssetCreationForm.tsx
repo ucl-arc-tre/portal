@@ -110,7 +110,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
   useEffect(() => {
     if (editingAsset) {
-      console.log(editingAsset); // todo
       reset({
         title: editingAsset.title,
         description: editingAsset.description,
