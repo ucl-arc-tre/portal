@@ -227,36 +227,6 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 )}
               </Label>
             )}
-
-            <div className={sharedStyles["option-field"]} data-cy="involvesMnca">
-              <span>
-                The{" "}
-                <a
-                  className={sharedStyles["form-link"]}
-                  href="https://www.myresearchproject.org.uk/help/hlptemplatesfor.aspx"
-                >
-                  HRA Model Non-Commercial Agreement
-                </a>{" "}
-                will be in place across all sites when working with NHS sites
-              </span>
-              <Controller
-                name="involvesMnca"
-                control={control}
-                defaultValue={undefined}
-                render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
-              />
-            </div>
-
-            <div className={sharedStyles["option-field"]} data-cy="requiresDspt">
-              This research requires an NHS Data Security & Protection Toolkit registration to be in place at UCL. (This
-              might arise when approaching public bodies for NHS and social care data)
-              <Controller
-                name="requiresDspt"
-                control={control}
-                defaultValue={undefined}
-                render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
-              />
-            </div>
           </>
         )}
       </fieldset>
