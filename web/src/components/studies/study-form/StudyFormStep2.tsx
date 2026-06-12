@@ -97,7 +97,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
               className={sharedStyles["form-link"]}
               href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/"
             >
-              Health Research Authority REC
+              Health Research Authority Research Ethics Committee
             </a>{" "}
             approval of this research
           </span>
