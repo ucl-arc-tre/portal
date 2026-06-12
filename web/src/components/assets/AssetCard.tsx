@@ -19,8 +19,8 @@ const formatClassification = (classification: string) => {
   return classification.replace(/_/g, " ");
 };
 
-const formatProtection = (protection: string) => {
-  return protection.replace(/_/g, " ");
+const formatProtection = (protection: string | undefined) => {
+  return protection?.replace(/_/g, " ");
 };
 
 const getClassificationClass = (classification: string) => {
@@ -70,9 +70,11 @@ export default function AssetCard(props: AssetCardProps) {
               {formatClassification(asset.classification_impact)}
             </Badge>
 
-            <Badge className={styles["asset-protection"]} cy="asset-protection-badge">
-              {formatProtection(asset.protection)}
-            </Badge>
+            {asset.protection && (
+              <Badge className={styles["asset-protection"]} cy="asset-protection-badge">
+                {formatProtection(asset.protection)}
+              </Badge>
+            )}
           </div>
         </>
       }
