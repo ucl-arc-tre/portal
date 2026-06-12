@@ -1588,7 +1588,7 @@ components:
         involves_hra_approval:
           type: boolean
           nullable: true
-          description: Whether Health Research Authority REC approval is involved (seeking/have sought)
+          description: Whether Health Research Authority Research Ethics Committee approval is involved (seeking/have sought)
         iras_id:
           type: string
           nullable: true

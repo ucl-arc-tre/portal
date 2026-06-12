@@ -268,7 +268,7 @@ export type StudyBase = {
      */
     involves_ethics_approval?: boolean | null;
     /**
-     * Whether Health Research Authority REC approval is involved (seeking/have sought)
+     * Whether Health Research Authority Research Ethics Committee approval is involved (seeking/have sought)
      */
     involves_hra_approval?: boolean | null;
     /**
