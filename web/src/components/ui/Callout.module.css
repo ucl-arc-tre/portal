@@ -3,8 +3,8 @@
   width: 80%;
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-left: 4px solid #0066cc;
+  background-color: #f9f8fa;
+  border-left: 4px solid var(--ucl-mid);
   border-radius: var(--default-border-radius);
   margin-inline: 3vw;
 
@@ -16,11 +16,12 @@
   }
 
   a {
-    color: #0066cc;
+    color: var(--ucl-accent);
     text-decoration: underline;
+    transition: color 0.3s ease;
 
     &:hover {
-      color: #004499;
+      color: var(--ucl-mid);
     }
   }
 }
@@ -31,5 +32,5 @@
 }
 
 .definition {
-  border-color: #14b5bd;
+  border-color: var(--ucl-accent);
 }

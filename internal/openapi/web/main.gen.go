@@ -1163,13 +1163,13 @@ type Study struct {
 	// InvolvesDataProcessingOutsideEea Whether data is processed outside UK/EEA
 	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea,omitempty"`
 
-	// InvolvesEthicsApproval Whether Research Ethics Committee approval is involved (seeking/have sought)
+	// InvolvesEthicsApproval Whether local or other external body Research Ethics Committee approval is involved (seeking/have sought)
 	InvolvesEthicsApproval *bool `json:"involves_ethics_approval,omitempty"`
 
 	// InvolvesExternalUsers Whether external users will have access to the study
 	InvolvesExternalUsers *bool `json:"involves_external_users,omitempty"`
 
-	// InvolvesHraApproval Whether Health Research Authority approval is involved (seeking/have sought)
+	// InvolvesHraApproval Whether Health Research Authority Research Ethics Committee approval is involved (seeking/have sought)
 	InvolvesHraApproval *bool `json:"involves_hra_approval,omitempty"`
 
 	// InvolvesIndirectDataCollection Whether data is collected indirectly for the study (e.g. via a third party)
@@ -1256,13 +1256,13 @@ type StudyBase struct {
 	// InvolvesDataProcessingOutsideEea Whether data is processed outside UK/EEA
 	InvolvesDataProcessingOutsideEea *bool `json:"involves_data_processing_outside_eea,omitempty"`
 
-	// InvolvesEthicsApproval Whether Research Ethics Committee approval is involved (seeking/have sought)
+	// InvolvesEthicsApproval Whether local or other external body Research Ethics Committee approval is involved (seeking/have sought)
 	InvolvesEthicsApproval *bool `json:"involves_ethics_approval,omitempty"`
 
 	// InvolvesExternalUsers Whether external users will have access to the study
 	InvolvesExternalUsers *bool `json:"involves_external_users,omitempty"`
 
-	// InvolvesHraApproval Whether Health Research Authority approval is involved (seeking/have sought)
+	// InvolvesHraApproval Whether Health Research Authority Research Ethics Committee approval is involved (seeking/have sought)
 	InvolvesHraApproval *bool `json:"involves_hra_approval,omitempty"`
 
 	// InvolvesIndirectDataCollection Whether data is collected indirectly for the study (e.g. via a third party)

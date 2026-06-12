@@ -191,7 +191,7 @@ func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email st
 func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
 	days := config.DaysUntilStudySignoffExpiry(&study)
 
-	content := "You are required to re-attest details about your Study '" + study.Title + "'. Your current attestation "
+	content := "You are required to re-attest details about your Study '" + study.Title + "'. Your current affirmation "
 	if days < 0 {
 		content += "has expired. "
 	} else if days == 0 {
@@ -201,9 +201,9 @@ func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, ema
 	} else {
 		content += fmt.Sprintf("expires in %d days. ", days)
 	}
-	content += "Please login to the ARC Services Portal to complete the attestation."
+	content += "Please login to the ARC Services Portal to complete the affirmation."
 
-	subject := "Notification: Study attestation expiry"
+	subject := "Notification: Study affirmation expiry"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }
 

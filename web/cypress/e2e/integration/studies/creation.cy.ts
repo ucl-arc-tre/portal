@@ -91,9 +91,11 @@ describe("Study creation end-to-end", () => {
 
     // mark as ready for review
     cy.get('[data-cy="study-ready-for-review-button"]').click();
+    cy.get('[data-cy="study-affirmation-confirm-checkbox"]').check();
+    cy.get('[data-cy="study-affirmation-confirm-button"]').click();
 
     cy.contains("Case ref").should("exist");
-    cy.contains("Last signed off").should("not.exist");
+    cy.contains("Last signed off").should("exist");
   });
 
   it("owner should be able to edit an asset", () => {

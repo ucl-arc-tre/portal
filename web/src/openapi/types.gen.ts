@@ -288,11 +288,11 @@ export type StudyBase = {
      */
     cag_reference?: string | null;
     /**
-     * Whether Research Ethics Committee approval is involved (seeking/have sought)
+     * Whether local or other external body Research Ethics Committee approval is involved (seeking/have sought)
      */
     involves_ethics_approval?: boolean | null;
     /**
-     * Whether Health Research Authority approval is involved (seeking/have sought)
+     * Whether Health Research Authority Research Ethics Committee approval is involved (seeking/have sought)
      */
     involves_hra_approval?: boolean | null;
     /**

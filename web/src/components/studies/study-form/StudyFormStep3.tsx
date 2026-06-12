@@ -26,9 +26,8 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
-
       <div className={sharedStyles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
-        The research is already registered with the UCL Data Protection Office
+        <div>The research is already registered with the UCL Data Protection Office</div>
         <Controller
           name="isDataProtectionOfficeRegistered"
           control={control}
@@ -36,75 +35,87 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
           render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
         />
       </div>
-
+      {showDataProtectionNumber !== true && (
+        <Alert type="info" className={styles.alert}>
+          <AlertMessage>
+            All research involving personal data must be registered before any processing begins. See{" "}
+            <a href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/research/research-registration-guidance">
+              UCL guidance
+            </a>
+            .{" "}
+          </AlertMessage>
+        </Alert>
+      )}
       {showDataProtectionNumber === true && (
-        <Label htmlFor="dataProtectionNumber">
-          Data Protection Registration Number*:
-          <HelperText>
-            This is comprised of a registry ID, the year and month the data was registered and a 2-3 digit number. Eg.{" "}
-            {UclDpoId}/2022/01/123
-          </HelperText>
-          <div className={styles["data-protection-wrapper"]}>
-            <Controller
-              name="dataProtectionPrefix"
-              control={control}
-              rules={{
-                required:
-                  controllerValue?.toLowerCase() !== "ucl" && showDataProtectionNumber
-                    ? "Registry ID is required"
-                    : false,
-              }}
-              render={({ field }) => {
-                const isUcl = controllerValue?.toLowerCase() === "ucl";
-                return (
-                  <input
-                    {...field}
-                    value={isUcl ? UclDpoId : (field.value ?? "")}
-                    type="text"
-                    id="dataProtectionPrefix"
-                    readOnly={isUcl}
-                    placeholder={isUcl ? "" : "Registry ID eg ZX1234"}
-                    className={isUcl ? sharedStyles.readonly : ""}
-                  />
-                );
-              }}
-            />
+        <>
+          <Label htmlFor="dataProtectionNumber">
+            Data Protection Registration Number*:
+            <HelperText>
+              This is comprised of a registry ID, the year and month the data was registered and a 2-3 digit number. Eg.{" "}
+              {UclDpoId}/2022/01/123
+            </HelperText>
+            <div className={styles["data-protection-wrapper"]}>
+              <Controller
+                name="dataProtectionPrefix"
+                control={control}
+                rules={{
+                  required:
+                    controllerValue?.toLowerCase() !== "ucl" && showDataProtectionNumber
+                      ? "Registry ID is required"
+                      : false,
+                }}
+                render={({ field }) => {
+                  const isUcl = controllerValue?.toLowerCase() === "ucl";
+                  return (
+                    <input
+                      {...field}
+                      value={isUcl ? UclDpoId : (field.value ?? "")}
+                      type="text"
+                      id="dataProtectionPrefix"
+                      readOnly={isUcl}
+                      placeholder={isUcl ? "" : "Registry ID eg ZX1234"}
+                      className={isUcl ? sharedStyles.readonly : ""}
+                    />
+                  );
+                }}
+              />
 
-            <Controller
-              name="dataProtectionDate"
-              control={control}
-              rules={{
-                required: showDataProtectionNumber ? "Registration date is required" : false,
-              }}
-              render={({ field }) => <input {...field} type="month" id="dataProtectionDate" />}
-            />
+              <Controller
+                name="dataProtectionDate"
+                control={control}
+                rules={{
+                  required: showDataProtectionNumber ? "Registration date is required" : false,
+                }}
+                render={({ field }) => <input {...field} type="month" id="dataProtectionDate" />}
+              />
 
-            <Controller
-              name="dataProtectionId"
-              control={control}
-              rules={{
-                required: showDataProtectionNumber ? "Registration number is required" : false,
-                pattern: {
-                  value: /^(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$/,
-                  message:
-                    "Must be 2 or 3 digits. Values below 10 should be prefixed with a 0. Values above must not have a 0 prefix.",
-                },
-              }}
-              render={({ field }) => (
-                <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
-              )}
-            />
-          </div>
-          {(errors.dataProtectionPrefix || errors.dataProtectionDate || errors.dataProtectionId) && (
-            <Alert type="error">
-              <AlertMessage>
-                {errors.dataProtectionPrefix?.message ||
-                  errors.dataProtectionDate?.message ||
-                  errors.dataProtectionId?.message}
-              </AlertMessage>
-            </Alert>
-          )}
-        </Label>
+              <Controller
+                name="dataProtectionId"
+                control={control}
+                rules={{
+                  required: showDataProtectionNumber ? "Registration number is required" : false,
+                  pattern: {
+                    value: /^(?:(?:0[1-9])|(?:[1-9]\d{1,2}))$/,
+                    message:
+                      "Must be 2 or 3 digits. Values below 10 should be prefixed with a 0. Values above must not have a 0 prefix.",
+                  },
+                }}
+                render={({ field }) => (
+                  <input {...field} type="text" id="dataProtectionId" placeholder="eg 123" value={field.value} />
+                )}
+              />
+            </div>
+            {(errors.dataProtectionPrefix || errors.dataProtectionDate || errors.dataProtectionId) && (
+              <Alert type="error">
+                <AlertMessage>
+                  {errors.dataProtectionPrefix?.message ||
+                    errors.dataProtectionDate?.message ||
+                    errors.dataProtectionId?.message}
+                </AlertMessage>
+              </Alert>
+            )}
+          </Label>
+        </>
       )}
 
       <div className={sharedStyles["option-field"]} data-cy="involvesThirdParty">

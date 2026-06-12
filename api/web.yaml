@@ -1610,11 +1610,11 @@ components:
         involves_ethics_approval:
           type: boolean
           nullable: true
-          description: Whether Research Ethics Committee approval is involved (seeking/have sought)
+          description: Whether local or other external body Research Ethics Committee approval is involved (seeking/have sought)
         involves_hra_approval:
           type: boolean
           nullable: true
-          description: Whether Health Research Authority approval is involved (seeking/have sought)
+          description: Whether Health Research Authority Research Ethics Committee approval is involved (seeking/have sought)
         iras_id:
           type: string
           nullable: true
