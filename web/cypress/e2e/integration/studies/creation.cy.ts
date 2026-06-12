@@ -40,8 +40,6 @@ describe("Study creation end-to-end", () => {
     cy.get("input#title").type(assetTitle);
     cy.get('[name="description"]').type("Unknown");
     cy.get('[name="classification_impact"]').select("public");
-    cy.get('[name="protection"]').select("anonymisation");
-    cy.get('[name="legal_basis"]').select("consent");
     cy.get('[name="format"]').select("electronic");
     cy.get("input[name='has_expiry_date'][value='true']").check({ force: true });
     cy.get('[name="expires_at"]').type("2022-01-01");
@@ -126,8 +124,6 @@ describe("Study creation end-to-end", () => {
     cy.get("input#title").type(deleteAssetTitle);
     cy.get('[name="description"]').type("Unknown");
     cy.get('[name="classification_impact"]').select("public");
-    cy.get('[name="protection"]').select("anonymisation");
-    cy.get('[name="legal_basis"]').select("consent");
     cy.get('[name="format"]').select("electronic");
     cy.get("input[name='has_expiry_date'][value='true']").check({ force: true });
     cy.get('[name="expires_at"]').type("2022-01-01");

@@ -238,10 +238,12 @@ export default function ManageAssetPage() {
               <label>Tier:</label>
               <span>{asset.tier}</span>
             </div>
-            <div className={styles.field}>
-              <label>Protection:</label>
-              <span>{asset.protection.replaceAll("_", " ")}</span>
-            </div>
+            {asset.protection && (
+              <div className={styles.field}>
+                <label>Protection:</label>
+                <span>{asset.protection.replaceAll("_", " ")}</span>
+              </div>
+            )}
             <div className={styles.field}>
               <label>Legal Basis:</label>
               <span>{asset.legal_basis}</span>

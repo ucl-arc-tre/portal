@@ -22,7 +22,7 @@ func validAssetBase() openapi.AssetBase {
 		ClassificationImpact: openapi.AssetBaseClassificationImpactPublic,
 		Tier:                 1,
 		Locations:            []string{"UK"},
-		Protection:           openapi.AssetBaseProtectionAnonymisation,
+		Protection:           new(openapi.AssetBaseProtectionAnonymisation),
 		LegalBasis:           new(openapi.AssetBaseLegalBasisConsent),
 		Format:               openapi.AssetBaseFormatElectronic,
 		ExpiresAt:            new(time.Now().Format(config.DateFormat)),
@@ -125,7 +125,7 @@ func TestValidateAssetData(t *testing.T) {
 		{
 			name: "invalid protection",
 			modify: func(a *openapi.AssetBase) {
-				a.Protection = "invalid"
+				a.Protection = new(openapi.AssetBaseProtection("invalid"))
 			},
 			wantError: true,
 		},

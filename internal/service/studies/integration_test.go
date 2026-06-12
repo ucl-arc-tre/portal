@@ -25,8 +25,6 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
 
-func ptr[T any](value T) *T { return &value }
-
 // To be called by each test within this package to AutoMigrate
 // only the models/tables required by this package
 func migrate(db *gorm.DB) error {
@@ -77,10 +75,10 @@ func TestIntegration_CreateAsset(t *testing.T) {
 		ClassificationImpact: openapi.AssetBaseClassificationImpactPublic,
 		Tier:                 2,
 		Locations:            []string{"UK", "EU"},
-		Protection:           openapi.AssetBaseProtectionAnonymisation,
+		Protection:           new(openapi.AssetBaseProtectionAnonymisation),
 		LegalBasis:           new(openapi.AssetBaseLegalBasisConsent),
 		Format:               openapi.AssetBaseFormatElectronic,
-		ExpiresAt:            ptr(time.Now().AddDate(1, 0, 0).Format("2006-01-02")),
+		ExpiresAt:            new(time.Now().AddDate(1, 0, 0).Format("2006-01-02")),
 		Status:               openapi.AssetBaseStatusActive,
 	}
 
@@ -151,10 +149,10 @@ func TestIntegration_ValidateContract(t *testing.T) {
 	validBase := openapi.ContractBase{
 		Title:                 "Valid Contract",
 		OrganisationSignatory: "user1@testIntegration.com",
-		ThirdPartyName:        ptr("Third Party"),
+		ThirdPartyName:        new("Third Party"),
 		Status:                openapi.ContractBaseStatusActive,
-		StartDate:             ptr(now.Format("2006-01-02")),
-		ExpiryDate:            ptr(later.Format("2006-01-02")),
+		StartDate:             new(now.Format("2006-01-02")),
+		ExpiryDate:            new(later.Format("2006-01-02")),
 		AssetIds:              []string{asset.ID.String()},
 	}
 
@@ -194,7 +192,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 		{
 			name: "invalid third party name",
 			modify: func(c *openapi.ContractBase) {
-				c.ThirdPartyName = ptr("a")
+				c.ThirdPartyName = new("a")
 			},
 			expectErr: true,
 		},
@@ -208,7 +206,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 		{
 			name: "missing start date",
 			modify: func(c *openapi.ContractBase) {
-				c.StartDate = ptr("")
+				c.StartDate = new("")
 			},
 			expectErr: true,
 		},
@@ -219,8 +217,8 @@ func TestIntegration_ValidateContract(t *testing.T) {
 		{
 			name: "start date after expiry",
 			modify: func(c *openapi.ContractBase) {
-				c.StartDate = ptr(later.Format("2006-01-02"))
-				c.ExpiryDate = ptr(now.Format("2006-01-02"))
+				c.StartDate = new(later.Format("2006-01-02"))
+				c.ExpiryDate = new(now.Format("2006-01-02"))
 			},
 			expectErr: true,
 		},
@@ -321,10 +319,10 @@ func TestIntegration_CreateContract(t *testing.T) {
 	contractBase := openapi.ContractBase{
 		Title:                 "Integration Contract",
 		OrganisationSignatory: "user1@testIntegration.com",
-		ThirdPartyName:        ptr("Third Party"),
+		ThirdPartyName:        new("Third Party"),
 		Status:                openapi.ContractBaseStatusActive,
-		StartDate:             ptr("2024-01-01"),
-		ExpiryDate:            ptr("2024-12-31"),
+		StartDate:             new("2024-01-01"),
+		ExpiryDate:            new("2024-12-31"),
 		AssetIds:              []string{asset.ID.String()},
 	}
 
@@ -398,7 +396,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 	baseRequest := openapi.StudyRequest{
 		Title:                         "Valid Study",
 		DataControllerOrganisation:    "Org",
-		Description:                   ptr("Valid description"),
+		Description:                   new("Valid description"),
 		AdditionalStudyAdminUsernames: []string{"admin1@testIntegration.com"},
 	}
 
@@ -441,7 +439,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 		{
 			name: "description too long",
 			modify: func(req *openapi.StudyRequest) {
-				req.Description = ptr(strings.Repeat("a", 300))
+				req.Description = new(strings.Repeat("a", 300))
 			},
 			mockStaff: true,
 			expectErr: true,
@@ -449,7 +447,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 		{
 			name: "DPO missing number",
 			modify: func(req *openapi.StudyRequest) {
-				req.IsDataProtectionOfficeRegistered = ptr(true)
+				req.IsDataProtectionOfficeRegistered = new(true)
 				req.DataProtectionNumber = nil
 			},
 			mockStaff: true,
@@ -458,8 +456,8 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 		{
 			name: "invalid DPO format",
 			modify: func(req *openapi.StudyRequest) {
-				req.IsDataProtectionOfficeRegistered = ptr(true)
-				req.DataProtectionNumber = ptr("BAD")
+				req.IsDataProtectionOfficeRegistered = new(true)
+				req.DataProtectionNumber = new("BAD")
 			},
 			mockStaff: true,
 			expectErr: true,
@@ -467,7 +465,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 		{
 			name: "invalid CAG",
 			modify: func(req *openapi.StudyRequest) {
-				req.CagReference = ptr("BAD")
+				req.CagReference = new("BAD")
 			},
 			mockStaff: true,
 			expectErr: true,
@@ -475,7 +473,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 		{
 			name: "invalid NHS",
 			modify: func(req *openapi.StudyRequest) {
-				req.NhsEnglandReference = ptr("BAD")
+				req.NhsEnglandReference = new("BAD")
 			},
 			mockStaff: true,
 			expectErr: true,
@@ -536,7 +534,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 		{
 			name: "description at max length",
 			modify: func(req *openapi.StudyRequest) {
-				req.Description = ptr(strings.Repeat("a", 255))
+				req.Description = new(strings.Repeat("a", 255))
 			},
 			mockStaff: true,
 			expectErr: false,

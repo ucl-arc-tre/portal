@@ -1414,7 +1414,6 @@ components:
         - tier
         - locations
         - data_types
-        - protection
         - format
         - requires_contract
         - has_dspt
@@ -1805,7 +1804,6 @@ components:
         - classification_impact
         - tier
         - locations
-        - protection
         - format
         - requires_contract
         - expires_at

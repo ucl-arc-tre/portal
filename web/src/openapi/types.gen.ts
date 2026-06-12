@@ -170,7 +170,7 @@ export type AssetBase = {
     /**
      * Type of protection applied to the asset
      */
-    protection: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    protection?: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
     /**
      * Legal basis for holding the asset
      */
@@ -446,7 +446,7 @@ export type AssetImport = {
     description: string;
     tier: number;
     locations: Array<string>;
-    protection: string;
+    protection?: string;
     legal_basis?: string;
     format: string;
     expires_at: string;

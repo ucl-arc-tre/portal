@@ -19,7 +19,7 @@ type AssetFormProps = {
 };
 
 type AssetTierData = {
-  classification_impact: string;
+  classification_impact: "public" | "confidential" | "highly_confidential" | undefined;
   is_leak_major_disruption: boolean | string;
   is_leak_major_financial_loss: boolean | string;
   is_leak_major_reputational_damage: boolean | string;
@@ -60,7 +60,7 @@ function calculateTier(data: AssetTierData): number | undefined {
   const is_strongly_protected = data.protection == "anonymisation" || data.protection == "pseudonymisation";
 
   if (anyTrue(is_impact_4_or_5, is_special_category_personal, data.requires_tre)) {
-    return data.has_targeted_threat_actors ? 4 : 3;
+    return isTrue(data.has_targeted_threat_actors) ? 4 : 3;
   }
 
   if (anyTrue(is_impact_4_or_5, is_special_category_personal, is_personal) && is_strongly_protected) {
@@ -86,7 +86,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
       title: "",
       description: "",
       source: undefined,
-      classification_impact: "",
+      classification_impact: undefined,
       tier: "",
       protection: undefined,
       legal_basis: undefined,
@@ -140,7 +140,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         title: "",
         description: "",
         source: undefined,
-        classification_impact: "",
+        classification_impact: undefined,
         tier: "",
         protection: undefined,
         legal_basis: undefined,
@@ -167,10 +167,12 @@ export default function AssetCreationForm(props: AssetFormProps) {
   const protectionValue = watch("protection");
   const hasExpiryDateValue = watch("has_expiry_date");
   const requiresTRE = isTrue(watch("requires_tre"));
+  const classificationImpactValue = watch("classification_impact");
+  const isPublic = classificationImpactValue === "public";
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
   const showExpiryDate = isTrue(hasExpiryDateValue);
   const tier = calculateTier({
-    classification_impact: watch("classification_impact"),
+    classification_impact: classificationImpactValue,
     is_leak_major_disruption: watch("is_leak_major_disruption"),
     is_leak_major_financial_loss: watch("is_leak_major_financial_loss"),
     is_leak_major_reputational_damage: watch("is_leak_major_reputational_damage"),
@@ -333,7 +335,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        {dataTypesValue.includes("personal") && (
+        {dataTypesValue.includes("personal") && !isPublic && (
           <>
             <div className="field">
               <Label htmlFor="protection">What protection is applied to this asset in the form described here? *</Label>
@@ -446,7 +448,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
               aria-invalid={!!errors.legal_basis_special}
               className={errors.legal_basis_special ? styles.error : ""}
             >
-              <option value={undefined}>Select additional condition</option>
+              <option value={""}>Select additional condition</option>
               <option value="archiving_research_statistical">
                 Archiving, research, or statistical purposes (with safeguards)
               </option>
@@ -467,7 +469,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </div>
         )}
 
-        {!dataTypesValue.includes("personal") && !dataTypesValue.includes("special_category_personal") && (
+        {!dataTypesValue.includes("personal") && !dataTypesValue.includes("special_category_personal") && !isPublic && (
           <div className="field">
             <Label htmlFor="requires_tre">
               Does this asset require an ISO27001 certified Trusted Research Environment to be stored or processed? *
@@ -506,7 +508,8 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
         {!dataTypesValue.includes("personal") &&
           !dataTypesValue.includes("special_category_personal") &&
-          !requiresTRE && (
+          !requiresTRE &&
+          !isPublic && (
             <>
               <div className="field">
                 <Label htmlFor="is_leak_major_financial_loss">

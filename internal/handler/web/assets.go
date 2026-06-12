@@ -116,7 +116,6 @@ func assetToOpenApiAsset(data types.Asset) openapi.Asset {
 		Description:                   data.Description,
 		ClassificationImpact:          openapi.AssetClassificationImpact(data.ClassificationImpact),
 		Tier:                          data.Tier,
-		Protection:                    openapi.AssetProtection(data.Protection),
 		Format:                        openapi.AssetFormat(data.Format),
 		ExpiresAt:                     openapi.FormatOptionalTime(data.ExpiresAt),
 		Locations:                     data.LocationStrings(),
@@ -139,6 +138,9 @@ func assetToOpenApiAsset(data types.Asset) openapi.Asset {
 	}
 	for _, dataType := range data.DataTypes {
 		asset.DataTypes = append(asset.DataTypes, openapi.AssetDataTypes(dataType.Name))
+	}
+	if data.Protection != nil {
+		asset.Protection = new(openapi.AssetProtection(*data.Protection))
 	}
 	if data.LegalBasis != nil {
 		asset.LegalBasis = new(openapi.AssetLegalBasis(*data.LegalBasis))

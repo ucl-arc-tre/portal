@@ -703,7 +703,7 @@ type Asset struct {
 	Locations []string `json:"locations"`
 
 	// Protection Type of protection applied to the asset
-	Protection AssetProtection `json:"protection"`
+	Protection *AssetProtection `json:"protection,omitempty"`
 
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
@@ -796,7 +796,7 @@ type AssetBase struct {
 	Locations []string `json:"locations"`
 
 	// Protection Type of protection applied to the asset
-	Protection AssetBaseProtection `json:"protection"`
+	Protection *AssetBaseProtection `json:"protection,omitempty"`
 
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
@@ -850,7 +850,7 @@ type AssetImport struct {
 	HasDspt            bool     `json:"has_dspt"`
 	LegalBasis         *string  `json:"legal_basis,omitempty"`
 	Locations          []string `json:"locations"`
-	Protection         string   `json:"protection"`
+	Protection         *string  `json:"protection,omitempty"`
 	RequiresContract   bool     `json:"requires_contract"`
 	Status             string   `json:"status"`
 	StoredOutsideUkEea bool     `json:"stored_outside_uk_eea"`

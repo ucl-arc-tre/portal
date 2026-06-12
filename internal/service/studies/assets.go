@@ -35,7 +35,7 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 		return types.NewErrClientInvalidObjectF("at least one location must be specified")
 	}
 
-	if !assetData.Protection.Valid() {
+	if assetData.Protection != nil && !assetData.Protection.Valid() {
 		return types.NewErrClientInvalidObjectF("protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation")
 	}
 
@@ -78,7 +78,6 @@ func assetFromBase(data openapi.AssetBase) (*types.Asset, error) {
 		Source:                        data.Source,
 		ClassificationImpact:          string(data.ClassificationImpact),
 		Tier:                          data.Tier,
-		Protection:                    string(data.Protection),
 		Format:                        string(data.Format),
 		HasDspt:                       data.HasDspt,
 		RequiresContract:              data.RequiresContract,
@@ -89,6 +88,9 @@ func assetFromBase(data openapi.AssetBase) (*types.Asset, error) {
 		IsLeakMajorReputationalDamage: data.IsLeakMajorReputationalDamage,
 		RequiresTre:                   data.RequiresTre,
 		HasTargetedThreatActors:       data.HasTargetedThreatActors,
+	}
+	if data.Protection != nil {
+		asset.Protection = new(string(*data.Protection))
 	}
 	if data.LegalBasis != nil {
 		asset.LegalBasis = new(string(*data.LegalBasis))
