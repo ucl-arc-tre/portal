@@ -81,7 +81,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Fax",
     value: "fax",
     definition:
-      "Consult with ISG Advisory (slms.pid@ucl.ac.uk) if you need to use fax to send or receive research participants' personal data.",
+      "Consult with ISG Advisory (via MyServices) if you need to use fax to send or receive research participants' personal data.",
     riskScore: 5,
   },
   {
@@ -101,7 +101,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Handheld recording equipment (unsecured)",
     value: "handheld_recording_unsecured",
     definition:
-      "Consult with ISG Advisory (slms.pid@ucl.ac.uk) if you need to use unsecured devices to store research participants' personal data.",
+      "Consult with ISG Advisory (via MyServices) if you need to use unsecured devices to store research participants' personal data.",
     riskScore: 5,
   },
   {
@@ -307,7 +307,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Standard postage/courier",
     value: "standard_postage_courier",
     definition:
-      "Consult with ISG Advisory (slms.pid@ucl.ac.uk) if you need to use standard postage/couriers to send or receive research participants' personal data. The risks are of mis-addressing envelopes, using faulty packaging for bulkier items and items being left unattended in shared accommodation situations.",
+      "Consult with ISG Advisory (via MyServices) if you need to use standard postage/couriers to send or receive research participants' personal data. The risks are of mis-addressing envelopes, using faulty packaging for bulkier items and items being left unattended in shared accommodation situations.",
     riskScore: 5,
   },
   {
