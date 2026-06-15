@@ -156,6 +156,45 @@ func (e AssetLegalBasis) Valid() bool {
 	}
 }
 
+// Defines values for AssetLegalBasisSpecial.
+const (
+	AssetLegalBasisSpecialArchivingResearchStatistical AssetLegalBasisSpecial = "archiving_research_statistical"
+	AssetLegalBasisSpecialConsent                      AssetLegalBasisSpecial = "consent"
+	AssetLegalBasisSpecialHealth                       AssetLegalBasisSpecial = "health"
+	AssetLegalBasisSpecialLaw                          AssetLegalBasisSpecial = "law"
+	AssetLegalBasisSpecialLegal                        AssetLegalBasisSpecial = "legal"
+	AssetLegalBasisSpecialMadePublic                   AssetLegalBasisSpecial = "made_public"
+	AssetLegalBasisSpecialPublicHealth                 AssetLegalBasisSpecial = "public_health"
+	AssetLegalBasisSpecialPublicInterest               AssetLegalBasisSpecial = "public_interest"
+	AssetLegalBasisSpecialVitalInterests               AssetLegalBasisSpecial = "vital_interests"
+)
+
+// Valid indicates whether the value is a known member of the AssetLegalBasisSpecial enum.
+func (e AssetLegalBasisSpecial) Valid() bool {
+	switch e {
+	case AssetLegalBasisSpecialArchivingResearchStatistical:
+		return true
+	case AssetLegalBasisSpecialConsent:
+		return true
+	case AssetLegalBasisSpecialHealth:
+		return true
+	case AssetLegalBasisSpecialLaw:
+		return true
+	case AssetLegalBasisSpecialLegal:
+		return true
+	case AssetLegalBasisSpecialMadePublic:
+		return true
+	case AssetLegalBasisSpecialPublicHealth:
+		return true
+	case AssetLegalBasisSpecialPublicInterest:
+		return true
+	case AssetLegalBasisSpecialVitalInterests:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for AssetProtection.
 const (
 	AssetProtectionAnonymisation                             AssetProtection = "anonymisation"
@@ -312,6 +351,45 @@ func (e AssetBaseLegalBasis) Valid() bool {
 	case AssetBaseLegalBasisPublicTask:
 		return true
 	case AssetBaseLegalBasisVitalInterests:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AssetBaseLegalBasisSpecial.
+const (
+	AssetBaseLegalBasisSpecialArchivingResearchStatistical AssetBaseLegalBasisSpecial = "archiving_research_statistical"
+	AssetBaseLegalBasisSpecialConsent                      AssetBaseLegalBasisSpecial = "consent"
+	AssetBaseLegalBasisSpecialHealth                       AssetBaseLegalBasisSpecial = "health"
+	AssetBaseLegalBasisSpecialLaw                          AssetBaseLegalBasisSpecial = "law"
+	AssetBaseLegalBasisSpecialLegal                        AssetBaseLegalBasisSpecial = "legal"
+	AssetBaseLegalBasisSpecialMadePublic                   AssetBaseLegalBasisSpecial = "made_public"
+	AssetBaseLegalBasisSpecialPublicHealth                 AssetBaseLegalBasisSpecial = "public_health"
+	AssetBaseLegalBasisSpecialPublicInterest               AssetBaseLegalBasisSpecial = "public_interest"
+	AssetBaseLegalBasisSpecialVitalInterests               AssetBaseLegalBasisSpecial = "vital_interests"
+)
+
+// Valid indicates whether the value is a known member of the AssetBaseLegalBasisSpecial enum.
+func (e AssetBaseLegalBasisSpecial) Valid() bool {
+	switch e {
+	case AssetBaseLegalBasisSpecialArchivingResearchStatistical:
+		return true
+	case AssetBaseLegalBasisSpecialConsent:
+		return true
+	case AssetBaseLegalBasisSpecialHealth:
+		return true
+	case AssetBaseLegalBasisSpecialLaw:
+		return true
+	case AssetBaseLegalBasisSpecialLegal:
+		return true
+	case AssetBaseLegalBasisSpecialMadePublic:
+		return true
+	case AssetBaseLegalBasisSpecialPublicHealth:
+		return true
+	case AssetBaseLegalBasisSpecialPublicInterest:
+		return true
+	case AssetBaseLegalBasisSpecialVitalInterests:
 		return true
 	default:
 		return false
@@ -600,20 +678,38 @@ type Asset struct {
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
 
+	// HasTargetedThreatActors The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
+	HasTargetedThreatActors *bool `json:"has_targeted_threat_actors,omitempty"`
+
 	// Id Unique identifier for the asset
 	Id string `json:"id"`
 
+	// IsLeakMajorDisruption Whether disclosure of this asset result in major disruption to UCL
+	IsLeakMajorDisruption *bool `json:"is_leak_major_disruption,omitempty"`
+
+	// IsLeakMajorFinancialLoss Whether disclosure of this asset would result in major financial loss
+	IsLeakMajorFinancialLoss *bool `json:"is_leak_major_financial_loss,omitempty"`
+
+	// IsLeakMajorReputationalDamage Whether disclosure of this asset would result in major reputational damage
+	IsLeakMajorReputationalDamage *bool `json:"is_leak_major_reputational_damage,omitempty"`
+
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis AssetLegalBasis `json:"legal_basis"`
+	LegalBasis *AssetLegalBasis `json:"legal_basis,omitempty"`
+
+	// LegalBasisSpecial Additional Condition for Special Category Data
+	LegalBasisSpecial *AssetLegalBasisSpecial `json:"legal_basis_special,omitempty"`
 
 	// Locations Storage locations and touchpoints for the asset
 	Locations []string `json:"locations"`
 
 	// Protection Type of protection applied to the asset
-	Protection AssetProtection `json:"protection"`
+	Protection *AssetProtection `json:"protection,omitempty"`
 
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
+
+	// RequiresTre Whether this asset is required to be held in a ISO27001 certified TRE
+	RequiresTre *bool `json:"requires_tre,omitempty"`
 
 	// Source Source of the data. e.g. 'NHS Trust X'
 	Source *string `json:"source,omitempty"`
@@ -649,6 +745,9 @@ type AssetFormat string
 // AssetLegalBasis Legal basis for holding the asset
 type AssetLegalBasis string
 
+// AssetLegalBasisSpecial Additional Condition for Special Category Data
+type AssetLegalBasisSpecial string
+
 // AssetProtection Type of protection applied to the asset
 type AssetProtection string
 
@@ -675,17 +774,35 @@ type AssetBase struct {
 	// HasDspt Whether there is an up to date Data Security & Protection Toolkit in place
 	HasDspt bool `json:"has_dspt"`
 
+	// HasTargetedThreatActors The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
+	HasTargetedThreatActors *bool `json:"has_targeted_threat_actors,omitempty"`
+
+	// IsLeakMajorDisruption Whether disclosure of this asset result in major disruption to UCL
+	IsLeakMajorDisruption *bool `json:"is_leak_major_disruption,omitempty"`
+
+	// IsLeakMajorFinancialLoss Whether disclosure of this asset would result in major financial loss
+	IsLeakMajorFinancialLoss *bool `json:"is_leak_major_financial_loss,omitempty"`
+
+	// IsLeakMajorReputationalDamage Whether disclosure of this asset would result in major reputational damage
+	IsLeakMajorReputationalDamage *bool `json:"is_leak_major_reputational_damage,omitempty"`
+
 	// LegalBasis Legal basis for holding the asset
-	LegalBasis AssetBaseLegalBasis `json:"legal_basis"`
+	LegalBasis *AssetBaseLegalBasis `json:"legal_basis,omitempty"`
+
+	// LegalBasisSpecial Additional Condition for Special Category Data
+	LegalBasisSpecial *AssetBaseLegalBasisSpecial `json:"legal_basis_special,omitempty"`
 
 	// Locations Storage locations and touchpoints for the asset
 	Locations []string `json:"locations"`
 
 	// Protection Type of protection applied to the asset
-	Protection AssetBaseProtection `json:"protection"`
+	Protection *AssetBaseProtection `json:"protection,omitempty"`
 
 	// RequiresContract Whether a contract is required for the asset
 	RequiresContract bool `json:"requires_contract"`
+
+	// RequiresTre Whether this asset is required to be held in a ISO27001 certified TRE
+	RequiresTre *bool `json:"requires_tre,omitempty"`
 
 	// Source Source of the data. e.g. 'NHS Trust X'
 	Source *string `json:"source,omitempty"`
@@ -715,6 +832,9 @@ type AssetBaseFormat string
 // AssetBaseLegalBasis Legal basis for holding the asset
 type AssetBaseLegalBasis string
 
+// AssetBaseLegalBasisSpecial Additional Condition for Special Category Data
+type AssetBaseLegalBasisSpecial string
+
 // AssetBaseProtection Type of protection applied to the asset
 type AssetBaseProtection string
 
@@ -728,9 +848,9 @@ type AssetImport struct {
 	ExpiresAt          string   `json:"expires_at"`
 	Format             string   `json:"format"`
 	HasDspt            bool     `json:"has_dspt"`
-	LegalBasis         string   `json:"legal_basis"`
+	LegalBasis         *string  `json:"legal_basis,omitempty"`
 	Locations          []string `json:"locations"`
-	Protection         string   `json:"protection"`
+	Protection         *string  `json:"protection,omitempty"`
 	RequiresContract   bool     `json:"requires_contract"`
 	Status             string   `json:"status"`
 	StoredOutsideUkEea bool     `json:"stored_outside_uk_eea"`

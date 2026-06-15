@@ -170,11 +170,15 @@ export type AssetBase = {
     /**
      * Type of protection applied to the asset
      */
-    protection: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
+    protection?: 'anonymisation' | 'pseudonymisation' | 'identifiable_low_confidence_pseudonymisation';
     /**
      * Legal basis for holding the asset
      */
-    legal_basis: 'consent' | 'contract' | 'legal_obligation' | 'vital_interests' | 'public_task' | 'legitimate_interests';
+    legal_basis?: 'consent' | 'contract' | 'legal_obligation' | 'vital_interests' | 'public_task' | 'legitimate_interests';
+    /**
+     * Additional Condition for Special Category Data
+     */
+    legal_basis_special?: 'archiving_research_statistical' | 'consent' | 'law' | 'vital_interests' | 'made_public' | 'legal' | 'public_interest' | 'health' | 'public_health';
     /**
      * Format of the asset
      */
@@ -199,6 +203,26 @@ export type AssetBase = {
      * Status of the asset
      */
     status: 'active' | 'destroyed';
+    /**
+     * Whether disclosure of this asset result in major disruption to UCL
+     */
+    is_leak_major_disruption?: boolean;
+    /**
+     * Whether disclosure of this asset would result in major financial loss
+     */
+    is_leak_major_financial_loss?: boolean;
+    /**
+     * Whether disclosure of this asset would result in major reputational damage
+     */
+    is_leak_major_reputational_damage?: boolean;
+    /**
+     * Whether this asset is required to be held in a ISO27001 certified TRE
+     */
+    requires_tre?: boolean;
+    /**
+     * The data are likely to be targeted by sophisticated, well-resourced, and determined actors, such as serious organised crime groups and state actors.
+     */
+    has_targeted_threat_actors?: boolean;
 };
 
 /**
@@ -422,8 +446,8 @@ export type AssetImport = {
     description: string;
     tier: number;
     locations: Array<string>;
-    protection: string;
-    legal_basis: string;
+    protection?: string;
+    legal_basis?: string;
     format: string;
     expires_at: string;
     requires_contract: boolean;
