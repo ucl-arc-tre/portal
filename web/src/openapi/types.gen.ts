@@ -1470,7 +1470,7 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
     201: unknown;
 };
 
-export type PostStudiesAdminByStudyIdOwnerData = {
+export type PostStudiesAdminByStudyIdOwnerRequestData = {
     body: StudyOwnerUpdate;
     path: {
         /**
@@ -1479,10 +1479,10 @@ export type PostStudiesAdminByStudyIdOwnerData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/admin/{studyId}/owner';
+    url: '/studies/admin/{studyId}/owner-request';
 };
 
-export type PostStudiesAdminByStudyIdOwnerErrors = {
+export type PostStudiesAdminByStudyIdOwnerRequestErrors = {
     /**
      * Forbidden
      */
@@ -1497,9 +1497,43 @@ export type PostStudiesAdminByStudyIdOwnerErrors = {
     500: unknown;
 };
 
-export type PostStudiesAdminByStudyIdOwnerResponses = {
+export type PostStudiesAdminByStudyIdOwnerRequestResponses = {
     /**
      * Owner change request successful
+     */
+    200: unknown;
+};
+
+export type PostStudiesAdminByStudyIdOwnerApproveData = {
+    body: StudyOwnerUpdate;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/owner-approve';
+};
+
+export type PostStudiesAdminByStudyIdOwnerApproveErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesAdminByStudyIdOwnerApproveResponses = {
+    /**
+     * Owner update approval successful
      */
     200: unknown;
 };
@@ -1626,7 +1660,7 @@ export type PostStudiesByStudyIdSignoffResponses = {
     200: unknown;
 };
 
-export type PostStudiesByStudyIdOwnerData = {
+export type PostStudiesByStudyIdOwnerRequestData = {
     body: StudyOwnerUpdate;
     path: {
         /**
@@ -1635,10 +1669,10 @@ export type PostStudiesByStudyIdOwnerData = {
         studyId: string;
     };
     query?: never;
-    url: '/studies/{studyId}/owner';
+    url: '/studies/{studyId}/owner-request';
 };
 
-export type PostStudiesByStudyIdOwnerErrors = {
+export type PostStudiesByStudyIdOwnerRequestErrors = {
     /**
      * Forbidden
      */
@@ -1653,7 +1687,7 @@ export type PostStudiesByStudyIdOwnerErrors = {
     500: unknown;
 };
 
-export type PostStudiesByStudyIdOwnerResponses = {
+export type PostStudiesByStudyIdOwnerRequestResponses = {
     /**
      * Owner change request successful
      */

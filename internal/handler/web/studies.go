@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -322,7 +321,7 @@ func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, study
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
-func (h *Handler) PostStudiesStudyIdOwner(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesStudyIdOwnerRequest(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
 		return
@@ -340,8 +339,26 @@ func (h *Handler) PostStudiesStudyIdOwner(ctx *gin.Context, studyId string) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) PostStudiesAdminStudyIdOwner(ctx *gin.Context, studyId string) {
-	// todo
+func (h *Handler) PostStudiesAdminStudyIdOwnerRequest(ctx *gin.Context, studyId string) {
+	h.PostStudiesStudyIdOwnerRequest(ctx, studyId)
+}
+
+func (h *Handler) PostStudiesAdminStudyIdOwnerApprove(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	data := openapi.StudyOwnerUpdate{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	if err := h.studies.ApproveStudyOwner(studyUUID, user, data); err != nil {
+		setError(ctx, err, "Failed to update study owner")
+		return
+	}
+	ctx.Status(http.StatusOK)
 }
 
 // Helper functions
@@ -382,8 +399,6 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 		Caseref:                          data.Caseref,
 	}
 	latestOwnerChange := data.LatestOwnerChange()
-	log.Debug().Any("latestOwnerChange", latestOwnerChange).Msg("l") // todo
-
 	if latestOwnerChange != nil && latestOwnerChange.ToUser.Username != data.Owner.Username {
 		study.PendingNewOwnerUsername = new(string(latestOwnerChange.ToUser.Username))
 	}

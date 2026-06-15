@@ -58,6 +58,10 @@ func AddChildRole(parentRole RoleName, childRole RoleName) (bool, error) {
 	return roleAdded, types.NewErrServerError(err)
 }
 
+func RemoveStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
+	return RemoveRole(user, makeStudyOwnerRole(studyId).RoleName())
+}
+
 // Add a study role for a user
 func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	roleName := makeStudyOwnerRole(studyId).RoleName()

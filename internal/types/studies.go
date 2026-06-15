@@ -72,7 +72,6 @@ type StudyOwnerChangeLog struct {
 	FromUserID uuid.UUID                 `gorm:"not null;index"`
 	ToUserID   uuid.UUID                 `gorm:"not null;index"`
 	Action     StudyOwnerChangelogAction `gorm:"not null"`
-	Comment    *string
 
 	// Relationships
 	Study    Study `gorm:"foreignKey:StudyID"`

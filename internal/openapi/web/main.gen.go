@@ -1544,8 +1544,11 @@ type PostStudiesAdminStudyIdAssetsImportJSONRequestBody = AssetImport
 // PostStudiesAdminStudyIdContractsImportJSONRequestBody defines body for PostStudiesAdminStudyIdContractsImport for application/json ContentType.
 type PostStudiesAdminStudyIdContractsImportJSONRequestBody = ContractImport
 
-// PostStudiesAdminStudyIdOwnerJSONRequestBody defines body for PostStudiesAdminStudyIdOwner for application/json ContentType.
-type PostStudiesAdminStudyIdOwnerJSONRequestBody = StudyOwnerUpdate
+// PostStudiesAdminStudyIdOwnerApproveJSONRequestBody defines body for PostStudiesAdminStudyIdOwnerApprove for application/json ContentType.
+type PostStudiesAdminStudyIdOwnerApproveJSONRequestBody = StudyOwnerUpdate
+
+// PostStudiesAdminStudyIdOwnerRequestJSONRequestBody defines body for PostStudiesAdminStudyIdOwnerRequest for application/json ContentType.
+type PostStudiesAdminStudyIdOwnerRequestJSONRequestBody = StudyOwnerUpdate
 
 // PostStudiesAdminStudyIdReviewJSONRequestBody defines body for PostStudiesAdminStudyIdReview for application/json ContentType.
 type PostStudiesAdminStudyIdReviewJSONRequestBody = StudyReview
@@ -1571,8 +1574,8 @@ type PutStudiesStudyIdContractsContractIdJSONRequestBody = ContractBase
 // PostStudiesStudyIdContractsContractIdObjectsMultipartRequestBody defines body for PostStudiesStudyIdContractsContractIdObjects for multipart/form-data ContentType.
 type PostStudiesStudyIdContractsContractIdObjectsMultipartRequestBody = ContractObject
 
-// PostStudiesStudyIdOwnerJSONRequestBody defines body for PostStudiesStudyIdOwner for application/json ContentType.
-type PostStudiesStudyIdOwnerJSONRequestBody = StudyOwnerUpdate
+// PostStudiesStudyIdOwnerRequestJSONRequestBody defines body for PostStudiesStudyIdOwnerRequest for application/json ContentType.
+type PostStudiesStudyIdOwnerRequestJSONRequestBody = StudyOwnerUpdate
 
 // PostTokensDshJSONRequestBody defines body for PostTokensDsh for application/json ContentType.
 type PostTokensDshJSONRequestBody = TokenRequest
@@ -1658,8 +1661,11 @@ type ServerInterface interface {
 	// (POST /studies/admin/{studyId}/contracts/import)
 	PostStudiesAdminStudyIdContractsImport(c *gin.Context, studyId StudyIdParam)
 
-	// (POST /studies/admin/{studyId}/owner)
-	PostStudiesAdminStudyIdOwner(c *gin.Context, studyId StudyIdParam)
+	// (POST /studies/admin/{studyId}/owner-approve)
+	PostStudiesAdminStudyIdOwnerApprove(c *gin.Context, studyId StudyIdParam)
+
+	// (POST /studies/admin/{studyId}/owner-request)
+	PostStudiesAdminStudyIdOwnerRequest(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/admin/{studyId}/review)
 	PostStudiesAdminStudyIdReview(c *gin.Context, studyId StudyIdParam)
@@ -1718,8 +1724,8 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/contracts/{contractId}/objects/{contractObjectId})
 	GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam, contractObjectId ContractObjectIdParam)
 
-	// (POST /studies/{studyId}/owner)
-	PostStudiesStudyIdOwner(c *gin.Context, studyId StudyIdParam)
+	// (POST /studies/{studyId}/owner-request)
+	PostStudiesStudyIdOwnerRequest(c *gin.Context, studyId StudyIdParam)
 
 	// (PATCH /studies/{studyId}/pending)
 	PatchStudiesStudyIdPending(c *gin.Context, studyId StudyIdParam)
@@ -2221,8 +2227,8 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdContractsImport(c *gin
 	siw.Handler.PostStudiesAdminStudyIdContractsImport(c, studyId)
 }
 
-// PostStudiesAdminStudyIdOwner operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdOwner(c *gin.Context) {
+// PostStudiesAdminStudyIdOwnerApprove operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdOwnerApprove(c *gin.Context) {
 
 	var err error
 	_ = err
@@ -2243,7 +2249,32 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdOwner(c *gin.Context) 
 		}
 	}
 
-	siw.Handler.PostStudiesAdminStudyIdOwner(c, studyId)
+	siw.Handler.PostStudiesAdminStudyIdOwnerApprove(c, studyId)
+}
+
+// PostStudiesAdminStudyIdOwnerRequest operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdOwnerRequest(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesAdminStudyIdOwnerRequest(c, studyId)
 }
 
 // PostStudiesAdminStudyIdReview operation middleware
@@ -2829,8 +2860,8 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdObjectsCo
 	siw.Handler.GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c, studyId, contractId, contractObjectId)
 }
 
-// PostStudiesStudyIdOwner operation middleware
-func (siw *ServerInterfaceWrapper) PostStudiesStudyIdOwner(c *gin.Context) {
+// PostStudiesStudyIdOwnerRequest operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdOwnerRequest(c *gin.Context) {
 
 	var err error
 	_ = err
@@ -2851,7 +2882,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdOwner(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostStudiesStudyIdOwner(c, studyId)
+	siw.Handler.PostStudiesStudyIdOwnerRequest(c, studyId)
 }
 
 // PatchStudiesStudyIdPending operation middleware
@@ -3121,7 +3152,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/admin/import", wrapper.PostStudiesAdminImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/assets/import", wrapper.PostStudiesAdminStudyIdAssetsImport)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/contracts/import", wrapper.PostStudiesAdminStudyIdContractsImport)
-	router.POST(options.BaseURL+"/studies/admin/:studyId/owner", wrapper.PostStudiesAdminStudyIdOwner)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/owner-approve", wrapper.PostStudiesAdminStudyIdOwnerApprove)
+	router.POST(options.BaseURL+"/studies/admin/:studyId/owner-request", wrapper.PostStudiesAdminStudyIdOwnerRequest)
 	router.POST(options.BaseURL+"/studies/admin/:studyId/review", wrapper.PostStudiesAdminStudyIdReview)
 	router.GET(options.BaseURL+"/studies/:studyId", wrapper.GetStudiesStudyId)
 	router.PUT(options.BaseURL+"/studies/:studyId", wrapper.PutStudiesStudyId)
@@ -3141,7 +3173,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects", wrapper.PostStudiesStudyIdContractsContractIdObjects)
 	router.DELETE(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts/:contractId/objects/:contractObjectId", wrapper.GetStudiesStudyIdContractsContractIdObjectsContractObjectId)
-	router.POST(options.BaseURL+"/studies/:studyId/owner", wrapper.PostStudiesStudyIdOwner)
+	router.POST(options.BaseURL+"/studies/:studyId/owner-request", wrapper.PostStudiesStudyIdOwnerRequest)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.POST(options.BaseURL+"/studies/:studyId/signoff", wrapper.PostStudiesStudyIdSignoff)
 	router.GET(options.BaseURL+"/tokens/dsh", wrapper.GetTokensDsh)

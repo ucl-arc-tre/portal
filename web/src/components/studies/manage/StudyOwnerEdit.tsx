@@ -4,7 +4,7 @@ import Dialog from "@/components/ui/Dialog";
 import Loading from "@/components/ui/Loading";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { postStudiesAdminByStudyIdOwner, postStudiesByStudyIdOwner, Study } from "@/openapi";
+import { postStudiesAdminByStudyIdOwnerRequest, postStudiesByStudyIdOwnerRequest, Study } from "@/openapi";
 import { useState } from "react";
 
 type StudyOwnerEditProps = {
@@ -38,19 +38,23 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
 
     const data = { path: { studyId: study.id }, body: { username: email } };
     let response;
-    if (isIgOps) {
-      response = await postStudiesAdminByStudyIdOwner(data);
-    } else {
-      response = await postStudiesByStudyIdOwner(data);
-    }
+    try {
+      if (isIgOps) {
+        response = await postStudiesAdminByStudyIdOwnerRequest(data);
+      } else {
+        response = await postStudiesByStudyIdOwnerRequest(data);
+      }
 
-    if (responseIsError(response)) {
-      setErrorMessage(`Failed to update study status: ${extractErrorMessage(response)}.`);
-    } else {
-      setSuccessMessage("Succeeded");
+      if (responseIsError(response)) {
+        setErrorMessage(`Failed to update study status: ${extractErrorMessage(response)}.`);
+      } else {
+        setSuccessMessage("Succeeded");
+      }
+    } catch {
+      setErrorMessage("Failed to update study status. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   }
 
   return (

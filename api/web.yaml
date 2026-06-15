@@ -494,7 +494,7 @@ paths:
         default:
           description: Unexpected error
 
-  /studies/admin/{studyId}/owner:
+  /studies/admin/{studyId}/owner-request:
     post:
       description: Request an owner change
       parameters:
@@ -508,6 +508,27 @@ paths:
       responses:
         "200":
           description: Owner change request successful
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+
+  /studies/admin/{studyId}/owner-approve:
+    post:
+      description: Approve an owner change
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyOwnerUpdate"
+      responses:
+        "200":
+          description: Owner update approval successful
         "403":
           description: Forbidden
         "404":
@@ -596,7 +617,7 @@ paths:
         "500":
           description: Internal server error
 
-  /studies/{studyId}/owner:
+  /studies/{studyId}/owner-request:
     post:
       description: Request an owner change
       parameters:
