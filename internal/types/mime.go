@@ -7,6 +7,7 @@ const (
 	MimeTypeDocx        = MimeType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 	MimeTypeJpeg        = MimeType("image/jpeg")
 	MimeTypePNG         = MimeType("image/png")
+	MimeTypeZip         = MimeType("application/zip")
 )
 
 type MimeType string
