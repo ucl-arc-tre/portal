@@ -67,21 +67,21 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "DfE network",
     value: "dfe_network",
     definition:
-      "The Department for Education's Data Sharing Agreement makes these data highly confidential by default. The contract must be adhered to. Advice is best sought from IG Advisory (slms.pid@ucl.ac.uk) before entering these agreements.",
+      "The Department for Education's Data Sharing Agreement makes these data highly confidential by default. The contract must be adhered to. Advice is best sought from IG Advisory (infogov@ucl.ac.uk) before entering these agreements.",
     riskScore: 3,
   },
   {
     name: "Email",
     value: "email",
     definition:
-      "Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to use email to send or receive research participants' personal data.",
+      "Consult with IG Advisory (infogov@ucl.ac.uk) if you need to use email to send or receive research participants' personal data.",
     riskScore: 5,
   },
   {
     name: "Fax",
     value: "fax",
     definition:
-      "Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to use fax to send or receive research participants' personal data.",
+      "Consult with ISG Advisory (via MyServices) if you need to use fax to send or receive research participants' personal data.",
     riskScore: 5,
   },
   {
@@ -101,7 +101,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Handheld recording equipment (unsecured)",
     value: "handheld_recording_unsecured",
     definition:
-      "Consult with IG Advisory (infogov@ucl.ac.uk) if you need to use unsecured devices to store research participants' personal data.",
+      "Consult with ISG Advisory (via MyServices) if you need to use unsecured devices to store research participants' personal data.",
     riskScore: 5,
   },
   {
@@ -114,7 +114,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Internet download/upload (unsecured)",
     value: "internet_download_upload_unsecured",
     definition:
-      "Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to download or upload research participants' personal data without a secure connection.",
+      "Consult with IG Advisory (infogov@ucl.ac.uk) if you need to download or upload research participants' personal data without a secure connection.",
     riskScore: 5,
   },
   {
@@ -135,7 +135,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Laptop/PC (security unconfirmed)",
     value: "laptop_pc_security_unconfirmed",
     definition:
-      "Should not be used to store a data set which in itself could be used to identify participants. Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to use unsecured devices to store research participants' personal data.",
+      "Should not be used to store a data set which in itself could be used to identify participants. Consult with IG Advisory (infogov@ucl.ac.uk) if you need to use unsecured devices to store research participants' personal data.",
     riskScore: 5,
   },
   {
@@ -176,7 +176,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "NHS Digital",
     value: "nhs_digital",
     definition:
-      "NHS Digital's Data Sharing Agreement makes these data highly confidential by default. The contract must be adhered to. Advice is best sought from IG Advisory (slms.pid@ucl.ac.uk) before entering these agreements.",
+      "NHS Digital's Data Sharing Agreement makes these data highly confidential by default. The contract must be adhered to. Advice is best sought from IG Advisory (infogov@ucl.ac.uk) before entering these agreements.",
     riskScore: 4,
   },
   {
@@ -210,7 +210,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Online database/survey tool (security unconfirmed)",
     value: "online_database_security_unconfirmed",
     definition:
-      "Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to use survey tools to store research participants' personal data that are hosted outside the EEA or without a data processing agreement in place.",
+      "Consult with IG Advisory (infogov@ucl.ac.uk) if you need to use survey tools to store research participants' personal data that are hosted outside the EEA or without a data processing agreement in place.",
     riskScore: 5,
   },
   {
@@ -224,7 +224,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Other location",
     value: "other_location",
     definition:
-      "Assumed likely to be a high risk but you should consult IG Advisory (slms.pid@ucl.ac.uk) if you need to assess a service not listed here.",
+      "Assumed likely to be a high risk but you should consult IG Advisory (infogov@ucl.ac.uk) if you need to assess a service not listed here.",
     riskScore: 5,
   },
   {
@@ -251,7 +251,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Phone/tablet (security unconfirmed)",
     value: "phone_tablet_security_unconfirmed",
     definition:
-      "Should not be used to store a data set which in itself could be used to identify participants. Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to use unsecured devices to store research participants' personal data.",
+      "Should not be used to store a data set which in itself could be used to identify participants. Consult with IG Advisory (infogov@ucl.ac.uk) if you need to use unsecured devices to store research participants' personal data.",
     riskScore: 5,
   },
   {
@@ -265,7 +265,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Public Health England",
     value: "public_health_england",
     definition:
-      "Public Health England's Data Sharing Agreement makes these data highly confidential by default. The contract must be adhered to. Advice is best sought from IG Advisory (slms.pid@ucl.ac.uk) before entering these agreements.",
+      "Public Health England's Data Sharing Agreement makes these data highly confidential by default. The contract must be adhered to. Advice is best sought from IG Advisory (infogov@ucl.ac.uk) before entering these agreements.",
     riskScore: 2,
   },
   {
@@ -307,7 +307,7 @@ export const storageLocationDefinitions: StorageLocationDefinition[] = [
     name: "Standard postage/courier",
     value: "standard_postage_courier",
     definition:
-      "Consult with IG Advisory (slms.pid@ucl.ac.uk) if you need to use standard postage/couriers to send or receive research participants' personal data. The risks are of mis-addressing envelopes, using faulty packaging for bulkier items and items being left unattended in shared accommodation situations.",
+      "Consult with ISG Advisory (via MyServices) if you need to use standard postage/couriers to send or receive research participants' personal data. The risks are of mis-addressing envelopes, using faulty packaging for bulkier items and items being left unattended in shared accommodation situations.",
     riskScore: 5,
   },
   {
