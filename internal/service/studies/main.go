@@ -189,7 +189,7 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Where("id IN (?)", ids).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelog").Preload("OwnerChangelog.ToUser").Where("id IN (?)", ids).Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 

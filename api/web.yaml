@@ -1756,6 +1756,9 @@ components:
             caseref:
               type: integer
               description: Unique 5-digit reference number for the study, assigned on creation
+            pending_new_owner_username:
+              type: string
+              description: Username of the owner who has been requested to be assigned for this study, which is pending approval
       description: A research study
 
     StudyOwnerUpdate:

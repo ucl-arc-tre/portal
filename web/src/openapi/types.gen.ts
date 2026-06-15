@@ -392,6 +392,10 @@ export type Study = StudyBase & {
      * Unique 5-digit reference number for the study, assigned on creation
      */
     caseref: number;
+    /**
+     * Username of the owner who has been requested to be assigned for this study, which is pending approval
+     */
+    pending_new_owner_username?: string;
 };
 
 export type StudyOwnerUpdate = {

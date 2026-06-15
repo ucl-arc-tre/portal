@@ -41,13 +41,24 @@ type Study struct {
 	Caseref int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
 
 	// Relationships
-	Owner       User         `gorm:"foreignKey:OwnerUserID"`
-	Assets      []Asset      `gorm:"foreignKey:StudyID"`
-	StudyAdmins []StudyAdmin `gorm:"foreignKey:StudyID"`
-	Contracts   []Contract   `gorm:"foreignKey:StudyID"`
+	Owner          User                  `gorm:"foreignKey:OwnerUserID"`
+	Assets         []Asset               `gorm:"foreignKey:StudyID"`
+	StudyAdmins    []StudyAdmin          `gorm:"foreignKey:StudyID"`
+	Contracts      []Contract            `gorm:"foreignKey:StudyID"`
+	OwnerChangelog []StudyOwnerChangeLog `gorm:"foreignKey:StudyID"`
 }
 
-type StudyOwnerChangeLogAction string
+func (s Study) LatestOwnerChange() *StudyOwnerChangeLog {
+	var latest *StudyOwnerChangeLog
+	for _, o := range s.OwnerChangelog {
+		if latest == nil || o.CreatedAt.After(latest.CreatedAt) {
+			latest = &o
+		}
+	}
+	return latest
+}
+
+type StudyOwnerChangelogAction string
 
 const (
 	StudyOwnerChangeLogActionRequest = "request"
@@ -60,7 +71,7 @@ type StudyOwnerChangeLog struct {
 	UserID     uuid.UUID                 `gorm:"not null;index"` // User who made the change
 	FromUserID uuid.UUID                 `gorm:"not null;index"`
 	ToUserID   uuid.UUID                 `gorm:"not null;index"`
-	Action     StudyOwnerChangeLogAction `gorm:"not null"`
+	Action     StudyOwnerChangelogAction `gorm:"not null"`
 	Comment    *string
 
 	// Relationships

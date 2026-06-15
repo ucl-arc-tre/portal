@@ -77,6 +77,13 @@ export default function StudyDetails(props: StudyOverviewProps) {
             )}
           </dd>
 
+          {study.pending_new_owner_username && (
+            <dd>
+              Pending Owner: <span className={styles["grey-value"]}>{study.pending_new_owner_username}</span>
+              <InfoTooltip text="Owner update is pending approval"></InfoTooltip>
+            </dd>
+          )}
+
           <dd className={styles["detail-item"]}>
             Admins:
             {study.additional_study_admin_usernames.length === 0 && <span className={styles["grey-value"]}>None</span>}

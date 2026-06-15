@@ -1211,6 +1211,9 @@ type Study struct {
 	// OwnerUsername Username of the user who owns the study
 	OwnerUsername *string `json:"owner_username,omitempty"`
 
+	// PendingNewOwnerUsername Username of the owner who has been requested to be assigned for this study, which is pending approval
+	PendingNewOwnerUsername *string `json:"pending_new_owner_username,omitempty"`
+
 	// RequiresDbs Whether a DBS check is required for staff
 	RequiresDbs *bool `json:"requires_dbs,omitempty"`
 

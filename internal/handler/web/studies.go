@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -345,42 +346,46 @@ func (h *Handler) PostStudiesAdminStudyIdOwner(ctx *gin.Context, studyId string)
 
 // Helper functions
 
-func studyToOpenApiStudy(study types.Study) openapi.Study {
-	ownerUserIDStr := study.OwnerUserID.String()
-	ownerUsernameStr := string(study.Owner.Username)
-
-	return openapi.Study{
-		Id:                               study.ID.String(),
-		Title:                            study.Title,
-		Description:                      study.Description,
-		OwnerUserId:                      &ownerUserIDStr,
-		OwnerUsername:                    &ownerUsernameStr,
-		ApprovalStatus:                   openapi.StudyApprovalStatus(study.ApprovalStatus),
-		AdditionalStudyAdminUsernames:    study.AdminUsernames(),
-		DataControllerOrganisation:       study.DataControllerOrganisation,
-		InvolvesUclSponsorship:           study.InvolvesUclSponsorship,
-		InvolvesCag:                      study.InvolvesCag,
-		CagReference:                     study.CagReference,
-		InvolvesEthicsApproval:           study.InvolvesEthicsApproval,
-		InvolvesHraApproval:              study.InvolvesHraApproval,
-		IrasId:                           study.IrasId,
-		IsNhsAssociated:                  study.IsNhsAssociated,
-		InvolvesNhsEngland:               study.InvolvesNhsEngland,
-		NhsEnglandReference:              study.NhsEnglandReference,
-		InvolvesMnca:                     study.InvolvesMnca,
-		RequiresDspt:                     study.RequiresDspt,
-		RequiresDbs:                      study.RequiresDbs,
-		IsDataProtectionOfficeRegistered: study.IsDataProtectionOfficeRegistered,
-		DataProtectionNumber:             study.DataProtectionNumber,
-		InvolvesThirdParty:               study.InvolvesThirdParty,
-		InvolvesExternalUsers:            study.InvolvesExternalUsers,
-		InvolvesParticipantConsent:       study.InvolvesParticipantConsent,
-		InvolvesIndirectDataCollection:   study.InvolvesIndirectDataCollection,
-		InvolvesDataProcessingOutsideEea: study.InvolvesDataProcessingOutsideEea,
-		Feedback:                         study.Feedback,
-		CreatedAt:                        openapi.FormatTime(study.CreatedAt),
-		UpdatedAt:                        openapi.FormatTime(study.UpdatedAt),
-		LastSignoff:                      openapi.FormatOptionalTime(study.LastSignoff),
-		Caseref:                          study.Caseref,
+func studyToOpenApiStudy(data types.Study) openapi.Study {
+	study := openapi.Study{
+		Id:                               data.ID.String(),
+		Title:                            data.Title,
+		Description:                      data.Description,
+		OwnerUserId:                      new(data.OwnerUserID.String()),
+		OwnerUsername:                    new(string(data.Owner.Username)),
+		ApprovalStatus:                   openapi.StudyApprovalStatus(data.ApprovalStatus),
+		AdditionalStudyAdminUsernames:    data.AdminUsernames(),
+		DataControllerOrganisation:       data.DataControllerOrganisation,
+		InvolvesUclSponsorship:           data.InvolvesUclSponsorship,
+		InvolvesCag:                      data.InvolvesCag,
+		CagReference:                     data.CagReference,
+		InvolvesEthicsApproval:           data.InvolvesEthicsApproval,
+		InvolvesHraApproval:              data.InvolvesHraApproval,
+		IrasId:                           data.IrasId,
+		IsNhsAssociated:                  data.IsNhsAssociated,
+		InvolvesNhsEngland:               data.InvolvesNhsEngland,
+		NhsEnglandReference:              data.NhsEnglandReference,
+		InvolvesMnca:                     data.InvolvesMnca,
+		RequiresDspt:                     data.RequiresDspt,
+		RequiresDbs:                      data.RequiresDbs,
+		IsDataProtectionOfficeRegistered: data.IsDataProtectionOfficeRegistered,
+		DataProtectionNumber:             data.DataProtectionNumber,
+		InvolvesThirdParty:               data.InvolvesThirdParty,
+		InvolvesExternalUsers:            data.InvolvesExternalUsers,
+		InvolvesParticipantConsent:       data.InvolvesParticipantConsent,
+		InvolvesIndirectDataCollection:   data.InvolvesIndirectDataCollection,
+		InvolvesDataProcessingOutsideEea: data.InvolvesDataProcessingOutsideEea,
+		Feedback:                         data.Feedback,
+		CreatedAt:                        openapi.FormatTime(data.CreatedAt),
+		UpdatedAt:                        openapi.FormatTime(data.UpdatedAt),
+		LastSignoff:                      openapi.FormatOptionalTime(data.LastSignoff),
+		Caseref:                          data.Caseref,
 	}
+	latestOwnerChange := data.LatestOwnerChange()
+	log.Debug().Any("latestOwnerChange", latestOwnerChange).Msg("l") // todo
+
+	if latestOwnerChange != nil && latestOwnerChange.ToUser.Username != data.Owner.Username {
+		study.PendingNewOwnerUsername = new(string(latestOwnerChange.ToUser.Username))
+	}
+	return study
 }

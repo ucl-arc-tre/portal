@@ -73,7 +73,9 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
-  const canEditStudyOwner = isStudyOwner || (userData?.roles.includes("ig-ops-staff") ?? false);
+  const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
+  const canEditStudyOwner =
+    (isStudyOwner || (userData?.roles.includes("ig-ops-staff") ?? false)) && !studyOwnerPendingChange;
   const canRequestReview =
     study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
@@ -170,7 +172,15 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         setStudyOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
       />
 
-      {studyOwnerEditModalOpen && <StudyOwnerEdit study={study} setDialogOpen={setStudyOwnerEditModalOpen} />}
+      {studyOwnerEditModalOpen && (
+        <StudyOwnerEdit
+          study={study}
+          setDialogOpen={(show) => {
+            setStudyOwnerEditModalOpen(show);
+            fetchStudy(study.id);
+          }}
+        />
+      )}
     </Box>
   );
 }
