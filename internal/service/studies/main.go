@@ -398,6 +398,49 @@ func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uui
 	return nil
 }
 
+func (s *Service) UpdateStudyOwner(studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	study := types.Study{}
+	if err := tx.Where("id = ?", studyUUID).First(&study).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to get studies")
+	}
+
+	newOwner, err := s.users.UserByUsername(types.Username(data.Username))
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrClientInvalidObjectF("failed to find new owner [%v] in directory", data.Username)
+	} else if newOwner.ID == user.ID {
+		tx.Rollback()
+		return types.NewErrClientInvalidObjectF("cannot change study owner to self")
+	}
+
+	isApprovedStaffResearcher, err := rbac.HasRole(*newOwner, rbac.ApprovedStaffResearcher)
+	if err != nil {
+		tx.Rollback()
+		return err
+	} else if !isApprovedStaffResearcher {
+		tx.Rollback()
+		return types.NewErrClientInvalidObjectF("new owner must be an approved staff researcher")
+	}
+
+	changeEvent := types.StudyOwnerChangeLog{
+		StudyID:    study.ID,
+		UserID:     user.ID,
+		FromUserID: study.OwnerUserID,
+		ToUserID:   newOwner.ID,
+		Action:     types.StudyOwnerChangeLogActionRequest,
+	}
+	if err := tx.Create(&changeEvent).Error; err != nil { // NOTE: must not be first or create. Log is immutable
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to create StudyOwnerChangeLog record")
+	}
+
+	return commitTransaction(tx)
+}
+
 func (s *Service) newStudyTransaction(ctx context.Context) *StudyTransaction {
 	return &StudyTransaction{ctx: ctx, db: s.db.Begin(), newIAAs: []types.User{}}
 }

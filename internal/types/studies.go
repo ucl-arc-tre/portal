@@ -47,6 +47,29 @@ type Study struct {
 	Contracts   []Contract   `gorm:"foreignKey:StudyID"`
 }
 
+type StudyOwnerChangeLogAction string
+
+const (
+	StudyOwnerChangeLogActionRequest = "request"
+	StudyOwnerChangeLogActionApprove = "approve"
+)
+
+type StudyOwnerChangeLog struct {
+	Model
+	StudyID    uuid.UUID                 `gorm:"not null;index"`
+	UserID     uuid.UUID                 `gorm:"not null;index"` // User who made the change
+	FromUserID uuid.UUID                 `gorm:"not null;index"`
+	ToUserID   uuid.UUID                 `gorm:"not null;index"`
+	Action     StudyOwnerChangeLogAction `gorm:"not null"`
+	Comment    *string
+
+	// Relationships
+	Study    Study `gorm:"foreignKey:StudyID"`
+	User     User  `gorm:"foreignKey:UserID"`
+	FromUser User  `gorm:"foreignKey:FromUserID"`
+	ToUser   User  `gorm:"foreignKey:ToUserID"`
+}
+
 // Queried via the DSH API
 type DSHStudyExportRecord struct {
 	Caseref        int

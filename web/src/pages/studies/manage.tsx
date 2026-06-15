@@ -20,6 +20,7 @@ const defaultMeta = (
 export default function ManageStudyPage() {
   const router = useRouter();
   const { studyId } = router.query;
+
   const { authInProgress, isAuthed, userData } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
   const [isLoading, setIsLoading] = useState(false);

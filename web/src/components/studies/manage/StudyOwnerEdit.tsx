@@ -3,7 +3,8 @@ import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import Loading from "@/components/ui/Loading";
 import { useAuth } from "@/hooks/useAuth";
-import { Study } from "@/openapi";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
+import { postStudiesAdminByStudyIdOwner, postStudiesByStudyIdOwner, Study } from "@/openapi";
 import { useState } from "react";
 
 type StudyOwnerEditProps = {
@@ -17,13 +18,40 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
   const { userData } = useAuth();
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
+  const isIgOps = userData?.roles.includes("ig-ops-staff");
 
-  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit() {}
+  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!email) {
+      setErrorMessage("New owner email must be set");
+      return;
+    }
+
+    setErrorMessage("");
+    setIsLoading(true);
+
+    const data = { path: { studyId: study.id }, body: { username: email } };
+    let response;
+    if (isIgOps) {
+      response = await postStudiesAdminByStudyIdOwner(data);
+    } else {
+      response = await postStudiesByStudyIdOwner(data);
+    }
+
+    if (responseIsError(response)) {
+      setErrorMessage(`Failed to update study status: ${extractErrorMessage(response)}.`);
+    } else {
+      setSuccessMessage("Succeeded");
+    }
+
+    setIsLoading(false);
+  }
 
   return (
     <Dialog setDialogOpen={setDialogOpen}>
@@ -36,9 +64,9 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
           id="email"
           placeholder="Email address"
           name="email"
-          required={true}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
           autoFocus
         />
         <Alert type="warning">
@@ -48,10 +76,12 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
               : "Note that the transfer will require approval."}
           </AlertMessage>
         </Alert>
-        <Button disabled={isLoading} type="submit" cy="request-study-owner-edit-button">
-          {isLoading && <Loading message="" size="small" />}
-          Submit Request
-        </Button>
+        {successMessage === "" && (
+          <Button disabled={isLoading} type="submit" cy="request-study-owner-edit-button">
+            {isLoading && <Loading message="" size="small" />}
+            Submit Request
+          </Button>
+        )}
 
         {(errorMessage || successMessage) && (
           <Alert type={errorMessage ? "error" : "success"}>

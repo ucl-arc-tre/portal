@@ -494,6 +494,27 @@ paths:
         default:
           description: Unexpected error
 
+  /studies/admin/{studyId}/owner:
+    post:
+      description: Request an owner change
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyOwnerUpdate"
+      responses:
+        "200":
+          description: Owner change request successful
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+
   /studies/admin/import:
     post:
       description: Tempoary endpoint to import a study object. Idempotent. Updates on caseref
@@ -568,6 +589,27 @@ paths:
       responses:
         "200":
           description: Signoff recorded successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+
+  /studies/{studyId}/owner:
+    post:
+      description: Request an owner change
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyOwnerUpdate"
+      responses:
+        "200":
+          description: Owner change request successful
         "403":
           description: Forbidden
         "404":
@@ -1715,6 +1757,15 @@ components:
               type: integer
               description: Unique 5-digit reference number for the study, assigned on creation
       description: A research study
+
+    StudyOwnerUpdate:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+          description: Username to change the owner of the study to. Must exist
 
     StudyImport:
       type: object

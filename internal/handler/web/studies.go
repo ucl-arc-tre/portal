@@ -321,6 +321,28 @@ func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, study
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
+func (h *Handler) PostStudiesStudyIdOwner(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+	data := openapi.StudyOwnerUpdate{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	if err := h.studies.UpdateStudyOwner(studyUUID, user, data); err != nil {
+		setError(ctx, err, "Failed to update study owner")
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) PostStudiesAdminStudyIdOwner(ctx *gin.Context, studyId string) {
+	// todo
+}
+
 // Helper functions
 
 func studyToOpenApiStudy(study types.Study) openapi.Study {

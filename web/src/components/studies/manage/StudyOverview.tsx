@@ -73,7 +73,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
-  const canEditStudyOwner = isStudyOwner || userData?.roles.includes("ig-ops-staff");
+  const canEditStudyOwner = isStudyOwner || (userData?.roles.includes("ig-ops-staff") ?? false);
   const canRequestReview =
     study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;

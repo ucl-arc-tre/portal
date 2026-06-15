@@ -394,6 +394,13 @@ export type Study = StudyBase & {
     caseref: number;
 };
 
+export type StudyOwnerUpdate = {
+    /**
+     * Username to change the owner of the study to. Must exist
+     */
+    username: string;
+};
+
 export type StudyImport = {
     title: string;
     description?: string;
@@ -1459,6 +1466,40 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
     201: unknown;
 };
 
+export type PostStudiesAdminByStudyIdOwnerData = {
+    body: StudyOwnerUpdate;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/owner';
+};
+
+export type PostStudiesAdminByStudyIdOwnerErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesAdminByStudyIdOwnerResponses = {
+    /**
+     * Owner change request successful
+     */
+    200: unknown;
+};
+
 export type PostStudiesAdminImportData = {
     body: StudyImport;
     path?: never;
@@ -1577,6 +1618,40 @@ export type PostStudiesByStudyIdSignoffErrors = {
 export type PostStudiesByStudyIdSignoffResponses = {
     /**
      * Signoff recorded successfully
+     */
+    200: unknown;
+};
+
+export type PostStudiesByStudyIdOwnerData = {
+    body: StudyOwnerUpdate;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/owner';
+};
+
+export type PostStudiesByStudyIdOwnerErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesByStudyIdOwnerResponses = {
+    /**
+     * Owner change request successful
      */
     200: unknown;
 };
