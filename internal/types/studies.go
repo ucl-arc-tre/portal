@@ -93,21 +93,27 @@ const (
 
 type Asset struct {
 	ModelAuditable
-	CreatorUserID        uuid.UUID `gorm:"not null;index"`
-	StudyID              uuid.UUID `gorm:"not null;index"`
-	Title                string    `gorm:"not null"`
-	Description          string    `gorm:"type:text;not null"`
-	ClassificationImpact string    `gorm:"not null"`
-	Tier                 int       `gorm:"not null;default:0"`
-	Protection           string    `gorm:"not null"`
-	LegalBasis           string    `gorm:"not null"`
-	Format               string    `gorm:"not null"`
-	ExpiresAt            *time.Time
-	RequiresContract     bool        `gorm:"not null;default:false"`
-	HasDspt              bool        `gorm:"not null;default:false"`
-	StoredOutsideUkEea   bool        `gorm:"not null;default:false"`
-	Status               AssetStatus `gorm:"not null"`
-	Source               *string     // Data source location
+	CreatorUserID                 uuid.UUID `gorm:"not null;index"`
+	StudyID                       uuid.UUID `gorm:"not null;index"`
+	Title                         string    `gorm:"not null"`
+	Description                   string    `gorm:"type:text;not null"`
+	ClassificationImpact          string    `gorm:"not null"`
+	Tier                          int       `gorm:"not null;default:0"`
+	Protection                    *string
+	Format                        string `gorm:"not null"`
+	ExpiresAt                     *time.Time
+	RequiresContract              bool        `gorm:"not null;default:false"`
+	HasDspt                       bool        `gorm:"not null;default:false"`
+	StoredOutsideUkEea            bool        `gorm:"not null;default:false"`
+	Status                        AssetStatus `gorm:"not null"`
+	Source                        *string     // Data source location
+	LegalBasis                    *string     // GDPR
+	LegalBasisSpecial             *string     // Additional condition(s) for Special Category Data e.g. "Explicit consent"
+	IsLeakMajorDisruption         *bool
+	IsLeakMajorFinancialLoss      *bool
+	IsLeakMajorReputationalDamage *bool
+	RequiresTre                   *bool
+	HasTargetedThreatActors       *bool
 
 	// Relationships
 	CreatorUser User            `gorm:"foreignKey:CreatorUserID"`

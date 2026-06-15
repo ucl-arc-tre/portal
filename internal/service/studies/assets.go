@@ -2,6 +2,7 @@ package studies
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,52 +15,65 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/validation"
 )
 
-func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
-	if !validation.AssetTitlePattern.MatchString(assetData.Title) {
+func (s *Service) validateAssetData(data openapi.AssetBase) error {
+	if !validation.AssetTitlePattern.MatchString(data.Title) {
 		return types.NewErrClientInvalidObjectF("asset title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, hyphens and apostrophes")
 	}
 
-	if !validation.AssetDescriptionPattern.MatchString(assetData.Description) {
+	if !validation.AssetDescriptionPattern.MatchString(data.Description) {
 		return types.NewErrClientInvalidObjectF("asset description must be 4-255 characters")
 	}
 
-	if !assetData.ClassificationImpact.Valid() {
+	if !data.ClassificationImpact.Valid() {
 		return types.NewErrClientInvalidObjectF("classification_impact must be one of: public, confidential, highly_confidential")
 	}
 
-	if assetData.Tier < 0 || assetData.Tier > 4 {
+	if data.Tier < 0 || data.Tier > 4 {
 		return types.NewErrClientInvalidObjectF("tier must be between 0 and 4")
 	}
 
-	if len(assetData.Locations) == 0 {
+	if len(data.Locations) == 0 {
 		return types.NewErrClientInvalidObjectF("at least one location must be specified")
 	}
 
-	if !assetData.Protection.Valid() {
+	isPersonal := slices.Contains(data.DataTypes, openapi.AssetBaseDataTypesPersonal)
+	isSpecialCategoryPersonal := slices.Contains(data.DataTypes, openapi.AssetBaseDataTypesSpecialCategoryPersonal)
+	if (isPersonal || isSpecialCategoryPersonal) && (data.Protection == nil || data.LegalBasis == nil) {
+		return types.NewErrClientInvalidObjectF("non-public personal or special category data must have an applied protection and legal basis")
+	}
+	if isSpecialCategoryPersonal && data.LegalBasisSpecial == nil {
+		return types.NewErrClientInvalidObjectF("non-public special category personal data must additional condition")
+	}
+
+	if data.Protection != nil && !data.Protection.Valid() {
 		return types.NewErrClientInvalidObjectF("protection must be one of: anonymisation, pseudonymisation, identifiable_low_confidence_pseudonymisation")
 	}
 
-	if !assetData.LegalBasis.Valid() {
+	if data.LegalBasis != nil && !data.LegalBasis.Valid() {
 		return types.NewErrClientInvalidObjectF("invalid legal basis")
 	}
 
-	if !assetData.Format.Valid() {
+	if data.LegalBasisSpecial != nil && !data.LegalBasisSpecial.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid special legal basis")
+	}
+
+	if !data.Format.Valid() {
 		return types.NewErrClientInvalidObjectF("invalid format. must be one of: electronic, paper, other")
 	}
 
-	if !assetData.Status.Valid() {
+	if !data.Status.Valid() {
 		return types.NewErrClientInvalidObjectF("invalid status")
 	}
 
-	for _, dataType := range assetData.DataTypes {
+	for _, dataType := range data.DataTypes {
 		if !dataType.Valid() {
 			return types.NewErrClientInvalidObjectF("data type [%v] was not valid", dataType)
 		}
 	}
 
 	// Validate expiry field if provided
-	if assetData.ExpiresAt != nil {
-		if _, err := time.Parse(config.DateFormat, *assetData.ExpiresAt); err != nil {
+	if data.ExpiresAt != nil {
+		if _, err := time.Parse(config.DateFormat, *data.ExpiresAt); err != nil {
 			return types.NewErrClientInvalidObjectF("expiry date must be in %s format", config.DateFormat)
 		}
 	}
@@ -67,26 +81,37 @@ func (s *Service) validateAssetData(assetData openapi.AssetBase) error {
 	return nil
 }
 
-func assetFromBase(assetData openapi.AssetBase) (*types.Asset, error) {
+func assetFromBase(data openapi.AssetBase) (*types.Asset, error) {
 	asset := &types.Asset{
-		Title:                assetData.Title,
-		Description:          assetData.Description,
-		Source:               assetData.Source,
-		ClassificationImpact: string(assetData.ClassificationImpact),
-		Tier:                 assetData.Tier,
-		Protection:           string(assetData.Protection),
-		LegalBasis:           string(assetData.LegalBasis),
-		Format:               string(assetData.Format),
-		HasDspt:              assetData.HasDspt,
-		RequiresContract:     assetData.RequiresContract,
-		StoredOutsideUkEea:   assetData.StoredOutsideUkEea,
-		Status:               string(assetData.Status),
+		Title:                         data.Title,
+		Description:                   data.Description,
+		Source:                        data.Source,
+		ClassificationImpact:          string(data.ClassificationImpact),
+		Tier:                          data.Tier,
+		Format:                        string(data.Format),
+		HasDspt:                       data.HasDspt,
+		RequiresContract:              data.RequiresContract,
+		StoredOutsideUkEea:            data.StoredOutsideUkEea,
+		Status:                        string(data.Status),
+		IsLeakMajorDisruption:         data.IsLeakMajorDisruption,
+		IsLeakMajorFinancialLoss:      data.IsLeakMajorFinancialLoss,
+		IsLeakMajorReputationalDamage: data.IsLeakMajorReputationalDamage,
+		RequiresTre:                   data.RequiresTre,
+		HasTargetedThreatActors:       data.HasTargetedThreatActors,
 	}
-
-	if assetData.ExpiresAt != nil {
-		parsedDateTime, err := time.Parse(config.DateFormat, *assetData.ExpiresAt)
+	if data.Protection != nil {
+		asset.Protection = new(string(*data.Protection))
+	}
+	if data.LegalBasis != nil {
+		asset.LegalBasis = new(string(*data.LegalBasis))
+	}
+	if data.LegalBasisSpecial != nil {
+		asset.LegalBasisSpecial = new(string(*data.LegalBasisSpecial))
+	}
+	if data.ExpiresAt != nil {
+		parsedDateTime, err := time.Parse(config.DateFormat, *data.ExpiresAt)
 		if err != nil {
-			return nil, types.NewErrInvalidObjectF("failed to parse validated expiry date %s: %v", *assetData.ExpiresAt, err)
+			return nil, types.NewErrInvalidObjectF("failed to parse validated expiry date %s: %v", *data.ExpiresAt, err)
 		}
 		asset.ExpiresAt = &parsedDateTime
 	}

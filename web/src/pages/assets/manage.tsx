@@ -232,16 +232,18 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Classification:</label>
-              <span>{asset.classification_impact}</span>
+              <span>{asset.classification_impact.replaceAll("_", " ")}</span>
             </div>
             <div className={styles.field}>
               <label>Tier:</label>
               <span>{asset.tier}</span>
             </div>
-            <div className={styles.field}>
-              <label>Protection:</label>
-              <span>{asset.protection}</span>
-            </div>
+            {asset.protection && (
+              <div className={styles.field}>
+                <label>Protection:</label>
+                <span>{asset.protection.replaceAll("_", " ")}</span>
+              </div>
+            )}
             <div className={styles.field}>
               <label>Legal Basis:</label>
               <span>{asset.legal_basis}</span>
@@ -261,6 +263,7 @@ export default function ManageAssetPage() {
 
             <div className={styles.field}>
               <label>Data types:</label>
+              {asset.data_types.length === 0 && "None"}
               <span>{asset.data_types.map((data_type) => data_type.replace(/_/g, " ")).join(", ")}</span>
             </div>
 

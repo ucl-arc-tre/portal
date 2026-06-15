@@ -106,36 +106,47 @@ func (h *Handler) DeleteStudiesStudyIdAssetsAssetId(
 
 // Helper functions
 
-func assetToOpenApiAsset(asset types.Asset) openapi.Asset {
-	contractIds := []string{}
-	for _, contract := range asset.Contracts {
-		contractIds = append(contractIds, contract.ID.String())
+func assetToOpenApiAsset(data types.Asset) openapi.Asset {
+	asset := openapi.Asset{
+		Id:                            data.ID.String(),
+		CreatorUserId:                 data.CreatorUserID.String(),
+		StudyId:                       data.StudyID.String(),
+		Title:                         data.Title,
+		Source:                        data.Source,
+		Description:                   data.Description,
+		ClassificationImpact:          openapi.AssetClassificationImpact(data.ClassificationImpact),
+		Tier:                          data.Tier,
+		Format:                        openapi.AssetFormat(data.Format),
+		ExpiresAt:                     openapi.FormatOptionalTime(data.ExpiresAt),
+		Locations:                     data.LocationStrings(),
+		RequiresContract:              data.RequiresContract,
+		HasDspt:                       data.HasDspt,
+		StoredOutsideUkEea:            data.StoredOutsideUkEea,
+		Status:                        openapi.AssetStatus(data.Status),
+		CreatedAt:                     openapi.FormatTime(data.CreatedAt),
+		UpdatedAt:                     openapi.FormatTime(data.UpdatedAt),
+		ContractIds:                   []string{},
+		DataTypes:                     []openapi.AssetDataTypes{},
+		IsLeakMajorDisruption:         data.IsLeakMajorDisruption,
+		IsLeakMajorFinancialLoss:      data.IsLeakMajorFinancialLoss,
+		IsLeakMajorReputationalDamage: data.IsLeakMajorReputationalDamage,
+		RequiresTre:                   data.RequiresTre,
+		HasTargetedThreatActors:       data.HasTargetedThreatActors,
 	}
-	dataTypes := []openapi.AssetDataTypes{}
-	for _, dataType := range asset.DataTypes {
-		dataTypes = append(dataTypes, openapi.AssetDataTypes(dataType.Name))
+	for _, contract := range data.Contracts {
+		asset.ContractIds = append(asset.ContractIds, contract.ID.String())
 	}
-	return openapi.Asset{
-		Id:                   asset.ID.String(),
-		CreatorUserId:        asset.CreatorUserID.String(),
-		StudyId:              asset.StudyID.String(),
-		Title:                asset.Title,
-		Source:               asset.Source,
-		Description:          asset.Description,
-		ClassificationImpact: openapi.AssetClassificationImpact(asset.ClassificationImpact),
-		Tier:                 asset.Tier,
-		Protection:           openapi.AssetProtection(asset.Protection),
-		LegalBasis:           openapi.AssetLegalBasis(asset.LegalBasis),
-		Format:               openapi.AssetFormat(asset.Format),
-		ExpiresAt:            openapi.FormatOptionalTime(asset.ExpiresAt),
-		Locations:            asset.LocationStrings(),
-		DataTypes:            dataTypes,
-		RequiresContract:     asset.RequiresContract,
-		HasDspt:              asset.HasDspt,
-		StoredOutsideUkEea:   asset.StoredOutsideUkEea,
-		Status:               openapi.AssetStatus(asset.Status),
-		CreatedAt:            openapi.FormatTime(asset.CreatedAt),
-		UpdatedAt:            openapi.FormatTime(asset.UpdatedAt),
-		ContractIds:          contractIds,
+	for _, dataType := range data.DataTypes {
+		asset.DataTypes = append(asset.DataTypes, openapi.AssetDataTypes(dataType.Name))
 	}
+	if data.Protection != nil {
+		asset.Protection = new(openapi.AssetProtection(*data.Protection))
+	}
+	if data.LegalBasis != nil {
+		asset.LegalBasis = new(openapi.AssetLegalBasis(*data.LegalBasis))
+	}
+	if data.LegalBasisSpecial != nil {
+		asset.LegalBasisSpecial = new(openapi.AssetLegalBasisSpecial(*data.LegalBasisSpecial))
+	}
+	return asset
 }
