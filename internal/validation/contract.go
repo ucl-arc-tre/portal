@@ -16,6 +16,7 @@ var (
 		types.MimeTypeDocx,
 		types.MimeTypeJpeg,
 		types.MimeTypePNG,
+		types.MimeTypeOctetStream,
 	}
 )
 
