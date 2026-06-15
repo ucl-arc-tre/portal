@@ -2,6 +2,8 @@ package web
 
 import (
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -66,6 +68,7 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 
 	// Open the uploaded file
 	file, err := fileHeader.Open()
+	log.Debug().Msgf("Opened uploaded file [%v]", file)
 	if err != nil {
 		setError(ctx, types.NewErrServerError(err), "Failed to open uploaded file")
 		return
@@ -82,6 +85,11 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 	} else if !validation.IsValidContractMimeType(mimeType) {
 		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v] not valid", mimeType), "Invalid MIME type")
 		return
+	} else if strings.ToLower(filepath.Ext(fileHeader.Filename)) == ".doc" &&
+		(mimeType == types.MimeTypeOctetStream ||
+			mimeType == types.MimeTypeDoc) {
+
+		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v], did not match valid type for doc", mimeType), "Invalid MIME type for filetype")
 	}
 
 	contractObject := studies.ContractObject{
