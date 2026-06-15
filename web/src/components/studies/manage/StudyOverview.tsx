@@ -12,6 +12,7 @@ import StudyForm from "../study-form/StudyForm";
 import Box from "@/components/ui/Box";
 import Dialog from "@/components/ui/Dialog";
 import StudyAffirmation from "./StudyAffirmation";
+import StudyOwnerEdit from "./StudyOwnerEdit";
 
 type StudyOverviewProps = {
   study: Study;
@@ -64,6 +65,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
+  const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
   const { userData } = useAuth();
   const isStudyOwner =
@@ -71,6 +73,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
+  const canEditStudyOwner = isStudyOwner || userData?.roles.includes("ig-ops-staff");
   const canRequestReview =
     study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
@@ -161,7 +164,13 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         )}
       </div>
 
-      <StudyDetails study={study} riskScore={riskScore} />
+      <StudyDetails
+        study={study}
+        riskScore={riskScore}
+        setStudyOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
+      />
+
+      {studyOwnerEditModalOpen && <StudyOwnerEdit study={study} setDialogOpen={setStudyOwnerEditModalOpen} />}
     </Box>
   );
 }

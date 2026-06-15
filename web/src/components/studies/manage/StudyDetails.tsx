@@ -5,10 +5,12 @@ import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { formatDate } from "../../shared/exports";
 import Badge from "@/components/ui/Badge";
+import EditIcon from "@/components/ui/EditIcon";
 
 type StudyOverviewProps = {
   study: Study;
   riskScore: number;
+  setStudyOwnerEditModal: ((show: boolean) => void) | undefined;
 };
 
 function getRiskClassification(score: number): string {
@@ -25,7 +27,7 @@ function getRiskClassification(score: number): string {
 }
 
 export default function StudyDetails(props: StudyOverviewProps) {
-  const { study, riskScore } = props;
+  const { study, riskScore, setStudyOwnerEditModal } = props;
   const standardRiskScoreStatement = "increases risk score by 5";
 
   const riskClassification = getRiskClassification(riskScore);
@@ -70,10 +72,14 @@ export default function StudyDetails(props: StudyOverviewProps) {
         <dl className={styles.ownership}>
           <dd>
             Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
+            {setStudyOwnerEditModal && (
+              <EditIcon onClick={() => setStudyOwnerEditModal(true)} label="Edit study owner" />
+            )}
           </dd>
 
           <dd className={styles["detail-item"]}>
             Admins:
+            {study.additional_study_admin_usernames.length === 0 && <span className={styles["grey-value"]}>None</span>}
             {study.additional_study_admin_usernames.map((username) => (
               <li key={username}>
                 <span className={styles["grey-value"]}>{username}</span>

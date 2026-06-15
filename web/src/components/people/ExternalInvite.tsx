@@ -46,8 +46,9 @@ export default function ExternalInvite() {
     <>
       {isDialogVisible && (
         <Dialog setDialogOpen={setDialogVisible}>
-          <form onSubmit={handleSubmit} className={styles["invite-form"]}>
-            <Label htmlFor="email">Invite a researcher to the portal</Label>
+          <h2>Invite a researcher to the portal</h2>
+          <form onSubmit={handleSubmit} className={"form"}>
+            <Label htmlFor="email"></Label>
             <Input
               type="email"
               id="email"

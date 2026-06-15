@@ -40,6 +40,10 @@
 
   margin: 0;
 
+  h2 {
+    margin-bottom: 1rem;
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }
