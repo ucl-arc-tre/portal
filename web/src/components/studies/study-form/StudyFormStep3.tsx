@@ -16,16 +16,6 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
 
   return (
     <fieldset className={sharedStyles.fieldset}>
-      <div className={sharedStyles["option-field"]} data-cy="requiresDbs">
-        There is data related to this research only to be handled by staff who have obtained a Disclosure and Barring
-        Service (DBS) check
-        <Controller
-          name="requiresDbs"
-          control={control}
-          defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
-        />
-      </div>
       <div className={sharedStyles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
         <div>The research is already registered with the UCL Data Protection Office</div>
         <Controller
