@@ -189,7 +189,7 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 // StudiesById retrieves all studies that are in a list of ids
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
-	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelog").Preload("OwnerChangelog.ToUser").Where("id IN (?)", ids).Find(&studies).Error
+	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelogs").Preload("OwnerChangelogs.ToUser").Where("id IN (?)", ids).Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 
@@ -426,12 +426,12 @@ func (s *Service) UpdateStudyOwner(studyUUID uuid.UUID, user types.User, data op
 		return types.NewErrClientInvalidObjectF("new owner must be an approved staff researcher")
 	}
 
-	changeEvent := types.StudyOwnerChangeLog{
+	changeEvent := types.StudyOwnerChangelog{
 		StudyID:    study.ID,
 		UserID:     user.ID,
 		FromUserID: study.OwnerUserID,
 		ToUserID:   newOwner.ID,
-		Action:     types.StudyOwnerChangeLogActionRequest,
+		Action:     types.StudyOwnerChangelogActionRequest,
 	}
 	if err := tx.Create(&changeEvent).Error; err != nil { // NOTE: must not be first or create. Log is immutable
 		tx.Rollback()
@@ -451,8 +451,8 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		return types.NewErrFromGorm(err, "failed to get studies")
 	}
 
-	changeRequest := types.StudyOwnerChangeLog{}
-	if res := tx.Preload("ToUser").Where("study_id = ? AND action = ?", studyUUID, types.StudyOwnerChangeLogActionRequest).Order("created_at DESC").Limit(1).Find(&changeRequest); res.Error != nil {
+	changeRequest := types.StudyOwnerChangelog{}
+	if res := tx.Preload("ToUser").Where("study_id = ? AND action = ?", studyUUID, types.StudyOwnerChangelogActionRequest).Order("created_at DESC").Limit(1).Find(&changeRequest); res.Error != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(res.Error, "failed to get study owner change log request")
 	} else if res.RowsAffected == 0 {
@@ -476,12 +476,12 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		return types.NewErrClientInvalidObjectF("cannot self approve")
 	}
 
-	changeEvent := types.StudyOwnerChangeLog{
+	changeEvent := types.StudyOwnerChangelog{
 		StudyID:    study.ID,
 		UserID:     user.ID,
-		FromUserID: study.OwnerUserID,
+		FromUserID: oldOwner.ID,
 		ToUserID:   newOwner.ID,
-		Action:     types.StudyOwnerChangeLogActionApprove,
+		Action:     types.StudyOwnerChangelogActionApprove,
 	}
 	if err := tx.Create(&changeEvent).Error; err != nil { // NOTE: must not be first or create. Log is immutable
 		tx.Rollback()

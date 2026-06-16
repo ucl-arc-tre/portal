@@ -41,16 +41,17 @@ type Study struct {
 	Caseref int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
 
 	// Relationships
-	Owner          User                  `gorm:"foreignKey:OwnerUserID"`
-	Assets         []Asset               `gorm:"foreignKey:StudyID"`
-	StudyAdmins    []StudyAdmin          `gorm:"foreignKey:StudyID"`
-	Contracts      []Contract            `gorm:"foreignKey:StudyID"`
-	OwnerChangelog []StudyOwnerChangeLog `gorm:"foreignKey:StudyID"`
+	Owner           User                  `gorm:"foreignKey:OwnerUserID"`
+	Assets          []Asset               `gorm:"foreignKey:StudyID"`
+	StudyAdmins     []StudyAdmin          `gorm:"foreignKey:StudyID"`
+	Contracts       []Contract            `gorm:"foreignKey:StudyID"`
+	OwnerChangelogs []StudyOwnerChangelog `gorm:"foreignKey:StudyID"`
 }
 
-func (s Study) LatestOwnerChange() *StudyOwnerChangeLog {
-	var latest *StudyOwnerChangeLog
-	for _, o := range s.OwnerChangelog {
+// Latest study owner changelog record. Optional
+func (s Study) LatestOwnerChange() *StudyOwnerChangelog {
+	var latest *StudyOwnerChangelog
+	for _, o := range s.OwnerChangelogs {
 		if latest == nil || o.CreatedAt.After(latest.CreatedAt) {
 			latest = &o
 		}
@@ -61,14 +62,14 @@ func (s Study) LatestOwnerChange() *StudyOwnerChangeLog {
 type StudyOwnerChangelogAction string
 
 const (
-	StudyOwnerChangeLogActionRequest = "request"
-	StudyOwnerChangeLogActionApprove = "approve"
+	StudyOwnerChangelogActionRequest = "request"
+	StudyOwnerChangelogActionApprove = "approve"
 )
 
-type StudyOwnerChangeLog struct {
+type StudyOwnerChangelog struct {
 	Model
 	StudyID    uuid.UUID                 `gorm:"not null;index"`
-	UserID     uuid.UUID                 `gorm:"not null;index"` // User who made the change
+	UserID     uuid.UUID                 `gorm:"not null;index"` // User took the action
 	FromUserID uuid.UUID                 `gorm:"not null;index"`
 	ToUserID   uuid.UUID                 `gorm:"not null;index"`
 	Action     StudyOwnerChangelogAction `gorm:"not null"`

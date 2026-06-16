@@ -34,7 +34,7 @@ func migrate(db *gorm.DB) error {
 		&types.User{},
 		&types.Study{},
 		&types.StudyAdmin{},
-		&types.StudyOwnerChangeLog{},
+		&types.StudyOwnerChangelog{},
 		&types.Asset{},
 		&types.AssetLocation{},
 		&types.Contract{},

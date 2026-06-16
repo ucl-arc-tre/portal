@@ -33,7 +33,7 @@ func InitDB() {
 		&types.UserAttributes{},
 		&types.Study{},
 		&types.StudyAdmin{},
-		&types.StudyOwnerChangeLog{},
+		&types.StudyOwnerChangelog{},
 		&types.StudyAgreementSignature{},
 		&types.Asset{},
 		&types.AssetLocation{},
