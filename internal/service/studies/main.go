@@ -450,6 +450,8 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to get studies")
 	}
+	log.Debug().Any("s", study).Msg("todo")
+
 	changeRequest := types.StudyOwnerChangeLog{}
 	if res := tx.Preload("ToUser").Where("study_id = ? AND action = ?", studyUUID, types.StudyOwnerChangeLogActionRequest).Order("created_at DESC").Limit(1).Find(&changeRequest); res.Error != nil {
 		tx.Rollback()
@@ -462,6 +464,7 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		return types.NewErrClientInvalidObjectF("study owner change request was stale. study owner has changed")
 	}
 
+	oldOwner := study.Owner
 	newOwner, err := s.users.UserByUsername(types.Username(data.Username))
 	if err != nil {
 		tx.Rollback()
@@ -486,7 +489,9 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		return types.NewErrFromGorm(err, "failed to create StudyOwnerChangeLog record")
 	}
 
-	if err := tx.Model(&study).Where("id = ?", studyUUID).Update("owner_user_id", newOwner.ID).Error; err != nil {
+	log.Debug().Any("newuser", newOwner).Msg("todo")
+
+	if err := tx.Model(&study).Association("Owner").Replace(newOwner); err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study owner")
 	}
@@ -496,7 +501,7 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		return err
 	}
 
-	if _, err := rbac.RemoveStudyOwnerRole(study.Owner, studyUUID); err != nil {
+	if _, err := rbac.RemoveStudyOwnerRole(oldOwner, studyUUID); err != nil {
 		tx.Rollback()
 		return err
 	}

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -399,6 +400,9 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 		Caseref:                          data.Caseref,
 	}
 	latestOwnerChange := data.LatestOwnerChange()
+
+	log.Debug().Any("l", latestOwnerChange).Msg("todo")
+
 	if latestOwnerChange != nil && latestOwnerChange.ToUser.Username != data.Owner.Username {
 		study.PendingNewOwnerUsername = new(string(latestOwnerChange.ToUser.Username))
 	}

@@ -68,6 +68,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
   const { userData } = useAuth();
+  const isIGOps = userData?.roles.includes("ig-ops-staff") ?? false;
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
@@ -75,9 +76,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
 
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
   const canEditStudyOwner =
-    (isStudyOwner || (userData?.roles.includes("ig-ops-staff") ?? false)) && !studyOwnerPendingChange;
-  const canRequestReview =
-    study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
+    (isStudyOwner || isIGOps) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
+  const canRequestReview = study.approval_status !== "Approved" && isStudyOwner && !isIGOps;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const riskScore = calculateRiskScore(study, assets);
@@ -169,7 +169,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       <StudyDetails
         study={study}
         riskScore={riskScore}
-        setStudyOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
+        canEditOwner={canEditStudyOwner}
+        setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
       />
 
       {studyOwnerEditModalOpen && (

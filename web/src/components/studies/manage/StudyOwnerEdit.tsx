@@ -81,7 +81,7 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
           </AlertMessage>
         </Alert>
         {successMessage === "" && (
-          <Button disabled={isLoading} type="submit" cy="request-study-owner-edit-button">
+          <Button disabled={isLoading} type="submit" cy="request-study-owner-edit-submit">
             {isLoading && <Loading message="" size="small" />}
             Submit Request
           </Button>

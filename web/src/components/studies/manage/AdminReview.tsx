@@ -31,7 +31,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const canReviewStudyOwnerChange = userData?.username !== study.pending_new_owner_username;
-  const canSeeOwnerApproval = study.pending_new_owner_username && canReviewStudyOwnerChange;
+  const canSeeOwnerChangeApproval = study.pending_new_owner_username && canReviewStudyOwnerChange;
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
@@ -101,7 +101,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
 
   return (
     <>
-      {canSeeOwnerApproval && (
+      {canSeeOwnerChangeApproval && (
         <Box>
           <h3 className={styles["heading"]}>Review Owner Change</h3>
           <p className={styles["approve-owner-change-text"]}>
@@ -110,7 +110,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
           </p>
           <Button
             onClick={() => handleStudyOwnerApprove()}
-            data-cy="study-approve-button"
+            data-cy="study-owner-change-approve-button"
             disabled={!!loadingAction}
             size="small"
           >
