@@ -4,7 +4,7 @@ beforeEach(() => {
 });
 
 describe("Study owner change end-to-end", () => {
-  let studyTitle = `study-${Date.now()}`; // todo - revert to const
+  const studyTitle = `study-${Date.now()}`;
   const assetTitle = `asset-${Date.now()}`;
 
   it("staff should become an approved researcher", () => {

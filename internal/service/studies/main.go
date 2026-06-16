@@ -450,7 +450,6 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to get studies")
 	}
-	log.Debug().Any("s", study).Msg("todo")
 
 	changeRequest := types.StudyOwnerChangeLog{}
 	if res := tx.Preload("ToUser").Where("study_id = ? AND action = ?", studyUUID, types.StudyOwnerChangeLogActionRequest).Order("created_at DESC").Limit(1).Find(&changeRequest); res.Error != nil {
@@ -488,9 +487,6 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create StudyOwnerChangeLog record")
 	}
-
-	log.Debug().Any("newuser", newOwner).Msg("todo")
-
 	if err := tx.Model(&study).Association("Owner").Replace(newOwner); err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study owner")
