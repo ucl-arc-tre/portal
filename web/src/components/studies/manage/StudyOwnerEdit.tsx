@@ -62,17 +62,18 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
       <h2>Edit Study Owner</h2>
 
       <form onSubmit={handleSubmit} className={"form"}>
-        <Label htmlFor="email"></Label>
-        <Input
-          type="email"
-          id="email"
-          placeholder="Email address"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          autoFocus
-        />
+        <Label htmlFor="email">
+          <Input
+            type="email"
+            id="email"
+            placeholder="Email address"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoFocus
+          />
+        </Label>
         <Alert type="warning">
           <AlertMessage>
             {isStudyOwner

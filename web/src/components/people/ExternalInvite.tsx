@@ -48,17 +48,18 @@ export default function ExternalInvite() {
         <Dialog setDialogOpen={setDialogVisible}>
           <h2>Invite a researcher to the portal</h2>
           <form onSubmit={handleSubmit} className={"form"}>
-            <Label htmlFor="email"></Label>
-            <Input
-              type="email"
-              id="email"
-              placeholder="Email address"
-              name="email"
-              required={true}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoFocus
-            />
+            <Label htmlFor="email">
+              <Input
+                type="email"
+                id="email"
+                placeholder="Email address"
+                name="email"
+                required={true}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoFocus
+              />
+            </Label>
             <Button disabled={isLoading} type="submit" cy="send-invite" className={styles["send-button"]}>
               {isLoading && (
                 <span className={styles.loader}>
