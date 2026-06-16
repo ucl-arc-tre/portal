@@ -2,10 +2,16 @@ import Box from "../../ui/Box";
 import { Alert, AlertMessage, Textarea } from "../../shared/uikitExports";
 import Button from "../../ui/Button";
 import { useState } from "react";
-import { StudyApprovalStatus, postStudiesAdminByStudyIdReview, Study } from "@/openapi";
+import {
+  StudyApprovalStatus,
+  postStudiesAdminByStudyIdReview,
+  Study,
+  postStudiesAdminByStudyIdOwnerApprove,
+} from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./AdminReview.module.css";
+import { useAuth } from "@/hooks/useAuth";
 
 type AdminReviewProps = {
   study: Study;
@@ -14,6 +20,7 @@ type AdminReviewProps = {
 };
 
 export default function AdminReview({ study, unagreedAdminUsernames, onReviewComplete }: AdminReviewProps) {
+  const { userData } = useAuth();
   const [loadingAction, setLoadingAction] = useState<StudyApprovalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState(study.feedback ?? "");
@@ -22,6 +29,9 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
 
   const status = study.approval_status;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
+
+  const canReviewStudyOwnerChange = userData?.username !== study.pending_new_owner_username;
+  const canSeeOwnerChangeApproval = study.pending_new_owner_username && canReviewStudyOwnerChange;
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
@@ -59,8 +69,56 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
     }
   };
 
+  const handleStudyOwnerApprove = async () => {
+    if (!study.pending_new_owner_username) {
+      setError("Pending new owner username was not set");
+      return;
+    }
+
+    try {
+      setError("");
+      setLoadingAction("Approved");
+
+      const response = await postStudiesAdminByStudyIdOwnerApprove({
+        path: { studyId: study.id },
+        body: { username: study.pending_new_owner_username },
+      });
+
+      if (responseIsError(response)) {
+        setError(`Failed to update study owner: ${extractErrorMessage(response)}`);
+        return;
+      }
+
+      setFeedback("");
+      setSuccessMessage("Updated successfully");
+      await onReviewComplete();
+    } catch {
+      setError("Failed to update study owner. Please try again.");
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
   return (
     <>
+      {canSeeOwnerChangeApproval && (
+        <Box>
+          <h3 className={styles["heading"]}>Review Owner Change</h3>
+          <p className={styles["approve-owner-change-text"]}>
+            An owner change has been requested from <strong>{study.owner_username}</strong> to{" "}
+            <strong>{study.pending_new_owner_username}</strong>. Please review this action carefully.
+          </p>
+          <Button
+            onClick={() => handleStudyOwnerApprove()}
+            data-cy="study-owner-change-approve-button"
+            disabled={!!loadingAction}
+            size="small"
+          >
+            {loadingAction === "Approved" ? "Approving..." : "Approve"}
+          </Button>
+        </Box>
+      )}
+
       {(status === "Pending" || status === "Rejected") && (
         <Box>
           <h3 className={styles["heading"]}>Review Study</h3>

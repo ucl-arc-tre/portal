@@ -12,6 +12,7 @@ import StudyForm from "../study-form/StudyForm";
 import Box from "@/components/ui/Box";
 import Dialog from "@/components/ui/Dialog";
 import StudyAffirmation from "./StudyAffirmation";
+import StudyOwnerEdit from "./StudyOwnerEdit";
 
 type StudyOverviewProps = {
   study: Study;
@@ -64,15 +65,19 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
+  const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
   const { userData } = useAuth();
+  const isIGOps = userData?.roles.includes("ig-ops-staff") ?? false;
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
-  const canRequestReview =
-    study.approval_status !== "Approved" && isStudyOwner && !userData?.roles.includes("ig-ops-staff");
+  const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
+  const canEditStudyOwner =
+    (isStudyOwner || isIGOps) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
+  const canRequestReview = study.approval_status !== "Approved" && isStudyOwner && !isIGOps;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const riskScore = calculateRiskScore(study, assets);
@@ -161,7 +166,22 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         )}
       </div>
 
-      <StudyDetails study={study} riskScore={riskScore} />
+      <StudyDetails
+        study={study}
+        riskScore={riskScore}
+        canEditOwner={canEditStudyOwner}
+        setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
+      />
+
+      {studyOwnerEditModalOpen && (
+        <StudyOwnerEdit
+          study={study}
+          setDialogOpen={(show) => {
+            setStudyOwnerEditModalOpen(show);
+            fetchStudy(study.id);
+          }}
+        />
+      )}
     </Box>
   );
 }

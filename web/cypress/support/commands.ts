@@ -25,6 +25,12 @@ declare global {
       loginAsStaff(): Chainable<JQuery<HTMLElement>>;
 
       /**
+       * Custom command to login as a staff2 user
+       * @example cy.loginAsStaff()
+       */
+      loginAsStaff2(): Chainable<JQuery<HTMLElement>>;
+
+      /**
        * Custom command to login as a IG operations user
        * @example cy.loginAsIGOps()
        */
@@ -422,6 +428,27 @@ Cypress.Commands.add("loginAsStaff", () => {
 
         log.snapshot("before");
         login(botStaffUsername, botStaffPassword);
+        log.snapshot("after");
+        log.end();
+      },
+      sessionOptions
+    );
+  });
+});
+
+Cypress.Commands.add("loginAsStaff2", () => {
+  cy.env(["botStaff2Username", "botStaff2Password"]).then(({ botStaff2Username, botStaff2Password }) => {
+    cy.session(
+      `login-staff2`,
+      () => {
+        const log = Cypress.log({
+          displayName: "Entra ID staff2 user Login",
+          message: [`🔐 Authenticating staff2 user`],
+          autoEnd: false,
+        });
+
+        log.snapshot("before");
+        login(botStaff2Username, botStaff2Password);
         log.snapshot("after");
         log.end();
       },

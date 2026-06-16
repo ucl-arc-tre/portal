@@ -5,10 +5,13 @@ import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { formatDate } from "../../shared/exports";
 import Badge from "@/components/ui/Badge";
+import EditIcon from "@/components/ui/EditIcon";
 
 type StudyOverviewProps = {
   study: Study;
   riskScore: number;
+  setOwnerEditModal: ((show: boolean) => void) | undefined;
+  canEditOwner: boolean;
 };
 
 function getRiskClassification(score: number): string {
@@ -25,7 +28,7 @@ function getRiskClassification(score: number): string {
 }
 
 export default function StudyDetails(props: StudyOverviewProps) {
-  const { study, riskScore } = props;
+  const { study, riskScore, setOwnerEditModal, canEditOwner } = props;
   const standardRiskScoreStatement = "increases risk score by 5";
 
   const riskClassification = getRiskClassification(riskScore);
@@ -70,10 +73,21 @@ export default function StudyDetails(props: StudyOverviewProps) {
         <dl className={styles.ownership}>
           <dd>
             Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
+            {canEditOwner && setOwnerEditModal && (
+              <EditIcon onClick={() => setOwnerEditModal(true)} label="Edit study owner" cy="study-owner-edit-icon" />
+            )}
           </dd>
+
+          {study.pending_new_owner_username && (
+            <dd>
+              Pending Owner: <span className={styles["grey-value"]}>{study.pending_new_owner_username}</span>
+              <InfoTooltip text="Owner update is pending approval"></InfoTooltip>
+            </dd>
+          )}
 
           <dd className={styles["detail-item"]}>
             Admins:
+            {study.additional_study_admin_usernames.length === 0 && <span className={styles["grey-value"]}>None</span>}
             {study.additional_study_admin_usernames.map((username) => (
               <li key={username}>
                 <span className={styles["grey-value"]}>{username}</span>
