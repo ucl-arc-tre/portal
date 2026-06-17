@@ -7,6 +7,7 @@ import {
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdContracts,
   Study,
+  StudyAgreements,
 } from "@/openapi";
 import StudyOverview from "./StudyOverview";
 import StudySetupSteps from "./StudySetupSteps";
@@ -27,17 +28,22 @@ type ManageStudyProps = {
 };
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
+  const { userData } = useAuth();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [agreements, setAgreements] = useState<StudyAgreements | null>(null);
   const [unagreedAdminUsernames, setUnagreedAdminUsernames] = useState<string[]>([]);
-  const [studyStepsCompleted, setStudyStepsCompleted] = useState(false);
+
+  const hasAsset = assets.length > 0;
+  const hasAgreed = agreements && userData && agreements.usernames.includes(userData.username);
+  const studyStepsCompleted = isLoading ? null : hasAsset && hasAgreed;
 
   const router = useRouter();
   const tab = (router.query.tab as string) ?? "study";
 
-  const { userData } = useAuth();
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
   const isStudyOwner =
     userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username;
@@ -89,6 +95,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
       setAssets(assetsResponse.data);
       setContracts(contractsResponse.data);
+      setAgreements(agreementsResponse.data);
 
       checkStudyAdminAgreements(agreementsResponse.data.usernames);
     } catch (error) {
@@ -116,14 +123,13 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     );
   }
 
-  if (!studyStepsCompleted && !isIGOpsStaff) {
+  if (studyStepsCompleted === false && !isIGOpsStaff) {
     return (
       <StudySetupSteps
         study={study}
         assets={assets}
         setAssets={setAssets}
         onStepsComplete={() => {
-          setStudyStepsCompleted(true);
           fetchStudyContents();
         }}
       />
