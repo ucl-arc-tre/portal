@@ -617,7 +617,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             </>
           )}
 
-        {tier && tier >= 3 && (
+        {(tier ?? 0) >= 3 && (
           <div className="field">
             <Label htmlFor="has_targeted_threat_actors">
               Is the asset likely to be targeted by sophisticated, well-resourced, and determined actors, such as

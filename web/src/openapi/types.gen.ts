@@ -392,6 +392,17 @@ export type Study = StudyBase & {
      * Unique 5-digit reference number for the study, assigned on creation
      */
     caseref: number;
+    /**
+     * Username of the owner who has been requested to be assigned for this study, which is pending approval
+     */
+    pending_new_owner_username?: string;
+};
+
+export type StudyOwnerUpdate = {
+    /**
+     * Username to change the owner of the study to. Must exist
+     */
+    username: string;
 };
 
 export type StudyImport = {
@@ -1459,6 +1470,74 @@ export type PostStudiesAdminByStudyIdReviewResponses = {
     201: unknown;
 };
 
+export type PostStudiesAdminByStudyIdOwnerRequestData = {
+    body: StudyOwnerUpdate;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/owner-request';
+};
+
+export type PostStudiesAdminByStudyIdOwnerRequestErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesAdminByStudyIdOwnerRequestResponses = {
+    /**
+     * Owner change request successful
+     */
+    200: unknown;
+};
+
+export type PostStudiesAdminByStudyIdOwnerApproveData = {
+    body: StudyOwnerUpdate;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/admin/{studyId}/owner-approve';
+};
+
+export type PostStudiesAdminByStudyIdOwnerApproveErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesAdminByStudyIdOwnerApproveResponses = {
+    /**
+     * Owner update approval successful
+     */
+    200: unknown;
+};
+
 export type PostStudiesAdminImportData = {
     body: StudyImport;
     path?: never;
@@ -1577,6 +1656,40 @@ export type PostStudiesByStudyIdSignoffErrors = {
 export type PostStudiesByStudyIdSignoffResponses = {
     /**
      * Signoff recorded successfully
+     */
+    200: unknown;
+};
+
+export type PostStudiesByStudyIdOwnerRequestData = {
+    body: StudyOwnerUpdate;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/owner-request';
+};
+
+export type PostStudiesByStudyIdOwnerRequestErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesByStudyIdOwnerRequestResponses = {
+    /**
+     * Owner change request successful
      */
     200: unknown;
 };
