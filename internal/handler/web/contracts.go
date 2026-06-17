@@ -78,23 +78,20 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 			log.Err(err).Msg("Failed to close uploaded file")
 		}
 	}()
+	fileExtension := strings.ToLower(filepath.Ext(fileHeader.Filename))
 
 	if mimeType, err := validation.MimeType(file); err != nil {
 		setError(ctx, err, "Failed to determine MIME type of file")
 		return
+	} else if fileExtension == ".doc" &&
+		(mimeType == types.MimeTypeOctetStream || mimeType == types.MimeTypeDoc) {
+		// doc files can have generic MIME type
+	} else if fileExtension == ".docx" &&
+		(mimeType == types.MimeTypeZip || mimeType == types.MimeTypeDocx) {
+		// docx files can have a ZIP file type
 	} else if !validation.IsValidContractMimeType(mimeType) {
 		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v] not valid", mimeType), "Invalid MIME type")
 		return
-	} else if strings.ToLower(filepath.Ext(fileHeader.Filename)) == ".doc" &&
-		(mimeType != types.MimeTypeOctetStream &&
-			mimeType != types.MimeTypeDoc) {
-
-		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v], did not match valid type for doc", mimeType), "Invalid MIME type for filetype")
-	} else if strings.ToLower(filepath.Ext(fileHeader.Filename)) == ".docx" &&
-		(mimeType != types.MimeTypeZip &&
-			mimeType != types.MimeTypeDocx) {
-
-		setError(ctx, types.NewErrInvalidObjectF("mime type was [%v], did not match valid type for docx", mimeType), "Invalid MIME type for filetype")
 	}
 
 	contractObject := studies.ContractObject{
