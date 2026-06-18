@@ -487,7 +487,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             />
             <Label htmlFor="contract-file-input" className={styles["file-label"]}>
               <div className={styles["upload-icon"]}>📄</div>
-              <span>{editingContract ? "Choose new files (optional)" : "Choose files or drag and drop"}</span>
+              <span>{editingContract ? "Choose new file (optional)" : "Choose file to upload"}</span>
             </Label>
           </div>
           <HelperText>Only PDF, Word, PNG, and JPEG files up to 10MB are accepted.</HelperText>

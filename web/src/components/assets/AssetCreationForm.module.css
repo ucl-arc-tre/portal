@@ -23,10 +23,6 @@
   margin-top: 1rem;
 }
 
-.submit-button {
-  min-width: 140px;
-}
-
 .alert {
   margin-bottom: 1rem;
 }
@@ -99,13 +95,13 @@
 }
 
 .radio-label:hover {
-  border-color: #0066cc;
-  background-color: #e8f4f8;
+  border-color: var(--ucl-accent);
+  background-color: #f0e8f8;
 }
 
 .radio-label:has(input:checked) {
-  border-color: #0066cc;
-  background-color: #0066cc;
+  border-color: var(--ucl-accent);
+  background-color: var(--ucl-mid);
   color: white;
 }
 
