@@ -1,11 +1,11 @@
 .button-container {
   justify-self: center;
-  justify-items: space-evenly;
   align-items: center;
+  justify-content: center;
   height: 4rem;
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: repeat(auto-fill, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-block: 0.8rem;
 }
 
