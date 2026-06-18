@@ -176,6 +176,8 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 		content += "in " + fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate."
 	}
 
+	content += "<br><br>Please note that without valid training, your access to any environments will be revoked."
+
 	subject := "Notification: Your training certificate is due to expire soon"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }
