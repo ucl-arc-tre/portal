@@ -21,7 +21,7 @@
     "react-is": "^19.2.7",
     "react-markdown": "^10.1.0",
     "recharts": "^3.8.1",
-    "uikit-react-public": "^0.25.5"
+    "uikit-react-public": "^0.26.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
