@@ -14,7 +14,7 @@ export function convertRFC3339ToDDMMYYYY(dateString: string) {
   return `${day}/${month}/${year}`;
 }
 
-export function formatDate(dateString: string) {
+export function humanReadableOfDDMMYYYY(dateString: string) {
   try {
     return new Date(dateString).toLocaleDateString("en-GB", {
       year: "numeric",

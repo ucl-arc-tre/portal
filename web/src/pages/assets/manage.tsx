@@ -26,7 +26,7 @@ import ContractCard from "@/components/contracts/ContractCard";
 import { HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
-import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports";
+import { calculateExpiryUrgency, humanReadableOfDDMMYYYY } from "@/components/shared/exports";
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
 import Box from "@/components/ui/Box";
@@ -254,7 +254,7 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Expiry Date:</label>
-              <span>{asset.expires_at ? formatDate(asset.expires_at) : "None"}</span>
+              <span>{asset.expires_at ? humanReadableOfDDMMYYYY(asset.expires_at) : "None"}</span>
             </div>
             <div className={styles.field}>
               <label>Locations:</label>
