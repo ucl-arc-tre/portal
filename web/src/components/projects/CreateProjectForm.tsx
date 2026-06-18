@@ -416,7 +416,11 @@ export default function CreateProjectForm({
                       id="name"
                       type="text"
                       placeholder="e.g., myproject"
-                      disabled={isSubmitting || !!editingProject}
+                      disabled={
+                        isSubmitting ||
+                        !!editingProject ||
+                        !environments.find((env) => env.id === selectedEnvironmentId)
+                      }
                     />
                   )}
                 />
