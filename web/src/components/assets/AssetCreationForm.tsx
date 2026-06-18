@@ -910,7 +910,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
         )}
 
         <div className={styles.actions}>
-          <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
               ? editingAsset
                 ? "Updating..."
