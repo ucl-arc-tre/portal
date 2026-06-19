@@ -16,7 +16,7 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
-import CreateProjectForm from "@/components/projects/CreateProjectForm";
+import CreateProjectForm from "@/components/projects/ProjectForm";
 
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";

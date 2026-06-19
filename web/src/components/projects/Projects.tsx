@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Auth, Project, Study, getProjects, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
-import CreateProjectForm from "./CreateProjectForm";
+import ProjectForm from "./ProjectForm";
 import ProjectCardsList from "./ProjectCardsList";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
@@ -150,7 +150,7 @@ export default function Projects({ userData }: Props) {
       )}
 
       {createProjectFormOpen && (
-        <CreateProjectForm
+        <ProjectForm
           approvedStudies={approvedStudies}
           handleProjectCreated={handleProjectCreated}
           handleCancelCreate={handleCancelCreate}
