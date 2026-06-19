@@ -135,7 +135,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		content = "Your study has not been approved, please review the feedback and request another review once the changes have been addressed."
 		subject = "Notification: Unfortunately, your study has not been approved"
 		if review.Feedback != nil {
-			content += " <br><br>Feedback: " + *review.Feedback
+			content += " \nFeedback: " + *review.Feedback
 			subject = "Notification: Your study has feedback to address"
 		}
 	}
@@ -175,6 +175,8 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 	} else {
 		content += "in " + fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate."
 	}
+
+	content += "\nPlease note that without valid training, your access to any environments may be revoked."
 
 	subject := "Notification: Your training certificate is due to expire soon"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
