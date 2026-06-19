@@ -3,7 +3,7 @@ import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage } from "../../shared/uikitExports";
 import { ProjectFormData } from "@/types/projects";
 import Button from "@/components/ui/Button";
-import { ProjectTreRoleName } from "@/openapi";
+import { ProjectTre, ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 
 // this should match the domain that is used for the entra ID users in the portal
@@ -20,11 +20,11 @@ const roles: Record<ProjectTreRoleName, Role> = {
     description: "Can access the desktop environment and work with data within the TRE",
   },
   ingresser: {
-    label: "Desktop User",
+    label: "Ingresser",
     description: "Can upload data into the TRE environment",
   },
   egresser: {
-    label: "Ingresser",
+    label: "Egresser",
     description: "Can download data from the TRE environment after approval",
   },
   egress_requester: {
@@ -43,10 +43,11 @@ const roles: Record<ProjectTreRoleName, Role> = {
 
 type Props = {
   fieldsDisabled: boolean;
+  editingProject: ProjectTre | null | undefined;
 };
 
 export default function ProjectFormTREStep(props: Props) {
-  const { fieldsDisabled } = props;
+  const { fieldsDisabled, editingProject } = props;
   const { watch, control, getValues, setValue } = useFormContext<ProjectFormData>();
 
   const {
@@ -108,7 +109,12 @@ export default function ProjectFormTREStep(props: Props) {
                             id={`researcher-${index}`}
                             type="text"
                             placeholder="ccaxyz"
-                            disabled={fieldsDisabled}
+                            disabled={
+                              fieldsDisabled ||
+                              editingProject?.members.some((member) => {
+                                return member.username === getValues("members")[index].username + domainName;
+                              })
+                            }
                           />
                           <span className={styles["domain-suffix"]}>{domainName}</span>
                         </div>

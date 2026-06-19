@@ -12,10 +12,11 @@ type Props = {
   environments: Environment[] | null;
   environmentsError: string | null;
   fieldsDisabled: boolean;
+  editing: boolean;
 };
 
 export default function ProjectFormStep1(props: Props) {
-  const { approvedStudies, assets, environments, environmentsError, fieldsDisabled } = props;
+  const { approvedStudies, assets, environments, environmentsError, fieldsDisabled, editing } = props;
   const {
     watch,
     register,
@@ -50,7 +51,7 @@ export default function ProjectFormStep1(props: Props) {
           {...register("studyId", {
             required: "Please select a study",
           })}
-          disabled={fieldsDisabled}
+          disabled={fieldsDisabled || editing}
         >
           <option value="">Select a study...</option>
           {approvedStudies.map((approvedStudy) => (
@@ -74,7 +75,7 @@ export default function ProjectFormStep1(props: Props) {
           {...register("environmentId", {
             required: "Please select an environment",
           })}
-          disabled={fieldsDisabled || isLoadingEnvironments || !!environmentsError}
+          disabled={fieldsDisabled || editing || isLoadingEnvironments || !!environmentsError}
         >
           <option value="">
             {isLoadingEnvironments
@@ -168,7 +169,7 @@ export default function ProjectFormStep1(props: Props) {
               id="name"
               type="text"
               placeholder="e.g., myproject"
-              disabled={fieldsDisabled || !selectedEnvironment}
+              disabled={fieldsDisabled || editing || !selectedEnvironment}
             />
           )}
         />

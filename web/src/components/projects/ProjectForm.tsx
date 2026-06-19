@@ -63,7 +63,8 @@ export default function ProjectForm({
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isTREProject = selectedEnvironment?.name == "ARC Trusted Research Environment";
 
-  const fieldsDisabled = isSubmitting || !!editingProject;
+  const fieldsDisabled = isSubmitting;
+  const editing = editingProject !== null && editingProject !== undefined;
 
   useEffect(() => {
     const fetchEnvironments = async () => {
@@ -80,6 +81,7 @@ export default function ProjectForm({
       } catch (error) {
         console.error("Failed to fetch environments:", error);
         setEnvironmentsError("Failed to load environments. Please try again later.");
+        setEnvironments([]);
       }
     };
 
@@ -256,10 +258,13 @@ export default function ProjectForm({
                 environments={environments}
                 environmentsError={environmentsError}
                 fieldsDisabled={fieldsDisabled}
+                editing={editing}
               />
             )}
 
-            {currentStep === 2 && isTREProject && <ProjectTREStep fieldsDisabled={fieldsDisabled} />}
+            {currentStep === 2 && isTREProject && (
+              <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject} />
+            )}
 
             <div className={styles.actions}>
               {currentStep > 1 && (
