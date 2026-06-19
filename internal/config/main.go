@@ -158,11 +158,13 @@ func NotificationsEnabled() bool {
 
 func Myservicies() MyserviciesCredentialBundle {
 	return MyserviciesCredentialBundle{
-		Enabled:      k.Bool("myservices.enabled"),
-		URL:          k.String("myservices.url"),
-		TenantID:     k.String("myservices.entra.tenant_id"),
-		ClientID:     k.String("myservices.entra.client_id"),
-		ClientSecret: k.String("myservices.entra.client_secret"),
+		Enabled:       k.Bool("myservices.enabled"),
+		URL:           k.String("myservices.url"),
+		TenantID:      k.String("myservices.entra.tenant_id"),
+		ClientID:      k.String("myservices.entra.client_id"),
+		ClientSecret:  k.String("myservices.entra.client_secret"),
+		APIClientID:   k.String("myservices.entra.api_client_id"),
+		SupportDomain: k.String("myservices.support_domain"),
 	}
 }
 
@@ -170,6 +172,7 @@ func Myservicies() MyserviciesCredentialBundle {
 func RateLimitSlowPaths() map[string]bool {
 	return map[string]bool{
 		BaseWebURL + "/users/invite": true,
+		BaseWebURL + "/feedback":     true,
 	}
 }
 

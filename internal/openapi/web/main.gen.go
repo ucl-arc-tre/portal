@@ -999,6 +999,11 @@ type Environment struct {
 // EnvironmentName defines model for EnvironmentName.
 type EnvironmentName string
 
+// Feedback defines model for Feedback.
+type Feedback struct {
+	Message string `json:"message"`
+}
+
 // Profile defines model for Profile.
 type Profile struct {
 	ChosenName string `json:"chosen_name"`
@@ -1517,6 +1522,9 @@ type PutUsersUserIdAttributesJSONBody struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// PostFeedbackJSONRequestBody defines body for PostFeedback for application/json ContentType.
+type PostFeedbackJSONRequestBody = Feedback
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -1600,6 +1608,9 @@ type ServerInterface interface {
 
 	// (GET /environments)
 	GetEnvironments(c *gin.Context)
+
+	// (POST /feedback)
+	PostFeedback(c *gin.Context)
 
 	// (GET /logout)
 	GetLogout(c *gin.Context)
@@ -1819,6 +1830,19 @@ func (siw *ServerInterfaceWrapper) GetEnvironments(c *gin.Context) {
 	}
 
 	siw.Handler.GetEnvironments(c)
+}
+
+// PostFeedback operation middleware
+func (siw *ServerInterfaceWrapper) PostFeedback(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostFeedback(c)
 }
 
 // GetLogout operation middleware
@@ -3132,6 +3156,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/agreements/:agreementType", wrapper.GetAgreementsAgreementType)
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/environments", wrapper.GetEnvironments)
+	router.POST(options.BaseURL+"/feedback", wrapper.PostFeedback)
 	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)

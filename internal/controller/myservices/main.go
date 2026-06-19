@@ -9,10 +9,16 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/types"
+)
+
+const (
+	sourceIdentity = "arc-portal"
 )
 
 type Controller struct {
-	client *ClientWithResponses
+	client        *ClientWithResponses
+	supportDomain string
 }
 
 func New() *Controller {
@@ -20,7 +26,7 @@ func New() *Controller {
 
 	if !cfg.Enabled {
 		log.Warn().Msg("Myservices integration disabled - nil controller")
-		return nil
+		return &Controller{}
 	}
 
 	azCredentials, err := azidentity.NewClientSecretCredential(
@@ -33,8 +39,11 @@ func New() *Controller {
 		panic(fmt.Errorf("failed to create az credentials: %v", err))
 	}
 
+	scopes := []string{
+		fmt.Sprintf("%s/.default", cfg.APIClientID),
+	}
 	addAuth := func(ctx context.Context, req *http.Request) error {
-		token, err := azCredentials.GetToken(ctx, policy.TokenRequestOptions{})
+		token, err := azCredentials.GetToken(ctx, policy.TokenRequestOptions{Scopes: scopes})
 		if err != nil {
 			log.Err(err).Msg("Failed to get token for request")
 		} else {
@@ -51,5 +60,44 @@ func New() *Controller {
 		panic(fmt.Errorf("failed to initialise myservicies client [%v]", err))
 	}
 
-	return &Controller{client: client}
+	return &Controller{client: client, supportDomain: cfg.SupportDomain}
+}
+
+func (c *Controller) SubmitFeedback(ctx context.Context, user types.User, message string) error {
+	if c.client == nil {
+		return types.NewErrServerError("no client")
+	}
+	fields := map[string]any{
+		"request_description": message,
+	}
+	data := PostRequestsJSONRequestBody{
+		RequestedByEmail:  new(string(user.Username)),
+		RequestedForEmail: new(string(user.Username)),
+		SourceId:          new(sourceIdentity),
+		Subject:           new("Feedback"),
+		CustomFields:      &fields,
+		SupportDomain:     c.supportDomain,
+		TemplateName:      "arc_services_portal_help_or_advice", // ask Roy Thompson for these values. const
+	}
+	resp, err := c.client.PostRequestsWithResponse(ctx, data)
+	if err != nil {
+		return types.NewErrServerError(err)
+	} else if resp.JSON400 != nil {
+		return types.NewErrInvalidObjectF("myservices API request error: %s", marshalError(resp.JSON400))
+	} else if resp.JSON500 != nil {
+		return types.NewErrServerErrorF("myservices API request error: %s", marshalError(resp.JSON500))
+	} else if resp.StatusCode() != 200 {
+		return types.NewErrServerErrorF("myservices API request failed with code: %d", resp.StatusCode())
+	}
+	log.Debug().Any("response", resp.JSON200).Msg("Submitted feedback request")
+	return nil
+}
+
+func marshalError(e *Error) string {
+	if e == nil {
+		return ""
+	} else if e.Message == nil {
+		return "no message"
+	}
+	return *e.Message
 }

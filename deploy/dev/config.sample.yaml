@@ -55,7 +55,9 @@ tre:
 myservices:
   enabled: true
   url: <CHANGE_ME> # e.g. https://myservicies-api.example.com
+  support_domain: <CHANGE_ME> # e.g arc
   entra: # Requires [Get.Token, DomainAccess.X] API permissions on the myservicies API
     tenant_id: <CHANGE_ME>
     client_id: <CHANGE_ME>
     client_secret: <CHANGE_ME>
+    api_client_id: <CHANGE_ME> # Client ID of the Myservices API in Entra
