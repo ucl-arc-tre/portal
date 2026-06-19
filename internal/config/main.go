@@ -156,6 +156,16 @@ func NotificationsEnabled() bool {
 	return k.Bool("entra.notifications_enabled")
 }
 
+func Myservicies() MyserviciesCredentialBundle {
+	return MyserviciesCredentialBundle{
+		Enabled:      k.Bool("myservices.enabled"),
+		URL:          k.String("myservices.url"),
+		TenantID:     k.String("myservices.entra.tenant_id"),
+		ClientID:     k.String("myservices.entra.client_id"),
+		ClientSecret: k.String("myservices.entra.client_secret"),
+	}
+}
+
 // Map of paths to strictly rate limit, so they are 'slow'
 func RateLimitSlowPaths() map[string]bool {
 	return map[string]bool{

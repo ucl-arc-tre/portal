@@ -50,3 +50,12 @@ url: <CHANGE_ME> # eg. https://portal.arc.ucl.ac.uk
 tre:
   users: # Map of usernames to passwords for HTTP basic auth
     username: password # pragma: allowlist secret
+
+# Integration with UCL myservicies a IT service management
+myservices:
+  enabled: true
+  url: <CHANGE_ME> # e.g. https://myservicies-api.example.com
+  entra: # Requires [Get.Token, DomainAccess.X] API permissions on the myservicies API
+    tenant_id: <CHANGE_ME>
+    client_id: <CHANGE_ME>
+    client_secret: <CHANGE_ME>

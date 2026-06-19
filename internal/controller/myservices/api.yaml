@@ -1,0 +1,447 @@
+openapi: "3.0.3"
+info:
+  title: "Enterprise Endpoint API"
+  version: "1.0.0"
+  description: "API for managing enterprise service requests."
+
+paths:
+  /requests:
+    post:
+      summary: "Create a new enterprise service request"
+      description: "This endpoint allows you to create a new enterprise service request."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestBodySchema"
+      responses:
+        "200":
+          description: "Request created successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/requestResponseSchema"
+        "400":
+          description: "Invalid request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /requests/{id}:
+    get:
+      summary: "Get details of a specific request"
+      description: "This endpoint retrieves the details of a service request by its identifier."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Identifier of the request"
+          schema:
+            type: integer
+            example: 822716
+      responses:
+        "200":
+          description: "Request details retrieved successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/requestResponseSchema"
+        "400":
+          description: "Invalid request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: "Request not found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+    patch:
+      summary: "Update a specific request"
+      description: "This endpoint allows partial updates to a service request by its identifier."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Identifier of the request"
+          schema:
+            type: integer
+            example: 822716
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: "The new status of the request."
+                  example: "completed"
+                completion_reason:
+                  type: string
+                  description: "Reason for the completion of the request."
+                  example: "Issue resolved"
+      responses:
+        "200":
+          description: "Request updated successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/requestResponseSchema"
+        "400":
+          description: "Invalid request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: "Request not found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+  /requests/{id}/attachments:
+    get:
+      summary: "Get attachments specific request"
+      description: "This endpoint retrieves the attachments of a service request by its identifier.  This does not include attachments to notes."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Identifier of the request"
+          schema:
+            type: integer
+            example: 822716
+      responses:
+        "200":
+          description: "Request attachments retrieved successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/attachmentResponseSchema"
+        "400":
+          description: "Invalid request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: "Request not found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /tasks/{id}:
+    patch:
+      summary: "Update a specific task"
+      description: "This endpoint allows partial updates to a task by its identifier."
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Identifier of the task"
+          schema:
+            type: integer
+            example: 234123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: "The new status of the request."
+                  example: "completed"
+                note:
+                  type: string
+                  description: "A note to add to the task."
+                  example: "Task completed successfully"
+                custom_fields:
+                  type: object
+                  description: "custom fields to add to the task"
+                  additionalProperties: true
+                  example:
+                    {
+                      "project_code": 123456789,
+                      "details": "The project was created successfully",
+                    }
+
+      responses:
+        "200":
+          description: "Task updated successfully."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/taskResponseSchema"
+        "400":
+          description: "Invalid request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "404":
+          description: "Request not found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        "500":
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+
+components:
+  schemas:
+    requestBodySchema:
+      type: object
+      description: "Details of the service request."
+      required:
+        - support_domain
+        - template_name
+      properties:
+        support_domain:
+          type: string
+          description: "Domain where the request is created."
+          example: "myservices-hr"
+        service_instance:
+          type: string
+          description: "Service instance associated with the request."
+          example: "HR - Employee Management"
+        template_name:
+          type: string
+          description: "Name of the template used for the request."
+          example: "hr_rt_leaver"
+        source:
+          $ref: "#/components/schemas/source"
+        channel:
+          $ref: "#/components/schemas/channel"
+        source_id:
+          type: string
+          description: "A unique id for this request in the source system"
+          example: "ed0eda87-9fbc-4f81-8bd9-2bf2b89e9e5b"
+        subject:
+          type: string
+          description: "Subject of the request."
+          example: "Multi-factor authentication (MFA) > Post Setup"
+        requested_by_upi:
+          type: string
+          description: "UPI of person making the request. Used to lookup a person record in MyServices. If blank defaults to a system account.  requested_by_upi takes precedence over requested_by_email. "
+          example: "ABC123"
+        requested_for_upi:
+          type: string
+          description: "UPI of person the request is for. If blank defaults to requested_by_upi.  requested_for_upi takes precedence over requested_for_email."
+          example: "ABC123"
+        requested_by_email:
+          type: string
+          description: "Email address of person making the request. Used to lookup a person record in MyServices. Can be used as alternative to requested_by_upi.  If a ucl address, the form of userid@ucl.ac.uk is recommended over alias."
+          example: "abc123@abc.com"
+        requested_for_email:
+          type: string
+          description: "Email address of person the request is for. If blank defaults to requested_by_email. Can be used as alternative to requested_for_upi.  If a ucl address, the form of userid@ucl.ac.uk is recommended over alias."
+          example: "abc123@abc.com"
+        custom_fields:
+          type: object
+          description: "Custom fields specific to the request. This can contain any fields"
+          additionalProperties: true
+          example:
+            {
+              "dt_number": "292897",
+              "employee_name": "Example Person",
+              "assignment_leaving_reason": "Ill Health Retirement",
+              "norman_ref": "CAS-495789-J2G5Y8",
+              "logged_at": "12/07/2024 19:12",
+              "transaction_status": "On Approval (HR)",
+              "origin": "Phone",
+            }
+
+    requestResponseSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          description: "Response object containing request details."
+          properties:
+            request:
+              type: object
+              description: "Details of the created request."
+              properties:
+                identifier:
+                  type: integer
+                  description: "Unique identifier for the request."
+                  example: 819185
+                status:
+                  type: string
+                  description: "Status of the request."
+                  example: "completed"
+                completion_reason:
+                  type: string
+                  description: "Reason for request completion."
+                  example: "withdrawn"
+                subject:
+                  type: string
+                  description: "Subject of the request."
+                  example: "Multi-factor authentication (MFA) > Post Setup"
+                created_at:
+                  type: string
+                  format: date-time
+                  description: "Timestamp when the request was created."
+                  example: "2024-07-08T16:11:23+01:00"
+                updated_at:
+                  type: string
+                  format: date-time
+                  description: "Timestamp when the request was last updated."
+                  example: "2024-08-16T12:08:02+01:00"
+                source:
+                  $ref: "#/components/schemas/source"
+                channel:
+                  $ref: "#/components/schemas/channel"
+                source_id:
+                  type: string
+                  description: "A unique id for this request in the source system"
+                  example: "ed0eda87-9fbc-4f81-8bd9-2bf2b89e9e5b"
+                team:
+                  type: string
+                  description: "Team responsible for handling the request."
+                  example: "Integration Test Team"
+                template:
+                  type: string
+                  description: "Template used for the request."
+                  example: "integration_test_template"
+                custom_fields:
+                  type: object
+                  description: "Custom fields associated with the request."
+                  additionalProperties: true
+                  example:
+                    {
+                      "norman_ref": "CAS-495789-J2G5Y8",
+                      "logged_at": "12/07/2024 19:12",
+                      "norman_status": "Escalated",
+                      "description": "Username: abcde12\n\nTester requires an MFA reset...",
+                      "meaningful_response": "Your case has been passed to the relevant team...",
+                    }
+
+    attachmentResponseSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          description: "Response object containing request details."
+          properties:
+            request:
+              type: object
+              description: "Details of the created request."
+              properties:
+                identifier:
+                  type: integer
+                  description: "Unique identifier for the request."
+                  example: 819185
+                attachments:
+                  type: object
+                  description: "List of attachments for the request.  The key name for each attachment is the attachment id as will appear in custom fields of attachment type."
+                  additionalProperties:
+                    type: object
+                    description: "Details of an attachment"
+                    properties:
+                      id:
+                        type: integer
+                        description: "Internal id of the attachment record"
+                        example: 123456
+                      filename:
+                        type: string
+                        description: "filename of attachment"
+                        example: "test.pdf"
+                      url:
+                        type: string
+                        description: "A temporary url that can be used to download the attachment content.  This be valid for no more than 1 hour.  TODO: check this."
+
+    taskResponseSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          description: "Response object containing task details."
+          properties:
+            request:
+              type: object
+              description: "Details of the created task."
+              properties:
+                identifier:
+                  type: integer
+                  description: "Unique identifier for the task."
+                  example: 819185
+                status:
+                  type: string
+                  description: "Status of the task."
+                  example: "completed"
+                custom_fields:
+                  type: object
+                  description: "Custom fields associated with the task."
+                  additionalProperties: true
+                  example:
+                    {
+                      "project_code": 123456789,
+                      "details": "The project was created successfully",
+                    }
+
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: "Error code."
+          example: "REQ_NOT_FOUND"
+        message:
+          type: string
+          description: "Error message."
+          example: "Request not found"
+        timestamp:
+          type: string
+          description: "Timestamp of the error."
+          example: "2024-07-08T16:11:23+01:00"
+
+    source:
+      type: string
+      enum: ["Contact Centre", Norman, InsideUCL, MyHR]
+      description: "Source of the request, this will be the name of a UCL service where appropriate"
+      example: "Contact Centre"
+
+    channel:
+      type: string
+      enum: [Voice, Chat, Email]
+      description: "Medium of interaction to create a Request"
+      example: "Chat"
