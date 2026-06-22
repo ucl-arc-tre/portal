@@ -5,7 +5,8 @@ export const TrainingKindOptions = {
 };
 
 // UTILITY FUNCTIONS
-export function convertRFC3339ToDDMMYYYY(dateString: string) {
+export function formatTime(dateString: string) {
+  // used to convert rfc3339 format to dd/mm/yyyy format for HTML date elems
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -15,13 +16,12 @@ export function convertRFC3339ToDDMMYYYY(dateString: string) {
 }
 
 export function formatDate(dateString: string) {
+  // used to display dates in a human readable format, e.g. 1 January 2024
   try {
     return new Date(dateString).toLocaleDateString("en-GB", {
       year: "numeric",
-      month: "short",
+      month: "long",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
   } catch {
     return dateString;
