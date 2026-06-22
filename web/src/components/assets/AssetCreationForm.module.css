@@ -72,44 +72,6 @@
   text-decoration: none;
 }
 
-.radio-group {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.75rem;
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-weight: 500 !important;
-  padding: 1rem 1.25rem;
-  border: 2px solid #e0e0e0;
-  border-radius: var(--default-border-radius);
-  background-color: #f8f9fa;
-  transition: all 0.2s ease;
-  min-width: 90px;
-  max-width: 10svw;
-  text-align: center;
-}
-
-.radio-label:hover {
-  border-color: var(--ucl-accent);
-  background-color: #f0e8f8;
-}
-
-.radio-label:has(input:checked) {
-  border-color: var(--ucl-accent);
-  background-color: var(--ucl-mid);
-  color: white;
-}
-
-.radio {
-  appearance: none;
-  display: none;
-}
-
 .ucl-guidance {
   margin-top: 1rem;
   padding: 1rem;

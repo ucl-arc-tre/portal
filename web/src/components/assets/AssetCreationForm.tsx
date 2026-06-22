@@ -10,6 +10,7 @@ import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
 import { Asset } from "@/openapi";
 import InfoTooltip from "../ui/InfoTooltip";
 import { assetDataTypeDefinitions } from "../shared/assetDataTypeDefinitions";
+import RadioOptions from "../ui/form/RadioOptions";
 
 type AssetFormProps = {
   handleAssetSubmit: (data: AssetFormData) => Promise<void>;
@@ -469,40 +470,16 @@ export default function AssetCreationForm(props: AssetFormProps) {
         )}
 
         {!dataTypesValue.includes("personal") && !dataTypesValue.includes("special_category_personal") && !isPublic && (
-          <div className="field">
-            <Label htmlFor="requires_tre">
-              Does this asset require an ISO27001 certified Trusted Research Environment to be stored or processed? *
-            </Label>
-            <div className={styles["radio-group"]}>
-              <label className={styles["radio-label"]}>
-                <input
-                  type="radio"
-                  value="true"
-                  {...register("requires_tre", {
-                    required: "Please select yes or no",
-                  })}
-                  className={styles.radio}
-                />
-                Yes
-              </label>
-              <label className={styles["radio-label"]}>
-                <input
-                  type="radio"
-                  value="false"
-                  {...register("requires_tre", {
-                    required: "Please select yes or no",
-                  })}
-                  className={styles.radio}
-                />
-                No
-              </label>
-            </div>
-            {errors.requires_tre && (
-              <Alert type="error">
-                <AlertMessage>{errors.requires_tre.message}</AlertMessage>
-              </Alert>
-            )}
-          </div>
+          <RadioOptions
+            name="requires_tre"
+            label="Does this asset require an ISO27001 certified Trusted Research Environment to be stored or processed? *"
+            options={[
+              { name: "Yes", value: "true" },
+              { name: "No", value: "false" },
+            ]}
+            register={register}
+            errors={errors}
+          />
         )}
 
         {!dataTypesValue.includes("personal") &&
@@ -510,149 +487,51 @@ export default function AssetCreationForm(props: AssetFormProps) {
           !requiresTRE &&
           !isPublic && (
             <>
-              <div className="field">
-                <Label htmlFor="is_leak_major_financial_loss">
-                  Would disclosure of this asset result in significant financial loss? *
-                </Label>
-                <div className={styles["radio-group"]}>
-                  <label className={styles["radio-label"]}>
-                    <input
-                      type="radio"
-                      value="true"
-                      {...register("is_leak_major_financial_loss", {
-                        required: "Please select yes or no",
-                      })}
-                      className={styles.radio}
-                    />
-                    Yes
-                  </label>
-                  <label className={styles["radio-label"]}>
-                    <input
-                      type="radio"
-                      value="false"
-                      {...register("is_leak_major_financial_loss", {
-                        required: "Please select yes or no",
-                      })}
-                      className={styles.radio}
-                    />
-                    No
-                  </label>
-                </div>
-                {errors.is_leak_major_financial_loss && (
-                  <Alert type="error">
-                    <AlertMessage>{errors.is_leak_major_financial_loss.message}</AlertMessage>
-                  </Alert>
-                )}
-              </div>
-
-              <div className="field">
-                <Label htmlFor="is_leak_major_disruption">
-                  Would disclosure of this asset result in major disruption to UCL? *
-                </Label>
-                <div className={styles["radio-group"]}>
-                  <label className={styles["radio-label"]}>
-                    <input
-                      type="radio"
-                      value="true"
-                      {...register("is_leak_major_disruption", {
-                        required: "Please select yes or no",
-                      })}
-                      className={styles.radio}
-                    />
-                    Yes
-                  </label>
-                  <label className={styles["radio-label"]}>
-                    <input
-                      type="radio"
-                      value="false"
-                      {...register("is_leak_major_disruption", {
-                        required: "Please select yes or no",
-                      })}
-                      className={styles.radio}
-                    />
-                    No
-                  </label>
-                </div>
-                {errors.is_leak_major_disruption && (
-                  <Alert type="error">
-                    <AlertMessage>{errors.is_leak_major_disruption.message}</AlertMessage>
-                  </Alert>
-                )}
-              </div>
-
-              <div className="field">
-                <Label htmlFor="is_leak_major_reputational_damage">
-                  Would disclosure of this asset result in significant reputational damage to UCL? *
-                </Label>
-                <div className={styles["radio-group"]}>
-                  <label className={styles["radio-label"]}>
-                    <input
-                      type="radio"
-                      value="true"
-                      {...register("is_leak_major_reputational_damage", {
-                        required: "Please select yes or no",
-                      })}
-                      className={styles.radio}
-                    />
-                    Yes
-                  </label>
-                  <label className={styles["radio-label"]}>
-                    <input
-                      type="radio"
-                      value="false"
-                      {...register("is_leak_major_reputational_damage", {
-                        required: "Please select yes or no",
-                      })}
-                      className={styles.radio}
-                    />
-                    No
-                  </label>
-                </div>
-                {errors.is_leak_major_reputational_damage && (
-                  <Alert type="error">
-                    <AlertMessage>{errors.is_leak_major_reputational_damage.message}</AlertMessage>
-                  </Alert>
-                )}
-              </div>
+              <RadioOptions
+                name="is_leak_major_financial_loss"
+                label="Would disclosure of this asset result in significant financial loss? *"
+                options={[
+                  { name: "Yes", value: "true" },
+                  { name: "No", value: "false" },
+                ]}
+                register={register}
+                errors={errors}
+              />
+              <RadioOptions
+                name="is_leak_major_disruption"
+                label="Would disclosure of this asset result in major disruption to UCL? *"
+                options={[
+                  { name: "Yes", value: "true" },
+                  { name: "No", value: "false" },
+                ]}
+                register={register}
+                errors={errors}
+              />
+              <RadioOptions
+                name="is_leak_major_reputational_damage"
+                label="Would disclosure of this asset result in significant reputational damage to UCL? *"
+                options={[
+                  { name: "Yes", value: "true" },
+                  { name: "No", value: "false" },
+                ]}
+                register={register}
+                errors={errors}
+              />
             </>
           )}
 
         {(tier ?? 0) >= 3 && (
-          <div className="field">
-            <Label htmlFor="has_targeted_threat_actors">
-              Is the asset likely to be targeted by sophisticated, well-resourced, and determined actors, such as
-              serious organised crime groups and state actors? *
-            </Label>
-            <div className={styles["radio-group"]}>
-              <label className={styles["radio-label"]}>
-                <input
-                  type="radio"
-                  value="true"
-                  {...register("has_targeted_threat_actors", {
-                    required: "Please select yes or no",
-                  })}
-                  className={styles.radio}
-                />
-                Yes
-              </label>
-              <label className={styles["radio-label"]}>
-                <input
-                  type="radio"
-                  value="false"
-                  {...register("has_targeted_threat_actors", {
-                    required: "Please select yes or no",
-                  })}
-                  className={styles.radio}
-                />
-                No
-              </label>
-            </div>
-            {errors.has_targeted_threat_actors && (
-              <Alert type="error">
-                <AlertMessage>{errors.has_targeted_threat_actors.message}</AlertMessage>
-              </Alert>
-            )}
-          </div>
+          <RadioOptions
+            name="has_targeted_threat_actors"
+            label="Is the asset likely to be targeted by sophisticated, well-resourced, and determined actors, such as
+            serious organised crime groups and state actors? *"
+            options={[
+              { name: "Yes", value: "true" },
+              { name: "No", value: "false" },
+            ]}
+            register={register}
+            errors={errors}
+          />
         )}
 
         <div className="field">
@@ -677,38 +556,16 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className="field">
-          <Label htmlFor="has_expiry_date">Does this asset have a retention expiry date? *</Label>
-          <div className={styles["radio-group"]}>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="true"
-                {...register("has_expiry_date", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              Yes
-            </label>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="false"
-                {...register("has_expiry_date", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              No
-            </label>
-          </div>
-          {errors.has_expiry_date && (
-            <Alert type="error">
-              <AlertMessage>{errors.has_expiry_date.message}</AlertMessage>
-            </Alert>
-          )}
-        </div>
+        <RadioOptions
+          name="has_expiry_date"
+          label="Does this asset have a retention expiry date? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          errors={errors}
+        />
 
         {showExpiryDate && (
           <div className="field">
@@ -768,113 +625,39 @@ export default function AssetCreationForm(props: AssetFormProps) {
           )}
         </div>
 
-        <div className="field">
-          <Label htmlFor="requires_contract">Does this asset require a contract? *</Label>
-          <p>Answering yes will require you to add a contract document in a later step</p>
-          <div className={styles["radio-group"]}>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="true"
-                {...register("requires_contract", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              Yes
-            </label>
+        <RadioOptions
+          name="requires_contract"
+          label="Does this asset require a contract? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          errors={errors}
+        />
 
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="false"
-                {...register("requires_contract", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              No
-            </label>
-          </div>
-          {errors.requires_contract && (
-            <Alert type="error">
-              <AlertMessage>{errors.requires_contract.message}</AlertMessage>
-            </Alert>
-          )}
-        </div>
+        <RadioOptions
+          name="has_dspt"
+          label="Is this information provided under condition of there being an up to date Data Security & Protection Toolkit
+          in place at the organisation? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          errors={errors}
+        />
 
-        <div className="field">
-          <Label htmlFor="has_dspt">
-            Is this information provided under condition of there being an up to date Data Security & Protection Toolkit
-            in place at the organisation? *
-          </Label>
-          <div className={styles["radio-group"]}>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="true"
-                {...register("has_dspt", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              Yes
-            </label>
-
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="false"
-                {...register("has_dspt", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              No
-            </label>
-          </div>
-          {errors.has_dspt && (
-            <Alert type="error">
-              <AlertMessage>{errors.has_dspt.message}</AlertMessage>
-            </Alert>
-          )}
-        </div>
-
-        <div className="field">
-          <Label htmlFor="stored_outside_uk_eea">
-            Is this asset stored or processed outside of the UK and the European Economic Area at all? *
-          </Label>
-          <div className={styles["radio-group"]}>
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="true"
-                {...register("stored_outside_uk_eea", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              Yes
-            </label>
-
-            <label className={styles["radio-label"]}>
-              <input
-                type="radio"
-                value="false"
-                {...register("stored_outside_uk_eea", {
-                  required: "Please select yes or no",
-                })}
-                className={styles.radio}
-              />
-              No
-            </label>
-          </div>
-          {errors.stored_outside_uk_eea && (
-            <Alert type="error">
-              <AlertMessage>{errors.stored_outside_uk_eea.message}</AlertMessage>
-            </Alert>
-          )}
-        </div>
+        <RadioOptions
+          name="stored_outside_uk_eea"
+          label="Is this asset stored or processed outside of the UK and the European Economic Area at all? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          errors={errors}
+        />
 
         <div className="field">
           <Label htmlFor="status">Status *</Label>
