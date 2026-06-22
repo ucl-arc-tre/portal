@@ -7,7 +7,7 @@ import styles from "./UserDataTable.module.css";
 import { useState } from "react";
 import TrainingForm from "./TrainingForm";
 import ChosenNameForm from "./ChosenNameForm";
-import { convertRFC3339ToDDMMYYYY, getHumanReadableTrainingKind } from "../shared/exports";
+import { formatTime, getHumanReadableTrainingKind } from "../shared/exports";
 
 type Props = {
   canEditTrainingOrName: boolean;
@@ -138,7 +138,7 @@ export default function UserDataTable(Props: Props) {
                 {userData.agreements.confirmed_agreements.map((agreement: ConfirmedAgreement) => (
                   <div key={agreement.agreement_type} className={styles.agreement}>
                     {agreement.agreement_type}
-                    {agreement.confirmed_at && <small>{convertRFC3339ToDDMMYYYY(agreement.confirmed_at)}</small>}
+                    {agreement.confirmed_at && <small>{formatTime(agreement.confirmed_at)}</small>}
                   </div>
                 ))}
               </td>
@@ -159,7 +159,7 @@ export default function UserDataTable(Props: Props) {
                           <XIcon />
                         </span>
                       )}
-                      {training.completed_at && <small>{convertRFC3339ToDDMMYYYY(training.completed_at)}</small>}
+                      {training.completed_at && <small>{formatTime(training.completed_at)}</small>}
                     </div>
                   ))}{" "}
                 </div>
