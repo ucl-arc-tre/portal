@@ -1986,6 +1986,7 @@ components:
         - study_id
         - asset_ids
         - members
+        - num_required_egress_approvals
       properties:
         name:
           type: string
@@ -1998,6 +1999,9 @@ components:
           description: List of asset identifiers to link to this project (can be empty)
           items:
             type: string
+        num_required_egress_approvals:
+          type: integer
+          description: Number of approvals required to egress data from the TRE
         members:
           type: array
           description: List of project members with their roles (can be empty)
@@ -2010,6 +2014,7 @@ components:
       required:
         - asset_ids
         - members
+        - num_required_egress_approvals
       properties:
         asset_ids:
           type: array
@@ -2021,6 +2026,9 @@ components:
           description: List of project members with their roles (can be empty)
           items:
             $ref: "#/components/schemas/ProjectTREMember"
+        num_required_egress_approvals:
+          type: integer
+          description: Number of approvals required to egress data from the TRE
 
     ProjectTREMember:
       type: object
@@ -2123,6 +2131,7 @@ components:
         - environment_name
         - assets
         - members
+        - num_required_egress_approvals
       properties:
         id:
           type: string
@@ -2159,6 +2168,9 @@ components:
           description: List of project members with their roles (TRE-specific)
           items:
             $ref: "#/components/schemas/ProjectTREMember"
+        num_required_egress_approvals:
+          type: integer
+          description: Number of approvals required to egress data from the TRE
 
     ContractBase:
       type: object

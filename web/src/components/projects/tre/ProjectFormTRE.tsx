@@ -1,10 +1,11 @@
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage } from "../../shared/uikitExports";
+import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
 import { ProjectFormData } from "@/types/projects";
 import Button from "@/components/ui/Button";
 import { ProjectTre, ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
+import RadioOptions from "@/components/ui/form/RadioOptions";
 
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
@@ -48,7 +49,14 @@ type Props = {
 
 export default function ProjectFormTREStep(props: Props) {
   const { fieldsDisabled, editingProject } = props;
-  const { watch, control, getValues, setValue } = useFormContext<ProjectFormData>();
+  const {
+    watch,
+    control,
+    getValues,
+    setValue,
+    register,
+    formState: { errors },
+  } = useFormContext<ProjectFormData>();
 
   const {
     fields: researcherFields,
@@ -61,13 +69,19 @@ export default function ProjectFormTREStep(props: Props) {
 
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
+  const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
+  const members = watch("members");
+  console.log(members);
+  const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
+  console.log(numEgressCheckers, numRequiredEgressApprovals);
+
   return (
     <>
       <div className="field">
-        <span>Project users (optional):</span>
+        <Label htmlFor="members">Project users (optional):*</Label>
         <fieldset className="linkage-fieldset">
           {researcherFields.map((field, index) => {
-            const researcher = watch(`members.${index}`);
+            const researcher = members[index];
             const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
 
             return (
@@ -96,7 +110,7 @@ export default function ProjectFormTREStep(props: Props) {
                             return true;
                           },
                           isUnique: (value) => {
-                            const allUsernames = getValues("members").map((user) => user.username);
+                            const allUsernames = members.map((user) => user.username);
                             const duplicateCount = allUsernames.filter((username) => username === value).length;
                             return duplicateCount <= 1 || "Username has already been entered";
                           },
@@ -232,13 +246,44 @@ export default function ProjectFormTREStep(props: Props) {
         <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
       </div>
 
-      <div className="field">
-        <span>Number of required egress approvals:</span>
-
+      <div>
+        <RadioOptions
+          name="tre.numRequiredEgressApprovals"
+          label="Number of required approvals to egress a file *"
+          options={[
+            { name: "1", value: "1" },
+            { name: "2", value: "2" },
+            { name: "3", value: "3" },
+            { name: "4", value: "4" },
+          ]}
+          register={register}
+          errors={errors}
+        />
         <HelperText>
-          Egressing (downloading) data from the TRE requires approval. Each request will require this number of
-          approvals before it can be downloaded. Self approvals are permitted.
+          The TRE requires approvals on files to be egressed. Self approvals are permitted. See the{" "}
+          <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
         </HelperText>
+        {numRequiredEgressApprovals === "1" && (
+          <div className={styles["num-egress-approvals-alert"]}>
+            <Alert type="warning">
+              <AlertMessage>
+                {
+                  'You have selected a single approval for a project with more than one user. This means that there will not be a "four eyes" check on the data that is being egressed. Please strongly consider adding using at least two required approvers.'
+                }
+              </AlertMessage>
+            </Alert>
+          </div>
+        )}
+
+        {numRequiredEgressApprovals && numEgressCheckers < Number(numRequiredEgressApprovals) && (
+          <div className={styles["num-egress-approvals-alert"]}>
+            <Alert type="warning">
+              <AlertMessage>
+                {`The number of users with an "egress checker" role is currently ${numEgressCheckers} which is fewer than the required number of approvals ${numRequiredEgressApprovals} which means no data will be able to be egressed from the TRE.`}
+              </AlertMessage>
+            </Alert>
+          </div>
+        )}
       </div>
     </>
   );

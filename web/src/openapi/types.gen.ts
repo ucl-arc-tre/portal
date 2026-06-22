@@ -517,6 +517,10 @@ export type ProjectTreRequest = {
      */
     asset_ids: Array<string>;
     /**
+     * Number of approvals required to egress data from the TRE
+     */
+    num_required_egress_approvals: number;
+    /**
      * List of project members with their roles (can be empty)
      */
     members: Array<ProjectTreMember>;
@@ -534,6 +538,10 @@ export type ProjectTreUpdate = {
      * List of project members with their roles (can be empty)
      */
     members: Array<ProjectTreMember>;
+    /**
+     * Number of approvals required to egress data from the TRE
+     */
+    num_required_egress_approvals: number;
 };
 
 /**
@@ -646,6 +654,10 @@ export type ProjectTre = {
      * List of project members with their roles (TRE-specific)
      */
     members: Array<ProjectTreMember>;
+    /**
+     * Number of approvals required to egress data from the TRE
+     */
+    num_required_egress_approvals: number;
 };
 
 export type ContractBase = {

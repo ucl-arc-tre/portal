@@ -1077,8 +1077,11 @@ type ProjectTRE struct {
 	Members []ProjectTREMember `json:"members"`
 
 	// Name Name of the project
-	Name   string           `json:"name"`
-	Status ProjectTREStatus `json:"status"`
+	Name string `json:"name"`
+
+	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
+	NumRequiredEgressApprovals int              `json:"num_required_egress_approvals"`
+	Status                     ProjectTREStatus `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
@@ -1108,6 +1111,9 @@ type ProjectTRERequest struct {
 	// Name Name of the project
 	Name string `json:"name"`
 
+	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
+	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
 }
@@ -1125,6 +1131,9 @@ type ProjectTREUpdate struct {
 
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
+
+	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
+	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
 }
 
 // Study defines model for Study.

@@ -18,10 +18,15 @@ type ProjectNameValidation = {
   helperText: string;
 };
 
+type ProjectFormDataTRE = {
+  numRequiredEgressApprovals: string;
+};
+
 type ProjectFormData = {
   name: string;
   studyId: string;
   environmentId: string;
   assetIds: { value: string }[];
   members: { username: string; roles: AnyProjectRoleName[] }[];
+  tre?: ProjectFormDataTRE;
 };

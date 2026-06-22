@@ -37,6 +37,10 @@ func (s *Service) validateProjectTREData(projectTreData openapi.ProjectTREReques
 		return err
 	}
 
+	if projectTreData.NumRequiredEgressApprovals < 1 {
+		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
+	}
+
 	return s.validateProjectTREAssetsAndMembers(projectTreData.AssetIds, projectTreData.Members, studyUUID)
 }
 
@@ -167,9 +171,9 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 	return nil
 }
 
-func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
+func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, data openapi.ProjectTRERequest) error {
 
-	if err := s.validateProjectTREData(projectTreData, studyUUID); err != nil {
+	if err := s.validateProjectTREData(data, studyUUID); err != nil {
 		return err
 	}
 
@@ -186,7 +190,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 
 	// Create Project record
 	project := types.Project{
-		Name:          projectTreData.Name,
+		Name:          data.Name,
 		CreatorUserID: creator.ID,
 		StudyID:       studyUUID,
 		EnvironmentID: treEnvironment.ID,
@@ -200,7 +204,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	// Create ProjectTRE record
 	projectTRE := types.ProjectTRE{
 		ProjectID:                     project.ID,
-		EgressNumberRequiredApprovals: 2, // TODO: this needs follow up UI/UX and backend validation work, need to discuss with the team
+		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
@@ -209,13 +213,13 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return types.NewErrFromGorm(err, "failed to create project TRE")
 	}
 
-	if err := s.createOrUpdateProjectAssets(tx, project.ID, projectTreData); err != nil {
+	if err := s.createOrUpdateProjectAssets(tx, project.ID, data); err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
