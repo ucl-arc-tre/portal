@@ -279,7 +279,7 @@ export default function ProjectFormTREStep(props: Props) {
           <div className={styles["num-egress-approvals-alert"]}>
             <Alert type="warning">
               <AlertMessage>
-                {`The number of users with an "egress checker" role is currently ${numEgressCheckers}, which is fewer than the required number of approvals ${numRequiredEgressApprovals}. No data will be able to be egressable from the TRE.`}
+                {`The number of users with an "egress checker" role is currently ${numEgressCheckers}, which is fewer than the required number of approvals ${numRequiredEgressApprovals}. No data will be able to be egressed from the TRE.`}
               </AlertMessage>
             </Alert>
           </div>
