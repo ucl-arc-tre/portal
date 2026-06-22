@@ -17,3 +17,11 @@ type ProjectNameValidation = {
   patternMessage: string;
   helperText: string;
 };
+
+type ProjectFormData = {
+  name: string;
+  studyId: string;
+  environmentId: string;
+  assetIds: { value: string }[];
+  members: { username: string; roles: AnyProjectRoleName[] }[];
+};

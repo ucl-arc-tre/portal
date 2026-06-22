@@ -1,0 +1,55 @@
+.step-progress {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ddd;
+}
+
+.step-dot.active {
+  background-color: var(--ucl-accent);
+  box-shadow: 0 0 0 3px rgba(123, 0, 255, 0.25);
+}
+
+.step-dot.completed {
+  background-color: var(--ucl-mid);
+}
+
+.section-label {
+  font-weight: bold;
+}
+
+.username-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.username-input-wrapper > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.domain-suffix {
+  color: var(--text--secondary);
+  font-weight: 500;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}

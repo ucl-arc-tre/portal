@@ -1,0 +1,14 @@
+.environment-docs {
+  padding: 0.75rem;
+  background-color: #e7f3ff;
+}
+
+.environment-docs a {
+  color: var(--form-purple--light);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.environment-docs a:hover {
+  text-decoration: underline;
+}
