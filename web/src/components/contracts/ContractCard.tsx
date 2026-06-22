@@ -1,6 +1,6 @@
 import { Contract } from "@/openapi";
 import styles from "./ContractCard.module.css";
-import { calculateExpiryUrgency, humanReadableOfDDMMYYYY } from "../shared/exports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
 
@@ -66,20 +66,18 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
 
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Expiry Date: </span>
-          <span className={styles.value}>
-            {contract.expiry_date ? humanReadableOfDDMMYYYY(contract.expiry_date) : "None"}
-          </span>
+          <span className={styles.value}>{contract.expiry_date ? formatDate(contract.expiry_date) : "None"}</span>
         </div>
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Retention End Date: </span>
           <span className={styles.value}>
-            {contract.retention_end_date ? humanReadableOfDDMMYYYY(contract.retention_end_date) : "None"}
+            {contract.retention_end_date ? formatDate(contract.retention_end_date) : "None"}
           </span>
         </div>
 
         <div className={styles["detail-item"]}>
           <span className={styles.label}>Uploaded: </span>
-          <span className={styles.value}>{humanReadableOfDDMMYYYY(contract.created_at)}</span>
+          <span className={styles.value}>{formatDate(contract.created_at)}</span>
         </div>
 
         <div className={styles["detail-item"]}>

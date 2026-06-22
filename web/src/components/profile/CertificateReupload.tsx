@@ -4,7 +4,7 @@ import TrainingCertificate from "./approved-researcher-components/TrainingCertif
 import Button from "../ui/Button";
 import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import styles from "./CertificateReupload.module.css";
-import { humanReadableOfDDMMYYYY } from "../shared/exports";
+import { formatDate } from "../shared/exports";
 
 type Props = {
   trainingData: ProfileTraining | null;
@@ -49,7 +49,7 @@ export default function CertificateReupload({ trainingData, expiryUrgency, onReu
       {nhsdTraining?.completed_at && (
         <dl className={styles["cert-details"]}>
           <dt>Training completion date:</dt>
-          <dd>{humanReadableOfDDMMYYYY(nhsdTraining.completed_at)}</dd>
+          <dd>{formatDate(nhsdTraining.completed_at)}</dd>
           <dt>Certificate expiry date:</dt>
           <dd>{getExpiryDate(nhsdTraining.completed_at)}</dd>
         </dl>

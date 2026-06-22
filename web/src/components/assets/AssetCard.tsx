@@ -2,7 +2,7 @@ import { Asset } from "@/openapi";
 import styles from "./AssetCard.module.css";
 import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
-import { calculateExpiryUrgency, humanReadableOfDDMMYYYY } from "../shared/exports";
+import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
@@ -114,13 +114,13 @@ export default function AssetCard(props: AssetCardProps) {
 
         <div className={styles["asset-detail"]}>
           <span className={styles["asset-detail-label"]}>Created:</span>
-          <span className={styles["asset-detail-value"]}>{humanReadableOfDDMMYYYY(asset.created_at)}</span>
+          <span className={styles["asset-detail-value"]}>{formatDate(asset.created_at)}</span>
         </div>
 
         {asset.updated_at !== asset.created_at && (
           <div className={styles["asset-detail"]}>
             <span className={styles["asset-detail-label"]}>Last Updated:</span>
-            <span className={styles["asset-detail-value"]}>{humanReadableOfDDMMYYYY(asset.updated_at)}</span>
+            <span className={styles["asset-detail-value"]}>{formatDate(asset.updated_at)}</span>
           </div>
         )}
 

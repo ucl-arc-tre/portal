@@ -22,7 +22,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractUploadForm from "@/components/contracts/ContractUploadForm";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ContractObjectCard from "@/components/contracts/ContractObjectCard";
-import { humanReadableOfDDMMYYYY } from "@/components/shared/exports";
+import { formatDate } from "@/components/shared/exports";
 import Box from "@/components/ui/Box";
 
 export default function ManageContractPage() {
@@ -203,21 +203,21 @@ export default function ManageContractPage() {
           {contract.start_date && (
             <div className={styles.field}>
               <label>Start date:</label>
-              <span>{humanReadableOfDDMMYYYY(contract.start_date)}</span>
+              <span>{formatDate(contract.start_date)}</span>
             </div>
           )}
 
           {contract.expiry_date && (
             <div className={styles.field}>
               <label>Expiry date:</label>
-              <span>{humanReadableOfDDMMYYYY(contract.expiry_date)}</span>
+              <span>{formatDate(contract.expiry_date)}</span>
             </div>
           )}
 
           {contract.retention_end_date && (
             <div className={styles.field}>
               <label>Retention Period End Date:</label>
-              <span>{humanReadableOfDDMMYYYY(contract.retention_end_date)}</span>
+              <span>{formatDate(contract.retention_end_date)}</span>
             </div>
           )}
 
@@ -230,7 +230,7 @@ export default function ManageContractPage() {
                 contractId={contract.id}
                 studyId={study.id}
                 filename={obj.filename}
-                createdAt={humanReadableOfDDMMYYYY(obj.created_at)}
+                createdAt={formatDate(obj.created_at)}
                 canModify={canModify}
               />
             ))}

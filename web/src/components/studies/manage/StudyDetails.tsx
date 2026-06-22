@@ -3,7 +3,7 @@ import { Alert } from "../../shared/uikitExports";
 import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
-import { humanReadableOfDDMMYYYY } from "../../shared/exports";
+import { formatDate } from "../../shared/exports";
 import Badge from "@/components/ui/Badge";
 import EditIcon from "@/components/ui/EditIcon";
 
@@ -42,16 +42,16 @@ export default function StudyDetails(props: StudyOverviewProps) {
         </span>
 
         <span className={styles["detail-item"]}>
-          Created: <span className={styles["grey-value"]}>{humanReadableOfDDMMYYYY(study.created_at)}</span>
+          Created: <span className={styles["grey-value"]}>{formatDate(study.created_at)}</span>
         </span>
 
         <span className={styles["detail-item"]}>
-          Last updated: <span className={styles["grey-value"]}>{humanReadableOfDDMMYYYY(study.updated_at)}</span>
+          Last updated: <span className={styles["grey-value"]}>{formatDate(study.updated_at)}</span>
         </span>
 
         {study.last_signoff && (
           <span className={styles["detail-item"]}>
-            Last signed off: <span className={styles["grey-value"]}>{humanReadableOfDDMMYYYY(study.last_signoff)}</span>
+            Last signed off: <span className={styles["grey-value"]}>{formatDate(study.last_signoff)}</span>
           </span>
         )}
 
