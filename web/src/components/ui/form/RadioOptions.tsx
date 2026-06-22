@@ -1,6 +1,6 @@
 import { Alert, AlertMessage, Label } from "@/components/shared/uikitExports";
 import styles from "./RadioOptions.module.css";
-import { FieldPath, FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import { FieldPath, FieldError, FieldValues, UseFormRegister } from "react-hook-form";
 
 export type Option = {
   name: string;
@@ -11,16 +11,15 @@ type Props<T extends FieldValues> = {
   name: FieldPath<T>;
   label: string;
   register: UseFormRegister<T>;
-  errors: FieldErrors<T>;
+  error?: FieldError;
   options: Option[];
 };
 
 export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
-  const { name, label, options, register, errors } = props;
-  const error = errors[name];
+  const { name, label, options, register, error } = props;
 
   return (
-    <div className="field">
+    <div className="field" data-cy={name}>
       <Label htmlFor={name}>{label}</Label>
       <div className={styles.group}>
         {options.map((option) => {

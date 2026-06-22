@@ -478,7 +478,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
               { name: "No", value: "false" },
             ]}
             register={register}
-            errors={errors}
+            error={errors.requires_tre}
           />
         )}
 
@@ -495,7 +495,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   { name: "No", value: "false" },
                 ]}
                 register={register}
-                errors={errors}
+                error={errors.is_leak_major_financial_loss}
               />
               <RadioOptions
                 name="is_leak_major_disruption"
@@ -505,7 +505,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   { name: "No", value: "false" },
                 ]}
                 register={register}
-                errors={errors}
+                error={errors.is_leak_major_disruption}
               />
               <RadioOptions
                 name="is_leak_major_reputational_damage"
@@ -515,7 +515,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   { name: "No", value: "false" },
                 ]}
                 register={register}
-                errors={errors}
+                error={errors.is_leak_major_reputational_damage}
               />
             </>
           )}
@@ -530,7 +530,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
               { name: "No", value: "false" },
             ]}
             register={register}
-            errors={errors}
+            error={errors.has_targeted_threat_actors}
           />
         )}
 
@@ -564,7 +564,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             { name: "No", value: "false" },
           ]}
           register={register}
-          errors={errors}
+          error={errors.has_expiry_date}
         />
 
         {showExpiryDate && (
@@ -633,7 +633,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             { name: "No", value: "false" },
           ]}
           register={register}
-          errors={errors}
+          error={errors.requires_contract}
         />
 
         <RadioOptions
@@ -645,7 +645,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             { name: "No", value: "false" },
           ]}
           register={register}
-          errors={errors}
+          error={errors.has_dspt}
         />
 
         <RadioOptions
@@ -656,7 +656,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             { name: "No", value: "false" },
           ]}
           register={register}
-          errors={errors}
+          error={errors.stored_outside_uk_eea}
         />
 
         <div className="field">

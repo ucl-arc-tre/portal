@@ -152,6 +152,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		NumRequiredEgressApprovals: projectTRE.EgressNumberRequiredApprovals,
 		Assets:                     assets,
 		Members:                    members,
+		AssetIds:                   nil,
 	}
 
 	ctx.JSON(http.StatusOK, response)

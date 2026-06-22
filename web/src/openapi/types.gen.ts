@@ -503,7 +503,7 @@ export type ValidationError = {
 /**
  * Request payload for creating a new TRE project
  */
-export type ProjectTreRequest = {
+export type ProjectTreRequest = ProjectTreBase & {
     /**
      * Name of the project
      */
@@ -512,37 +512,12 @@ export type ProjectTreRequest = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
-    /**
-     * List of asset identifiers to link to this project (can be empty)
-     */
-    asset_ids: Array<string>;
-    /**
-     * Number of approvals required to egress data from the TRE
-     */
-    num_required_egress_approvals: number;
-    /**
-     * List of project members with their roles (can be empty)
-     */
-    members: Array<ProjectTreMember>;
 };
 
 /**
  * Request payload for updating an existing TRE project (members and assets only)
  */
-export type ProjectTreUpdate = {
-    /**
-     * List of asset identifiers to link to this project (can be empty)
-     */
-    asset_ids: Array<string>;
-    /**
-     * List of project members with their roles (can be empty)
-     */
-    members: Array<ProjectTreMember>;
-    /**
-     * Number of approvals required to egress data from the TRE
-     */
-    num_required_egress_approvals: number;
-};
+export type ProjectTreUpdate = ProjectTreBase;
 
 /**
  * A project member with their assigned roles
@@ -615,7 +590,7 @@ export type Project = {
 /**
  * A TRE project with base project details and environment-specific data
  */
-export type ProjectTre = {
+export type ProjectTre = ProjectTreBase & {
     /**
      * Unique identifier for the base project
      */
@@ -650,8 +625,15 @@ export type ProjectTre = {
      * List of assets associated with this project
      */
     assets: Array<Asset>;
+};
+
+export type ProjectTreBase = {
     /**
-     * List of project members with their roles (TRE-specific)
+     * List of asset identifiers to link to this project (can be empty)
+     */
+    asset_ids: Array<string>;
+    /**
+     * List of project members with their roles (can be empty)
      */
     members: Array<ProjectTreMember>;
     /**

@@ -1058,8 +1058,11 @@ type Project struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// ProjectTRE A TRE project with base project details and environment-specific data
+// ProjectTRE defines model for ProjectTRE.
 type ProjectTRE struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
 	// Assets List of assets associated with this project
 	Assets []Asset `json:"assets"`
 
@@ -1073,7 +1076,7 @@ type ProjectTRE struct {
 	// Id Unique identifier for the base project
 	Id string `json:"id"`
 
-	// Members List of project members with their roles (TRE-specific)
+	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
 
 	// Name Name of the project
@@ -1093,6 +1096,18 @@ type ProjectTRE struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+// ProjectTREBase defines model for ProjectTREBase.
+type ProjectTREBase struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Members List of project members with their roles (can be empty)
+	Members []ProjectTREMember `json:"members"`
+
+	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
+	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+}
+
 // ProjectTREMember A project member with their assigned roles
 type ProjectTREMember struct {
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
@@ -1100,7 +1115,7 @@ type ProjectTREMember struct {
 	Username string               `json:"username"`
 }
 
-// ProjectTRERequest Request payload for creating a new TRE project
+// ProjectTRERequest defines model for ProjectTRERequest.
 type ProjectTRERequest struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
@@ -1124,17 +1139,8 @@ type ProjectTRERoleName string
 // ProjectTREStatus defines model for ProjectTREStatus.
 type ProjectTREStatus string
 
-// ProjectTREUpdate Request payload for updating an existing TRE project (members and assets only)
-type ProjectTREUpdate struct {
-	// AssetIds List of asset identifiers to link to this project (can be empty)
-	AssetIds []string `json:"asset_ids"`
-
-	// Members List of project members with their roles (can be empty)
-	Members []ProjectTREMember `json:"members"`
-
-	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
-	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
-}
+// ProjectTREUpdate defines model for ProjectTREUpdate.
+type ProjectTREUpdate = ProjectTREBase
 
 // Study defines model for Study.
 type Study struct {
