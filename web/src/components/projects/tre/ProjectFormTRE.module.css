@@ -54,3 +54,7 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.num-egress-approvals-alert {
+  margin-top: 0.75rem;
+}

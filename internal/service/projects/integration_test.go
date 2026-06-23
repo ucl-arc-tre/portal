@@ -110,10 +110,10 @@ func TestCreateProjectTRE(t *testing.T) {
 		)
 
 	req := openapi.ProjectTRERequest{
-		Name:     "proj123",
-		StudyId:  study.ID.String(),
-		AssetIds: []string{asset.ID.String()},
-
+		Name:                       "proj123",
+		StudyId:                    study.ID.String(),
+		AssetIds:                   []string{asset.ID.String()},
+		NumRequiredEgressApprovals: 2,
 		Members: []openapi.ProjectTREMember{
 			{
 				Username: "bob@testIntegration.com",

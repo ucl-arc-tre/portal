@@ -64,6 +64,8 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[name="environmentId"]').select("ARC Trusted Research Environment (Tier 3)");
     cy.get('[name="name"]').type(projectTitle);
     cy.get('[data-cy="next-form-page-button"]').click();
+
+    cy.get('[name="tre.numRequiredEgressApprovals"]').check("1", { force: true });
     cy.get('[data-cy="submit-project-button"]').click();
   });
 

@@ -54,6 +54,7 @@ export default function ProjectForm({
       environmentId: "",
       assetIds: [],
       members: [],
+      tre: undefined,
     },
   });
   const { handleSubmit, watch, setValue, trigger } = methods;
@@ -109,6 +110,8 @@ export default function ProjectForm({
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
       setValue("members", projectMembers);
+
+      setValue("tre.numRequiredEgressApprovals", `${editingProject.num_required_egress_approvals}`);
     }
   }, [editingProject, setValue, environments]);
 
@@ -179,6 +182,11 @@ export default function ProjectForm({
 
       switch (selectedEnvironment.name) {
         case "ARC Trusted Research Environment":
+          if (!data.tre) {
+            setError("Missing required TRE data");
+            return;
+          }
+
           const treMembers = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
@@ -193,6 +201,7 @@ export default function ProjectForm({
               body: {
                 asset_ids: assetIds,
                 members: treMembers,
+                num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               },
             });
           } else {
@@ -202,6 +211,7 @@ export default function ProjectForm({
               study_id: data.studyId,
               asset_ids: assetIds,
               members: treMembers,
+              num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
             };
             response = await postProjectsTre({ body: requestBody });
           }

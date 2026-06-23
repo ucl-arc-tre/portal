@@ -140,17 +140,19 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	members := extractProjectMembers(projectTRE)
 
 	response := openapi.ProjectTRE{
-		Id:              projectTRE.Project.ID.String(),
-		Name:            projectTRE.Project.Name,
-		StudyId:         projectTRE.Project.StudyID.String(),
-		StudyTitle:      projectTRE.Project.Study.Title,
-		CreatorUsername: string(projectTRE.Project.CreatorUser.Username),
-		Status:          openapi.ProjectTREStatus(projectTRE.Status),
-		CreatedAt:       openapi.FormatTime(projectTRE.Project.CreatedAt),
-		UpdatedAt:       openapi.FormatTime(projectTRE.Project.UpdatedAt),
-		EnvironmentName: openapi.EnvironmentName(projectTRE.Project.Environment.Name),
-		Assets:          assets,
-		Members:         members,
+		Id:                         projectTRE.Project.ID.String(),
+		Name:                       projectTRE.Project.Name,
+		StudyId:                    projectTRE.Project.StudyID.String(),
+		StudyTitle:                 projectTRE.Project.Study.Title,
+		CreatorUsername:            string(projectTRE.Project.CreatorUser.Username),
+		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
+		CreatedAt:                  openapi.FormatTime(projectTRE.Project.CreatedAt),
+		UpdatedAt:                  openapi.FormatTime(projectTRE.Project.UpdatedAt),
+		EnvironmentName:            openapi.EnvironmentName(projectTRE.Project.Environment.Name),
+		NumRequiredEgressApprovals: projectTRE.EgressNumberRequiredApprovals,
+		Assets:                     assets,
+		Members:                    members,
+		AssetIds:                   nil,
 	}
 
 	ctx.JSON(http.StatusOK, response)
