@@ -289,7 +289,7 @@ export default function ProjectFormTREStep(props: Props) {
       <div>
         <RadioOptions
           name="tre.externalEncryptionEnabled"
-          label="External encryption *"
+          label="Data will need be stored outside of the TRE? *"
           options={[
             { name: "Yes", value: "true" },
             { name: "No", value: "false" },
@@ -298,9 +298,9 @@ export default function ProjectFormTREStep(props: Props) {
           error={errors.tre?.externalEncryptionEnabled}
         />
         <HelperText>
-          The TRE can be used to store data outside the environment. This is useful in limited cases with very large
-          datasets, or for data archival. See the <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more
-          information.
+          The TRE can be used to store data outside the environment using an external encryption mechanism. This is
+          useful in limited cases with very large datasets, or for data archival. See the{" "}
+          <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
         </HelperText>
       </div>
     </>
