@@ -3,6 +3,7 @@ import { Alert, AlertTitle, AlertMessage, Input } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsers, UserData } from "@/openapi";
 import styles from "./UserLookup.module.css";
+import Loading from "../ui/Loading";
 
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
@@ -17,7 +18,6 @@ export default function UserLookup(props: UserLookupProps) {
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
-    console.log("Searching for users with query:", query);
     const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
     const isValid = new RegExp(regex).test(query);
 
@@ -27,7 +27,6 @@ export default function UserLookup(props: UserLookupProps) {
     }
     try {
       const response = await getUsers({ query: { find: query, is_approved_researcher: filterByApprovedResearchers } });
-      console.log("Search response:", response);
       const results = response?.data || [];
       setSearchResults(results);
       setNoResultsFound(results.length === 0);
@@ -50,6 +49,7 @@ export default function UserLookup(props: UserLookupProps) {
             if (e.target.value.length < 3) {
               setSearchResults([]);
               setSearchErrorMessage("");
+              setNoResultsFound(false);
             }
           }}
           value={searchQuery}
@@ -58,6 +58,11 @@ export default function UserLookup(props: UserLookupProps) {
           Search
         </Button>
       </div>
+      {isLoading && (
+        <span className={styles.loader}>
+          <Loading message="searching users" size="small" />
+        </span>
+      )}
       {searchQuery.length > 3 &&
         (noResultsFound ? (
           <Alert type="warning" className={styles["user-result"]}>
