@@ -112,6 +112,7 @@ export default function ProjectForm({
       setValue("members", projectMembers);
 
       setValue("tre.numRequiredEgressApprovals", `${editingProject.num_required_egress_approvals}`);
+      setValue("tre.externalEncryptionEnabled", editingProject.external_encryption_enabled ? "true" : "false");
     }
   }, [editingProject, setValue, environments]);
 
@@ -202,6 +203,7 @@ export default function ProjectForm({
                 asset_ids: assetIds,
                 members: treMembers,
                 num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
+                external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
               },
             });
           } else {
@@ -212,6 +214,7 @@ export default function ProjectForm({
               asset_ids: assetIds,
               members: treMembers,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
+              external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
             };
             response = await postProjectsTre({ body: requestBody });
           }

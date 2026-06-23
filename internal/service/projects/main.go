@@ -61,6 +61,10 @@ func (s *Service) validateProjectTREUpdate(data openapi.ProjectTREUpdate, projec
 		return types.NewErrInvalidObjectF("cannot update tre project with [%v] status", projectTre.Status)
 	}
 
+	if projectTre.ExternalEncryptionEnabled && !data.ExternalEncryptionEnabled {
+		return types.NewErrClientInvalidObjectF("cannot toggle external encryption off once enabled")
+	}
+
 	return s.validateProjectTREAssetsAndMembers(data.AssetIds, data.Members, projectTre.Project.StudyID)
 }
 
@@ -215,6 +219,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	projectTRE := types.ProjectTRE{
 		ProjectID:                     project.ID,
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
+		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
@@ -391,6 +396,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 
 	projectTRE.Status = types.ProjectTREStatusIncomplete
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
+	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
 
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).

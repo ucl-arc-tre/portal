@@ -640,6 +640,10 @@ export type ProjectTreBase = {
      * Number of approvals required to egress data from the TRE
      */
     num_required_egress_approvals: number;
+    /**
+     * Is external encryption enabled for this project?
+     */
+    external_encryption_enabled: boolean;
 };
 
 export type ContractBase = {

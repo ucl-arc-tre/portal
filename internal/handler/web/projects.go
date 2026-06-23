@@ -150,6 +150,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		UpdatedAt:                  openapi.FormatTime(projectTRE.Project.UpdatedAt),
 		EnvironmentName:            openapi.EnvironmentName(projectTRE.Project.Environment.Name),
 		NumRequiredEgressApprovals: projectTRE.EgressNumberRequiredApprovals,
+		ExternalEncryptionEnabled:  projectTRE.ExternalEncryptionEnabled,
 		Assets:                     assets,
 		Members:                    members,
 		AssetIds:                   nil,
