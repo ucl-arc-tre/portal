@@ -3,6 +3,7 @@ import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../../s
 import Button from "../../ui/Button";
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep1.module.css";
+import UserLookup from "@/components/shared/UserLookup";
 
 type StudyFormStep1Props = {
   control: Control<StudyFormData>;
@@ -91,10 +92,9 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
           Additional Study Administrator (optional):
           <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
-              Add a UCL staff member who will help administrate this study. <strong>Must</strong> be valid UCL staff
-              usernames.
+              Add a UCL staff member who will help administrate this study. <strong>Must</strong> be valid UCL staff.
             </HelperText>
-
+            <UserLookup filterByApprovedResearchers={true} />
             {fields.map((field, index) => (
               <div key={field.id} className={styles["admin-wrapper"]}>
                 <Label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
@@ -109,12 +109,12 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
                           }
                           return true;
                         },
-                        notEmailPart: (value) => {
-                          if (value.replace(domainName, "").includes("@")) {
-                            return `Enter only the username part (without ${domainName})`;
-                          }
-                          return true;
-                        },
+                        // notEmailPart: (value) => {
+                        //   if (value.replace(domainName, "").includes("@")) {
+                        //     return `Enter only the username part (without ${domainName})`;
+                        //   }
+                        //   return true;
+                        // },
                         isUnique: (value) => {
                           const allAdminUsernames = getValues(`additionalStudyAdminUsernames`).map(
                             (admin) => admin.value
@@ -126,7 +126,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
                     }}
                     render={({ field, fieldState }) => (
                       <div className={styles["username-input-wrapper"]}>
-                        <div>
+                        {/* <div>
                           <Input
                             value={field.value?.replace(domainName, "") ?? ""}
                             onChange={(e) => field.onChange(`${e.target.value}${domainName}`)}
@@ -138,7 +138,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
                             placeholder="Valid UCL username"
                           />
                           <span className={styles["domain-suffix"]}>{domainName}</span>
-                        </div>
+                        </div> */}
 
                         {fieldState.error && (
                           <Alert type="error">
@@ -150,13 +150,13 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
                   />
                 </Label>
 
-                <Button type="button" onClick={() => remove(index)} size="small" data-cy="remove-study-admin-button">
+                {/* <Button type="button" onClick={() => remove(index)} size="small" data-cy="remove-study-admin-button">
                   Remove
-                </Button>
+                </Button> */}
               </div>
             ))}
 
-            {getValues(`additionalStudyAdminUsernames`).length < 1 && (
+            {/* {getValues(`additionalStudyAdminUsernames`).length < 1 && (
               <Button
                 type="button"
                 variant="secondary"
@@ -167,7 +167,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
               >
                 Add Administrator
               </Button>
-            )}
+            )} */}
           </fieldset>
         </Label>
 
