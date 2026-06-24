@@ -8,9 +8,11 @@ import Loading from "../ui/Loading";
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
   usernames: StudyFormData["additionalStudyAdminUsernames"];
+  appendUsername: (value: string) => void;
+  removeUsername: (username: string) => void;
 };
 export default function UserLookup(props: UserLookupProps) {
-  const { filterByApprovedResearchers, usernames } = props;
+  const { filterByApprovedResearchers, usernames, appendUsername, removeUsername } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
@@ -55,6 +57,10 @@ export default function UserLookup(props: UserLookupProps) {
       const results = response?.data || [];
       setSearchResults(results);
       setNoResultsFound(results.length === 0);
+
+      if (results.length > 0 && usernames.length > 0) {
+        setSearchResults(results.filter((result) => !usernames.some((u) => u.value === result.user.username)));
+      }
     } catch (error) {
       console.error("Failed to search users:", error);
       setNoResultsFound(false);
@@ -72,6 +78,9 @@ export default function UserLookup(props: UserLookupProps) {
         ?.querySelector(`[data-id="${user.user.id}"]`)
         ?.classList.add(styles.hidden);
     }
+    if (!usernames.some((u) => u.value === user.user.username)) {
+      appendUsername(user.user.username);
+    }
   };
 
   const handleRemoveUser = (user: UserData) => {
@@ -80,6 +89,10 @@ export default function UserLookup(props: UserLookupProps) {
       .getElementById("search-results")
       ?.querySelector(`[data-id="${user.user.id}"]`)
       ?.classList.remove(styles.hidden);
+    const index = usernames.findIndex((u) => u.value === user.user.username);
+    if (index !== -1) {
+      removeUsername(user.user.username);
+    }
   };
   return (
     <>
