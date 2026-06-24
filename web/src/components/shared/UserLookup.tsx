@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Alert, AlertTitle, AlertMessage, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
-import { getUsers, UserData } from "@/openapi";
+import { getUsers, postUsersInvite, UserData } from "@/openapi";
 import styles from "./UserLookup.module.css";
 import Loading from "../ui/Loading";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
@@ -19,6 +20,11 @@ export default function UserLookup(props: UserLookupProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [noResultsFound, setNoResultsFound] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<UserData[]>([]);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [inviteErrorMessage, setInviteErrorMessage] = useState("");
+
+  const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
 
   useEffect(() => {
     const fetchSelectedUsers = async () => {
@@ -45,7 +51,7 @@ export default function UserLookup(props: UserLookupProps) {
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
-    const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
+
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
@@ -54,6 +60,11 @@ export default function UserLookup(props: UserLookupProps) {
     }
     try {
       const response = await getUsers({ query: { find: query, is_approved_researcher: filterByApprovedResearchers } });
+      if (responseIsError(response)) {
+        const errorMsg = extractErrorMessage(response);
+        setSearchErrorMessage(errorMsg);
+        return;
+      }
       const results = response?.data || [];
       setSearchResults(results);
       setNoResultsFound(results.length === 0);
@@ -92,6 +103,30 @@ export default function UserLookup(props: UserLookupProps) {
     const index = usernames.findIndex((u) => u.value === user.user.username);
     if (index !== -1) {
       removeUsername(user.user.username);
+    }
+  };
+
+  const handleSendInvite = async (email: string) => {
+    setInviteLoading(true);
+    const isValid = new RegExp(regex).test(email);
+    if (!isValid) {
+      setInviteErrorMessage("Invalid entry, only alphanumeric characters, @ and - are allowed");
+      return;
+    }
+    try {
+      const response = await postUsersInvite({ body: { email } });
+      if (responseIsError(response)) {
+        const errorMsg = extractErrorMessage(response);
+        setInviteErrorMessage(errorMsg);
+        return;
+      }
+      setSuccessMessage("Invite sent");
+      setSearchQuery("");
+    } catch (err) {
+      console.error("Invite post error:", err);
+      setInviteErrorMessage("Failed to send invitation. Please try again.");
+    } finally {
+      setInviteLoading(false);
     }
   };
   return (
@@ -142,7 +177,13 @@ export default function UserLookup(props: UserLookupProps) {
           <Alert type="warning" className={styles["user-result"]}>
             &quot;{searchQuery}&quot; not found.{" "}
             {searchQuery.includes("@") && (
-              <Button size="small" variant="secondary">
+              <Button
+                size="small"
+                variant="secondary"
+                onClick={() => handleSendInvite(searchQuery)}
+                disabled={inviteLoading && !inviteErrorMessage}
+                loading={inviteLoading && !inviteErrorMessage}
+              >
                 Invite
               </Button>
             )}
@@ -165,9 +206,9 @@ export default function UserLookup(props: UserLookupProps) {
           </div>
         ) : null)}
 
-      {searchErrorMessage !== "" && (
-        <Alert type="error">
-          <AlertMessage>{searchErrorMessage}</AlertMessage>
+      {(searchErrorMessage || successMessage || inviteErrorMessage) && (
+        <Alert type={successMessage ? "success" : "error"}>
+          <AlertMessage>{searchErrorMessage || successMessage || inviteErrorMessage}</AlertMessage>
         </Alert>
       )}
     </>
