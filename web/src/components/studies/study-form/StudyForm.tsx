@@ -91,6 +91,7 @@ export default function StudyForm(StudyProps: StudyProps) {
     const studyId = editingStudy?.id;
 
     try {
+      console.log(data);
       const studyData = convertStudyFormDataToApiRequest(data);
 
       const response = studyId
