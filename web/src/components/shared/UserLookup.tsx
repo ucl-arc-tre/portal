@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, AlertTitle, AlertMessage, Input } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsers, UserData } from "@/openapi";
@@ -7,14 +7,41 @@ import Loading from "../ui/Loading";
 
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
+  usernames: StudyFormData["additionalStudyAdminUsernames"];
 };
 export default function UserLookup(props: UserLookupProps) {
-  const { filterByApprovedResearchers } = props;
+  const { filterByApprovedResearchers, usernames } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [noResultsFound, setNoResultsFound] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<UserData[]>([]);
+
+  // useeffect to set the chosen users by fetching users by username?
+
+  useEffect(() => {
+    const fetchSelectedUsers = async () => {
+      if (usernames.length > 0) {
+        setIsLoading(true);
+        try {
+          const response = await getUsers({
+            query: {
+              find: usernames.map((u) => u.value).join(","),
+              is_approved_researcher: filterByApprovedResearchers,
+            },
+          });
+          const results = response?.data || [];
+          setSelectedUsers(results);
+        } catch (error) {
+          console.error("Failed to fetch selected users from usernames:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchSelectedUsers();
+  }, [usernames, filterByApprovedResearchers]);
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -38,8 +65,41 @@ export default function UserLookup(props: UserLookupProps) {
     }
   };
 
+  const handleAddUser = (user: UserData) => {
+    if (!selectedUsers.some((u) => u.user.id === user.user.id)) {
+      setSelectedUsers([...selectedUsers, user]);
+      // hiding with CSS rather than removing from list so it shows up again if removed from selected users
+      document
+        .getElementById("search-results")
+        ?.querySelector(`[data-id="${user.user.id}"]`)
+        ?.classList.add(styles.hidden);
+    }
+  };
+
+  const handleRemoveUser = (user: UserData) => {
+    setSelectedUsers(selectedUsers.filter((u) => u.user.id !== user.user.id));
+    document
+      .getElementById("search-results")
+      ?.querySelector(`[data-id="${user.user.id}"]`)
+      ?.classList.remove(styles.hidden);
+  };
   return (
     <>
+      <div>
+        {selectedUsers.map((result) => (
+          <div key={result.user.id}>
+            <Alert type="success" className={styles["user-result"]}>
+              <AlertTitle>{result.chosen_name}</AlertTitle>
+              <AlertMessage className={styles["user-result-content"]}>
+                {result.user.username}
+                <Button size="small" variant="secondary" onClick={() => handleRemoveUser(result)}>
+                  x Remove
+                </Button>
+              </AlertMessage>
+            </Alert>
+          </div>
+        ))}
+      </div>
       <div className={styles.lookup}>
         <Input
           type="text"
@@ -74,15 +134,15 @@ export default function UserLookup(props: UserLookupProps) {
             )}
           </Alert>
         ) : searchResults.length > 0 ? (
-          <div>
+          <div id="search-results">
             {searchResults.map((result) => (
-              <div key={result.user.id}>
+              <div key={result.user.id} data-id={result.user.id}>
                 <Alert type="success" className={styles["user-result"]}>
                   <AlertTitle>{result.chosen_name}</AlertTitle>
                   <AlertMessage className={styles["user-result-content"]}>
                     {result.user.username}
-                    <Button size="small" variant="secondary">
-                      Add
+                    <Button size="small" variant="secondary" onClick={() => handleAddUser(result)}>
+                      + Add
                     </Button>
                   </AlertMessage>
                 </Alert>
