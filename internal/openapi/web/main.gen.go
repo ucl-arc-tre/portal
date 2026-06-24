@@ -533,6 +533,7 @@ func (e EnvironmentName) Valid() bool {
 
 // Defines values for ProjectTRERoleName.
 const (
+	ApiUser         ProjectTRERoleName = "api_user"
 	DesktopUser     ProjectTRERoleName = "desktop_user"
 	EgressChecker   ProjectTRERoleName = "egress_checker"
 	EgressRequester ProjectTRERoleName = "egress_requester"
@@ -544,6 +545,8 @@ const (
 // Valid indicates whether the value is a known member of the ProjectTRERoleName enum.
 func (e ProjectTRERoleName) Valid() bool {
 	switch e {
+	case ApiUser:
+		return true
 	case DesktopUser:
 		return true
 	case EgressChecker:
