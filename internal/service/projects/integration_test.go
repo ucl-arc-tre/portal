@@ -23,7 +23,6 @@ import (
 // To be called by each test within this package to AutoMigrate
 // only the models/tables required by this package
 func migrate(db *gorm.DB) error {
-
 	// Run migrations, only the models/tables required by this package
 	err := db.AutoMigrate(
 		&types.User{},
@@ -126,6 +125,7 @@ func TestCreateProjectTRE(t *testing.T) {
 				Roles: []openapi.ProjectTRERoleName{
 					openapi.DesktopUser,
 					openapi.Ingresser,
+					openapi.ApiUser,
 				},
 			},
 		},
