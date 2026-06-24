@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, AlertTitle, AlertMessage, Input } from "./uikitExports";
+import { Alert, AlertTitle, AlertMessage, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsers, UserData } from "@/openapi";
 import styles from "./UserLookup.module.css";
@@ -17,8 +17,6 @@ export default function UserLookup(props: UserLookupProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [noResultsFound, setNoResultsFound] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<UserData[]>([]);
-
-  // useeffect to set the chosen users by fetching users by username?
 
   useEffect(() => {
     const fetchSelectedUsers = async () => {
@@ -85,21 +83,24 @@ export default function UserLookup(props: UserLookupProps) {
   };
   return (
     <>
-      <div>
-        {selectedUsers.map((result) => (
-          <div key={result.user.id}>
-            <Alert type="success" className={styles["user-result"]}>
-              <AlertTitle>{result.chosen_name}</AlertTitle>
-              <AlertMessage className={styles["user-result-content"]}>
-                {result.user.username}
-                <Button size="small" variant="secondary" onClick={() => handleRemoveUser(result)}>
-                  x Remove
-                </Button>
-              </AlertMessage>
-            </Alert>
-          </div>
-        ))}
-      </div>
+      {selectedUsers.length > 0 && (
+        <div className={styles["selected-users"]}>
+          <Label>Selected Users</Label>
+          {selectedUsers.map((result) => (
+            <div key={result.user.id}>
+              <Alert type="success" className={styles["user-result"]}>
+                <AlertTitle>{result.chosen_name}</AlertTitle>
+                <AlertMessage className={styles["user-result-content"]}>
+                  {result.user.username}
+                  <Button size="small" variant="secondary" onClick={() => handleRemoveUser(result)}>
+                    x Remove
+                  </Button>
+                </AlertMessage>
+              </Alert>
+            </div>
+          ))}
+        </div>
+      )}
       <div className={styles.lookup}>
         <Input
           type="text"
@@ -137,7 +138,7 @@ export default function UserLookup(props: UserLookupProps) {
           <div id="search-results">
             {searchResults.map((result) => (
               <div key={result.user.id} data-id={result.user.id}>
-                <Alert type="success" className={styles["user-result"]}>
+                <Alert type="info" className={styles["user-result"]}>
                   <AlertTitle>{result.chosen_name}</AlertTitle>
                   <AlertMessage className={styles["user-result-content"]}>
                     {result.user.username}
