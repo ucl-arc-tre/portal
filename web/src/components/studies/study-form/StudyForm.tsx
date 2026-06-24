@@ -91,7 +91,6 @@ export default function StudyForm(StudyProps: StudyProps) {
     const studyId = editingStudy?.id;
 
     try {
-      console.log(data);
       const studyData = convertStudyFormDataToApiRequest(data);
 
       const response = studyId
@@ -130,13 +129,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
         {currentStep === 1 && (
-          <StudyFormStep1
-            control={control}
-            errors={errors}
-            register={register}
-            getValues={getValues}
-            username={username}
-          />
+          <StudyFormStep1 control={control} errors={errors} register={register} username={username} />
         )}
 
         {currentStep === 2 && <StudyFormStep2 control={control} errors={errors} />}
