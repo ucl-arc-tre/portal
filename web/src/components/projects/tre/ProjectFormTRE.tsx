@@ -38,7 +38,7 @@ const roles: Record<ProjectTreRoleName, Role> = {
   },
   trusted_egresser: {
     label: "Trusted Egresser",
-    description: "Can download data from the TRE environment without requiring approval",
+    description: "Can download data from the TRE environment to a trusted destination",
   },
   api_user: {
     label: "API User",
