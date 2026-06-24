@@ -40,6 +40,10 @@ const roles: Record<ProjectTreRoleName, Role> = {
     label: "Trusted Egresser",
     description: "Can download data from the TRE environment without requiring approval",
   },
+  api_user: {
+    label: "API User",
+    description: "Can use the TRE API to programmatically upload data into the TRE environment",
+  },
 };
 
 type Props = {
