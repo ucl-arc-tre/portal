@@ -40,4 +40,4 @@ For more information on production deployments, refer to the project Slack chann
 
 # Contact
 
-If you are part of a service team, check our [services documentation](docs/services.md). Otherwise, get in touch with [the portal team](mailto:arc.portal@ucl.ac.uk).
+If you are part of a service team, get in touch with [the portal team](mailto:arc.portal@ucl.ac.uk).
