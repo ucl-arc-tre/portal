@@ -39,7 +39,7 @@ func (s *Service) InviteExternalUser(ctx context.Context, email string, inviter 
 		return types.User{}, err
 	}
 
-	entraUser, err := s.entra.SendInvite(ctx, email, sponsor)
+	entraUser, err := s.entra.SendInvite(ctx, email, sponsor, nil, nil)
 	if err != nil {
 		return types.User{}, err
 	}

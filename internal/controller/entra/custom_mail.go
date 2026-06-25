@@ -108,15 +108,24 @@ func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails
 
 }
 
-func (c *Controller) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (c *Controller) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) error {
 	// use graph to send email saying so-and-so has invited you to the portal
 
-	content := ""
-	if sponsor.ChosenName != "" {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
-	} else {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
+	content := "You have been invited to join the"
+	if studyName != nil {
+		if projectName != nil {
+			content += " project '" + *projectName + "' in the study '" + *studyName + "'"
+		} else {
+			content += " study '" + *studyName + "'"
+		}
 	}
+
+	if sponsor.ChosenName != "" {
+		content += " by " + string(sponsor.ChosenName)
+	} else {
+		content += " by " + string(sponsor.Username)
+	}
+	content += "\nYou can view this on the UCL ARC Services Portal"
 
 	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
 }

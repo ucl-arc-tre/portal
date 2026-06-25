@@ -11,9 +11,11 @@ type UserLookupProps = {
   usernames: StudyFormData["additionalStudyAdminUsernames"];
   appendUsername: (value: string) => void;
   removeUsername: (username: string) => void;
+  studyName?: string;
+  projectName?: string;
 };
 export default function UserLookup(props: UserLookupProps) {
-  const { filterByApprovedResearchers, usernames, appendUsername, removeUsername } = props;
+  const { filterByApprovedResearchers, usernames, appendUsername, removeUsername, studyName, projectName } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
@@ -50,6 +52,7 @@ export default function UserLookup(props: UserLookupProps) {
   }, [usernames, filterByApprovedResearchers]);
 
   const handleSearch = async (query: string) => {
+    setSearchErrorMessage("");
     setIsLoading(true);
 
     const isValid = new RegExp(regex).test(query);
@@ -107,6 +110,7 @@ export default function UserLookup(props: UserLookupProps) {
   };
 
   const handleSendInvite = async (email: string) => {
+    setInviteErrorMessage("");
     setInviteLoading(true);
     const isValid = new RegExp(regex).test(email);
     if (!isValid) {
@@ -114,12 +118,15 @@ export default function UserLookup(props: UserLookupProps) {
       return;
     }
     try {
-      const response = await postUsersInvite({ body: { email } });
+      const response = await postUsersInvite({
+        body: { email: email, study_name: studyName, project_name: projectName },
+      });
       if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setInviteErrorMessage(errorMsg);
         return;
       }
+      setInviteErrorMessage("");
       setSuccessMessage("Invite sent");
       setSearchQuery("");
     } catch (err) {
