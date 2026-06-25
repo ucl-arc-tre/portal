@@ -318,6 +318,13 @@ paths:
                 email:
                   type: string
                   description: Email address of the person to be invited
+                study_name:
+                  type: string
+                  description: Optional name of study for notification
+                project_name:
+                  type: string
+                  description: Optional name of project for notification
+
       responses:
         "200":
           description: Successfully sent invite

@@ -1216,6 +1216,14 @@ export type PostUsersInviteData = {
          * Email address of the person to be invited
          */
         email: string;
+        /**
+         * Optional name of study for notification
+         */
+        study_name?: string;
+        /**
+         * Optional name of project for notification
+         */
+        project_name?: string;
     };
     path?: never;
     query?: never;

@@ -1528,6 +1528,12 @@ type GetUsersParams struct {
 type PostUsersInviteJSONBody struct {
 	// Email Email address of the person to be invited
 	Email string `json:"email"`
+
+	// ProjectName Optional name of project for notification
+	ProjectName *string `json:"project_name,omitempty"`
+
+	// StudyName Optional name of study for notification
+	StudyName *string `json:"study_name,omitempty"`
 }
 
 // PutUsersUserIdAttributesJSONBody defines parameters for PutUsersUserIdAttributes.
