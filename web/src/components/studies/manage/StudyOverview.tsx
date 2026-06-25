@@ -134,7 +134,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       )}
 
       <div className={styles["header"]}>
-        <h2>Study: {study.title}</h2>
+        <h2>{study.title}</h2>
         {isStudyOwnerOrAdmin && (
           <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
             Edit Study
