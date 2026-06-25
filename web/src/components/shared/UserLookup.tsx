@@ -147,7 +147,12 @@ export default function UserLookup(props: UserLookupProps) {
                 <AlertTitle>{result.chosen_name}</AlertTitle>
                 <AlertMessage className={styles["user-result-content"]}>
                   {result.user.username}
-                  <Button size="small" variant="secondary" onClick={() => handleRemoveUser(result)}>
+                  <Button
+                    size="small"
+                    variant="secondary"
+                    onClick={() => handleRemoveUser(result)}
+                    data-cy="remove-user-from-selection"
+                  >
                     x Remove
                   </Button>
                 </AlertMessage>
@@ -160,6 +165,8 @@ export default function UserLookup(props: UserLookupProps) {
         <Input
           type="text"
           placeholder={filterByApprovedResearchers ? "Search approved researchers..." : "Search users..."}
+          data-cy="user-lookup"
+          id="lookup"
           onChange={(e) => {
             setSearchQuery(e.target.value);
             if (e.target.value.length < 3) {
@@ -170,7 +177,11 @@ export default function UserLookup(props: UserLookupProps) {
           }}
           value={searchQuery}
         />
-        <Button onClick={() => handleSearch(searchQuery)} disabled={isLoading || searchQuery.length < 3}>
+        <Button
+          onClick={() => handleSearch(searchQuery)}
+          disabled={isLoading || searchQuery.length < 3}
+          data-cy="user-lookup-submit"
+        >
           Search
         </Button>
       </div>
@@ -190,6 +201,7 @@ export default function UserLookup(props: UserLookupProps) {
                 onClick={() => handleSendInvite(searchQuery)}
                 disabled={inviteLoading && !inviteErrorMessage}
                 loading={inviteLoading && !inviteErrorMessage}
+                data-cy="invite-user"
               >
                 Invite
               </Button>
@@ -203,7 +215,12 @@ export default function UserLookup(props: UserLookupProps) {
                   <AlertTitle>{result.chosen_name}</AlertTitle>
                   <AlertMessage className={styles["user-result-content"]}>
                     {result.user.username}
-                    <Button size="small" variant="secondary" onClick={() => handleAddUser(result)}>
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      onClick={() => handleAddUser(result)}
+                      data-cy="add-user-to-selection"
+                    >
                       + Add
                     </Button>
                   </AlertMessage>

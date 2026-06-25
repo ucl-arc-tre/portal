@@ -83,7 +83,7 @@ export default function StudyFormStep1({ control, errors, register, username }: 
           </HelperText>
         </Label>
 
-        <Label>
+        <Label htmlFor="lookup">
           Additional Study Administrator (optional):
           <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
