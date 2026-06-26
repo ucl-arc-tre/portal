@@ -533,7 +533,7 @@ export type ProjectTreMember = {
 /**
  * Available TRE project roles
  */
-export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser' | 'api_user';
+export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser' | 'API_user';
 
 /**
  * An environment with its tier mapping
