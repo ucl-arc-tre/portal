@@ -125,7 +125,7 @@ func TestCreateProjectTRE(t *testing.T) {
 				Roles: []openapi.ProjectTRERoleName{
 					openapi.DesktopUser,
 					openapi.Ingresser,
-					openapi.ApiUser,
+					openapi.APIUser,
 				},
 			},
 		},
