@@ -39,28 +39,36 @@ export default function UserLookup(props: UserLookupProps) {
   const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
 
   useEffect(() => {
-    //only want to run when component mounts
     const fetchSelectedUsers = async () => {
-      if (usernames.length > 0) {
-        setIsLoading(true);
+      if (usernames.length === 0) {
+        setSelectedUsers([]);
+        setNoResultsFound(false);
+        return;
+      }
+
+      setIsLoading(true);
+      const fetchedUsers: UserData[] = [];
+
+      for (const username of usernames) {
         try {
           const response = await getUsers({
             query: {
-              find: usernames.map((u) => ("value" in u ? u.value : u.username)).join(","),
+              find: "value" in username ? username.value : username.username,
               is_approved_researcher: filterByApprovedResearchers,
             },
           });
           const results = response?.data || [];
-          setSelectedUsers(results);
+          fetchedUsers.push(...results);
         } catch (error) {
           console.error("Failed to fetch selected users from usernames:", error);
-        } finally {
-          setIsLoading(false);
         }
       }
+
+      setSelectedUsers(fetchedUsers);
+      setIsLoading(false);
     };
     fetchSelectedUsers();
-  }, []);
+  }, [usernames, filterByApprovedResearchers]);
 
   const handleSearch = async (query: string) => {
     setSearchErrorMessage("");
@@ -122,6 +130,7 @@ export default function UserLookup(props: UserLookupProps) {
     if (index !== -1) {
       removeUsername(user.user.username);
     }
+    console.log(selectedUsers);
   };
 
   const handleSendInvite = async (email: string) => {
