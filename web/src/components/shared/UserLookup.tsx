@@ -5,17 +5,27 @@ import { getUsers, postUsersInvite, UserData } from "@/openapi";
 import styles from "./UserLookup.module.css";
 import Loading from "../ui/Loading";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
+import { ProjectFormData } from "@/types/projects";
 
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
-  usernames: StudyFormData["additionalStudyAdminUsernames"];
+  usernames: StudyFormData["additionalStudyAdminUsernames"] | ProjectFormData["members"];
   appendUsername: (value: string) => void;
   removeUsername: (username: string) => void;
   studyName?: string;
   projectName?: string;
+  limit?: number;
 };
 export default function UserLookup(props: UserLookupProps) {
-  const { filterByApprovedResearchers, usernames, appendUsername, removeUsername, studyName, projectName } = props;
+  const {
+    filterByApprovedResearchers,
+    usernames,
+    appendUsername,
+    removeUsername,
+    studyName,
+    projectName,
+    limit = 5,
+  } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
@@ -29,13 +39,14 @@ export default function UserLookup(props: UserLookupProps) {
   const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
 
   useEffect(() => {
+    //only want to run when component mounts
     const fetchSelectedUsers = async () => {
       if (usernames.length > 0) {
         setIsLoading(true);
         try {
           const response = await getUsers({
             query: {
-              find: usernames.map((u) => u.value).join(","),
+              find: usernames.map((u) => ("value" in u ? u.value : u.username)).join(","),
               is_approved_researcher: filterByApprovedResearchers,
             },
           });
@@ -49,7 +60,7 @@ export default function UserLookup(props: UserLookupProps) {
       }
     };
     fetchSelectedUsers();
-  }, [usernames, filterByApprovedResearchers]);
+  }, []);
 
   const handleSearch = async (query: string) => {
     setSearchErrorMessage("");
@@ -73,7 +84,11 @@ export default function UserLookup(props: UserLookupProps) {
       setNoResultsFound(results.length === 0);
 
       if (results.length > 0 && usernames.length > 0) {
-        setSearchResults(results.filter((result) => !usernames.some((u) => u.value === result.user.username)));
+        setSearchResults(
+          results.filter(
+            (result) => !usernames.some((u) => ("value" in u ? u.value : u.username) === result.user.username)
+          )
+        );
       }
     } catch (error) {
       console.error("Failed to search users:", error);
@@ -92,7 +107,7 @@ export default function UserLookup(props: UserLookupProps) {
         ?.querySelector(`[data-id="${user.user.id}"]`)
         ?.classList.add(styles.hidden);
     }
-    if (!usernames.some((u) => u.value === user.user.username)) {
+    if (!usernames.some((u) => ("value" in u ? u.value : u.username) === user.user.username)) {
       appendUsername(user.user.username);
     }
   };
@@ -103,7 +118,7 @@ export default function UserLookup(props: UserLookupProps) {
       .getElementById("search-results")
       ?.querySelector(`[data-id="${user.user.id}"]`)
       ?.classList.remove(styles.hidden);
-    const index = usernames.findIndex((u) => u.value === user.user.username);
+    const index = usernames.findIndex((u) => ("value" in u ? u.value : u.username) === user.user.username);
     if (index !== -1) {
       removeUsername(user.user.username);
     }
@@ -215,14 +230,16 @@ export default function UserLookup(props: UserLookupProps) {
                   <AlertTitle>{result.chosen_name}</AlertTitle>
                   <AlertMessage className={styles["user-result-content"]}>
                     {result.user.username}
-                    <Button
-                      size="small"
-                      variant="secondary"
-                      onClick={() => handleAddUser(result)}
-                      data-cy="add-user-to-selection"
-                    >
-                      + Add
-                    </Button>
+                    {selectedUsers.length! <= limit && (
+                      <Button
+                        size="small"
+                        variant="secondary"
+                        onClick={() => handleAddUser(result)}
+                        data-cy="add-user-to-selection"
+                      >
+                        + Add
+                      </Button>
+                    )}
                   </AlertMessage>
                 </Alert>
               </div>
