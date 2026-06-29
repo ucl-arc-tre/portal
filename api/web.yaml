@@ -2028,6 +2028,7 @@ components:
         - egress_requester
         - egress_checker
         - trusted_egresser
+        - API_user
 
     Environment:
       type: object
