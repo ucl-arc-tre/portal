@@ -1986,9 +1986,6 @@ components:
         - required:
             - name
             - study_id
-            - asset_ids
-            - members
-            - num_required_egress_approvals
           properties:
             name:
               type: string
@@ -2161,6 +2158,11 @@ components:
         external_encryption_enabled:
           type: boolean
           description: Is external encryption enabled for this project?
+        airlock_whitelist:
+          type: array
+          description: List of IPs or FQDNs to whitelist for this project (optional)
+          items:
+            type: string
 
     ContractBase:
       type: object
