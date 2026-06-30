@@ -11,6 +11,18 @@ import { Role, roles } from "./roles";
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
 
+// Mirrors backend validation in internal/validation/ip.go (IsIPv4OrFQDN).
+const ipv4Regex =
+  /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$/;
+const fqdnRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+function isIPv4OrFQDN(value: string): boolean {
+  if (ipv4Regex.test(value)) {
+    return true;
+  }
+  return value.length <= 253 && fqdnRegex.test(value);
+}
+
 type Props = {
   fieldsDisabled: boolean;
   editingProject: ProjectTre | null | undefined;
@@ -34,6 +46,15 @@ export default function ProjectFormTREStep(props: Props) {
   } = useFieldArray({
     control,
     name: "members",
+  });
+
+  const {
+    fields: whitelistFields,
+    append: appendWhitelist,
+    remove: removeWhitelist,
+  } = useFieldArray({
+    control,
+    name: "tre.airlockWhitelist",
   });
 
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
@@ -269,6 +290,66 @@ export default function ProjectFormTREStep(props: Props) {
           useful in limited cases with very large datasets, or for data archival. See the{" "}
           <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
         </HelperText>
+      </div>
+
+      <div className="field">
+        <Label htmlFor="tre.airlockWhitelist">Airlock whitelist (optional):</Label>
+        <fieldset className="linkage-fieldset">
+          {whitelistFields.map((field, index) => (
+            <div key={field.id} className="item-wrapper">
+              <Controller
+                name={`tre.airlockWhitelist.${index}.value` as const}
+                control={control}
+                rules={{
+                  validate: {
+                    isNotEmpty: (value) => {
+                      if (!value || value.trim() === "") {
+                        return "An IP or FQDN is required";
+                      }
+                      return true;
+                    },
+                    isIPv4OrFQDN: (value) => {
+                      if (value && !isIPv4OrFQDN(value.trim())) {
+                        return "Must be a valid IPv4 address or FQDN";
+                      }
+                      return true;
+                    },
+                  },
+                }}
+                render={({ field: whitelistField, fieldState }) => (
+                  <div>
+                    <input
+                      {...whitelistField}
+                      id={`airlock-whitelist-${index}`}
+                      type="text"
+                      placeholder="192.168.0.1 or example.ucl.ac.uk"
+                      disabled={fieldsDisabled}
+                    />
+                    {fieldState.error && (
+                      <Alert type="error">
+                        <AlertMessage>{fieldState.error.message}</AlertMessage>
+                      </Alert>
+                    )}
+                  </div>
+                )}
+              />
+
+              <button
+                type="button"
+                onClick={() => removeWhitelist(index)}
+                className="remove-button"
+                aria-label={`Remove whitelist entry ${index + 1}`}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+
+          <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
+            Add IP / FQDN
+          </Button>
+        </fieldset>
+        <HelperText>Optionally add IPs or FQDNs to whitelist in the TRE airlock for this project.</HelperText>
       </div>
     </>
   );

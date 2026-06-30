@@ -113,6 +113,10 @@ export default function ProjectForm({
 
       setValue("tre.numRequiredEgressApprovals", `${editingProject.num_required_egress_approvals}`);
       setValue("tre.externalEncryptionEnabled", editingProject.external_encryption_enabled ? "true" : "false");
+      setValue(
+        "tre.airlockWhitelist",
+        (editingProject.airlock_whitelist ?? []).map((value) => ({ value }))
+      );
     }
   }, [editingProject, setValue, environments]);
 
@@ -195,6 +199,10 @@ export default function ProjectForm({
               roles: researcher.roles as ProjectTreRoleName[],
             }));
 
+          const airlockWhitelist = (data.tre.airlockWhitelist ?? [])
+            .map((entry) => entry.value.trim())
+            .filter((value) => value !== "");
+
           if (editingProject) {
             // Update existing project (only members and assets)
             response = await putProjectsTreByProjectId({
@@ -204,6 +212,7 @@ export default function ProjectForm({
                 members: treMembers,
                 num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
                 external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
+                airlock_whitelist: airlockWhitelist.length > 0 ? airlockWhitelist : undefined,
               },
             });
           } else {
@@ -215,6 +224,7 @@ export default function ProjectForm({
               members: treMembers,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
+              airlock_whitelist: airlockWhitelist.length > 0 ? airlockWhitelist : undefined,
             };
             response = await postProjectsTre({ body: requestBody });
           }
