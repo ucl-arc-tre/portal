@@ -15,6 +15,7 @@ type UserLookupProps = {
   studyName?: string;
   projectName?: string;
   limit?: number;
+  filterIAO?: string;
 };
 export default function UserLookup(props: UserLookupProps) {
   const {
@@ -25,6 +26,7 @@ export default function UserLookup(props: UserLookupProps) {
     studyName,
     projectName,
     limit = 5,
+    filterIAO,
   } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
@@ -88,16 +90,20 @@ export default function UserLookup(props: UserLookupProps) {
         return;
       }
       const results = response?.data || [];
-      setSearchResults(results);
-      setNoResultsFound(results.length === 0);
+      let filteredResults = results;
 
-      if (results.length > 0 && usernames.length > 0) {
-        setSearchResults(
-          results.filter(
-            (result) => !usernames.some((u) => ("value" in u ? u.value : u.username) === result.user.username)
-          )
+      if (filterIAO) {
+        filteredResults = filteredResults.filter((result) => result.user.username !== filterIAO);
+      }
+
+      if (usernames.length > 0) {
+        filteredResults = filteredResults.filter(
+          (result) => !usernames.some((u) => ("value" in u ? u.value : u.username) === result.user.username)
         );
       }
+
+      setSearchResults(filteredResults);
+      setNoResultsFound(filteredResults.length === 0);
     } catch (error) {
       console.error("Failed to search users:", error);
       setNoResultsFound(false);

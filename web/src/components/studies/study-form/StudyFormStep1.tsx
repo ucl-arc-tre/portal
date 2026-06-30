@@ -97,6 +97,7 @@ export default function StudyFormStep1({ control, errors, register, username }: 
                 const index = fields.findIndex((field) => field.value === username);
                 if (index !== -1) remove(index);
               }}
+              filterIAO={username}
             />
             {errors.additionalStudyAdminUsernames && (
               <Alert type="error">
