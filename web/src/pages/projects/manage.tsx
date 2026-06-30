@@ -17,6 +17,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 import ProjectForm from "@/components/projects/ProjectForm";
+import { roleLabel } from "@/components/projects/tre/roles";
 
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
@@ -355,7 +356,7 @@ export default function ManageProjectPage() {
                     <div className={styles["member-roles"]}>
                       {member.roles.map((role, roleIndex) => (
                         <span key={roleIndex} className={styles["role-badge"]}>
-                          {role.replace(/_/g, " ")}
+                          {roleLabel(role)}
                         </span>
                       ))}
                     </div>

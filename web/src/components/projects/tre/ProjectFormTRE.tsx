@@ -6,41 +6,10 @@ import Button from "@/components/ui/Button";
 import { ProjectTre, ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
+import { Role, roles } from "./roles";
 
 // this should match the domain that is used for the entra ID users in the portal
 const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
-
-type Role = {
-  label: string;
-  description: string;
-};
-
-const roles: Record<ProjectTreRoleName, Role> = {
-  desktop_user: {
-    label: "Desktop User",
-    description: "Can access the desktop environment and work with data within the TRE",
-  },
-  ingresser: {
-    label: "Ingresser",
-    description: "Can upload data into the TRE environment",
-  },
-  egresser: {
-    label: "Egresser",
-    description: "Can download data from the TRE environment after approval",
-  },
-  egress_requester: {
-    label: "Egress Requester",
-    description: "Can request data to be downloaded from the TRE",
-  },
-  egress_checker: {
-    label: "Egress Checker",
-    description: "Can review and approve egress requests from other users",
-  },
-  trusted_egresser: {
-    label: "Trusted Egresser",
-    description: "Can download data from the TRE environment without requiring approval",
-  },
-};
 
 type Props = {
   fieldsDisabled: boolean;
@@ -71,9 +40,7 @@ export default function ProjectFormTREStep(props: Props) {
 
   const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
   const members = watch("members");
-  console.log(members);
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
-  console.log(numEgressCheckers, numRequiredEgressApprovals);
 
   return (
     <>
