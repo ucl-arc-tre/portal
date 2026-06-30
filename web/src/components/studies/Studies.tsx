@@ -25,7 +25,13 @@ export default function Studies() {
       <div className={styles.header}>
         <h2>
           {isOpsStaff ? "Studies" : "Your Studies"}{" "}
-          <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
+          <Button
+            onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+            variant="tertiary"
+            size="small"
+            inline
+            aria-label="Toggle study definition"
+          >
             <InfoIcon />
           </Button>
         </h2>

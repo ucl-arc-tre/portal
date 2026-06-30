@@ -61,7 +61,13 @@ export default function Assets(props: AssetsProps) {
         <div className={styles.header}>
           <h3>
             Asset Management{" "}
-            <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
+            <Button
+              onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+              variant="tertiary"
+              size="small"
+              inline
+              aria-label="Toggle asset definition"
+            >
               <InfoIcon />
             </Button>
           </h3>
