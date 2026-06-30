@@ -35,7 +35,7 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
     {
       id: "chosen-name",
       title: "Set Your Name",
-      description: "Enter your preferred name - this must match the name on your training certificate",
+      description: "Enter your full name - this must match the name on your training certificate",
       completed: hasChosenName,
       current: !hasChosenName,
     },
