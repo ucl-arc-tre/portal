@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Alert, AlertTitle, AlertMessage, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsers, postUsersInvite, UserData } from "@/openapi";
@@ -12,6 +12,7 @@ type UserLookupProps = {
   usernames: StudyFormData["additionalStudyAdminUsernames"] | ProjectFormData["members"];
   appendUsername: (value: string) => void;
   removeUsername: (username: string) => void;
+  roleControl?: ReactElement | ((user: UserData) => ReactElement | null);
   studyName?: string;
   projectName?: string;
   limit?: number;
@@ -23,6 +24,7 @@ export default function UserLookup(props: UserLookupProps) {
     usernames,
     appendUsername,
     removeUsername,
+    roleControl,
     studyName,
     projectName,
     limit = 5,
@@ -177,6 +179,7 @@ export default function UserLookup(props: UserLookupProps) {
                 <AlertTitle>{result.chosen_name}</AlertTitle>
                 <AlertMessage className={styles["user-result-content"]}>
                   {result.user.username}
+                  {typeof roleControl === "function" ? roleControl(result) : roleControl}
                   <Button
                     size="small"
                     variant="secondary"
