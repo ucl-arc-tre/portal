@@ -22,15 +22,18 @@ type Project struct {
 
 type ProjectTRE struct {
 	ModelAuditable
-	ProjectID                     uuid.UUID        `gorm:"not null;index"`
-	EgressNumberRequiredApprovals int              `gorm:"not null;default:1"`
-	ExternalEncryptionEnabled     bool             `gorm:"not null;default:false"`
-	Status                        ProjectTREStatus `gorm:"not null;default:'incomplete'"`
+	ProjectID                     uuid.UUID           `gorm:"not null;index"`
+	EgressNumberRequiredApprovals int                 `gorm:"not null;default:1"`
+	ExternalEncryptionEnabled     bool                `gorm:"not null;default:false"`
+	AirlockWhitelist              ProjectTREWhitelist `gorm:"type:text[]"`
+	Status                        ProjectTREStatus    `gorm:"not null;default:'incomplete'"`
 
 	// Relationships
 	Project         Project                 `gorm:"foreignKey:ProjectID"`
 	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
 }
+
+type ProjectTREWhitelist *[]string
 
 type ProjectTREStatus string
 

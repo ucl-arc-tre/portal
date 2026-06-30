@@ -85,7 +85,6 @@ func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members 
 
 	// Validate members
 	if len(members) > 0 {
-
 		if err := s.validateProjectMembers(members); err != nil {
 			return err
 		}
@@ -186,7 +185,6 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 }
 
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, data openapi.ProjectTRERequest) error {
-
 	if err := s.validateProjectTREData(data, studyUUID); err != nil {
 		return err
 	}
@@ -220,6 +218,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		ProjectID:                     project.ID,
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+		AirlockWhitelist:              data.AirlockWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
@@ -300,7 +299,6 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("TRERoleBindings.User").
 		Where("project_id = ?", projectId).
 		First(&projectTRE).Error
-
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
 	}
@@ -397,6 +395,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	projectTRE.Status = types.ProjectTREStatusIncomplete
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
+	projectTRE.AirlockWhitelist = data.AirlockWhitelist
 
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).
