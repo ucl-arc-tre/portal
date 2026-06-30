@@ -533,7 +533,7 @@ export type ProjectTreMember = {
 /**
  * Available TRE project roles
  */
-export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser';
+export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser' | 'API_user';
 
 /**
  * An environment with its tier mapping
@@ -640,6 +640,10 @@ export type ProjectTreBase = {
      * Number of approvals required to egress data from the TRE
      */
     num_required_egress_approvals: number;
+    /**
+     * Is external encryption enabled for this project?
+     */
+    external_encryption_enabled: boolean;
 };
 
 export type ContractBase = {

@@ -533,6 +533,7 @@ func (e EnvironmentName) Valid() bool {
 
 // Defines values for ProjectTRERoleName.
 const (
+	APIUser         ProjectTRERoleName = "API_user"
 	DesktopUser     ProjectTRERoleName = "desktop_user"
 	EgressChecker   ProjectTRERoleName = "egress_checker"
 	EgressRequester ProjectTRERoleName = "egress_requester"
@@ -544,6 +545,8 @@ const (
 // Valid indicates whether the value is a known member of the ProjectTRERoleName enum.
 func (e ProjectTRERoleName) Valid() bool {
 	switch e {
+	case APIUser:
+		return true
 	case DesktopUser:
 		return true
 	case EgressChecker:
@@ -1073,6 +1076,9 @@ type ProjectTRE struct {
 	CreatorUsername string          `json:"creator_username"`
 	EnvironmentName EnvironmentName `json:"environment_name"`
 
+	// ExternalEncryptionEnabled Is external encryption enabled for this project?
+	ExternalEncryptionEnabled bool `json:"external_encryption_enabled"`
+
 	// Id Unique identifier for the base project
 	Id string `json:"id"`
 
@@ -1101,6 +1107,9 @@ type ProjectTREBase struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
+	// ExternalEncryptionEnabled Is external encryption enabled for this project?
+	ExternalEncryptionEnabled bool `json:"external_encryption_enabled"`
+
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
 
@@ -1119,6 +1128,9 @@ type ProjectTREMember struct {
 type ProjectTRERequest struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
+
+	// ExternalEncryptionEnabled Is external encryption enabled for this project?
+	ExternalEncryptionEnabled bool `json:"external_encryption_enabled"`
 
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`

@@ -66,6 +66,8 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[data-cy="next-form-page-button"]').click();
 
     cy.get('[name="tre.numRequiredEgressApprovals"]').check("1", { force: true });
+    cy.get('[name="tre.externalEncryptionEnabled"]').check("false", { force: true });
+
     cy.get('[data-cy="submit-project-button"]').click();
   });
 
@@ -74,5 +76,6 @@ describe("TRE project creation end-to-end", () => {
 
     cy.visit("/projects");
     cy.contains(projectTitle).should("exist");
+    cy.contains(projectTitle).click();
   });
 });
