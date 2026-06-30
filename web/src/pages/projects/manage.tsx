@@ -337,6 +337,14 @@ export default function ManageProjectPage() {
             <label>Study:</label>
             <span>{project.study_title}</span>
           </div>
+          <div className={styles.field}>
+            <label>Number of approvals required for egress:</label>
+            <span>{project.num_required_egress_approvals}</span>
+          </div>
+          <div className={styles.field}>
+            <label>External encryption enabled:</label>
+            <span>{project.external_encryption_enabled ? "Yes" : "No"}</span>
+          </div>
 
           <div className={styles.field}>
             <label>Members:</label>

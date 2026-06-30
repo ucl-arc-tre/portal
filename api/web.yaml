@@ -2143,6 +2143,7 @@ components:
         - asset_ids
         - members
         - num_required_egress_approvals
+        - external_encryption_enabled
       properties:
         asset_ids:
           type: array
@@ -2157,6 +2158,9 @@ components:
         num_required_egress_approvals:
           type: integer
           description: Number of approvals required to egress data from the TRE
+        external_encryption_enabled:
+          type: boolean
+          description: Is external encryption enabled for this project?
 
     ContractBase:
       type: object

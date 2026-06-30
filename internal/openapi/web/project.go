@@ -19,6 +19,7 @@ func (p ProjectTREUpdate) AssetUUIDs() ([]uuid.UUID, error) {
 
 func (p ProjectTRERequest) Base() ProjectTREBase {
 	return ProjectTREBase{
+		ExternalEncryptionEnabled:  p.ExternalEncryptionEnabled,
 		NumRequiredEgressApprovals: p.NumRequiredEgressApprovals,
 		AssetIds:                   p.AssetIds,
 		Members:                    p.Members,
