@@ -21,6 +21,7 @@ type ProjectNameValidation = {
 type ProjectFormDataTRE = {
   numRequiredEgressApprovals: string;
   externalEncryptionEnabled: "false" | "true";
+  airlockExternalDataEnabled?: "false" | "true";
   airlockWhitelist?: { value: string }[];
 };
 
