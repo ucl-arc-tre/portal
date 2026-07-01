@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	BasicAuthScopes basicAuthContextKey = "basicAuth.Scopes"
+	JWTScopes jWTContextKey = "JWT.Scopes"
 )
 
 // Defines values for ProjectStatusUpdateStatus.
@@ -50,6 +50,9 @@ type UserStatus struct {
 	// NhsdTrainingExpiresAt Instant at which the user's training expires in RFC3339 format
 	NhsdTrainingExpiresAt *string `json:"nhsd_training_expires_at,omitempty"`
 }
+
+// jWTContextKey is the context key for JWT security scheme
+type jWTContextKey string
 
 // basicAuthContextKey is the context key for basicAuth security scheme
 type basicAuthContextKey string
@@ -97,7 +100,7 @@ func (siw *ServerInterfaceWrapper) PostProjectsProjectNameStatus(c *gin.Context)
 		return
 	}
 
-	c.Set(string(BasicAuthScopes), []string{})
+	c.Set(string(JWTScopes), []string{"tre:w"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -115,7 +118,7 @@ func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 	var err error
 	_ = err
 
-	c.Set(string(BasicAuthScopes), []string{})
+	c.Set(string(JWTScopes), []string{"tre:r"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUserStatusParams

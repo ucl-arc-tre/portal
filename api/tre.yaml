@@ -17,6 +17,8 @@ paths:
         description: Username of the user to get the status of. e.g. ccxyz@ucl.ac.uk
     get:
       description: Get the status of a user
+      security:
+        - JWT: ["tre:r"]
       responses:
         "200":
           content:
@@ -41,6 +43,8 @@ paths:
           type: string
     post:
       description: Update the status of a TRE project
+      security:
+        - JWT: ["tre:w"]
       requestBody:
         required: true
         content:
@@ -67,6 +71,11 @@ components:
       type: http
       scheme: basic
       description: HTTP Basic authentication
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     UserStatus:
       type: object

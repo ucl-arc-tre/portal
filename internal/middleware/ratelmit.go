@@ -32,7 +32,7 @@ func NewWebRateLimit() gin.HandlerFunc {
 	return handlerFunc
 }
 
-func NewDSHRateLimit() func(ctx *gin.Context) {
+func NewDefaultRateLimit() func(ctx *gin.Context) {
 	limiter := httprate.NewRateLimiter(100, time.Minute)
 
 	handlerFunc := func(ctx *gin.Context) {

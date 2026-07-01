@@ -8,11 +8,20 @@ import (
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) GetTokensDsh(ctx *gin.Context) {
-	dshId, err := h.environments.DSHId()
+func (h *Handler) GetTokensEnvironment(ctx *gin.Context, environmentParam openapi.GetTokensEnvironmentParamsEnvironment) {
+	environmentName := types.EnvironmentName("")
+	switch environmentParam {
+	case openapi.GetTokensEnvironmentParamsEnvironmentTre:
+		environmentName = environments.TRE
+	case openapi.GetTokensEnvironmentParamsEnvironmentDsh:
+		environmentName = environments.DSH
+	}
+
+	dshId, err := h.environments.EnvironmentId(environmentName)
 	if err != nil {
 		setError(ctx, err, "Failed to get environment")
 		return
@@ -33,14 +42,28 @@ func (h *Handler) GetTokensDsh(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) PostTokensDsh(ctx *gin.Context) {
+func (h *Handler) PostTokensEnvironment(
+	ctx *gin.Context,
+	environmentParam openapi.PostTokensEnvironmentParamsEnvironment,
+) {
 	user := middleware.GetUser(ctx)
 
 	request := openapi.TokenRequest{}
 	if err := bindJSONOrSetError(ctx, &request); err != nil {
 		return
 	}
-	dshId, err := h.environments.DSHId()
+
+	environmentName := types.EnvironmentName("")
+	scopes := []string{}
+	switch environmentParam {
+	case openapi.PostTokensEnvironmentParamsEnvironmentTre:
+		environmentName = environments.TRE
+		scopes = []string{"tre:r", "tre:w"} // defined by the OpenAPI schema
+	case openapi.PostTokensEnvironmentParamsEnvironmentDsh:
+		environmentName = environments.DSH
+		scopes = []string{"dsh:r", "dsh:w"} // defined by the OpenAPI schema
+	}
+	dshId, err := h.environments.EnvironmentId(environmentName)
 	if err != nil {
 		setError(ctx, err, "Failed to get environment")
 		return
@@ -52,7 +75,7 @@ func (h *Handler) PostTokensDsh(ctx *gin.Context) {
 		CreatorUserID:  user.ID,
 		EnvironmentID:  dshId,
 	}
-	tokenWithValue, err := h.tokens.CreateDSH(token)
+	tokenWithValue, err := h.tokens.Create(token, scopes)
 	if err != nil {
 		setError(ctx, err, "Failed to get DSH API tokens")
 		return
@@ -65,12 +88,24 @@ func (h *Handler) PostTokensDsh(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) DeleteTokensDshTokenId(ctx *gin.Context, tokenId string) {
+func (h *Handler) DeleteTokensEnvironmentTokenId(
+	ctx *gin.Context,
+	environmentParam openapi.DeleteTokensEnvironmentTokenIdParamsEnvironment,
+	tokenId string,
+) {
+	environmentName := types.EnvironmentName("")
+	switch environmentParam {
+	case openapi.DeleteTokensEnvironmentTokenIdParamsEnvironmentTre:
+		environmentName = environments.TRE
+	case openapi.DeleteTokensEnvironmentTokenIdParamsEnvironmentDsh:
+		environmentName = environments.DSH
+	}
+
 	tokenUUID, err := parseUUIDOrSetError(ctx, tokenId)
 	if err != nil {
 		return
 	}
-	dshId, err := h.environments.DSHId()
+	dshId, err := h.environments.EnvironmentId(environmentName)
 	if err != nil {
 		setError(ctx, err, "Failed to get environment")
 		return

@@ -2,11 +2,12 @@ import { useAuth } from "@/hooks/useAuth";
 import MetaHead from "@/components/meta/Head";
 import Profile from "@/components/profile/Profile";
 import LoginFallback from "@/components/ui/LoginFallback";
-import DSHTokens from "@/components/profile/DSHTokens";
+import Tokens from "@/components/profile/Tokens";
 
 export default function ProfilePage() {
   const { authInProgress, isAuthed, userData, refreshAuth } = useAuth();
   const canSeeDSHTokens = userData?.roles.includes("dsh-ops-staff") || userData?.roles.includes("admin");
+  const canSeeTRETokens = userData?.roles.includes("tre-ops-staff") || userData?.roles.includes("admin");
 
   if (authInProgress) return null;
 
@@ -22,7 +23,8 @@ export default function ProfilePage() {
       <div className="content">
         <Profile userData={userData} refreshAuth={refreshAuth} />
 
-        {canSeeDSHTokens && <DSHTokens />}
+        {canSeeDSHTokens && <Tokens environment="dsh" />}
+        {canSeeTRETokens && <Tokens environment="tre" />}
       </div>
     </>
   );

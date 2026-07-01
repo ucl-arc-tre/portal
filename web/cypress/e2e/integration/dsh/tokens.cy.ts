@@ -12,12 +12,12 @@ describe("Create use and delete DSH API tokens end-to-end", () => {
     cy.becomeApprovedResearcher();
 
     cy.visit("/profile");
-    cy.get('[data-cy="create-dsh-token-button"]').click();
-    cy.get('[data-cy="create-dsh-token-form"]').should("be.visible");
+    cy.get('[data-cy="create-token-button"]').click();
+    cy.get('[data-cy="create-token-form"]').should("be.visible");
     cy.get('[name="name"]').type(tokenName);
     cy.get('button[aria-disabled="false"][type="submit"]').click();
 
-    cy.get('[data-cy="dsh-token-value"]').then(($div) => {
+    cy.get('[data-cy="token-value"]').then(($div) => {
       tokenValue = $div.text();
     });
   });
