@@ -62,6 +62,7 @@ export default function ProjectFormTREStep(props: Props) {
   const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
   const members = watch("members");
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
+  const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
 
   return (
     <>
@@ -292,65 +293,85 @@ export default function ProjectFormTREStep(props: Props) {
         </HelperText>
       </div>
 
-      <div className="field">
-        <Label>Airlock whitelist (optional):</Label>
-        <fieldset className="linkage-fieldset">
-          {whitelistFields.map((field, index) => (
-            <div key={field.id} className="item-wrapper">
-              <Controller
-                name={`tre.airlockWhitelist.${index}.value` as const}
-                control={control}
-                rules={{
-                  validate: {
-                    isNotEmpty: (value) => {
-                      if (!value || value.trim() === "") {
-                        return "An IP or FQDN is required";
-                      }
-                      return true;
-                    },
-                    isIPv4OrFQDN: (value) => {
-                      if (value && !isIPv4OrFQDN(value.trim())) {
-                        return "Must be a valid IPv4 address or FQDN";
-                      }
-                      return true;
-                    },
-                  },
-                }}
-                render={({ field: whitelistField, fieldState }) => (
-                  <div>
-                    <input
-                      {...whitelistField}
-                      id={`airlock-whitelist-${index}`}
-                      type="text"
-                      placeholder="192.168.0.1 or example.ucl.ac.uk"
-                      disabled={fieldsDisabled}
-                    />
-                    {fieldState.error && (
-                      <Alert type="error">
-                        <AlertMessage>{fieldState.error.message}</AlertMessage>
-                      </Alert>
-                    )}
-                  </div>
-                )}
-              />
-
-              <button
-                type="button"
-                onClick={() => removeWhitelist(index)}
-                className="remove-button"
-                aria-label={`Remove whitelist entry ${index + 1}`}
-              >
-                ×
-              </button>
-            </div>
-          ))}
-
-          <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
-            Add IP / FQDN
-          </Button>
-        </fieldset>
-        <HelperText>Optionally add IPs or FQDNs to whitelist in the TRE airlock for this project.</HelperText>
+      <div>
+        <RadioOptions
+          name="tre.airlockExternalDataEnabled"
+          label="Does your project need to download or retrieve data from an external website or API? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          error={errors.tre?.airlockExternalDataEnabled}
+        />
+        <HelperText>
+          Data can be pulled into the TRE from an external source by logging into the airlock and running an appropriate
+          download command (e.g. `curl`). This requires whitelisting the external source for outbound network access.
+          See the <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
+        </HelperText>
       </div>
+
+      {airlockExternalDataEnabled === "true" && (
+        <div className="field">
+          <Label>Airlock whitelist (optional):</Label>
+          <fieldset className="linkage-fieldset">
+            {whitelistFields.map((field, index) => (
+              <div key={field.id} className="item-wrapper">
+                <Controller
+                  name={`tre.airlockWhitelist.${index}.value` as const}
+                  control={control}
+                  rules={{
+                    validate: {
+                      isNotEmpty: (value) => {
+                        if (!value || value.trim() === "") {
+                          return "An IP or FQDN is required";
+                        }
+                        return true;
+                      },
+                      isIPv4OrFQDN: (value) => {
+                        if (value && !isIPv4OrFQDN(value.trim())) {
+                          return "Must be a valid IPv4 address or FQDN";
+                        }
+                        return true;
+                      },
+                    },
+                  }}
+                  render={({ field: whitelistField, fieldState }) => (
+                    <div>
+                      <input
+                        {...whitelistField}
+                        id={`airlock-whitelist-${index}`}
+                        type="text"
+                        placeholder="192.168.0.1 or example.ucl.ac.uk"
+                        disabled={fieldsDisabled}
+                      />
+                      {fieldState.error && (
+                        <Alert type="error">
+                          <AlertMessage>{fieldState.error.message}</AlertMessage>
+                        </Alert>
+                      )}
+                    </div>
+                  )}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => removeWhitelist(index)}
+                  className="remove-button"
+                  aria-label={`Remove whitelist entry ${index + 1}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+            <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
+              Add IP / FQDN
+            </Button>
+          </fieldset>
+          <HelperText>Optionally add IPs or FQDNs to whitelist in the TRE airlock for this project.</HelperText>
+        </div>
+      )}
     </>
   );
 }
