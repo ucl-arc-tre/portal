@@ -277,7 +277,7 @@ export default function ProjectFormTREStep(props: Props) {
       <div>
         <RadioOptions
           name="tre.externalEncryptionEnabled"
-          label="Data will need be stored outside of the TRE? *"
+          label="Will data need to be stored outside of the TRE? *"
           options={[
             { name: "Yes", value: "true" },
             { name: "No", value: "false" },
@@ -293,7 +293,7 @@ export default function ProjectFormTREStep(props: Props) {
       </div>
 
       <div className="field">
-        <Label htmlFor="tre.airlockWhitelist">Airlock whitelist (optional):</Label>
+        <Label>Airlock whitelist (optional):</Label>
         <fieldset className="linkage-fieldset">
           {whitelistFields.map((field, index) => (
             <div key={field.id} className="item-wrapper">
