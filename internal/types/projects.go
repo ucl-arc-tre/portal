@@ -25,6 +25,7 @@ type ProjectTRE struct {
 	ProjectID                     uuid.UUID           `gorm:"not null;index"`
 	EgressNumberRequiredApprovals int                 `gorm:"not null;default:1"`
 	ExternalEncryptionEnabled     bool                `gorm:"not null;default:false"`
+	AirlockSSHEnabled             bool                `gorm:"not null;default:true"`
 	AirlockWhitelist              ProjectTREWhitelist `gorm:"serializer:json"`
 	Status                        ProjectTREStatus    `gorm:"not null;default:'incomplete'"`
 

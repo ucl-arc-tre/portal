@@ -225,6 +225,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		ProjectID:                     project.ID,
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+		AirlockSSHEnabled:             true, // Enable airlock ssh by default
 		AirlockWhitelist:              data.AirlockWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
