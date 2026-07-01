@@ -69,6 +69,7 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[name="tre.externalEncryptionEnabled"]').check("false", { force: true });
 
     // Add an airlock whitelist entry
+    cy.get('[name="tre.airlockExternalDataEnabled"]').check("true", { force: true });
     cy.contains("button", "Add IP / FQDN").click();
     cy.get('[name="tre.airlockWhitelist.0.value"]').type("192.168.1.1");
 
