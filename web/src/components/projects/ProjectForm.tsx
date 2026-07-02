@@ -216,7 +216,7 @@ export default function ProjectForm({
                 members: treMembers,
                 num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
                 external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
-                airlock_whitelist: airlockWhitelist.length > 0 ? airlockWhitelist : [],
+                airlock_whitelist: airlockWhitelist,
               },
             });
           } else {
