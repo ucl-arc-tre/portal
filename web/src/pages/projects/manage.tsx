@@ -347,6 +347,21 @@ export default function ManageProjectPage() {
           </div>
 
           <div className={styles.field}>
+            <label>Airlock whitelist:</label>
+            {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
+              <ul className={styles["assets-list"]}>
+                {project.airlock_whitelist.map((entry, index) => (
+                  <li key={index} className={styles["asset-item"]}>
+                    {entry}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
+            )}
+          </div>
+
+          <div className={styles.field}>
             <label>Members:</label>
             {project.members && project.members.length > 0 ? (
               <ul className={styles["members-list"]}>
