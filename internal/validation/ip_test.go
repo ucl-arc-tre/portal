@@ -1,6 +1,10 @@
 package validation
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestIsIPv4OrFQDN(t *testing.T) {
 	testCases := []struct {
@@ -15,8 +19,6 @@ func TestIsIPv4OrFQDN(t *testing.T) {
 
 	for _, tc := range testCases {
 		result := IsIPv4OrFQDN(tc.ip)
-		if result != tc.expect {
-			t.Errorf("IsIPv4OrFQDN(%q) = %v; want %v", tc.ip, result, tc.expect)
-		}
+		assert.Equal(t, tc.expect, result)
 	}
 }
