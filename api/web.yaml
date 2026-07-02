@@ -2156,6 +2156,7 @@ components:
         - members
         - num_required_egress_approvals
         - external_encryption_enabled
+        - airlock_whitelist
       properties:
         asset_ids:
           type: array
@@ -2175,7 +2176,7 @@ components:
           description: Is external encryption enabled for this project?
         airlock_whitelist:
           type: array
-          description: List of IPs or FQDNs to whitelist for this project (optional)
+          description: List of IPs or FQDNs to whitelist for this project (can be empty)
           items:
             type: string
 
