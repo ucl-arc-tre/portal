@@ -1070,6 +1070,10 @@ export type GetUsersData = {
          * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
          */
         find: string;
+        /**
+         * Whether to filter by approved researchers only. If true, only approved researchers will be returned. If false, all users will be returned.
+         */
+        is_approved_researcher: boolean;
     };
     url: '/users';
 };
@@ -1216,6 +1220,14 @@ export type PostUsersInviteData = {
          * Email address of the person to be invited
          */
         email: string;
+        /**
+         * Optional name of study for notification
+         */
+        study_name?: string;
+        /**
+         * Optional name of project for notification
+         */
+        project_name?: string;
     };
     path?: never;
     query?: never;

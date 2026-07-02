@@ -1,0 +1,31 @@
+.selected-users {
+  margin-bottom: 1rem;
+}
+
+.lookup {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-result {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+
+  > div {
+    width: 100%;
+  }
+
+  .user-result-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.hidden {
+  display: none;
+}

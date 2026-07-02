@@ -119,6 +119,7 @@ export default function Projects({ userData }: Props) {
                 variant="tertiary"
                 size="small"
                 inline
+                aria-label="Toggle project definition"
               >
                 <InfoIcon />
               </Button>

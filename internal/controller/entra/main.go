@@ -187,11 +187,11 @@ func (c *Controller) UserExists(ctx context.Context, username types.Username) (b
 	return true, nil
 }
 
-func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
+func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) (*InvitedUserData, error) {
 	user, err := c.userData(ctx, types.Username(email))
 	if err == nil {
 		log.Debug().Any("userEmail", user.Email).Msg("User already exists in entra")
-		return c.sendInviteExistingEntraUser(ctx, email, sponsor)
+		return c.sendInviteExistingEntraUser(ctx, email, sponsor, studyName, projectName)
 	} else if errors.Is(err, types.ErrNotFound) {
 		return c.sendInviteNewEntraUser(ctx, email, sponsor)
 	} else {
@@ -199,14 +199,14 @@ func (c *Controller) SendInvite(ctx context.Context, email string, sponsor types
 	}
 }
 
-func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor) (*InvitedUserData, error) {
+func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) (*InvitedUserData, error) {
 	log.Debug().Str("email", email).Msg("Inviting existing entra user to portal")
 
 	user, err := c.userData(ctx, types.Username(email))
 	if err != nil {
 		return nil, err
 	}
-	if err := c.SendCustomInviteNotification(ctx, email, sponsor); err != nil {
+	if err := c.SendCustomInviteNotification(ctx, email, sponsor, studyName, projectName); err != nil {
 		return nil, err
 	}
 	return &InvitedUserData{Id: user.Id}, nil
@@ -219,7 +219,6 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, email string, s
 	invitedUserEmailAddress := email
 	inviteRedirectUrl := config.EntraInviteRedirectURL()
 	sendInvitationMessage := true
-
 	requestBody.SetInvitedUserEmailAddress(&invitedUserEmailAddress)
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 	requestBody.SetSendInvitationMessage(&sendInvitationMessage)

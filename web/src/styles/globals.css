@@ -11,6 +11,8 @@
   --green-100: #328543;
   --green-50: #64bb75;
 
+  --success-bg: color-mix(in srgb, var(--green-50) 20%, var(--background) 80%);
+
   --red-200: #c82333;
   --red-100: #dc3545;
 
