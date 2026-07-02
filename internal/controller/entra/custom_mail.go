@@ -113,9 +113,9 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 
 	content := ""
 	if sponsor.ChosenName != "" {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
+		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName) ". The first thing you need to do is complete your profile."
 	} else {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
+		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username) ". The first thing you need to do is complete your profile."
 	}
 
 	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
@@ -124,19 +124,25 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
 	// email to notify IAO + IAA when study has been reviewed
 
-	content := "There has been an update to your study request, please log into the portal to view the changes."
-	subject := "Notification: Something has changed in your study request"
+	content := "There has been an update to your Study review. Go to the Studies page to view the update."
+	subject := "Notification: Something has changed on your Study review"
 
 	switch review.Status {
 	case openapi.StudyApprovalStatusApproved:
-		subject = "Notification: Your study has been approved!"
-		content = "Your study has been approved! You will be notified when you have any contracts or assets approaching expiry."
+		subject = "Notification: Your Study has been approved!"
+		content = "Your Study has been approved! You will be notified when you have any contracts or assets approaching expiry."
 	case openapi.StudyApprovalStatusRejected:
-		content = "Your study has not been approved, please review the feedback and request another review once the changes have been addressed."
-		subject = "Notification: Unfortunately, your study has not been approved"
+		content = "Your Study has not been approved, please review the feedback and request another review once the comments have been addressed."
+		subject = "Notification: Unfortunately, your Study has not been approved"
 		if review.Feedback != nil {
 			content += " \nFeedback: " + *review.Feedback
-			subject = "Notification: Your study has feedback to address"
+			subject = "Notification: Your Study has feedback to address"
+		}
+	case openapi.StudyApprovalStatusPending:
+		content = "Your Study has been reviewed the Information Governance team. Please review the feedback, make the necessary updates, and then resubmit your study for review."
+		subject = "Notification: Your Study requires updates before approval"
+		if review.Feedback != nil {
+			content += "\nFeedback:" + *review.Feedback
 		}
 	}
 
@@ -150,13 +156,13 @@ func (c *Controller) SendContractExpiryNotification(ctx context.Context, contrac
 	}
 	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
 	if *days < 0 {
-		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract or update its status."
+		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to update its status or to upload a new contract."
 	} else if *days == 0 {
-		content += "today. Please sign in to the Portal to upload a new contract or update its status."
+		content += "today. Please sign in to the Portal to update its status or to upload a new contract."
 	} else if *days == 1 {
-		content += "tomorrow. Please sign in to the Portal to upload a new contract or update its status."
+		content += "tomorrow. Please sign in to the Portal to update its status or to upload a new contract."
 	} else {
-		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract or update its status."
+		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to update its status or to upload a new contract."
 	}
 
 	subject := "Notification: Study contract expiry"
@@ -184,16 +190,16 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 
 func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
 
-	content := "You have been added as an administrator to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
+	content := "You have been added as an Information Asset Administrator to the Study '" + studyTitle + "'. Please sign in to the Portal to view the Study details and sign the Administrator's Agreement."
 
-	subject := "Notification: Study administrator assignment"
+	subject := "Notification: Information Asset Administrator assignment"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
 }
 
 func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
 	days := config.DaysUntilStudySignoffExpiry(&study)
 
-	content := "You are required to re-attest details about your Study '" + study.Title + "'. Your current affirmation "
+	content := "You are required to re-affirm details about your Study '" + study.Title + "'. Your current affirmation "
 	if days < 0 {
 		content += "has expired. "
 	} else if days == 0 {
@@ -203,7 +209,7 @@ func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, ema
 	} else {
 		content += fmt.Sprintf("expires in %d days. ", days)
 	}
-	content += "Please login to the ARC Services Portal to complete the affirmation."
+	content += "Please login to the ARC Services Portal to re-affirm your Study details."
 
 	subject := "Notification: Study affirmation expiry"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
