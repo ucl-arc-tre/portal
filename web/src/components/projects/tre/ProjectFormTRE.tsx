@@ -324,13 +324,13 @@ export default function ProjectFormTREStep(props: Props) {
                     validate: {
                       isNotEmpty: (value) => {
                         if (!value || value.trim() === "") {
-                          return "An IP or FQDN is required";
+                          return "An IP or domain is required";
                         }
                         return true;
                       },
                       isIPv4OrFQDN: (value) => {
                         if (value && !isIPv4OrFQDN(value.trim())) {
-                          return "Must be a valid IPv4 address or FQDN";
+                          return "Must be a valid IPv4 address or domain";
                         }
                         return true;
                       },
@@ -366,10 +366,13 @@ export default function ProjectFormTREStep(props: Props) {
             ))}
 
             <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
-              Add IP / FQDN
+              Add IP / domain
             </Button>
           </fieldset>
-          <HelperText>Optionally add IPs or FQDNs to whitelist in the TRE airlock for this project.</HelperText>
+          <HelperText>
+            Optionally add IPs or domains (e.g. 127.0.0.1 or example.ucl.ac.uk) to whitelist in the TRE airlock for this
+            project.
+          </HelperText>
         </div>
       )}
     </>
