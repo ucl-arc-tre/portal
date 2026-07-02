@@ -34,7 +34,10 @@ type ProjectTRE struct {
 	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
 }
 
-type ProjectTREWhitelist *[]string
+type (
+	Host                = string // e.g. "127.0.0.1" or "example.com"
+	ProjectTREWhitelist []Host
+)
 
 type ProjectTREStatus string
 
