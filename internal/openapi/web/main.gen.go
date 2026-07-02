@@ -1135,6 +1135,9 @@ type Project struct {
 
 // ProjectTRE defines model for ProjectTRE.
 type ProjectTRE struct {
+	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
+	AirlockWhitelist []string `json:"airlock_whitelist"`
+
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
@@ -1176,6 +1179,9 @@ type ProjectTRE struct {
 
 // ProjectTREBase defines model for ProjectTREBase.
 type ProjectTREBase struct {
+	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
+	AirlockWhitelist []string `json:"airlock_whitelist"`
+
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
@@ -1198,6 +1204,9 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest defines model for ProjectTRERequest.
 type ProjectTRERequest struct {
+	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
+	AirlockWhitelist []string `json:"airlock_whitelist"`
+
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 

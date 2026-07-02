@@ -32,6 +32,11 @@ func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
 	if data.NumRequiredEgressApprovals < 1 {
 		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
 	}
+	for _, ip := range data.AirlockWhitelist {
+		if !validation.IsIPv4OrFQDN(ip) {
+			return types.NewErrClientInvalidObjectF("airlock whitelist must contain only IPs or FQDNs")
+		}
+	}
 	return nil
 }
 
@@ -85,7 +90,6 @@ func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members 
 
 	// Validate members
 	if len(members) > 0 {
-
 		if err := s.validateProjectMembers(members); err != nil {
 			return err
 		}
@@ -186,7 +190,6 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 }
 
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, data openapi.ProjectTRERequest) error {
-
 	if err := s.validateProjectTREData(data, studyUUID); err != nil {
 		return err
 	}
@@ -220,6 +223,8 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		ProjectID:                     project.ID,
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+		AirlockSSHEnabled:             true, // Enable airlock ssh by default
+		AirlockWhitelist:              data.AirlockWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
@@ -300,7 +305,6 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("TRERoleBindings.User").
 		Where("project_id = ?", projectId).
 		First(&projectTRE).Error
-
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
 	}
@@ -397,6 +401,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	projectTRE.Status = types.ProjectTREStatusIncomplete
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
+	projectTRE.AirlockWhitelist = data.AirlockWhitelist
 
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).
