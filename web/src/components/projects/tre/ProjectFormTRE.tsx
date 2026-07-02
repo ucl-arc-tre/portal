@@ -366,7 +366,7 @@ export default function ProjectFormTREStep(props: Props) {
             ))}
 
             <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
-              Add IP / domain
+              Add IP / Domain
             </Button>
           </fieldset>
           <HelperText>
