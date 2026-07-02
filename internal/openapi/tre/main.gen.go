@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	BasicAuthScopes basicAuthContextKey = "basicAuth.Scopes"
+	JWTScopes jWTContextKey = "JWT.Scopes"
 )
 
 // Defines values for ProjectStatusUpdateStatus.
@@ -33,6 +33,11 @@ func (e ProjectStatusUpdateStatus) Valid() bool {
 	}
 }
 
+// Ping defines model for Ping.
+type Ping struct {
+	Message string `json:"message"`
+}
+
 // ProjectStatusUpdate defines model for ProjectStatusUpdate.
 type ProjectStatusUpdate struct {
 	// Status Current status of the project in the TRE
@@ -51,6 +56,9 @@ type UserStatus struct {
 	NhsdTrainingExpiresAt *string `json:"nhsd_training_expires_at,omitempty"`
 }
 
+// jWTContextKey is the context key for JWT security scheme
+type jWTContextKey string
+
 // basicAuthContextKey is the context key for basicAuth security scheme
 type basicAuthContextKey string
 
@@ -65,6 +73,9 @@ type PostProjectsProjectNameStatusJSONRequestBody = ProjectStatusUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Ping to check connectivity and auth
+	// (GET /ping)
+	GetPing(c *gin.Context)
 
 	// (POST /projects/{projectName}/status)
 	PostProjectsProjectNameStatus(c *gin.Context, projectName string)
@@ -82,6 +93,21 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
+// GetPing operation middleware
+func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
+
+	c.Set(string(JWTScopes), []string{"tre:r"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetPing(c)
+}
+
 // PostProjectsProjectNameStatus operation middleware
 func (siw *ServerInterfaceWrapper) PostProjectsProjectNameStatus(c *gin.Context) {
 
@@ -97,7 +123,7 @@ func (siw *ServerInterfaceWrapper) PostProjectsProjectNameStatus(c *gin.Context)
 		return
 	}
 
-	c.Set(string(BasicAuthScopes), []string{})
+	c.Set(string(JWTScopes), []string{"tre:w"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -115,7 +141,7 @@ func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 	var err error
 	_ = err
 
-	c.Set(string(BasicAuthScopes), []string{})
+	c.Set(string(JWTScopes), []string{"tre:r"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUserStatusParams
@@ -165,6 +191,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 	router.POST(options.BaseURL+"/projects/:projectName/status", wrapper.PostProjectsProjectNameStatus)
 	router.GET(options.BaseURL+"/user-status", wrapper.GetUserStatus)
 }

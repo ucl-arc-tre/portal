@@ -119,9 +119,11 @@ paths:
         default:
           description: Unexpected error
 
-  /tokens/dsh:
+  /tokens/{environment}:
     get:
-      description: List tokens for the DSH API
+      description: List tokens for an environment API
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentParam"
       responses:
         "200":
           content:
@@ -136,6 +138,8 @@ paths:
           description: Unexpected error
     post:
       description: Create a token for the DSH API
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentParam"
       requestBody:
         required: true
         content:
@@ -152,10 +156,11 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-  /tokens/dsh/{tokenId}:
+  /tokens/{environment}/{tokenId}:
     delete:
       description: Revoke a token for the DSH API
       parameters:
+        - $ref: "#/components/parameters/EnvironmentParam"
         - in: path
           name: tokenId
           required: true
@@ -1240,6 +1245,16 @@ components:
       description: Contract object UUID
       schema:
         type: string
+    EnvironmentParam:
+      in: path
+      name: environment
+      required: true
+      description: Short environment name
+      schema:
+        type: string
+        enum:
+          - dsh
+          - tre
 
   schemas:
     Auth:
