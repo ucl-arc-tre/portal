@@ -7,6 +7,25 @@ servers:
   - url: /tre/api/v0
 
 paths:
+  /ping:
+    get:
+      summary: Ping to check connectivity and auth
+      security:
+        - JWT: ["tre:r"]
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ping"
+        "401":
+          description: Unauthorized
+        "406":
+          description: Not acceptable
+        "503":
+          description: Server error
+        default:
+          description: Unexpected error
   /user-status:
     parameters:
       - in: query
@@ -77,6 +96,14 @@ components:
       bearerFormat: JWT
 
   schemas:
+    Ping:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
     UserStatus:
       type: object
       required:

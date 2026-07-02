@@ -3,12 +3,12 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
-describe("Create use and delete DSH API tokens end-to-end", () => {
-  const tokenName = `test-dsh-${Date.now()}`;
+describe("Create use and delete TRE API tokens end-to-end", () => {
+  const tokenName = `test-tre-${Date.now()}`;
   let tokenValue = "";
 
-  it("dsh ops should become an approved researcher", () => {
-    cy.loginAsDSHOps();
+  it("tre ops should become an approved researcher", () => {
+    cy.loginAsTREOps();
     cy.becomeApprovedResearcher();
 
     cy.visit("/profile");
@@ -22,17 +22,17 @@ describe("Create use and delete DSH API tokens end-to-end", () => {
     });
   });
 
-  it("without a token should not be able to use the DSH API", () => {
+  it("without a token should not be able to use the TRE API", () => {
     cy.request({
       method: "GET",
-      url: "/dsh/api/v0/ping",
+      url: "/tre/api/v0/ping",
       failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.be.equal(406);
     });
     cy.request({
       method: "GET",
-      url: "/dsh/api/v0/ping",
+      url: "/tre/api/v0/ping",
       headers: {
         authorization: `Bearer blah`,
       },
@@ -43,36 +43,29 @@ describe("Create use and delete DSH API tokens end-to-end", () => {
   });
 
   it("anyone should be able to use the token", () => {
+    cy.wait(100); // for the token to become active
     const headers = {
       authorization: `Bearer ${tokenValue}`,
     };
     cy.request({
       method: "GET",
-      url: "/dsh/api/v0/ping",
+      url: "/tre/api/v0/ping",
       headers: headers,
     }).then((response) => {
       expect(response.body).to.have.property("message", "pong");
     });
 
-    cy.request({
-      method: "GET",
-      url: "/dsh/api/v0/approved-researchers",
-      headers: headers,
-    }).then((response) => {
-      expect(response.body).to.have.include("username,agreed_at,training_expires");
-    });
-
-    cy.request({
-      method: "GET",
-      url: "/dsh/api/v0/approved-studies",
-      headers: headers,
-    }).then((response) => {
-      expect(response.body).to.have.include("caseref,study_owner_username,study_admin_usernames");
+    cy.env(["botTREUsername"]).then(({ botTREUsername }) => {
+      cy.request({
+        method: "GET",
+        url: `/tre/api/v0/user-status?username=${encodeURI(botTREUsername)}`,
+        headers: headers,
+      }).should("be.ok");
     });
   });
 
-  it("dsh should be able to revoke the token", () => {
-    cy.loginAsDSHOps();
+  it("tre should be able to revoke the token", () => {
+    cy.loginAsTREOps();
     cy.visit("/profile");
     cy.get(`button[aria-label="Delete ${tokenName}"]`).click();
     cy.wait(10100); // wait for the cache to expire
@@ -84,7 +77,7 @@ describe("Create use and delete DSH API tokens end-to-end", () => {
     };
     cy.request({
       method: "GET",
-      url: "/dsh/api/v0/ping",
+      url: "/tre/api/v0/ping",
       headers: headers,
       failOnStatusCode: false,
     }).then((response) => {

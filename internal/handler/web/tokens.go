@@ -80,6 +80,8 @@ func (h *Handler) PostTokensEnvironment(
 		setError(ctx, err, "Failed to get DSH API tokens")
 		return
 	}
+	ctx.Header("Cache-Control", "no-store")
+	ctx.Header("Expires", "0")
 	ctx.JSON(http.StatusOK, openapi.TokenWithValue{
 		Id:        token.ID.String(),
 		Value:     tokenWithValue.Value,
