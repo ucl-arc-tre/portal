@@ -191,7 +191,7 @@ export default function ProjectForm({
           const treMembers = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
-              username: `${researcher.username.trim()}${domainName}`,
+              username: `${researcher.username.trim()}`,
               roles: researcher.roles as ProjectTreRoleName[],
             }));
 
@@ -275,9 +275,7 @@ export default function ProjectForm({
               />
             )}
 
-            {currentStep === 2 && isTREProject && (
-              <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject} />
-            )}
+            {currentStep === 2 && isTREProject && <ProjectTREStep fieldsDisabled={fieldsDisabled} />}
 
             <div className={styles.actions}>
               {currentStep > 1 && (
