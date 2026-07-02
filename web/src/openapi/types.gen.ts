@@ -645,9 +645,9 @@ export type ProjectTreBase = {
      */
     external_encryption_enabled: boolean;
     /**
-     * List of IPs or FQDNs to whitelist for this project (optional)
+     * List of IPs or FQDNs to whitelist for this project (can be empty)
      */
-    airlock_whitelist?: Array<string>;
+    airlock_whitelist: Array<string>;
 };
 
 export type ContractBase = {

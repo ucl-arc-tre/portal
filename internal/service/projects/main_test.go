@@ -23,8 +23,8 @@ func validProjectTRERequest() openapi.ProjectTRERequest {
 	}
 }
 
-func whitelist(entries ...string) *[]string {
-	return &entries
+func whitelist(entries ...string) types.ProjectTREWhitelist {
+	return entries
 }
 
 func TestCreateProjectTRE(t *testing.T) {
