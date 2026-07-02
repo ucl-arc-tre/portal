@@ -70,6 +70,20 @@ paths:
           description: Unauthenticated
         "406":
           $ref: "#/components/responses/InvalidObject"
+  /projects:
+    get:
+      description: Get the list of TRE projects
+      responses:
+        "200":
+          description: List of TRE projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthenticated
         "500":
           description: Internal server error
         default:
@@ -158,6 +172,179 @@ components:
           enum:
             - aws
             - condenser
+
+    Project:
+      type: object
+      required:
+        - name
+        - platform
+        - monthlyBudget
+        - backupEnabled
+        - encryptionKeyEnabled
+        - owners
+        - apiUsers
+        - usernames
+        - uids
+        - uploaders
+        - downloaders
+        - egressRequesters
+        - egressCheckers
+        - desktopUsers
+        - egressNumberRequiredApprovals
+        - airlock
+        - desktop
+        - efs
+      properties:
+        name:
+          type: string
+          description: Unique project name
+        platform:
+          type: string
+          description: TRE platform on which the project is hosted
+        monthlyBudget:
+          type: number
+          description: Monthly budget in USD
+        backupEnabled:
+          type: boolean
+          description: Whether backup is enabled
+        encryptionKeyEnabled:
+          type: boolean
+          description: Whether RDSS encryption is enabled
+        owners:
+          type: array
+          items:
+            type: string
+            description: Email of project IAO
+        apiUsers:
+          type: array
+          items:
+            type: string
+            description: Email of TRE API user
+        usernames:
+          type: object
+          description: Mapping of emails to usernames
+          additionalProperties:
+            type: string
+        uids:
+          type: object
+          description: Mapping of user emails to Linux UIDs
+          additionalProperties:
+            type: integer
+        uploaders:
+          type: array
+          items:
+            type: string
+            description: Email of uploader
+        downloaders:
+          type: array
+          items:
+            type: string
+            description: Email of downloader
+        egressRequesters:
+          type: array
+          items:
+            type: string
+            description: Email of egress requester
+        egressCheckers:
+          type: array
+          items:
+            type: string
+            description: Email of egress checker
+        desktopUsers:
+          type: array
+          items:
+            type: string
+            description: Email of desktop user
+        egressNumberRequiredApprovals:
+          type: integer
+          description: Number of approvals required to egress/download
+        airlock:
+          $ref: "#/components/schemas/Airlock"
+        desktop:
+          $ref: "#/components/schemas/Image"
+        efs:
+          $ref: "#/components/schemas/Efs"
+        desktopInstanceTypes:
+          type: object
+          description: Mapping of user email to desktop instance type configuration
+          additionalProperties:
+            $ref: "#/components/schemas/DesktopInstanceType"
+
+    Airlock:
+      type: object
+      required:
+        - version
+        - sftpEnabled
+        - sshEnabled
+        - httpEnabled
+        - whitelist
+        - internal
+        - external
+      properties:
+        version:
+          type: integer
+          description: Airlock version
+        sftpEnabled:
+          type: boolean
+          description: Where SFTP is enabled in airlock
+        sshEnabled:
+          type: boolean
+          description: Where SSH is enabled in airlock
+        httpEnabled:
+          type: boolean
+          description: Where HTTP is enabled in airlock
+        whitelist:
+          type: array
+          items:
+            type: string
+            description: Allowed hostname to connect to airlock
+        internal:
+          $ref: "#/components/schemas/Image"
+        external:
+          $ref: "#/components/schemas/Image"
+
+    Image:
+      description:
+      type: object
+      required:
+        - image
+      properties:
+        image:
+          type: string
+          description: VM image ID (e.g. AMI)
+
+    Efs:
+      type: object
+      required:
+        - shared
+      properties:
+        shared:
+          type: object
+          description: Shared EFS configuration
+          required:
+            - transitionToArchive
+            - bursting
+          properties:
+            transitionToArchive:
+              type: boolean
+            bursting:
+              type: boolean
+
+    DesktopInstanceType:
+      type: object
+      required:
+        - standard
+        - hpc
+      properties:
+        homeVolumeGb:
+          type: integer
+          description: Size of the home volume in GB
+        standard:
+          type: string
+          description: Standard instance type
+        hpc:
+          type: string
+          description: HPC instance type
 
     ProjectUpdate:
       type: object

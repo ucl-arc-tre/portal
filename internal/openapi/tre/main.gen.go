@@ -52,14 +52,101 @@ func (e VMImagePlatform) Valid() bool {
 	}
 }
 
+// Airlock defines model for Airlock.
+type Airlock struct {
+	External Image `json:"external"`
+
+	// HttpEnabled Where HTTP is enabled in airlock
+	HttpEnabled bool  `json:"httpEnabled"`
+	Internal    Image `json:"internal"`
+
+	// SftpEnabled Where SFTP is enabled in airlock
+	SftpEnabled bool `json:"sftpEnabled"`
+
+	// SshEnabled Where SSH is enabled in airlock
+	SshEnabled bool `json:"sshEnabled"`
+
+	// Version Airlock version
+	Version   int      `json:"version"`
+	Whitelist []string `json:"whitelist"`
+}
+
+// DesktopInstanceType defines model for DesktopInstanceType.
+type DesktopInstanceType struct {
+	// HomeVolumeGb Size of the home volume in GB
+	HomeVolumeGb *int `json:"homeVolumeGb,omitempty"`
+
+	// Hpc HPC instance type
+	Hpc string `json:"hpc"`
+
+	// Standard Standard instance type
+	Standard string `json:"standard"`
+}
+
+// Efs defines model for Efs.
+type Efs struct {
+	// Shared Shared EFS configuration
+	Shared struct {
+		Bursting            bool `json:"bursting"`
+		TransitionToArchive bool `json:"transitionToArchive"`
+	} `json:"shared"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
 }
 
+// Image defines model for Image.
+type Image struct {
+	// Image VM image ID (e.g. AMI)
+	Image string `json:"image"`
+}
+
 // Ping defines model for Ping.
 type Ping struct {
 	Message string `json:"message"`
+}
+
+// Project defines model for Project.
+type Project struct {
+	Airlock  Airlock  `json:"airlock"`
+	ApiUsers []string `json:"apiUsers"`
+
+	// BackupEnabled Whether backup is enabled
+	BackupEnabled bool  `json:"backupEnabled"`
+	Desktop       Image `json:"desktop"`
+
+	// DesktopInstanceTypes Mapping of user email to desktop instance type configuration
+	DesktopInstanceTypes *map[string]DesktopInstanceType `json:"desktopInstanceTypes,omitempty"`
+	DesktopUsers         []string                        `json:"desktopUsers"`
+	Downloaders          []string                        `json:"downloaders"`
+	Efs                  Efs                             `json:"efs"`
+	EgressCheckers       []string                        `json:"egressCheckers"`
+
+	// EgressNumberRequiredApprovals Number of approvals required to egress/download
+	EgressNumberRequiredApprovals int      `json:"egressNumberRequiredApprovals"`
+	EgressRequesters              []string `json:"egressRequesters"`
+
+	// EncryptionKeyEnabled Whether RDSS encryption is enabled
+	EncryptionKeyEnabled bool `json:"encryptionKeyEnabled"`
+
+	// MonthlyBudget Monthly budget in USD
+	MonthlyBudget float32 `json:"monthlyBudget"`
+
+	// Name Unique project name
+	Name   string   `json:"name"`
+	Owners []string `json:"owners"`
+
+	// Platform TRE platform on which the project is hosted
+	Platform string `json:"platform"`
+
+	// Uids Mapping of user emails to Linux UIDs
+	Uids      map[string]int `json:"uids"`
+	Uploaders []string       `json:"uploaders"`
+
+	// Usernames Mapping of emails to usernames
+	Usernames map[string]string `json:"usernames"`
 }
 
 // ProjectUpdate defines model for ProjectUpdate.
@@ -123,6 +210,9 @@ type ServerInterface interface {
 	// (GET /ping)
 	GetPing(c *gin.Context)
 
+	// (GET /projects)
+	GetProjects(c *gin.Context)
+
 	// (POST /projects/{projectName})
 	PostProjectsProjectName(c *gin.Context, projectName string)
 
@@ -155,6 +245,21 @@ func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 	}
 
 	siw.Handler.GetPing(c)
+}
+
+// GetProjects operation middleware
+func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
+
+	c.Set(string(BasicAuthScopes), []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjects(c)
 }
 
 // PostProjectsProjectName operation middleware
@@ -258,5 +363,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 	router.GET(options.BaseURL+"/user-status", wrapper.GetUserStatus)
 	router.POST(options.BaseURL+"/vm-images", wrapper.PostVmImages)
+	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)
 	router.POST(options.BaseURL+"/projects/:projectName", wrapper.PostProjectsProjectName)
 }
