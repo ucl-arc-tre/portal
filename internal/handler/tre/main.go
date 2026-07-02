@@ -24,6 +24,10 @@ func New() *Handler {
 	return &Handler{users: users.New(), projects: projects.New()}
 }
 
+func (h *Handler) GetPing(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, openapi.Ping{Message: "pong"})
+}
+
 func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusParams) {
 	user, err := h.users.UserByUsername(types.Username(params.Username))
 	if errors.Is(err, types.ErrNotFound) {

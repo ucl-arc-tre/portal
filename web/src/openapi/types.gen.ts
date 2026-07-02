@@ -775,6 +775,11 @@ export type ContractIdParam = string;
  */
 export type ContractObjectIdParam = string;
 
+/**
+ * Short environment name
+ */
+export type EnvironmentParam = 'dsh' | 'tre';
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -949,14 +954,19 @@ export type PostProfileTrainingResponses = {
 
 export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
 
-export type GetTokensDshData = {
+export type GetTokensByEnvironmentData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * Short environment name
+         */
+        environment: 'dsh' | 'tre';
+    };
     query?: never;
-    url: '/tokens/dsh';
+    url: '/tokens/{environment}';
 };
 
-export type GetTokensDshErrors = {
+export type GetTokensByEnvironmentErrors = {
     /**
      * Internal server error
      */
@@ -967,20 +977,25 @@ export type GetTokensDshErrors = {
     default: unknown;
 };
 
-export type GetTokensDshResponses = {
+export type GetTokensByEnvironmentResponses = {
     200: Array<Token>;
 };
 
-export type GetTokensDshResponse = GetTokensDshResponses[keyof GetTokensDshResponses];
+export type GetTokensByEnvironmentResponse = GetTokensByEnvironmentResponses[keyof GetTokensByEnvironmentResponses];
 
-export type PostTokensDshData = {
+export type PostTokensByEnvironmentData = {
     body: TokenRequest;
-    path?: never;
+    path: {
+        /**
+         * Short environment name
+         */
+        environment: 'dsh' | 'tre';
+    };
     query?: never;
-    url: '/tokens/dsh';
+    url: '/tokens/{environment}';
 };
 
-export type PostTokensDshErrors = {
+export type PostTokensByEnvironmentErrors = {
     /**
      * Internal server error
      */
@@ -991,25 +1006,29 @@ export type PostTokensDshErrors = {
     default: unknown;
 };
 
-export type PostTokensDshResponses = {
+export type PostTokensByEnvironmentResponses = {
     200: TokenWithValue;
 };
 
-export type PostTokensDshResponse = PostTokensDshResponses[keyof PostTokensDshResponses];
+export type PostTokensByEnvironmentResponse = PostTokensByEnvironmentResponses[keyof PostTokensByEnvironmentResponses];
 
-export type DeleteTokensDshByTokenIdData = {
+export type DeleteTokensByEnvironmentByTokenIdData = {
     body?: never;
     path: {
+        /**
+         * Short environment name
+         */
+        environment: 'dsh' | 'tre';
         /**
          * ID of the token to be updated
          */
         tokenId: string;
     };
     query?: never;
-    url: '/tokens/dsh/{tokenId}';
+    url: '/tokens/{environment}/{tokenId}';
 };
 
-export type DeleteTokensDshByTokenIdErrors = {
+export type DeleteTokensByEnvironmentByTokenIdErrors = {
     /**
      * Internal server error
      */
@@ -1020,14 +1039,14 @@ export type DeleteTokensDshByTokenIdErrors = {
     default: unknown;
 };
 
-export type DeleteTokensDshByTokenIdResponses = {
+export type DeleteTokensByEnvironmentByTokenIdResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type DeleteTokensDshByTokenIdResponse = DeleteTokensDshByTokenIdResponses[keyof DeleteTokensDshByTokenIdResponses];
+export type DeleteTokensByEnvironmentByTokenIdResponse = DeleteTokensByEnvironmentByTokenIdResponses[keyof DeleteTokensByEnvironmentByTokenIdResponses];
 
 export type GetAgreementsByAgreementTypeData = {
     body?: never;
