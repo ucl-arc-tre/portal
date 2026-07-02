@@ -179,7 +179,7 @@ export default function UserLookup(props: UserLookupProps) {
                 <AlertTitle>{result.chosen_name}</AlertTitle>
                 <AlertMessage className={styles["user-result-content"]}>
                   {result.user.username}
-                  {typeof roleControl === "function" ? roleControl(result) : roleControl}
+
                   <Button
                     size="small"
                     variant="secondary"
@@ -189,6 +189,8 @@ export default function UserLookup(props: UserLookupProps) {
                     x Remove
                   </Button>
                 </AlertMessage>
+                {roleControl && <h4 className={styles["role-heading"]}>Roles</h4>}
+                {typeof roleControl === "function" ? roleControl(result) : roleControl}
               </Alert>
             </div>
           ))}

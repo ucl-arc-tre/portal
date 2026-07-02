@@ -2,23 +2,18 @@ import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
 import { ProjectFormData } from "@/types/projects";
-import Button from "@/components/ui/Button";
-import { ProjectTre, ProjectTreRoleName } from "@/openapi";
+import { ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
 import UserLookup from "@/components/shared/UserLookup";
 
-// this should match the domain that is used for the entra ID users in the portal
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
-
 type Props = {
   fieldsDisabled: boolean;
-  editingProject: ProjectTre | null | undefined;
 };
 
 export default function ProjectFormTREStep(props: Props) {
-  const { fieldsDisabled, editingProject } = props;
+  const { fieldsDisabled } = props;
   const {
     watch,
     control,
@@ -76,7 +71,7 @@ export default function ProjectFormTREStep(props: Props) {
                     },
                   }}
                   render={({ fieldState }) => (
-                    <div>
+                    <div className={styles.roles}>
                       {researcher?.roles && researcher.roles.length > 0 && (
                         <div className={styles["role-tags"]}>
                           {researcher.roles.map((role) => (
