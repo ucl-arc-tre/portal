@@ -39,6 +39,23 @@ type (
 	ProjectTREWhitelist []Host
 )
 
+type ProjectTREPlatform string
+
+const (
+	ProjectTREPlatformAWS       ProjectTREPlatform = "aws"
+	ProjectTREPlatformCondenser ProjectTREPlatform = "condenser"
+)
+
+var ProjectTREPlatforms = []ProjectTREPlatform{ProjectTREPlatformAWS, ProjectTREPlatformCondenser}
+
+type ProjectTREVMImage struct {
+	ModelAuditable
+	Name        string             `gorm:"not null"`
+	ImageId     string             `gorm:"not null"` // e.g. AMI id
+	Description string             `gorm:"not null"`
+	Platform    ProjectTREPlatform `gorm:"not null;index"`
+}
+
 type ProjectTREStatus string
 
 const (

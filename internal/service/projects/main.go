@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
@@ -499,6 +501,28 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	}
 
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit delete project transaction")
+}
+
+func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
+	if data.Id == "" || data.Name == "" || data.Description == "" {
+		return types.NewErrClientInvalidObjectF("id, name, description are required")
+	}
+	if !data.Platform.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid platform")
+	} else if !slices.Contains(types.ProjectTREPlatforms, types.ProjectTREPlatform(data.Platform)) {
+		return types.NewErrServerError("mismatch between api and db platform names")
+	}
+	platform := types.ProjectTREPlatform(data.Platform)
+	image := types.ProjectTREVMImage{}
+	result := s.db.Where(types.ProjectTREVMImage{ImageId: data.Id, Platform: platform}).
+		Assign(types.ProjectTREVMImage{
+			ImageId:     data.Id,
+			Name:        data.Name,
+			Description: data.Description,
+			Platform:    platform,
+		}).
+		FirstOrCreate(&image)
+	return types.NewErrFromGorm(result.Error, "failed to create TRE project vm image")
 }
 
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {

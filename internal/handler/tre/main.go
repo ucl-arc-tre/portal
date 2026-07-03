@@ -81,3 +81,19 @@ func (h *Handler) PostProjectsProjectNameStatus(ctx *gin.Context, projectName st
 	}
 	ctx.Status(http.StatusNoContent)
 }
+
+func (h *Handler) PostVmImages(ctx *gin.Context) {
+	data := openapi.VMImage{}
+	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
+		log.Err(err).Msg("Failed to bind VMImage")
+		ctx.Status(http.StatusNotAcceptable)
+		return
+	}
+
+	err := h.projects.CreateTREVMImage(data)
+	if err != nil {
+		setError(ctx, err)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
