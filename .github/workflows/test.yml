@@ -93,8 +93,7 @@ jobs:
             client_secret: ${{ secrets.OAUTH2PROXY_CLIENT_SECRET }}
             primary_domain: arctretest.onmicrosoft.com
           tre:
-            users:
-              username: password
+            users: {}
           EOF
 
       - name: Create cypress env

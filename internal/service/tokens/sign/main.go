@@ -51,8 +51,8 @@ func (s *Service) AllEnvironment(environmentId uuid.UUID) ([]types.Token, error)
 	return tokens, nil
 }
 
-// CreateDSH a DSH API token with the default scopes
-func (s *Service) CreateDSH(token types.Token) (*TokenWithValue, error) {
+// Create a DSH API token with the default scopes
+func (s *Service) Create(token types.Token, scopes []string) (*TokenWithValue, error) {
 	if time.Now().After(token.ExpiresAt) {
 		return nil, types.NewErrInvalidObject("cannot create an already expired token")
 	}
@@ -65,7 +65,7 @@ func (s *Service) CreateDSH(token types.Token) (*TokenWithValue, error) {
 
 	token.VerificationKeyID = s.key.Id()
 	claims := tokens.Claims{
-		Scopes: []string{"dsh:r", "dsh:w"}, // defined by the OpenAPI schema
+		Scopes: scopes,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        token.ID.String(),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

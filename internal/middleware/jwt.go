@@ -30,7 +30,7 @@ func NewJWT() func(*gin.Context) {
 		requiredScopes := ctx.MustGet("JWT.Scopes").([]string) // Set by openapi
 		if !claims.HasAll(requiredScopes) {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
-			log.Warn().Any("scopes", claims.Scopes).Msg("Missing required scopes")
+			log.Warn().Any("scopes", claims.Scopes).Any("required", requiredScopes).Msg("Missing required scopes")
 			return
 		}
 	}

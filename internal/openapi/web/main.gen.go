@@ -636,6 +636,78 @@ func (e TrainingKind) Valid() bool {
 	}
 }
 
+// Defines values for EnvironmentParam.
+const (
+	EnvironmentParamDsh EnvironmentParam = "dsh"
+	EnvironmentParamTre EnvironmentParam = "tre"
+)
+
+// Valid indicates whether the value is a known member of the EnvironmentParam enum.
+func (e EnvironmentParam) Valid() bool {
+	switch e {
+	case EnvironmentParamDsh:
+		return true
+	case EnvironmentParamTre:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetTokensEnvironmentParamsEnvironment.
+const (
+	GetTokensEnvironmentParamsEnvironmentDsh GetTokensEnvironmentParamsEnvironment = "dsh"
+	GetTokensEnvironmentParamsEnvironmentTre GetTokensEnvironmentParamsEnvironment = "tre"
+)
+
+// Valid indicates whether the value is a known member of the GetTokensEnvironmentParamsEnvironment enum.
+func (e GetTokensEnvironmentParamsEnvironment) Valid() bool {
+	switch e {
+	case GetTokensEnvironmentParamsEnvironmentDsh:
+		return true
+	case GetTokensEnvironmentParamsEnvironmentTre:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PostTokensEnvironmentParamsEnvironment.
+const (
+	PostTokensEnvironmentParamsEnvironmentDsh PostTokensEnvironmentParamsEnvironment = "dsh"
+	PostTokensEnvironmentParamsEnvironmentTre PostTokensEnvironmentParamsEnvironment = "tre"
+)
+
+// Valid indicates whether the value is a known member of the PostTokensEnvironmentParamsEnvironment enum.
+func (e PostTokensEnvironmentParamsEnvironment) Valid() bool {
+	switch e {
+	case PostTokensEnvironmentParamsEnvironmentDsh:
+		return true
+	case PostTokensEnvironmentParamsEnvironmentTre:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for DeleteTokensEnvironmentTokenIdParamsEnvironment.
+const (
+	DeleteTokensEnvironmentTokenIdParamsEnvironmentDsh DeleteTokensEnvironmentTokenIdParamsEnvironment = "dsh"
+	DeleteTokensEnvironmentTokenIdParamsEnvironmentTre DeleteTokensEnvironmentTokenIdParamsEnvironment = "tre"
+)
+
+// Valid indicates whether the value is a known member of the DeleteTokensEnvironmentTokenIdParamsEnvironment enum.
+func (e DeleteTokensEnvironmentTokenIdParamsEnvironment) Valid() bool {
+	switch e {
+	case DeleteTokensEnvironmentTokenIdParamsEnvironmentDsh:
+		return true
+	case DeleteTokensEnvironmentTokenIdParamsEnvironmentTre:
+		return true
+	default:
+		return false
+	}
+}
+
 // Agreement defines model for Agreement.
 type Agreement struct {
 	// Id UUID of the agreement
@@ -1063,6 +1135,9 @@ type Project struct {
 
 // ProjectTRE defines model for ProjectTRE.
 type ProjectTRE struct {
+	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
+	AirlockWhitelist []string `json:"airlock_whitelist"`
+
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
@@ -1104,6 +1179,9 @@ type ProjectTRE struct {
 
 // ProjectTREBase defines model for ProjectTREBase.
 type ProjectTREBase struct {
+	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
+	AirlockWhitelist []string `json:"airlock_whitelist"`
+
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
@@ -1126,6 +1204,9 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest defines model for ProjectTRERequest.
 type ProjectTRERequest struct {
+	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
+	AirlockWhitelist []string `json:"airlock_whitelist"`
+
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
@@ -1491,6 +1572,9 @@ type ContractIdParam = string
 // ContractObjectIdParam defines model for ContractObjectIdParam.
 type ContractObjectIdParam = string
 
+// EnvironmentParam defines model for EnvironmentParam.
+type EnvironmentParam string
+
 // ProjectIdParam defines model for ProjectIdParam.
 type ProjectIdParam = string
 
@@ -1526,6 +1610,15 @@ type GetStudiesParams struct {
 	// Offset Index of the first item to return
 	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
+
+// GetTokensEnvironmentParamsEnvironment defines parameters for GetTokensEnvironment.
+type GetTokensEnvironmentParamsEnvironment string
+
+// PostTokensEnvironmentParamsEnvironment defines parameters for PostTokensEnvironment.
+type PostTokensEnvironmentParamsEnvironment string
+
+// DeleteTokensEnvironmentTokenIdParamsEnvironment defines parameters for DeleteTokensEnvironmentTokenId.
+type DeleteTokensEnvironmentTokenIdParamsEnvironment string
 
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
@@ -1613,8 +1706,8 @@ type PostStudiesStudyIdContractsContractIdObjectsMultipartRequestBody = Contract
 // PostStudiesStudyIdOwnerRequestJSONRequestBody defines body for PostStudiesStudyIdOwnerRequest for application/json ContentType.
 type PostStudiesStudyIdOwnerRequestJSONRequestBody = StudyOwnerUpdate
 
-// PostTokensDshJSONRequestBody defines body for PostTokensDsh for application/json ContentType.
-type PostTokensDshJSONRequestBody = TokenRequest
+// PostTokensEnvironmentJSONRequestBody defines body for PostTokensEnvironment for application/json ContentType.
+type PostTokensEnvironmentJSONRequestBody = TokenRequest
 
 // PostUsersInviteJSONRequestBody defines body for PostUsersInvite for application/json ContentType.
 type PostUsersInviteJSONRequestBody PostUsersInviteJSONBody
@@ -1769,14 +1862,14 @@ type ServerInterface interface {
 	// (POST /studies/{studyId}/signoff)
 	PostStudiesStudyIdSignoff(c *gin.Context, studyId StudyIdParam)
 
-	// (GET /tokens/dsh)
-	GetTokensDsh(c *gin.Context)
+	// (GET /tokens/{environment})
+	GetTokensEnvironment(c *gin.Context, environment GetTokensEnvironmentParamsEnvironment)
 
-	// (POST /tokens/dsh)
-	PostTokensDsh(c *gin.Context)
+	// (POST /tokens/{environment})
+	PostTokensEnvironment(c *gin.Context, environment PostTokensEnvironmentParamsEnvironment)
 
-	// (DELETE /tokens/dsh/{tokenId})
-	DeleteTokensDshTokenId(c *gin.Context, tokenId string)
+	// (DELETE /tokens/{environment}/{tokenId})
+	DeleteTokensEnvironmentTokenId(c *gin.Context, environment DeleteTokensEnvironmentTokenIdParamsEnvironment, tokenId string)
 
 	// (GET /users)
 	GetUsers(c *gin.Context, params GetUsersParams)
@@ -2971,37 +3064,70 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdSignoff(c *gin.Context) {
 	siw.Handler.PostStudiesStudyIdSignoff(c, studyId)
 }
 
-// GetTokensDsh operation middleware
-func (siw *ServerInterfaceWrapper) GetTokensDsh(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetTokensDsh(c)
-}
-
-// PostTokensDsh operation middleware
-func (siw *ServerInterfaceWrapper) PostTokensDsh(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostTokensDsh(c)
-}
-
-// DeleteTokensDshTokenId operation middleware
-func (siw *ServerInterfaceWrapper) DeleteTokensDshTokenId(c *gin.Context) {
+// GetTokensEnvironment operation middleware
+func (siw *ServerInterfaceWrapper) GetTokensEnvironment(c *gin.Context) {
 
 	var err error
 	_ = err
+
+	// ------------- Path parameter "environment" -------------
+	var environment GetTokensEnvironmentParamsEnvironment
+
+	err = runtime.BindStyledParameterWithOptions("simple", "environment", c.Param("environment"), &environment, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter environment: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetTokensEnvironment(c, environment)
+}
+
+// PostTokensEnvironment operation middleware
+func (siw *ServerInterfaceWrapper) PostTokensEnvironment(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "environment" -------------
+	var environment PostTokensEnvironmentParamsEnvironment
+
+	err = runtime.BindStyledParameterWithOptions("simple", "environment", c.Param("environment"), &environment, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter environment: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostTokensEnvironment(c, environment)
+}
+
+// DeleteTokensEnvironmentTokenId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTokensEnvironmentTokenId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "environment" -------------
+	var environment DeleteTokensEnvironmentTokenIdParamsEnvironment
+
+	err = runtime.BindStyledParameterWithOptions("simple", "environment", c.Param("environment"), &environment, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter environment: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	// ------------- Path parameter "tokenId" -------------
 	var tokenId string
@@ -3019,7 +3145,7 @@ func (siw *ServerInterfaceWrapper) DeleteTokensDshTokenId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteTokensDshTokenId(c, tokenId)
+	siw.Handler.DeleteTokensEnvironmentTokenId(c, environment, tokenId)
 }
 
 // GetUsers operation middleware
@@ -3220,9 +3346,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/:studyId/owner-request", wrapper.PostStudiesStudyIdOwnerRequest)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.POST(options.BaseURL+"/studies/:studyId/signoff", wrapper.PostStudiesStudyIdSignoff)
-	router.GET(options.BaseURL+"/tokens/dsh", wrapper.GetTokensDsh)
-	router.POST(options.BaseURL+"/tokens/dsh", wrapper.PostTokensDsh)
-	router.DELETE(options.BaseURL+"/tokens/dsh/:tokenId", wrapper.DeleteTokensDshTokenId)
+	router.GET(options.BaseURL+"/tokens/:environment", wrapper.GetTokensEnvironment)
+	router.POST(options.BaseURL+"/tokens/:environment", wrapper.PostTokensEnvironment)
+	router.DELETE(options.BaseURL+"/tokens/:environment/:tokenId", wrapper.DeleteTokensEnvironmentTokenId)
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)

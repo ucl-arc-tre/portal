@@ -8,6 +8,18 @@ import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
 import UserLookup from "@/components/shared/UserLookup";
 
+// Mirrors backend validation in internal/validation/ip.go (IsIPv4OrFQDN).
+const ipv4Regex =
+  /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$/;
+const fqdnRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
+function isIPv4OrFQDN(value: string): boolean {
+  if (ipv4Regex.test(value)) {
+    return true;
+  }
+  return value.length <= 253 && fqdnRegex.test(value);
+}
+
 type Props = {
   fieldsDisabled: boolean;
 };
@@ -32,11 +44,21 @@ export default function ProjectFormTREStep(props: Props) {
     name: "members",
   });
 
+  const {
+    fields: whitelistFields,
+    append: appendWhitelist,
+    remove: removeWhitelist,
+  } = useFieldArray({
+    control,
+    name: "tre.airlockWhitelist",
+  });
+
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
   const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
   const members = watch("members");
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
+  const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
 
   return (
     <>
@@ -181,7 +203,7 @@ export default function ProjectFormTREStep(props: Props) {
       <div>
         <RadioOptions
           name="tre.externalEncryptionEnabled"
-          label="Data will need be stored outside of the TRE? *"
+          label="Will data need to be stored outside of the TRE? *"
           options={[
             { name: "Yes", value: "true" },
             { name: "No", value: "false" },
@@ -195,6 +217,89 @@ export default function ProjectFormTREStep(props: Props) {
           <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
         </HelperText>
       </div>
+
+      <div>
+        <RadioOptions
+          name="tre.airlockExternalDataEnabled"
+          label="Does your project need to download or retrieve data from an external website or API? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          error={errors.tre?.airlockExternalDataEnabled}
+        />
+        <HelperText>
+          Data can be pulled into the TRE from an external source by logging into the airlock and running an appropriate
+          download command (e.g. `curl`). This requires whitelisting the external source for outbound network access.
+          See the <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
+        </HelperText>
+      </div>
+
+      {airlockExternalDataEnabled === "true" && (
+        <div className="field">
+          <Label>Airlock whitelist (optional):</Label>
+          <fieldset className="linkage-fieldset">
+            {whitelistFields.map((field, index) => (
+              <div key={field.id} className="item-wrapper">
+                <Controller
+                  name={`tre.airlockWhitelist.${index}.value` as const}
+                  control={control}
+                  rules={{
+                    validate: {
+                      isNotEmpty: (value) => {
+                        if (!value || value.trim() === "") {
+                          return "An IP or domain is required";
+                        }
+                        return true;
+                      },
+                      isIPv4OrFQDN: (value) => {
+                        if (value && !isIPv4OrFQDN(value.trim())) {
+                          return "Must be a valid IPv4 address or domain";
+                        }
+                        return true;
+                      },
+                    },
+                  }}
+                  render={({ field: whitelistField, fieldState }) => (
+                    <div>
+                      <input
+                        {...whitelistField}
+                        id={`airlock-whitelist-${index}`}
+                        type="text"
+                        placeholder="192.168.0.1 or example.ucl.ac.uk"
+                        disabled={fieldsDisabled}
+                      />
+                      {fieldState.error && (
+                        <Alert type="error">
+                          <AlertMessage>{fieldState.error.message}</AlertMessage>
+                        </Alert>
+                      )}
+                    </div>
+                  )}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => removeWhitelist(index)}
+                  className="remove-button"
+                  aria-label={`Remove whitelist entry ${index + 1}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+            <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
+              Add IP / Domain
+            </Button>
+          </fieldset>
+          <HelperText>
+            Optionally add IPs or domains (e.g. 127.0.0.1 or example.ucl.ac.uk) to whitelist in the TRE airlock for this
+            project.
+          </HelperText>
+        </div>
+      )}
     </>
   );
 }

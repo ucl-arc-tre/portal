@@ -91,6 +91,10 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 		Policy{RoleName: TreOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: WriteAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre", Action: WriteAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre/*", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre/*", Action: WriteAction},
 	)
 }
 

@@ -68,6 +68,11 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[name="tre.numRequiredEgressApprovals"]').check("1", { force: true });
     cy.get('[name="tre.externalEncryptionEnabled"]').check("false", { force: true });
 
+    // Add an airlock whitelist entry
+    cy.get('[name="tre.airlockExternalDataEnabled"]').check("true", { force: true });
+    cy.contains("button", "Add IP / Domain").click();
+    cy.get('[name="tre.airlockWhitelist.0.value"]').type("192.168.1.1");
+
     cy.get('[data-cy="submit-project-button"]').click();
   });
 
@@ -77,5 +82,8 @@ describe("TRE project creation end-to-end", () => {
     cy.visit("/projects");
     cy.contains(projectTitle).should("exist");
     cy.contains(projectTitle).click();
+
+    // The whitelisted IP should be displayed on the manage page
+    cy.contains("192.168.1.1").should("exist");
   });
 });
