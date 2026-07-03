@@ -51,9 +51,9 @@ var ProjectTREPlatforms = []ProjectTREPlatform{ProjectTREPlatformAWS, ProjectTRE
 type ProjectTREVMImage struct {
 	ModelAuditable
 	Name        string             `gorm:"not null"`
-	ImageId     string             `gorm:"not null"` // e.g. AMI id
+	ImageId     string             `gorm:"not null;index:idx_id_platform,unique"` // e.g. AMI id
 	Description string             `gorm:"not null"`
-	Platform    ProjectTREPlatform `gorm:"not null;index"`
+	Platform    ProjectTREPlatform `gorm:"not null;index:idx_id_platform,unique"`
 }
 
 type ProjectTREStatus string
