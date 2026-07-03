@@ -54,6 +54,20 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 	ctx.JSON(http.StatusOK, userStatus)
 }
 
+func (h *Handler) GetProjects(c *gin.Context) {
+	projectTREs, err := h.projects.AllProjectTREs()
+	if err != nil {
+		setError(c, err)
+		return
+	}
+
+	response := make([]openapi.Project, 0, len(projectTREs))
+	for _, tre := range projectTREs {
+		response = append(response, toApiProjectResponse(tre))
+	}
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *Handler) PostProjectsProjectName(ctx *gin.Context, projectName string) {
 	data := openapi.ProjectUpdate{}
 	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
@@ -81,4 +95,48 @@ func (h *Handler) PostVmImages(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusNoContent)
+}
+
+// Convert TRE project to API project response type
+func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
+	project := openapi.Project{
+		Name:                          projectTRE.Project.Name,
+		Platform:                      "",
+		MonthlyBudget:                 0,
+		BackupEnabled:                 false,
+		EncryptionKeyEnabled:          projectTRE.ExternalEncryptionEnabled,
+		Owners:                        []string{},
+		ApiUsers:                      []string{},
+		Usernames:                     map[string]string{},
+		Uids:                          map[string]int{},
+		Uploaders:                     []string{},
+		Downloaders:                   []string{},
+		EgressRequesters:              []string{},
+		EgressCheckers:                []string{},
+		DesktopUsers:                  []string{},
+		EgressNumberRequiredApprovals: projectTRE.EgressNumberRequiredApprovals,
+		Airlock:                       openapi.Airlock{},
+		Desktop:                       openapi.Image{},
+		Efs:                           openapi.Efs{},
+	}
+
+	// Unwind role bindings into individual project fields
+	for _, binding := range projectTRE.TRERoleBindings {
+		username := string(binding.User.Username)
+		switch binding.Role {
+		case types.ProjectTREIngresser:
+			project.Uploaders = append(project.Uploaders, username)
+		case types.ProjectTREEgresser:
+			project.Downloaders = append(project.Downloaders, username)
+		case types.ProjectTREEgressRequester:
+			project.EgressRequesters = append(project.EgressRequesters, username)
+		case types.ProjectTREEgressChecker:
+			project.EgressCheckers = append(project.EgressCheckers, username)
+		case types.ProjectTREDesktopUser:
+			project.DesktopUsers = append(project.DesktopUsers, username)
+		case types.ProjectTREAPIUser:
+			project.ApiUsers = append(project.ApiUsers, username)
+		}
+	}
+	return project
 }

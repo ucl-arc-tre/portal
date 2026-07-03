@@ -321,6 +321,21 @@ func (s *Service) genericProjectsQuery() *gorm.DB {
 		Joins("left join project_tres pt on pt.project_id = projects.id")
 }
 
+// Retrieve all active TRE projects together with role bindings and members
+func (s *Service) AllProjectTREs() ([]types.ProjectTRE, error) {
+	var projectTREs []types.ProjectTRE
+	err := s.db.
+		Preload("Project").
+		Preload("TRERoleBindings.User").
+		Joins("join projects on projects.id = project_tres.project_id").
+		Joins("join environments on environments.id = projects.environment_id").
+		Where("environments.name = ?", environments.TRE).
+		Where("projects.deleted_at IS NULL").
+		Find(&projectTREs).Error
+
+	return projectTREs, types.NewErrFromGorm(err, "failed to retrieve project TREs")
+}
+
 // retrieves a single TRE project by ID with all related data
 func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error) {
 	var projectTRE types.ProjectTRE
