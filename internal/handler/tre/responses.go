@@ -21,12 +21,14 @@ func setError(ctx *gin.Context, err error) {
 			Message: v.ClientReadableReason,
 		})
 		return
+	} else if errors.Is(err, types.ErrInvalidObject) {
+		log.Err(err).Msg("Invalid object")
+		ctx.JSON(http.StatusNotAcceptable, openapi.Error{Message: "Invalid object"})
+		return
 	}
 
 	statusCode := http.StatusInternalServerError
-	if errors.Is(err, types.ErrInvalidObject) {
-		statusCode = http.StatusNotAcceptable
-	} else if errors.Is(err, types.ErrNotFound) {
+	if errors.Is(err, types.ErrNotFound) {
 		statusCode = http.StatusNotFound
 	} else {
 		err = fmt.Errorf("unknown error: %v", err)
