@@ -94,17 +94,11 @@
   transition: all 0.2s ease;
 }
 
-.member-item:hover {
-  background: #f0f3f5;
-  border-color: var(--form-purple--light);
-}
-
 .member-item:last-child {
   margin-bottom: 0;
 }
 
 .member-username {
-  font-weight: 600;
   color: #333;
   font-size: 1rem;
 }
