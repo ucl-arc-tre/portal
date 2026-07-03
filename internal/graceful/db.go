@@ -45,6 +45,7 @@ func InitDB() {
 		&types.Project{},
 		&types.ProjectTRE{},
 		&types.ProjectTRERoleBinding{},
+		&types.ProjectTREVMImage{},
 		&types.ProjectAsset{},
 		&types.TokenVerificationKey{},
 		&types.Token{},
