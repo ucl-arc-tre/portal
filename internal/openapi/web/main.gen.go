@@ -567,6 +567,7 @@ func (e ProjectTRERoleName) Valid() bool {
 // Defines values for ProjectTREStatus.
 const (
 	ProjectTREStatusDeleted         ProjectTREStatus = "deleted"
+	ProjectTREStatusDeployed        ProjectTREStatus = "deployed"
 	ProjectTREStatusIncomplete      ProjectTREStatus = "incomplete"
 	ProjectTREStatusPendingApproval ProjectTREStatus = "pending-approval"
 	ProjectTREStatusPendingCreation ProjectTREStatus = "pending-creation"
@@ -578,6 +579,8 @@ const (
 func (e ProjectTREStatus) Valid() bool {
 	switch e {
 	case ProjectTREStatusDeleted:
+		return true
+	case ProjectTREStatusDeployed:
 		return true
 	case ProjectTREStatusIncomplete:
 		return true
