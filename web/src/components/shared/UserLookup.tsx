@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { Alert, AlertTitle, AlertMessage, Input, Label } from "./uikitExports";
+import { Alert, AlertMessage, CheckSquareIcon, InfoIcon, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsers, postUsersInvite, UserData } from "@/openapi";
 import styles from "./UserLookup.module.css";
@@ -174,24 +174,28 @@ export default function UserLookup(props: UserLookupProps) {
         <div className={styles["selected-users"]}>
           <Label>Selected Users</Label>
           {selectedUsers.map((result) => (
-            <div key={result.user.id}>
-              <Alert type="success" className={styles["user-result"]}>
-                <AlertTitle>{result.chosen_name}</AlertTitle>
-                <AlertMessage className={styles["user-result-content"]}>
-                  {result.user.username}
-
-                  <Button
-                    size="small"
-                    variant="secondary"
-                    onClick={() => handleRemoveUser(result)}
-                    data-cy="remove-user-from-selection"
-                  >
-                    x Remove
-                  </Button>
-                </AlertMessage>
-                {roleControl && <h4 className={styles["role-heading"]}>Roles</h4>}
-                {typeof roleControl === "function" ? roleControl(result) : roleControl}
-              </Alert>
+            <div className={`${styles["user-item"]} ${styles.selected}`} key={result.user.id}>
+              <div className={styles["user-info"]}>
+                <CheckSquareIcon />
+                <div>
+                  <h4>{result.chosen_name}</h4>
+                  <p>{result.user.username}</p>
+                </div>
+              </div>
+              <Button
+                size="small"
+                variant="secondary-destructive"
+                onClick={() => handleRemoveUser(result)}
+                data-cy="remove-user-from-selection"
+              >
+                x Remove
+              </Button>
+              {roleControl && (
+                <div className={styles["role-control"]}>
+                  <h5 className={styles["role-heading"]}>Roles</h5>
+                  {typeof roleControl === "function" ? roleControl(result) : roleControl}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -227,7 +231,7 @@ export default function UserLookup(props: UserLookupProps) {
       )}
       {searchQuery.length > 3 &&
         (noResultsFound ? (
-          <Alert type="warning" className={styles["user-result"]}>
+          <Alert type="warning">
             &quot;{searchQuery}&quot; not found.{" "}
             {searchQuery.includes("@") && (
               <Button
@@ -245,23 +249,24 @@ export default function UserLookup(props: UserLookupProps) {
         ) : searchResults.length > 0 ? (
           <div id="search-results">
             {searchResults.map((result) => (
-              <div key={result.user.id} data-id={result.user.id}>
-                <Alert type="info" className={styles["user-result"]}>
-                  <AlertTitle>{result.chosen_name}</AlertTitle>
-                  <AlertMessage className={styles["user-result-content"]}>
-                    {result.user.username}
-                    {selectedUsers.length! <= limit && (
-                      <Button
-                        size="small"
-                        variant="secondary"
-                        onClick={() => handleAddUser(result)}
-                        data-cy="add-user-to-selection"
-                      >
-                        + Add
-                      </Button>
-                    )}
-                  </AlertMessage>
-                </Alert>
+              <div className={`${styles["user-item"]} ${styles.result}`} key={result.user.id} data-id={result.user.id}>
+                <div className={styles["user-info"]}>
+                  <InfoIcon />
+                  <div>
+                    <h4>{result.chosen_name}</h4>
+                    <p>{result.user.username}</p>
+                  </div>
+                </div>
+                {selectedUsers.length! <= limit && (
+                  <Button
+                    size="small"
+                    variant="secondary"
+                    onClick={() => handleAddUser(result)}
+                    data-cy="add-user-to-selection"
+                  >
+                    + Add
+                  </Button>
+                )}
               </div>
             ))}
           </div>

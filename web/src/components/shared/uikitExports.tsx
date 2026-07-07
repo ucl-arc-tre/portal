@@ -12,6 +12,10 @@ export const AlertCircleIcon = dynamic(() => import("uikit-react-public").then((
   ssr: false,
 });
 
+export const CheckSquareIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.CheckSquare), {
+  ssr: false,
+});
+
 //  COMPONENTS
 export const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
   ssr: false,
