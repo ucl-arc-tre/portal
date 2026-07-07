@@ -17,6 +17,16 @@ func (p ProjectTREUpdate) AssetUUIDs() ([]uuid.UUID, error) {
 	return parseManyUUID(p.AssetIds)
 }
 
+func (p ProjectTRERequest) Base() ProjectTREBase {
+	return ProjectTREBase{
+		ExternalEncryptionEnabled:  p.ExternalEncryptionEnabled,
+		NumRequiredEgressApprovals: p.NumRequiredEgressApprovals,
+		AssetIds:                   p.AssetIds,
+		Members:                    p.Members,
+		AirlockWhitelist:           p.AirlockWhitelist,
+	}
+}
+
 func parseManyUUID(values []string) ([]uuid.UUID, error) {
 	uuids := []uuid.UUID{}
 	for _, value := range values {

@@ -4,15 +4,13 @@ import TrainingCertificate from "./approved-researcher-components/TrainingCertif
 import Button from "../ui/Button";
 import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import styles from "./CertificateReupload.module.css";
+import { formatDate } from "../shared/exports";
 
 type Props = {
   trainingData: ProfileTraining | null;
   expiryUrgency: ExpiryUrgency | null;
   onReupload: () => void;
 };
-
-const formatDate = (dateStr: string) =>
-  new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 const getExpiryDate = (completedAt: string) => {
   const expiry = new Date(completedAt);

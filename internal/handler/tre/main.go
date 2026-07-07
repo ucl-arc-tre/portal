@@ -24,14 +24,14 @@ func New() *Handler {
 	return &Handler{users: users.New(), projects: projects.New()}
 }
 
+func (h *Handler) GetPing(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, openapi.Ping{Message: "pong"})
+}
+
 func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusParams) {
 	user, err := h.users.UserByUsername(types.Username(params.Username))
-	if errors.Is(err, types.ErrNotFound) {
-		ctx.Status(http.StatusNotFound)
-		return
-	} else if err != nil {
-		log.Err(err).Any("params", params).Msg("Failed to get user")
-		ctx.Status(http.StatusInternalServerError)
+	if err != nil {
+		setError(ctx, err)
 		return
 	}
 	userStatus := openapi.UserStatus{}
@@ -57,13 +57,13 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 func (h *Handler) PostProjectsProjectNameStatus(ctx *gin.Context, projectName string) {
 	data := openapi.ProjectStatusUpdate{}
 	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
-		log.Err(err).Str("projectName", projectName).Msg("Failed to bind ProjectStatusUpdate")
-		ctx.Status(http.StatusNotAcceptable)
+		setError(ctx, types.NewErrInvalidObject("failed to bind ProjectStatusUpdate"))
 		return
 	}
 	status := types.ProjectTREStatus(data.Status)
 	if !data.Status.Valid() {
 		ctx.Status(http.StatusNotAcceptable)
+		setError(ctx, types.NewErrClientInvalidObjectF("invalid status"))
 		return
 	} else if status != types.ProjectTREStatusDeployed && status != types.ProjectTREStatusDeleted {
 		setError(ctx, types.NewErrInvalidObjectF("Status can only be deployed or deleted, was [%s]", status))
@@ -71,6 +71,21 @@ func (h *Handler) PostProjectsProjectNameStatus(ctx *gin.Context, projectName st
 	}
 
 	err := h.projects.UpdateProjectTREStatus(projectName, status)
+	if err != nil {
+		setError(ctx, err)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) PostVmImages(ctx *gin.Context) {
+	data := openapi.VMImage{}
+	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
+		setError(ctx, types.NewErrInvalidObject("failed to bind VMImage"))
+		return
+	}
+
+	err := h.projects.CreateTREVMImage(data)
 	if err != nil {
 		setError(ctx, err)
 		return

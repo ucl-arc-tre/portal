@@ -16,7 +16,8 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
-import CreateProjectForm from "@/components/projects/CreateProjectForm";
+import ProjectForm from "@/components/projects/ProjectForm";
+import { roleLabel } from "@/components/projects/tre/roles";
 
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
@@ -336,6 +337,29 @@ export default function ManageProjectPage() {
             <label>Study:</label>
             <span>{project.study_title}</span>
           </div>
+          <div className={styles.field}>
+            <label>Number of approvals required for egress:</label>
+            <span>{project.num_required_egress_approvals}</span>
+          </div>
+          <div className={styles.field}>
+            <label>External encryption enabled:</label>
+            <span>{project.external_encryption_enabled ? "Yes" : "No"}</span>
+          </div>
+
+          <div className={styles.field}>
+            <label>Airlock whitelist:</label>
+            {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
+              <ul className={styles["assets-list"]}>
+                {project.airlock_whitelist.map((entry, index) => (
+                  <li key={index} className={styles["asset-item"]}>
+                    {entry}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
+            )}
+          </div>
 
           <div className={styles.field}>
             <label>Members:</label>
@@ -347,7 +371,7 @@ export default function ManageProjectPage() {
                     <div className={styles["member-roles"]}>
                       {member.roles.map((role, roleIndex) => (
                         <span key={roleIndex} className={styles["role-badge"]}>
-                          {role.replace(/_/g, " ")}
+                          {roleLabel(role)}
                         </span>
                       ))}
                     </div>
@@ -380,7 +404,7 @@ export default function ManageProjectPage() {
         </Box>
 
         {showEditForm && project && (
-          <CreateProjectForm
+          <ProjectForm
             approvedStudies={approvedStudy}
             editingProject={project}
             handleProjectCreated={() => handleProjectCreated()}

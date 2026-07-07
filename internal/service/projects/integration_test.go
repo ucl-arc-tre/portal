@@ -23,7 +23,6 @@ import (
 // To be called by each test within this package to AutoMigrate
 // only the models/tables required by this package
 func migrate(db *gorm.DB) error {
-
 	// Run migrations, only the models/tables required by this package
 	err := db.AutoMigrate(
 		&types.User{},
@@ -103,29 +102,30 @@ func TestCreateProjectTRE(t *testing.T) {
 		On("UserIds", mock.Anything, mock.Anything).
 		Return(
 			map[types.Username]uuid.UUID{
-				types.Username("bob@testIntegration.com"):   creator.ID,
-				types.Username("alice@testIntegration.com"): user1.ID,
+				creator.Username: creator.ID,
+				user1.Username:   user1.ID,
 			},
 			nil,
 		)
 
 	req := openapi.ProjectTRERequest{
-		Name:     "proj123",
-		StudyId:  study.ID.String(),
-		AssetIds: []string{asset.ID.String()},
-
+		Name:                       "proj123",
+		StudyId:                    study.ID.String(),
+		AssetIds:                   []string{asset.ID.String()},
+		NumRequiredEgressApprovals: 2,
 		Members: []openapi.ProjectTREMember{
 			{
-				Username: "bob@testIntegration.com",
+				Username: string(creator.Username),
 				Roles: []openapi.ProjectTRERoleName{
 					openapi.TrustedEgresser,
 				},
 			},
 			{
-				Username: "alice@testIntegration.com",
+				Username: string(user1.Username),
 				Roles: []openapi.ProjectTRERoleName{
 					openapi.DesktopUser,
 					openapi.Ingresser,
+					openapi.APIUser,
 				},
 			},
 		},
@@ -140,10 +140,22 @@ func TestCreateProjectTRE(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	var project types.Project
-	err = db.First(&project).Error
+	var projectTRE types.ProjectTRE
+	err = db.Preload("Project").Preload("TRERoleBindings.User").First(&projectTRE).Error
 	require.NoError(t, err)
 
-	require.Equal(t, "proj123", project.Name)
-	require.Equal(t, creator.ID, project.CreatorUserID)
+	assert.True(t, projectTRE.AirlockSSHEnabled) // airlock ssh expecteed to be always enabled
+	assert.Equal(t, 2, projectTRE.EgressNumberRequiredApprovals)
+	assert.Equal(t, types.ProjectTREStatusIncomplete, projectTRE.Status)
+
+	// Assert relationships
+	roles := projectTRE.TRERoleBindings
+	assert.Equal(t, creator.Username, roles[0].User.Username)
+	assert.Equal(t, user1.Username, roles[1].User.Username)
+	assert.Equal(t, types.ProjectTRETrustedEgresser, roles[0].Role)
+	assert.Equal(t, types.ProjectTREDesktopUser, roles[1].Role)
+
+	project := projectTRE.Project
+	assert.Equal(t, "proj123", project.Name)
+	assert.Equal(t, creator.ID, project.CreatorUserID)
 }

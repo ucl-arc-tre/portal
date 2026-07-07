@@ -3,17 +3,21 @@ import Box from "../ui/Box";
 import Dialog from "../ui/Dialog";
 import Button from "../ui/Button";
 import { useForm } from "react-hook-form";
-import { deleteTokensDshByTokenId, getTokensDsh, postTokensDsh, Token } from "@/openapi";
+import { deleteTokensByEnvironmentByTokenId, postTokensByEnvironment, getTokensByEnvironment, Token } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import styles from "./DSHTokens.module.css";
+import styles from "./Tokens.module.css";
 import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
+
+type Props = {
+  environment: "tre" | "dsh";
+};
 
 type FormData = {
   name: string;
   expiryDays: string;
 };
 
-export default function DSHTokens() {
+export default function Tokens(props: Props) {
   const [formOpen, setFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null);
@@ -21,10 +25,13 @@ export default function DSHTokens() {
   const [tokens, setTokens] = useState<Array<Token>>([]);
   const [tokenValue, setTokenValue] = useState<string | null>(null);
 
+  const { environment } = props;
+  const environmentTitle = environment.toLocaleUpperCase();
+
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const response = await getTokensDsh();
+        const response = await getTokensByEnvironment({ path: { environment } });
         if (responseIsError(response) || !response.data) {
           const errorMsg = extractErrorMessage(response);
           setErrorMessage(`Failed to load tokens: ${errorMsg}`);
@@ -36,11 +43,12 @@ export default function DSHTokens() {
       }
     };
     fetchTokens();
-  }, [setTokens]);
+  }, [environment, setTokens]);
 
   const handleCloseForm = () => {
     setFormOpen(false);
     setTokenValue(null);
+    reset();
   };
 
   const handleCreateClick = () => {
@@ -54,8 +62,8 @@ export default function DSHTokens() {
     }
 
     setErrorMessage(null);
-    const response = await deleteTokensDshByTokenId({
-      path: { tokenId: id },
+    const response = await deleteTokensByEnvironmentByTokenId({
+      path: { environment, tokenId: id },
     });
     if (responseIsError(response)) {
       const errorMsg = extractErrorMessage(response);
@@ -70,7 +78,8 @@ export default function DSHTokens() {
       setIsSubmitting(true);
       setFormErrorMessage(null);
 
-      const response = await postTokensDsh({
+      const response = await postTokensByEnvironment({
+        path: { environment },
         body: {
           name: data.name,
           valid_for_days: parseInt(data.expiryDays),
@@ -100,6 +109,7 @@ export default function DSHTokens() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -111,8 +121,8 @@ export default function DSHTokens() {
     <>
       <Box>
         <div className={styles["title-container"]}>
-          <h3>DSH API Tokens</h3>
-          <Button onClick={handleCreateClick} data-cy="create-dsh-token-button">
+          <h3>{environmentTitle} API Tokens</h3>
+          <Button onClick={handleCreateClick} data-cy="create-token-button">
             Create
           </Button>
         </div>
@@ -121,8 +131,10 @@ export default function DSHTokens() {
           <div className={styles.list}>
             <p>No items to display</p>
             <HelperText>
-              <a href="https://github.com/ucl-arc-tre/portal/blob/main/api/dsh.yaml">DSH API</a> tokens can be used to
-              query the state of approved researchers and studies from the portal.
+              <a href={`https://github.com/ucl-arc-tre/portal/blob/main/api/${environment}.yaml`}>
+                {environmentTitle} API
+              </a>{" "}
+              tokens can be used to query the state of approved researchers and studies from the portal.
             </HelperText>
           </div>
         )}
@@ -167,10 +179,10 @@ export default function DSHTokens() {
       </Box>
 
       {formOpen && (
-        <Dialog setDialogOpen={handleCloseForm} cy="create-dsh-token-form">
+        <Dialog setDialogOpen={handleCloseForm} cy="create-token-form">
           {!tokenValue && (
             <form onSubmit={handleSubmit(onFormSubmit)} className="form">
-              <h3>DSH API Tokens</h3>
+              <h3>{environmentTitle} API Tokens</h3>
               <div className={styles.field}>
                 <Label htmlFor="name">Name *</Label>
                 <input
@@ -220,12 +232,18 @@ export default function DSHTokens() {
             <div className={styles["token-container"]}>
               <Alert type="info">
                 Use this bearer token for the{" "}
-                <a href="https://github.com/ucl-arc-tre/portal/blob/main/api/dsh.yaml">DSH API</a> with e.g.
+                <a href={`https://github.com/ucl-arc-tre/portal/blob/main/api/${environment}.yaml`}>
+                  {environmentTitle} API
+                </a>{" "}
+                with e.g.
                 <p className={styles.code}>
-                  {`curl -H "Authorization: Bearer <token>" \ https://portal.arc.ucl.ac.uk/dsh/api/v0/approved-researchers`}
+                  {environment === "dsh" &&
+                    `curl -H "Authorization: Bearer <token>" \ https://portal.arc.ucl.ac.uk/dsh/api/v0/approved-researchers`}
+                  {environment === "tre" &&
+                    `curl -H "Authorization: Bearer <token>" \ https://portal.arc.ucl.ac.uk/tre/api/v0/user-status?username=bob`}
                 </p>
               </Alert>
-              <div className={styles["token-display"]} data-cy="dsh-token-value">
+              <div className={styles["token-display"]} data-cy="token-value">
                 {tokenValue}
               </div>
               <Alert type="warning">

@@ -136,9 +136,11 @@ paths:
         default:
           description: Unexpected error
 
-  /tokens/dsh:
+  /tokens/{environment}:
     get:
-      description: List tokens for the DSH API
+      description: List tokens for an environment API
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentParam"
       responses:
         "200":
           content:
@@ -153,6 +155,8 @@ paths:
           description: Unexpected error
     post:
       description: Create a token for the DSH API
+      parameters:
+        - $ref: "#/components/parameters/EnvironmentParam"
       requestBody:
         required: true
         content:
@@ -169,10 +173,11 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-  /tokens/dsh/{tokenId}:
+  /tokens/{environment}/{tokenId}:
     delete:
       description: Revoke a token for the DSH API
       parameters:
+        - $ref: "#/components/parameters/EnvironmentParam"
         - in: path
           name: tokenId
           required: true
@@ -1257,6 +1262,16 @@ components:
       description: Contract object UUID
       schema:
         type: string
+    EnvironmentParam:
+      in: path
+      name: environment
+      required: true
+      description: Short environment name
+      schema:
+        type: string
+        enum:
+          - dsh
+          - tre
 
   schemas:
     Auth:
@@ -1998,46 +2013,24 @@ components:
     ProjectTRERequest:
       type: object
       description: Request payload for creating a new TRE project
-      required:
-        - name
-        - study_id
-        - asset_ids
-        - members
-      properties:
-        name:
-          type: string
-          description: Name of the project
-        study_id:
-          type: string
-          description: Unique identifier of the study to which the project belongs
-        asset_ids:
-          type: array
-          description: List of asset identifiers to link to this project (can be empty)
-          items:
-            type: string
-        members:
-          type: array
-          description: List of project members with their roles (can be empty)
-          items:
-            $ref: "#/components/schemas/ProjectTREMember"
+      allOf:
+        - $ref: "#/components/schemas/ProjectTREBase"
+        - required:
+            - name
+            - study_id
+          properties:
+            name:
+              type: string
+              description: Name of the project
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the project belongs
 
     ProjectTREUpdate:
       type: object
       description: Request payload for updating an existing TRE project (members and assets only)
-      required:
-        - asset_ids
-        - members
-      properties:
-        asset_ids:
-          type: array
-          description: List of asset identifiers to link to this project (can be empty)
-          items:
-            type: string
-        members:
-          type: array
-          description: List of project members with their roles (can be empty)
-          items:
-            $ref: "#/components/schemas/ProjectTREMember"
+      allOf:
+        - $ref: "#/components/schemas/ProjectTREBase"
 
     ProjectTREMember:
       type: object
@@ -2064,6 +2057,7 @@ components:
         - egress_requester
         - egress_checker
         - trusted_egresser
+        - API_user
 
     Environment:
       type: object
@@ -2128,54 +2122,80 @@ components:
     ProjectTRE:
       type: object
       description: A TRE project with base project details and environment-specific data
+      allOf:
+        - $ref: "#/components/schemas/ProjectTREBase"
+        - required:
+            - id
+            - name
+            - study_id
+            - study_title
+            - creator_username
+            - status
+            - created_at
+            - updated_at
+            - environment_name
+            - assets
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the base project
+            name:
+              type: string
+              description: Name of the project
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the project belongs
+            study_title:
+              type: string
+              description: Title of the study to which the project belongs
+            creator_username:
+              type: string
+              description: Username of the user who created the project
+            status:
+              $ref: "#/components/schemas/ProjectTREStatus"
+            created_at:
+              type: string
+              description: Time in RFC3339 format when the project was created
+            updated_at:
+              type: string
+              description: Time in RFC3339 format when the project was last updated
+            environment_name:
+              $ref: "#/components/schemas/EnvironmentName"
+            assets:
+              type: array
+              description: List of assets associated with this project
+              items:
+                $ref: "#/components/schemas/Asset"
+
+    ProjectTREBase:
       required:
-        - id
-        - name
-        - study_id
-        - study_title
-        - creator_username
-        - status
-        - created_at
-        - updated_at
-        - environment_name
-        - assets
+        - asset_ids
         - members
+        - num_required_egress_approvals
+        - external_encryption_enabled
+        - airlock_whitelist
       properties:
-        id:
-          type: string
-          description: Unique identifier for the base project
-        name:
-          type: string
-          description: Name of the project
-        study_id:
-          type: string
-          description: Unique identifier of the study to which the project belongs
-        study_title:
-          type: string
-          description: Title of the study to which the project belongs
-        creator_username:
-          type: string
-          description: Username of the user who created the project
-        status:
-          $ref: "#/components/schemas/ProjectTREStatus"
-        created_at:
-          type: string
-          description: Time in RFC3339 format when the project was created
-        updated_at:
-          type: string
-          description: Time in RFC3339 format when the project was last updated
-        environment_name:
-          $ref: "#/components/schemas/EnvironmentName"
-        assets:
+        asset_ids:
           type: array
-          description: List of assets associated with this project
+          description: List of asset identifiers to link to this project (can be empty)
           items:
-            $ref: "#/components/schemas/Asset"
+            type: string
         members:
           type: array
-          description: List of project members with their roles (TRE-specific)
+          description: List of project members with their roles (can be empty)
           items:
             $ref: "#/components/schemas/ProjectTREMember"
+        num_required_egress_approvals:
+          type: integer
+          description: Number of approvals required to egress data from the TRE
+        external_encryption_enabled:
+          type: boolean
+          description: Is external encryption enabled for this project?
+        airlock_whitelist:
+          type: array
+          description: List of IPs or FQDNs to whitelist for this project (can be empty)
+          items:
+            type: string
 
     ContractBase:
       type: object

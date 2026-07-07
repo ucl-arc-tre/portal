@@ -22,13 +22,38 @@ type Project struct {
 
 type ProjectTRE struct {
 	ModelAuditable
-	ProjectID                     uuid.UUID        `gorm:"not null;index"`
-	EgressNumberRequiredApprovals int              `gorm:"not null;default:1"`
-	Status                        ProjectTREStatus `gorm:"not null;default:'incomplete'"`
+	ProjectID                     uuid.UUID           `gorm:"not null;index"`
+	EgressNumberRequiredApprovals int                 `gorm:"not null;default:1"`
+	ExternalEncryptionEnabled     bool                `gorm:"not null;default:false"`
+	AirlockSSHEnabled             bool                `gorm:"not null;default:true"`
+	AirlockWhitelist              ProjectTREWhitelist `gorm:"serializer:json"`
+	Status                        ProjectTREStatus    `gorm:"not null;default:'incomplete'"`
 
 	// Relationships
 	Project         Project                 `gorm:"foreignKey:ProjectID"`
 	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
+}
+
+type (
+	Host                = string // e.g. "127.0.0.1" or "example.com"
+	ProjectTREWhitelist []Host
+)
+
+type ProjectTREPlatform string
+
+const (
+	ProjectTREPlatformAWS       ProjectTREPlatform = "aws"
+	ProjectTREPlatformCondenser ProjectTREPlatform = "condenser"
+)
+
+var ProjectTREPlatforms = []ProjectTREPlatform{ProjectTREPlatformAWS, ProjectTREPlatformCondenser}
+
+type ProjectTREVMImage struct {
+	ModelAuditable
+	Name        string             `gorm:"not null"`
+	ImageId     string             `gorm:"not null;index:idx_id_platform,unique"` // e.g. AMI id
+	Description string             `gorm:"not null"`
+	Platform    ProjectTREPlatform `gorm:"not null;index:idx_id_platform,unique"`
 }
 
 type ProjectTREStatus string
@@ -51,6 +76,7 @@ const (
 	ProjectTREEgressRequester ProjectTRERoleName = "egress_requester" // can request data to be egressed
 	ProjectTREEgressChecker   ProjectTRERoleName = "egress_checker"   // can approve egress requests
 	ProjectTRETrustedEgresser ProjectTRERoleName = "trusted_egresser" // can download data from the TRE without approval
+	ProjectTREAPIUser         ProjectTRERoleName = "API_user"         // can upload data through the TRE API
 )
 
 var AllProjectTRERoles = []ProjectTRERoleName{
@@ -60,6 +86,7 @@ var AllProjectTRERoles = []ProjectTRERoleName{
 	ProjectTREEgressRequester,
 	ProjectTREEgressChecker,
 	ProjectTRETrustedEgresser,
+	ProjectTREAPIUser,
 }
 
 type ProjectTRERoleBinding struct {

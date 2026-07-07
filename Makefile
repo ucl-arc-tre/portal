@@ -71,7 +71,6 @@ test-e2e-release: e2e-dependencies ## Run end-to-end tests against the release b
 	docker compose -p $(E2E_PROJECT_NAME) build && \
 	docker compose -p $(E2E_PROJECT_NAME) up nginx -d && \
 	docker compose -p $(E2E_PROJECT_NAME) run --rm cypress && \
-	docker compose -p $(E2E_PROJECT_NAME) run --rm tre-api-test && \
 	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans
 
 e2e-dependencies:

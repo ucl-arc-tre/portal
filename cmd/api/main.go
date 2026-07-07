@@ -53,8 +53,20 @@ func addWeb(router gin.IRouter) {
 
 // Add the TRE API defined by its OpenAPI spec with suitable middleware
 func addTRE(router gin.IRouter) {
-	router.Use(gin.BasicAuth(config.TREUserAccounts()))
-	apitre.RegisterHandlers(router, tre.New())
+	middlewares := []apitre.MiddlewareFunc{
+		middleware.LimitBodySize,
+		middleware.NewDefaultRateLimit(),
+	}
+
+	basicAuthAccounts := config.TREUserAccounts()
+	if useBasicAuth := len(basicAuthAccounts) > 0; useBasicAuth {
+		router.Use(gin.BasicAuth(basicAuthAccounts))
+	} else {
+		middlewares = append(middlewares, middleware.NewJWT())
+	}
+	apitre.RegisterHandlersWithOptions(router, tre.New(), apitre.GinServerOptions{
+		Middlewares: middlewares,
+	})
 }
 
 // Add the DSH API defined by its OpenAPI spec with suitable middleware
@@ -62,7 +74,7 @@ func addDSH(router gin.IRouter) {
 	apidsh.RegisterHandlersWithOptions(router, dsh.New(), apidsh.GinServerOptions{
 		Middlewares: []apidsh.MiddlewareFunc{
 			middleware.LimitBodySize,
-			middleware.NewDSHRateLimit(),
+			middleware.NewDefaultRateLimit(),
 			middleware.NewJWT(),
 		},
 	})

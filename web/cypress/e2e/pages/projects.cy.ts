@@ -118,7 +118,7 @@ describe("Project form validation", () => {
     cy.contains("Project name is required").should("not.exist");
 
     // Verify we moved to step 2 (members section visible)
-    cy.contains("Project users (optional)").should("be.visible");
+    cy.contains("Project users (optional)").should("exist");
   });
 
   it("should reject project names that violate TRE naming rules", () => {

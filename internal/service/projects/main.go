@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
@@ -28,26 +30,49 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateProjectTREData(projectTreData openapi.ProjectTRERequest, studyUUID uuid.UUID) error {
-	if !validation.TREProjectNamePattern.MatchString(projectTreData.Name) {
+func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
+	if data.NumRequiredEgressApprovals < 1 {
+		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
+	}
+	for _, ip := range data.AirlockWhitelist {
+		if !validation.IsIPv4OrFQDN(ip) {
+			return types.NewErrClientInvalidObjectF("airlock whitelist must contain only IPs or FQDNs")
+		}
+	}
+	return nil
+}
+
+func (s *Service) validateProjectTREData(data openapi.ProjectTRERequest, studyUUID uuid.UUID) error {
+	if !validation.TREProjectNamePattern.MatchString(data.Name) {
 		return types.NewErrClientInvalidObjectF("Project name must be 4-14 characters long and contain only lowercase letters and numbers")
 	}
 
-	if err := s.validateProjectNameUniqueness(projectTreData.Name); err != nil {
+	if err := s.validateProjectTREBase(data.Base()); err != nil {
 		return err
 	}
 
-	return s.validateProjectTREAssetsAndMembers(projectTreData.AssetIds, projectTreData.Members, studyUUID)
+	if err := s.validateProjectNameUniqueness(data.Name); err != nil {
+		return err
+	}
+	return s.validateProjectTREAssetsAndMembers(data.AssetIds, data.Members, studyUUID)
 }
 
-func (s *Service) validateProjectTREUpdate(projectUpdateData openapi.ProjectTREUpdate, projectTre *types.ProjectTRE) error {
+func (s *Service) validateProjectTREUpdate(data openapi.ProjectTREUpdate, projectTre *types.ProjectTRE) error {
+	if err := s.validateProjectTREBase(data); err != nil {
+		return err
+	}
+
 	isIncomplete := projectTre.Status == types.ProjectTREStatusIncomplete
 	isDeployed := projectTre.Status == types.ProjectTREStatusDeployed
 	if !isIncomplete && !isDeployed {
 		return types.NewErrInvalidObjectF("cannot update tre project with [%v] status", projectTre.Status)
 	}
 
-	return s.validateProjectTREAssetsAndMembers(projectUpdateData.AssetIds, projectUpdateData.Members, projectTre.Project.StudyID)
+	if projectTre.ExternalEncryptionEnabled && !data.ExternalEncryptionEnabled {
+		return types.NewErrClientInvalidObjectF("cannot toggle external encryption off once enabled")
+	}
+
+	return s.validateProjectTREAssetsAndMembers(data.AssetIds, data.Members, projectTre.Project.StudyID)
 }
 
 func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) error {
@@ -67,7 +92,6 @@ func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members 
 
 	// Validate members
 	if len(members) > 0 {
-
 		if err := s.validateProjectMembers(members); err != nil {
 			return err
 		}
@@ -167,9 +191,8 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 	return nil
 }
 
-func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, projectTreData openapi.ProjectTRERequest) error {
-
-	if err := s.validateProjectTREData(projectTreData, studyUUID); err != nil {
+func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, data openapi.ProjectTRERequest) error {
+	if err := s.validateProjectTREData(data, studyUUID); err != nil {
 		return err
 	}
 
@@ -186,7 +209,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 
 	// Create Project record
 	project := types.Project{
-		Name:          projectTreData.Name,
+		Name:          data.Name,
 		CreatorUserID: creator.ID,
 		StudyID:       studyUUID,
 		EnvironmentID: treEnvironment.ID,
@@ -200,7 +223,10 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	// Create ProjectTRE record
 	projectTRE := types.ProjectTRE{
 		ProjectID:                     project.ID,
-		EgressNumberRequiredApprovals: 2, // TODO: this needs follow up UI/UX and backend validation work, need to discuss with the team
+		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
+		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+		AirlockSSHEnabled:             true, // Enable airlock ssh by default
+		AirlockWhitelist:              data.AirlockWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
@@ -209,13 +235,13 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return types.NewErrFromGorm(err, "failed to create project TRE")
 	}
 
-	if err := s.createOrUpdateProjectAssets(tx, project.ID, projectTreData); err != nil {
+	if err := s.createOrUpdateProjectAssets(tx, project.ID, data); err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectTreData.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -281,7 +307,6 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("TRERoleBindings.User").
 		Where("project_id = ?", projectId).
 		First(&projectTRE).Error
-
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
 	}
@@ -367,40 +392,41 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
 }
 
-func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, projectUpdateData openapi.ProjectTREUpdate) error {
-	if err := s.validateProjectTREUpdate(projectUpdateData, projectTRE); err != nil {
+func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate) error {
+	if err := s.validateProjectTREUpdate(data, projectTRE); err != nil {
 		return err
 	}
 
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
+	projectTRE.Status = types.ProjectTREStatusIncomplete
+	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
+	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
+	projectTRE.AirlockWhitelist = data.AirlockWhitelist
+
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).
-		Update("status", types.ProjectTREStatusIncomplete)
+		Updates(projectTRE)
 
 	if err := result.Error; err != nil {
 		tx.Rollback()
-		return types.NewErrFromGorm(result.Error, "failed to update TRE project status")
+		return types.NewErrFromGorm(result.Error, "failed to update TRE project")
 	} else if result.RowsAffected == 0 {
 		return types.NewErrInvalidObject("failed to find project TRE to update")
 	}
 
-	if err := s.createOrUpdateProjectAssets(tx, projectTRE.ProjectID, projectUpdateData); err != nil {
+	if err := s.createOrUpdateProjectAssets(tx, projectTRE.ProjectID, data); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, projectUpdateData.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit update project transaction")
-	}
-
-	return nil
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
 }
 
 func (s *Service) UpdateProjectTREStatus(projectName string, status types.ProjectTREStatus) error {
@@ -474,11 +500,29 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 		return types.NewErrFromGorm(err, "failed to delete project")
 	}
 
-	if err := tx.Commit().Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to commit delete project transaction")
-	}
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit delete project transaction")
+}
 
-	return nil
+func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
+	if data.Id == "" || data.Name == "" || data.Description == "" {
+		return types.NewErrClientInvalidObjectF("id, name, description are required")
+	}
+	if !data.Platform.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid platform")
+	} else if !slices.Contains(types.ProjectTREPlatforms, types.ProjectTREPlatform(data.Platform)) {
+		return types.NewErrServerError("mismatch between api and db platform names")
+	}
+	platform := types.ProjectTREPlatform(data.Platform)
+	image := types.ProjectTREVMImage{}
+	result := s.db.Where(types.ProjectTREVMImage{ImageId: data.Id, Platform: platform}).
+		Assign(types.ProjectTREVMImage{
+			ImageId:     data.Id,
+			Name:        data.Name,
+			Description: data.Description,
+			Platform:    platform,
+		}).
+		FirstOrCreate(&image)
+	return types.NewErrFromGorm(result.Error, "failed to create TRE project vm image")
 }
 
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {

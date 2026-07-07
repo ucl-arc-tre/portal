@@ -503,7 +503,7 @@ export type ValidationError = {
 /**
  * Request payload for creating a new TRE project
  */
-export type ProjectTreRequest = {
+export type ProjectTreRequest = ProjectTreBase & {
     /**
      * Name of the project
      */
@@ -512,29 +512,12 @@ export type ProjectTreRequest = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
-    /**
-     * List of asset identifiers to link to this project (can be empty)
-     */
-    asset_ids: Array<string>;
-    /**
-     * List of project members with their roles (can be empty)
-     */
-    members: Array<ProjectTreMember>;
 };
 
 /**
  * Request payload for updating an existing TRE project (members and assets only)
  */
-export type ProjectTreUpdate = {
-    /**
-     * List of asset identifiers to link to this project (can be empty)
-     */
-    asset_ids: Array<string>;
-    /**
-     * List of project members with their roles (can be empty)
-     */
-    members: Array<ProjectTreMember>;
-};
+export type ProjectTreUpdate = ProjectTreBase;
 
 /**
  * A project member with their assigned roles
@@ -550,7 +533,7 @@ export type ProjectTreMember = {
 /**
  * Available TRE project roles
  */
-export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser';
+export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser' | 'API_user';
 
 /**
  * An environment with its tier mapping
@@ -607,7 +590,7 @@ export type Project = {
 /**
  * A TRE project with base project details and environment-specific data
  */
-export type ProjectTre = {
+export type ProjectTre = ProjectTreBase & {
     /**
      * Unique identifier for the base project
      */
@@ -642,10 +625,29 @@ export type ProjectTre = {
      * List of assets associated with this project
      */
     assets: Array<Asset>;
+};
+
+export type ProjectTreBase = {
     /**
-     * List of project members with their roles (TRE-specific)
+     * List of asset identifiers to link to this project (can be empty)
+     */
+    asset_ids: Array<string>;
+    /**
+     * List of project members with their roles (can be empty)
      */
     members: Array<ProjectTreMember>;
+    /**
+     * Number of approvals required to egress data from the TRE
+     */
+    num_required_egress_approvals: number;
+    /**
+     * Is external encryption enabled for this project?
+     */
+    external_encryption_enabled: boolean;
+    /**
+     * List of IPs or FQDNs to whitelist for this project (can be empty)
+     */
+    airlock_whitelist: Array<string>;
 };
 
 export type ContractBase = {
@@ -780,6 +782,11 @@ export type ContractIdParam = string;
  * Contract object UUID
  */
 export type ContractObjectIdParam = string;
+
+/**
+ * Short environment name
+ */
+export type EnvironmentParam = 'dsh' | 'tre';
 
 export type GetAuthData = {
     body?: never;
@@ -982,14 +989,19 @@ export type PostProfileTrainingResponses = {
 
 export type PostProfileTrainingResponse = PostProfileTrainingResponses[keyof PostProfileTrainingResponses];
 
-export type GetTokensDshData = {
+export type GetTokensByEnvironmentData = {
     body?: never;
-    path?: never;
+    path: {
+        /**
+         * Short environment name
+         */
+        environment: 'dsh' | 'tre';
+    };
     query?: never;
-    url: '/tokens/dsh';
+    url: '/tokens/{environment}';
 };
 
-export type GetTokensDshErrors = {
+export type GetTokensByEnvironmentErrors = {
     /**
      * Internal server error
      */
@@ -1000,20 +1012,25 @@ export type GetTokensDshErrors = {
     default: unknown;
 };
 
-export type GetTokensDshResponses = {
+export type GetTokensByEnvironmentResponses = {
     200: Array<Token>;
 };
 
-export type GetTokensDshResponse = GetTokensDshResponses[keyof GetTokensDshResponses];
+export type GetTokensByEnvironmentResponse = GetTokensByEnvironmentResponses[keyof GetTokensByEnvironmentResponses];
 
-export type PostTokensDshData = {
+export type PostTokensByEnvironmentData = {
     body: TokenRequest;
-    path?: never;
+    path: {
+        /**
+         * Short environment name
+         */
+        environment: 'dsh' | 'tre';
+    };
     query?: never;
-    url: '/tokens/dsh';
+    url: '/tokens/{environment}';
 };
 
-export type PostTokensDshErrors = {
+export type PostTokensByEnvironmentErrors = {
     /**
      * Internal server error
      */
@@ -1024,25 +1041,29 @@ export type PostTokensDshErrors = {
     default: unknown;
 };
 
-export type PostTokensDshResponses = {
+export type PostTokensByEnvironmentResponses = {
     200: TokenWithValue;
 };
 
-export type PostTokensDshResponse = PostTokensDshResponses[keyof PostTokensDshResponses];
+export type PostTokensByEnvironmentResponse = PostTokensByEnvironmentResponses[keyof PostTokensByEnvironmentResponses];
 
-export type DeleteTokensDshByTokenIdData = {
+export type DeleteTokensByEnvironmentByTokenIdData = {
     body?: never;
     path: {
+        /**
+         * Short environment name
+         */
+        environment: 'dsh' | 'tre';
         /**
          * ID of the token to be updated
          */
         tokenId: string;
     };
     query?: never;
-    url: '/tokens/dsh/{tokenId}';
+    url: '/tokens/{environment}/{tokenId}';
 };
 
-export type DeleteTokensDshByTokenIdErrors = {
+export type DeleteTokensByEnvironmentByTokenIdErrors = {
     /**
      * Internal server error
      */
@@ -1053,14 +1074,14 @@ export type DeleteTokensDshByTokenIdErrors = {
     default: unknown;
 };
 
-export type DeleteTokensDshByTokenIdResponses = {
+export type DeleteTokensByEnvironmentByTokenIdResponses = {
     /**
      * OK
      */
     204: void;
 };
 
-export type DeleteTokensDshByTokenIdResponse = DeleteTokensDshByTokenIdResponses[keyof DeleteTokensDshByTokenIdResponses];
+export type DeleteTokensByEnvironmentByTokenIdResponse = DeleteTokensByEnvironmentByTokenIdResponses[keyof DeleteTokensByEnvironmentByTokenIdResponses];
 
 export type GetAgreementsByAgreementTypeData = {
     body?: never;

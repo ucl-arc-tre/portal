@@ -1,0 +1,60 @@
+.role-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background-color: #e7f3ff;
+  border: 1px solid var(--ucl-accent);
+  border-radius: var(--default-border-radius);
+  font-size: 0.875rem;
+  color: var(--ucl-accent);
+}
+
+.role-tooltip span[class*="tooltip__content"] {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.role-tag-remove {
+  background: none;
+  border: none;
+  color: var(--ucl-accent);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: bold;
+}
+
+.role-tag-remove:hover {
+  color: var(--ucl-mid);
+}
+
+.role-dropdown {
+  margin-top: 0.5rem;
+}
+
+.researcher-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.researcher-content > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.num-egress-approvals-alert {
+  margin-top: 0.75rem;
+}
