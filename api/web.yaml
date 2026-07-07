@@ -2042,8 +2042,6 @@ components:
       required:
         - username
         - roles
-        - uid
-        - desktop_config
       properties:
         username:
           type: string

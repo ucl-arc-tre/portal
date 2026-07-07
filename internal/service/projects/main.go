@@ -99,12 +99,15 @@ func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members 
 	minValidUid := 1001 // *MUST* not change
 	validUids := []int{}
 	for _, member := range members {
-		if member.Uid < minValidUid {
-			return types.NewErrClientInvalidObjectF("UID was below the allowed minimum")
-		} else if slices.Contains(validUids, member.Uid) {
-			return types.NewErrClientInvalidObjectF("UID [%d] was not unique", member.Uid)
+		if member.Uid == nil {
+			continue
 		}
-		validUids = append(validUids, member.Uid)
+		if *member.Uid < minValidUid {
+			return types.NewErrClientInvalidObjectF("UID was below the allowed minimum")
+		} else if slices.Contains(validUids, *member.Uid) {
+			return types.NewErrClientInvalidObjectF("UID [%d] was not unique", *member.Uid)
+		}
+		validUids = append(validUids, *member.Uid)
 	}
 
 	return nil
@@ -609,7 +612,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 
 	projectTRE := types.ProjectTRE{}
 	now := time.Now()
-	err := tx.Preload("UserConfigs").Preload("TRERoleBindings").Where("project_id = ?", project.ID).
+	err := tx.Where("project_id = ?", project.ID).
 		Assign(types.ProjectTRE{
 			ProjectID:                     project.ID,
 			Status:                        types.ProjectTREStatus(data.Status),
@@ -628,7 +631,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create tre project")
 	}
-	// log.Debug().Any("projectTRE", projectTRE).Msg("Got TRE project")
+	log.Debug().Any("projectTRE", projectTRE).Msg("Got TRE project")
 
 	users := map[types.Username]types.User{}
 	roleBindings := []types.ProjectTRERoleBinding{}
@@ -648,29 +651,42 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			})
 		}
 	}
-
-	if err := graceful.UpdateManyExisting(tx, projectTRE.TRERoleBindings, roleBindings); err != nil {
+	existingRoleBindings := []types.ProjectTRERoleBinding{}
+	if err := tx.Unscoped().Where("project_tre_id = ?", projectTRE.ID).Find(&existingRoleBindings).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to get ProjectTRERoleBinding")
+	}
+	if err := graceful.UpdateManyExisting(tx, existingRoleBindings, roleBindings); err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to replace tre project role bindings")
 	}
 
-	userConfigs := []types.ProjectTREUserConfig{}
 	for _, member := range data.Members {
 		user, exists := users[types.Username(member.Username)]
 		if !exists {
 			log.Error().Any("username", member.Username).Msg("User did not have any rold bindings - skipping user config")
 			continue
 		}
-		userConfigs = append(userConfigs, types.ProjectTREUserConfig{
+		if member.Uid == nil || member.DesktopConfig == nil {
+			tx.Rollback()
+			return types.NewErrClientInvalidObjectF("member uid and desktop config must be set")
+		}
+		userConfig := types.ProjectTREUserConfig{
 			ProjectTREID:          projectTRE.ID,
 			UserID:                user.ID,
-			UID:                   member.Uid,
+			UID:                   *member.Uid,
 			DesktopRootVolumeSize: member.DesktopConfig.RootVolumeGb,
-		})
-	}
-	if err := graceful.UpdateManyExisting(tx, projectTRE.UserConfigs, userConfigs); err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to replace user configs in tre project")
+		}
+		if err := tx.Where(types.ProjectTREUserConfig{ // NOTE: does not clear old associations
+			ProjectTREID: projectTRE.ID,
+			UserID:       user.ID,
+		}).Assign(types.ProjectTREUserConfig{
+			UID:                   *member.Uid,
+			DesktopRootVolumeSize: member.DesktopConfig.RootVolumeGb,
+		}).FirstOrCreate(&userConfig).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create ProjectTREUserConfig")
+		}
 	}
 
 	if _, err := rbac.AddProjectTreOwnerRole(project.StudyID, project.ID); err != nil {

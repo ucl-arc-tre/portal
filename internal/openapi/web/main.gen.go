@@ -1214,13 +1214,13 @@ type ProjectTREImport struct {
 
 // ProjectTREMember A project member with their assigned roles
 type ProjectTREMember struct {
-	DesktopConfig struct {
+	DesktopConfig *struct {
 		RootVolumeGb *int `json:"root_volume_gb,omitempty"`
-	} `json:"desktop_config"`
+	} `json:"desktop_config,omitempty"`
 
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
 	Roles    []ProjectTRERoleName `json:"roles"`
-	Uid      int                  `json:"uid"`
+	Uid      *int                 `json:"uid,omitempty"`
 	Username string               `json:"username"`
 }
 

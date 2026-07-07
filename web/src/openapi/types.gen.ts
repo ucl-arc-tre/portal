@@ -524,8 +524,8 @@ export type ProjectTreUpdate = ProjectTreBase;
  */
 export type ProjectTreMember = {
     username: string;
-    uid: number;
-    desktop_config: {
+    uid?: number;
+    desktop_config?: {
         root_volume_gb?: number;
     };
     /**
