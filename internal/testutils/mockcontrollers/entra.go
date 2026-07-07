@@ -36,7 +36,7 @@ func (m *MockEntra) FindUsernames(ctx context.Context, query string) ([]types.Us
 	return args.Get(0).([]types.Username), args.Error(1)
 }
 
-func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) error {
 	panic("not implemented")
 }
 
