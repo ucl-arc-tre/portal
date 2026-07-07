@@ -2042,9 +2042,18 @@ components:
       required:
         - username
         - roles
+        - uid
+        - desktop_config
       properties:
         username:
           type: string
+        uid:
+          type: integer
+        desktop_config:
+          type: object
+          properties:
+            root_volume_gb:
+              type: integer
         roles:
           type: array
           description: List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
@@ -2074,6 +2083,8 @@ components:
         - num_required_egress_approvals
         - external_encryption_enabled
         - airlock_whitelist
+        - monthly_budget
+        - platform
       properties:
         name:
           type: string
@@ -2095,6 +2106,10 @@ components:
           type: array
           items:
             type: string
+        monthly_budget:
+          type: integer
+        platform:
+          type: string
 
     Environment:
       type: object

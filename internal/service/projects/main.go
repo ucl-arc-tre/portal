@@ -83,23 +83,28 @@ func (s *Service) validateProjectTREUpdate(data openapi.ProjectTREUpdate, projec
 func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) error {
 	// Validate assets belong to study and are compatible with TRE environment tier
 	if len(assetIds) > 0 {
-		// Get TRE environment tier
-		var treEnvironment types.Environment
-		err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
+		environment, err := s.environments.TRE()
 		if err != nil {
-			return types.NewErrFromGorm(err, "failed to fetch TRE environment")
+			return err
 		}
-
-		if err := s.validateAssets(assetIds, studyUUID, treEnvironment.Tier); err != nil {
+		if err := s.validateAssets(assetIds, studyUUID, environment.Tier); err != nil {
 			return err
 		}
 	}
 
-	// Validate members
-	if len(members) > 0 {
-		if err := s.validateProjectMembers(members); err != nil {
-			return err
+	if err := s.validateProjectMembers(members); err != nil {
+		return err
+	}
+
+	minValidUid := 1001 // *MUST* not change
+	validUids := []int{}
+	for _, member := range members {
+		if member.Uid < minValidUid {
+			return types.NewErrClientInvalidObjectF("UID was below the allowed minimum")
+		} else if slices.Contains(validUids, member.Uid) {
+			return types.NewErrClientInvalidObjectF("UID [%d] was not unique", member.Uid)
 		}
+		validUids = append(validUids, member.Uid)
 	}
 
 	return nil
@@ -132,6 +137,10 @@ func isValidProjectTRERole(role openapi.ProjectTRERoleName) bool {
 }
 
 func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) error {
+	if len(members) == 0 {
+		return nil
+	}
+
 	errorMessage := ""
 	for _, member := range members {
 		if len(member.Roles) == 0 {
@@ -600,7 +609,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 
 	projectTRE := types.ProjectTRE{}
 	now := time.Now()
-	err := tx.Preload("TRERoleBindings").Where("project_id = ?", project.ID).
+	err := tx.Preload("UserConfigs").Preload("TRERoleBindings").Where("project_id = ?", project.ID).
 		Assign(types.ProjectTRE{
 			ProjectID:                     project.ID,
 			Status:                        types.ProjectTREStatus(data.Status),
@@ -610,6 +619,8 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			AirlockWhitelist:              data.AirlockWhitelist,
 			RequestedVersionUpdatedAt:     &now,
 			DeployedVersionUpdatedAt:      &now,
+			MonthlyBudget:                 data.MonthlyBudget,
+			Platform:                      data.Platform,
 		}).
 		FirstOrCreate(&projectTRE).Error
 
@@ -619,6 +630,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 	}
 	// log.Debug().Any("projectTRE", projectTRE).Msg("Got TRE project")
 
+	users := map[types.Username]types.User{}
 	roleBindings := []types.ProjectTRERoleBinding{}
 	for _, member := range data.Members {
 		user, err := s.users.PersistedUser(types.Username(member.Username))
@@ -626,6 +638,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to get tre user")
 		}
+		users[user.Username] = user
 
 		for _, role := range member.Roles {
 			roleBindings = append(roleBindings, types.ProjectTRERoleBinding{
@@ -641,11 +654,29 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 		return types.NewErrFromGorm(err, "failed to replace tre project role bindings")
 	}
 
+	userConfigs := []types.ProjectTREUserConfig{}
+	for _, member := range data.Members {
+		user, exists := users[types.Username(member.Username)]
+		if !exists {
+			log.Error().Any("username", member.Username).Msg("User did not have any rold bindings - skipping user config")
+			continue
+		}
+		userConfigs = append(userConfigs, types.ProjectTREUserConfig{
+			ProjectTREID:          projectTRE.ID,
+			UserID:                user.ID,
+			UID:                   member.Uid,
+			DesktopRootVolumeSize: member.DesktopConfig.RootVolumeGb,
+		})
+	}
+	if err := graceful.UpdateManyExisting(tx, projectTRE.UserConfigs, userConfigs); err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to replace user configs in tre project")
+	}
+
 	if _, err := rbac.AddProjectTreOwnerRole(project.StudyID, project.ID); err != nil {
 		tx.Rollback()
 		return err
 	}
-
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to import tre project")
 }
 

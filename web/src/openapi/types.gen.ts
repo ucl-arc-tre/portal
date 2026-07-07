@@ -524,6 +524,10 @@ export type ProjectTreUpdate = ProjectTreBase;
  */
 export type ProjectTreMember = {
     username: string;
+    uid: number;
+    desktop_config: {
+        root_volume_gb?: number;
+    };
     /**
      * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
      */
@@ -544,6 +548,8 @@ export type ProjectTreImport = {
     external_encryption_enabled: boolean;
     airlock_ssh_enabled: boolean;
     airlock_whitelist: Array<string>;
+    monthly_budget: number;
+    platform: string;
 };
 
 /**

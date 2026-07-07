@@ -1205,15 +1205,22 @@ type ProjectTREImport struct {
 	Caseref                    int                `json:"caseref"`
 	ExternalEncryptionEnabled  bool               `json:"external_encryption_enabled"`
 	Members                    []ProjectTREMember `json:"members"`
+	MonthlyBudget              int                `json:"monthly_budget"`
 	Name                       string             `json:"name"`
 	NumRequiredEgressApprovals int                `json:"num_required_egress_approvals"`
+	Platform                   string             `json:"platform"`
 	Status                     string             `json:"status"`
 }
 
 // ProjectTREMember A project member with their assigned roles
 type ProjectTREMember struct {
+	DesktopConfig struct {
+		RootVolumeGb *int `json:"root_volume_gb,omitempty"`
+	} `json:"desktop_config"`
+
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
 	Roles    []ProjectTRERoleName `json:"roles"`
+	Uid      int                  `json:"uid"`
 	Username string               `json:"username"`
 }
 
