@@ -33,6 +33,7 @@ func migrate(db *gorm.DB) error {
 		&types.Project{},
 		&types.ProjectTRE{},
 		&types.ProjectTRERoleBinding{},
+		&types.ProjectTREUserConfig{},
 		&types.ProjectAsset{},
 	)
 	if err != nil {
@@ -53,8 +54,9 @@ func TestCreateProjectTRE(t *testing.T) {
 	mockUsers := new(mockusers.MockUsers)
 
 	svc := &Service{
-		db:    db,
-		users: mockUsers,
+		db:           db,
+		users:        mockUsers,
+		environments: environments.New(),
 	}
 
 	// set up test config
