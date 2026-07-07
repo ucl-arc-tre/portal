@@ -32,7 +32,7 @@ type ProjectTRE struct {
 	AirlockWhitelist              ProjectTREWhitelist `gorm:"serializer:json"`
 	Status                        ProjectTREStatus    `gorm:"not null;default:'incomplete'"`
 	MonthlyBudget                 Dollars             `gorm:"not null;default:100"`
-	Platform                      string              `gorm:"not null;default:'aws'"`
+	Platform                      ProjectTREPlatform  `gorm:"not null;default:'aws'"`
 
 	// Version of the project which has been requested
 	RequestedVersionUpdatedAt *time.Time
@@ -123,7 +123,7 @@ func (p ProjectTRERoleBinding) IsDeleted() bool {
 	return p.ModelAuditable.IsDeleted()
 }
 
-type GB = int
+type GB = uint
 
 type ProjectTREDesktopInstanceType = string // e.g. t3a.small
 

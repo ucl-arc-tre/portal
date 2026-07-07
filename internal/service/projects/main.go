@@ -578,6 +578,11 @@ func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.P
 }
 
 func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
+	tre, err := s.environments.TRE()
+	if err != nil {
+		return err
+	}
+
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
@@ -598,11 +603,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 		project.Name = data.Name
 		project.StudyID = project.Study.ID
 		project.CreatorUserID = project.Study.OwnerUserID
-		project.EnvironmentID, err = s.environments.EnvironmentId(environments.TRE)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
+		project.EnvironmentID = tre.ID
 
 		if err := tx.Create(&project).Error; err != nil {
 			tx.Rollback()
@@ -612,7 +613,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 
 	projectTRE := types.ProjectTRE{}
 	now := time.Now()
-	err := tx.Where("project_id = ?", project.ID).
+	err = tx.Where("project_id = ?", project.ID).
 		Assign(types.ProjectTRE{
 			ProjectID:                     project.ID,
 			Status:                        types.ProjectTREStatus(data.Status),
@@ -623,7 +624,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			RequestedVersionUpdatedAt:     &now,
 			DeployedVersionUpdatedAt:      &now,
 			MonthlyBudget:                 data.MonthlyBudget,
-			Platform:                      data.Platform,
+			Platform:                      types.ProjectTREPlatform(data.Platform),
 		}).
 		FirstOrCreate(&projectTRE).Error
 
@@ -671,18 +672,22 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			tx.Rollback()
 			return types.NewErrClientInvalidObjectF("member uid and desktop config must be set")
 		}
+		var rootVolumeGb *uint
+		if v := member.DesktopConfig.RootVolumeGb; v != nil {
+			rootVolumeGb = new(uint(*v))
+		}
 		userConfig := types.ProjectTREUserConfig{
 			ProjectTREID:          projectTRE.ID,
 			UserID:                user.ID,
 			UID:                   *member.Uid,
-			DesktopRootVolumeSize: member.DesktopConfig.RootVolumeGb,
+			DesktopRootVolumeSize: rootVolumeGb,
 		}
 		if err := tx.Where(types.ProjectTREUserConfig{ // NOTE: does not clear old associations
 			ProjectTREID: projectTRE.ID,
 			UserID:       user.ID,
 		}).Assign(types.ProjectTREUserConfig{
 			UID:                   *member.Uid,
-			DesktopRootVolumeSize: member.DesktopConfig.RootVolumeGb,
+			DesktopRootVolumeSize: rootVolumeGb,
 		}).FirstOrCreate(&userConfig).Error; err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create ProjectTREUserConfig")
