@@ -23,7 +23,7 @@ func (m *MockEntra) UserExists(ctx context.Context, username types.Username) (bo
 	return args.Get(0).(bool), args.Error(1)
 }
 
-func (m *MockEntra) SendInvite(ctx context.Context, email string, sponsor types.Sponsor) (*entra.InvitedUserData, error) {
+func (m *MockEntra) SendInvite(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) (*entra.InvitedUserData, error) {
 	panic("not implemented")
 }
 
