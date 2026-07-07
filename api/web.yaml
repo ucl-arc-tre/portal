@@ -820,6 +820,26 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+  /projects/tre/admin/import:
+    post:
+      description: Import a TRE project into the portal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectTREImport"
+      responses:
+        "204":
+          description: Project imported
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   # Study Asset Management
   /studies/{studyId}/assets:
@@ -2042,6 +2062,39 @@ components:
         - egress_checker
         - trusted_egresser
         - API_user
+
+    ProjectTREImport:
+      type: object
+      required:
+        - name
+        - status
+        - caseref
+        - members
+        - airlock_ssh_enabled
+        - num_required_egress_approvals
+        - external_encryption_enabled
+        - airlock_whitelist
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        caseref:
+          type: integer
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectTREMember"
+        num_required_egress_approvals:
+          type: integer
+        external_encryption_enabled:
+          type: boolean
+        airlock_ssh_enabled:
+          type: boolean
+        airlock_whitelist:
+          type: array
+          items:
+            type: string
 
     Environment:
       type: object

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
@@ -21,14 +22,16 @@ import (
 )
 
 type Service struct {
-	db    *gorm.DB
-	users users.Interface
+	db           *gorm.DB
+	users        users.Interface
+	environments *environments.Service
 }
 
 func New() *Service {
 	return &Service{
-		db:    graceful.NewDB(),
-		users: users.New(),
+		db:           graceful.NewDB(),
+		users:        users.New(),
+		environments: environments.New(),
 	}
 }
 
@@ -560,6 +563,90 @@ func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.P
 		return types.NewNotFoundError("tre project not found")
 	}
 	return nil
+}
+
+func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	project := types.Project{}
+	findResult := s.db.Where("name = ?", data.Name).Find(&project)
+	if err := findResult.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to find project")
+	} else if findResult.RowsAffected == 0 {
+		log.Debug().Str("name", data.Name).Msg("Project did not exist yet")
+
+		// NOTE: should use service here, but will be deleted after import so going quick and dirty
+		err := s.db.Where("caseref = ?", data.Caseref).First(&project.Study).Error
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to find study")
+		}
+		project.Name = data.Name
+		project.StudyID = project.Study.ID
+		project.CreatorUserID = project.Study.OwnerUserID
+		project.EnvironmentID, err = s.environments.EnvironmentId(environments.TRE)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		if err := tx.Create(&project).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create project")
+		}
+	}
+
+	projectTRE := types.ProjectTRE{}
+	now := time.Now()
+	err := tx.Preload("TRERoleBindings").Where("project_id = ?", project.ID).
+		Assign(types.ProjectTRE{
+			ProjectID:                     project.ID,
+			Status:                        types.ProjectTREStatus(data.Status),
+			EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
+			ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+			AirlockSSHEnabled:             data.AirlockSshEnabled,
+			AirlockWhitelist:              data.AirlockWhitelist,
+			RequestedVersionUpdatedAt:     &now,
+			DeployedVersionUpdatedAt:      &now,
+		}).
+		FirstOrCreate(&projectTRE).Error
+
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to create tre project")
+	}
+	// log.Debug().Any("projectTRE", projectTRE).Msg("Got TRE project")
+
+	roleBindings := []types.ProjectTRERoleBinding{}
+	for _, member := range data.Members {
+		user, err := s.users.PersistedUser(types.Username(member.Username))
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to get tre user")
+		}
+
+		for _, role := range member.Roles {
+			roleBindings = append(roleBindings, types.ProjectTRERoleBinding{
+				ProjectTREID: projectTRE.ID,
+				UserID:       user.ID,
+				Role:         types.ProjectTRERoleName(role),
+			})
+		}
+	}
+
+	if err := graceful.UpdateManyExisting(tx, projectTRE.TRERoleBindings, roleBindings); err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to replace tre project role bindings")
+	}
+
+	if _, err := rbac.AddProjectTreOwnerRole(project.StudyID, project.ID); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to import tre project")
 }
 
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {

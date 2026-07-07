@@ -1198,6 +1198,18 @@ type ProjectTREBase struct {
 	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
 }
 
+// ProjectTREImport defines model for ProjectTREImport.
+type ProjectTREImport struct {
+	AirlockSshEnabled          bool               `json:"airlock_ssh_enabled"`
+	AirlockWhitelist           []string           `json:"airlock_whitelist"`
+	Caseref                    int                `json:"caseref"`
+	ExternalEncryptionEnabled  bool               `json:"external_encryption_enabled"`
+	Members                    []ProjectTREMember `json:"members"`
+	Name                       string             `json:"name"`
+	NumRequiredEgressApprovals int                `json:"num_required_egress_approvals"`
+	Status                     string             `json:"status"`
+}
+
 // ProjectTREMember A project member with their assigned roles
 type ProjectTREMember struct {
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
@@ -1652,6 +1664,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
 
+// PostProjectsTreAdminImportJSONRequestBody defines body for PostProjectsTreAdminImport for application/json ContentType.
+type PostProjectsTreAdminImportJSONRequestBody = ProjectTREImport
+
 // PutProjectsTreProjectIdJSONRequestBody defines body for PutProjectsTreProjectId for application/json ContentType.
 type PutProjectsTreProjectIdJSONRequestBody = ProjectTREUpdate
 
@@ -1753,6 +1768,9 @@ type ServerInterface interface {
 
 	// (POST /projects/tre)
 	PostProjectsTre(c *gin.Context)
+
+	// (POST /projects/tre/admin/import)
+	PostProjectsTreAdminImport(c *gin.Context)
 
 	// (POST /projects/tre/admin/{projectId}/approve)
 	PostProjectsTreAdminProjectIdApprove(c *gin.Context, projectId ProjectIdParam)
@@ -2072,6 +2090,19 @@ func (siw *ServerInterfaceWrapper) PostProjectsTre(c *gin.Context) {
 	}
 
 	siw.Handler.PostProjectsTre(c)
+}
+
+// PostProjectsTreAdminImport operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsTreAdminImport(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsTreAdminImport(c)
 }
 
 // PostProjectsTreAdminProjectIdApprove operation middleware
@@ -3298,6 +3329,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)
 	router.GET(options.BaseURL+"/projects/tre", wrapper.GetProjectsTre)
 	router.POST(options.BaseURL+"/projects/tre", wrapper.PostProjectsTre)
+	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.DELETE(options.BaseURL+"/projects/tre/:projectId", wrapper.DeleteProjectsTreProjectId)
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)
