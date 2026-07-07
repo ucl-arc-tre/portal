@@ -52,19 +52,20 @@ describe("Study creation end-to-end", () => {
 
     // setup complete — tabs now visible, edit study to add then remove an admin
     cy.contains("Incomplete").should("be.visible");
+    cy.env(["botAdminUsername"]).then(({ botAdminUsername }) => {
+      const additionalAdminUsername = botAdminUsername.split("@")[0];
 
-    const additionalAdminUsername = "portal"; // semi placeholder until better way confirmed
-
-    cy.get('[data-cy="edit-study-button"]').click();
-    cy.get('[data-cy="user-lookup"]').type(additionalAdminUsername);
-    cy.get('button[data-cy="user-lookup-submit"]').click();
-    cy.get('[data-cy="add-user-to-selection"]').first().click();
-    cy.get('[data-cy="next"]').click();
-    cy.get('[data-cy="next"]').click();
-    cy.get("button[type='submit']").contains("Update Study").click();
-    cy.contains("Update Study").should("not.exist");
-    cy.contains("Edit Study").should("exist");
-    cy.contains(additionalAdminUsername).should("exist");
+      cy.get('[data-cy="edit-study-button"]').click();
+      cy.get('[data-cy="user-lookup"]').type(additionalAdminUsername);
+      cy.get('button[data-cy="user-lookup-submit"]').click();
+      cy.get('[data-cy="add-user-to-selection"]').first().click();
+      cy.get('[data-cy="next"]').click();
+      cy.get('[data-cy="next"]').click();
+      cy.get("button[type='submit']").contains("Update Study").click();
+      cy.contains("Update Study").should("not.exist");
+      cy.contains("Edit Study").should("exist");
+      cy.contains(additionalAdminUsername).should("exist");
+    });
   });
 
   it("admin should be able to agree to the study administrator agreement", () => {
