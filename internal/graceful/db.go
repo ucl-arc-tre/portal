@@ -72,6 +72,10 @@ func InitDB() {
 // Create a new gorm DB, blocking until a connection is made
 func NewDB() *gorm.DB {
 	dbOnce.Do(func() {
+		if db != nil {
+			return // already set
+		}
+
 		connectRetryDelay := initConnectRetryDelay
 		var err error
 		for {
@@ -88,6 +92,11 @@ func NewDB() *gorm.DB {
 		}
 	})
 	return db
+}
+
+func SetDBForTesting(testingDB *gorm.DB) {
+	log.Warn().Msg("Overwriting the database client for testing")
+	db = testingDB
 }
 
 type UpdateObject interface {

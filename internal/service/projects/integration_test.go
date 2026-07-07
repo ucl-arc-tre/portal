@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
@@ -48,8 +49,8 @@ func TestCreateProjectTRE(t *testing.T) {
 
 	// Create unique schema for this test
 	db := mockdb.NewTestDBSchema(t, migrate)
-
-	rbac.InitForTesting(db)
+	graceful.SetDBForTesting(db)
+	rbac.Init()
 
 	mockUsers := new(mockusers.MockUsers)
 
