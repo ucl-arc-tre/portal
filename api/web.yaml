@@ -1969,7 +1969,7 @@ components:
         - incomplete
         - pending-approval
         - pending-creation
-        - deployed
+        - pending-update
         - pending-deletion
         - deleted
 

@@ -567,19 +567,17 @@ func (e ProjectTRERoleName) Valid() bool {
 // Defines values for ProjectTREStatus.
 const (
 	ProjectTREStatusDeleted         ProjectTREStatus = "deleted"
-	ProjectTREStatusDeployed        ProjectTREStatus = "deployed"
 	ProjectTREStatusIncomplete      ProjectTREStatus = "incomplete"
 	ProjectTREStatusPendingApproval ProjectTREStatus = "pending-approval"
 	ProjectTREStatusPendingCreation ProjectTREStatus = "pending-creation"
 	ProjectTREStatusPendingDeletion ProjectTREStatus = "pending-deletion"
+	ProjectTREStatusPendingUpdate   ProjectTREStatus = "pending-update"
 )
 
 // Valid indicates whether the value is a known member of the ProjectTREStatus enum.
 func (e ProjectTREStatus) Valid() bool {
 	switch e {
 	case ProjectTREStatusDeleted:
-		return true
-	case ProjectTREStatusDeployed:
 		return true
 	case ProjectTREStatusIncomplete:
 		return true
@@ -588,6 +586,8 @@ func (e ProjectTREStatus) Valid() bool {
 	case ProjectTREStatusPendingCreation:
 		return true
 	case ProjectTREStatusPendingDeletion:
+		return true
+	case ProjectTREStatusPendingUpdate:
 		return true
 	default:
 		return false

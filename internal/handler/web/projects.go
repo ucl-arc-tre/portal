@@ -145,7 +145,6 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		StudyId:                    projectTRE.Project.StudyID.String(),
 		StudyTitle:                 projectTRE.Project.Study.Title,
 		CreatorUsername:            string(projectTRE.Project.CreatorUser.Username),
-		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
 		CreatedAt:                  openapi.FormatTime(projectTRE.Project.CreatedAt),
 		UpdatedAt:                  openapi.FormatTime(projectTRE.Project.UpdatedAt),
 		EnvironmentName:            openapi.EnvironmentName(projectTRE.Project.Environment.Name),
@@ -155,6 +154,13 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		Assets:                     assets,
 		Members:                    members,
 		AssetIds:                   nil,
+	}
+	if projectTRE.DeployedVersionUpdatedAt != nil &&
+		projectTRE.RequestedVersionUpdatedAt != nil &&
+		projectTRE.RequestedVersionUpdatedAt.After(*projectTRE.DeployedVersionUpdatedAt) {
+		response.Status = openapi.ProjectTREStatusPendingUpdate
+	} else {
+		response.Status = openapi.ProjectTREStatus(projectTRE.Status)
 	}
 
 	ctx.JSON(http.StatusOK, response)

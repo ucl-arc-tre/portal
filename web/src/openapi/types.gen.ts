@@ -483,7 +483,7 @@ export type ContractImport = {
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
-export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-deletion' | 'deleted';
+export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'pending-update' | 'pending-deletion' | 'deleted';
 
 export type StudyReview = {
     status: StudyApprovalStatus;

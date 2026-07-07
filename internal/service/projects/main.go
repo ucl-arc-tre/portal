@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -400,10 +402,13 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
-	projectTRE.Status = types.ProjectTREStatusIncomplete
+	if projectTRE.Status != types.ProjectTREStatusDeployed {
+		projectTRE.Status = types.ProjectTREStatusIncomplete
+	}
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
 	projectTRE.AirlockWhitelist = data.AirlockWhitelist
+	projectTRE.RequestedVersionUpdatedAt = new(time.Now())
 
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).
@@ -523,6 +528,38 @@ func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
 		}).
 		FirstOrCreate(&image)
 	return types.NewErrFromGorm(result.Error, "failed to create TRE project vm image")
+}
+
+func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.ProjectUpdate) error {
+	if !data.Status.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid status")
+	}
+	status := types.ProjectTREStatus(data.Status)
+	if status != types.ProjectTREStatusDeployed && status != types.ProjectTREStatusDeleted {
+		return types.NewErrClientInvalidObjectF("status can only be deployed or deleted, was [%s]", status)
+	}
+	deployedVersionUpdatedAt, err := time.Parse(config.TimeFormat, data.DeployedVersionUpdatedAt)
+	if err != nil {
+		return types.NewErrInvalidObject(err)
+	}
+
+	subQuery := s.db.Model(&types.ProjectTRE{}).
+		Select("project_tres.id").
+		Joins("JOIN projects ON projects.id = project_tres.project_id").
+		Where("projects.name = ?", projectName)
+
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("id IN (?)", subQuery).
+		Updates(types.ProjectTRE{
+			Status:                   status,
+			DeployedVersionUpdatedAt: &deployedVersionUpdatedAt,
+		})
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project")
+	} else if result.RowsAffected == 0 {
+		return types.NewNotFoundError("tre project not found")
+	}
+	return nil
 }
 
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
