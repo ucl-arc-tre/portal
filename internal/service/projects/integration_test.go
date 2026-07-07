@@ -220,3 +220,86 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 	assert.Equal(t, "proj123", project.Name)
 	assert.Equal(t, creator.ID, project.CreatorUserID)
 }
+
+func TestAllProjectTREs(t *testing.T) {
+	db := mockdb.NewTestDBSchema(t, migrate)
+
+	rbac.InitForTesting(db)
+
+	svc := &Service{
+		db: db,
+	}
+
+	creator := types.User{Username: "bob@testIntegration.com"}
+	require.NoError(t, db.Create(&creator).Error)
+
+	treEnv := types.Environment{
+		Name: environments.TRE,
+		Tier: 3,
+	}
+	require.NoError(t, db.Create(&treEnv).Error)
+
+	otherEnv := types.Environment{
+		Name: "Not-a-TRE",
+		Tier: 1,
+	}
+	require.NoError(t, db.Create(&otherEnv).Error)
+
+	study := types.Study{
+		OwnerUserID:    creator.ID,
+		ApprovalStatus: string(openapi.ProjectTREStatusIncomplete),
+	}
+	require.NoError(t, db.Create(&study).Error)
+
+	treProject := types.Project{
+		Name:          "TREproject",
+		CreatorUserID: creator.ID,
+		StudyID:       study.ID,
+		EnvironmentID: treEnv.ID,
+	}
+	require.NoError(t, db.Create(&treProject).Error)
+
+	nonTREProject := types.Project{
+		Name:          "nonTREproject",
+		CreatorUserID: creator.ID,
+		StudyID:       study.ID,
+		EnvironmentID: otherEnv.ID,
+	}
+	require.NoError(t, db.Create(&nonTREProject).Error)
+
+	deletedTREProject := types.Project{
+		Name:          "deletedProject",
+		CreatorUserID: creator.ID,
+		StudyID:       study.ID,
+		EnvironmentID: treEnv.ID,
+	}
+	require.NoError(t, db.Create(&deletedTREProject).Error)
+
+	treProjectTRE := types.ProjectTRE{
+		ProjectID:                     treProject.ID,
+		EgressNumberRequiredApprovals: 1,
+	}
+	require.NoError(t, db.Create(&treProjectTRE).Error)
+
+	nonTREProjectTRE := types.ProjectTRE{
+		ProjectID:                     nonTREProject.ID,
+		EgressNumberRequiredApprovals: 1,
+	}
+	require.NoError(t, db.Create(&nonTREProjectTRE).Error)
+
+	deletedTREProjectTRE := types.ProjectTRE{
+		ProjectID:                     deletedTREProject.ID,
+		EgressNumberRequiredApprovals: 1,
+	}
+	require.NoError(t, db.Create(&deletedTREProjectTRE).Error)
+	require.NoError(t, db.Delete(&deletedTREProject).Error)
+
+	projectTREs, err := svc.AllProjectTREs()
+	require.NoError(t, err)
+
+	// Only 1 active TRE project should be returned
+	require.Len(t, projectTREs, 1)
+	assert.Equal(t, treProjectTRE.ID, projectTREs[0].ID)
+	assert.Equal(t, treProject.ID, projectTREs[0].Project.ID)
+	assert.Equal(t, "TREproject", projectTREs[0].Project.Name)
+}
