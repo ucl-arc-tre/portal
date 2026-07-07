@@ -33,6 +33,29 @@ func (e ProjectStatusUpdateStatus) Valid() bool {
 	}
 }
 
+// Defines values for VMImagePlatform.
+const (
+	Aws       VMImagePlatform = "aws"
+	Condenser VMImagePlatform = "condenser"
+)
+
+// Valid indicates whether the value is a known member of the VMImagePlatform enum.
+func (e VMImagePlatform) Valid() bool {
+	switch e {
+	case Aws:
+		return true
+	case Condenser:
+		return true
+	default:
+		return false
+	}
+}
+
+// Error defines model for Error.
+type Error struct {
+	Message string `json:"message"`
+}
+
 // Ping defines model for Ping.
 type Ping struct {
 	Message string `json:"message"`
@@ -56,6 +79,22 @@ type UserStatus struct {
 	NhsdTrainingExpiresAt *string `json:"nhsd_training_expires_at,omitempty"`
 }
 
+// VMImage defines model for VMImage.
+type VMImage struct {
+	Description string `json:"description"`
+
+	// Id e.g. AMI id
+	Id       string          `json:"id"`
+	Name     string          `json:"name"`
+	Platform VMImagePlatform `json:"platform"`
+}
+
+// VMImagePlatform defines model for VMImage.Platform.
+type VMImagePlatform string
+
+// InvalidObject defines model for InvalidObject.
+type InvalidObject = Error
+
 // jWTContextKey is the context key for JWT security scheme
 type jWTContextKey string
 
@@ -71,6 +110,9 @@ type GetUserStatusParams struct {
 // PostProjectsProjectNameStatusJSONRequestBody defines body for PostProjectsProjectNameStatus for application/json ContentType.
 type PostProjectsProjectNameStatusJSONRequestBody = ProjectStatusUpdate
 
+// PostVmImagesJSONRequestBody defines body for PostVmImages for application/json ContentType.
+type PostVmImagesJSONRequestBody = VMImage
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Ping to check connectivity and auth
@@ -82,6 +124,9 @@ type ServerInterface interface {
 
 	// (GET /user-status)
 	GetUserStatus(c *gin.Context, params GetUserStatusParams)
+
+	// (POST /vm-images)
+	PostVmImages(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -164,6 +209,21 @@ func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 	siw.Handler.GetUserStatus(c, params)
 }
 
+// PostVmImages operation middleware
+func (siw *ServerInterfaceWrapper) PostVmImages(c *gin.Context) {
+
+	c.Set(string(JWTScopes), []string{"tre:w"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostVmImages(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -194,4 +254,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 	router.POST(options.BaseURL+"/projects/:projectName/status", wrapper.PostProjectsProjectNameStatus)
 	router.GET(options.BaseURL+"/user-status", wrapper.GetUserStatus)
+	router.POST(options.BaseURL+"/vm-images", wrapper.PostVmImages)
 }
