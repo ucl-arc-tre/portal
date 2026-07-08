@@ -57,7 +57,7 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 func (h *Handler) PostProjectsProjectName(ctx *gin.Context, projectName string) {
 	data := openapi.ProjectUpdate{}
 	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
-		setError(ctx, types.NewErrInvalidObject("failed to bind ProjectStatusUpdate"))
+		setError(ctx, types.NewErrInvalidObject("failed to bind ProjectUpdate"))
 		return
 	}
 	err := h.projects.UpdateProjectTREDeployed(projectName, data)

@@ -514,7 +514,7 @@ func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.P
 	}
 	deployedVersionUpdatedAt, err := time.Parse(config.TimeFormat, data.DeployedVersionUpdatedAt)
 	if err != nil {
-		return types.NewErrInvalidObject(err)
+		return types.NewErrClientInvalidObjectF("failed to parse deployed update time: %s", err.Error())
 	}
 
 	subQuery := s.db.Model(&types.ProjectTRE{}).
