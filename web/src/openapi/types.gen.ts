@@ -483,7 +483,7 @@ export type ContractImport = {
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
-export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-deletion' | 'deleted';
+export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-update' | 'pending-deletion' | 'deleted';
 
 export type StudyReview = {
     status: StudyApprovalStatus;
@@ -524,6 +524,10 @@ export type ProjectTreUpdate = ProjectTreBase;
  */
 export type ProjectTreMember = {
     username: string;
+    uid?: number;
+    desktop_config?: {
+        root_volume_gb?: number;
+    };
     /**
      * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
      */
@@ -534,6 +538,19 @@ export type ProjectTreMember = {
  * Available TRE project roles
  */
 export type ProjectTreRoleName = 'desktop_user' | 'ingresser' | 'egresser' | 'egress_requester' | 'egress_checker' | 'trusted_egresser' | 'API_user';
+
+export type ProjectTreImport = {
+    name: string;
+    status: string;
+    caseref: number;
+    members: Array<ProjectTreMember>;
+    num_required_egress_approvals: number;
+    external_encryption_enabled: boolean;
+    airlock_ssh_enabled: boolean;
+    airlock_whitelist: Array<string>;
+    monthly_budget: number;
+    platform: string;
+};
 
 /**
  * An environment with its tier mapping
@@ -2032,6 +2049,41 @@ export type PostProjectsTreAdminByProjectIdApproveResponses = {
      */
     200: unknown;
 };
+
+export type PostProjectsTreAdminImportData = {
+    body: ProjectTreImport;
+    path?: never;
+    query?: never;
+    url: '/projects/tre/admin/import';
+};
+
+export type PostProjectsTreAdminImportErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsTreAdminImportResponses = {
+    /**
+     * Project imported
+     */
+    204: void;
+};
+
+export type PostProjectsTreAdminImportResponse = PostProjectsTreAdminImportResponses[keyof PostProjectsTreAdminImportResponses];
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;

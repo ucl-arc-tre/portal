@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
@@ -33,6 +34,7 @@ func migrate(db *gorm.DB) error {
 		&types.Project{},
 		&types.ProjectTRE{},
 		&types.ProjectTRERoleBinding{},
+		&types.ProjectTREUserConfig{},
 		&types.ProjectAsset{},
 	)
 	if err != nil {
@@ -47,14 +49,15 @@ func TestCreateProjectTRE(t *testing.T) {
 
 	// Create unique schema for this test
 	db := mockdb.NewTestDBSchema(t, migrate)
-
-	rbac.InitForTesting(db)
+	graceful.SetDBForTesting(db)
+	rbac.Init()
 
 	mockUsers := new(mockusers.MockUsers)
 
 	svc := &Service{
-		db:    db,
-		users: mockUsers,
+		db:           db,
+		users:        mockUsers,
+		environments: environments.New(),
 	}
 
 	// set up test config

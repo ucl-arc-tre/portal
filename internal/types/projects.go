@@ -21,6 +21,8 @@ type Project struct {
 	ProjectAssets []ProjectAsset `gorm:"foreignKey:ProjectID"`
 }
 
+type Dollars = int
+
 type ProjectTRE struct {
 	ModelAuditable
 	ProjectID                     uuid.UUID           `gorm:"not null;index"`
@@ -29,6 +31,8 @@ type ProjectTRE struct {
 	AirlockSSHEnabled             bool                `gorm:"not null;default:true"`
 	AirlockWhitelist              ProjectTREWhitelist `gorm:"serializer:json"`
 	Status                        ProjectTREStatus    `gorm:"not null;default:'incomplete'"`
+	MonthlyBudget                 Dollars             `gorm:"not null;default:100"`
+	Platform                      ProjectTREPlatform  `gorm:"not null;default:'aws'"`
 
 	// Version of the project which has been requested
 	RequestedVersionUpdatedAt *time.Time
@@ -42,6 +46,7 @@ type ProjectTRE struct {
 	// Relationships
 	Project         Project                 `gorm:"foreignKey:ProjectID"`
 	TRERoleBindings []ProjectTRERoleBinding `gorm:"foreignKey:ProjectTREID"`
+	UserConfigs     []ProjectTREUserConfig  `gorm:"foreignKey:ProjectTREID"`
 }
 
 type (
@@ -115,6 +120,35 @@ func (p ProjectTRERoleBinding) UniqueKey() string {
 }
 
 func (p ProjectTRERoleBinding) IsDeleted() bool {
+	return p.ModelAuditable.IsDeleted()
+}
+
+type GB = uint
+
+type ProjectTREDesktopInstanceType = string // e.g. t3a.small
+
+type ProjectTREUserConfig struct {
+	ModelAuditable
+	ProjectTREID                uuid.UUID `gorm:"not null;index"`
+	UserID                      uuid.UUID `gorm:"not null;index"`
+	UID                         int       `gorm:"not null"`
+	DesktopImageID              *uuid.UUID
+	DesktopRootVolumeSize       *GB
+	DesktopHomeVolumeSize       *GB
+	DesktopStandardInstanceType *ProjectTREDesktopInstanceType
+	DesktopHPCInstanceType      *ProjectTREDesktopInstanceType
+
+	// Relationships
+	DesktopImage *ProjectTREVMImage `gorm:"foreignKey:DesktopImageID"`
+	ProjectTRE   ProjectTRE         `gorm:"foreignKey:ProjectTREID"`
+	User         User               `gorm:"foreignKey:UserID"`
+}
+
+func (p ProjectTREUserConfig) UniqueKey() string {
+	return fmt.Sprintf("%v%v", p.ProjectTREID, p.UserID)
+}
+
+func (p ProjectTREUserConfig) IsDeleted() bool {
 	return p.ModelAuditable.IsDeleted()
 }
 

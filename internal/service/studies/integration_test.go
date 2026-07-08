@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/controller/s3"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
@@ -604,8 +605,8 @@ func TestIntegration_CreateStudy(t *testing.T) {
 
 	// Create unique schema for this test
 	db := mockdb.NewTestDBSchema(t, migrate)
-
-	rbac.InitForTesting(db)
+	graceful.SetDBForTesting(db)
+	rbac.Init()
 
 	mockUsers := new(mockusers.MockUsers)
 	mockEntra := new(mockcontrollers.MockEntra)

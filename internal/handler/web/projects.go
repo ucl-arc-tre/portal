@@ -254,3 +254,17 @@ func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, project
 
 	ctx.Status(http.StatusOK)
 }
+
+func (h *Handler) PostProjectsTreAdminImport(ctx *gin.Context) {
+	data := openapi.ProjectTREImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+
+	err := h.projects.ImportProjectTRE(data)
+	if err != nil {
+		setError(ctx, err, "Failed to import project")
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
