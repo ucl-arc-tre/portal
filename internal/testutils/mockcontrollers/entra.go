@@ -23,7 +23,7 @@ func (m *MockEntra) UserExists(ctx context.Context, username types.Username) (bo
 	return args.Get(0).(bool), args.Error(1)
 }
 
-func (m *MockEntra) SendInvite(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) (*entra.InvitedUserData, error) {
+func (m *MockEntra) SendInvite(ctx context.Context, invite entra.Invite) (*entra.InvitedUserData, error) {
 	panic("not implemented")
 }
 
@@ -36,7 +36,7 @@ func (m *MockEntra) FindUsernames(ctx context.Context, query string) ([]types.Us
 	return args.Get(0).([]types.Username), args.Error(1)
 }
 
-func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) error {
+func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, invite entra.Invite) error {
 	panic("not implemented")
 }
 

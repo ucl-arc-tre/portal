@@ -35,7 +35,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
+func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []Email, content string) error {
 
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
@@ -108,26 +108,28 @@ func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails
 
 }
 
-func (c *Controller) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor, studyName *string, projectName *string) error {
+func (c *Controller) SendCustomInviteNotification(ctx context.Context, invite Invite) error {
 	// use graph to send email saying so-and-so has invited you to the portal
 
-	content := "You have been invited to join the"
-	if studyName != nil {
-		if projectName != nil {
-			content += " project '" + *projectName + "' in the study '" + *studyName + "'"
+	content := "You have been invited"
+	if invite.StudyName != nil {
+		if invite.ProjectName != nil {
+			content += "to join the project '" + *invite.ProjectName + "' in the study '" + *invite.StudyName + "'."
 		} else {
-			content += " study '" + *studyName + "'"
+			content += "to join the study '" + *invite.StudyName + "'."
 		}
+	} else {
+		content += " to the UCL ARC Services Portal"
 	}
 
-	if sponsor.ChosenName != "" {
-		content += " by " + string(sponsor.ChosenName)
+	if invite.Sponsor.ChosenName != "" {
+		content += " by " + string(invite.Sponsor.ChosenName)
 	} else {
-		content += " by " + string(sponsor.Username)
+		content += " by " + string(invite.Sponsor.Username)
 	}
 	content += "\nYou can view this on the UCL ARC Services Portal"
 
-	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
+	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{invite.Recipient}, content)
 }
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
