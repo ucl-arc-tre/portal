@@ -280,7 +280,12 @@ export default function ManageProjectPage() {
                 </Button>
               )}
 
-              <Button onClick={handleSubmit} disabled={isSubmitting} size="small">
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                size="small"
+                cy="mark-project-ready-for-review-button"
+              >
                 {isSubmitting ? "Submitting..." : "Mark Ready for Review"}
               </Button>
             </div>
@@ -293,7 +298,7 @@ export default function ManageProjectPage() {
               Please review the below project details, members, and assets before approving this project.
             </p>
             <div className={styles["approval-actions"]}>
-              <Button onClick={handleApprove} disabled={isApproving} size="large">
+              <Button onClick={handleApprove} disabled={isApproving} size="large" cy="accept-project-button">
                 {isApproving ? "Approving..." : "Accept Project"}
               </Button>
             </div>

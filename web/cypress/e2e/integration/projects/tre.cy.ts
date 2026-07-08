@@ -6,7 +6,10 @@ beforeEach(() => {
 describe("TRE project creation end-to-end", () => {
   const studyTitle = `study-tre-project-${Date.now()}`;
   const assetTitle = `asset-tre-project-${Date.now()}`;
-  const projectTitle = `tre${Date.now()}`.substring(0, 14);
+  let projectTitle = `tre${Date.now()}`.substring(0, 14); // todo
+
+  const tokenName = `test-tre-${Date.now()}`;
+  let tokenValue = "";
 
   it("staff member should create a study", () => {
     cy.loginAsStaff();
@@ -51,6 +54,8 @@ describe("TRE project creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).click();
     cy.get('[data-cy="study-approve-button"]').click();
   });
@@ -85,5 +90,57 @@ describe("TRE project creation end-to-end", () => {
 
     // The whitelisted IP should be displayed on the manage page
     cy.contains("192.168.1.1").should("exist");
+
+    cy.get('[data-cy="mark-project-ready-for-review-button"]').click();
+  });
+
+  it("tre ops staff should be able to approve the project", () => {
+    cy.loginAsTREOps();
+    cy.visit("/projects");
+
+    cy.contains(projectTitle).click();
+    cy.get(`[data-cy="accept-project-button"]`).click();
+  });
+
+  it("trepos API should be able to get an api token", () => {
+    cy.loginAsTREOps();
+
+    cy.visit("/profile");
+    cy.get('[data-cy="create-token-button"]').click();
+    cy.get('[data-cy="create-token-form"]').should("be.visible");
+    cy.get('[name="name"]').type(tokenName);
+    cy.get('button[aria-disabled="false"][type="submit"]').click();
+
+    cy.get('[data-cy="token-value"]').then(($div) => {
+      tokenValue = $div.text();
+    });
+  });
+
+  it("tre API should be able to mark the project as deployed", () => {
+    if (!tokenValue) {
+      throw new Error("unset token");
+    }
+
+    const headers = {
+      authorization: `Bearer ${tokenValue}`,
+    };
+
+    cy.request({
+      method: "POST",
+      url: `/tre/api/v0/projects/${projectTitle}`,
+      headers: headers,
+      body: {
+        status: "deployed",
+        deployed_version_updated_at: new Date().toISOString(),
+      },
+    }).should("be.ok");
+  });
+
+  it("project should now show as deployed", () => {
+    cy.loginAsTREOps();
+    cy.visit("/projects");
+
+    cy.contains(projectTitle).click();
+    cy.contains("deployed").should("be.visible");
   });
 });
