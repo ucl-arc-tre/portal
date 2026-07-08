@@ -96,13 +96,12 @@ func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members 
 		return err
 	}
 
-	minValidUid := 1001 // *MUST* not change
 	validUids := []int{}
 	for _, member := range members {
 		if member.Uid == nil {
 			continue
 		}
-		if *member.Uid < minValidUid {
+		if *member.Uid < validation.ProjectTREMinValidUid {
 			return types.NewErrClientInvalidObjectF("UID was below the allowed minimum")
 		} else if slices.Contains(validUids, *member.Uid) {
 			return types.NewErrClientInvalidObjectF("UID [%d] was not unique", *member.Uid)
