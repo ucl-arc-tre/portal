@@ -323,7 +323,9 @@ export default function ManageProjectPage() {
           </div>
           <div className={styles.field}>
             <label>Status:</label>
-            <span className={styles.status}>{project.status}</span>
+            <span className={styles.status}>
+              {project.status} {project.is_pending_deployment_update && " pending update"}
+            </span>
           </div>
           <div className={styles.field}>
             <label>Created by:</label>

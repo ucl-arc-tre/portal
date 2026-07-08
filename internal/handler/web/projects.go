@@ -151,6 +151,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		NumRequiredEgressApprovals: projectTRE.EgressNumberRequiredApprovals,
 		ExternalEncryptionEnabled:  projectTRE.ExternalEncryptionEnabled,
 		AirlockWhitelist:           projectTRE.AirlockWhitelist,
+		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
 		Assets:                     assets,
 		Members:                    members,
 		AssetIds:                   nil,
@@ -158,9 +159,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	if projectTRE.DeployedVersionUpdatedAt != nil &&
 		projectTRE.RequestedVersionUpdatedAt != nil &&
 		projectTRE.RequestedVersionUpdatedAt.After(*projectTRE.DeployedVersionUpdatedAt) {
-		response.Status = openapi.ProjectTREStatusPendingUpdate
-	} else {
-		response.Status = openapi.ProjectTREStatus(projectTRE.Status)
+		response.IsPendingDeploymentUpdate = true
 	}
 
 	ctx.JSON(http.StatusOK, response)

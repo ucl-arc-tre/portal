@@ -483,7 +483,7 @@ export type ContractImport = {
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
-export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-update' | 'pending-deletion' | 'deleted';
+export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-deletion' | 'deleted';
 
 export type StudyReview = {
     status: StudyApprovalStatus;
@@ -621,6 +621,10 @@ export type ProjectTre = ProjectTreBase & {
      */
     updated_at: string;
     environment_name: EnvironmentName;
+    /**
+     * Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
+     */
+    is_pending_deployment_update: boolean;
     /**
      * List of assets associated with this project
      */

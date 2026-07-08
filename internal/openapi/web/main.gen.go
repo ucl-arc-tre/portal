@@ -572,7 +572,6 @@ const (
 	ProjectTREStatusPendingApproval ProjectTREStatus = "pending-approval"
 	ProjectTREStatusPendingCreation ProjectTREStatus = "pending-creation"
 	ProjectTREStatusPendingDeletion ProjectTREStatus = "pending-deletion"
-	ProjectTREStatusPendingUpdate   ProjectTREStatus = "pending-update"
 )
 
 // Valid indicates whether the value is a known member of the ProjectTREStatus enum.
@@ -589,8 +588,6 @@ func (e ProjectTREStatus) Valid() bool {
 	case ProjectTREStatusPendingCreation:
 		return true
 	case ProjectTREStatusPendingDeletion:
-		return true
-	case ProjectTREStatusPendingUpdate:
 		return true
 	default:
 		return false
@@ -1159,6 +1156,9 @@ type ProjectTRE struct {
 
 	// Id Unique identifier for the base project
 	Id string `json:"id"`
+
+	// IsPendingDeploymentUpdate Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
+	IsPendingDeploymentUpdate bool `json:"is_pending_deployment_update"`
 
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
