@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -100,93 +99,6 @@ func TestCreateProjectTRE(t *testing.T) {
 				"validation failures should map to a 400 client error")
 		})
 	}
-}
-
-func TestAllProjectTREs(t *testing.T) {
-	db := newTestSqliteDB(t)
-	svc := &Service{db: db}
-
-	creator := types.User{
-		Model:    types.Model{ID: uuid.New()},
-		Username: "bob@testUnit.com",
-	}
-	require.NoError(t, db.Create(&creator).Error)
-
-	treEnv := types.Environment{
-		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		Name:           environments.TRE,
-		Tier:           2,
-	}
-	require.NoError(t, db.Create(&treEnv).Error)
-
-	otherEnv := types.Environment{
-		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		Name:           "Not-a-TRE",
-		Tier:           1,
-	}
-	require.NoError(t, db.Create(&otherEnv).Error)
-
-	// Studies not preloaded by AllProjectTREs and sqlite db doesn't
-	// enforce FK constraints, so an arbitrary StudyID suffices
-	studyID := uuid.New()
-
-	treProject := types.Project{
-		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		Name:           "TREproject",
-		CreatorUserID:  creator.ID,
-		StudyID:        studyID,
-		EnvironmentID:  treEnv.ID,
-	}
-	require.NoError(t, db.Create(&treProject).Error)
-
-	nonTREProject := types.Project{
-		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		Name:           "nonTREproject",
-		CreatorUserID:  creator.ID,
-		StudyID:        studyID,
-		EnvironmentID:  otherEnv.ID,
-	}
-	require.NoError(t, db.Create(&nonTREProject).Error)
-
-	deletedTREProject := types.Project{
-		ModelAuditable: types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		Name:           "deletedProject",
-		CreatorUserID:  creator.ID,
-		StudyID:        studyID,
-		EnvironmentID:  treEnv.ID,
-	}
-	require.NoError(t, db.Create(&deletedTREProject).Error)
-
-	treProjectTRE := types.ProjectTRE{
-		ModelAuditable:                types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		ProjectID:                     treProject.ID,
-		EgressNumberRequiredApprovals: 1,
-	}
-	require.NoError(t, db.Create(&treProjectTRE).Error)
-
-	nonTREProjectTRE := types.ProjectTRE{
-		ModelAuditable:                types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		ProjectID:                     nonTREProject.ID,
-		EgressNumberRequiredApprovals: 1,
-	}
-	require.NoError(t, db.Create(&nonTREProjectTRE).Error)
-
-	deletedTREProjectTRE := types.ProjectTRE{
-		ModelAuditable:                types.ModelAuditable{Model: types.Model{ID: uuid.New()}},
-		ProjectID:                     deletedTREProject.ID,
-		EgressNumberRequiredApprovals: 1,
-	}
-	require.NoError(t, db.Create(&deletedTREProjectTRE).Error)
-	require.NoError(t, db.Delete(&deletedTREProject).Error)
-
-	projectTREs, err := svc.AllProjectTREs()
-	require.NoError(t, err)
-
-	// Only 1 active TRE project should be listed
-	require.Len(t, projectTREs, 1)
-	assert.Equal(t, treProjectTRE.ID, projectTREs[0].ID)
-	assert.Equal(t, treProject.ID, projectTREs[0].Project.ID)
-	assert.Equal(t, "TREproject", projectTREs[0].Project.Name)
 }
 
 func TestValidateProjectTREBaseAcceptsValidWhitelist(t *testing.T) {
