@@ -18,6 +18,11 @@ describe("Study creation end-to-end", () => {
     cy.becomeApprovedResearcher();
   });
 
+  it("study admin should become an approved researcher", () => {
+    cy.loginAsAdmin();
+    cy.becomeApprovedResearcher();
+  });
+
   it("staff should successfully create a study", () => {
     cy.loginAsStaff();
 
