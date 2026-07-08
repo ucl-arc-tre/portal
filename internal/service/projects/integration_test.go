@@ -223,8 +223,8 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 
 func TestAllProjectTREs(t *testing.T) {
 	db := mockdb.NewTestDBSchema(t, migrate)
-
-	rbac.InitForTesting(db)
+	graceful.SetDBForTesting(db)
+	rbac.Init()
 
 	svc := &Service{
 		db: db,
