@@ -96,6 +96,7 @@ describe("TRE project creation end-to-end", () => {
 
   it("tre ops staff should be able to approve the project", () => {
     cy.loginAsTREOps();
+    cy.becomeApprovedResearcher();
     cy.visit("/projects");
 
     cy.contains(projectTitle).click();
