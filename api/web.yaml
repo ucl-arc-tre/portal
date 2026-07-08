@@ -2185,6 +2185,7 @@ components:
             - updated_at
             - environment_name
             - assets
+            - is_pending_deployment_update
           properties:
             id:
               type: string
@@ -2211,6 +2212,9 @@ components:
               description: Time in RFC3339 format when the project was last updated
             environment_name:
               $ref: "#/components/schemas/EnvironmentName"
+            is_pending_deployment_update:
+              type: boolean
+              description: Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
             assets:
               type: array
               description: List of assets associated with this project

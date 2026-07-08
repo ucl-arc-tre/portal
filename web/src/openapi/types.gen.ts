@@ -639,6 +639,10 @@ export type ProjectTre = ProjectTreBase & {
     updated_at: string;
     environment_name: EnvironmentName;
     /**
+     * Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
+     */
+    is_pending_deployment_update: boolean;
+    /**
      * List of assets associated with this project
      */
     assets: Array<Asset>;

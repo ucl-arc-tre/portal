@@ -37,10 +37,10 @@ type ProjectTRE struct {
 	// Version of the project which has been requested
 	RequestedVersionUpdatedAt *time.Time
 
-	// Version of the project that has been deployedUses the value of ModelAuditable.UpdatedAt. i.e.
+	// Version of the project that has been deployed. i.e.
 	// nil => project has not been deployed
-	// ModelAuditable.UpdatedAt == DeployedVersionUpdatedAt =>  project deploy is up to date
-	// ModelAuditable.UpdatedAt.After(DeployedVersionUpdatedAt) => project is awaiting new version being deployed
+	// RequestedVersionUpdatedAt == DeployedVersionUpdatedAt =>  project deploy is up to date
+	// RequestedVersionUpdatedAt.After(DeployedVersionUpdatedAt) => project is awaiting new version being deployed
 	DeployedVersionUpdatedAt *time.Time
 
 	// Relationships
