@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -400,10 +402,13 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
-	projectTRE.Status = types.ProjectTREStatusIncomplete
+	if projectTRE.Status != types.ProjectTREStatusDeployed {
+		projectTRE.Status = types.ProjectTREStatusIncomplete
+	}
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
 	projectTRE.AirlockWhitelist = data.AirlockWhitelist
+	projectTRE.RequestedVersionUpdatedAt = new(time.Now())
 
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).
@@ -427,32 +432,6 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	}
 
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
-}
-
-func (s *Service) UpdateProjectTREStatus(projectName string, status types.ProjectTREStatus) error {
-	projects := []types.Project{}
-
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
-	if err := tx.Where("name = ?", projectName).Find(&projects).Error; err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to find projects")
-	} else if len(projects) == 0 {
-		tx.Rollback()
-		return types.NewNotFoundError(fmt.Errorf("project [%s] not found", projectName))
-	}
-
-	// NOTE: Can't do this in pure GORM statement, which is annoying
-	result := tx.Model(&types.ProjectTRE{}).
-		Where("project_id = ?", projects[0].ID).
-		Update("status", status)
-	if result.Error != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(result.Error, "failed to update project TRE status")
-
-	}
-	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit")
 }
 
 func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
@@ -523,6 +502,38 @@ func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
 		}).
 		FirstOrCreate(&image)
 	return types.NewErrFromGorm(result.Error, "failed to create TRE project vm image")
+}
+
+func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.ProjectUpdate) error {
+	if !data.Status.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid status")
+	}
+	status := types.ProjectTREStatus(data.Status)
+	if status != types.ProjectTREStatusDeployed && status != types.ProjectTREStatusDeleted {
+		return types.NewErrClientInvalidObjectF("status can only be deployed or deleted, was [%s]", status)
+	}
+	deployedVersionUpdatedAt, err := time.Parse(config.TimeFormat, data.DeployedVersionUpdatedAt)
+	if err != nil {
+		return types.NewErrClientInvalidObjectF("failed to parse deployed update time: %s", err.Error())
+	}
+
+	subQuery := s.db.Model(&types.ProjectTRE{}).
+		Select("project_tres.id").
+		Joins("JOIN projects ON projects.id = project_tres.project_id").
+		Where("projects.name = ?", projectName)
+
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("id IN (?)", subQuery).
+		Updates(types.ProjectTRE{
+			Status:                   status,
+			DeployedVersionUpdatedAt: &deployedVersionUpdatedAt,
+		})
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project")
+	} else if result.RowsAffected == 0 {
+		return types.NewNotFoundError("tre project not found")
+	}
+	return nil
 }
 
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
