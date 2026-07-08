@@ -434,32 +434,6 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
 }
 
-func (s *Service) UpdateProjectTREStatus(projectName string, status types.ProjectTREStatus) error {
-	projects := []types.Project{}
-
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
-	if err := tx.Where("name = ?", projectName).Find(&projects).Error; err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to find projects")
-	} else if len(projects) == 0 {
-		tx.Rollback()
-		return types.NewNotFoundError(fmt.Errorf("project [%s] not found", projectName))
-	}
-
-	// NOTE: Can't do this in pure GORM statement, which is annoying
-	result := tx.Model(&types.ProjectTRE{}).
-		Where("project_id = ?", projects[0].ID).
-		Update("status", status)
-	if result.Error != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(result.Error, "failed to update project TRE status")
-
-	}
-	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit")
-}
-
 func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
