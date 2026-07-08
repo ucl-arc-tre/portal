@@ -7,10 +7,10 @@ type StudyFormStep1Props = {
   control: Control<StudyFormData>;
   errors: FieldErrors<StudyFormData>;
   register: UseFormRegister<StudyFormData>;
-  username: string;
+  ownerUsername: string;
 };
 
-export default function StudyFormStep1({ control, errors, register, username }: StudyFormStep1Props) {
+export default function StudyFormStep1({ control, errors, register, ownerUsername }: StudyFormStep1Props) {
   const { fields, append, remove } = useFieldArray<StudyFormData, "additionalStudyAdminUsernames", "id">({
     control,
     name: "additionalStudyAdminUsernames",
@@ -75,7 +75,7 @@ export default function StudyFormStep1({ control, errors, register, username }: 
             id="owner"
             {...register("owner")}
             readOnly={true}
-            value={username}
+            value={ownerUsername}
             inputClassName={sharedStyles.readonly}
           />
           <HelperText>
@@ -91,13 +91,13 @@ export default function StudyFormStep1({ control, errors, register, username }: 
             </HelperText>
             <UserLookup
               filterByApprovedResearchers={true}
-              usernames={fields}
+              usernames={Array.from(fields, (field) => field.value)}
               appendUsername={(value: string) => append({ value })}
               removeUsername={(username: string) => {
                 const index = fields.findIndex((field) => field.value === username);
                 if (index !== -1) remove(index);
               }}
-              filterIAO={username}
+              filterExcludeUsername={ownerUsername}
             />
             {errors.additionalStudyAdminUsernames && (
               <Alert type="error">

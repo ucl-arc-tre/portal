@@ -113,7 +113,7 @@ export default function Projects({ userData }: Props) {
         <>
           <div className={styles.header}>
             <h2>
-              {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
+              {isOpsStaff ? "All Projects" : "Your Projects"}{" "}
               <Button
                 onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
                 variant="tertiary"

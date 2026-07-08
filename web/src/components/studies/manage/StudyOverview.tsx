@@ -118,7 +118,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       )}
 
       {hasUnagreedAdmins && isStudyOwnerOrAdmin && (
-        <Alert type="warning">
+        <Alert type="warning" className={styles["sutdy-admin-review"]}>
           <AlertMessage>
             The following administrators have not yet agreed to the study agreement:{" "}
             {unagreedAdminUsernames.map((username, index) => (

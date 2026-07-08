@@ -119,6 +119,7 @@ export type UserData = {
     agreements: UserAgreements;
     training_record: ProfileTraining;
     chosen_name?: string;
+    is_valid_approved_researcher: boolean;
 };
 
 export type UserTrainingUpdate = {
@@ -1093,10 +1094,6 @@ export type GetUsersData = {
          * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
          */
         find: string;
-        /**
-         * Whether to filter by approved researchers only. If true, only approved researchers will be returned. If false, all users will be returned.
-         */
-        is_approved_researcher: boolean;
     };
     url: '/users';
 };

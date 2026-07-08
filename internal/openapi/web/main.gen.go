@@ -1536,11 +1536,12 @@ type UserAgreements struct {
 
 // UserData defines model for UserData.
 type UserData struct {
-	Agreements     UserAgreements  `json:"agreements"`
-	ChosenName     *string         `json:"chosen_name,omitempty"`
-	Roles          []string        `json:"roles"`
-	TrainingRecord ProfileTraining `json:"training_record"`
-	User           User            `json:"user"`
+	Agreements                UserAgreements  `json:"agreements"`
+	ChosenName                *string         `json:"chosen_name,omitempty"`
+	IsValidApprovedResearcher bool            `json:"is_valid_approved_researcher"`
+	Roles                     []string        `json:"roles"`
+	TrainingRecord            ProfileTraining `json:"training_record"`
+	User                      User            `json:"user"`
 }
 
 // UserMetrics defines model for UserMetrics.
@@ -1624,9 +1625,6 @@ type DeleteTokensEnvironmentTokenIdParamsEnvironment string
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
 	Find string `form:"find" json:"find"`
-
-	// IsApprovedResearcher Whether to filter by approved researchers only. If true, only approved researchers will be returned. If false, all users will be returned.
-	IsApprovedResearcher bool `form:"is_approved_researcher" json:"is_approved_researcher"`
 }
 
 // PostUsersInviteJSONBody defines parameters for PostUsersInvite.
@@ -3162,14 +3160,6 @@ func (siw *ServerInterfaceWrapper) GetUsers(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, true, "find", c.Request.URL.Query(), &params.Find, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter find: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Required query parameter "is_approved_researcher" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, true, "is_approved_researcher", c.Request.URL.Query(), &params.IsApprovedResearcher, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter is_approved_researcher: %w", err), http.StatusBadRequest)
 		return
 	}
 

@@ -58,7 +58,7 @@ export default function PeoplePage() {
     }
 
     try {
-      const response = await getUsers({ query: { find: query, is_approved_researcher: false } });
+      const response = await getUsers({ query: { find: query } });
 
       if (responseIsError(response) || !response.data) {
         const errorMsg = extractErrorMessage(response);

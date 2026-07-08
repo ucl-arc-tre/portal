@@ -208,12 +208,6 @@ paths:
           description: user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
           schema:
             type: string
-        - in: query
-          name: is_approved_researcher
-          required: true
-          description: Whether to filter by approved researchers only. If true, only approved researchers will be returned. If false, all users will be returned.
-          schema:
-            type: boolean
       responses:
         "200":
           content:
@@ -1455,6 +1449,7 @@ components:
         - roles
         - agreements
         - training_record
+        - is_valid_approved_researcher
       properties:
         user:
           $ref: "#/components/schemas/User"
@@ -1468,6 +1463,8 @@ components:
           $ref: "#/components/schemas/ProfileTraining"
         chosen_name:
           type: string
+        is_valid_approved_researcher:
+          type: boolean
 
     UserTrainingUpdate:
       type: object

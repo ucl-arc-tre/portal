@@ -61,10 +61,7 @@ func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUp
 }
 
 func (s *Service) hasValidApprovedResearcherTrainingRecord(user types.User) (bool, error) {
-	record := types.UserTrainingRecord{
-		UserID: user.ID,
-		Kind:   types.TrainingKindNHSD,
-	}
+	record := types.UserTrainingRecord{UserID: user.ID}
 	result := s.db.Order("completed_at desc").
 		Where("user_id = ? AND (kind = ? OR kind = ?)", user.ID, types.TrainingKindNHSD, types.TrainingKindUCLHIg).
 		Find(&record)
@@ -136,6 +133,15 @@ func (s *Service) TrainingExpiresAt(user types.User, kind types.TrainingKind) (*
 	}
 	expiresAt := record.CompletedAt.Add(config.TrainingValidity)
 	return &expiresAt, nil
+}
+
+func trainingRecordsIncludeValidIg(records []openapi.TrainingRecord) bool {
+	for _, record := range records {
+		if record.IsValid && record.IsIgKind != nil && *record.IsIgKind {
+			return true
+		}
+	}
+	return false
 }
 
 func TrainingIsValid(completedAt time.Time) bool {

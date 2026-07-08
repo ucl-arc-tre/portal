@@ -68,7 +68,7 @@ export default function ProjectFormTREStep(props: Props) {
         <fieldset className="linkage-fieldset">
           <UserLookup
             filterByApprovedResearchers={false}
-            usernames={members}
+            usernames={Array.from(members, (member) => member.username)}
             appendUsername={(value: string) => appendResearcher({ username: value, roles: [] })}
             removeUsername={(username: string) => {
               const index = researcherFields.findIndex((field) => field.username === username);
@@ -164,7 +164,7 @@ export default function ProjectFormTREStep(props: Props) {
       <div>
         <RadioOptions
           name="tre.numRequiredEgressApprovals"
-          label="Number of required approvals to egress a file *"
+          label="Number of required approvals to egress files *"
           options={[
             { name: "1", value: "1" },
             { name: "2", value: "2" },

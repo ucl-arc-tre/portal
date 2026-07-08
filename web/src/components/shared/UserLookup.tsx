@@ -1,22 +1,21 @@
 import { ReactElement, useEffect, useState } from "react";
-import { Alert, AlertMessage, CheckSquareIcon, InfoIcon, Input, Label } from "./uikitExports";
+import { Alert, AlertMessage, CheckSquareIcon, HelperText, InfoIcon, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsers, postUsersInvite, UserData } from "@/openapi";
 import styles from "./UserLookup.module.css";
 import Loading from "../ui/Loading";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { ProjectFormData } from "@/types/projects";
 
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
-  usernames: StudyFormData["additionalStudyAdminUsernames"] | ProjectFormData["members"];
+  usernames: string[];
   appendUsername: (value: string) => void;
   removeUsername: (username: string) => void;
   roleControl?: ReactElement | ((user: UserData) => ReactElement | null);
   studyName?: string;
   projectName?: string;
   limit?: number;
-  filterIAO?: string;
+  filterExcludeUsername?: string;
 };
 export default function UserLookup(props: UserLookupProps) {
   const {
@@ -28,7 +27,7 @@ export default function UserLookup(props: UserLookupProps) {
     studyName,
     projectName,
     limit = 5,
-    filterIAO,
+    filterExcludeUsername: filterExcludeUsername,
   } = props;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserData[]>([]);
@@ -57,12 +56,13 @@ export default function UserLookup(props: UserLookupProps) {
         try {
           const response = await getUsers({
             query: {
-              find: "value" in username ? username.value : username.username,
-              is_approved_researcher: filterByApprovedResearchers,
+              find: username,
             },
           });
-          const results = response?.data || [];
-          fetchedUsers.push(...results);
+          const user = response?.data?.find((user) => user.user.username === username);
+          if (user) {
+            fetchedUsers.push(user);
+          }
         } catch (error) {
           console.error("Failed to fetch selected users from usernames:", error);
         }
@@ -76,7 +76,6 @@ export default function UserLookup(props: UserLookupProps) {
 
   const handleSearch = async (query: string) => {
     setSearchErrorMessage("");
-    setIsLoading(true);
 
     const isValid = new RegExp(regex).test(query);
 
@@ -84,8 +83,10 @@ export default function UserLookup(props: UserLookupProps) {
       setSearchErrorMessage("Invalid query, only alphanumeric characters, @ and - are allowed");
       return;
     }
+
+    setIsLoading(true);
     try {
-      const response = await getUsers({ query: { find: query, is_approved_researcher: filterByApprovedResearchers } });
+      const response = await getUsers({ query: { find: query } });
       if (responseIsError(response)) {
         const errorMsg = extractErrorMessage(response);
         setSearchErrorMessage(errorMsg);
@@ -94,14 +95,16 @@ export default function UserLookup(props: UserLookupProps) {
       const results = response?.data || [];
       let filteredResults = results;
 
-      if (filterIAO) {
-        filteredResults = filteredResults.filter((result) => result.user.username !== filterIAO);
+      if (filterExcludeUsername) {
+        filteredResults = filteredResults.filter((result) => result.user.username !== filterExcludeUsername);
+      }
+
+      if (filterByApprovedResearchers) {
+        filteredResults = filteredResults.filter((result) => result.is_valid_approved_researcher);
       }
 
       if (usernames.length > 0) {
-        filteredResults = filteredResults.filter(
-          (result) => !usernames.some((u) => ("value" in u ? u.value : u.username) === result.user.username)
-        );
+        filteredResults = filteredResults.filter((result) => !usernames.some((u) => u === result.user.username));
       }
 
       setSearchResults(filteredResults);
@@ -123,7 +126,7 @@ export default function UserLookup(props: UserLookupProps) {
         ?.querySelector(`[data-id="${user.user.id}"]`)
         ?.classList.add(styles.hidden);
     }
-    if (!usernames.some((u) => ("value" in u ? u.value : u.username) === user.user.username)) {
+    if (!usernames.some((u) => u === user.user.username)) {
       appendUsername(user.user.username);
     }
   };
@@ -134,7 +137,7 @@ export default function UserLookup(props: UserLookupProps) {
       .getElementById("search-results")
       ?.querySelector(`[data-id="${user.user.id}"]`)
       ?.classList.remove(styles.hidden);
-    const index = usernames.findIndex((u) => ("value" in u ? u.value : u.username) === user.user.username);
+    const index = usernames.findIndex((u) => u === user.user.username);
     if (index !== -1) {
       removeUsername(user.user.username);
     }
@@ -170,36 +173,6 @@ export default function UserLookup(props: UserLookupProps) {
   };
   return (
     <>
-      {selectedUsers.length > 0 && (
-        <div className={styles["selected-users"]}>
-          <Label>Selected Users</Label>
-          {selectedUsers.map((result) => (
-            <div className={`${styles["user-item"]} ${styles.selected}`} key={result.user.id}>
-              <div className={styles["user-info"]}>
-                <CheckSquareIcon />
-                <div>
-                  <h4>{result.chosen_name}</h4>
-                  <p>{result.user.username}</p>
-                </div>
-              </div>
-              <Button
-                size="small"
-                variant="secondary-destructive"
-                onClick={() => handleRemoveUser(result)}
-                data-cy="remove-user-from-selection"
-              >
-                x Remove
-              </Button>
-              {roleControl && (
-                <div className={styles["role-control"]}>
-                  <h5 className={styles["role-heading"]}>Roles</h5>
-                  {typeof roleControl === "function" ? roleControl(result) : roleControl}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
       <div className={styles.lookup}>
         <Input
           type="text"
@@ -271,6 +244,39 @@ export default function UserLookup(props: UserLookupProps) {
             ))}
           </div>
         ) : null)}
+
+      {selectedUsers.length === 0 ? (
+        <HelperText>No users selected</HelperText>
+      ) : (
+        <div className={styles["selected-users"]}>
+          <Label>Selected Users</Label>
+          {selectedUsers.map((result) => (
+            <div className={`${styles["user-item"]} ${styles.selected}`} key={result.user.id}>
+              <div className={styles["user-info"]}>
+                <CheckSquareIcon />
+                <div>
+                  <h4>{result.chosen_name}</h4>
+                  <p>{result.user.username}</p>
+                </div>
+              </div>
+              <Button
+                size="small"
+                variant="secondary-destructive"
+                onClick={() => handleRemoveUser(result)}
+                data-cy="remove-user-from-selection"
+              >
+                x Remove
+              </Button>
+              {roleControl && (
+                <div className={styles["role-control"]}>
+                  <h5 className={styles["role-heading"]}>Roles</h5>
+                  {typeof roleControl === "function" ? roleControl(result) : roleControl}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {(searchErrorMessage || successMessage || inviteErrorMessage) && (
         <Alert type={successMessage ? "success" : "error"}>

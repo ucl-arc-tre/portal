@@ -21,9 +21,6 @@ import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
-// this should match the domain that is used for the entra ID users in the portal
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
-
 type Props = {
   approvedStudies: Study[];
   handleProjectCreated: () => void;
@@ -106,7 +103,7 @@ export default function ProjectForm({
 
       const projectMembers =
         editingProject.members?.map((member) => ({
-          username: member.username.replace(domainName, ""),
+          username: member.username,
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
       setValue("members", projectMembers);
