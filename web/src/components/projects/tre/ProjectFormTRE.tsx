@@ -67,7 +67,7 @@ export default function ProjectFormTREStep(props: Props) {
         <Label htmlFor="members">Project users (optional):*</Label>
         <fieldset className="linkage-fieldset">
           <UserLookup
-            filterByApprovedResearchers={false}
+            filterByApprovedResearchers={true}
             usernames={Array.from(members, (member) => member.username)}
             appendUsername={(value: string) => appendResearcher({ username: value, roles: [] })}
             removeUsername={(username: string) => {

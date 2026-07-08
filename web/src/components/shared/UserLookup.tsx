@@ -6,6 +6,52 @@ import styles from "./UserLookup.module.css";
 import Loading from "../ui/Loading";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
+const selectedUserCache = new Map<string, Promise<UserData | null>>();
+const searchResultsCache = new Map<string, Promise<UserData[]>>();
+
+const normaliseSearchQuery = (query: string) => query.trim().toLowerCase();
+
+const fetchExactUser = (username: string) => {
+  const cached = selectedUserCache.get(username);
+  if (cached) return cached;
+
+  const request = getUsers({
+    query: {
+      find: username,
+    },
+  })
+    .then((response) => response?.data?.find((user) => user.user.username === username) ?? null)
+    .catch((error) => {
+      selectedUserCache.delete(username);
+      throw error;
+    });
+
+  selectedUserCache.set(username, request);
+  return request;
+};
+
+const fetchSearchResults = (query: string) => {
+  const cacheKey = normaliseSearchQuery(query);
+  const cached = searchResultsCache.get(cacheKey);
+  if (cached) return cached;
+
+  const request = getUsers({ query: { find: query } })
+    .then((response) => {
+      if (responseIsError(response)) {
+        throw new Error(extractErrorMessage(response));
+      }
+
+      return response?.data || [];
+    })
+    .catch((error) => {
+      searchResultsCache.delete(cacheKey);
+      throw error;
+    });
+
+  searchResultsCache.set(cacheKey, request);
+  return request;
+};
+
 type UserLookupProps = {
   filterByApprovedResearchers: boolean;
   usernames: string[];
@@ -38,41 +84,43 @@ export default function UserLookup(props: UserLookupProps) {
   const [inviteLoading, setInviteLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [inviteErrorMessage, setInviteErrorMessage] = useState("");
+  const usernamesKey = usernames.join("\0");
 
   const regex = /^\w[a-zA-Z0-9\-\.+@_\s]+\w$/;
 
   useEffect(() => {
+    let isActive = true;
+
     const fetchSelectedUsers = async () => {
-      if (usernames.length === 0) {
+      const selectedUsernames = usernamesKey ? usernamesKey.split("\0") : [];
+
+      if (selectedUsernames.length === 0) {
         setSelectedUsers([]);
         setNoResultsFound(false);
         return;
       }
 
       setIsLoading(true);
-      const fetchedUsers: UserData[] = [];
 
-      for (const username of usernames) {
-        try {
-          const response = await getUsers({
-            query: {
-              find: username,
-            },
-          });
-          const user = response?.data?.find((user) => user.user.username === username);
-          if (user) {
-            fetchedUsers.push(user);
-          }
-        } catch (error) {
-          console.error("Failed to fetch selected users from usernames:", error);
+      try {
+        const fetchedUsers = await Promise.all(selectedUsernames.map(fetchExactUser));
+        if (isActive) {
+          setSelectedUsers(fetchedUsers.filter((user): user is UserData => user !== null));
+        }
+      } catch (error) {
+        console.error("Failed to fetch selected users from usernames:", error);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
         }
       }
-
-      setSelectedUsers(fetchedUsers);
-      setIsLoading(false);
     };
     fetchSelectedUsers();
-  }, [usernames, filterByApprovedResearchers]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [usernamesKey]);
 
   const handleSearch = async (query: string) => {
     setSearchErrorMessage("");
@@ -86,13 +134,7 @@ export default function UserLookup(props: UserLookupProps) {
 
     setIsLoading(true);
     try {
-      const response = await getUsers({ query: { find: query } });
-      if (responseIsError(response)) {
-        const errorMsg = extractErrorMessage(response);
-        setSearchErrorMessage(errorMsg);
-        return;
-      }
-      const results = response?.data || [];
+      const results = await fetchSearchResults(query);
       let filteredResults = results;
 
       if (filterExcludeUsername) {
@@ -111,6 +153,9 @@ export default function UserLookup(props: UserLookupProps) {
       setNoResultsFound(filteredResults.length === 0);
     } catch (error) {
       console.error("Failed to search users:", error);
+      if (error instanceof Error) {
+        setSearchErrorMessage(error.message);
+      }
       setNoResultsFound(false);
     } finally {
       setIsLoading(false);
