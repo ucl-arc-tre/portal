@@ -110,26 +110,8 @@ func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails
 
 func (c *Controller) SendCustomInviteNotification(ctx context.Context, invite Invite) error {
 	// use graph to send email saying so-and-so has invited you to the portal
-
-	content := "You have been invited"
-	if invite.StudyName != nil {
-		if invite.ProjectName != nil {
-			content += " to join the project '" + *invite.ProjectName + "' in the study '" + *invite.StudyName + "'."
-		} else {
-			content += " to join the study '" + *invite.StudyName + "'."
-		}
-	} else {
-		content += " to the UCL ARC Services Portal"
-	}
-
-	if invite.Sponsor.ChosenName != "" {
-		content += " by " + string(invite.Sponsor.ChosenName)
-	} else {
-		content += " by " + string(invite.Sponsor.Username)
-	}
-	content += "\nYou can view this on the UCL ARC Services Portal"
-
-	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{invite.Recipient}, content)
+	subject := "Notification: You have been invited to the UCL ARC Services Portal"
+	return c.sendCustomEmail(ctx, subject, []string{invite.Recipient}, inviteEmailContent(invite))
 }
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {

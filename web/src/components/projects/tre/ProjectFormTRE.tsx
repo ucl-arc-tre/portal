@@ -75,7 +75,7 @@ export default function ProjectFormTREStep(props: Props) {
               if (index !== -1) removeResearcher(index);
             }}
             roleControl={(user) => {
-              const memberIndex = members.findIndex((member) => member.username === user.user.username);
+              const memberIndex = members.findIndex((member) => member.username === user.username);
               const researcher = members[memberIndex];
               const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
 

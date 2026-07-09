@@ -223,12 +223,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, invite Invite) 
 	requestBody.SetInviteRedirectUrl(&inviteRedirectUrl)
 	requestBody.SetSendInvitationMessage(&sendInvitationMessage)
 
-	message := ""
-	if invite.Sponsor.ChosenName != "" {
-		message = "You have been invited to join the UCL ARC Services Portal by " + string(invite.Sponsor.ChosenName)
-	} else {
-		message = "You have been invited to join the UCL ARC Services Portal by " + string(invite.Sponsor.Username)
-	}
+	message := inviteEmailContent(invite)
 	messageInfo := graphmodels.NewInvitedUserMessageInfo()
 	messageInfo.SetCustomizedMessageBody(&message)
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
