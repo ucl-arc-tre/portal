@@ -139,7 +139,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 			subject = "Notification: Your Study has feedback to address"
 		}
 	case openapi.StudyApprovalStatusPending:
-		content = "Your Study has been reviewed the Information Governance team. Please review the feedback, make the necessary updates, and then resubmit your Study for review."
+		content = "Your Study has been reviewed by the Information Governance team. Please review the feedback, make the necessary updates, and then resubmit your Study for review."
 		subject = "Notification: Your Study requires updates before approval"
 		if review.Feedback != nil {
 			content += "\nFeedback:" + *review.Feedback
