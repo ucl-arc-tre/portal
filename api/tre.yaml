@@ -74,11 +74,11 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-  /projects/{projectName}/status:
+  /projects/{projectName}:
     parameters:
       - in: path
         name: projectName
-        description: TRE project name which is unique
+        description: Unique TRE project name
         required: true
         schema:
           type: string
@@ -91,7 +91,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectStatusUpdate"
+              $ref: "#/components/schemas/ProjectUpdate"
       responses:
         "204":
           description: Successfully updated status
@@ -159,10 +159,11 @@ components:
             - aws
             - condenser
 
-    ProjectStatusUpdate:
+    ProjectUpdate:
       type: object
       required:
         - status
+        - deployed_version_updated_at
       properties:
         status:
           type: string
@@ -170,6 +171,9 @@ components:
           enum:
             - deployed
             - deleted
+        deployed_version_updated_at:
+          type: string
+          description: Value of the updated_at field that the deployed version is, in RFC3339 format
 
     Error:
       type: object

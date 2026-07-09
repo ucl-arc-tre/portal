@@ -36,14 +36,26 @@ func (s *Service) GetAll() ([]types.Environment, error) {
 	return environments, nil
 }
 
+func (s *Service) TRE() (types.Environment, error) {
+	return s.environment(TRE)
+}
+
 func (s *Service) EnvironmentId(name types.EnvironmentName) (uuid.UUID, error) {
+	environment, err := s.environment(name)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	return environment.ID, nil
+}
+
+func (s *Service) environment(name types.EnvironmentName) (types.Environment, error) {
 	if environment, exists := s.cache.Get(name); exists {
-		return environment.ID, nil
+		return environment, nil
 	}
 	environment := types.Environment{Name: name}
 	if err := s.db.First(&environment, "name = ?", name).Error; err != nil {
-		return uuid.UUID{}, types.NewErrFromGorm(err)
+		return types.Environment{}, types.NewErrFromGorm(err)
 	}
 	_ = s.cache.Add(name, environment)
-	return environment.ID, nil
+	return environment, nil
 }

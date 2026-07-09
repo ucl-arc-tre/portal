@@ -54,23 +54,13 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 	ctx.JSON(http.StatusOK, userStatus)
 }
 
-func (h *Handler) PostProjectsProjectNameStatus(ctx *gin.Context, projectName string) {
-	data := openapi.ProjectStatusUpdate{}
+func (h *Handler) PostProjectsProjectName(ctx *gin.Context, projectName string) {
+	data := openapi.ProjectUpdate{}
 	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
-		setError(ctx, types.NewErrInvalidObject("failed to bind ProjectStatusUpdate"))
+		setError(ctx, types.NewErrInvalidObject("failed to bind ProjectUpdate"))
 		return
 	}
-	status := types.ProjectTREStatus(data.Status)
-	if !data.Status.Valid() {
-		ctx.Status(http.StatusNotAcceptable)
-		setError(ctx, types.NewErrClientInvalidObjectF("invalid status"))
-		return
-	} else if status != types.ProjectTREStatusDeployed && status != types.ProjectTREStatusDeleted {
-		setError(ctx, types.NewErrInvalidObjectF("Status can only be deployed or deleted, was [%s]", status))
-		return
-	}
-
-	err := h.projects.UpdateProjectTREStatus(projectName, status)
+	err := h.projects.UpdateProjectTREDeployed(projectName, data)
 	if err != nil {
 		setError(ctx, err)
 		return
