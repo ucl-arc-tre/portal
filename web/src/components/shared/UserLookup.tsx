@@ -72,7 +72,7 @@ export default function UserLookup(props: UserLookupProps) {
     roleControl,
     studyName,
     projectName,
-    limit = 5,
+    limit = 100,
     filterExcludeUsername: filterExcludeUsername,
   } = props;
   const [searchQuery, setSearchQuery] = useState("");
@@ -186,7 +186,6 @@ export default function UserLookup(props: UserLookupProps) {
     if (index !== -1) {
       removeUsername(user.user.username);
     }
-    console.log(selectedUsers);
   };
 
   const handleSendInvite = async (email: string) => {
@@ -216,6 +215,7 @@ export default function UserLookup(props: UserLookupProps) {
       setInviteLoading(false);
     }
   };
+
   return (
     <>
       <div className={styles.lookup}>
@@ -275,7 +275,7 @@ export default function UserLookup(props: UserLookupProps) {
                     <p>{result.user.username}</p>
                   </div>
                 </div>
-                {selectedUsers.length! <= limit && (
+                {selectedUsers.length < limit && (
                   <Button
                     size="small"
                     variant="secondary"

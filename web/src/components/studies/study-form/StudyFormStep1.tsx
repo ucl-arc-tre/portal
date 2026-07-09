@@ -98,6 +98,7 @@ export default function StudyFormStep1({ control, errors, register, ownerUsernam
                 if (index !== -1) remove(index);
               }}
               filterExcludeUsername={ownerUsername}
+              limit={1} // only a single admin can be added
             />
             {errors.additionalStudyAdminUsernames && (
               <Alert type="error">
