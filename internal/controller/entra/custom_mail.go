@@ -113,9 +113,9 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, email str
 
 	content := ""
 	if sponsor.ChosenName != "" {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName) ". The first thing you need to do is complete your profile."
+		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName) + ". The first thing you need to do is complete your profile."
 	} else {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username) ". The first thing you need to do is complete your profile."
+		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username) + ". The first thing you need to do is complete your profile."
 	}
 
 	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
