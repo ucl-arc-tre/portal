@@ -1,13 +1,13 @@
 import { ReactElement, useEffect, useState } from "react";
 import { Alert, AlertMessage, CheckSquareIcon, HelperText, InfoIcon, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
-import { getUsers, postUsersInvite, UserData } from "@/openapi";
+import { getUsersLookup, postUsersInvite, UserDataLookup } from "@/openapi";
 import styles from "./UserLookup.module.css";
 import Loading from "../ui/Loading";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
-const selectedUserCache = new Map<string, Promise<UserData | null>>();
-const searchResultsCache = new Map<string, Promise<UserData[]>>();
+const selectedUserCache = new Map<string, Promise<UserDataLookup | null>>();
+const searchResultsCache = new Map<string, Promise<UserDataLookup[]>>();
 
 const normaliseSearchQuery = (query: string) => query.trim().toLowerCase();
 
@@ -15,12 +15,12 @@ const fetchExactUser = (username: string) => {
   const cached = selectedUserCache.get(username);
   if (cached) return cached;
 
-  const request = getUsers({
+  const request = getUsersLookup({
     query: {
       find: username,
     },
   })
-    .then((response) => response?.data?.find((user) => user.user.username === username) ?? null)
+    .then((response) => response?.data?.find((user) => user.username === username) ?? null)
     .catch((error) => {
       selectedUserCache.delete(username);
       throw error;
@@ -35,7 +35,7 @@ const fetchSearchResults = (query: string) => {
   const cached = searchResultsCache.get(cacheKey);
   if (cached) return cached;
 
-  const request = getUsers({ query: { find: query } })
+  const request = getUsersLookup({ query: { find: query } })
     .then((response) => {
       if (responseIsError(response)) {
         throw new Error(extractErrorMessage(response));
@@ -57,7 +57,7 @@ type UserLookupProps = {
   usernames: string[];
   appendUsername: (value: string) => void;
   removeUsername: (username: string) => void;
-  roleControl?: ReactElement | ((user: UserData) => ReactElement | null);
+  roleControl?: ReactElement | ((user: UserDataLookup) => ReactElement | null);
   studyName?: string;
   projectName?: string;
   limit?: number;
@@ -76,11 +76,11 @@ export default function UserLookup(props: UserLookupProps) {
     filterExcludeUsername: filterExcludeUsername,
   } = props;
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<UserData[]>([]);
+  const [searchResults, setSearchResults] = useState<UserDataLookup[]>([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [noResultsFound, setNoResultsFound] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState<UserData[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<UserDataLookup[]>([]);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [inviteErrorMessage, setInviteErrorMessage] = useState("");
@@ -105,7 +105,7 @@ export default function UserLookup(props: UserLookupProps) {
       try {
         const fetchedUsers = await Promise.all(selectedUsernames.map(fetchExactUser));
         if (isActive) {
-          setSelectedUsers(fetchedUsers.filter((user): user is UserData => user !== null));
+          setSelectedUsers(fetchedUsers.filter((user): user is UserDataLookup => user !== null));
         }
       } catch (error) {
         console.error("Failed to fetch selected users from usernames:", error);
@@ -138,7 +138,7 @@ export default function UserLookup(props: UserLookupProps) {
       let filteredResults = results;
 
       if (filterExcludeUsername) {
-        filteredResults = filteredResults.filter((result) => result.user.username !== filterExcludeUsername);
+        filteredResults = filteredResults.filter((result) => result.username !== filterExcludeUsername);
       }
 
       if (filterByApprovedResearchers) {
@@ -146,7 +146,7 @@ export default function UserLookup(props: UserLookupProps) {
       }
 
       if (usernames.length > 0) {
-        filteredResults = filteredResults.filter((result) => !usernames.some((u) => u === result.user.username));
+        filteredResults = filteredResults.filter((result) => !usernames.some((u) => u === result.username));
       }
 
       setSearchResults(filteredResults);
@@ -162,29 +162,29 @@ export default function UserLookup(props: UserLookupProps) {
     }
   };
 
-  const handleAddUser = (user: UserData) => {
-    if (!selectedUsers.some((u) => u.user.id === user.user.id)) {
+  const handleAddUser = (user: UserDataLookup) => {
+    if (!selectedUsers.some((u) => u.username === user.username)) {
       setSelectedUsers([...selectedUsers, user]);
       // hiding with CSS rather than removing from list so it shows up again if removed from selected users
       document
         .getElementById("search-results")
-        ?.querySelector(`[data-id="${user.user.id}"]`)
+        ?.querySelector(`[data-id="${user.username}"]`)
         ?.classList.add(styles.hidden);
     }
-    if (!usernames.some((u) => u === user.user.username)) {
-      appendUsername(user.user.username);
+    if (!usernames.some((u) => u === user.username)) {
+      appendUsername(user.username);
     }
   };
 
-  const handleRemoveUser = (user: UserData) => {
-    setSelectedUsers(selectedUsers.filter((u) => u.user.id !== user.user.id));
+  const handleRemoveUser = (user: UserDataLookup) => {
+    setSelectedUsers(selectedUsers.filter((u) => u.username !== user.username));
     document
       .getElementById("search-results")
-      ?.querySelector(`[data-id="${user.user.id}"]`)
+      ?.querySelector(`[data-id="${user.username}"]`)
       ?.classList.remove(styles.hidden);
-    const index = usernames.findIndex((u) => u === user.user.username);
+    const index = usernames.findIndex((u) => u === user.username);
     if (index !== -1) {
-      removeUsername(user.user.username);
+      removeUsername(user.username);
     }
   };
 
@@ -267,12 +267,16 @@ export default function UserLookup(props: UserLookupProps) {
         ) : searchResults.length > 0 ? (
           <div id="search-results">
             {searchResults.map((result) => (
-              <div className={`${styles["user-item"]} ${styles.result}`} key={result.user.id} data-id={result.user.id}>
+              <div
+                className={`${styles["user-item"]} ${styles.result}`}
+                key={result.username}
+                data-id={result.username}
+              >
                 <div className={styles["user-info"]}>
                   <InfoIcon />
                   <div>
-                    <h4>{result.chosen_name}</h4>
-                    <p>{result.user.username}</p>
+                    <h4>{result.chosen_name ? result.chosen_name : result.username}</h4>
+                    <p>{result.chosen_name && result.username}</p>
                   </div>
                 </div>
                 {selectedUsers.length < limit && (
@@ -296,12 +300,12 @@ export default function UserLookup(props: UserLookupProps) {
         <div className={styles["selected-users"]}>
           <Label>Selected Users</Label>
           {selectedUsers.map((result) => (
-            <div className={`${styles["user-item"]} ${styles.selected}`} key={result.user.id}>
+            <div className={`${styles["user-item"]} ${styles.selected}`} key={result.username}>
               <div className={styles["user-info"]}>
                 <CheckSquareIcon />
                 <div>
                   <h4>{result.chosen_name}</h4>
-                  <p>{result.user.username}</p>
+                  <p>{result.username}</p>
                 </div>
               </div>
               <Button

@@ -17,12 +17,29 @@ import (
 )
 
 func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
-	people, err := h.users.Find(ctx, params.Find)
+	users, err := h.users.Find(ctx, params.Find)
 	if err != nil {
-		setError(ctx, err, "Failed to find people")
+		setError(ctx, err, "Failed to find users")
 		return
 	}
-	ctx.JSON(http.StatusOK, people)
+	ctx.JSON(http.StatusOK, users)
+}
+
+func (h *Handler) GetUsersLookup(ctx *gin.Context, params openapi.GetUsersLookupParams) {
+	usersData, err := h.users.Find(ctx, params.Find)
+	if err != nil {
+		setError(ctx, err, "Failed to find users")
+		return
+	}
+	users := []openapi.UserDataLookup{}
+	for _, userData := range usersData {
+		users = append(users, openapi.UserDataLookup{
+			ChosenName:                userData.ChosenName,
+			IsValidApprovedResearcher: userData.IsValidApprovedResearcher,
+			Username:                  userData.User.Username,
+		})
+	}
+	ctx.JSON(http.StatusOK, users)
 }
 
 func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
