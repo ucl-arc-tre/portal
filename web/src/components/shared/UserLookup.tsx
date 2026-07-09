@@ -247,7 +247,7 @@ export default function UserLookup(props: UserLookupProps) {
           <Loading message="searching users" size="small" />
         </span>
       )}
-      {searchQuery.length > 3 &&
+      {searchQuery.length >= 3 &&
         (noResultsFound ? (
           <Alert type="warning">
             &quot;{searchQuery}&quot; not found.{" "}

@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
@@ -83,22 +84,37 @@ func (h *Handler) PostUsersApprovedResearchersImportCsv(ctx *gin.Context) {
 }
 
 func (h *Handler) PostUsersInvite(ctx *gin.Context) {
-	var invite openapi.PostUsersInviteJSONRequestBody
-	if err := bindJSONOrSetError(ctx, &invite); err != nil {
-		return
-	}
-
-	if exists, err := h.users.UserExistsWithEmailOrUsername(ctx, invite.Email); err != nil {
-		setError(ctx, err, "Failed to check user existence")
-		return
-	} else if exists {
-		log.Debug().Any("email", invite.Email).Msg("User already exists - not inviting")
-		ctx.Status(http.StatusNoContent)
+	data := openapi.PostUsersInviteJSONRequestBody{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
 
 	inviter := middleware.GetUser(ctx)
-	if _, err := h.users.InviteExternalUser(ctx, invite.Email, inviter); err != nil {
+	attributes, err := h.users.Attributes(inviter)
+	if err != nil {
+		setError(ctx, err, "Failed to get user attributes")
+		return
+	}
+	invite := entra.Invite{
+		Recipient: data.Email,
+		Sponsor: types.Sponsor{
+			User:       inviter,
+			ChosenName: attributes.ChosenName,
+		},
+		StudyName:   data.StudyName,
+		ProjectName: data.ProjectName,
+	}
+
+	if exists, err := h.users.UserExistsWithEmailOrUsername(ctx, invite.Recipient); err != nil {
+		setError(ctx, err, "Failed to check user existence")
+		return
+	} else if exists {
+		log.Debug().Any("email", invite.Recipient).Msg("User already exists - not inviting")
+		ctx.Status(http.StatusNoContent)
+		return
+	}
+
+	if _, err := h.users.InviteExternalUser(ctx, invite); err != nil {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}

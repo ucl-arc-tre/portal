@@ -114,9 +114,9 @@ func (c *Controller) SendCustomInviteNotification(ctx context.Context, invite In
 	content := "You have been invited"
 	if invite.StudyName != nil {
 		if invite.ProjectName != nil {
-			content += "to join the project '" + *invite.ProjectName + "' in the study '" + *invite.StudyName + "'."
+			content += " to join the project '" + *invite.ProjectName + "' in the study '" + *invite.StudyName + "'."
 		} else {
-			content += "to join the study '" + *invite.StudyName + "'."
+			content += " to join the study '" + *invite.StudyName + "'."
 		}
 	} else {
 		content += " to the UCL ARC Services Portal"

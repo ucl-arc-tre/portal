@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -41,7 +42,7 @@ func (m *MockUsers) ImportApprovedResearchersCSV(
 	panic("not implemented")
 }
 
-func (m *MockUsers) InviteExternalUser(ctx context.Context, email string, inviter types.User) (types.User, error) {
+func (m *MockUsers) InviteExternalUser(ctx context.Context, invite entra.Invite) (types.User, error) {
 	panic("not implemented")
 }
 

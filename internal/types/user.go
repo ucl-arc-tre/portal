@@ -34,7 +34,7 @@ type UserAttributes struct {
 }
 
 type Sponsor struct {
-	Username   Username
+	User
 	ChosenName ChosenName
 }
 

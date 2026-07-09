@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -20,8 +21,7 @@ type Interface interface {
 		csvContent []byte,
 		agreement types.Agreement,
 	) error
-	InviteExternalUser(ctx context.Context, email string, inviter types.User) (types.User, error)
-	CreateUserSponsorship(user types.User, sponsor types.User) (types.UserSponsorship, error)
+	InviteExternalUser(ctx context.Context, invite entra.Invite) (types.User, error)
 	Metrics() (*openapi.UserMetrics, error)
 	UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error)
 	CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error
