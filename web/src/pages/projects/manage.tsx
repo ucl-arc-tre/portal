@@ -280,7 +280,12 @@ export default function ManageProjectPage() {
                 </Button>
               )}
 
-              <Button onClick={handleSubmit} disabled={isSubmitting} size="small">
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                size="small"
+                cy="mark-project-ready-for-review-button"
+              >
                 {isSubmitting ? "Submitting..." : "Mark Ready for Review"}
               </Button>
             </div>
@@ -293,7 +298,7 @@ export default function ManageProjectPage() {
               Please review the below project details, members, and assets before approving this project.
             </p>
             <div className={styles["approval-actions"]}>
-              <Button onClick={handleApprove} disabled={isApproving} size="large">
+              <Button onClick={handleApprove} disabled={isApproving} size="large" cy="accept-project-button">
                 {isApproving ? "Approving..." : "Accept Project"}
               </Button>
             </div>
@@ -323,7 +328,9 @@ export default function ManageProjectPage() {
           </div>
           <div className={styles.field}>
             <label>Status:</label>
-            <span className={styles.status}>{project.status}</span>
+            <span className={styles.status}>
+              {project.status} {project.is_pending_deployment_update && " pending update"}
+            </span>
           </div>
           <div className={styles.field}>
             <label>Created by:</label>
@@ -344,6 +351,21 @@ export default function ManageProjectPage() {
           <div className={styles.field}>
             <label>External encryption enabled:</label>
             <span>{project.external_encryption_enabled ? "Yes" : "No"}</span>
+          </div>
+
+          <div className={styles.field}>
+            <label>Airlock whitelist:</label>
+            {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
+              <ul className={styles["assets-list"]}>
+                {project.airlock_whitelist.map((entry, index) => (
+                  <li key={index} className={styles["asset-item"]}>
+                    {entry}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
+            )}
           </div>
 
           <div className={styles.field}>

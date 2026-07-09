@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
@@ -167,8 +168,8 @@ func TestFind_ReturnsPortalAndEntraUsers(t *testing.T) {
 	// Note: Remove t.Parallel() from RBAC-dependent integration tests
 
 	db := mockdb.NewTestDBSchema(t, migrate)
-
-	rbac.InitForTesting(db)
+	graceful.SetDBForTesting(db)
+	rbac.Init()
 
 	alice := createTestUser(t, db, "alice@testIntegration.com")
 

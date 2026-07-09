@@ -39,16 +39,6 @@ func seedPolicies(enforcer *casbin.Enforcer) {
 	runMigrations()
 }
 
-// Initialise the RBAC with roles and users, for integration tests
-func InitForTesting(testDatabase *gorm.DB) {
-	if testDatabase != nil {
-		database = testDatabase
-	}
-	enforcer := NewEnforcer(database)
-
-	seedPolicies(enforcer)
-}
-
 func addBasePolicies(enforcer *casbin.Enforcer) {
 	policies := []Policy{
 		{RoleName: Base, Resource: "/auth", Action: ReadAction},
@@ -90,6 +80,10 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 		Policy{RoleName: TreOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: WriteAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre", Action: WriteAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre/*", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/tokens/tre/*", Action: WriteAction},
 	)
 }
 

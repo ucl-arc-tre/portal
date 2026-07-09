@@ -4,9 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
@@ -17,20 +22,27 @@ import (
 )
 
 type Service struct {
-	db    *gorm.DB
-	users users.Interface
+	db           *gorm.DB
+	users        users.Interface
+	environments *environments.Service
 }
 
 func New() *Service {
 	return &Service{
-		db:    graceful.NewDB(),
-		users: users.New(),
+		db:           graceful.NewDB(),
+		users:        users.New(),
+		environments: environments.New(),
 	}
 }
 
 func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
 	if data.NumRequiredEgressApprovals < 1 {
 		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
+	}
+	for _, ip := range data.AirlockWhitelist {
+		if !validation.IsIPv4OrFQDN(ip) {
+			return types.NewErrClientInvalidObjectF("airlock whitelist must contain only IPs or FQDNs")
+		}
 	}
 	return nil
 }
@@ -71,24 +83,30 @@ func (s *Service) validateProjectTREUpdate(data openapi.ProjectTREUpdate, projec
 func (s *Service) validateProjectTREAssetsAndMembers(assetIds []string, members []openapi.ProjectTREMember, studyUUID uuid.UUID) error {
 	// Validate assets belong to study and are compatible with TRE environment tier
 	if len(assetIds) > 0 {
-		// Get TRE environment tier
-		var treEnvironment types.Environment
-		err := s.db.Where("name = ?", environments.TRE).First(&treEnvironment).Error
+		environment, err := s.environments.TRE()
 		if err != nil {
-			return types.NewErrFromGorm(err, "failed to fetch TRE environment")
+			return err
 		}
-
-		if err := s.validateAssets(assetIds, studyUUID, treEnvironment.Tier); err != nil {
+		if err := s.validateAssets(assetIds, studyUUID, environment.Tier); err != nil {
 			return err
 		}
 	}
 
-	// Validate members
-	if len(members) > 0 {
+	if err := s.validateProjectMembers(members); err != nil {
+		return err
+	}
 
-		if err := s.validateProjectMembers(members); err != nil {
-			return err
+	validUids := []int{}
+	for _, member := range members {
+		if member.Uid == nil {
+			continue
 		}
+		if *member.Uid < validation.ProjectTREMinValidUid {
+			return types.NewErrClientInvalidObjectF("UID was below the allowed minimum")
+		} else if slices.Contains(validUids, *member.Uid) {
+			return types.NewErrClientInvalidObjectF("UID [%d] was not unique", *member.Uid)
+		}
+		validUids = append(validUids, *member.Uid)
 	}
 
 	return nil
@@ -121,6 +139,10 @@ func isValidProjectTRERole(role openapi.ProjectTRERoleName) bool {
 }
 
 func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) error {
+	if len(members) == 0 {
+		return nil
+	}
+
 	errorMessage := ""
 	for _, member := range members {
 		if len(member.Roles) == 0 {
@@ -186,7 +208,6 @@ func (s *Service) validateAssets(assetIDs []string, studyUUID uuid.UUID, environ
 }
 
 func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, studyUUID uuid.UUID, data openapi.ProjectTRERequest) error {
-
 	if err := s.validateProjectTREData(data, studyUUID); err != nil {
 		return err
 	}
@@ -220,6 +241,8 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		ProjectID:                     project.ID,
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+		AirlockSSHEnabled:             true, // Enable airlock ssh by default
+		AirlockWhitelist:              data.AirlockWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 	}
 
@@ -300,7 +323,6 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("TRERoleBindings.User").
 		Where("project_id = ?", projectId).
 		First(&projectTRE).Error
-
 	if err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
 	}
@@ -394,9 +416,13 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
-	projectTRE.Status = types.ProjectTREStatusIncomplete
+	if projectTRE.Status != types.ProjectTREStatusDeployed {
+		projectTRE.Status = types.ProjectTREStatusIncomplete
+	}
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
+	projectTRE.AirlockWhitelist = data.AirlockWhitelist
+	projectTRE.RequestedVersionUpdatedAt = new(time.Now())
 
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("id = ?", projectTRE.ID).
@@ -420,32 +446,6 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	}
 
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
-}
-
-func (s *Service) UpdateProjectTREStatus(projectName string, status types.ProjectTREStatus) error {
-	projects := []types.Project{}
-
-	tx := s.db.Begin()
-	defer graceful.RollbackTransactionOnPanic(tx)
-
-	if err := tx.Where("name = ?", projectName).Find(&projects).Error; err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to find projects")
-	} else if len(projects) == 0 {
-		tx.Rollback()
-		return types.NewNotFoundError(fmt.Errorf("project [%s] not found", projectName))
-	}
-
-	// NOTE: Can't do this in pure GORM statement, which is annoying
-	result := tx.Model(&types.ProjectTRE{}).
-		Where("project_id = ?", projects[0].ID).
-		Update("status", status)
-	if result.Error != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(result.Error, "failed to update project TRE status")
-
-	}
-	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit")
 }
 
 func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
@@ -494,6 +494,184 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	}
 
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit delete project transaction")
+}
+
+func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
+	if data.Id == "" || data.Name == "" || data.Description == "" {
+		return types.NewErrClientInvalidObjectF("id, name, description are required")
+	}
+	if !data.Platform.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid platform")
+	} else if !slices.Contains(types.ProjectTREPlatforms, types.ProjectTREPlatform(data.Platform)) {
+		return types.NewErrServerError("mismatch between api and db platform names")
+	}
+	platform := types.ProjectTREPlatform(data.Platform)
+	image := types.ProjectTREVMImage{}
+	result := s.db.Where(types.ProjectTREVMImage{ImageId: data.Id, Platform: platform}).
+		Assign(types.ProjectTREVMImage{
+			ImageId:     data.Id,
+			Name:        data.Name,
+			Description: data.Description,
+			Platform:    platform,
+		}).
+		FirstOrCreate(&image)
+	return types.NewErrFromGorm(result.Error, "failed to create TRE project vm image")
+}
+
+func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.ProjectUpdate) error {
+	if !data.Status.Valid() {
+		return types.NewErrClientInvalidObjectF("invalid status")
+	}
+	status := types.ProjectTREStatus(data.Status)
+	if status != types.ProjectTREStatusDeployed && status != types.ProjectTREStatusDeleted {
+		return types.NewErrClientInvalidObjectF("status can only be deployed or deleted, was [%s]", status)
+	}
+	deployedVersionUpdatedAt, err := time.Parse(config.TimeFormat, data.DeployedVersionUpdatedAt)
+	if err != nil {
+		return types.NewErrClientInvalidObjectF("failed to parse deployed update time: %s", err.Error())
+	}
+
+	subQuery := s.db.Model(&types.ProjectTRE{}).
+		Select("project_tres.id").
+		Joins("JOIN projects ON projects.id = project_tres.project_id").
+		Where("projects.name = ?", projectName)
+
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("id IN (?)", subQuery).
+		Updates(types.ProjectTRE{
+			Status:                   status,
+			DeployedVersionUpdatedAt: &deployedVersionUpdatedAt,
+		})
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project")
+	} else if result.RowsAffected == 0 {
+		return types.NewNotFoundError("tre project not found")
+	}
+	return nil
+}
+
+func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
+	tre, err := s.environments.TRE()
+	if err != nil {
+		return err
+	}
+
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	project := types.Project{}
+	findResult := s.db.Where("name = ?", data.Name).Find(&project)
+	if err := findResult.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to find project")
+	} else if findResult.RowsAffected == 0 {
+		log.Debug().Str("name", data.Name).Msg("Project did not exist yet")
+
+		// NOTE: should use service here, but will be deleted after import so going quick and dirty
+		err := s.db.Where("caseref = ?", data.Caseref).First(&project.Study).Error
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to find study")
+		}
+		project.Name = data.Name
+		project.StudyID = project.Study.ID
+		project.CreatorUserID = project.Study.OwnerUserID
+		project.EnvironmentID = tre.ID
+
+		if err := tx.Create(&project).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create project")
+		}
+	}
+
+	projectTRE := types.ProjectTRE{}
+	now := time.Now()
+	err = tx.Where("project_id = ?", project.ID).
+		Assign(types.ProjectTRE{
+			ProjectID:                     project.ID,
+			Status:                        types.ProjectTREStatus(data.Status),
+			EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
+			ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
+			AirlockSSHEnabled:             data.AirlockSshEnabled,
+			AirlockWhitelist:              data.AirlockWhitelist,
+			RequestedVersionUpdatedAt:     &now,
+			DeployedVersionUpdatedAt:      &now,
+			MonthlyBudget:                 data.MonthlyBudget,
+			Platform:                      types.ProjectTREPlatform(data.Platform),
+		}).
+		FirstOrCreate(&projectTRE).Error
+
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to create tre project")
+	}
+	log.Debug().Any("projectTRE", projectTRE).Msg("Got TRE project")
+
+	users := map[types.Username]types.User{}
+	roleBindings := []types.ProjectTRERoleBinding{}
+	for _, member := range data.Members {
+		user, err := s.users.PersistedUser(types.Username(member.Username))
+		if err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to get tre user")
+		}
+		users[user.Username] = user
+
+		for _, role := range member.Roles {
+			roleBindings = append(roleBindings, types.ProjectTRERoleBinding{
+				ProjectTREID: projectTRE.ID,
+				UserID:       user.ID,
+				Role:         types.ProjectTRERoleName(role),
+			})
+		}
+	}
+	existingRoleBindings := []types.ProjectTRERoleBinding{}
+	if err := tx.Unscoped().Where("project_tre_id = ?", projectTRE.ID).Find(&existingRoleBindings).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to get ProjectTRERoleBinding")
+	}
+	if err := graceful.UpdateManyExisting(tx, existingRoleBindings, roleBindings); err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to replace tre project role bindings")
+	}
+
+	for _, member := range data.Members {
+		user, exists := users[types.Username(member.Username)]
+		if !exists {
+			log.Error().Any("username", member.Username).Msg("User did not have any rold bindings - skipping user config")
+			continue
+		}
+		if member.Uid == nil || member.DesktopConfig == nil {
+			tx.Rollback()
+			return types.NewErrClientInvalidObjectF("member uid and desktop config must be set")
+		}
+		var rootVolumeGb *uint
+		if v := member.DesktopConfig.RootVolumeGb; v != nil {
+			rootVolumeGb = new(uint(*v))
+		}
+		userConfig := types.ProjectTREUserConfig{
+			ProjectTREID:          projectTRE.ID,
+			UserID:                user.ID,
+			UID:                   *member.Uid,
+			DesktopRootVolumeSize: rootVolumeGb,
+		}
+		if err := tx.Where(types.ProjectTREUserConfig{ // NOTE: does not clear old associations
+			ProjectTREID: projectTRE.ID,
+			UserID:       user.ID,
+		}).Assign(types.ProjectTREUserConfig{
+			UID:                   *member.Uid,
+			DesktopRootVolumeSize: rootVolumeGb,
+		}).FirstOrCreate(&userConfig).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create ProjectTREUserConfig")
+		}
+	}
+
+	if _, err := rbac.AddProjectTreOwnerRole(project.StudyID, project.ID); err != nil {
+		tx.Rollback()
+		return err
+	}
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to import tre project")
 }
 
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
