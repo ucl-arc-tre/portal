@@ -827,6 +827,26 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+  /projects/tre/admin/import:
+    post:
+      description: Import a TRE project into the portal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectTREImport"
+      responses:
+        "204":
+          description: Project imported
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
 
   # Study Asset Management
   /studies/{studyId}/assets:
@@ -1980,6 +2000,7 @@ components:
         - pending-approval
         - pending-creation
         - deployed
+        - pending-update
         - pending-deletion
         - deleted
 
@@ -2034,6 +2055,13 @@ components:
       properties:
         username:
           type: string
+        uid:
+          type: integer
+        desktop_config:
+          type: object
+          properties:
+            root_volume_gb:
+              type: integer
         roles:
           type: array
           description: List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
@@ -2051,6 +2079,45 @@ components:
         - egress_checker
         - trusted_egresser
         - API_user
+
+    ProjectTREImport:
+      type: object
+      required:
+        - name
+        - status
+        - caseref
+        - members
+        - airlock_ssh_enabled
+        - num_required_egress_approvals
+        - external_encryption_enabled
+        - airlock_whitelist
+        - monthly_budget
+        - platform
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        caseref:
+          type: integer
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectTREMember"
+        num_required_egress_approvals:
+          type: integer
+        external_encryption_enabled:
+          type: boolean
+        airlock_ssh_enabled:
+          type: boolean
+        airlock_whitelist:
+          type: array
+          items:
+            type: string
+        monthly_budget:
+          type: integer
+        platform:
+          type: string
 
     Environment:
       type: object
@@ -2128,6 +2195,7 @@ components:
             - updated_at
             - environment_name
             - assets
+            - is_pending_deployment_update
           properties:
             id:
               type: string
@@ -2154,6 +2222,9 @@ components:
               description: Time in RFC3339 format when the project was last updated
             environment_name:
               $ref: "#/components/schemas/EnvironmentName"
+            is_pending_deployment_update:
+              type: boolean
+              description: Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
             assets:
               type: array
               description: List of assets associated with this project

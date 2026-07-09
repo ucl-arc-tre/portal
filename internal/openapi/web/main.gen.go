@@ -572,6 +572,7 @@ const (
 	ProjectTREStatusPendingApproval ProjectTREStatus = "pending-approval"
 	ProjectTREStatusPendingCreation ProjectTREStatus = "pending-creation"
 	ProjectTREStatusPendingDeletion ProjectTREStatus = "pending-deletion"
+	ProjectTREStatusPendingUpdate   ProjectTREStatus = "pending-update"
 )
 
 // Valid indicates whether the value is a known member of the ProjectTREStatus enum.
@@ -588,6 +589,8 @@ func (e ProjectTREStatus) Valid() bool {
 	case ProjectTREStatusPendingCreation:
 		return true
 	case ProjectTREStatusPendingDeletion:
+		return true
+	case ProjectTREStatusPendingUpdate:
 		return true
 	default:
 		return false
@@ -1157,6 +1160,9 @@ type ProjectTRE struct {
 	// Id Unique identifier for the base project
 	Id string `json:"id"`
 
+	// IsPendingDeploymentUpdate Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
+	IsPendingDeploymentUpdate bool `json:"is_pending_deployment_update"`
+
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
 
@@ -1195,10 +1201,29 @@ type ProjectTREBase struct {
 	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
 }
 
+// ProjectTREImport defines model for ProjectTREImport.
+type ProjectTREImport struct {
+	AirlockSshEnabled          bool               `json:"airlock_ssh_enabled"`
+	AirlockWhitelist           []string           `json:"airlock_whitelist"`
+	Caseref                    int                `json:"caseref"`
+	ExternalEncryptionEnabled  bool               `json:"external_encryption_enabled"`
+	Members                    []ProjectTREMember `json:"members"`
+	MonthlyBudget              int                `json:"monthly_budget"`
+	Name                       string             `json:"name"`
+	NumRequiredEgressApprovals int                `json:"num_required_egress_approvals"`
+	Platform                   string             `json:"platform"`
+	Status                     string             `json:"status"`
+}
+
 // ProjectTREMember A project member with their assigned roles
 type ProjectTREMember struct {
+	DesktopConfig *struct {
+		RootVolumeGb *int `json:"root_volume_gb,omitempty"`
+	} `json:"desktop_config,omitempty"`
+
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
 	Roles    []ProjectTRERoleName `json:"roles"`
+	Uid      *int                 `json:"uid,omitempty"`
 	Username string               `json:"username"`
 }
 
@@ -1656,6 +1681,9 @@ type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 // PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
 
+// PostProjectsTreAdminImportJSONRequestBody defines body for PostProjectsTreAdminImport for application/json ContentType.
+type PostProjectsTreAdminImportJSONRequestBody = ProjectTREImport
+
 // PutProjectsTreProjectIdJSONRequestBody defines body for PutProjectsTreProjectId for application/json ContentType.
 type PutProjectsTreProjectIdJSONRequestBody = ProjectTREUpdate
 
@@ -1757,6 +1785,9 @@ type ServerInterface interface {
 
 	// (POST /projects/tre)
 	PostProjectsTre(c *gin.Context)
+
+	// (POST /projects/tre/admin/import)
+	PostProjectsTreAdminImport(c *gin.Context)
 
 	// (POST /projects/tre/admin/{projectId}/approve)
 	PostProjectsTreAdminProjectIdApprove(c *gin.Context, projectId ProjectIdParam)
@@ -2076,6 +2107,19 @@ func (siw *ServerInterfaceWrapper) PostProjectsTre(c *gin.Context) {
 	}
 
 	siw.Handler.PostProjectsTre(c)
+}
+
+// PostProjectsTreAdminImport operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsTreAdminImport(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsTreAdminImport(c)
 }
 
 // PostProjectsTreAdminProjectIdApprove operation middleware
@@ -3302,6 +3346,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)
 	router.GET(options.BaseURL+"/projects/tre", wrapper.GetProjectsTre)
 	router.POST(options.BaseURL+"/projects/tre", wrapper.PostProjectsTre)
+	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.DELETE(options.BaseURL+"/projects/tre/:projectId", wrapper.DeleteProjectsTreProjectId)
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)

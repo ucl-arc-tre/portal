@@ -145,16 +145,21 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		StudyId:                    projectTRE.Project.StudyID.String(),
 		StudyTitle:                 projectTRE.Project.Study.Title,
 		CreatorUsername:            string(projectTRE.Project.CreatorUser.Username),
-		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
 		CreatedAt:                  openapi.FormatTime(projectTRE.Project.CreatedAt),
 		UpdatedAt:                  openapi.FormatTime(projectTRE.Project.UpdatedAt),
 		EnvironmentName:            openapi.EnvironmentName(projectTRE.Project.Environment.Name),
 		NumRequiredEgressApprovals: projectTRE.EgressNumberRequiredApprovals,
 		ExternalEncryptionEnabled:  projectTRE.ExternalEncryptionEnabled,
 		AirlockWhitelist:           projectTRE.AirlockWhitelist,
+		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
 		Assets:                     assets,
 		Members:                    members,
 		AssetIds:                   nil,
+	}
+	if projectTRE.DeployedVersionUpdatedAt != nil &&
+		projectTRE.RequestedVersionUpdatedAt != nil &&
+		projectTRE.RequestedVersionUpdatedAt.After(*projectTRE.DeployedVersionUpdatedAt) {
+		response.IsPendingDeploymentUpdate = true
 	}
 
 	ctx.JSON(http.StatusOK, response)
@@ -248,4 +253,18 @@ func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, project
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) PostProjectsTreAdminImport(ctx *gin.Context) {
+	data := openapi.ProjectTREImport{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+
+	err := h.projects.ImportProjectTRE(data)
+	if err != nil {
+		setError(ctx, err, "Failed to import project")
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }
