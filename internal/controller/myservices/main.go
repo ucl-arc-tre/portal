@@ -13,12 +13,14 @@ import (
 )
 
 const (
-	sourceIdentity = "arc-portal"
+	sourceIdentity  = "arc-portal"
+	serviceInstance = "ARC Services Portal"
 )
 
 type Controller struct {
-	client        *ClientWithResponses
-	supportDomain string
+	client         *ClientWithResponses
+	supportDomain  string
+	requestorEmail string
 }
 
 func New() *Controller {
@@ -60,23 +62,29 @@ func New() *Controller {
 		panic(fmt.Errorf("failed to initialise myservicies client [%v]", err))
 	}
 
-	return &Controller{client: client, supportDomain: cfg.SupportDomain}
+	return &Controller{client: client, supportDomain: cfg.SupportDomain, requestorEmail: cfg.RequestorEmail}
 }
 
 func (c *Controller) SubmitFeedback(ctx context.Context, user types.User, message string) error {
 	if c.client == nil {
 		return types.NewErrServerError("no client")
 	}
+
 	fields := map[string]any{
-		"request_description": message,
+		"request_description": fmt.Sprintf(
+			"%s has provided the following feedback from the portal:\n\n%s",
+			user.Username,
+			message,
+		),
 	}
 	data := PostRequestsJSONRequestBody{
-		RequestedByEmail:  new(string(user.Username)),
-		RequestedForEmail: new(string(user.Username)),
+		RequestedByEmail:  &c.requestorEmail,
+		RequestedForEmail: &c.requestorEmail,
 		SourceId:          new(sourceIdentity),
 		Subject:           new("Feedback"),
 		CustomFields:      &fields,
 		SupportDomain:     c.supportDomain,
+		ServiceInstance:   new(serviceInstance),
 		TemplateName:      "arc_services_portal_help_or_advice", // ask Roy Thompson for these values. const
 	}
 	resp, err := c.client.PostRequestsWithResponse(ctx, data)
@@ -86,8 +94,8 @@ func (c *Controller) SubmitFeedback(ctx context.Context, user types.User, messag
 		return types.NewErrInvalidObjectF("myservices API request error: %s", marshalError(resp.JSON400))
 	} else if resp.JSON500 != nil {
 		return types.NewErrServerErrorF("myservices API request error: %s", marshalError(resp.JSON500))
-	} else if resp.StatusCode() != 200 {
-		return types.NewErrServerErrorF("myservices API request failed with code: %d", resp.StatusCode())
+	} else if resp.StatusCode() >= 300 {
+		return types.NewErrServerErrorF("myservices API request failed with code: %d. body: %s", resp.StatusCode(), string(resp.Body))
 	}
 	log.Debug().Any("response", resp.JSON200).Msg("Submitted feedback request")
 	return nil

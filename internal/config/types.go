@@ -14,11 +14,12 @@ type S3CredentialBundle struct {
 }
 
 type MyserviciesCredentialBundle struct {
-	Enabled       bool
-	URL           string
-	TenantID      string
-	ClientID      string
-	ClientSecret  string // #nosec G117 -- Loaded from mounted config
-	APIClientID   string
-	SupportDomain string
+	Enabled        bool
+	URL            string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string // #nosec G117 -- Loaded from mounted config
+	APIClientID    string
+	SupportDomain  string
+	RequestorEmail string
 }
