@@ -91,6 +91,15 @@ export default function ProjectFormTREStep(props: Props) {
                         }
                         return true;
                       },
+                      hasDesktopIfNeeded: (value) => {
+                        const isEgressChecker = value.includes("egress_checker");
+                        const isEgressRequester = value.includes("egress_requester");
+                        const hasDesktop = value.includes("desktop_user");
+                        if ((isEgressChecker || isEgressRequester) && !hasDesktop) {
+                          return "Egress requesters and checkers must have a desktop user role";
+                        }
+                        return true;
+                      },
                     },
                   }}
                   render={({ fieldState }) => (
