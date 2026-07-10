@@ -5,6 +5,13 @@ info:
   description: "API for managing enterprise service requests."
 
 paths:
+  /heartbeat:
+    get:
+      summary: "Ping the API"
+    responses:
+      "200":
+        description: "OK"
+
   /requests:
     post:
       summary: "Create a new enterprise service request"
