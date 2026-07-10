@@ -46,3 +46,10 @@ type EmailTemplateParams struct {
 	Content   string
 	PortalUrl string
 }
+
+type Invite struct {
+	Recipient   Email
+	Sponsor     types.Sponsor
+	StudyName   *string
+	ProjectName *string
+}

@@ -35,7 +35,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []string, content string) error {
+func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []Email, content string) error {
 
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
@@ -108,17 +108,10 @@ func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails
 
 }
 
-func (c *Controller) SendCustomInviteNotification(ctx context.Context, email string, sponsor types.Sponsor) error {
+func (c *Controller) SendCustomInviteNotification(ctx context.Context, invite Invite) error {
 	// use graph to send email saying so-and-so has invited you to the portal
-
-	content := ""
-	if sponsor.ChosenName != "" {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.ChosenName)
-	} else {
-		content = "You have been invited to join the UCL ARC Services Portal by " + string(sponsor.Username)
-	}
-
-	return c.sendCustomEmail(ctx, "Notification: You have been invited to the UCL ARC Services Portal", []string{email}, content)
+	subject := "Notification: You have been invited to the UCL ARC Services Portal"
+	return c.sendCustomEmail(ctx, subject, []string{invite.Recipient}, inviteEmailContent(invite))
 }
 
 func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {

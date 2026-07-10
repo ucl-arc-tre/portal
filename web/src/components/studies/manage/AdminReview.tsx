@@ -143,7 +143,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
             </form>
 
             {hasUnagreedAdmins && (
-              <Alert type="warning">
+              <Alert type="warning" className={styles["sutdy-admin-review"]}>
                 <AlertMessage>
                   The following administrators have not yet agreed to the study agreement:{" "}
                   {unagreedAdminUsernames.map((username, index) => (
