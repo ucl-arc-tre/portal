@@ -101,26 +101,34 @@ func (h *Handler) PostVmImages(ctx *gin.Context) {
 func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 	project := openapi.Project{
 		Name:                          projectTRE.Project.Name,
-		Platform:                      "",
-		MonthlyBudget:                 0,
-		BackupEnabled:                 false,
+		Platform:                      string(projectTRE.Platform),
+		MonthlyBudget:                 float32(projectTRE.MonthlyBudget),
 		EncryptionKeyEnabled:          projectTRE.ExternalEncryptionEnabled,
-		Owners:                        []string{},
-		ApiUsers:                      []string{},
+		Owners:                        projectOwners(projectTRE),
 		Usernames:                     map[string]string{},
 		Uids:                          map[string]int{},
-		Uploaders:                     []string{},
-		Downloaders:                   []string{},
-		EgressRequesters:              []string{},
-		EgressCheckers:                []string{},
-		DesktopUsers:                  []string{},
+		ApiUsers:                      []string{}, // Filled below
+		Uploaders:                     []string{}, // Filled below
+		Downloaders:                   []string{}, // Filled below
+		EgressRequesters:              []string{}, // Filled below
+		EgressCheckers:                []string{}, // Filled below
+		DesktopUsers:                  []string{}, // Filled below
 		EgressNumberRequiredApprovals: projectTRE.EgressNumberRequiredApprovals,
-		Airlock:                       openapi.Airlock{},
-		Desktop:                       openapi.Image{},
-		Efs:                           openapi.Efs{},
+		Airlock: openapi.Airlock{
+			HttpEnabled: true,
+			SftpEnabled: true,
+			SshEnabled:  projectTRE.AirlockSSHEnabled,
+			Whitelist:   projectTRE.AirlockWhitelist,
+		},
 	}
 
-	// Unwind role bindings into individual project fields
+	for _, config := range projectTRE.UserConfigs {
+		username := string(config.User.Username)
+		project.Usernames[username] = string(config.User.Username.LocalPart())
+		project.Uids[username] = int(config.UID)
+	}
+
+	// Unwind role bindings into individual user lists
 	for _, binding := range projectTRE.TRERoleBindings {
 		username := string(binding.User.Username)
 		switch binding.Role {
@@ -139,4 +147,10 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 		}
 	}
 	return project
+}
+
+func projectOwners(projectTRE types.ProjectTRE) []string {
+	owners := projectTRE.Project.Study.AdminUsernames()
+	owners = append(owners, string(projectTRE.Project.Study.Owner.Username))
+	return owners
 }

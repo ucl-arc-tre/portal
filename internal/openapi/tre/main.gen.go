@@ -54,27 +54,21 @@ func (e VMImagePlatform) Valid() bool {
 
 // Airlock defines model for Airlock.
 type Airlock struct {
-	External Image `json:"external"`
+	// HttpEnabled Whether HTTP is enabled in airlock
+	HttpEnabled bool `json:"http_enabled"`
 
-	// HttpEnabled Where HTTP is enabled in airlock
-	HttpEnabled bool  `json:"httpEnabled"`
-	Internal    Image `json:"internal"`
+	// SftpEnabled Whether SFTP is enabled in airlock
+	SftpEnabled bool `json:"sftp_enabled"`
 
-	// SftpEnabled Where SFTP is enabled in airlock
-	SftpEnabled bool `json:"sftpEnabled"`
-
-	// SshEnabled Where SSH is enabled in airlock
-	SshEnabled bool `json:"sshEnabled"`
-
-	// Version Airlock version
-	Version   int      `json:"version"`
-	Whitelist []string `json:"whitelist"`
+	// SshEnabled Whether SSH is enabled in airlock
+	SshEnabled bool     `json:"ssh_enabled"`
+	Whitelist  []string `json:"whitelist"`
 }
 
-// DesktopInstanceType defines model for DesktopInstanceType.
-type DesktopInstanceType struct {
+// DesktopInstanceConfig defines model for DesktopInstanceConfig.
+type DesktopInstanceConfig struct {
 	// HomeVolumeGb Size of the home volume in GB
-	HomeVolumeGb *int `json:"homeVolumeGb,omitempty"`
+	HomeVolumeGb *int `json:"home_volume_gb,omitempty"`
 
 	// Hpc HPC instance type
 	Hpc string `json:"hpc"`
@@ -83,24 +77,9 @@ type DesktopInstanceType struct {
 	Standard string `json:"standard"`
 }
 
-// Efs defines model for Efs.
-type Efs struct {
-	// Shared Shared EFS configuration
-	Shared struct {
-		Bursting            bool `json:"bursting"`
-		TransitionToArchive bool `json:"transitionToArchive"`
-	} `json:"shared"`
-}
-
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
-}
-
-// Image defines model for Image.
-type Image struct {
-	// Image VM image ID (e.g. AMI)
-	Image string `json:"image"`
 }
 
 // Ping defines model for Ping.
@@ -111,28 +90,24 @@ type Ping struct {
 // Project defines model for Project.
 type Project struct {
 	Airlock  Airlock  `json:"airlock"`
-	ApiUsers []string `json:"apiUsers"`
-
-	// BackupEnabled Whether backup is enabled
-	BackupEnabled bool  `json:"backupEnabled"`
-	Desktop       Image `json:"desktop"`
+	ApiUsers []string `json:"api_users"`
+	Desktop  VMImage  `json:"desktop"`
 
 	// DesktopInstanceTypes Mapping of user email to desktop instance type configuration
-	DesktopInstanceTypes *map[string]DesktopInstanceType `json:"desktopInstanceTypes,omitempty"`
-	DesktopUsers         []string                        `json:"desktopUsers"`
-	Downloaders          []string                        `json:"downloaders"`
-	Efs                  Efs                             `json:"efs"`
-	EgressCheckers       []string                        `json:"egressCheckers"`
+	DesktopInstanceTypes *map[string]DesktopInstanceConfig `json:"desktop_instance_types,omitempty"`
+	DesktopUsers         []string                          `json:"desktop_users"`
+	Downloaders          []string                          `json:"downloaders"`
+	EgressCheckers       []string                          `json:"egress_checkers"`
 
 	// EgressNumberRequiredApprovals Number of approvals required to egress/download
-	EgressNumberRequiredApprovals int      `json:"egressNumberRequiredApprovals"`
-	EgressRequesters              []string `json:"egressRequesters"`
+	EgressNumberRequiredApprovals int      `json:"egress_number_required_approvals"`
+	EgressRequesters              []string `json:"egress_requesters"`
 
 	// EncryptionKeyEnabled Whether RDSS encryption is enabled
-	EncryptionKeyEnabled bool `json:"encryptionKeyEnabled"`
+	EncryptionKeyEnabled bool `json:"encryption_key_enabled"`
 
 	// MonthlyBudget Monthly budget in USD
-	MonthlyBudget float32 `json:"monthlyBudget"`
+	MonthlyBudget float32 `json:"monthly_budget"`
 
 	// Name Unique project name
 	Name   string   `json:"name"`
@@ -141,11 +116,14 @@ type Project struct {
 	// Platform TRE platform on which the project is hosted
 	Platform string `json:"platform"`
 
+	// RequestedVersionUpdatedAt Value of the updated_at field of requested version, in RFC3339 format
+	RequestedVersionUpdatedAt string `json:"requested_version_updated_at"`
+
 	// Uids Mapping of user emails to Linux UIDs
 	Uids      map[string]int `json:"uids"`
 	Uploaders []string       `json:"uploaders"`
 
-	// Usernames Mapping of emails to usernames
+	// Usernames Mapping of emails to userids
 	Usernames map[string]string `json:"usernames"`
 }
 

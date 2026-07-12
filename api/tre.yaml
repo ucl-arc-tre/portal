@@ -178,22 +178,22 @@ components:
       required:
         - name
         - platform
-        - monthlyBudget
-        - backupEnabled
-        - encryptionKeyEnabled
+        - monthly_budget
+        - backup_enabled
+        - encryption_key_enabled
         - owners
-        - apiUsers
+        - api_users
         - usernames
         - uids
         - uploaders
         - downloaders
-        - egressRequesters
-        - egressCheckers
-        - desktopUsers
-        - egressNumberRequiredApprovals
+        - egress_requesters
+        - egress_checkers
+        - desktop_users
+        - egress_number_required_approvals
+        - requested_version_updated_at
         - airlock
         - desktop
-        - efs
       properties:
         name:
           type: string
@@ -201,13 +201,10 @@ components:
         platform:
           type: string
           description: TRE platform on which the project is hosted
-        monthlyBudget:
+        monthly_budget:
           type: number
           description: Monthly budget in USD
-        backupEnabled:
-          type: boolean
-          description: Whether backup is enabled
-        encryptionKeyEnabled:
+        encryption_key_enabled:
           type: boolean
           description: Whether RDSS encryption is enabled
         owners:
@@ -215,14 +212,14 @@ components:
           items:
             type: string
             description: Email of project IAO
-        apiUsers:
+        api_users:
           type: array
           items:
             type: string
             description: Email of TRE API user
         usernames:
           type: object
-          description: Mapping of emails to usernames
+          description: Mapping of emails to userids
           additionalProperties:
             type: string
         uids:
@@ -240,111 +237,75 @@ components:
           items:
             type: string
             description: Email of downloader
-        egressRequesters:
+        egress_requesters:
           type: array
           items:
             type: string
             description: Email of egress requester
-        egressCheckers:
+        egress_checkers:
           type: array
           items:
             type: string
             description: Email of egress checker
-        desktopUsers:
+        desktop_users:
           type: array
           items:
             type: string
             description: Email of desktop user
-        egressNumberRequiredApprovals:
+        egress_number_required_approvals:
           type: integer
           description: Number of approvals required to egress/download
+        requested_version_updated_at:
+          type: string
+          description: Value of the updated_at field of requested version, in RFC3339 format
         airlock:
           $ref: "#/components/schemas/Airlock"
         desktop:
-          $ref: "#/components/schemas/Image"
-        efs:
-          $ref: "#/components/schemas/Efs"
-        desktopInstanceTypes:
+          $ref: "#/components/schemas/VMImage"
+        desktop_instance_types:
           type: object
           description: Mapping of user email to desktop instance type configuration
           additionalProperties:
-            $ref: "#/components/schemas/DesktopInstanceType"
+            $ref: "#/components/schemas/DesktopInstanceConfig"
 
     Airlock:
       type: object
       required:
-        - version
-        - sftpEnabled
-        - sshEnabled
-        - httpEnabled
+        - sftp_enabled
+        - ssh_enabled
+        - http_enabled
         - whitelist
-        - internal
-        - external
       properties:
-        version:
-          type: integer
-          description: Airlock version
-        sftpEnabled:
+        sftp_enabled:
           type: boolean
-          description: Where SFTP is enabled in airlock
-        sshEnabled:
+          description: Whether SFTP is enabled in airlock
+        ssh_enabled:
           type: boolean
-          description: Where SSH is enabled in airlock
-        httpEnabled:
+          description: Whether SSH is enabled in airlock
+        http_enabled:
           type: boolean
-          description: Where HTTP is enabled in airlock
+          description: Whether HTTP is enabled in airlock
         whitelist:
           type: array
           items:
             type: string
             description: Allowed hostname to connect to airlock
-        internal:
-          $ref: "#/components/schemas/Image"
-        external:
-          $ref: "#/components/schemas/Image"
 
-    Image:
-      description:
-      type: object
-      required:
-        - image
-      properties:
-        image:
-          type: string
-          description: VM image ID (e.g. AMI)
-
-    Efs:
-      type: object
-      required:
-        - shared
-      properties:
-        shared:
-          type: object
-          description: Shared EFS configuration
-          required:
-            - transitionToArchive
-            - bursting
-          properties:
-            transitionToArchive:
-              type: boolean
-            bursting:
-              type: boolean
-
-    DesktopInstanceType:
+    DesktopInstanceConfig:
       type: object
       required:
         - standard
         - hpc
       properties:
-        homeVolumeGb:
-          type: integer
-          description: Size of the home volume in GB
         standard:
           type: string
           description: Standard instance type
         hpc:
           type: string
           description: HPC instance type
+        home_volume_gb:
+          type: integer
+          description: Size of the home volume in GB
 
     ProjectUpdate:
       type: object
