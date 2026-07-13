@@ -119,6 +119,13 @@ export type UserData = {
     agreements: UserAgreements;
     training_record: ProfileTraining;
     chosen_name?: string;
+    is_valid_approved_researcher: boolean;
+};
+
+export type UserDataLookup = {
+    username: string;
+    chosen_name?: string;
+    is_valid_approved_researcher: boolean;
 };
 
 export type UserTrainingUpdate = {
@@ -809,6 +816,11 @@ export type ContractObjectIdParam = string;
  */
 export type EnvironmentParam = 'dsh' | 'tre';
 
+/**
+ * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+ */
+export type UserFindParam = string;
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -1170,6 +1182,39 @@ export type GetUsersResponses = {
 
 export type GetUsersResponse = GetUsersResponses[keyof GetUsersResponses];
 
+export type GetUsersLookupData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+         */
+        find: string;
+    };
+    url: '/users/lookup';
+};
+
+export type GetUsersLookupErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetUsersLookupResponses = {
+    200: Array<UserDataLookup>;
+};
+
+export type GetUsersLookupResponse = GetUsersLookupResponses[keyof GetUsersLookupResponses];
+
 export type PostUsersByUserIdTrainingData = {
     body: UserTrainingUpdate;
     path: {
@@ -1291,6 +1336,14 @@ export type PostUsersInviteData = {
          * Email address of the person to be invited
          */
         email: string;
+        /**
+         * Optional name of study for notification
+         */
+        study_name?: string;
+        /**
+         * Optional name of project for notification
+         */
+        project_name?: string;
     };
     path?: never;
     query?: never;

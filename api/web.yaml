@@ -219,12 +219,7 @@ paths:
     get:
       description: Get all the users a user has access to view
       parameters:
-        - in: query
-          name: find
-          required: true
-          description: user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
-          schema:
-            type: string
+        - $ref: "#/components/parameters/UserFindParam"
       responses:
         "200":
           content:
@@ -233,6 +228,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserData"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /users/lookup:
+    get:
+      description: Lookup users a user has access to view
+      parameters:
+        - $ref: "#/components/parameters/UserFindParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDataLookup"
         "403":
           description: Forbidden
         "500":
@@ -334,6 +349,13 @@ paths:
                 email:
                   type: string
                   description: Email address of the person to be invited
+                study_name:
+                  type: string
+                  description: Optional name of study for notification
+                project_name:
+                  type: string
+                  description: Optional name of project for notification
+
       responses:
         "200":
           description: Successfully sent invite
@@ -1292,6 +1314,13 @@ components:
         enum:
           - dsh
           - tre
+    UserFindParam:
+      in: query
+      name: find
+      required: true
+      description: user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+      schema:
+        type: string
 
   schemas:
     Auth:
@@ -1479,6 +1508,7 @@ components:
         - roles
         - agreements
         - training_record
+        - is_valid_approved_researcher
       properties:
         user:
           $ref: "#/components/schemas/User"
@@ -1492,6 +1522,21 @@ components:
           $ref: "#/components/schemas/ProfileTraining"
         chosen_name:
           type: string
+        is_valid_approved_researcher:
+          type: boolean
+
+    UserDataLookup:
+      type: object
+      required:
+        - username
+        - is_valid_approved_researcher
+      properties:
+        username:
+          type: string
+        chosen_name:
+          type: string
+        is_valid_approved_researcher:
+          type: boolean
 
     UserTrainingUpdate:
       type: object

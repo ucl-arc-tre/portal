@@ -21,9 +21,6 @@ import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 
-// this should match the domain that is used for the entra ID users in the portal
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
-
 type Props = {
   approvedStudies: Study[];
   handleProjectCreated: () => void;
@@ -57,7 +54,13 @@ export default function ProjectForm({
       tre: undefined,
     },
   });
-  const { handleSubmit, watch, setValue, trigger } = methods;
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    trigger,
+    formState: { isValid },
+  } = methods;
 
   const selectedStudyId = watch("studyId");
   const selectedEnvironmentId = watch("environmentId");
@@ -106,7 +109,7 @@ export default function ProjectForm({
 
       const projectMembers =
         editingProject.members?.map((member) => ({
-          username: member.username.replace(domainName, ""),
+          username: member.username,
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
       setValue("members", projectMembers);
@@ -198,7 +201,7 @@ export default function ProjectForm({
           const treMembers = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
-              username: `${researcher.username.trim()}${domainName}`,
+              username: `${researcher.username.trim()}`,
               roles: researcher.roles as ProjectTreRoleName[],
             }));
 
@@ -289,9 +292,7 @@ export default function ProjectForm({
               />
             )}
 
-            {currentStep === 2 && isTREProject && (
-              <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject} />
-            )}
+            {currentStep === 2 && isTREProject && <ProjectTREStep fieldsDisabled={fieldsDisabled} />}
 
             <div className={styles.actions}>
               {currentStep > 1 && (
@@ -309,7 +310,7 @@ export default function ProjectForm({
               {currentStep === totalSteps && (
                 <Button
                   type="button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                   onClick={handleSubmit((data) => submitProject(data))}
                   cy="submit-project-button"
                 >
@@ -319,7 +320,7 @@ export default function ProjectForm({
                       : "Creating..."
                     : editingProject
                       ? "Update Project"
-                      : "Save Draft"}
+                      : "Create Project"}
                 </Button>
               )}
             </div>

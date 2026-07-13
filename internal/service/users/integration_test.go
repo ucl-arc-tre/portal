@@ -242,9 +242,9 @@ func TestCreateUserSponsorship(t *testing.T) {
 	}
 
 	user := createTestUser(t, db, "alice@testIntegration.com")
-	sponsor := createTestUser(t, db, "bob@testIntegration.com")
+	sponsor := types.Sponsor{User: createTestUser(t, db, "bob@testIntegration.com")}
 
-	got, err := service.CreateUserSponsorship(user, sponsor)
+	got, err := service.createUserSponsorship(user, sponsor)
 
 	require.NoError(t, err)
 

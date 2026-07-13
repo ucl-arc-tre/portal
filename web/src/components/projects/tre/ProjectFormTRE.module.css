@@ -1,3 +1,7 @@
+.roles {
+  margin-inline: 0.2rem;
+}
+
 .role-tags {
   display: flex;
   flex-wrap: wrap;
@@ -10,7 +14,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.75rem;
-  background-color: #e7f3ff;
+  background-color: var(--background);
   border: 1px solid var(--ucl-accent);
   border-radius: var(--default-border-radius);
   font-size: 0.875rem;
@@ -40,6 +44,7 @@
 
 .role-dropdown {
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .researcher-content {

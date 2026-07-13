@@ -1,0 +1,62 @@
+.selected-users {
+  margin-bottom: 1rem;
+}
+
+.lookup {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.user-item {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  padding: 0.25rem;
+
+  &.selected {
+    background-color: var(--success-bg);
+    color: var(--green-300);
+  }
+
+  &.result {
+    background-color: #f3f4f6;
+    color: #374151;
+
+    svg {
+      color: #6b7280;
+    }
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-inline: 0.5rem;
+
+    svg {
+      height: 1.2rem;
+    }
+  }
+
+  .role-control {
+    padding-inline: 0.5rem;
+    grid-row: 2;
+    grid-column-start: 1;
+    grid-column-end: 5;
+
+    .role-heading {
+      border-top: 1px solid var(--grey-border--light);
+      padding-top: 0.5rem;
+      margin-top: 0.4rem;
+    }
+  }
+}
+
+.hidden {
+  display: none;
+}

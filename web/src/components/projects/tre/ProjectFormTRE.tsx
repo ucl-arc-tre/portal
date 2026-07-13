@@ -2,14 +2,12 @@ import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
 import { ProjectFormData } from "@/types/projects";
-import Button from "@/components/ui/Button";
-import { ProjectTre, ProjectTreRoleName } from "@/openapi";
+import { ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
-
-// this should match the domain that is used for the entra ID users in the portal
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+import UserLookup from "@/components/shared/UserLookup";
+import Button from "@/components/ui/Button";
 
 // Mirrors backend validation in internal/validation/ip.go (IsIPv4OrFQDN).
 const ipv4Regex =
@@ -25,11 +23,10 @@ function isIPv4OrFQDN(value: string): boolean {
 
 type Props = {
   fieldsDisabled: boolean;
-  editingProject: ProjectTre | null | undefined;
 };
 
 export default function ProjectFormTREStep(props: Props) {
-  const { fieldsDisabled, editingProject } = props;
+  const { fieldsDisabled } = props;
   const {
     watch,
     control,
@@ -69,168 +66,106 @@ export default function ProjectFormTREStep(props: Props) {
       <div className="field">
         <Label htmlFor="members">Project users (optional):*</Label>
         <fieldset className="linkage-fieldset">
-          {researcherFields.map((field, index) => {
-            const researcher = members[index];
-            const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
+          <UserLookup
+            filterByApprovedResearchers={true}
+            usernames={Array.from(members, (member) => member.username)}
+            appendUsername={(value: string) => appendResearcher({ username: value, roles: [] })}
+            removeUsername={(username: string) => {
+              const index = researcherFields.findIndex((field) => field.username === username);
+              if (index !== -1) removeResearcher(index);
+            }}
+            roleControl={(user) => {
+              const memberIndex = members.findIndex((member) => member.username === user.username);
+              const researcher = members[memberIndex];
+              const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
 
-            return (
-              <div key={field.id} className="item-wrapper">
-                <div className={styles["researcher-content"]}>
-                  <div>
-                    <label htmlFor={`researcher-${index}`} className={styles["field-label"]}>
-                      Username:
-                    </label>
-                    <Controller
-                      name={`members.${index}.username` as const}
-                      control={control}
-                      rules={{
-                        required: "Username is required",
-                        validate: {
-                          isNotEmpty: (value) => {
-                            if (!value || value.trim() === "") {
-                              return "Username is required";
-                            }
-                            return true;
-                          },
-                          notEmailPart: (value) => {
-                            if (value.includes("@")) {
-                              return `Enter only the username part (without ${domainName})`;
-                            }
-                            return true;
-                          },
-                          isUnique: (value) => {
-                            const allUsernames = members.map((user) => user.username);
-                            const duplicateCount = allUsernames.filter((username) => username === value).length;
-                            return duplicateCount <= 1 || "Username has already been entered";
-                          },
-                        },
-                      }}
-                      render={({ field: usernameField, fieldState }) => (
-                        <div className={styles["username-input-wrapper"]}>
-                          <div>
-                            <input
-                              {...usernameField}
-                              id={`researcher-${index}`}
-                              type="text"
-                              placeholder="ccaxyz"
-                              disabled={
-                                fieldsDisabled ||
-                                editingProject?.members.some((member) => {
-                                  return member.username === getValues("members")[index].username + domainName;
-                                })
-                              }
-                            />
-                            <span className={styles["domain-suffix"]}>{domainName}</span>
-                          </div>
-                          {fieldState.error && (
-                            <Alert type="error">
-                              <AlertMessage>{fieldState.error.message}</AlertMessage>
-                            </Alert>
-                          )}
-                        </div>
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label>Roles:</label>
-                    <Controller
-                      name={`members.${index}.roles` as const}
-                      control={control}
-                      rules={{
-                        validate: {
-                          hasAtLeastOneRole: (value) => {
-                            if (!value || value.length === 0) {
-                              return "At least one role is required";
-                            }
-                            return true;
-                          },
-                        },
-                      }}
-                      render={({ fieldState }) => (
-                        <div>
-                          {researcher?.roles && researcher.roles.length > 0 && (
-                            <div className={styles["role-tags"]}>
-                              {researcher.roles.map((role) => (
-                                <span key={role} className={styles["role-tag"]}>
-                                  {roles[role as ProjectTreRoleName].label}
-                                  <span className={styles["role-tooltip"]}>
-                                    <InfoTooltip text={roles[role as ProjectTreRoleName].description} />
-                                  </span>
-                                  <button
-                                    type="button"
-                                    className={styles["role-tag-remove"]}
-                                    onClick={() => {
-                                      const currentRoles = getValues(`members.${index}.roles`);
-                                      setValue(
-                                        `members.${index}.roles`,
-                                        currentRoles.filter((chosenRole) => chosenRole !== role),
-                                        { shouldValidate: true }
-                                      );
-                                    }}
-                                    aria-label={`Remove ${role} role`}
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {availableRolesToAdd.length > 0 && (
-                            <select
-                              className={`${styles["role-dropdown"]}`}
-                              value=""
-                              onChange={(e) => {
-                                if (e.target.value) {
-                                  const currentRoles = getValues(`members.${index}.roles`) || [];
+              return (
+                <Controller
+                  name={`members.${memberIndex}.roles` as const}
+                  control={control}
+                  rules={{
+                    validate: {
+                      hasAtLeastOneRole: (value) => {
+                        if (!value || value.length === 0) {
+                          return "At least one role is required";
+                        }
+                        return true;
+                      },
+                      hasDesktopIfNeeded: (value) => {
+                        const isEgressChecker = value.includes("egress_checker");
+                        const isEgressRequester = value.includes("egress_requester");
+                        const hasDesktop = value.includes("desktop_user");
+                        if ((isEgressChecker || isEgressRequester) && !hasDesktop) {
+                          return "Egress requesters and checkers must have the Desktop User role";
+                        }
+                        return true;
+                      },
+                    },
+                  }}
+                  render={({ fieldState }) => (
+                    <div className={styles.roles}>
+                      {researcher?.roles && researcher.roles.length > 0 && (
+                        <div className={styles["role-tags"]}>
+                          {researcher.roles.map((role) => (
+                            <span key={role} className={styles["role-tag"]}>
+                              {roles[role as ProjectTreRoleName].label}
+                              <span className={styles["role-tooltip"]}>
+                                <InfoTooltip text={roles[role as ProjectTreRoleName].description} />
+                              </span>
+                              <button
+                                type="button"
+                                className={styles["role-tag-remove"]}
+                                onClick={() => {
+                                  const currentRoles = getValues(`members.${memberIndex}.roles`);
                                   setValue(
-                                    `members.${index}.roles`,
-                                    [...currentRoles, e.target.value as ProjectTreRoleName],
+                                    `members.${memberIndex}.roles`,
+                                    currentRoles.filter((chosenRole) => chosenRole !== role),
                                     { shouldValidate: true }
                                   );
-                                }
-                              }}
-                              disabled={fieldsDisabled}
-                            >
-                              <option value="">+ Add role...</option>
-                              {availableRolesToAdd.map(([roleName, role]) => (
-                                <option key={roleName} value={roleName}>
-                                  {role.label}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          {fieldState.error && (
-                            <Alert type="error">
-                              <AlertMessage>{fieldState.error.message}</AlertMessage>
-                            </Alert>
-                          )}
+                                }}
+                                aria-label={`Remove ${role} role`}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
                         </div>
                       )}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => removeResearcher(index)}
-                  className="remove-button"
-                  aria-label={`Remove researcher ${index + 1}`}
-                >
-                  ×
-                </button>
-              </div>
-            );
-          })}
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="small"
-            onClick={() => appendResearcher({ username: "", roles: [] })}
-          >
-            Add Researcher
-          </Button>
+                      {availableRolesToAdd.length > 0 && (
+                        <select
+                          className={styles["role-dropdown"]}
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              const currentRoles = getValues(`members.${memberIndex}.roles`) || [];
+                              setValue(
+                                `members.${memberIndex}.roles`,
+                                [...currentRoles, e.target.value as ProjectTreRoleName],
+                                { shouldValidate: true }
+                              );
+                            }
+                          }}
+                          disabled={fieldsDisabled}
+                        >
+                          <option value="">+ Add role...</option>
+                          {availableRolesToAdd.map(([roleName, role]) => (
+                            <option key={roleName} value={roleName}>
+                              {role.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {fieldState.error && (
+                        <Alert type="error">
+                          <AlertMessage>{fieldState.error.message}</AlertMessage>
+                        </Alert>
+                      )}
+                    </div>
+                  )}
+                />
+              );
+            }}
+          />
         </fieldset>
         <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
       </div>
@@ -238,7 +173,7 @@ export default function ProjectFormTREStep(props: Props) {
       <div>
         <RadioOptions
           name="tre.numRequiredEgressApprovals"
-          label="Number of required approvals to egress a file *"
+          label="Number of required approvals to egress files *"
           options={[
             { name: "1", value: "1" },
             { name: "2", value: "2" },

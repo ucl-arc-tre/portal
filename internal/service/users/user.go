@@ -53,6 +53,7 @@ func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 			return usersData, fmt.Errorf("failed to get training for user: %w", err)
 		}
 		userData.TrainingRecord.TrainingRecords = trainingRecords
+		userData.IsValidApprovedResearcher = confirmedAgreementsIncludeApprovedResearcher(agreements) && trainingRecordsIncludeValidIg(trainingRecords)
 
 		usersData = append(usersData, userData)
 	}

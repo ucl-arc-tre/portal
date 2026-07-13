@@ -1566,11 +1566,19 @@ type UserAgreements struct {
 
 // UserData defines model for UserData.
 type UserData struct {
-	Agreements     UserAgreements  `json:"agreements"`
-	ChosenName     *string         `json:"chosen_name,omitempty"`
-	Roles          []string        `json:"roles"`
-	TrainingRecord ProfileTraining `json:"training_record"`
-	User           User            `json:"user"`
+	Agreements                UserAgreements  `json:"agreements"`
+	ChosenName                *string         `json:"chosen_name,omitempty"`
+	IsValidApprovedResearcher bool            `json:"is_valid_approved_researcher"`
+	Roles                     []string        `json:"roles"`
+	TrainingRecord            ProfileTraining `json:"training_record"`
+	User                      User            `json:"user"`
+}
+
+// UserDataLookup defines model for UserDataLookup.
+type UserDataLookup struct {
+	ChosenName                *string `json:"chosen_name,omitempty"`
+	IsValidApprovedResearcher bool    `json:"is_valid_approved_researcher"`
+	Username                  string  `json:"username"`
 }
 
 // UserMetrics defines model for UserMetrics.
@@ -1610,6 +1618,9 @@ type ProjectIdParam = string
 
 // StudyIdParam defines model for StudyIdParam.
 type StudyIdParam = string
+
+// UserFindParam defines model for UserFindParam.
+type UserFindParam = string
 
 // UserIdParam defines model for UserIdParam.
 type UserIdParam = string
@@ -1653,13 +1664,25 @@ type DeleteTokensEnvironmentTokenIdParamsEnvironment string
 // GetUsersParams defines parameters for GetUsers.
 type GetUsersParams struct {
 	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
-	Find string `form:"find" json:"find"`
+	Find UserFindParam `form:"find" json:"find"`
 }
 
 // PostUsersInviteJSONBody defines parameters for PostUsersInvite.
 type PostUsersInviteJSONBody struct {
 	// Email Email address of the person to be invited
 	Email string `json:"email"`
+
+	// ProjectName Optional name of project for notification
+	ProjectName *string `json:"project_name,omitempty"`
+
+	// StudyName Optional name of study for notification
+	StudyName *string `json:"study_name,omitempty"`
+}
+
+// GetUsersLookupParams defines parameters for GetUsersLookup.
+type GetUsersLookupParams struct {
+	// Find user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+	Find UserFindParam `form:"find" json:"find"`
 }
 
 // PutUsersUserIdAttributesJSONBody defines parameters for PutUsersUserIdAttributes.
@@ -1912,6 +1935,9 @@ type ServerInterface interface {
 
 	// (POST /users/invite)
 	PostUsersInvite(c *gin.Context)
+
+	// (GET /users/lookup)
+	GetUsersLookup(c *gin.Context, params GetUsersLookupParams)
 
 	// (GET /users/metrics)
 	GetUsersMetrics(c *gin.Context)
@@ -3260,6 +3286,33 @@ func (siw *ServerInterfaceWrapper) PostUsersInvite(c *gin.Context) {
 	siw.Handler.PostUsersInvite(c)
 }
 
+// GetUsersLookup operation middleware
+func (siw *ServerInterfaceWrapper) GetUsersLookup(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUsersLookupParams
+
+	// ------------- Required query parameter "find" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "find", c.Request.URL.Query(), &params.Find, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter find: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUsersLookup(c, params)
+}
+
 // GetUsersMetrics operation middleware
 func (siw *ServerInterfaceWrapper) GetUsersMetrics(c *gin.Context) {
 
@@ -3405,6 +3458,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/users", wrapper.GetUsers)
 	router.POST(options.BaseURL+"/users/approved-researchers/import/csv", wrapper.PostUsersApprovedResearchersImportCsv)
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
+	router.GET(options.BaseURL+"/users/lookup", wrapper.GetUsersLookup)
 	router.GET(options.BaseURL+"/users/metrics", wrapper.GetUsersMetrics)
 	router.PUT(options.BaseURL+"/users/:userId/attributes", wrapper.PutUsersUserIdAttributes)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)

@@ -52,10 +52,14 @@ func (s *Service) hasAgreedToApprovedResarcherAgreement(user types.User) (bool, 
 	if err != nil {
 		return false, err
 	}
+	return confirmedAgreementsIncludeApprovedResearcher(agreements), nil
+}
+
+func confirmedAgreementsIncludeApprovedResearcher(agreements []openapi.ConfirmedAgreement) bool {
 	for _, agreement := range agreements {
 		if agreement.AgreementType == openapi.AgreementTypeApprovedResearcher {
-			return true, nil
+			return true
 		}
 	}
-	return false, nil
+	return false
 }
