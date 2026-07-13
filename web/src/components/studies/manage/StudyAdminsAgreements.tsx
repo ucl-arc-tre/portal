@@ -2,6 +2,7 @@ import { getStudiesByStudyIdAgreements } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useEffect, useState } from "react";
 import styles from "./StudyAdminsAgreements.module.css";
+import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 
 type StudyAdminsAgreementsProps = {
   studyId: string;
@@ -57,9 +58,9 @@ export default function StudyAdminsAgreements(props: StudyAdminsAgreementsProps)
 
   if (error) {
     return (
-      <div className={"error-message"}>
-        <strong>Error:</strong> {error}
-      </div>
+      <Alert type="error">
+        <AlertMessage>{error}</AlertMessage>
+      </Alert>
     );
   }
 
