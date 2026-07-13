@@ -96,7 +96,7 @@ export default function ProjectFormTREStep(props: Props) {
                         const isEgressRequester = value.includes("egress_requester");
                         const hasDesktop = value.includes("desktop_user");
                         if ((isEgressChecker || isEgressRequester) && !hasDesktop) {
-                          return "Egress requesters and checkers must have a desktop user role";
+                          return "Egress requesters and checkers must have the Desktop User role";
                         }
                         return true;
                       },
