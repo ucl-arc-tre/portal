@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"crypto/md5"
+	"crypto/md5" // #nosec G501 - not used for sensitive values
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -59,7 +59,8 @@ func notificationDedupeKey(notification types.Notification, user types.User) str
 	if notification.ExpiresAt != nil {
 		expiresAtStr += notification.ExpiresAt.Format(config.TimeFormat)
 	}
-	hash := md5.Sum([]byte(fmt.Sprintf("%s%s%s%s", user.ID.String(), notification.Title, bodyStr, expiresAtStr)))
+	dedupeKey := fmt.Sprintf("%s%s%s%s", user.ID.String(), notification.Title, bodyStr, expiresAtStr)
+	hash := md5.Sum([]byte(dedupeKey)) // #nosec G401 -- No sensitivie values hashed
 	return hex.EncodeToString(hash[:])
 }
 
