@@ -193,7 +193,7 @@ components:
         - egress_number_required_approvals
         - requested_version_updated_at
         - airlock
-        - desktop
+        - desktop_instance_types
       properties:
         name:
           type: string
@@ -260,13 +260,11 @@ components:
           description: Value of the updated_at field of requested version, in RFC3339 format
         airlock:
           $ref: "#/components/schemas/Airlock"
-        desktop:
-          $ref: "#/components/schemas/VMImage"
         desktop_instance_types:
           type: object
           description: Mapping of user email to desktop instance type configuration
           additionalProperties:
-            $ref: "#/components/schemas/DesktopInstanceConfig"
+            $ref: "#/components/schemas/DesktopInstanceType"
 
     Airlock:
       type: object
@@ -291,12 +289,16 @@ components:
             type: string
             description: Allowed hostname to connect to airlock
 
-    DesktopInstanceConfig:
+    DesktopInstanceType:
       type: object
       required:
+        - image
         - standard
         - hpc
       properties:
+        image:
+          type: string
+          description: Image to use for the desktop instance
         standard:
           type: string
           description: Standard instance type

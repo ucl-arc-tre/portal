@@ -65,13 +65,16 @@ type Airlock struct {
 	Whitelist  []string `json:"whitelist"`
 }
 
-// DesktopInstanceConfig defines model for DesktopInstanceConfig.
-type DesktopInstanceConfig struct {
+// DesktopInstanceType defines model for DesktopInstanceType.
+type DesktopInstanceType struct {
 	// HomeVolumeGb Size of the home volume in GB
 	HomeVolumeGb *int `json:"home_volume_gb,omitempty"`
 
 	// Hpc HPC instance type
 	Hpc string `json:"hpc"`
+
+	// Image Image to use for the desktop instance
+	Image string `json:"image"`
 
 	// Standard Standard instance type
 	Standard string `json:"standard"`
@@ -91,13 +94,12 @@ type Ping struct {
 type Project struct {
 	Airlock  Airlock  `json:"airlock"`
 	ApiUsers []string `json:"api_users"`
-	Desktop  VMImage  `json:"desktop"`
 
 	// DesktopInstanceTypes Mapping of user email to desktop instance type configuration
-	DesktopInstanceTypes *map[string]DesktopInstanceConfig `json:"desktop_instance_types,omitempty"`
-	DesktopUsers         []string                          `json:"desktop_users"`
-	Downloaders          []string                          `json:"downloaders"`
-	EgressCheckers       []string                          `json:"egress_checkers"`
+	DesktopInstanceTypes map[string]DesktopInstanceType `json:"desktop_instance_types"`
+	DesktopUsers         []string                       `json:"desktop_users"`
+	Downloaders          []string                       `json:"downloaders"`
+	EgressCheckers       []string                       `json:"egress_checkers"`
 
 	// EgressNumberRequiredApprovals Number of approvals required to egress/download
 	EgressNumberRequiredApprovals int      `json:"egress_number_required_approvals"`

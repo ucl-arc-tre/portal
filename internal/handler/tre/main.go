@@ -3,6 +3,7 @@ package tre
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -105,14 +106,15 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 		MonthlyBudget:                 float32(projectTRE.MonthlyBudget),
 		EncryptionKeyEnabled:          projectTRE.ExternalEncryptionEnabled,
 		Owners:                        projectOwners(projectTRE),
-		Usernames:                     map[string]string{},
-		Uids:                          map[string]int{},
-		ApiUsers:                      []string{}, // Filled below
-		Uploaders:                     []string{}, // Filled below
-		Downloaders:                   []string{}, // Filled below
-		EgressRequesters:              []string{}, // Filled below
-		EgressCheckers:                []string{}, // Filled below
-		DesktopUsers:                  []string{}, // Filled below
+		Usernames:                     map[string]string{},                      // Filled below
+		Uids:                          map[string]int{},                         // Filled below
+		ApiUsers:                      []string{},                               // Filled below
+		Uploaders:                     []string{},                               // Filled below
+		Downloaders:                   []string{},                               // Filled below
+		EgressRequesters:              []string{},                               // Filled below
+		EgressCheckers:                []string{},                               // Filled below
+		DesktopUsers:                  []string{},                               // Filled below
+		DesktopInstanceTypes:          map[string]openapi.DesktopInstanceType{}, // Filled below
 		EgressNumberRequiredApprovals: projectTRE.EgressNumberRequiredApprovals,
 		Airlock: openapi.Airlock{
 			HttpEnabled: true,
@@ -120,12 +122,33 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 			SshEnabled:  projectTRE.AirlockSSHEnabled,
 			Whitelist:   projectTRE.AirlockWhitelist,
 		},
+		RequestedVersionUpdatedAt: requestedVersionUpdatedAt(projectTRE),
 	}
 
+	// Populate user configs
 	for _, config := range projectTRE.UserConfigs {
 		username := string(config.User.Username)
+
+		// User identities
 		project.Usernames[username] = string(config.User.Username.LocalPart())
 		project.Uids[username] = int(config.UID)
+
+		// Desktop instance types
+		desktopInstanceType := openapi.DesktopInstanceType{}
+		if config.DesktopStandardInstanceType != nil {
+			desktopInstanceType.Standard = *config.DesktopStandardInstanceType
+		}
+		if config.DesktopHPCInstanceType != nil {
+			desktopInstanceType.Hpc = *config.DesktopHPCInstanceType
+		}
+		if config.DesktopImage != nil {
+			desktopInstanceType.Image = config.DesktopImage.ImageId
+		}
+		if config.DesktopHomeVolumeSize != nil {
+			homeVolGB := int(*config.DesktopHomeVolumeSize)
+			desktopInstanceType.HomeVolumeGb = &homeVolGB
+		}
+		project.DesktopInstanceTypes[username] = desktopInstanceType
 	}
 
 	// Unwind role bindings into individual user lists
@@ -153,4 +176,11 @@ func projectOwners(projectTRE types.ProjectTRE) []string {
 	owners := projectTRE.Project.Study.AdminUsernames()
 	owners = append(owners, string(projectTRE.Project.Study.Owner.Username))
 	return owners
+}
+
+func requestedVersionUpdatedAt(projectTRE types.ProjectTRE) string {
+	if projectTRE.RequestedVersionUpdatedAt != nil {
+		return projectTRE.RequestedVersionUpdatedAt.Format(time.RFC3339)
+	}
+	return ""
 }
