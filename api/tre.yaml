@@ -179,7 +179,6 @@ components:
         - name
         - platform
         - monthly_budget
-        - backup_enabled
         - encryption_key_enabled
         - owners
         - api_users
