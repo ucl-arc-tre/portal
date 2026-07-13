@@ -138,12 +138,6 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 			content += " \nFeedback: " + *review.Feedback
 			subject = "Notification: Your Study has feedback to address"
 		}
-	case openapi.StudyApprovalStatusPending:
-		content = "Your Study has been reviewed by the Information Governance team. Please review the feedback, make the necessary updates, and then resubmit your Study for review."
-		subject = "Notification: Your Study requires updates before approval"
-		if review.Feedback != nil {
-			content += "\nFeedback:" + *review.Feedback
-		}
 	}
 
 	return c.sendCustomEmail(ctx, subject, emails, content)
