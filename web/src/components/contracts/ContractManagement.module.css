@@ -36,8 +36,8 @@
 .error {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: var(--error-bg);
+  color: var(--error-text);
   border: 1px solid #f5c6cb;
   border-radius: var(--default-border-radius);
   font-size: 1rem;

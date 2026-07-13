@@ -1,5 +1,5 @@
 .error {
-  border-color: #dc3545 !important;
+  border-color: var(--red-100) !important;
 }
 
 .field {

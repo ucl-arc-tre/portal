@@ -45,7 +45,7 @@
 
       .remove-button {
         padding: 0.5rem 0.75rem;
-        background-color: #dc3545;
+        background-color: var(--red-100);
         color: white;
         border: none;
         border-radius: var(--default-border-radius);
@@ -60,11 +60,11 @@
         height: unset;
 
         &:hover {
-          background-color: #c82333;
+          background-color: var(--red-200);
         }
 
         &:focus {
-          outline: 2px solid #dc3545;
+          outline: 2px solid var(--red-100);
           outline-offset: 2px;
         }
       }

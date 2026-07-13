@@ -87,8 +87,8 @@
 }
 
 .error {
-  color: #dc3545;
-  background: #f8d7da;
+  color: var(--error-text);
+  background: var(--error-bg);
   padding: 1rem;
   border-radius: var(--default-border-radius);
   border: 1px solid #f5c6cb;
