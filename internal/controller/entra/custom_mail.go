@@ -190,7 +190,7 @@ func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email s
 
 func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
 
-	content := "You have been added as an Information Asset Administrator to the Study '" + studyTitle + "'. Please sign in to the Portal to view the Study details and sign the Administrator's Agreement."
+	content := "You have been added as an Information Asset Administrator (IAA) to the Study '" + studyTitle + "'. Please sign in to the Portal to view the Study details and sign the Administrator's Agreement."
 
 	subject := "Notification: Information Asset Administrator assignment"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
