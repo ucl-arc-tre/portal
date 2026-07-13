@@ -54,7 +54,13 @@ export default function ProjectForm({
       tre: undefined,
     },
   });
-  const { handleSubmit, watch, setValue, trigger } = methods;
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    trigger,
+    formState: { isValid },
+  } = methods;
 
   const selectedStudyId = watch("studyId");
   const selectedEnvironmentId = watch("environmentId");
@@ -304,7 +310,7 @@ export default function ProjectForm({
               {currentStep === totalSteps && (
                 <Button
                   type="button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                   onClick={handleSubmit((data) => submitProject(data))}
                   cy="submit-project-button"
                 >
@@ -314,7 +320,7 @@ export default function ProjectForm({
                       : "Creating..."
                     : editingProject
                       ? "Update Project"
-                      : "Save Draft"}
+                      : "Create Project"}
                 </Button>
               )}
             </div>
