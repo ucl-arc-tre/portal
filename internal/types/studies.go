@@ -10,31 +10,31 @@ import (
 // for descriptions of the Study fields, see /api/web.yaml
 type Study struct {
 	ModelAuditable
-	OwnerUserID                      uuid.UUID `gorm:"not null;index"`
-	Title                            string    `gorm:"not null"`
-	Description                      *string   `gorm:"type:text"`
-	DataControllerOrganisation       string    `gorm:"not null"`
-	InvolvesUclSponsorship           *bool     `gorm:""`
-	InvolvesCag                      *bool     `gorm:""`
-	CagReference                     *string   `gorm:"type:varchar(255)"`
-	InvolvesEthicsApproval           *bool     `gorm:""`
-	InvolvesHraApproval              *bool     `gorm:""`
-	IrasId                           *string   `gorm:"type:varchar(255)"`
-	IsNhsAssociated                  *bool     `gorm:""`
-	InvolvesNhsEngland               *bool     `gorm:""`
-	NhsEnglandReference              *string   `gorm:"type:varchar(255)"`
-	InvolvesMnca                     *bool     `gorm:""`
-	RequiresDspt                     *bool     `gorm:""`
-	RequiresDbs                      *bool     `gorm:""`
-	IsDataProtectionOfficeRegistered *bool     `gorm:""`
-	DataProtectionNumber             *string   `gorm:"type:varchar(255)"`
-	InvolvesThirdParty               *bool     `gorm:""`
-	InvolvesExternalUsers            *bool     `gorm:""`
-	InvolvesParticipantConsent       *bool     `gorm:""`
-	InvolvesIndirectDataCollection   *bool     `gorm:""`
-	InvolvesDataProcessingOutsideEea *bool     `gorm:""`
-	ApprovalStatus                   string    `gorm:"not null"`
-	Feedback                         *string   `gorm:"type:text"`
+	OwnerUserID                      uuid.UUID           `gorm:"not null;index"`
+	Title                            string              `gorm:"not null"`
+	Description                      *string             `gorm:"type:text"`
+	DataControllerOrganisation       string              `gorm:"not null"`
+	InvolvesUclSponsorship           *bool               `gorm:""`
+	InvolvesCag                      *bool               `gorm:""`
+	CagReference                     *string             `gorm:"type:varchar(255)"`
+	InvolvesEthicsApproval           *bool               `gorm:""`
+	InvolvesHraApproval              *bool               `gorm:""`
+	IrasId                           *string             `gorm:"type:varchar(255)"`
+	IsNhsAssociated                  *bool               `gorm:""`
+	InvolvesNhsEngland               *bool               `gorm:""`
+	NhsEnglandReference              *string             `gorm:"type:varchar(255)"`
+	InvolvesMnca                     *bool               `gorm:""`
+	RequiresDspt                     *bool               `gorm:""`
+	RequiresDbs                      *bool               `gorm:""`
+	IsDataProtectionOfficeRegistered *bool               `gorm:""`
+	DataProtectionNumber             *string             `gorm:"type:varchar(255)"`
+	InvolvesThirdParty               *bool               `gorm:""`
+	InvolvesExternalUsers            *bool               `gorm:""`
+	InvolvesParticipantConsent       *bool               `gorm:""`
+	InvolvesIndirectDataCollection   *bool               `gorm:""`
+	InvolvesDataProcessingOutsideEea *bool               `gorm:""`
+	ApprovalStatus                   StudyApprovalStatus `gorm:"not null"`
+	Feedback                         *string             `gorm:"type:text"`
 	LastSignoff                      *time.Time
 	// caseref sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	// study_caseref_seq defined in internal/graceful/db.go
@@ -58,6 +58,15 @@ func (s Study) LatestOwnerChange() *StudyOwnerChangelog {
 	}
 	return latest
 }
+
+type StudyApprovalStatus = string
+
+const (
+	StudyApprovalStatusApproved   = "Approved"
+	StudyApprovalStatusIncomplete = "Incomplete"
+	StudyApprovalStatusPending    = "Pending"
+	StudyApprovalStatusRejected   = "Rejected"
+)
 
 type StudyOwnerChangelogAction string
 
@@ -96,10 +105,10 @@ func (s Study) AdminUsernames() []string {
 	return usernames
 }
 
-func (s Study) NotificationRecipients() []string {
-	recipients := []string{string(s.Owner.Username)}
+func (s Study) NotificationRecipients() []User {
+	recipients := []User{s.Owner}
 	for _, studyAdmin := range s.StudyAdmins {
-		recipients = append(recipients, string(studyAdmin.User.Username))
+		recipients = append(recipients, studyAdmin.User)
 	}
 	return recipients
 }

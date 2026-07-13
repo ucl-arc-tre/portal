@@ -14,6 +14,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mocknotifications"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -58,7 +59,8 @@ func TestPersistedUser_CreatesUser(t *testing.T) {
 	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
-		db: db,
+		db:            db,
+		notifications: &mocknotifications.MockNotifications{},
 	}
 
 	username := types.Username("bob@testIntegration.com")
@@ -112,7 +114,8 @@ func TestPersistedExternalUser_CreatesNewUser(t *testing.T) {
 	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
-		db: db,
+		db:            db,
+		notifications: &mocknotifications.MockNotifications{},
 	}
 
 	user, err := service.PersistedExternalUser(

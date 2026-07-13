@@ -531,6 +531,42 @@ func (e EnvironmentName) Valid() bool {
 	}
 }
 
+// Defines values for NotificationKind.
+const (
+	NotificationKindAssetExpiry      NotificationKind = "asset-expiry"
+	NotificationKindCompleteProfile  NotificationKind = "complete-profile"
+	NotificationKindContractExpiry   NotificationKind = "contract-expiry"
+	NotificationKindIaaAssignment    NotificationKind = "iaa-assignment"
+	NotificationKindPendingStudy     NotificationKind = "pending-study"
+	NotificationKindStudyAffirmation NotificationKind = "study-affirmation"
+	NotificationKindStudyReview      NotificationKind = "study-review"
+	NotificationKindTrainingExpiry   NotificationKind = "training-expiry"
+)
+
+// Valid indicates whether the value is a known member of the NotificationKind enum.
+func (e NotificationKind) Valid() bool {
+	switch e {
+	case NotificationKindAssetExpiry:
+		return true
+	case NotificationKindCompleteProfile:
+		return true
+	case NotificationKindContractExpiry:
+		return true
+	case NotificationKindIaaAssignment:
+		return true
+	case NotificationKindPendingStudy:
+		return true
+	case NotificationKindStudyAffirmation:
+		return true
+	case NotificationKindStudyReview:
+		return true
+	case NotificationKindTrainingExpiry:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ProjectTRERoleName.
 const (
 	APIUser         ProjectTRERoleName = "API_user"
@@ -1076,6 +1112,27 @@ type Environment struct {
 
 // EnvironmentName defines model for EnvironmentName.
 type EnvironmentName string
+
+// Notification defines model for Notification.
+type Notification struct {
+	Body *string `json:"body,omitempty"`
+
+	// Href Local link to follow e.g. "/profile"
+	Href *string `json:"href,omitempty"`
+
+	// Id UUID of the notification
+	Id    string            `json:"id"`
+	Kind  *NotificationKind `json:"kind,omitempty"`
+	Title string            `json:"title"`
+}
+
+// NotificationKind defines model for NotificationKind.
+type NotificationKind string
+
+// NotificationsReadAll defines model for NotificationsReadAll.
+type NotificationsReadAll struct {
+	Kind *NotificationKind `json:"kind,omitempty"`
+}
 
 // Profile defines model for Profile.
 type Profile struct {
@@ -1685,6 +1742,9 @@ type PutUsersUserIdAttributesJSONBody struct {
 	ChosenName string `json:"chosen_name"`
 }
 
+// PostNotificationsReadJSONRequestBody defines body for PostNotificationsRead for application/json ContentType.
+type PostNotificationsReadJSONRequestBody = NotificationsReadAll
+
 // PostProfileJSONRequestBody defines body for PostProfile for application/json ContentType.
 type PostProfileJSONRequestBody = ProfileUpdate
 
@@ -1774,6 +1834,15 @@ type ServerInterface interface {
 
 	// (GET /logout)
 	GetLogout(c *gin.Context)
+
+	// (GET /notifications)
+	GetNotifications(c *gin.Context)
+
+	// (POST /notifications/read)
+	PostNotificationsRead(c *gin.Context)
+
+	// (POST /notifications/{notificationId}/read)
+	PostNotificationsNotificationIdRead(c *gin.Context, notificationId string)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -2009,6 +2078,57 @@ func (siw *ServerInterfaceWrapper) GetLogout(c *gin.Context) {
 	}
 
 	siw.Handler.GetLogout(c)
+}
+
+// GetNotifications operation middleware
+func (siw *ServerInterfaceWrapper) GetNotifications(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetNotifications(c)
+}
+
+// PostNotificationsRead operation middleware
+func (siw *ServerInterfaceWrapper) PostNotificationsRead(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostNotificationsRead(c)
+}
+
+// PostNotificationsNotificationIdRead operation middleware
+func (siw *ServerInterfaceWrapper) PostNotificationsNotificationIdRead(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "notificationId" -------------
+	var notificationId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter notificationId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostNotificationsNotificationIdRead(c, notificationId)
 }
 
 // GetProfile operation middleware
@@ -3383,6 +3503,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/environments", wrapper.GetEnvironments)
 	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
+	router.GET(options.BaseURL+"/notifications", wrapper.GetNotifications)
+	router.POST(options.BaseURL+"/notifications/read", wrapper.PostNotificationsRead)
+	router.POST(options.BaseURL+"/notifications/:notificationId/read", wrapper.PostNotificationsNotificationIdRead)
 	router.GET(options.BaseURL+"/profile", wrapper.GetProfile)
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)

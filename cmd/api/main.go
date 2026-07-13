@@ -15,6 +15,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/router"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/tasks"
 )
 
@@ -38,6 +39,7 @@ func initialise() {
 	rbac.Init()
 	agreements.Init()
 	environments.Init()
+	users.Init()
 }
 
 // Add the web API defined by its OpenAPI spec with suitable middleware

@@ -7,6 +7,7 @@ import {
   UserAgreements,
   ProfileTraining,
   Auth,
+  postNotificationsRead,
 } from "@/openapi";
 import { calculateExpiryUrgency } from "@/components/shared/exports";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -90,12 +91,20 @@ export default function Profile({ userData, refreshAuth }: Props) {
     fetchProfileData();
   }, [fetchProfileData]);
 
+  const clearCompleteProfileCompleteNotification = async () => {
+    const response = await postNotificationsRead({ body: { kind: "complete-profile" } });
+    if (responseIsError(response)) {
+      console.log(`Failed to clear complete profile notfiication ${extractErrorMessage(response)}`);
+    }
+  };
+
   const handleStepsComplete = (name: string) => {
     setChosenName(name);
     setProfileComplete(true);
     setExpiryUrgency(null);
     refreshAuth();
     fetchProfileData();
+    clearCompleteProfileCompleteNotification();
   };
 
   if (isLoading) return <Loading message="Loading your profile" />;

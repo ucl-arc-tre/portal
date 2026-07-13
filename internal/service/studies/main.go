@@ -15,10 +15,12 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -26,18 +28,20 @@ const (
 )
 
 type Service struct {
-	db    *gorm.DB
-	entra entra.Interface
-	s3    s3.Interface
-	users users.Interface
+	db            *gorm.DB
+	entra         entra.Interface
+	s3            s3.Interface
+	users         users.Interface
+	notifications notifications.Interface
 }
 
 func New() *Service {
 	return &Service{
-		db:    graceful.NewDB(),
-		s3:    s3.New(),
-		entra: entra.New(),
-		users: users.New(),
+		db:            graceful.NewDB(),
+		s3:            s3.New(),
+		entra:         entra.New(),
+		users:         users.New(),
+		notifications: notifications.New(),
 	}
 }
 
@@ -324,8 +328,11 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 	return s.commitStudyTransaction(tx, &study)
 }
 
-func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) error {
-	db := s.db.Model(&types.Study{}).Where("id = ?", id).
+func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review openapi.StudyReview) error {
+	study := types.Study{}
+	db := s.db.Model(&study).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
 		Update("approval_status", review.Status).
 		Update("feedback", review.Feedback)
 
@@ -333,7 +340,24 @@ func (s *Service) UpdateStudyReview(id uuid.UUID, review openapi.StudyReview) er
 		db = db.Update("last_signoff", time.Now())
 	}
 
-	return types.NewErrFromGorm(db.Error, "failed to update study review")
+	if err := db.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update study review")
+	}
+	if db.RowsAffected == 0 {
+		return nil // nothing changed
+	}
+	if err := s.db.Preload("Owner").Preload("StudyAdmins").Preload("StudyAdmins.User").First(&study).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to get study after update")
+	}
+
+	igOpsStaff, err := s.users.UsersWithConfigRole(rbac.IGOpsStaff)
+	if err != nil {
+		return err
+	}
+	if err := s.notifications.NotifyStudyReview(ctx, study, igOpsStaff); err != nil {
+		log.Err(err).Msg("Failed to notify") // not fatal
+	}
+	return nil
 }
 
 func (s *Service) RecordStudySignoff(id uuid.UUID) error {
@@ -376,26 +400,6 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 	}
 
 	return s.commitStudyTransaction(tx, &study)
-}
-
-func (s *Service) SendReviewEmailNotification(ctx context.Context, studyUUID uuid.UUID, review openapi.StudyReview) error {
-
-	studies, err := s.StudiesById(studyUUID)
-	if err != nil {
-		return err
-	}
-
-	// IAO + IAAs should be recipients
-	recipients := []string{string(studies[0].Owner.Username)}
-	for _, studyAdmin := range studies[0].StudyAdmins {
-		recipients = append(recipients, string(studyAdmin.User.Username))
-	}
-
-	err = s.entra.SendCustomStudyReviewNotification(ctx, recipients, review)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (s *Service) UpdateStudyOwner(studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
@@ -518,7 +522,7 @@ func (s *Service) commitStudyTransaction(tx *StudyTransaction, study *types.Stud
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
 		for _, user := range tx.newIAAs {
-			if err := s.entra.SendIaaAssignmentNotification(ctx, string(user.Username), study.Title); err != nil {
+			if err := s.notifications.NotifyIaaAssignment(ctx, user, *study); err != nil {
 				log.Err(err).Any("username", user.Username).Msg("Failed to send IAA assignment email")
 			}
 		}

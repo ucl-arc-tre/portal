@@ -201,15 +201,9 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		return
 	}
 
-	err = h.studies.UpdateStudyReview(studyUUID, review)
+	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
-		return
-	}
-
-	err = h.studies.SendReviewEmailNotification(ctx, studyUUID, review)
-	if err != nil {
-		setError(ctx, err, "Failed to send study notification")
 		return
 	}
 
@@ -242,7 +236,7 @@ func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	err = h.studies.UpdateStudyReview(studyUUID, review)
+	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return

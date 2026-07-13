@@ -1,4 +1,4 @@
-//go:build !integration
+///go:build !integration
 
 package studies
 
@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -32,4 +33,11 @@ func TestContainsStudyAdminUser(t *testing.T) {
 	}
 	assert.True(t, studyAdmins[0].IsDeleted())
 	assert.False(t, containsStudyAdminUser(studyAdmins, types.User{Model: types.Model{ID: userId1}}))
+}
+
+func TestApprovalStateEquality(t *testing.T) {
+	assert.Equal(t, types.StudyApprovalStatusApproved, string(openapi.StudyApprovalStatusApproved))
+	assert.Equal(t, types.StudyApprovalStatusIncomplete, string(openapi.StudyApprovalStatusIncomplete))
+	assert.Equal(t, types.StudyApprovalStatusPending, string(openapi.StudyApprovalStatusPending))
+	assert.Equal(t, types.StudyApprovalStatusRejected, string(openapi.StudyApprovalStatusRejected))
 }
