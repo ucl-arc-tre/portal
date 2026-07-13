@@ -13,7 +13,7 @@ type S3CredentialBundle struct {
 	SecretAccessKey string
 }
 
-type MyserviciesCredentialBundle struct {
+type MyservicesCredentialBundle struct {
 	Enabled        bool
 	URL            string
 	TenantID       string

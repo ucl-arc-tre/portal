@@ -135,7 +135,7 @@
         <mxCell id="2pc-hW2APEXyrac_QrEP-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontColor=#000066;strokeColor=#000066;" edge="1" parent="1" source="2pc-hW2APEXyrac_QrEP-7" target="2pc-hW2APEXyrac_QrEP-6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="2pc-hW2APEXyrac_QrEP-7" value="ISD MyServicies API" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" vertex="1" parent="1">
+        <mxCell id="2pc-hW2APEXyrac_QrEP-7" value="ISD Myservices API" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;" vertex="1" parent="1">
           <mxGeometry x="610" y="150" width="130" height="27.56" as="geometry" />
         </mxCell>
         <mxCell id="2pc-hW2APEXyrac_QrEP-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#000066;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="secJR8oH6ISVTxLb7Hlb-5" target="2pc-hW2APEXyrac_QrEP-7">

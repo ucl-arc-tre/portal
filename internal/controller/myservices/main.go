@@ -24,7 +24,7 @@ type Controller struct {
 }
 
 func New() *Controller {
-	cfg := config.Myservicies()
+	cfg := config.Myservices()
 
 	if !cfg.Enabled {
 		log.Warn().Msg("Myservices integration disabled - nil controller")
@@ -59,7 +59,7 @@ func New() *Controller {
 	}
 	client, err := NewClientWithResponses(cfg.URL, opts)
 	if err != nil {
-		panic(fmt.Errorf("failed to initialise myservicies client [%v]", err))
+		panic(fmt.Errorf("failed to initialise myservices client [%v]", err))
 	}
 
 	return &Controller{client: client, supportDomain: cfg.SupportDomain, requestorEmail: cfg.RequestorEmail}

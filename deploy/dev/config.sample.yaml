@@ -51,13 +51,13 @@ tre:
   users: # Map of usernames to passwords for HTTP basic auth
     username: password # pragma: allowlist secret
 
-# Integration with UCL myservicies a IT service management
+# Integration with UCL myservices a IT service management
 myservices:
   enabled: true
-  url: <CHANGE_ME> # e.g. https://myservicies-api.example.com
+  url: <CHANGE_ME> # e.g. https://myservices-api.example.com
   support_domain: <CHANGE_ME> # e.g arc
   requestor_email: <CHANGE_ME> # e,g, portal@example.com
-  entra: # Requires [Get.Token, DomainAccess.X] API permissions on the myservicies API
+  entra: # Requires [Get.Token, DomainAccess.X] API permissions on the myservices API
     tenant_id: <CHANGE_ME>
     client_id: <CHANGE_ME>
     client_secret: <CHANGE_ME>

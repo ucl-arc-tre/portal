@@ -64,7 +64,7 @@ func (h *Handler) PostFeedback(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	err := h.myservices.SubmitFeedback(ctx, user, data.Message)
 	if err != nil {
-		setError(ctx, err, "Failed to submit feedback to myservicies")
+		setError(ctx, err, "Failed to submit feedback to myservices")
 		return
 	}
 	ctx.Status(http.StatusNoContent)

@@ -156,8 +156,8 @@ func NotificationsEnabled() bool {
 	return k.Bool("entra.notifications_enabled")
 }
 
-func Myservicies() MyserviciesCredentialBundle {
-	return MyserviciesCredentialBundle{
+func Myservices() MyservicesCredentialBundle {
+	return MyservicesCredentialBundle{
 		Enabled:        k.Bool("myservices.enabled"),
 		URL:            k.String("myservices.url"),
 		TenantID:       k.String("myservices.entra.tenant_id"),
@@ -165,7 +165,7 @@ func Myservicies() MyserviciesCredentialBundle {
 		ClientSecret:   k.String("myservices.entra.client_secret"),
 		APIClientID:    k.String("myservices.entra.api_client_id"),
 		SupportDomain:  k.String("myservices.support_domain"),
-		RequestorEmail: k.String("myservicies.requestor_email"),
+		RequestorEmail: k.String("myservices.requestor_email"),
 	}
 }
 
