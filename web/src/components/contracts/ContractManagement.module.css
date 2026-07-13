@@ -38,7 +38,7 @@
   padding: 1rem;
   background-color: var(--error-bg);
   color: var(--error-text);
-  border: 1px solid #f5c6cb;
+  border: 1px solid var(--error-border);
   border-radius: var(--default-border-radius);
   font-size: 1rem;
 }

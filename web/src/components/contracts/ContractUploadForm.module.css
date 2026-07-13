@@ -81,7 +81,7 @@
   font-weight: 500;
   padding: 0.75rem;
   background-color: var(--error-bg);
-  border: 1px solid #f5c6cb;
+  border: 1px solid var(--error-border);
   border-radius: var(--default-border-radius);
 }
 

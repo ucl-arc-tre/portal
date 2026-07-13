@@ -19,7 +19,7 @@
 .status-expired {
   background-color: var(--error-bg);
   color: var(--error-text);
-  border: 1px solid #f5c6cb;
+  border: 1px solid var(--error-border);
 }
 
 .status-default {

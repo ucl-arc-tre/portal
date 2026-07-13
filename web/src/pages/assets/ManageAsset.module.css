@@ -91,7 +91,7 @@
   background: var(--error-bg);
   padding: 1rem;
   border-radius: var(--default-border-radius);
-  border: 1px solid #f5c6cb;
+  border: 1px solid var(--error-border);
   margin: 1rem 0;
 }
 
