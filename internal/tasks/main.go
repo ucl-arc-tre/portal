@@ -17,7 +17,7 @@ import (
 type Manager struct {
 	scheduler     gocron.Scheduler
 	db            *gorm.DB
-	notifications *notifications.Service
+	notifications notifications.Interface
 }
 
 // Create a task manager instance

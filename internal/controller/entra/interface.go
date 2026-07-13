@@ -13,4 +13,5 @@ type Interface interface {
 	AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error
 	FindUsernames(ctx context.Context, query string) ([]types.Username, error)
 	SendCustomInviteNotification(ctx context.Context, invite Invite) error
+	SendEmail(ctx context.Context, subject string, emails []Email, content string) error
 }

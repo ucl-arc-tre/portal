@@ -21,10 +21,10 @@ const (
 
 type Notification struct {
 	Model
-	RecipientUserID uuid.UUID         `gorm:"index"`
-	DedupeKey       string            `gorm:"not null;uniqueIndex"`
-	Title           string            `gorm:"not null"`
-	Kind            *NotificationKind `gorm:"not null"`
+	RecipientUserID uuid.UUID `gorm:"index"`
+	DedupeKey       string    `gorm:"not null;uniqueIndex"`
+	Title           string    `gorm:"not null"`
+	Kind            *NotificationKind
 	Body            *string
 	Href            *string // local link e.g. "/profile"
 	ReadAt          *time.Time
