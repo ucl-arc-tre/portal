@@ -348,6 +348,11 @@ declare global {
       mockEnvironmentsTre(): Chainable<any>;
 
       /**
+       * Mock notifications
+       */
+      mockNotifications(notifications: Notification[]): Chainable<any>;
+
+      /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
        * @param selector - Optional selector to check specific element (defaults to entire page)
        * @example cy.checkAccessibility()
@@ -585,6 +590,19 @@ Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
     statusCode: 200,
     body,
   }).as("getChosenName");
+});
+
+export type Notification = {
+  title: string;
+  kind: string;
+};
+
+Cypress.Commands.add("mockNotifications", (notifications: Notification[]) => {
+  console.log(notifications);
+  cy.intercept("GET", "/web/api/v0/notifications", {
+    statusCode: 200,
+    body: notifications,
+  }).as("getNotifications");
 });
 
 Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {

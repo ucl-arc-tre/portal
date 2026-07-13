@@ -21,6 +21,8 @@ export default function UserTasks() {
   const [error, setError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const completeProfileNotification = notifications?.find((notification) => notification.kind === "complete-profile");
+  const needToCompleteProfile = completeProfileNotification !== undefined;
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -91,7 +93,7 @@ export default function UserTasks() {
     <div className={styles.container}>
       <div className={styles["header"]}>
         <h2>Your Tasks</h2>
-        {notifications && notifications.length > 0 && (
+        {notifications && notifications.length > 0 && !needToCompleteProfile && (
           <Button
             variant="secondary"
             size="xsmall"
@@ -110,13 +112,13 @@ export default function UserTasks() {
         </Alert>
       )}
 
-      {notifications?.some((notification) => notification.kind === "complete-profile") ? (
+      {needToCompleteProfile ? (
         <div className={styles["setup-prompt"]}>
           <h3>Complete Your Profile Setup</h3>
           <p>
             To get started with ARC services, please complete your profile setup including setting your chosen name.
           </p>
-          <Button href="/profile" size="large">
+          <Button href="/profile" variant="secondary" onClick={() => clearNotification(completeProfileNotification!)}>
             Complete Profile Setup
           </Button>
         </div>
@@ -125,22 +127,21 @@ export default function UserTasks() {
           <div className={styles["researcher-prompt"]}>
             <p>Complete your profile setup to become an approved researcher.</p>
             <Button href="/profile" variant="secondary">
-              Continue Profile Setup
+              Become an Approved Researcher
             </Button>
           </div>
         )
       )}
-      {notifications && notifications.length > 0 && (
+      {!needToCompleteProfile && notifications && notifications.length > 0 && (
         <div className={styles["tasks"]}>
           {notifications.map((notification) => (
             <div className={styles["task"]} key={notification.id}>
               <a
                 onClick={() => {
-                  clearNotification(notification);
                   if (notification.href) {
                     router.push(notification.href);
-                  } else {
                   }
+                  clearNotification(notification);
                 }}
               >
                 <p>{notification.title}</p>
