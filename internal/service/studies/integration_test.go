@@ -18,6 +18,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mocknotifications"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockusers"
 	"gorm.io/gorm"
 
@@ -610,11 +611,13 @@ func TestIntegration_CreateStudy(t *testing.T) {
 
 	mockUsers := new(mockusers.MockUsers)
 	mockEntra := new(mockcontrollers.MockEntra)
+	mockNotifications := new(mocknotifications.MockNotifications)
 
 	service := &Service{
-		db:    db,
-		entra: mockEntra,
-		users: mockUsers,
+		db:            db,
+		entra:         mockEntra,
+		users:         mockUsers,
+		notifications: mockNotifications,
 	}
 
 	// Seed owner

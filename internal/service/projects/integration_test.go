@@ -44,7 +44,7 @@ func migrate(db *gorm.DB) error {
 	return nil
 }
 
-func TestCreateProjectTRE(t *testing.T) {
+func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 	// Note: Remove t.Parallel() from RBAC-dependent integration tests
 
 	// Create unique schema for this test

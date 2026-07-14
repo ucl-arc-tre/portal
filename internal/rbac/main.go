@@ -16,19 +16,23 @@ import (
 )
 
 const (
-	Admin                         = RoleName(openapi.AuthRolesAdmin)                         // Global admin on everything
+	Admin                         = ConfigRolename(openapi.AuthRolesAdmin)                   // Global admin on everything
 	Base                          = RoleName(openapi.AuthRolesBase)                          // Most restricted role possible
 	Staff                         = RoleName(openapi.AuthRolesStaff)                         // Staff member at the institution
 	ApprovedResearcher            = RoleName(openapi.AuthRolesApprovedResearcher)            // Trained and attested user
 	ApprovedStaffResearcher       = RoleName(openapi.AuthRolesApprovedStaffResearcher)       // Member of staff at the institution thats also an approved researcher
-	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreeed to the study owner agreement for at least one study
-	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreeed to the study administrator agreement for at least one study
-	TreOpsStaff                   = RoleName(openapi.AuthRolesTreOpsStaff)                   // Lesser admin role for tre ops staff
-	IGOpsStaff                    = RoleName(openapi.AuthRolesIgOpsStaff)                    // Information governance operations staff
-	DSHOpsStaff                   = RoleName(openapi.AuthRolesDshOpsStaff)                   // Data Safe Haven operations staff
+	InformationAssetOwner         = RoleName(openapi.AuthRolesInformationAssetOwner)         // Has agreed to the study owner agreement for at least one study
+	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreed to the study administrator agreement for at least one study
+	TreOpsStaff                   = ConfigRolename(openapi.AuthRolesTreOpsStaff)             // Lesser admin role for tre ops staff
+	IGOpsStaff                    = ConfigRolename(openapi.AuthRolesIgOpsStaff)              // Information governance operations staff
+	DSHOpsStaff                   = ConfigRolename(openapi.AuthRolesDshOpsStaff)             // Data Safe Haven operations staff
 
 	ReadAction  = Action("read")
 	WriteAction = Action("write")
+)
+
+var (
+	ConfigRoleNames = []ConfigRolename{Admin, TreOpsStaff, IGOpsStaff, DSHOpsStaff}
 )
 
 var enforcer *casbin.Enforcer
@@ -192,7 +196,7 @@ func HasAnyListedRole(user types.User, required ...RoleName) (bool, error) {
 	return false, nil
 }
 
-func userIdsWithRole(role RoleName) ([]uuid.UUID, error) {
+func UserIdsWithRole(role RoleName) ([]uuid.UUID, error) {
 	userIds, err := enforcer.GetUsersForRole(string(role))
 	if err != nil {
 		return nil, err
@@ -214,9 +218,8 @@ func makeCasbinModel() model.Model {
 func must[T any](value T, err error) T {
 	if err != nil {
 		panic(err)
-	} else {
-		return value
 	}
+	return value
 }
 
 // See: https://casbin.org/docs/syntax-for-models and https://casbin.org/editor/

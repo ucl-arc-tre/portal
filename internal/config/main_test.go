@@ -42,11 +42,11 @@ func TestContractShouldNotify(t *testing.T) {
 	c := types.Contract{}
 	assert.False(t, ShouldNotifyContractExpiry(c))
 
-	twoMonthsFromNow := time.Now().Add(2 * month)
+	twoMonthsFromNow := time.Now().Add(2 * Month)
 	c.ExpiryDate = &twoMonthsFromNow
 	assert.False(t, ShouldNotifyContractExpiry(c))
 
-	oneMonthFromNow := time.Now().Add(1 * month).Add(1 * time.Second)
+	oneMonthFromNow := time.Now().Add(1 * Month).Add(1 * time.Second)
 	c.ExpiryDate = &oneMonthFromNow
 	assert.True(t, ShouldNotifyContractExpiry(c))
 

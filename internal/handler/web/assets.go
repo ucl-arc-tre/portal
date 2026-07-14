@@ -132,6 +132,9 @@ func assetToOpenApiAsset(data types.Asset) openapi.Asset {
 		IsLeakMajorReputationalDamage: data.IsLeakMajorReputationalDamage,
 		RequiresTre:                   data.RequiresTre,
 		HasTargetedThreatActors:       data.HasTargetedThreatActors,
+		Protection:                    optional[string, openapi.AssetProtection](data.Protection),
+		LegalBasis:                    optional[string, openapi.AssetLegalBasis](data.LegalBasis),
+		LegalBasisSpecial:             optional[string, openapi.AssetLegalBasisSpecial](data.LegalBasisSpecial),
 	}
 	for _, contract := range data.Contracts {
 		asset.ContractIds = append(asset.ContractIds, contract.ID.String())
@@ -139,14 +142,12 @@ func assetToOpenApiAsset(data types.Asset) openapi.Asset {
 	for _, dataType := range data.DataTypes {
 		asset.DataTypes = append(asset.DataTypes, openapi.AssetDataTypes(dataType.Name))
 	}
-	if data.Protection != nil {
-		asset.Protection = new(openapi.AssetProtection(*data.Protection))
-	}
-	if data.LegalBasis != nil {
-		asset.LegalBasis = new(openapi.AssetLegalBasis(*data.LegalBasis))
-	}
-	if data.LegalBasisSpecial != nil {
-		asset.LegalBasisSpecial = new(openapi.AssetLegalBasisSpecial(*data.LegalBasisSpecial))
-	}
 	return asset
+}
+
+func optional[A ~string, B ~string](a *A) *B {
+	if a == nil {
+		return nil
+	}
+	return new(B(*a))
 }
