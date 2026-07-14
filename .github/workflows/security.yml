@@ -26,4 +26,4 @@ jobs:
       - name: Run Gosec Security Scanner
         uses: securego/gosec@9e6a9843d7a4a6e3e9a8539b02612c8a4aa3f889 # v2.27.1
         with:
-          args: "-concurrency=4 ./..."
+          args: "-concurrency=2 ./..."
