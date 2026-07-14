@@ -16,6 +16,10 @@
   --red-200: #c82333;
   --red-100: #dc3545;
 
+  --error-text: #721c24;
+  --error-bg: #f8d7da;
+  --error-border: #f5c6cb;
+
   --form-link: #5800cc;
   --form-link--hover: #470b9a;
   --form-purple--light: #7300ff;
@@ -90,15 +94,6 @@ dialog {
 .content {
   width: clamp(50vw, 60vw, 70vw);
   margin-inline: auto;
-}
-
-.error-message {
-  color: #d32f2f;
-  background-color: #fdeaea;
-  border: 1px solid #f5c6cb;
-  border-radius: var(--default-border-radius);
-  padding: 12px;
-  margin-bottom: 16px;
 }
 
 .tab-collection {

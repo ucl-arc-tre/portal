@@ -356,9 +356,9 @@ export default function ManageProjectPage() {
           <div className={styles.field}>
             <label>Airlock whitelist:</label>
             {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
-              <ul className={styles["assets-list"]}>
+              <ul className={styles["field-list"]}>
                 {project.airlock_whitelist.map((entry, index) => (
-                  <li key={index} className={styles["asset-item"]}>
+                  <li key={index} className={styles["field-item"]}>
                     {entry}
                   </li>
                 ))}
@@ -371,7 +371,7 @@ export default function ManageProjectPage() {
           <div className={styles.field}>
             <label>Members:</label>
             {project.members && project.members.length > 0 ? (
-              <ul className={styles["members-list"]}>
+              <ul className={styles["field-list"]}>
                 {project.members.map((member, index) => (
                   <li key={index} className={styles["member-item"]}>
                     <span className={styles["member-username"]}>{member.username}</span>
@@ -393,9 +393,9 @@ export default function ManageProjectPage() {
           <div className={styles.field}>
             <label>Assets:</label>
             {project.assets && project.assets.length > 0 ? (
-              <ul className={styles["assets-list"]}>
+              <ul className={styles["field-list"]}>
                 {project.assets.map((asset) => (
-                  <li key={asset.id} className={styles["asset-item"]}>
+                  <li key={asset.id} className={styles["field-item"]}>
                     <div className={styles["asset-info"]}>
                       <strong>{asset.title}</strong>
                       <p>{asset.description}</p>
