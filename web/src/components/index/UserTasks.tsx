@@ -30,7 +30,7 @@ export default function UserTasks() {
       try {
         const response = await getNotifications();
 
-        if (responseIsError(response) || !response.data) {
+        if (responseIsError(response)) {
           const errorMsg = extractErrorMessage(response);
           setError(`Failed to load notifications: ${errorMsg}`);
           setNotifications(undefined);
