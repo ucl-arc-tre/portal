@@ -15,6 +15,26 @@ export type Auth = {
     roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff' | 'dsh-ops-staff'>;
 };
 
+export type Notification = {
+    /**
+     * UUID of the notification
+     */
+    id: string;
+    title: string;
+    body?: string;
+    kind?: NotificationKind;
+    /**
+     * Local link to follow e.g. "/profile"
+     */
+    href?: string;
+};
+
+export type NotificationsReadAll = {
+    kind?: NotificationKind;
+};
+
+export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-expiry' | 'training-expiry' | 'iaa-assignment' | 'study-affirmation' | 'study-review';
+
 export type Profile = {
     username: string;
     chosen_name: string;
@@ -849,6 +869,97 @@ export type GetAuthResponses = {
 
 export type GetAuthResponse = GetAuthResponses[keyof GetAuthResponses];
 
+export type GetNotificationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/notifications';
+};
+
+export type GetNotificationsErrors = {
+    /**
+     * Unauthenticated
+     */
+    401: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetNotificationsResponses = {
+    200: Array<Notification>;
+};
+
+export type GetNotificationsResponse = GetNotificationsResponses[keyof GetNotificationsResponses];
+
+export type PostNotificationsByNotificationIdReadData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the notification to be updated
+         */
+        notificationId: string;
+    };
+    query?: never;
+    url: '/notifications/{notificationId}/read';
+};
+
+export type PostNotificationsByNotificationIdReadErrors = {
+    /**
+     * Unauthenticated
+     */
+    401: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostNotificationsByNotificationIdReadResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostNotificationsByNotificationIdReadResponse = PostNotificationsByNotificationIdReadResponses[keyof PostNotificationsByNotificationIdReadResponses];
+
+export type PostNotificationsReadData = {
+    body: NotificationsReadAll;
+    path?: never;
+    query?: never;
+    url: '/notifications/read';
+};
+
+export type PostNotificationsReadErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostNotificationsReadResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostNotificationsReadResponse = PostNotificationsReadResponses[keyof PostNotificationsReadResponses];
+
 export type PostFeedbackData = {
     body: Feedback;
     path?: never;
@@ -861,10 +972,6 @@ export type PostFeedbackErrors = {
      * Internal server error
      */
     500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
 };
 
 export type PostFeedbackResponses = {

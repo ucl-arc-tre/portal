@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 
@@ -106,5 +107,9 @@ func (m *MockUsers) Find(ctx context.Context, query string) ([]openapi.UserData,
 }
 
 func (m *MockUsers) AllApprovedResearchers() ([]users.ApprovedResearcherExportRecord, error) {
+	panic("not implemented")
+}
+
+func (m *MockUsers) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error) {
 	panic("not implemented")
 }

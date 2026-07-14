@@ -4,6 +4,10 @@ export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
+export const IconButton = dynamic(() => import("uikit-react-public").then((mod) => mod.IconButton), {
+  ssr: false,
+});
+
 export const InfoIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Info), {
   ssr: false,
 });

@@ -206,8 +206,9 @@ func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, invite Inv
 	if err != nil {
 		return nil, err
 	}
-	if err := c.SendCustomInviteNotification(ctx, invite); err != nil {
-		return nil, err
+	subject := "Notification: You have been invited to the UCL ARC Services Portal"
+	if err := c.SendEmail(ctx, subject, []string{invite.Recipient}, inviteEmailContent(invite)); err != nil {
+		log.Err(err).Msg("Failed to send notification")
 	}
 	return &InvitedUserData{Id: user.Id}, nil
 }

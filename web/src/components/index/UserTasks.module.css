@@ -2,7 +2,7 @@
   background: var(--background);
   border: 1px solid #e5e7eb;
   border-radius: var(--default-border-radius);
-  padding: 2rem;
+  padding: 1.5rem;
   margin: 2rem 0;
   max-width: 50vw;
   max-height: fit-content;
@@ -14,6 +14,15 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--foreground);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 .setup-prompt {
@@ -64,21 +73,29 @@
   font-weight: 500;
 }
 
-.signoff-task {
+.tasks {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.task {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 0;
+  font-weight: 500;
+  background-color: #fafafa;
+  border-radius: var(--default-border-radius);
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  a:hover {
+    cursor: pointer;
+    color: var(--ucl-accent);
+  }
 }
 
-.signoff-task + .signoff-task {
-  border-top: 1px solid #bbf7d0;
-
-  p {
-    margin: 0;
-    color: #166534;
-    font-weight: 500;
-    text-align: left;
-  }
+.task + .task {
+  border-top: 1px solid var(--ucl-mid);
 }

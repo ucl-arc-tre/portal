@@ -4,14 +4,12 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"fmt"
 	"html/template"
 
 	graphmodels "github.com/microsoftgraph/msgraph-sdk-go/models"
 	graphusers "github.com/microsoftgraph/msgraph-sdk-go/users"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
-	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -35,7 +33,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails []Email, content string) error {
+func (c *Controller) SendEmail(ctx context.Context, subject string, emails []Email, content string) error {
 
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
@@ -111,120 +109,5 @@ func (c *Controller) sendCustomEmail(ctx context.Context, subject string, emails
 func (c *Controller) SendCustomInviteNotification(ctx context.Context, invite Invite) error {
 	// use graph to send email saying so-and-so has invited you to the portal
 	subject := "Notification: You have been invited to the UCL ARC Services Portal"
-	return c.sendCustomEmail(ctx, subject, []string{invite.Recipient}, inviteEmailContent(invite))
-}
-
-func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emails []string, review openapi.StudyReview) error {
-	// email to notify IAO + IAA when study has been reviewed
-
-	content := "There has been an update to your study request, please log into the portal to view the changes."
-	subject := "Notification: Something has changed in your study request"
-
-	switch review.Status {
-	case openapi.StudyApprovalStatusApproved:
-		subject = "Notification: Your study has been approved!"
-		content = "Your study has been approved! You will be notified when you have any contracts or assets approaching expiry."
-	case openapi.StudyApprovalStatusRejected:
-		content = "Your study has not been approved, please review the feedback and request another review once the changes have been addressed."
-		subject = "Notification: Unfortunately, your study has not been approved"
-		if review.Feedback != nil {
-			content += " \nFeedback: " + *review.Feedback
-			subject = "Notification: Your study has feedback to address"
-		}
-	}
-
-	return c.sendCustomEmail(ctx, subject, emails, content)
-}
-
-func (c *Controller) SendContractExpiryNotification(ctx context.Context, contract types.Contract, study types.Study) error {
-	days := config.DaysUntilContractExpiry(contract)
-	if days == nil {
-		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
-	}
-	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
-	if *days < 0 {
-		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract or update its status."
-	} else if *days == 0 {
-		content += "today. Please sign in to the Portal to upload a new contract or update its status."
-	} else if *days == 1 {
-		content += "tomorrow. Please sign in to the Portal to upload a new contract or update its status."
-	} else {
-		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract or update its status."
-	}
-
-	subject := "Notification: Study contract expiry"
-	return c.sendCustomEmail(ctx, subject, study.NotificationRecipients(), content)
-}
-
-func (c *Controller) SendTrainingExpiryNotification(ctx context.Context, email string, training types.UserTrainingRecord) error {
-	days := config.DaysUntilTrainingExpiry(training)
-	content := "You have a training certificate that expires "
-	if days < 0 {
-		content = "You have a training certificate that has expired. Please sign in to the Portal to upload a new certificate."
-	} else if days == 0 {
-		content += "today. Please sign in to the Portal to upload a new certificate."
-	} else if days == 1 {
-		content += "tomorrow. Please sign in to the Portal to upload a new certificate."
-	} else {
-		content += "in " + fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate."
-	}
-
-	content += "\nPlease note that without valid training, your access to any environments may be revoked."
-
-	subject := "Notification: Your training certificate is due to expire soon"
-	return c.sendCustomEmail(ctx, subject, []string{email}, content)
-}
-
-func (c *Controller) SendIaaAssignmentNotification(ctx context.Context, email string, studyTitle string) error {
-
-	content := "You have been added as an administrator to the Study '" + studyTitle + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
-
-	subject := "Notification: Study administrator assignment"
-	return c.sendCustomEmail(ctx, subject, []string{email}, content)
-}
-
-func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, email string, study types.Study) error {
-	days := config.DaysUntilStudySignoffExpiry(&study)
-
-	content := "You are required to re-attest details about your Study '" + study.Title + "'. Your current affirmation "
-	if days < 0 {
-		content += "has expired. "
-	} else if days == 0 {
-		content += "expires today. "
-	} else if days == 1 {
-		content += "expires tomorrow. "
-	} else {
-		content += fmt.Sprintf("expires in %d days. ", days)
-	}
-	content += "Please login to the ARC Services Portal to complete the affirmation."
-
-	subject := "Notification: Study affirmation expiry"
-	return c.sendCustomEmail(ctx, subject, []string{email}, content)
-}
-
-func (c *Controller) SendAssetExpiryNotification(ctx context.Context, assets []types.Asset, study types.Study) error {
-	if len(assets) == 0 {
-		return fmt.Errorf("Cannot notify asset expiry with no assets in [%s]", study.Title)
-	}
-
-	content := "There are assets in your Study '" + study.Title + "' that are close to expiring or have expired.\n"
-
-	for _, asset := range assets {
-		days := config.DaysUntilAssetExpiry(asset)
-		if days == nil {
-			log.Error().Str("study", study.Title).Msg("Attempted to send asset expiry notification with nil expiry")
-			continue
-		}
-		content += "- '" + asset.Title + "'"
-		if *days < 0 {
-			content += fmt.Sprintf(" expired %d days ago.\n", -(*days))
-		} else {
-			content += fmt.Sprintf(" expires in %d days.\n", *days)
-		}
-	}
-
-	content += "Please take action to extend the asset expiry, or delete the asset and update its status in the Portal to 'Destroyed'."
-
-	subject := "Notification: Asset expiry"
-	return c.sendCustomEmail(ctx, subject, study.NotificationRecipients(), content)
+	return c.SendEmail(ctx, subject, []string{invite.Recipient}, inviteEmailContent(invite))
 }

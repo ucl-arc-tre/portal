@@ -13,6 +13,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/service/auth"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/service/tokens/sign"
@@ -20,27 +21,29 @@ import (
 )
 
 type Handler struct {
-	agreements   *agreements.Service
-	users        *users.Service
-	studies      *studies.Service
-	auth         *auth.Service
-	environments *environments.Service
-	projects     *projects.Service
-	tokens       *sign.Service
-	myservices   *myservices.Controller
+	agreements    *agreements.Service
+	users         *users.Service
+	studies       *studies.Service
+	auth          *auth.Service
+	environments  *environments.Service
+	projects      *projects.Service
+	tokens        *sign.Service
+	notifications *notifications.Service
+	myservices    *myservices.Controller
 }
 
 func New() *Handler {
 	log.Info().Msg("Creating web handler")
 	return &Handler{
-		agreements:   agreements.New(),
-		users:        users.New(),
-		studies:      studies.New(),
-		auth:         auth.New(),
-		environments: environments.New(),
-		projects:     projects.New(),
-		tokens:       sign.New(),
-		myservices:   myservices.New(),
+		agreements:    agreements.New(),
+		users:         users.New(),
+		studies:       studies.New(),
+		auth:          auth.New(),
+		environments:  environments.New(),
+		projects:      projects.New(),
+		tokens:        sign.New(),
+		notifications: notifications.New(),
+		myservices:    myservices.New(),
 	}
 }
 

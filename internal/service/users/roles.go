@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -42,4 +43,33 @@ func (s *Service) updateApprovedResearcherStatus(user types.User) error {
 	}
 	log.Info().Any("username", user.Username).Msg("Assigned approved researcher")
 	return nil
+}
+
+func (s *Service) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error) {
+	if users, exists := s.roleCache.Get(role); exists {
+		return users, nil
+	}
+	var usernames []types.Username
+	switch role {
+	case rbac.Admin:
+		usernames = config.AdminUsernames()
+	case rbac.IGOpsStaff:
+		usernames = config.IGOpsStaffUsernames()
+	case rbac.DSHOpsStaff:
+		usernames = config.DSHOpsStaffUsernames()
+	case rbac.TreOpsStaff:
+		usernames = config.TreOpsStaffUsernames()
+	default:
+		return []types.User{}, types.NewErrInvalidObjectF("[%v] is not a config set role name", role)
+	}
+	users := []types.User{}
+	for _, username := range usernames {
+		user, err := s.PersistedUser(username)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+	s.roleCache.Add(role, users)
+	return users, nil
 }

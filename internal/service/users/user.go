@@ -77,6 +77,13 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 	if result.Error != nil {
 		return user, types.NewErrFromGorm(result.Error, "failed to get or create user")
 	}
+	if result.RowsAffected == 0 {
+		return user, nil
+	}
+	log.Info().Any("username", username).Msg("User created")
+	if err := s.notifications.NotifyToCompleteProfile(user); err != nil {
+		log.Err(err).Msg("Failed to notify user to complete profile") // not fatal
+	}
 	return user, nil
 }
 
@@ -128,11 +135,18 @@ func (s *Service) PersistedExternalUser(username types.Username, email Email) (t
 			tx.Rollback()
 			return types.User{}, types.NewErrFromGorm(err, "failed to set email for existing user")
 		}
+
 		log.Info().Str("email", email).Any("username", username).Msg("External user created")
 	}
-
-	err := tx.Commit().Error
-	return user, types.NewErrFromGorm(err, "failed to persist external user transaction")
+	if err := tx.Commit().Error; err != nil {
+		return user, types.NewErrFromGorm(err, "failed to persist external user transaction")
+	}
+	if !userExists {
+		if err := s.notifications.NotifyToCompleteProfile(user); err != nil {
+			log.Err(err).Msg("Failed to notify user to complete profile") // not fatal
+		}
+	}
+	return user, nil
 }
 
 func (s *Service) UserExistsWithEmailOrUsername(ctx context.Context, value string) (bool, error) {

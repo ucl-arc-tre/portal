@@ -15,7 +15,7 @@ import (
 
 const (
 	day   = 24 * time.Hour
-	month = 30 * day
+	Month = 30 * day
 
 	BaseWebURL = "/web/api/v0"
 	BaseTREURL = "/tre/api/v0"
@@ -35,7 +35,7 @@ const (
 
 	ServerShutdownGraceDuration = 10 * time.Second
 
-	StudySignoffValidity = 3 * month
+	StudySignoffValidity = 3 * Month
 )
 
 var k = koanf.New(".")
@@ -136,6 +136,7 @@ func EntraInvitedUserGroup() string {
 func SetforTesting(key string, value string) error {
 	return k.Set(key, value)
 }
+
 func AdminUsernames() []types.Username {
 	return usernames("admin_usernames")
 }
