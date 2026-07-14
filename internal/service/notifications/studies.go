@@ -129,11 +129,12 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 		return fmt.Errorf("cannot notify asset expiry with no assets in [%s]", study.Title)
 	}
 
-	var earliestExpiryingAssetAt *time.Time
+	var earliestExpiringAssetAt *time.Time
 	content := "There are assets in your Study '" + study.Title + "' that are close to expiring or have expired.\n"
 	for _, asset := range assets {
-		if asset.ExpiresAt != nil && (earliestExpiryingAssetAt == nil || asset.ExpiresAt.Before(*earliestExpiryingAssetAt)) {
-			earliestExpiryingAssetAt = asset.ExpiresAt
+		if asset.ExpiresAt != nil &&
+			(earliestExpiringAssetAt == nil || asset.ExpiresAt.Before(*earliestExpiringAssetAt)) {
+			earliestExpiringAssetAt = asset.ExpiresAt
 		}
 		days := config.DaysUntilAssetExpiry(asset)
 		if days == nil {
@@ -159,7 +160,7 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 		Title:     fmt.Sprintf("An asset in '%s' is expiring soon", study.Title),
 		Href:      new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
 		Kind:      new(types.NotificationKindAssetExpiry),
-		ExpiresAt: new(earliestExpiryingAssetAt.Add(3 * config.Month)),
+		ExpiresAt: new(earliestExpiringAssetAt.Add(3 * config.Month)),
 	}
 	return s.createForAll(notification, recipients)
 }

@@ -34,7 +34,7 @@ export const getNotifications = <ThrowOnError extends boolean = false>(options?:
 export const postNotificationsByNotificationIdRead = <ThrowOnError extends boolean = false>(options: Options<PostNotificationsByNotificationIdReadData, ThrowOnError>): RequestResult<PostNotificationsByNotificationIdReadResponses, PostNotificationsByNotificationIdReadErrors, ThrowOnError> => (options.client ?? client).post<PostNotificationsByNotificationIdReadResponses, PostNotificationsByNotificationIdReadErrors, ThrowOnError>({ url: '/notifications/{notificationId}/read', ...options });
 
 /**
- * Mark a single notification as read
+ * Mark all notifications of a kind as read
  */
 export const postNotificationsRead = <ThrowOnError extends boolean = false>(options: Options<PostNotificationsReadData, ThrowOnError>): RequestResult<PostNotificationsReadResponses, PostNotificationsReadErrors, ThrowOnError> => (options.client ?? client).post<PostNotificationsReadResponses, PostNotificationsReadErrors, ThrowOnError>({
     url: '/notifications/read',

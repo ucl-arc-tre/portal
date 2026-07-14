@@ -598,7 +598,6 @@ export type Notification = {
 };
 
 Cypress.Commands.add("mockNotifications", (notifications: Notification[]) => {
-  console.log(notifications);
   cy.intercept("GET", "/web/api/v0/notifications", {
     statusCode: 200,
     body: notifications,

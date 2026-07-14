@@ -10,7 +10,6 @@ type NotificationKind string
 
 const (
 	NotificationKindCompleteProfile = NotificationKind("complete-profile")
-	NotificationKindPendingStudy    = NotificationKind("pending-study")
 	NotificationKindContractExpiry  = NotificationKind("contract-expiry")
 	NotificationKindAssetExpiry     = NotificationKind("asset-expiry")
 	NotificationKindTrainingExpiry  = NotificationKind("training-expiry")

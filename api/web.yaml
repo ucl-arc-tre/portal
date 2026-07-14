@@ -61,7 +61,7 @@ paths:
           description: Unexpected error
   /notifications/read:
     post:
-      description: Mark a single notification as read
+      description: Mark all notifications of a kind as read
       requestBody:
         required: true
         content:
