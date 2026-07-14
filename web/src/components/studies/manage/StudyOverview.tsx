@@ -151,7 +151,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
                     <AlertMessage>
                       Please note the following assets do not have an associated contract but have been flagged as
                       requiring a contract:{" "}
-                      {assetsRequiringContracts.map((asset, index) => (
+                      {assetsRequiringContracts.map((asset) => (
                         <li key={asset.id}>
                           <strong>{asset.title}</strong>
                         </li>
