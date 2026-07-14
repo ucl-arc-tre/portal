@@ -777,6 +777,10 @@ export type TokenWithValue = Token & {
     value: string;
 };
 
+export type Feedback = {
+    message: string;
+};
+
 /**
  * User UUID
  */
@@ -844,6 +848,33 @@ export type GetAuthResponses = {
 };
 
 export type GetAuthResponse = GetAuthResponses[keyof GetAuthResponses];
+
+export type PostFeedbackData = {
+    body: Feedback;
+    path?: never;
+    query?: never;
+    url: '/feedback';
+};
+
+export type PostFeedbackErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostFeedbackResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostFeedbackResponse = PostFeedbackResponses[keyof PostFeedbackResponses];
 
 export type GetProfileData = {
     body?: never;
