@@ -321,7 +321,9 @@ func (s *Service) genericProjectsQuery() *gorm.DB {
 		Joins("left join project_tres pt on pt.project_id = projects.id")
 }
 
-// Retrieve all active TRE projects together with role bindings and members
+// Retrieve all active TRE projects together with role bindings and members.
+// Only projects with pending creation, deployed, or pending deletion status
+// are returned
 func (s *Service) AllProjectTREs() ([]types.ProjectTRE, error) {
 	var projectTREs []types.ProjectTRE
 	err := s.db.
@@ -331,6 +333,11 @@ func (s *Service) AllProjectTREs() ([]types.ProjectTRE, error) {
 		Joins("join environments on environments.id = projects.environment_id").
 		Where("environments.name = ?", environments.TRE).
 		Where("projects.deleted_at IS NULL").
+		Where("project_tres.status IN ?", []types.ProjectTREStatus{
+			types.ProjectTREStatusPendingCreation,
+			types.ProjectTREStatusDeployed,
+			types.ProjectTREStatusPendingDeletion,
+		}).
 		Find(&projectTREs).Error
 
 	return projectTREs, types.NewErrFromGorm(err, "failed to retrieve project TREs")
