@@ -797,6 +797,10 @@ export type TokenWithValue = Token & {
     value: string;
 };
 
+export type Feedback = {
+    message: string;
+};
+
 /**
  * User UUID
  */
@@ -938,10 +942,6 @@ export type PostNotificationsReadData = {
 
 export type PostNotificationsReadErrors = {
     /**
-     * Unauthenticated
-     */
-    401: unknown;
-    /**
      * Internal server error
      */
     500: unknown;
@@ -959,6 +959,29 @@ export type PostNotificationsReadResponses = {
 };
 
 export type PostNotificationsReadResponse = PostNotificationsReadResponses[keyof PostNotificationsReadResponses];
+
+export type PostFeedbackData = {
+    body: Feedback;
+    path?: never;
+    query?: never;
+    url: '/feedback';
+};
+
+export type PostFeedbackErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostFeedbackResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostFeedbackResponse = PostFeedbackResponses[keyof PostFeedbackResponses];
 
 export type GetProfileData = {
     body?: never;

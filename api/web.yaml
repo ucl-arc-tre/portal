@@ -71,12 +71,25 @@ paths:
       responses:
         "204":
           description: OK
-        "401":
-          description: Unauthenticated
         "500":
           description: Internal server error
         default:
           description: Unexpected error
+
+  /feedback:
+    post:
+      description: Submit some feedback for the portal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Feedback"
+      responses:
+        "204":
+          description: OK
+        "500":
+          description: Internal server error
 
   /profile:
     get:
@@ -2519,3 +2532,11 @@ components:
           properties:
             value:
               type: string
+
+    Feedback:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
