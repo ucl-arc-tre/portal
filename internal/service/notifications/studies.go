@@ -148,6 +148,9 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 			content += fmt.Sprintf(" expires in %d days.\n", *days)
 		}
 	}
+	if earliestExpiringAssetAt == nil {
+		return types.NewErrInvalidObject("had no asset which expires to notify on")
+	}
 
 	content += "Please take action to extend the asset expiry, or delete the asset and update its status in the Portal to 'Destroyed'."
 
