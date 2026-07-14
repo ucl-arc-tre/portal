@@ -1,5 +1,5 @@
 .error {
-  border-color: #dc3545 !important;
+  border-color: var(--red-100) !important;
 }
 
 .checkbox-label {
@@ -49,10 +49,6 @@
 
 .info-text a:hover {
   color: #004499;
-}
-
-.red-text {
-  color: #dc3545;
 }
 
 .checkbox-group {
