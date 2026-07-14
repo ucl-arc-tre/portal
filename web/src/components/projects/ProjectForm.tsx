@@ -210,6 +210,8 @@ export default function ProjectForm({
               ? (data.tre.airlockWhitelist ?? []).map((entry) => entry.value.trim()).filter((value) => value !== "")
               : [];
 
+          // todo HPC body - check is desktop user and need hpc decktops
+
           if (editingProject) {
             // Update existing project (only members and assets)
             response = await putProjectsTreByProjectId({
@@ -231,7 +233,7 @@ export default function ProjectForm({
               members: treMembers,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
-              airlock_whitelist: airlockWhitelist.length > 0 ? airlockWhitelist : [],
+              airlock_whitelist: airlockWhitelist,
             };
             response = await postProjectsTre({ body: requestBody });
           }

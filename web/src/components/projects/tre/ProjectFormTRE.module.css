@@ -47,6 +47,11 @@
   margin-bottom: 0.5rem;
 }
 
+.userconfig-dropdown {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .researcher-content {
   flex: 1;
   display: flex;

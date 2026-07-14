@@ -23,6 +23,8 @@ type ProjectFormDataTRE = {
   externalEncryptionEnabled: "false" | "true";
   airlockExternalDataEnabled?: "false" | "true";
   airlockWhitelist?: { value: string }[];
+  requiresHPCDesktops: "false" | "true";
+  userConfig: { username: string; hpcInstance: string? }[];
 };
 
 type ProjectFormData = {
