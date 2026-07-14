@@ -537,7 +537,6 @@ const (
 	NotificationKindCompleteProfile  NotificationKind = "complete-profile"
 	NotificationKindContractExpiry   NotificationKind = "contract-expiry"
 	NotificationKindIaaAssignment    NotificationKind = "iaa-assignment"
-	NotificationKindPendingStudy     NotificationKind = "pending-study"
 	NotificationKindStudyAffirmation NotificationKind = "study-affirmation"
 	NotificationKindStudyReview      NotificationKind = "study-review"
 	NotificationKindTrainingExpiry   NotificationKind = "training-expiry"
@@ -553,8 +552,6 @@ func (e NotificationKind) Valid() bool {
 	case NotificationKindContractExpiry:
 		return true
 	case NotificationKindIaaAssignment:
-		return true
-	case NotificationKindPendingStudy:
 		return true
 	case NotificationKindStudyAffirmation:
 		return true

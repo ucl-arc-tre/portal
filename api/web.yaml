@@ -1431,7 +1431,6 @@ components:
       type: string
       enum:
         - complete-profile
-        - pending-study
         - asset-expiry
         - contract-expiry
         - training-expiry
