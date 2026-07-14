@@ -147,7 +147,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
             {affirmationDialogOpen && (
               <Dialog setDialogOpen={setAffirmationDialogOpen}>
                 {assetsRequiringContracts.length > 0 && (
-                  <Alert type="warning">
+                  <Alert type="warning" className={styles.outstanding}>
                     <AlertMessage>
                       Please note the following assets do not have an associated contract but have been flagged as
                       requiring a contract:{" "}
@@ -159,7 +159,6 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
                     </AlertMessage>
                   </Alert>
                 )}
-                <hr></hr>
                 <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
               </Dialog>
             )}
