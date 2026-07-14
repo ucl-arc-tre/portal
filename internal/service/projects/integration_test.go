@@ -222,6 +222,51 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 }
 
 func TestAllProjectTREs(t *testing.T) {
+	svc, study, creator, treEnv, otherEnv := setupProjectTRETest(t)
+
+	// Create TRE projects with possible statuses
+	for _, status := range []types.ProjectTREStatus{
+		types.ProjectTREStatusIncomplete,
+		types.ProjectTREStatusPendingApproval,
+		types.ProjectTREStatusPendingCreation,
+		types.ProjectTREStatusDeployed,
+		types.ProjectTREStatusPendingDeletion,
+	} {
+		projectTRE := createTREProject(t, svc.db, string(status)+"-project", study, creator, treEnv, status)
+		require.NoError(t, svc.db.Save(projectTRE).Error)
+	}
+
+	// Create and delete a TRE project
+	deleted := createTREProject(t, svc.db, "Deleted", study, creator, treEnv, types.ProjectTREStatusDeleted)
+	require.NoError(t, svc.db.Where("id = ?", deleted.ProjectID).Delete(&types.Project{}).Error)
+
+	// Create a non-TRE project
+	createNonTREProject(t, svc.db, study, creator, otherEnv, types.ProjectTREStatusDeployed)
+
+	projectTREs, err := svc.AllProjectTREs()
+	require.NoError(t, err)
+
+	// Should return only TRE projects with PendingCreation/Deployed/PendingDeletion
+	// statuses and are not deleted, so only 3 projects
+	require.Len(t, projectTREs, 3)
+	returnedStatuses := make([]types.ProjectTREStatus, 0, len(projectTREs))
+	for _, tre := range projectTREs {
+		returnedStatuses = append(returnedStatuses, tre.Status)
+	}
+	assert.Contains(t, returnedStatuses, types.ProjectTREStatusPendingCreation)
+	assert.Contains(t, returnedStatuses, types.ProjectTREStatusDeployed)
+	assert.Contains(t, returnedStatuses, types.ProjectTREStatusPendingDeletion)
+}
+
+func setupProjectTRETest(t *testing.T) (
+	*Service,
+	*types.Study,
+	*types.User,
+	*types.Environment,
+	*types.Environment,
+) {
+	t.Helper()
+
 	db := mockdb.NewTestDBSchema(t, migrate)
 	graceful.SetDBForTesting(db)
 	rbac.Init()
@@ -230,15 +275,17 @@ func TestAllProjectTREs(t *testing.T) {
 		db: db,
 	}
 
-	creator := types.User{Username: "bob@testIntegration.com"}
+	creator := types.User{Username: "foo@testIntegration.com"}
 	require.NoError(t, db.Create(&creator).Error)
 
+	// TRE environment
 	treEnv := types.Environment{
 		Name: environments.TRE,
 		Tier: 3,
 	}
 	require.NoError(t, db.Create(&treEnv).Error)
 
+	// Non-TRE environment
 	otherEnv := types.Environment{
 		Name: "Not-a-TRE",
 		Tier: 1,
@@ -251,55 +298,59 @@ func TestAllProjectTREs(t *testing.T) {
 	}
 	require.NoError(t, db.Create(&study).Error)
 
-	treProject := types.Project{
-		Name:          "TREproject",
-		CreatorUserID: creator.ID,
+	return svc, &study, &creator, &treEnv, &otherEnv
+}
+
+func createTREProject(
+	t *testing.T,
+	db *gorm.DB,
+	name string,
+	study *types.Study,
+	creator *types.User,
+	treEnv *types.Environment,
+	status types.ProjectTREStatus,
+) *types.ProjectTRE {
+	t.Helper()
+
+	project := types.Project{
+		Name:          name,
 		StudyID:       study.ID,
+		CreatorUserID: creator.ID,
 		EnvironmentID: treEnv.ID,
 	}
-	require.NoError(t, db.Create(&treProject).Error)
+	require.NoError(t, db.Create(&project).Error)
+
+	projectTRE := types.ProjectTRE{
+		ProjectID:                     project.ID,
+		EgressNumberRequiredApprovals: 1,
+		Status:                        status,
+	}
+	require.NoError(t, db.Create(&projectTRE).Error)
+	return &projectTRE
+}
+
+func createNonTREProject(
+	t *testing.T,
+	db *gorm.DB,
+	study *types.Study,
+	creator *types.User,
+	otherEnv *types.Environment,
+	status types.ProjectTREStatus,
+) {
+	t.Helper()
 
 	nonTREProject := types.Project{
 		Name:          "nonTREproject",
-		CreatorUserID: creator.ID,
 		StudyID:       study.ID,
+		CreatorUserID: creator.ID,
 		EnvironmentID: otherEnv.ID,
 	}
 	require.NoError(t, db.Create(&nonTREProject).Error)
 
-	deletedTREProject := types.Project{
-		Name:          "deletedProject",
-		CreatorUserID: creator.ID,
-		StudyID:       study.ID,
-		EnvironmentID: treEnv.ID,
-	}
-	require.NoError(t, db.Create(&deletedTREProject).Error)
-
-	treProjectTRE := types.ProjectTRE{
-		ProjectID:                     treProject.ID,
-		EgressNumberRequiredApprovals: 1,
-	}
-	require.NoError(t, db.Create(&treProjectTRE).Error)
-
 	nonTREProjectTRE := types.ProjectTRE{
 		ProjectID:                     nonTREProject.ID,
 		EgressNumberRequiredApprovals: 1,
+		Status:                        status,
 	}
 	require.NoError(t, db.Create(&nonTREProjectTRE).Error)
-
-	deletedTREProjectTRE := types.ProjectTRE{
-		ProjectID:                     deletedTREProject.ID,
-		EgressNumberRequiredApprovals: 1,
-	}
-	require.NoError(t, db.Create(&deletedTREProjectTRE).Error)
-	require.NoError(t, db.Delete(&deletedTREProject).Error)
-
-	projectTREs, err := svc.AllProjectTREs()
-	require.NoError(t, err)
-
-	// Only 1 active TRE project should be returned
-	require.Len(t, projectTREs, 1)
-	assert.Equal(t, treProjectTRE.ID, projectTREs[0].ID)
-	assert.Equal(t, treProject.ID, projectTREs[0].Project.ID)
-	assert.Equal(t, "TREproject", projectTREs[0].Project.Name)
 }
