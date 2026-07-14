@@ -45,6 +45,12 @@ func NewErrServerError(err any) error {
 	return newErrorWithType(err, ErrServerError)
 }
 
+// New server error wrapping an internal error
+// e.g. NewErrServerErrorF("failed: %w", err)
+func NewErrServerErrorF(format string, objs ...any) error {
+	return newErrorWithType(fmt.Errorf(format, objs...), ErrServerError)
+}
+
 // New not found error wrapping an internal error
 // e.g. NewNotFoundError(err)
 func NewNotFoundError(err any) error {
