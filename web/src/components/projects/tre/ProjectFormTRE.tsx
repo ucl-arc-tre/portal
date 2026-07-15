@@ -223,14 +223,16 @@ export default function ProjectFormTREStep(props: Props) {
                         name="hpcInstances"
                         className={styles["userconfig-dropdown"]}
                         onChange={(e) => {
-                          if (e.target.value) {
+                          if (e.target.value === "") {
+                            updateUserConfig(index, { username: field.username, hpcInstance: "" });
+                          } else if (e.target.value) {
                             updateUserConfig(index, { username: field.username, hpcInstance: e.target.value });
                           }
                         }}
                         value={field.hpcInstance}
                         disabled={fieldsDisabled}
                       >
-                        <option value="">+ Select...</option>
+                        <option value="">None</option>
                         {desktopInstances.map((instance, index) => (
                           <option key={index} value={instance.aws_value}>
                             {instance.label}

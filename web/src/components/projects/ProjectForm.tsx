@@ -210,13 +210,13 @@ export default function ProjectForm({
           const hasHPCDesktops = watch("tre.requiresHPCDesktops");
           const usersConfig = data.tre?.userConfig.map((config) => ({
             username: config.username,
-            desktop_config: config.hpcInstance
-              ? {
-                  hpc_instance_type: hasHPCDesktops ? config.hpcInstance : undefined,
-                }
-              : undefined,
+            desktop_config:
+              config.hpcInstance !== undefined
+                ? {
+                    hpc_instance_type: hasHPCDesktops ? config.hpcInstance : undefined,
+                  }
+                : undefined,
           }));
-          console.log(hasHPCDesktops, usersConfig);
 
           const treMembers: Array<ProjectTreMember> = data.members
             .filter((researcher) => researcher.username.trim() !== "")
