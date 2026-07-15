@@ -1276,9 +1276,7 @@ type ProjectTREImport struct {
 
 // ProjectTREMember A project member with their assigned roles
 type ProjectTREMember struct {
-	DesktopConfig *struct {
-		RootVolumeGb *int `json:"root_volume_gb,omitempty"`
-	} `json:"desktop_config,omitempty"`
+	DesktopConfig *ProjectTREUserDesktopConfig `json:"desktop_config,omitempty"`
 
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
 	Roles    []ProjectTRERoleName `json:"roles"`
@@ -1318,6 +1316,12 @@ type ProjectTREStatus string
 
 // ProjectTREUpdate defines model for ProjectTREUpdate.
 type ProjectTREUpdate = ProjectTREBase
+
+// ProjectTREUserDesktopConfig defines model for ProjectTREUserDesktopConfig.
+type ProjectTREUserDesktopConfig struct {
+	HpcInstanceType *string `json:"hpc_instance_type,omitempty"`
+	RootVolumeGb    *int    `json:"root_volume_gb,omitempty"`
+}
 
 // Study defines model for Study.
 type Study struct {

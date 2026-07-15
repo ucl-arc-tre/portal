@@ -551,14 +551,17 @@ export type ProjectTreUpdate = ProjectTreBase;
  */
 export type ProjectTreMember = {
     username: string;
+    desktop_config?: ProjectTreUserDesktopConfig;
     uid?: number;
-    desktop_config?: {
-        root_volume_gb?: number;
-    };
     /**
      * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
      */
     roles: Array<ProjectTreRoleName>;
+};
+
+export type ProjectTreUserDesktopConfig = {
+    hpc_instance_type?: string;
+    root_volume_gb?: number;
 };
 
 /**

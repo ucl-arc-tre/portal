@@ -2194,18 +2194,23 @@ components:
       properties:
         username:
           type: string
+        desktop_config:
+          $ref: "#/components/schemas/ProjectTREUserDesktopConfig"
         uid:
           type: integer
-        desktop_config:
-          type: object
-          properties:
-            root_volume_gb:
-              type: integer
         roles:
           type: array
           description: List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
           items:
             $ref: "#/components/schemas/ProjectTRERoleName"
+
+    ProjectTREUserDesktopConfig:
+      type: object
+      properties:
+        hpc_instance_type:
+          type: string
+        root_volume_gb:
+          type: integer
 
     ProjectTRERoleName:
       type: string

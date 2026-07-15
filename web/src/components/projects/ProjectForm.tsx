@@ -4,12 +4,12 @@ import {
   postProjectsTre,
   putProjectsTreByProjectId,
   ProjectTreRequest,
-  ProjectTreRoleName,
   Study,
   Environment,
   getStudiesByStudyIdAssets,
   Asset,
   getEnvironments,
+  ProjectTreMember,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName, ProjectFormData } from "@/types/projects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -123,6 +123,15 @@ export default function ProjectForm({
         "tre.airlockWhitelist",
         (editingProject.airlock_whitelist ?? []).map((value) => ({ value }))
       );
+
+      const hasHPCDesktops = editingProject.members.some((member) => member.desktop_config?.hpc_instance_type);
+      setValue("tre.requiresHPCDesktops", hasHPCDesktops ? "true" : "false");
+
+      const userConfig = editingProject.members.map((member) => ({
+        username: member.username,
+        hpcInstance: member.desktop_config?.hpc_instance_type,
+      }));
+      setValue("tre.userConfig", userConfig);
     }
   }, [editingProject, setValue, environments]);
 
@@ -198,11 +207,23 @@ export default function ProjectForm({
             return;
           }
 
-          const treMembers = data.members
+          const hasHPCDesktops = watch("tre.requiresHPCDesktops");
+          const usersConfig = data.tre?.userConfig.map((config) => ({
+            username: config.username,
+            desktop_config: config.hpcInstance
+              ? {
+                  hpc_instance_type: hasHPCDesktops ? config.hpcInstance : undefined,
+                }
+              : undefined,
+          }));
+          console.log(hasHPCDesktops, usersConfig);
+
+          const treMembers: Array<ProjectTreMember> = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
-              username: `${researcher.username.trim()}`,
-              roles: researcher.roles as ProjectTreRoleName[],
+              username: researcher.username,
+              roles: researcher.roles,
+              desktop_config: usersConfig.find((config) => config.username == researcher.username)?.desktop_config,
             }));
 
           const airlockWhitelist =
@@ -210,7 +231,9 @@ export default function ProjectForm({
               ? (data.tre.airlockWhitelist ?? []).map((entry) => entry.value.trim()).filter((value) => value !== "")
               : [];
 
-          // todo HPC body - check is desktop user and need hpc decktops
+          // todo HPC body -
+          // - check is desktop user and need hpc decktops
+          // - check not empty instance
 
           if (editingProject) {
             // Update existing project (only members and assets)

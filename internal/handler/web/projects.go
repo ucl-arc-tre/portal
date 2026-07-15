@@ -136,9 +136,6 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
 	}
 
-	// Extract members from TRE role bindings
-	members := extractProjectMembers(projectTRE)
-
 	response := openapi.ProjectTRE{
 		Id:                         projectTRE.Project.ID.String(),
 		Name:                       projectTRE.Project.Name,
@@ -153,7 +150,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		AirlockWhitelist:           projectTRE.AirlockWhitelist,
 		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
 		Assets:                     assets,
-		Members:                    members,
+		Members:                    extractProjectMembers(projectTRE),
 		AssetIds:                   nil,
 	}
 	if projectTRE.DeployedVersionUpdatedAt != nil &&
@@ -219,6 +216,16 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 			Roles:    roles,
 		})
 	}
+	for i, member := range members {
+		for _, userConfig := range projectTRE.UserConfigs {
+			if userConfig.User.Username == types.Username(member.Username) {
+				members[i].DesktopConfig = &openapi.ProjectTREUserDesktopConfig{
+					HpcInstanceType: userConfig.DesktopHPCInstanceType,
+					RootVolumeGb:    optionalInt(userConfig.DesktopRootVolumeSize),
+				}
+			}
+		}
+	}
 
 	return members
 }
@@ -267,4 +274,11 @@ func (h *Handler) PostProjectsTreAdminImport(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusNoContent)
+}
+
+func optionalInt(i *uint) *int {
+	if i == nil {
+		return nil
+	}
+	return new(int(*i))
 }

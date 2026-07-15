@@ -55,7 +55,11 @@ export default function ProjectFormTREStep(props: Props) {
     name: "tre.airlockWhitelist",
   });
 
-  const { append: appendUserConfig, update: updateUserConfig } = useFieldArray({
+  const {
+    append: appendUserConfig,
+    update: updateUserConfig,
+    remove: removeUserConfig,
+  } = useFieldArray({
     control,
     name: "tre.userConfig",
   });
@@ -66,6 +70,7 @@ export default function ProjectFormTREStep(props: Props) {
   const members = watch("members");
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
   const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
+  const userConfig = watch("tre.userConfig");
   const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
   const requiresHPCDesktops = watch("tre.requiresHPCDesktops") === "true";
 
@@ -79,7 +84,7 @@ export default function ProjectFormTREStep(props: Props) {
             usernames={Array.from(members, (member) => member.username)}
             appendUsername={(value: string) => {
               appendResearcher({ username: value, roles: [] });
-              appendUserConfig({ username: value, hpcInstance: null });
+              appendUserConfig({ username: value, hpcInstance: undefined });
             }}
             removeUsername={(username: string) => {
               const index = researcherFields.findIndex((field) => field.username === username);
@@ -87,6 +92,7 @@ export default function ProjectFormTREStep(props: Props) {
             }}
             roleControl={(user) => {
               const memberIndex = members.findIndex((member) => member.username === user.username);
+              const userConfigIndex = userConfig?.findIndex((cfg) => cfg.username == user.username);
               const researcher = members[memberIndex];
               const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
 
@@ -133,6 +139,9 @@ export default function ProjectFormTREStep(props: Props) {
                                     currentRoles.filter((chosenRole) => chosenRole !== role),
                                     { shouldValidate: true }
                                   );
+                                  if (userConfigIndex) {
+                                    removeUserConfig(userConfigIndex);
+                                  }
                                 }}
                                 aria-label={`Remove ${role} role`}
                               >
@@ -198,33 +207,38 @@ export default function ProjectFormTREStep(props: Props) {
             then please select yes. See the <a href="https://docs.tre.arc.ucl.ac.uk/pricing/">documentation</a> for
             pricing information.
           </HelperText>
-          {requiresHPCDesktops && (
+          {requiresHPCDesktops && userConfig && (
             <div className="field">
               <Label htmlFor="hpcInstances">HPC Desktops:</Label>
               <fieldset className="linkage-fieldset">
-                {desktopUsers.map((field, index) => (
-                  <div key={index} className="item-wrapper">
-                    {field.username}
-                    <select
-                      id="hpcInstances"
-                      name="hpcInstances"
-                      className={styles["userconfig-dropdown"]}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          updateUserConfig(index, { username: field.username, hpcInstance: e.target.value });
-                        }
-                      }}
-                      disabled={fieldsDisabled}
-                    >
-                      <option value="">+ Select...</option>
-                      {desktopInstances.map((instance, index) => (
-                        <option key={index} value={instance.value}>
-                          {instance.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                {userConfig
+                  .filter((field) =>
+                    members.find((member) => member.username == field.username && member.roles.includes("desktop_user"))
+                  )
+                  .map((field, index) => (
+                    <div key={field.username} className="item-wrapper">
+                      {field.username}
+                      <select
+                        id="hpcInstances"
+                        name="hpcInstances"
+                        className={styles["userconfig-dropdown"]}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            updateUserConfig(index, { username: field.username, hpcInstance: e.target.value });
+                          }
+                        }}
+                        value={field.hpcInstance}
+                        disabled={fieldsDisabled}
+                      >
+                        <option value="">+ Select...</option>
+                        {desktopInstances.map((instance, index) => (
+                          <option key={index} value={instance.aws_value}>
+                            {instance.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
               </fieldset>
             </div>
           )}
