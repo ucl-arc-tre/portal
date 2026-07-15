@@ -100,6 +100,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     setAffirmationDialogOpen(false);
   };
 
+  const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract && asset.contract_ids.length === 0);
+
   return (
     <Box>
       {isFormOpen && userData && (
@@ -144,6 +146,19 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
           <>
             {affirmationDialogOpen && (
               <Dialog setDialogOpen={setAffirmationDialogOpen}>
+                {assetsRequiringContracts.length > 0 && (
+                  <Alert type="warning" className={styles.outstanding}>
+                    <AlertMessage>
+                      Please note the following assets do not have an associated contract but have been flagged as
+                      requiring a contract:{" "}
+                      {assetsRequiringContracts.map((asset) => (
+                        <li key={asset.id}>
+                          <strong>{asset.title}</strong>
+                        </li>
+                      ))}
+                    </AlertMessage>
+                  </Alert>
+                )}
                 <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
               </Dialog>
             )}
