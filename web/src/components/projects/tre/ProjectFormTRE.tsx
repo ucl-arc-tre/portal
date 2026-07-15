@@ -8,7 +8,7 @@ import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
 import UserLookup from "@/components/shared/UserLookup";
 import Button from "@/components/ui/Button";
-import { desktopInstances } from "./desktops";
+import { defaultDesktopInstance, hpcDesktopInstances } from "./desktops";
 
 // Mirrors backend validation in internal/validation/ip.go (IsIPv4OrFQDN).
 const ipv4Regex =
@@ -203,9 +203,9 @@ export default function ProjectFormTREStep(props: Props) {
             error={errors.tre?.requiresHPCDesktops}
           />
           <HelperText>
-            Compute intensive workloads require more than a standard 2 core, 4 GB RAM desktop. If you require a GPU for
-            then please select yes. See the <a href="https://docs.tre.arc.ucl.ac.uk/pricing/">documentation</a> for
-            pricing information.
+            Compute intensive workloads require more than a standard {defaultDesktopInstance.label} desktop. If you
+            require a GPU then please select yes. See the{" "}
+            <a href="https://docs.tre.arc.ucl.ac.uk/pricing/">documentation</a> for pricing information.
           </HelperText>
           {requiresHPCDesktops && userConfig && (
             <div className="field">
@@ -231,7 +231,7 @@ export default function ProjectFormTREStep(props: Props) {
                           disabled={fieldsDisabled}
                         >
                           <option value="">None</option>
-                          {desktopInstances.map((instance, index) => (
+                          {hpcDesktopInstances.map((instance, index) => (
                             <option key={index} value={instance.aws_value}>
                               {instance.label}
                             </option>

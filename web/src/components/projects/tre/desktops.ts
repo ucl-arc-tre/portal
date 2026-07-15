@@ -3,7 +3,12 @@ export type DesktopInstance = {
   aws_value: string;
 };
 
-export const desktopInstances: DesktopInstance[] = [
+export const defaultDesktopInstance: DesktopInstance = {
+  label: "2 cores, 4 GB memory",
+  aws_value: "t3a.medium",
+};
+
+export const hpcDesktopInstances: DesktopInstance[] = [
   {
     label: "2 cores, 8 GB memory",
     aws_value: "t3a.large",

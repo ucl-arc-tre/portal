@@ -233,10 +233,6 @@ export default function ProjectForm({
               ? (data.tre.airlockWhitelist ?? []).map((entry) => entry.value.trim()).filter((value) => value !== "")
               : [];
 
-          // todo HPC body -
-          // - check is desktop user and need hpc decktops
-          // - check not empty instance
-
           if (editingProject) {
             // Update existing project (only members and assets)
             response = await putProjectsTreByProjectId({
