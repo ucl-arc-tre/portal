@@ -423,8 +423,6 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 		return err
 	}
 
-	log.Debug().Any("members", members).Msg("todo")
-
 	requested := []types.ProjectTREUserConfig{}
 	for _, member := range members {
 		if member.DesktopConfig == nil {
@@ -440,6 +438,7 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 			ProjectTREID:           projectTREID,
 			UserID:                 userIds[types.Username(member.Username)],
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
+			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
 		}
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]
@@ -457,6 +456,7 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 			Where("project_tre_id = ? AND user_id = ?", projectTREID, userConfig.UserID).
 			Assign(types.ProjectTREUserConfig{
 				DesktopHPCInstanceType: userConfig.DesktopHPCInstanceType,
+				DesktopRootVolumeSize:  userConfig.DesktopRootVolumeSize,
 			}).
 			Attrs(types.ProjectTREUserConfig{
 				UID: userConfig.UID,
@@ -782,4 +782,11 @@ func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
 		uid++
 	}
 	return uid, nil
+}
+
+func optionalUint(i *int) *uint {
+	if i == nil {
+		return nil
+	}
+	return new(uint(*i))
 }

@@ -3,24 +3,6 @@ beforeEach(() => {
   cy.clearLocalStorage();
 });
 
-describe("TRE project creation tmp", () => {
-  const studyTitle = `study-tre-project-1782213325973`;
-  let projectTitle = `tre${Date.now()}`.substring(0, 14);
-
-  it("tmp", () => {
-    //cy.pause(); // todo
-
-    cy.loginAsStaff();
-
-    cy.visit("/projects");
-    cy.get('[data-cy="create-project-button"]').click();
-    cy.get('[name="studyId"]').select(studyTitle);
-    cy.get('[name="environmentId"]').select("ARC Trusted Research Environment (Tier 3)");
-    cy.get('[name="name"]').type(projectTitle);
-    cy.get('[data-cy="next-form-page-button"]').click();
-  });
-});
-
 describe("TRE project creation end-to-end", () => {
   const studyTitle = `study-tre-project-${Date.now()}`;
   const assetTitle = `asset-tre-project-${Date.now()}`;
