@@ -303,6 +303,7 @@ func (s *Service) AllProjects() ([]GenericProject, error) {
 
 func (s *Service) genericProjectsQuery() *gorm.DB {
 	return s.db.Table("projects").
+		Order("projects.created_at DESC").
 		Select(`
 			projects.id,
 	  		projects.study_id,

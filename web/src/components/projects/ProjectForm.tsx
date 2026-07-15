@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   postProjectsTre,
@@ -40,6 +40,7 @@ export default function ProjectForm({
   const [environmentsError, setEnvironmentsError] = useState<string | null>(null);
   const [assets, setAssets] = useState<Asset[] | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
   const totalSteps = 2;
 
@@ -172,6 +173,10 @@ export default function ProjectForm({
     fetchAssets();
   }, [selectedStudyId, selectedEnvironmentId]);
 
+  useEffect(() => {
+    dialogContentRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [currentStep]);
+
   const nextStep = async () => {
     if (currentStep === totalSteps) return;
 
@@ -208,14 +213,11 @@ export default function ProjectForm({
           }
 
           const hasHPCDesktops = watch("tre.requiresHPCDesktops");
-          const usersConfig = data.tre?.userConfig.map((config) => ({
+          const usersConfig = data.tre?.userConfig?.map((config) => ({
             username: config.username,
-            desktop_config:
-              config.hpcInstance !== undefined
-                ? {
-                    hpc_instance_type: hasHPCDesktops ? config.hpcInstance : undefined,
-                  }
-                : undefined,
+            desktop_config: {
+              hpc_instance_type: hasHPCDesktops ? config.hpcInstance : "",
+            },
           }));
 
           const treMembers: Array<ProjectTreMember> = data.members
@@ -223,7 +225,7 @@ export default function ProjectForm({
             .map((researcher) => ({
               username: researcher.username,
               roles: researcher.roles,
-              desktop_config: usersConfig.find((config) => config.username == researcher.username)?.desktop_config,
+              desktop_config: usersConfig?.find((config) => config.username == researcher.username)?.desktop_config,
             }));
 
           const airlockWhitelist =
@@ -283,7 +285,7 @@ export default function ProjectForm({
   };
 
   return (
-    <Dialog setDialogOpen={handleCancelCreate}>
+    <Dialog setDialogOpen={handleCancelCreate} contentRef={dialogContentRef}>
       <div>
         <h2>{editingProject ? "Edit Project" : "Create New Project"}</h2>
 
