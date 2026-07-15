@@ -464,7 +464,16 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 			FirstOrCreate(&userConfig).
 			Error
 		if err != nil {
-			return err
+			return types.NewErrFromGorm(err, "failed to create/update project tre config")
+		}
+	}
+	for _, userConfig := range existing {
+		hasUser := func(u types.ProjectTREUserConfig) bool { return u.User.Username == userConfig.User.Username }
+		isDeleted := !slices.ContainsFunc(requested, hasUser)
+		if isDeleted {
+			if err := tx.Delete(&userConfig).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to delete old user project tre config")
+			}
 		}
 	}
 	return nil
