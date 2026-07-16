@@ -405,31 +405,13 @@ export default function ManageProjectPage() {
             </div>
 
             <div className={styles.field}>
-              <label>
-                Assets:
-                <small>
-                  For full asset details, see the{" "}
-                  <Button onClick={() => setTab("assets")} variant="tertiary">
-                    Assets
-                  </Button>{" "}
-                  tab.
-                </small>
-              </label>
-              {project.assets && project.assets.length > 0 ? (
-                <ul className={styles["field-list"]}>
-                  {project.assets.map((asset) => (
-                    <li key={asset.id} className={styles["field-item"]}>
-                      <div className={styles["asset-info"]}>
-                        <strong>{asset.title}</strong>
-                        <p>{asset.description}</p>
-                        <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
-              )}
+              <label>Number of members:</label>
+              <span>{project.members ? project.members.length : 0}</span>
+            </div>
+
+            <div className={styles.field}>
+              <label>Number of Assets:</label>
+              <span>{project.assets ? project.assets.length : 0}</span>
             </div>
           </Box>
         )}
