@@ -42,7 +42,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const studyStepsCompleted = isLoading ? null : hasAsset && hasAgreed;
 
   const router = useRouter();
-  const tab = (router.query.tab as string) ?? "study";
+  const tab = (router.query.tab as "study" | "assets" | "contracts") ?? "study";
 
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
   const isStudyOwner =
