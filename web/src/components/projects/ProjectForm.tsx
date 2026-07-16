@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   postProjectsTre,
   putProjectsTreByProjectId,
   ProjectTreRequest,
-  ProjectTreRoleName,
   Study,
   Environment,
   getStudiesByStudyIdAssets,
   Asset,
   getEnvironments,
+  ProjectTreMember,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName, ProjectFormData } from "@/types/projects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -40,6 +40,7 @@ export default function ProjectForm({
   const [environmentsError, setEnvironmentsError] = useState<string | null>(null);
   const [assets, setAssets] = useState<Asset[] | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
   const totalSteps = 2;
 
@@ -123,6 +124,15 @@ export default function ProjectForm({
         "tre.airlockWhitelist",
         (editingProject.airlock_whitelist ?? []).map((value) => ({ value }))
       );
+
+      const hasHPCDesktops = editingProject.members.some((member) => member.desktop_config?.hpc_instance_type);
+      setValue("tre.requiresHPCDesktops", hasHPCDesktops ? "true" : "false");
+
+      const userConfig = editingProject.members.map((member) => ({
+        username: member.username,
+        hpcInstance: member.desktop_config?.hpc_instance_type,
+      }));
+      setValue("tre.userConfig", userConfig);
     }
   }, [editingProject, setValue, environments]);
 
@@ -163,6 +173,10 @@ export default function ProjectForm({
     fetchAssets();
   }, [selectedStudyId, selectedEnvironmentId]);
 
+  useEffect(() => {
+    dialogContentRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [currentStep]);
+
   const nextStep = async () => {
     if (currentStep === totalSteps) return;
 
@@ -198,11 +212,20 @@ export default function ProjectForm({
             return;
           }
 
-          const treMembers = data.members
+          const hasHPCDesktops = watch("tre.requiresHPCDesktops");
+          const usersConfig = data.tre?.userConfig?.map((config) => ({
+            username: config.username,
+            desktop_config: {
+              hpc_instance_type: hasHPCDesktops ? config.hpcInstance : "",
+            },
+          }));
+
+          const treMembers: Array<ProjectTreMember> = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
-              username: `${researcher.username.trim()}`,
-              roles: researcher.roles as ProjectTreRoleName[],
+              username: researcher.username,
+              roles: researcher.roles,
+              desktop_config: usersConfig?.find((config) => config.username == researcher.username)?.desktop_config,
             }));
 
           const airlockWhitelist =
@@ -231,7 +254,7 @@ export default function ProjectForm({
               members: treMembers,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
-              airlock_whitelist: airlockWhitelist.length > 0 ? airlockWhitelist : [],
+              airlock_whitelist: airlockWhitelist,
             };
             response = await postProjectsTre({ body: requestBody });
           }
@@ -258,7 +281,7 @@ export default function ProjectForm({
   };
 
   return (
-    <Dialog setDialogOpen={handleCancelCreate}>
+    <Dialog setDialogOpen={handleCancelCreate} contentRef={dialogContentRef}>
       <div>
         <h2>{editingProject ? "Edit Project" : "Create New Project"}</h2>
 

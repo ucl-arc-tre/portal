@@ -144,10 +144,6 @@ type ProjectTREUserConfig struct {
 	User         User               `gorm:"foreignKey:UserID"`
 }
 
-func (p ProjectTREUserConfig) UniqueKey() string {
-	return fmt.Sprintf("%v%v", p.ProjectTREID, p.UserID)
-}
-
 func (p ProjectTREUserConfig) IsDeleted() bool {
 	return p.ModelAuditable.IsDeleted()
 }

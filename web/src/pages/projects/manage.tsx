@@ -24,6 +24,7 @@ import Box from "@/components/ui/Box";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import Dialog from "@/components/ui/Dialog";
+import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -475,9 +476,13 @@ export default function ManageProjectPage() {
                         ))}
                       </div>
                       {member.desktop_config && (
-                        <div className={styles["member-desktop-config"]}>
-                          <strong>Desktop Config:</strong>
-                          <p>{member.desktop_config}</p>
+                        <div className={styles["desktop-configuration"]}>
+                          <strong>Desktop configuration:</strong>
+                          <p>
+                            {hpcDesktopInstances.find(
+                              (instance) => instance.aws_value == member.desktop_config?.hpc_instance_type
+                            )?.label || defaultDesktopInstance.label + " (default)"}
+                          </p>
                         </div>
                       )}
                     </li>
