@@ -25,6 +25,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
+import AssetCard from "@/components/assets/AssetCard";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -489,6 +490,15 @@ export default function ManageProjectPage() {
                   ))}
                 </ul>
               )}
+            </div>
+          </Box>
+        )}
+        {tab === "assets" && (
+          <Box>
+            <div className={styles["assets-grid"]}>
+              {project.assets?.map((asset) => (
+                <AssetCard key={asset.id} studyId={project.study_id} asset={asset} involvesNHS={null} />
+              ))}
             </div>
           </Box>
         )}
