@@ -166,6 +166,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
   const dataTypesValue = watch("data_types");
   const protectionValue = watch("protection");
   const hasExpiryDateValue = watch("has_expiry_date");
+  const formatValue = watch("format");
   const requiresTRE = isTrue(watch("requires_tre"));
   const classificationImpactValue = watch("classification_impact");
   const isPublic = classificationImpactValue === "public";
@@ -552,6 +553,11 @@ export default function AssetCreationForm(props: AssetFormProps) {
           {errors.format && (
             <Alert type="error">
               <AlertMessage>{errors.format.message}</AlertMessage>
+            </Alert>
+          )}
+          {formatValue == "other" && (
+            <Alert type="info">
+              <AlertMessage>Please add details of the format to the asset description</AlertMessage>
             </Alert>
           )}
         </div>
