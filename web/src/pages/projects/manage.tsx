@@ -194,9 +194,7 @@ export default function ManageProjectPage() {
     setDeleteError(null);
   };
 
-  const tab = (router.query.tab as string) ?? "project";
-  const setTab = (newTab: string) =>
-    router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
+  const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
 
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
