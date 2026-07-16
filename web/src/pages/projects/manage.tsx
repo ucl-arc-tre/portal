@@ -427,7 +427,7 @@ export default function ManageProjectPage() {
             {project.assets && project.assets.length > 0 ? (
               <div className={styles["assets-grid"]}>
                 {project.assets?.map((asset) => (
-                  <AssetCard key={asset.id} studyId={project.study_id} asset={asset} />
+                  <AssetCard key={asset.id} studyId={project.study_id} asset={asset} showRiskScore={false} />
                 ))}
               </div>
             ) : (
