@@ -337,16 +337,14 @@ export default function ManageProjectPage() {
             Project Overview
           </Button>
 
-          {project.members && project.members.length > 0 && (
-            <Button
-              onClick={() => setTab("members")}
-              variant="secondary"
-              className={`tab ${tab === "members" ? "active" : ""}`}
-              cy="project-members"
-            >
-              Members
-            </Button>
-          )}
+          <Button
+            onClick={() => setTab("members")}
+            variant="secondary"
+            className={`tab ${tab === "members" ? "active" : ""}`}
+            cy="project-members"
+          >
+            Members
+          </Button>
 
           <Button
             onClick={() => setTab("assets")}
@@ -408,32 +406,6 @@ export default function ManageProjectPage() {
 
             <div className={styles.field}>
               <label>
-                Members:
-                {project.members && project.members.length > 0 && (
-                  <small>
-                    To view full member details, see the{" "}
-                    <Button onClick={() => setTab("members")} variant="tertiary">
-                      Members
-                    </Button>{" "}
-                    tab.
-                  </small>
-                )}
-              </label>
-              {project.members && project.members.length > 0 ? (
-                <ul className={styles["field-list"]}>
-                  {project.members.map((member, index) => (
-                    <li key={index} className={styles["member-item"]}>
-                      <span className={styles["member-username"]}>{member.username}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
-              )}
-            </div>
-
-            <div className={styles.field}>
-              <label>
                 Assets:
                 <small>
                   For full asset details, see the{" "}
@@ -461,10 +433,11 @@ export default function ManageProjectPage() {
             </div>
           </Box>
         )}
+
         {tab === "members" && (
           <Box>
             <div>
-              {project.members && (
+              {project.members && project.members.length > 0 ? (
                 <ul className={styles["field-list"]}>
                   {project.members.map((member, index) => (
                     <li key={index} className={styles["member-item"]}>
@@ -489,17 +462,23 @@ export default function ManageProjectPage() {
                     </li>
                   ))}
                 </ul>
+              ) : (
+                <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
               )}
             </div>
           </Box>
         )}
         {tab === "assets" && (
           <Box>
-            <div className={styles["assets-grid"]}>
-              {project.assets?.map((asset) => (
-                <AssetCard key={asset.id} studyId={project.study_id} asset={asset} involvesNHS={null} />
-              ))}
-            </div>
+            {project.assets && project.assets.length > 0 ? (
+              <div className={styles["assets-grid"]}>
+                {project.assets?.map((asset) => (
+                  <AssetCard key={asset.id} studyId={project.study_id} asset={asset} involvesNHS={null} />
+                ))}
+              </div>
+            ) : (
+              <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
+            )}
           </Box>
         )}
 
