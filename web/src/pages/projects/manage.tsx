@@ -191,6 +191,10 @@ export default function ManageProjectPage() {
     setDeleteError(null);
   };
 
+  const tab = (router.query.tab as string) ?? "project";
+  const setTab = (newTab: string) =>
+    router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
+
   if (authInProgress) return <Loading />;
   if (!isAuthed) return <LoginFallback />;
   if (loading) return <Loading />;
@@ -305,110 +309,184 @@ export default function ManageProjectPage() {
           </div>
         )}
 
-        <Box>
-          <div className={styles.header}>
-            <h2>Project: {project.name}</h2>
-            {canEdit && project.status !== "incomplete" && (
-              <div>
-                <Button
-                  onClick={() => setShowEditForm(true)}
-                  size="medium"
-                  variant="secondary"
-                  disabled={!editingEnabled}
-                >
-                  Edit Project
-                </Button>
-              </div>
-            )}
-          </div>
+        <div className={styles.header}>
+          <h2>{project.name}</h2>
+          {canEdit && project.status !== "incomplete" && (
+            <div>
+              <Button
+                onClick={() => setShowEditForm(true)}
+                size="medium"
+                variant="secondary"
+                disabled={!editingEnabled}
+              >
+                Edit Project
+              </Button>
+            </div>
+          )}
+        </div>
 
-          <div className={styles.field}>
-            <label>Environment:</label>
-            <span>{project.environment_name}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Status:</label>
-            <span className={styles.status}>
-              {project.status} {project.is_pending_deployment_update && " pending update"}
-            </span>
-          </div>
-          <div className={styles.field}>
-            <label>Created by:</label>
-            <span>{project.creator_username}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Created:</label>
-            <span>{new Date(project.created_at).toLocaleDateString()}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Study:</label>
-            <span>{project.study_title}</span>
-          </div>
-          <div className={styles.field}>
-            <label>Number of approvals required for egress:</label>
-            <span>{project.num_required_egress_approvals}</span>
-          </div>
-          <div className={styles.field}>
-            <label>External encryption enabled:</label>
-            <span>{project.external_encryption_enabled ? "Yes" : "No"}</span>
-          </div>
+        <div className={"tab-collection"}>
+          <Button
+            onClick={() => setTab("project")}
+            variant="secondary"
+            className={`tab ${tab === "project" ? "active" : ""}`}
+            cy="project-overview"
+          >
+            Project Overview
+          </Button>
 
-          <div className={styles.field}>
-            <label>Airlock whitelist:</label>
-            {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
-              <ul className={styles["field-list"]}>
-                {project.airlock_whitelist.map((entry, index) => (
-                  <li key={index} className={styles["field-item"]}>
-                    {entry}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
-            )}
-          </div>
+          {project.members && project.members.length > 0 && (
+            <Button
+              onClick={() => setTab("members")}
+              variant="secondary"
+              className={`tab ${tab === "members" ? "active" : ""}`}
+              cy="project-members"
+            >
+              Members
+            </Button>
+          )}
 
-          <div className={styles.field}>
-            <label>Members:</label>
-            {project.members && project.members.length > 0 ? (
-              <ul className={styles["field-list"]}>
-                {project.members.map((member, index) => (
-                  <li key={index} className={styles["member-item"]}>
-                    <span className={styles["member-username"]}>{member.username}</span>
-                    <div className={styles["member-roles"]}>
-                      {member.roles.map((role, roleIndex) => (
-                        <span key={roleIndex} className={styles["role-badge"]}>
-                          {roleLabel(role)}
-                        </span>
-                      ))}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
-            )}
-          </div>
+          <Button
+            onClick={() => setTab("assets")}
+            variant="secondary"
+            className={`tab ${tab === "assets" ? "active" : ""}`}
+            cy="project-assets"
+          >
+            Assets
+          </Button>
+        </div>
 
-          <div className={styles.field}>
-            <label>Assets:</label>
-            {project.assets && project.assets.length > 0 ? (
-              <ul className={styles["field-list"]}>
-                {project.assets.map((asset) => (
-                  <li key={asset.id} className={styles["field-item"]}>
-                    <div className={styles["asset-info"]}>
-                      <strong>{asset.title}</strong>
-                      <p>{asset.description}</p>
-                      <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
-            )}
-          </div>
-        </Box>
+        {tab === "project" && (
+          <Box>
+            <div className={styles.field}>
+              <label>Environment:</label>
+              <span>{project.environment_name}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Status:</label>
+              <span className={styles.status}>
+                {project.status} {project.is_pending_deployment_update && " pending update"}
+              </span>
+            </div>
+            <div className={styles.field}>
+              <label>Created by:</label>
+              <span>{project.creator_username}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Created:</label>
+              <span>{new Date(project.created_at).toLocaleDateString()}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Study:</label>
+              <span>{project.study_title}</span>
+            </div>
+            <div className={styles.field}>
+              <label>Number of approvals required for egress:</label>
+              <span>{project.num_required_egress_approvals}</span>
+            </div>
+            <div className={styles.field}>
+              <label>External encryption enabled:</label>
+              <span>{project.external_encryption_enabled ? "Yes" : "No"}</span>
+            </div>
+
+            <div className={styles.field}>
+              <label>Airlock whitelist:</label>
+              {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
+                <ul className={styles["field-list"]}>
+                  {project.airlock_whitelist.map((entry, index) => (
+                    <li key={index} className={styles["field-item"]}>
+                      {entry}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
+              )}
+            </div>
+
+            <div className={styles.field}>
+              <label>
+                Members:
+                {project.members && project.members.length > 0 && (
+                  <small>
+                    To view full member details, see the{" "}
+                    <Button onClick={() => setTab("members")} variant="tertiary">
+                      Members
+                    </Button>{" "}
+                    tab.
+                  </small>
+                )}
+              </label>
+              {project.members && project.members.length > 0 ? (
+                <ul className={styles["field-list"]}>
+                  {project.members.map((member, index) => (
+                    <li key={index} className={styles["member-item"]}>
+                      <span className={styles["member-username"]}>{member.username}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles["empty-message"]}>No members have been added to this project yet.</p>
+              )}
+            </div>
+
+            <div className={styles.field}>
+              <label>
+                Assets:
+                <small>
+                  For full asset details, see the{" "}
+                  <Button onClick={() => setTab("assets")} variant="tertiary">
+                    Assets
+                  </Button>{" "}
+                  tab.
+                </small>
+              </label>
+              {project.assets && project.assets.length > 0 ? (
+                <ul className={styles["field-list"]}>
+                  {project.assets.map((asset) => (
+                    <li key={asset.id} className={styles["field-item"]}>
+                      <div className={styles["asset-info"]}>
+                        <strong>{asset.title}</strong>
+                        <p>{asset.description}</p>
+                        <span className={styles["asset-tier"]}>Tier {asset.tier}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles["empty-message"]}>No assets have been added to this project yet.</p>
+              )}
+            </div>
+          </Box>
+        )}
+        {tab === "members" && (
+          <Box>
+            <div>
+              {project.members && (
+                <ul className={styles["field-list"]}>
+                  {project.members.map((member, index) => (
+                    <li key={index} className={styles["member-item"]}>
+                      <span className={styles["member-username"]}>{member.username}</span>
+                      <div className={styles["member-roles"]}>
+                        {member.roles.map((role, roleIndex) => (
+                          <span key={roleIndex} className={styles["role-badge"]}>
+                            {roleLabel(role)}
+                          </span>
+                        ))}
+                      </div>
+                      {member.desktop_config && (
+                        <div className={styles["member-desktop-config"]}>
+                          <strong>Desktop Config:</strong>
+                          <p>{member.desktop_config}</p>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </Box>
+        )}
 
         {showEditForm && project && (
           <ProjectForm
