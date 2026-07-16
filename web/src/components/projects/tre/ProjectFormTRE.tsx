@@ -8,6 +8,7 @@ import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
 import UserLookup from "@/components/shared/UserLookup";
 import Button from "@/components/ui/Button";
+import { defaultDesktopInstance, hpcDesktopInstances } from "./desktops";
 
 // Mirrors backend validation in internal/validation/ip.go (IsIPv4OrFQDN).
 const ipv4Regex =
@@ -54,12 +55,25 @@ export default function ProjectFormTREStep(props: Props) {
     name: "tre.airlockWhitelist",
   });
 
+  const { append: appendUserConfig, update: updateUserConfig } = useFieldArray({
+    control,
+    name: "tre.userConfig",
+  });
+
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
   const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
   const members = watch("members");
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
   const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
+  const userConfig = watch("tre.userConfig");
+  const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
+  const requiresHPCDesktops = watch("tre.requiresHPCDesktops") === "true";
+
+  const isDesktopUser = (username: string): boolean => {
+    console.log(username);
+    return members.some((member) => member.username == username && member.roles.includes("desktop_user"));
+  };
 
   return (
     <>
@@ -69,7 +83,12 @@ export default function ProjectFormTREStep(props: Props) {
           <UserLookup
             filterByApprovedResearchers={true}
             usernames={Array.from(members, (member) => member.username)}
-            appendUsername={(value: string) => appendResearcher({ username: value, roles: [] })}
+            appendUsername={(value: string) => {
+              appendResearcher({ username: value, roles: [] });
+              if (!userConfig?.some((u) => u.username === value)) {
+                appendUserConfig({ username: value, hpcInstance: undefined });
+              }
+            }}
             removeUsername={(username: string) => {
               const index = researcherFields.findIndex((field) => field.username === username);
               if (index !== -1) removeResearcher(index);
@@ -133,6 +152,7 @@ export default function ProjectFormTREStep(props: Props) {
                       )}
                       {availableRolesToAdd.length > 0 && (
                         <select
+                          data-cy="tre-member-role-dropdown"
                           className={styles["role-dropdown"]}
                           value=""
                           onChange={(e) => {
@@ -170,6 +190,62 @@ export default function ProjectFormTREStep(props: Props) {
         <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
       </div>
 
+      {desktopUsers.length > 0 && (
+        <>
+          <RadioOptions
+            name="tre.requiresHPCDesktops"
+            label="Will any desktop users run compute intenstive workloads? *"
+            options={[
+              { name: "Yes", value: "true" },
+              { name: "No", value: "false" },
+            ]}
+            register={register}
+            error={errors.tre?.requiresHPCDesktops}
+          />
+          <HelperText>
+            Compute intensive workloads require more than a standard {defaultDesktopInstance.label} desktop. If you
+            require a GPU then please select yes. See the{" "}
+            <a href="https://docs.tre.arc.ucl.ac.uk/pricing/">documentation</a> for pricing information.
+          </HelperText>
+          {requiresHPCDesktops && userConfig && (
+            <div className="field">
+              <Label htmlFor="hpcInstances">HPC Desktops:</Label>
+              <fieldset className="linkage-fieldset">
+                {userConfig.map(
+                  (field, index) =>
+                    isDesktopUser(field.username) && (
+                      <div key={field.username} className="item-wrapper">
+                        {field.username}
+                        <select
+                          id="hpcInstances"
+                          name="hpcInstances"
+                          className={styles["userconfig-dropdown"]}
+                          onChange={(e) => {
+                            if (e.target.value === "") {
+                              updateUserConfig(index, { username: field.username, hpcInstance: "" });
+                            } else if (e.target.value) {
+                              updateUserConfig(index, { username: field.username, hpcInstance: e.target.value });
+                            }
+                          }}
+                          value={field.hpcInstance}
+                          disabled={fieldsDisabled}
+                        >
+                          <option value="">None</option>
+                          {hpcDesktopInstances.map((instance, index) => (
+                            <option key={index} value={instance.aws_value}>
+                              {instance.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )
+                )}
+              </fieldset>
+            </div>
+          )}
+        </>
+      )}
+
       <div>
         <RadioOptions
           name="tre.numRequiredEgressApprovals"
@@ -187,7 +263,7 @@ export default function ProjectFormTREStep(props: Props) {
           The TRE requires approvals on files to be egressed. Self approvals are permitted. See the{" "}
           <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
         </HelperText>
-        {numRequiredEgressApprovals === "1" && (
+        {numRequiredEgressApprovals === "1" && members.length > 1 && (
           <div className={styles["num-egress-approvals-alert"]}>
             <Alert type="warning">
               <AlertMessage>

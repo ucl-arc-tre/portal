@@ -28,6 +28,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
               <input
                 type="radio"
                 value={option.value}
+                data-cy={`${name}-${option.value}`}
                 {...register(name, {
                   required: "Please select an option",
                 })}

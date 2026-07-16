@@ -9,16 +9,18 @@ const Blanket = dynamic(() => import("uikit-react-public").then((mod) => mod.Bla
 });
 
 type DialogProps = {
-  setDialogOpen: (name: boolean) => void;
+  setDialogOpen: (open: boolean) => void;
   children: React.ReactNode;
   className?: string;
   cy?: string;
+  contentRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 export default function Dialog(DialogProps: DialogProps) {
-  const { setDialogOpen, children, className, cy } = DialogProps;
+  const { setDialogOpen, children, className, cy, contentRef: externalContentRef } = DialogProps;
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const internalContentRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = externalContentRef ?? internalContentRef;
 
   const closeDialog = () => {
     dialogRef.current?.close();
