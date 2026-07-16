@@ -26,6 +26,7 @@ import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
+import ProjectTabs from "@/components/projects/ProjectTabs";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -327,34 +328,7 @@ export default function ManageProjectPage() {
           )}
         </div>
 
-        <div className={"tab-collection"}>
-          <Button
-            onClick={() => setTab("project")}
-            variant="secondary"
-            className={`tab ${tab === "project" ? "active" : ""}`}
-            cy="project-overview"
-          >
-            Project Overview
-          </Button>
-
-          <Button
-            onClick={() => setTab("members")}
-            variant="secondary"
-            className={`tab ${tab === "members" ? "active" : ""}`}
-            cy="project-members"
-          >
-            Members
-          </Button>
-
-          <Button
-            onClick={() => setTab("assets")}
-            variant="secondary"
-            className={`tab ${tab === "assets" ? "active" : ""}`}
-            cy="project-assets"
-          >
-            Assets
-          </Button>
-        </div>
+        <ProjectTabs />
 
         {tab === "project" && (
           <Box>
