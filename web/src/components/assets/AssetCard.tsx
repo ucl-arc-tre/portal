@@ -12,7 +12,7 @@ import Badge from "../ui/Badge";
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  involvesNHS: boolean | null | undefined;
+  involvesNHS?: boolean | null;
 };
 
 const formatClassification = (classification: string) => {
@@ -95,10 +95,12 @@ export default function AssetCard(props: AssetCardProps) {
       {asset.description && <p className={styles["asset-description"]}>{asset.description}</p>}
 
       <div className={styles["asset-details"]}>
-        <div className={styles["asset-detail"]}>
-          <span className={styles["asset-detail-label"]}>Risk Score:</span>
-          <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset, involvesNHS)}</span>
-        </div>
+        {involvesNHS && (
+          <div className={styles["asset-detail"]}>
+            <span className={styles["asset-detail-label"]}>Risk Score:</span>
+            <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset, involvesNHS)}</span>
+          </div>
+        )}
         <div className={styles["asset-detail"]}>
           <span className={styles["asset-detail-label"]}>Tier:</span>
           <span className={styles["asset-detail-value"]}>{asset.tier}</span>
