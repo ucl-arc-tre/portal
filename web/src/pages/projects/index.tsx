@@ -50,6 +50,7 @@ export default function ProjectsPage() {
       <Callout construction>
         Not all Project features work yet. We&apos;re actively working on adding more functionality!
       </Callout>
+      <Callout text="DSH Project management is not supported yet, please use the Share Management Tool within the DSH or open a ticket on MyServices" />
 
       <Projects userData={userData} />
     </>
