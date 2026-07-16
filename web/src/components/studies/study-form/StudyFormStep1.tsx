@@ -88,6 +88,7 @@ export default function StudyFormStep1({ control, errors, register, ownerUsernam
           <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
               Add a UCL staff member who will help administrate this study. <strong>Must</strong> be valid UCL staff.
+              <br></br> Note that only <i>approved researchers</i> will appear in the search results.
             </HelperText>
             <UserLookup
               filterByApprovedResearchers={true}
