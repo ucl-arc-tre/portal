@@ -254,7 +254,7 @@ export default function UserLookup(props: UserLookupProps) {
         (noResultsFound ? (
           <Alert type="warning">
             {filterByApprovedResearchers ? "No approved researchers" : "No users"}
-            {` found with search term '${searchQuery}' `}
+            {` found matching '${searchQuery}' `}
             {searchQuery.includes("@") && (
               <Button
                 size="small"
