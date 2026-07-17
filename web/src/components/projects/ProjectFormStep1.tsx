@@ -1,4 +1,5 @@
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import Link from "next/link";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Button from "../ui/Button";
 import { Asset, Environment, Study } from "@/openapi";
@@ -120,7 +121,16 @@ export default function ProjectFormStep1(props: Props) {
               case "Data Safe Haven":
                 return (
                   <>
-                    <Callout text="DSH Project management is not supported yet, please use the Share Management Tool within the DSH or open a ticket on MyServices" />
+                    <Callout text="DSH Project management is not supported yet.">
+                      Please use the Share Management Tool within the DSH or open a ticket on{" "}
+                      <Link
+                        href="https://myservices.ucl.ac.uk/self-service/requests/new/select_template?from=wizard&service_id=1473&service_instance_id=3892"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        MyServices
+                      </Link>
+                    </Callout>
                     <div className={styles["environment-docs"]}>
                       <a
                         href="https://www.ucl.ac.uk/isd/services/file-storage-sharing/data-safe-haven-dsh"
