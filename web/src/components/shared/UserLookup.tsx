@@ -124,11 +124,14 @@ export default function UserLookup(props: UserLookupProps) {
 
   const handleSearch = async (query: string) => {
     setSearchErrorMessage("");
+    setInviteErrorMessage("");
 
     const isValid = new RegExp(regex).test(query);
 
     if (!isValid) {
-      setSearchErrorMessage("Invalid query, only alphanumeric characters, @ and - are allowed");
+      setSearchErrorMessage(
+        "Invalid query, only alphanumeric characters, @ and - are allowed and must start and end with a letter or number."
+      );
       return;
     }
 
@@ -250,7 +253,8 @@ export default function UserLookup(props: UserLookupProps) {
       {searchQuery.length >= 3 &&
         (noResultsFound ? (
           <Alert type="warning">
-            &quot;{searchQuery}&quot; not found.{" "}
+            {filterByApprovedResearchers ? "No approved researchers" : "No users"}
+            {` found matching '${searchQuery}' `}
             {searchQuery.includes("@") && (
               <Button
                 size="small"
