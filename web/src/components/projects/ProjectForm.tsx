@@ -260,7 +260,9 @@ export default function ProjectForm({
           }
           break;
         case "Data Safe Haven":
-          throw new Error("DSH projects are not yet supported");
+          setEnvironmentsError(
+            "DSH projects are not yet supported. Please use the Share Management Tool within the DSH or open a ticket on MyServices."
+          );
         default:
           throw new Error(`Unknown environment: ${selectedEnvironment.name}`);
       }
