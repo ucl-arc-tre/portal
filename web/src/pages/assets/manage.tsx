@@ -26,6 +26,7 @@ import ContractCard from "@/components/contracts/ContractCard";
 import { HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
+import ErrorMessage from "@/components/ui/Error";
 import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports";
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
@@ -147,7 +148,7 @@ export default function ManageAssetPage() {
     return (
       <div className={styles.container}>
         <Title text="Error" />
-        <p className={styles.error}>{error}</p>
+        <ErrorMessage message={error} />
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>
@@ -159,7 +160,7 @@ export default function ManageAssetPage() {
     return (
       <div className={styles.container}>
         <Title text="Not Found" />
-        <p className={styles.error}>Study or asset not found.</p>
+        <ErrorMessage message="Study or asset not found." />
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>

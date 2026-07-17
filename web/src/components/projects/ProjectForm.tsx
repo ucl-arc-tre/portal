@@ -19,7 +19,7 @@ import Dialog from "../ui/Dialog";
 import styles from "./ProjectForm.module.css";
 import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import ErrorMessage from "../ui/Error";
 
 type Props = {
   approvedStudies: Study[];
@@ -296,11 +296,7 @@ export default function ProjectForm({
           ))}
         </div>
 
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <ErrorMessage message={error} />}
 
         <FormProvider {...methods}>
           <form className="form" onSubmit={(e) => e.preventDefault()}>

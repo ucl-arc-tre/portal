@@ -5,7 +5,8 @@ import Button from "@/components/ui/Button";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./IGOpsStudies.module.css";
 import Loading from "../ui/Loading";
-import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
+import { HelperText } from "../shared/uikitExports";
+import Error from "../ui/Error";
 import Search from "../ui/Search";
 
 type Props = {
@@ -178,11 +179,7 @@ export default function IGOpsStudies(props: Props) {
         </>
       )}
 
-      {errorMessage && (
-        <Alert type="error">
-          <AlertMessage>{errorMessage}</AlertMessage>
-        </Alert>
-      )}
+      {errorMessage && <Error message={errorMessage} />}
 
       {isLoading && <Loading message="Loading studies..." />}
 

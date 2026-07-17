@@ -296,7 +296,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Title of the contract"
             />
-            {errors.title && <span className={styles["form-error"]}>{errors.title.message}</span>}
+            {errors.title && <Error message={errors.title.message} />}
           </div>
 
           <div className={"field"}>
@@ -314,9 +314,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Enter organisation signatory email"
             />
-            {errors.organisationSignatory && (
-              <span className={styles["form-error"]}>{errors.organisationSignatory.message}</span>
-            )}
+            {errors.organisationSignatory && <Error message={errors.organisationSignatory.message} />}
           </div>
 
           <div className={"field"}>
@@ -330,7 +328,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="e.g. Alice Smith, bob@example.com, NHS England"
             />
-            {errors.otherSignatories && <span className={styles["form-error"]}>{errors.otherSignatories.message}</span>}
+            {errors.otherSignatories && <Error message={errors.otherSignatories.message} />}
           </div>
 
           <div className={"field"}>
@@ -346,7 +344,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Enter the other party in the contract (e.g. an organisation or a person)"
             />
-            {errors.thirdPartyName && <span className={styles["form-error"]}>{errors.thirdPartyName.message}</span>}
+            {errors.thirdPartyName && <Error message={errors.thirdPartyName.message} />}
           </div>
 
           <div className={"field"}>
@@ -361,7 +359,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               <option value="active">Active</option>
               <option value="closed">Closed</option>
             </select>
-            {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
+            {errors.status && <Error message={errors.status.message} />}
           </div>
 
           <div className={"field"}>
@@ -374,7 +372,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               })}
               className={styles["form-input"]}
             />
-            {errors.startDate && <span className={styles["form-error"]}>{errors.startDate.message}</span>}
+            {errors.startDate && <Error message={errors.startDate.message} />}
           </div>
 
           <div className={"field"}>
@@ -387,7 +385,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               })}
               className={styles["form-input"]}
             />
-            {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
+            {errors.expiryDate && <Error message={errors.expiryDate.message} />}
           </div>
 
           <div className={"field"}>
@@ -402,7 +400,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               This is the date until when you are required to keep the contract. eg. if the period is 5 years, enter the
               date 5 years from the expiry date
             </HelperText>
-            {errors.retentionEndDate && <span className={styles["form-error"]}>{errors.retentionEndDate.message}</span>}
+            {errors.retentionEndDate && <Error message={errors.retentionEndDate.message} />}
           </div>
         </div>
 

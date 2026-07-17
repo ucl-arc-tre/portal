@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import { putUsersByUserIdAttributes } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";
+import Error from "@/components/ui/Error";
 
 type Props = {
   userId: string;
@@ -70,7 +71,7 @@ export default function ChosenNameForm(props: Props) {
           />
         </div>
 
-        {errorMessage && <div className={styles.error}>{errorMessage}</div>}
+        {errorMessage && <Error message={errorMessage} />}
 
         <div className={styles["button-group"]}>
           <Button

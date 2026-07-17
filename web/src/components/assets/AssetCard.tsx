@@ -1,6 +1,6 @@
 import { Asset } from "@/openapi";
 import styles from "./AssetCard.module.css";
-import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
+import { AlertCircleIcon } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";

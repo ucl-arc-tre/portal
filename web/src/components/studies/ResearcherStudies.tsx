@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import Loading from "../ui/Loading";
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import Error from "../ui/Error";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -50,11 +50,7 @@ export default function ResearcherStudies(props: Props) {
   if (!userData) return null;
 
   if (error) {
-    return (
-      <Alert type="error">
-        <AlertMessage>{error}</AlertMessage>
-      </Alert>
-    );
+    return <Error message={error} />;
   }
 
   if (isLoading) {

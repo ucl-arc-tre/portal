@@ -1,5 +1,6 @@
 import { Control, Controller, FieldErrors, UseFormRegister, useFieldArray } from "react-hook-form";
-import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../../shared/uikitExports";
+import { Input, HelperText, Textarea, Label } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import sharedStyles from "./StudyFormShared.module.css";
 import UserLookup from "@/components/shared/UserLookup";
 
@@ -38,11 +39,7 @@ export default function StudyFormStep1({ control, errors, register, ownerUsernam
             Study title must be 4-50 characters, start and end with a letter/number, only letters, numbers, spaces, and
             hyphens allowed
           </HelperText>
-          {errors.title && (
-            <Alert type="error">
-              <AlertMessage>{errors.title.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.title && <Error message={errors.title.message} />}
         </Label>
 
         <Label htmlFor="description">
@@ -59,11 +56,7 @@ export default function StudyFormStep1({ control, errors, register, ownerUsernam
             }}
             render={({ field }) => <Textarea {...field} id="description" />}
           />
-          {errors.description && (
-            <Alert type="error">
-              <AlertMessage>{errors.description.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.description && <Error message={errors.description.message} />}
         </Label>
       </fieldset>
 
@@ -101,11 +94,7 @@ export default function StudyFormStep1({ control, errors, register, ownerUsernam
               filterExcludeUsername={ownerUsername}
               limit={1} // only a single admin can be added
             />
-            {errors.additionalStudyAdminUsernames && (
-              <Alert type="error">
-                <AlertMessage>{errors.additionalStudyAdminUsernames.message}</AlertMessage>
-              </Alert>
-            )}
+            {errors.additionalStudyAdminUsernames && <Error message={errors.additionalStudyAdminUsernames.message} />}
           </fieldset>
         </Label>
 
@@ -118,11 +107,7 @@ export default function StudyFormStep1({ control, errors, register, ownerUsernam
             render={({ field }) => <Input {...field} type="text" id="controller" placeholder={`e.g. "UCL"`} />}
           />
           <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
-          {errors.dataControllerOrganisation && (
-            <Alert type="error">
-              <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.dataControllerOrganisation && <Error message={errors.dataControllerOrganisation.message} />}
         </Label>
       </fieldset>
     </>

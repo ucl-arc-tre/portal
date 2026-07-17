@@ -1,6 +1,7 @@
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import { ProjectFormData } from "@/types/projects";
 import { ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
@@ -175,11 +176,7 @@ export default function ProjectFormTREStep(props: Props) {
                           ))}
                         </select>
                       )}
-                      {fieldState.error && (
-                        <Alert type="error">
-                          <AlertMessage>{fieldState.error.message}</AlertMessage>
-                        </Alert>
-                      )}
+                      {fieldState.error && <Error message={fieldState.error.message} />}
                     </div>
                   )}
                 />
@@ -356,11 +353,7 @@ export default function ProjectFormTREStep(props: Props) {
                         placeholder="192.168.0.1 or example.ucl.ac.uk"
                         disabled={fieldsDisabled}
                       />
-                      {fieldState.error && (
-                        <Alert type="error">
-                          <AlertMessage>{fieldState.error.message}</AlertMessage>
-                        </Alert>
-                      )}
+                      {fieldState.error && <Error message={fieldState.error.message} />}
                     </div>
                   )}
                 />

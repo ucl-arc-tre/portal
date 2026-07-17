@@ -10,6 +10,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 import Box from "@/components/ui/Box";
+import Error from "@/components/ui/Error";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 export default function ManageProjectPage() {
@@ -54,7 +55,7 @@ export default function ManageProjectPage() {
     return (
       <div className="container">
         <Title text={!user ? "Not found" : "Error"} />
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <Error message={error} />}
         <Button onClick={() => router.push("/people")} variant="secondary">
           Back to People
         </Button>
@@ -83,7 +84,7 @@ export default function ManageProjectPage() {
 
       <div className="content">
         <Box>
-          <div className={styles.field}>
+          <div>
             <label>Chosen name:</label>
             <span>{user.chosen_name ?? "Unset"}</span>
           </div>

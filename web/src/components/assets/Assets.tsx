@@ -10,7 +10,7 @@ import AssetCard from "./AssetCard";
 import styles from "./Assets.module.css";
 import { InfoIcon } from "../shared/uikitExports";
 import Box from "../ui/Box";
-import Error from "../ui/Error";
+import ErrorMessage from "../ui/Error";
 import { AssetDefinition } from "../shared/entityDefinitions";
 
 type AssetsProps = {
@@ -89,7 +89,7 @@ export default function Assets(props: AssetsProps) {
             </>
           )}
         </div>
-        {error && <Error message={error} />}
+        {error && <ErrorMessage message={error} />}
 
         {infoCalloutExpanded && <AssetDefinition />}
 

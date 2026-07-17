@@ -2,7 +2,6 @@ import {
   deleteStudiesByStudyIdContractsByContractIdObjectsByContractObjectId,
   getStudiesByStudyIdContractsByContractIdObjectsByContractObjectId,
 } from "@/openapi";
-import { Alert, AlertMessage } from "../shared/uikitExports";
 import Button from "../ui/Button";
 import Error from "../ui/Error";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
