@@ -122,7 +122,8 @@ export default function ProjectFormStep1(props: Props) {
                 return (
                   <>
                     <Callout text="DSH Project management is not supported yet.">
-                      Please use the Share Management Tool within the DSH or open a ticket on{" "}
+                      If you would like to edit an existing project, please use the Share Management Tool within the DSH
+                      or to create a new DSH project (also known as a share), open a ticket on{" "}
                       <Link
                         href="https://myservices.ucl.ac.uk/self-service/requests/new/select_template?from=wizard&service_id=1473&service_instance_id=3892"
                         target="_blank"
