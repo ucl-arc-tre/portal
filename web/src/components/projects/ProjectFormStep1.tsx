@@ -1,10 +1,12 @@
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import Link from "next/link";
 import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
 import Button from "../ui/Button";
 import { Asset, Environment, Study } from "@/openapi";
 import { getProjectNameValidation } from "./lib/projects";
 import styles from "./ProjectFormStep1.module.css";
 import { ProjectFormData } from "@/types/projects";
+import Callout from "../ui/Callout";
 
 type Props = {
   approvedStudies: Study[];
@@ -84,15 +86,12 @@ export default function ProjectFormStep1(props: Props) {
                 ? "Error loading environments"
                 : "Select an environment..."}
           </option>
-          {/* TODO: Remove this filter once DSH project creation is supported */}
           {environments &&
-            environments
-              .filter((environment) => environment.name !== "Data Safe Haven")
-              .map((environment) => (
-                <option key={environment.id} value={environment.id}>
-                  {environment.name} (Tier {environment.tier})
-                </option>
-              ))}
+            environments.map((environment) => (
+              <option key={environment.id} value={environment.id}>
+                {environment.name} (Tier {environment.tier})
+              </option>
+            ))}
         </select>
         {environmentsError && (
           <Alert type="error">
@@ -121,15 +120,28 @@ export default function ProjectFormStep1(props: Props) {
                 );
               case "Data Safe Haven":
                 return (
-                  <div className={styles["environment-docs"]}>
-                    <a
-                      href="https://www.ucl.ac.uk/isd/services/file-storage-sharing/data-safe-haven-dsh"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View DSH documentation
-                    </a>
-                  </div>
+                  <>
+                    <Callout text="DSH Project management is not supported yet.">
+                      If you would like to edit an existing project, please use the Share Management Tool within the DSH
+                      or to create a new DSH project (also known as a share), open a ticket on{" "}
+                      <Link
+                        href="https://myservices.ucl.ac.uk/self-service/requests/new/select_template?from=wizard&service_id=1473&service_instance_id=3892"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        MyServices
+                      </Link>
+                    </Callout>
+                    <div className={styles["environment-docs"]}>
+                      <a
+                        href="https://www.ucl.ac.uk/isd/services/file-storage-sharing/data-safe-haven-dsh"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View DSH documentation
+                      </a>
+                    </div>
+                  </>
                 );
               default:
                 return null;
@@ -169,7 +181,9 @@ export default function ProjectFormStep1(props: Props) {
               id="name"
               type="text"
               placeholder="e.g., myproject"
-              disabled={fieldsDisabled || editing || !selectedEnvironment}
+              disabled={
+                fieldsDisabled || editing || !selectedEnvironment || selectedEnvironment.name === "Data Safe Haven"
+              }
             />
           )}
         />
