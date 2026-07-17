@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import styles from "./TrainingForm.module.css";
 import Button from "../ui/Button";
-import { postUsersByUserIdTraining, TrainingKind, TrainingRecord } from "@/openapi";
+import { postUsersByUserIdTraining, TrainingKind } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
@@ -19,11 +19,11 @@ const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mo
 type TrainingFormProps = {
   userId: string;
   setTrainingDialogOpen: (name: boolean) => void;
-  updateTrainingDateCell: (userId: string, training: TrainingRecord) => void;
+  callback: () => void;
 };
 
 export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
-  const { userId, setTrainingDialogOpen, updateTrainingDateCell } = TrainingFormProps;
+  const { userId, setTrainingDialogOpen, callback } = TrainingFormProps;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AlertType>("warning");
 
@@ -51,14 +51,8 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
         setErrorType("error");
         return;
       }
-
+      callback();
       closeDialog();
-
-      updateTrainingDateCell(userId, {
-        kind: trainingKind as TrainingKind,
-        completed_at: trainingDisplayDate,
-        is_valid: response.data?.is_valid || false,
-      });
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit training update. Please try again.");

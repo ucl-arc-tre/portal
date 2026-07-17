@@ -8,18 +8,18 @@ import Error from "@/components/ui/Error";
 
 type Props = {
   userId: string;
-  currentChosenName: string;
+  currentChosenName?: string;
   setChosenNameDialogOpen: (open: boolean) => void;
-  updateChosenNameCell: (userId: string, chosenName: string) => void;
+  callback: () => void;
 };
 
 export default function ChosenNameForm(props: Props) {
-  const { userId, currentChosenName, setChosenNameDialogOpen, updateChosenNameCell } = props;
+  const { userId, currentChosenName, setChosenNameDialogOpen, callback } = props;
   const [chosenName, setChosenName] = useState(currentChosenName || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMessage("");
@@ -39,7 +39,7 @@ export default function ChosenNameForm(props: Props) {
         setErrorMessage(errorMsg);
         return;
       }
-      updateChosenNameCell(userId, chosenName);
+      callback();
       setChosenNameDialogOpen(false);
     } catch (error) {
       console.error("Failed to update chosen name:", error);

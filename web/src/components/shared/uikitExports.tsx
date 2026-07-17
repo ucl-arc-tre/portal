@@ -50,3 +50,7 @@ export const HelperText = dynamic(() => import("uikit-react-public").then((mod) 
 export const Textarea = dynamic(() => import("uikit-react-public").then((mod) => mod.Textarea), {
   ssr: false,
 });
+
+export const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
+  ssr: false,
+});

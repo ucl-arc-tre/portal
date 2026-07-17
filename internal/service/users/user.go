@@ -245,8 +245,7 @@ func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, e
 
 func (s *Service) UserDataById(userId uuid.UUID) (*openapi.UserData, error) {
 	user := types.User{}
-
-	if err := s.db.First(&user).Error; err != nil {
+	if err := s.db.Where("id = ?", userId).First(&user).Error; err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to find user")
 	}
 	return s.userData(user)

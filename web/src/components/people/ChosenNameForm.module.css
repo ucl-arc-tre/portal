@@ -1,6 +1,5 @@
 .chosen-name-dialog {
-  width: 100%;
-  max-width: 28rem;
+  width: 40rem;
 }
 
 .form {
@@ -53,10 +52,4 @@
 .button-group button {
   margin: 0;
   vertical-align: middle;
-}
-
-@media (width >= 768px) {
-  .chosen-name-dialog {
-    width: 28rem;
-  }
 }
