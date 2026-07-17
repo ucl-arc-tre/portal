@@ -14,7 +14,8 @@ import {
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
+import Error from "../ui/Error";
+import { HelperText, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
   title: string;
@@ -524,11 +525,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             Cancel
           </Button>
         </div>
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <Error message={error} />}
       </form>
     </Dialog>
   );

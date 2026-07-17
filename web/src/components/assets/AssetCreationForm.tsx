@@ -9,6 +9,8 @@ import styles from "./AssetCreationForm.module.css";
 import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
 import { Asset } from "@/openapi";
 import InfoTooltip from "../ui/InfoTooltip";
+import Error from "../ui/Error";
+
 import { assetDataTypeDefinitions } from "../shared/assetDataTypeDefinitions";
 import RadioOptions from "../ui/form/RadioOptions";
 
@@ -230,11 +232,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             aria-invalid={!!errors.title}
             className={errors.title ? styles.error : ""}
           />
-          {errors.title && (
-            <Alert type="error">
-              <AlertMessage>{errors.title.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.title && <Error message={errors.title.message} />}
         </div>
 
         <div className="field">
@@ -250,11 +248,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             aria-invalid={!!errors.description}
             className={errors.description ? styles.error : ""}
           />
-          {errors.description && (
-            <Alert type="error">
-              <AlertMessage>{errors.description.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.description && <Error message={errors.description.message} />}
         </div>
 
         <div className="field">
@@ -269,11 +263,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             className={errors.source ? styles.error : ""}
           />
           <HelperText>Please add where the data asset has come from.</HelperText>
-          {errors.source && (
-            <Alert type="error">
-              <AlertMessage>{errors.source.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.source && <Error message={errors.source.message} />}
         </div>
 
         <div className="field">
@@ -305,11 +295,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <option value="confidential">Confidential</option>
             <option value="highly_confidential">Highly confidential</option>
           </select>
-          {errors.classification_impact && (
-            <Alert type="error">
-              <AlertMessage>{errors.classification_impact.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.classification_impact && <Error message={errors.classification_impact.message} />}
         </div>
 
         <div className="field">
@@ -329,11 +315,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             ))}
           </div>
 
-          {errors.data_types && (
-            <Alert type="error">
-              <AlertMessage>{errors.data_types.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.data_types && <Error message={errors.data_types.message} />}
         </div>
 
         {(dataTypesValue.includes("personal") || dataTypesValue.includes("special_category_personal")) && (
@@ -355,11 +337,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   Identifiable or low confidence of pseudonymisation
                 </option>
               </select>
-              {errors.protection && (
-                <Alert type="error">
-                  <AlertMessage>{errors.protection.message}</AlertMessage>
-                </Alert>
-              )}
+              {errors.protection && <Error message={errors.protection.message} />}
 
               {showUCLGuidanceText && (
                 <div className={styles["ucl-guidance"]}>
@@ -427,11 +405,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                   data which overrides those legitimate interests
                 </option>
               </select>
-              {errors.legal_basis && (
-                <Alert type="error">
-                  <AlertMessage>{errors.legal_basis.message}</AlertMessage>
-                </Alert>
-              )}
+              {errors.legal_basis && <Error message={errors.legal_basis.message} />}
             </div>
           </>
         )}
@@ -462,11 +436,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
               <option value="public_health">Public health</option>
               <option value="legal">Legal claims</option>
             </select>
-            {errors.legal_basis_special && (
-              <Alert type="error">
-                <AlertMessage>{errors.legal_basis_special.message}</AlertMessage>
-              </Alert>
-            )}
+            {errors.legal_basis_special && <Error message={errors.legal_basis_special.message} />}
           </div>
         )}
 
@@ -550,11 +520,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <option value="paper">Paper</option>
             <option value="other">Other</option>
           </select>
-          {errors.format && (
-            <Alert type="error">
-              <AlertMessage>{errors.format.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.format && <Error message={errors.format.message} />}
           {formatValue == "other" && (
             <Alert type="info">
               <AlertMessage>Please add details of the format to the asset description</AlertMessage>
@@ -585,11 +551,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
               aria-invalid={!!errors.expires_at}
               className={errors.expires_at ? styles.error : ""}
             />
-            {errors.expires_at && (
-              <Alert type="error">
-                <AlertMessage>{errors.expires_at.message}</AlertMessage>
-              </Alert>
-            )}
+            {errors.expires_at && <Error message={errors.expires_at.message} />}
           </div>
         )}
 
@@ -624,11 +586,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
             ))}
           </div>
 
-          {errors.locations && (
-            <Alert type="error">
-              <AlertMessage>{errors.locations.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.locations && <Error message={errors.locations.message} />}
         </div>
 
         <RadioOptions
@@ -679,18 +637,10 @@ export default function AssetCreationForm(props: AssetFormProps) {
             <option value="active">Active</option>
             <option value="destroyed">Destroyed</option>
           </select>
-          {errors.status && (
-            <Alert type="error">
-              <AlertMessage>{errors.status.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.status && <Error message={errors.status.message} />}
         </div>
 
-        {errorMessage && (
-          <Alert type="error" className={styles.alert}>
-            <AlertMessage>{errorMessage}</AlertMessage>
-          </Alert>
-        )}
+        {errorMessage && <Error message={errorMessage} />}
 
         {successMessage && (
           <Alert type="success" className={styles.alert}>

@@ -8,8 +8,9 @@ import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
-import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
+import { InfoIcon } from "../shared/uikitExports";
 import Box from "../ui/Box";
+import Error from "../ui/Error";
 import { AssetDefinition } from "../shared/entityDefinitions";
 
 type AssetsProps = {
@@ -88,11 +89,7 @@ export default function Assets(props: AssetsProps) {
             </>
           )}
         </div>
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <Error message={error} />}
 
         {infoCalloutExpanded && <AssetDefinition />}
 

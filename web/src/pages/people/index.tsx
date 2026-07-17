@@ -11,7 +11,6 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, HelperText } from "@/components/shared/uikitExports";
 import UserDataTable from "@/components/people/UserDataTable";
-import Callout from "@/components/ui/Callout";
 import dynamic from "next/dynamic";
 import Search from "@/components/ui/Search";
 
@@ -87,12 +86,11 @@ export default function PeoplePage() {
   }
 
   return (
-    <>
+    <div className="content">
       <MetaHead
         title="People | ARC Services Portal"
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
-      <Callout construction />
 
       <Title
         text={"People"}
@@ -157,6 +155,6 @@ export default function PeoplePage() {
             />
           </>
         ))}
-    </>
+    </div>
   );
 }

@@ -11,7 +11,8 @@ import {
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
-import { AlertMessage, Alert, IconButton, XIcon } from "../shared/uikitExports";
+import Error from "../ui/Error";
+import { IconButton, XIcon } from "../shared/uikitExports";
 import router from "next/router";
 
 export default function UserTasks() {
@@ -106,11 +107,7 @@ export default function UserTasks() {
         )}
       </div>
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={error} />}
 
       {needToCompleteProfile ? (
         <div className={styles["setup-prompt"]}>

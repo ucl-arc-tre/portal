@@ -4,6 +4,7 @@ import {
 } from "@/openapi";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 import Button from "../ui/Button";
+import Error from "../ui/Error";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 import { useState } from "react";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -118,11 +119,7 @@ export default function ContractObjectCard(props: ContractObjectCardProps) {
     >
       <>
         <span>Created at: {createdAt}</span>
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <Error message={error} />}
         {showDeleteModal && (
           <ConfirmDeleteModal
             title="Delete File"

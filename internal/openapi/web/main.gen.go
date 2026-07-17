@@ -2012,6 +2012,9 @@ type ServerInterface interface {
 	// (GET /users/metrics)
 	GetUsersMetrics(c *gin.Context)
 
+	// (GET /users/{userId})
+	GetUsersUserId(c *gin.Context, userId UserIdParam)
+
 	// (PUT /users/{userId}/attributes)
 	PutUsersUserIdAttributes(c *gin.Context, userId UserIdParam)
 
@@ -3447,6 +3450,31 @@ func (siw *ServerInterfaceWrapper) GetUsersMetrics(c *gin.Context) {
 	siw.Handler.GetUsersMetrics(c)
 }
 
+// GetUsersUserId operation middleware
+func (siw *ServerInterfaceWrapper) GetUsersUserId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "userId" -------------
+	var userId UserIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUsersUserId(c, userId)
+}
+
 // PutUsersUserIdAttributes operation middleware
 func (siw *ServerInterfaceWrapper) PutUsersUserIdAttributes(c *gin.Context) {
 
@@ -3584,6 +3612,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/users/invite", wrapper.PostUsersInvite)
 	router.GET(options.BaseURL+"/users/lookup", wrapper.GetUsersLookup)
 	router.GET(options.BaseURL+"/users/metrics", wrapper.GetUsersMetrics)
+	router.GET(options.BaseURL+"/users/:userId", wrapper.GetUsersUserId)
 	router.PUT(options.BaseURL+"/users/:userId/attributes", wrapper.PutUsersUserIdAttributes)
 	router.POST(options.BaseURL+"/users/:userId/training", wrapper.PostUsersUserIdTraining)
 }

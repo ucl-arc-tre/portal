@@ -15,47 +15,53 @@ import (
 	"gorm.io/gorm"
 )
 
+func (s *Service) userData(user types.User) (*openapi.UserData, error) {
+
+	userData := &openapi.UserData{
+		User: openapi.User{
+			Id:       user.ID.String(),
+			Username: string(user.Username),
+		},
+	}
+
+	attributes, err := s.Attributes(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get attributes for user: %w", err)
+	}
+	chosenNameStr := string(attributes.ChosenName)
+	userData.ChosenName = &chosenNameStr
+
+	agreements, err := s.ConfirmedAgreements(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get agreements for user: %w", err)
+	}
+	userData.Agreements.ConfirmedAgreements = agreements
+
+	roles, err := rbac.Roles(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get roles for user: %w", err)
+	}
+	for _, role := range roles {
+		userData.Roles = append(userData.Roles, string(role))
+	}
+
+	trainingRecords, err := s.TrainingRecords(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get training for user: %w", err)
+	}
+	userData.TrainingRecord.TrainingRecords = trainingRecords
+	userData.IsValidApprovedResearcher = confirmedAgreementsIncludeApprovedResearcher(agreements) && trainingRecordsIncludeValidIg(trainingRecords)
+	return userData, nil
+}
+
 func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 	usersData := []openapi.UserData{}
-	// loops through all users given and get training, roles and agreements for each
-
 	for _, user := range users {
-		userData := openapi.UserData{
-			User: openapi.User{
-				Id:       user.ID.String(),
-				Username: string(user.Username),
-			},
-		}
-
-		attributes, err := s.Attributes(user)
+		userData, err := s.userData(user)
 		if err != nil {
-			return usersData, fmt.Errorf("failed to get attributes for user: %w", err)
+			return usersData, err
 		}
-		chosenNameStr := string(attributes.ChosenName)
-		userData.ChosenName = &chosenNameStr
-
-		agreements, err := s.ConfirmedAgreements(user)
-		if err != nil {
-			return usersData, fmt.Errorf("failed to get agreements for user: %w", err)
-		}
-		userData.Agreements.ConfirmedAgreements = agreements
-
-		roles, err := rbac.Roles(user)
-		if err != nil {
-			return usersData, fmt.Errorf("failed to get roles for user: %w", err)
-		}
-		for _, role := range roles {
-			userData.Roles = append(userData.Roles, string(role))
-		}
-
-		trainingRecords, err := s.TrainingRecords(user)
-		if err != nil {
-			return usersData, fmt.Errorf("failed to get training for user: %w", err)
-		}
-		userData.TrainingRecord.TrainingRecords = trainingRecords
-		userData.IsValidApprovedResearcher = confirmedAgreementsIncludeApprovedResearcher(agreements) && trainingRecordsIncludeValidIg(trainingRecords)
-
-		usersData = append(usersData, userData)
+		usersData = append(usersData, *userData)
 	}
 	return usersData, nil
 }
@@ -235,6 +241,15 @@ func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, e
 	}
 
 	return s.usersData(append(portalUsers, entraUsers...))
+}
+
+func (s *Service) UserDataById(userId uuid.UUID) (*openapi.UserData, error) {
+	user := types.User{}
+
+	if err := s.db.First(&user).Error; err != nil {
+		return nil, types.NewErrFromGorm(err, "failed to find user")
+	}
+	return s.userData(user)
 }
 
 func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error) {
