@@ -11,6 +11,11 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+const (
+	JWTScopes       jWTContextKey       = "JWT.Scopes"
+	BasicAuthScopes basicAuthContextKey = "basicAuth.Scopes"
+)
+
 // Defines values for ProjectUpdateStatus.
 const (
 	Deleted  ProjectUpdateStatus = "deleted"
@@ -94,6 +99,12 @@ type VMImagePlatform string
 // InvalidObject defines model for InvalidObject.
 type InvalidObject = Error
 
+// jWTContextKey is the context key for JWT security scheme
+type jWTContextKey string
+
+// basicAuthContextKey is the context key for basicAuth security scheme
+type basicAuthContextKey string
+
 // GetUserStatusParams defines parameters for GetUserStatus.
 type GetUserStatusParams struct {
 	// Username Username of the user to get the status of. e.g. ccxyz@ucl.ac.uk
@@ -134,6 +145,8 @@ type MiddlewareFunc func(c *gin.Context)
 // GetPing operation middleware
 func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 
+	c.Set(string(JWTScopes), []string{"tre:r"})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -159,6 +172,8 @@ func (siw *ServerInterfaceWrapper) PostProjectsProjectName(c *gin.Context) {
 		return
 	}
 
+	c.Set(string(JWTScopes), []string{"tre:w"})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -174,6 +189,8 @@ func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 
 	var err error
 	_ = err
+
+	c.Set(string(JWTScopes), []string{"tre:r"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetUserStatusParams
@@ -198,6 +215,8 @@ func (siw *ServerInterfaceWrapper) GetUserStatus(c *gin.Context) {
 
 // PostVmImages operation middleware
 func (siw *ServerInterfaceWrapper) PostVmImages(c *gin.Context) {
+
+	c.Set(string(JWTScopes), []string{"tre:w"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)

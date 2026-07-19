@@ -83,7 +83,7 @@ export default function ChosenNameForm(props: Props) {
             Cancel
           </Button>
 
-          <Button type="submit" variant="primary" disabled={isSubmitting}>
+          <Button type="submit" variant="primary" disabled={isSubmitting} data-cy="save-name">
             {isSubmitting ? "Saving..." : "Save"}
           </Button>
         </div>

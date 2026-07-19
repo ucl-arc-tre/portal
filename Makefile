@@ -40,8 +40,8 @@ dev-s3:  ## Run a seaweedfs admin server on http://localhost:23646
 	docker exec -it ucl-arc-tre-portal-dev-s3-1 weed admin -adminUser=admin -adminPassword=admin -masters="localhost:9333"
 
 codegen:  ## Run the code generation
-	oapi-codegen -package openapi -generate "gin,types" api/web.yaml > "internal/openapi/web/main.gen.go"
-	oapi-codegen -package openapi -generate "gin,types" api/tre.yaml > "internal/openapi/tre/main.gen.go"
+	oapi-codegen -package openapi -config api/.config.yaml -generate "gin,types" api/web.yaml > "internal/openapi/web/main.gen.go"
+	oapi-codegen -package openapi -config api/.config.yaml -generate "gin,types" api/tre.yaml > "internal/openapi/tre/main.gen.go"
 	oapi-codegen -package openapi -generate "gin,types" api/dsh.yaml > "internal/openapi/dsh/main.gen.go"
 	oapi-codegen -package myservices -generate "client,types" internal/controller/myservices/api.yaml > "internal/controller/myservices/main.gen.go"
 	cd web && npm run openapi-ts

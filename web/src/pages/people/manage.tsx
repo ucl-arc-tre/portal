@@ -76,6 +76,8 @@ export default function ManageUserPage() {
 
   const chosenNameUnset = !user.chosen_name || user.chosen_name === "";
   const userLabel = chosenNameUnset ? user.user.username : user.chosen_name!;
+  const trainingRecords = user.training_record.training_records;
+  const nonBaseRoles = user.roles.filter((role) => !role.includes("base")).sort();
 
   return (
     <>
@@ -105,13 +107,20 @@ export default function ManageUserPage() {
           <div className={styles.field}>
             <label>Chosen name: </label>
             <span>
-              {chosenNameUnset ? "Unset" : user.chosen_name}{" "}
-              {canEdit && <EditIcon onClick={() => setChosenNameDialogOpen(true)} label="Request chosen name change" />}
+              {chosenNameUnset ? "Not set" : user.chosen_name}{" "}
+              {canEdit && (
+                <EditIcon
+                  onClick={() => setChosenNameDialogOpen(true)}
+                  label="Request chosen name change"
+                  cy="edit-name-button"
+                />
+              )}
             </span>
           </div>
 
           <div className={styles.field}>
             <label>Agreements: </label>
+            {user.agreements.confirmed_agreements.length === 0 && "None"}
             {user.agreements.confirmed_agreements.map((agreement) => (
               <div key={agreement.agreement_type} className={styles["agreement"]}>
                 <p>{agreement.agreement_type}</p>
@@ -123,7 +132,8 @@ export default function ManageUserPage() {
           <div className={styles.field}>
             <label>Training: </label>
             <div className={styles.trainingRecord}>
-              {user.training_record.training_records?.map((training) => (
+              {!trainingRecords || (trainingRecords.length === 0 && "None")}
+              {trainingRecords?.map((training) => (
                 <div key={`${training.kind}-${training.completed_at}`} className={styles["training"]}>
                   <p>
                     {getHumanReadableTrainingKind(training.kind)}{" "}
@@ -148,7 +158,12 @@ export default function ManageUserPage() {
             {canEdit && (
               <>
                 <div></div>
-                <Button variant="tertiary" size="small" onClick={() => setTrainingDialogOpen(true)}>
+                <Button
+                  variant="tertiary"
+                  size="small"
+                  onClick={() => setTrainingDialogOpen(true)}
+                  cy="add-training-record"
+                >
                   Add +
                 </Button>
               </>
@@ -158,14 +173,12 @@ export default function ManageUserPage() {
           <div className={styles.field}>
             <label>Roles: </label>
             <div>
-              {(user.roles ?? [])
-                .filter((role) => !role.includes("base"))
-                .sort()
-                .map((role) => (
-                  <p key={role} className={"role " + styles["role"]}>
-                    {role}
-                  </p>
-                ))}
+              {nonBaseRoles.length === 0 && "None"}
+              {nonBaseRoles.map((role) => (
+                <p key={role} className={"role " + styles["role"]}>
+                  {role}
+                </p>
+              ))}
             </div>
           </div>
         </Box>

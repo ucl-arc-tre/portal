@@ -22,6 +22,7 @@ func (s *Service) userData(user types.User) (*openapi.UserData, error) {
 			Id:       user.ID.String(),
 			Username: string(user.Username),
 		},
+		Roles: []string{},
 	}
 
 	attributes, err := s.Attributes(user)

@@ -1,0 +1,3 @@
+# open api codegen configuration
+compatibility:
+  enable-auth-scopes-on-context: true
