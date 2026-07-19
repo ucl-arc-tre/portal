@@ -7,10 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	JWTScopes jWTContextKey = "JWT.Scopes"
+)
+
 // Ping defines model for Ping.
 type Ping struct {
 	Message string `json:"message"`
 }
+
+// jWTContextKey is the context key for JWT security scheme
+type jWTContextKey string
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -37,6 +44,8 @@ type MiddlewareFunc func(c *gin.Context)
 // GetApprovedResearchers operation middleware
 func (siw *ServerInterfaceWrapper) GetApprovedResearchers(c *gin.Context) {
 
+	c.Set(string(JWTScopes), []string{"dsh:r"})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -50,6 +59,8 @@ func (siw *ServerInterfaceWrapper) GetApprovedResearchers(c *gin.Context) {
 // GetApprovedStudies operation middleware
 func (siw *ServerInterfaceWrapper) GetApprovedStudies(c *gin.Context) {
 
+	c.Set(string(JWTScopes), []string{"dsh:r"})
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -62,6 +73,8 @@ func (siw *ServerInterfaceWrapper) GetApprovedStudies(c *gin.Context) {
 
 // GetPing operation middleware
 func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
+
+	c.Set(string(JWTScopes), []string{"dsh:r"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
