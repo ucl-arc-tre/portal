@@ -402,12 +402,12 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 	return s.commitStudyTransaction(tx, &study)
 }
 
-func (s *Service) UpdateStudyOwner(studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
+func (s *Service) UpdateStudyOwner(ctx context.Context, studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
 	study := types.Study{}
-	if err := tx.Where("id = ?", studyUUID).First(&study).Error; err != nil {
+	if err := tx.Preload("Owner").Where("id = ?", studyUUID).First(&study).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to get studies")
 	}
@@ -442,7 +442,24 @@ func (s *Service) UpdateStudyOwner(studyUUID uuid.UUID, user types.User, data op
 		return types.NewErrFromGorm(err, "failed to create StudyOwnerChangeLog record")
 	}
 
-	return commitTransaction(tx)
+	if err := commitTransaction(tx); err != nil {
+		return err
+	}
+	if err := s.notifyOwnerChange(ctx, &study); err != nil {
+		log.Err(err).Msg("Failed to notify owner change") // not fatal
+	}
+	return nil
+}
+
+func (s *Service) notifyOwnerChange(ctx context.Context, study *types.Study) error {
+	if study == nil {
+		return types.NewErrInvalidObject("nil study - cannot notify owner change")
+	}
+	igOpsStaff, err := s.users.UsersWithConfigRole(rbac.IGOpsStaff)
+	if err != nil {
+		return err
+	}
+	return s.notifications.NotifyOwnerChange(ctx, *study, igOpsStaff)
 }
 
 func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {

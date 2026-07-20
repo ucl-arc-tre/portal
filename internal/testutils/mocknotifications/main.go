@@ -47,3 +47,7 @@ func (s *MockNotifications) NotifyStudySignoffExpiry(ctx context.Context, study 
 func (s *MockNotifications) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, study types.Study) error {
 	panic("not-implemented")
 }
+
+func (s *MockNotifications) NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error {
+	panic("not-implemented")
+}
