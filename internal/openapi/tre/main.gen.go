@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	JWTScopes jWTContextKey = "JWT.Scopes"
+	JWTScopes       jWTContextKey       = "JWT.Scopes"
+	BasicAuthScopes basicAuthContextKey = "basicAuth.Scopes"
 )
 
 // Defines values for ProjectUpdateStatus.

@@ -767,7 +767,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			return types.NewErrClientInvalidObjectF("member uid and desktop config must be set")
 		}
 		var rootVolumeGb *uint
-		if v := member.DesktopConfig.RootVolumeGb; v != nil { // #nosec G115 -- volume gb size wont exeed MaxInt
+		if v := member.DesktopConfig.RootVolumeGb; v != nil { // #nosec G115 -- volume gb size wont exceed MaxInt
 			rootVolumeGb = new(uint(*v))
 		}
 		userConfig := types.ProjectTREUserConfig{
