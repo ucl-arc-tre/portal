@@ -38,10 +38,15 @@ export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-e
 export type Profile = {
     username: string;
     chosen_name: string;
+    requested_chosen_name?: string;
 };
 
 export type ProfileUpdate = {
     chosen_name: string;
+};
+
+export type ProfileUpdateResponse = {
+    requires_approval: boolean;
 };
 
 export type Agreement = {
@@ -1028,7 +1033,7 @@ export type PostProfileResponses = {
     /**
      * Successfully updated profile
      */
-    200: Profile;
+    200: ProfileUpdateResponse;
 };
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];

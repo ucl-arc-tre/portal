@@ -29,13 +29,12 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 	if err := bindJSONOrSetError(ctx, &update); err != nil {
 		return
 	}
-	if err := h.users.SetUserChosenName(user, types.ChosenName(update.ChosenName)); err != nil {
+	data, err := h.users.SetUserChosenName(user, types.ChosenName(update.ChosenName))
+	if err != nil {
 		setError(ctx, err, "Failed to update chosen name")
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
-		ChosenName: update.ChosenName,
-	})
+	ctx.JSON(http.StatusOK, data)
 }
 
 func (h *Handler) PostProfileAgreements(ctx *gin.Context) {

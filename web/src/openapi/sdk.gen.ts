@@ -63,7 +63,7 @@ export const postFeedback = <ThrowOnError extends boolean = false>(options: Opti
 export const getProfile = <ThrowOnError extends boolean = false>(options?: Options<GetProfileData, ThrowOnError>): RequestResult<GetProfileResponses, GetProfileErrors, ThrowOnError> => (options?.client ?? client).get<GetProfileResponses, GetProfileErrors, ThrowOnError>({ url: '/profile', ...options });
 
 /**
- * Update own profile chosen name
+ * Update own profile
  */
 export const postProfile = <ThrowOnError extends boolean = false>(options: Options<PostProfileData, ThrowOnError>): RequestResult<PostProfileResponses, PostProfileErrors, ThrowOnError> => (options.client ?? client).post<PostProfileResponses, PostProfileErrors, ThrowOnError>({
     url: '/profile',

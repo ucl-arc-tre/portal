@@ -30,7 +30,7 @@ func (m *MockUsers) Attributes(user types.User) (types.UserAttributes, error) {
 	panic("not implemented")
 }
 
-func (m *MockUsers) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
+func (m *MockUsers) SetUserChosenName(user types.User, chosenName types.ChosenName) (*openapi.ProfileUpdateResponse, error) {
 	panic("not implemented")
 }
 

@@ -170,7 +170,7 @@ func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
 		return
 	}
 
-	if err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
+	if _, err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
 		setError(ctx, err, "Failed to update chosen name")
 		return
 	}

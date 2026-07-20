@@ -103,7 +103,7 @@ paths:
         default:
           description: Unexpected error
     post:
-      description: Update own profile chosen name
+      description: Update own profile
       requestBody:
         required: true
         content:
@@ -116,7 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Profile"
+                $ref: "#/components/schemas/ProfileUpdateResponse"
         "500":
           description: Internal server error
         default:
@@ -1467,6 +1467,8 @@ components:
           type: string
         chosen_name:
           type: string
+        requested_chosen_name:
+          type: string
 
     ProfileUpdate:
       type: object
@@ -1475,6 +1477,14 @@ components:
       properties:
         chosen_name:
           type: string
+
+    ProfileUpdateResponse:
+      type: object
+      required:
+        - requires_approval
+      properties:
+        requires_approval:
+          type: boolean
 
     Agreement:
       type: object

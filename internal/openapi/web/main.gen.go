@@ -1153,8 +1153,9 @@ type NotificationsReadAll struct {
 
 // Profile defines model for Profile.
 type Profile struct {
-	ChosenName string `json:"chosen_name"`
-	Username   string `json:"username"`
+	ChosenName          string  `json:"chosen_name"`
+	RequestedChosenName *string `json:"requested_chosen_name,omitempty"`
+	Username            string  `json:"username"`
 }
 
 // ProfileTraining defines model for ProfileTraining.
@@ -1185,6 +1186,11 @@ type ProfileTrainingUpdate struct {
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
+}
+
+// ProfileUpdateResponse defines model for ProfileUpdateResponse.
+type ProfileUpdateResponse struct {
+	RequiresApproval bool `json:"requires_approval"`
 }
 
 // Project A project with base details (environment-agnostic)
