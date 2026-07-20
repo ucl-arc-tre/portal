@@ -220,7 +220,12 @@ components:
             description: Email of TRE API user
         usernames:
           type: object
-          description: Mapping of emails to userids
+          description: Mapping of user emails to userids
+          additionalProperties:
+            type: string
+        user_principals:
+          type: object
+          description: Mapping of principal emails to user emails
           additionalProperties:
             type: string
         uids:

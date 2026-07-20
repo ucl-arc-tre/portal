@@ -124,7 +124,10 @@ type Project struct {
 	Uids      map[string]int `json:"uids"`
 	Uploaders []string       `json:"uploaders"`
 
-	// Usernames Mapping of emails to userids
+	// UserPrincipals Mapping of principal emails to user emails
+	UserPrincipals *map[string]string `json:"user_principals,omitempty"`
+
+	// Usernames Mapping of user emails to userids
 	Usernames map[string]string `json:"usernames"`
 }
 

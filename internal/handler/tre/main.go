@@ -107,6 +107,7 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 		EncryptionKeyEnabled:          projectTRE.ExternalEncryptionEnabled,
 		Owners:                        projectOwners(projectTRE),
 		Usernames:                     map[string]string{},                      // Filled below
+		UserPrincipals:                &map[string]string{},                     // Filled below
 		Uids:                          map[string]int{},                         // Filled below
 		ApiUsers:                      []string{},                               // Filled below
 		Uploaders:                     []string{},                               // Filled below
@@ -132,6 +133,7 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 		// User identities
 		project.Usernames[username] = string(config.User.Username.LocalPart())
 		project.Uids[username] = int(config.UID)
+		// TODO: populate project.UserPrincipals
 
 		// Desktop instance types
 		desktopInstanceType := openapi.DesktopInstanceType{}
