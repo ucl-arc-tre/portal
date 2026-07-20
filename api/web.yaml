@@ -1455,6 +1455,7 @@ components:
         - iaa-assignment
         - study-affirmation
         - study-review
+        - study-owner-change
 
     Profile:
       type: object

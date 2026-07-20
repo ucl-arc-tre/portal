@@ -326,7 +326,7 @@ func (h *Handler) PostStudiesStudyIdOwnerRequest(ctx *gin.Context, studyId strin
 	}
 
 	user := middleware.GetUser(ctx)
-	if err := h.studies.UpdateStudyOwner(studyUUID, user, data); err != nil {
+	if err := h.studies.UpdateStudyOwner(ctx, studyUUID, user, data); err != nil {
 		setError(ctx, err, "Failed to update study owner")
 		return
 	}

@@ -46,7 +46,7 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
       }
 
       if (responseIsError(response)) {
-        setErrorMessage(`Failed to update study status: ${extractErrorMessage(response)}.`);
+        setErrorMessage(`Failed to edit study owner: ${extractErrorMessage(response)}.`);
       } else {
         setSuccessMessage("Succeeded");
       }
