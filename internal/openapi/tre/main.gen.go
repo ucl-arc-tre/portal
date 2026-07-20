@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	JWTScopes       jWTContextKey       = "JWT.Scopes"
-	BasicAuthScopes basicAuthContextKey = "basicAuth.Scopes"
+	JWTScopes jWTContextKey = "JWT.Scopes"
 )
 
 // Defines values for ProjectUpdateStatus.
@@ -230,7 +229,7 @@ func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 // GetProjects operation middleware
 func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
 
-	c.Set(string(BasicAuthScopes), []string{})
+	c.Set(string(JWTScopes), []string{"tre:r"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)

@@ -73,6 +73,8 @@ paths:
   /projects:
     get:
       description: Get the list of TRE projects
+      security:
+        - JWT: ["tre:r"]
       responses:
         "200":
           description: List of TRE projects
