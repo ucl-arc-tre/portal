@@ -9,10 +9,36 @@ import (
 )
 
 // Invite an external user to the portal. Idempotent
-func (s *Service) InviteExternalUser(ctx context.Context, invite entra.Invite) (types.User, error) {
-	if username := types.Username(invite.Recipient); !username.IsValid() {
+func (s *Service) InviteUser(ctx context.Context, invite entra.Invite) (types.User, error) {
+	username := types.Username(invite.Recipient)
+	if !username.IsValid() {
 		return types.User{}, types.NewErrInvalidObjectF("[%s] was not a valid username", invite.Recipient)
-	} else if !entra.IsExternalUsername(username) {
+	}
+	if entra.IsExternalUsername(username) {
+		return s.inviteExternalUser(ctx, invite)
+	}
+	return s.inviteInternalUser(ctx, invite)
+}
+
+func (s *Service) inviteInternalUser(ctx context.Context, invite entra.Invite) (types.User, error) {
+	username := types.Username(invite.Recipient)
+	if entra.IsExternalUsername(username) {
+		return types.User{}, types.NewErrInvalidObjectF("[%s] was an external username", invite.Recipient)
+	}
+
+	invitedUser, err := s.PersistedUser(username)
+	if err != nil {
+		return types.User{}, err
+	}
+	if _, err = s.entra.SendInvite(ctx, invite); err != nil {
+		return invitedUser, err
+	}
+	return invitedUser, nil
+}
+
+func (s *Service) inviteExternalUser(ctx context.Context, invite entra.Invite) (types.User, error) {
+	username := types.Username(invite.Recipient)
+	if !entra.IsExternalUsername(username) {
 		return types.User{}, types.NewErrInvalidObjectF("[%s] was not an external username", invite.Recipient)
 	}
 

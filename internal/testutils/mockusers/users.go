@@ -43,7 +43,7 @@ func (m *MockUsers) ImportApprovedResearchersCSV(
 	panic("not implemented")
 }
 
-func (m *MockUsers) InviteExternalUser(ctx context.Context, invite entra.Invite) (types.User, error) {
+func (m *MockUsers) InviteUser(ctx context.Context, invite entra.Invite) (types.User, error) {
 	panic("not implemented")
 }
 
