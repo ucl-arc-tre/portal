@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
-import { getUsersByUserId, UserData } from "@/openapi";
+import { getUsersByUserId, putUsersByUserIdAttributes, UserData } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
@@ -52,6 +52,31 @@ export default function ManageUserPage() {
     }
   };
 
+  const handleChosenNameApprove = async () => {
+    if (!userId || typeof userId !== "string" || !user?.requested_chosen_name) return;
+
+    setError("");
+    try {
+      const response = await putUsersByUserIdAttributes({
+        path: {
+          userId: userId,
+        },
+        body: {
+          chosen_name: user.requested_chosen_name,
+        },
+      });
+
+      if (responseIsError(response)) {
+        setError(extractErrorMessage(response));
+        return;
+      }
+      fetchData(userId);
+    } catch (error) {
+      console.error("Failed to update chosen name:", error);
+      setError("Failed to update chosen name. Please try again.");
+    }
+  };
+
   useEffect(() => {
     if (userIdIsSet) {
       fetchData(userId);
@@ -78,6 +103,7 @@ export default function ManageUserPage() {
   const userLabel = chosenNameUnset ? user.user.username : user.chosen_name!;
   const trainingRecords = user.training_record.training_records;
   const nonBaseRoles = user.roles.filter((role) => !role.includes("base")).sort();
+  const hasRequestedChosenName = user.chosen_name === user.requested_chosen_name;
 
   return (
     <>
@@ -117,6 +143,26 @@ export default function ManageUserPage() {
               )}
             </span>
           </div>
+
+          {user.requested_chosen_name && !hasRequestedChosenName && canEdit && (
+            <div className={styles.field}>
+              <label>Requested chosen name: </label>
+              <span>
+                {user.requested_chosen_name}{" "}
+                {canEdit && (
+                  <Button
+                    size="xsmall"
+                    variant="secondary"
+                    onClick={handleChosenNameApprove}
+                    label="Approve chosen name change"
+                    cy="approve-name-change-button"
+                  >
+                    Approve
+                  </Button>
+                )}
+              </span>
+            </div>
+          )}
 
           <div className={styles.field}>
             <label>Agreements: </label>

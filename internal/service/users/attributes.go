@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/rs/zerolog/log"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users/strutil"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -19,29 +21,51 @@ func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 	return attrs, types.NewErrFromGorm(result.Error)
 }
 
-func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) (*openapi.ProfileUpdateResponse, error) {
-	if isValid := chosenNamePattern.MatchString(string(chosenName)) || chosenName == ""; !isValid {
-		return nil, types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", chosenName))
+func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*openapi.ProfileUpdateResponse, error) {
+	if isValid := chosenNamePattern.MatchString(data.ChosenName) || data.ChosenName == ""; !isValid {
+		return nil, types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", data.ChosenName))
 	}
-	attrs := types.UserAttributes{UserID: user.ID}
-
-	findResult := s.db.Where(&attrs).Limit(1).Find(&attrs)
-	if err := findResult.Error; err != nil {
+	attrs := types.UserAttributes{UserID: user.ID, User: user}
+	if err := s.db.Where(&attrs).Limit(1).Find(&attrs).Error; err != nil {
 		return nil, types.NewErrFromGorm(err, "failed to find user attributes")
 	}
-
+	requestedChosenName := types.ChosenName(data.ChosenName)
 	response := openapi.ProfileUpdateResponse{}
 	var err error
-	if nameChangeRequiresApproval(attrs.ChosenName, chosenName) {
+	if nameChangeRequiresApproval(attrs.ChosenName, requestedChosenName) {
 		response.RequiresApproval = true
-		attrs.RequestedChosenName = &chosenName
+		attrs.RequestedChosenName = &requestedChosenName
 		err = s.db.Model(&attrs).Where("id = ?", attrs.ID).Updates(&attrs).Error
+
+		if err := s.notifyUserNameChange(attrs); err != nil {
+			log.Err(err).Msg("Failed to notify user name change") // not fatal
+		}
 	} else {
 		response.RequiresApproval = false
-		attrs.ChosenName = chosenName
-		err = s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName}).FirstOrCreate(&attrs).Error
+		attrs.ChosenName = requestedChosenName
+		err = s.db.Model(&attrs).Where("user_id = ?", user.ID).Assign(types.UserAttributes{
+			ChosenName:          requestedChosenName,
+			RequestedChosenName: &requestedChosenName,
+		}).FirstOrCreate(&attrs).Error
 	}
 	return &response, types.NewErrFromGorm(err)
+}
+
+func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
+	if isValid := chosenNamePattern.MatchString(string(chosenName)) || chosenName == ""; !isValid {
+		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", chosenName))
+	}
+	attrs := types.UserAttributes{UserID: user.ID}
+	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName}).FirstOrCreate(&attrs).Error
+	return types.NewErrFromGorm(err, "failed to set chosen name")
+}
+
+func (s *Service) notifyUserNameChange(attrs types.UserAttributes) error {
+	recipients, err := s.UsersWithConfigRole(rbac.IGOpsStaff)
+	if err != nil {
+		return err
+	}
+	return s.notifications.NotifyUserNameChange(attrs, recipients)
 }
 
 func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {
@@ -51,8 +75,8 @@ func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {
 }
 
 func nameChangeRequiresApproval(old types.ChosenName, new types.ChosenName) bool {
-	if old == "" || new == "old" {
+	if old == "" || new == old {
 		return false
 	}
-	return strutil.LevenshteinSimilarity(string(old), string(new)) > 0.5
+	return strutil.LevenshteinSimilarity(string(old), string(new)) < 0.5
 }

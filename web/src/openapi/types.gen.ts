@@ -144,6 +144,7 @@ export type UserData = {
     agreements: UserAgreements;
     training_record: ProfileTraining;
     chosen_name?: string;
+    requested_chosen_name?: string;
     is_valid_approved_researcher: boolean;
 };
 

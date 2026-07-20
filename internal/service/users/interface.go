@@ -15,7 +15,8 @@ type Interface interface {
 	ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 	ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgreement, error)
 	Attributes(user types.User) (types.UserAttributes, error)
-	SetUserChosenName(user types.User, chosenName types.ChosenName) (*openapi.ProfileUpdateResponse, error)
+	ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*openapi.ProfileUpdateResponse, error)
+	SetUserChosenName(user types.User, chosenName types.ChosenName) error
 	ImportApprovedResearchersCSV(
 		ctx context.Context,
 		importer types.User,

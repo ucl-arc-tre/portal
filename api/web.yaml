@@ -1638,6 +1638,8 @@ components:
           $ref: "#/components/schemas/ProfileTraining"
         chosen_name:
           type: string
+        requested_chosen_name:
+          type: string
         is_valid_approved_researcher:
           type: boolean
 

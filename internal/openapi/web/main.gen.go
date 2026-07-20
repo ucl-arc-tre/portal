@@ -1648,6 +1648,7 @@ type UserData struct {
 	Agreements                UserAgreements  `json:"agreements"`
 	ChosenName                *string         `json:"chosen_name,omitempty"`
 	IsValidApprovedResearcher bool            `json:"is_valid_approved_researcher"`
+	RequestedChosenName       *string         `json:"requested_chosen_name,omitempty"`
 	Roles                     []string        `json:"roles"`
 	TrainingRecord            ProfileTraining `json:"training_record"`
 	User                      User            `json:"user"`

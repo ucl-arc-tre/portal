@@ -5,6 +5,7 @@ import { putUsersByUserIdAttributes } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";
 import Error from "@/components/ui/Error";
+import { HelperText } from "../shared/uikitExports";
 
 type Props = {
   userId: string;
@@ -51,11 +52,8 @@ export default function ChosenNameForm(props: Props) {
 
   return (
     <Dialog setDialogOpen={() => setChosenNameDialogOpen(false)} className={styles["chosen-name-dialog"]}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <p className={styles["help-text"]}>
-          Please only update a user&apos;s chosen name if they have submitted a request through My Services.
-        </p>
-        <div className={styles["form-group"]}>
+      <form onSubmit={handleSubmit} className="form">
+        <div className="field">
           <label htmlFor="chosenName" className={styles.label}>
             Chosen Name
           </label>
@@ -69,6 +67,9 @@ export default function ChosenNameForm(props: Props) {
             maxLength={100}
             className={styles.input}
           />
+          <HelperText>
+            Please only update a user&apos;s chosen name if they have submitted a request through My Services.
+          </HelperText>
         </div>
 
         {errorMessage && <Error message={errorMessage} />}

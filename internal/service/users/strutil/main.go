@@ -19,7 +19,7 @@ type Levenshtein struct {
 // Compute the Levenshtein similarity between two strings. Returns a value
 // between 0 (different) and 1 (identical)
 func LevenshteinSimilarity(a string, b string) float64 {
-	m := Levenshtein{}
+	m := Levenshtein{InsertCost: 1, DeleteCost: 1, ReplaceCost: 1}
 	distance, maxLen := m.distance(a, b)
 	return 1 - float64(distance)/float64(maxLen)
 }

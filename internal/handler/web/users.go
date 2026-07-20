@@ -153,7 +153,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 }
 
 func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
-	var requestBody openapi.PutUsersUserIdAttributesJSONRequestBody
+	var requestBody openapi.PutUsersUserIdAttributesJSONBody
 	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
 		return
 	}
@@ -170,7 +170,7 @@ func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
 		return
 	}
 
-	if _, err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
+	if err := h.users.SetUserChosenName(*targetUser, types.ChosenName(requestBody.ChosenName)); err != nil {
 		setError(ctx, err, "Failed to update chosen name")
 		return
 	}
