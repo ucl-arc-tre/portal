@@ -1,4 +1,5 @@
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import Error from "@/components/ui/Error";
+import { Alert } from "@/components/shared/uikitExports";
 import styles from "./StudyAffirmation.module.css";
 import { useState } from "react";
 import { postStudiesByStudyIdSignoff } from "@/openapi";
@@ -79,11 +80,7 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
           </label>
         </div>
 
-        {affirmationError && (
-          <Alert type="error">
-            <AlertMessage>{affirmationError}</AlertMessage>
-          </Alert>
-        )}
+        {affirmationError && <Error message={affirmationError} />}
 
         <div className={styles["signoff-button-container"]}>
           <Button

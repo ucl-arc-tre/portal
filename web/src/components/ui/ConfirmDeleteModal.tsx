@@ -1,6 +1,6 @@
 import Dialog from "./Dialog";
 import Button from "./Button";
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import Error from "./Error";
 import styles from "./ConfirmDeleteModal.module.css";
 
 type ConfirmDeleteModalProps = {
@@ -26,11 +26,7 @@ export default function ConfirmDeleteModal({
         <h2>{title}</h2>
         <div className={styles.message}>{message}</div>
 
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <Error message={error} />}
 
         <div className={styles.actions}>
           <Button onClick={onCancel} variant="secondary" disabled={isDeleting}>

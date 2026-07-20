@@ -5,7 +5,7 @@ import AgreementForm from "@/components/ui/agreements/AgreementForm";
 import AgreementText from "@/components/ui/agreements/AgreementText";
 import styles from "./StudyAgreement.module.css";
 import { useAuth } from "@/hooks/useAuth";
-import { AlertMessage, Alert } from "../../shared/uikitExports";
+import ErrorMessage from "../../ui/Error";
 import Loading from "../../ui/Loading";
 
 type StudyAgreementProps = {
@@ -80,11 +80,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
         Study {studyRole} Agreement for study: {studyTitle}
       </h2>
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <ErrorMessage message={error} />}
 
       <AgreementText text={studyAgreementText.text} />
       <AgreementForm

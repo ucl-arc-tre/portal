@@ -6,7 +6,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import AgreementForm from "../../ui/agreements/AgreementForm";
 import AgreementText from "../../ui/agreements/AgreementText";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import ErrorMessage from "@/components/ui/Error";
 
 type ApprovedResearcherAgreementProps = {
   setAgreementCompleted: (completed: boolean) => void;
@@ -63,12 +63,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
 
   if (authInProgress || isLoadingAgreement) return null;
 
-  if (error)
-    return (
-      <Alert type="error">
-        <AlertMessage>{error}</AlertMessage>
-      </Alert>
-    );
+  if (error) return <ErrorMessage message={error} />;
 
   if (!agreement) return <div>No agreements could be found.</div>;
 

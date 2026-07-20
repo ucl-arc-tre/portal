@@ -1,5 +1,6 @@
 import { Control, Controller, FieldErrors, useWatch } from "react-hook-form";
 import { Alert, AlertMessage, HelperText, Label } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep3.module.css";
 import { UclDpoId } from "./lib/studyFormUtils";
@@ -96,13 +97,13 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
               />
             </div>
             {(errors.dataProtectionPrefix || errors.dataProtectionDate || errors.dataProtectionId) && (
-              <Alert type="error">
-                <AlertMessage>
-                  {errors.dataProtectionPrefix?.message ||
-                    errors.dataProtectionDate?.message ||
-                    errors.dataProtectionId?.message}
-                </AlertMessage>
-              </Alert>
+              <Error
+                message={
+                  errors.dataProtectionPrefix?.message ||
+                  errors.dataProtectionDate?.message ||
+                  errors.dataProtectionId?.message
+                }
+              />
             )}
           </Label>
         </>

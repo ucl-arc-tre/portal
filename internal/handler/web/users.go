@@ -25,6 +25,19 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 	ctx.JSON(http.StatusOK, users)
 }
 
+func (h *Handler) GetUsersUserId(ctx *gin.Context, userId string) {
+	id, err := parseUUIDOrSetError(ctx, userId)
+	if err != nil {
+		return
+	}
+	userData, err := h.users.UserDataById(id)
+	if err != nil {
+		setError(ctx, err, "Failed to find users")
+		return
+	}
+	ctx.JSON(http.StatusOK, userData)
+}
+
 func (h *Handler) GetUsersLookup(ctx *gin.Context, params openapi.GetUsersLookupParams) {
 	usersData, err := h.users.Find(ctx, params.Find)
 	if err != nil {

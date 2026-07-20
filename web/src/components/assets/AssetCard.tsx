@@ -1,6 +1,6 @@
 import { Asset } from "@/openapi";
 import styles from "./AssetCard.module.css";
-import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
+import { AlertCircleIcon } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
@@ -8,6 +8,7 @@ import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
 import { calculateRiskScorePerAsset } from "../studies/manage/StudyOverview";
 import Badge from "../ui/Badge";
+import Error from "../ui/Error";
 
 type AssetCardProps = {
   asset: Asset;
@@ -137,11 +138,7 @@ export default function AssetCard(props: AssetCardProps) {
         </div>
       </div>
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={error} />}
     </Card>
   );
 }

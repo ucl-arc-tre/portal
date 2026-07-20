@@ -22,7 +22,7 @@ import { roleLabel } from "@/components/projects/tre/roles";
 import styles from "./ManageProject.module.css";
 import Box from "@/components/ui/Box";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import Error from "@/components/ui/Error";
 import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
@@ -224,7 +224,7 @@ export default function ManageProjectPage() {
     return (
       <div className={styles.container}>
         <Title text="Error" />
-        <p className={styles.error}>{error}</p>
+        <Error message={error} />
         <Button onClick={() => router.push("/projects")} variant="secondary">
           Back to Projects
         </Button>
@@ -236,7 +236,7 @@ export default function ManageProjectPage() {
     return (
       <div className={styles.container}>
         <Title text="Not Found" />
-        <p className={styles.error}>Project not found.</p>
+        <Error message="Project not found." />
         <Button onClick={() => router.push("/projects")} variant="secondary">
           Back to Projects
         </Button>
@@ -459,11 +459,7 @@ export default function ManageProjectPage() {
                 <li>Project configuration</li>
               </ul>
 
-              {deleteError && (
-                <Alert type="error">
-                  <AlertMessage>{deleteError}</AlertMessage>
-                </Alert>
-              )}
+              {deleteError && <Error message={deleteError} />}
 
               <div className={styles["delete-actions"]}>
                 <Button onClick={handleCancelDelete} variant="secondary" disabled={!!deleting}>

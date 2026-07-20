@@ -67,6 +67,7 @@ func addAdminPolicy(enforcer *casbin.Enforcer) {
 func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: TreOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/users/:id", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: WriteAction},
@@ -80,6 +81,7 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: IGOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/users/:id", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id/training", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id/attributes", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/metrics", Action: ReadAction},
@@ -95,6 +97,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: DSHOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/users/:id", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: WriteAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: ReadAction},

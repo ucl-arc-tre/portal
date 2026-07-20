@@ -11,7 +11,7 @@ import {
 } from "@/openapi";
 import { calculateExpiryUrgency } from "@/components/shared/exports";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import Error from "../ui/Error";
 import ProfileSetupSteps from "./ProfileSetupSteps";
 import ProfileSummaryCard from "./ProfileSummaryCard";
 import CertificateReupload from "./CertificateReupload";
@@ -110,11 +110,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
   if (isLoading) return <Loading message="Loading your profile" />;
 
   if (errorMessage) {
-    return (
-      <Alert type="error">
-        <AlertMessage>{errorMessage}</AlertMessage>
-      </Alert>
-    );
+    return <Error message={errorMessage} />;
   }
 
   if (!profileComplete) {

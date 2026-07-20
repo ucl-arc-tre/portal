@@ -1,6 +1,7 @@
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { HelperText } from "../shared/uikitExports";
 import Link from "next/link";
-import { Alert, AlertMessage, HelperText } from "../shared/uikitExports";
+import Error from "../ui/Error";
 import Button from "../ui/Button";
 import { Asset, Environment, Study } from "@/openapi";
 import { getProjectNameValidation } from "./lib/projects";
@@ -62,11 +63,7 @@ export default function ProjectFormStep1(props: Props) {
             </option>
           ))}
         </select>
-        {errors.studyId && (
-          <Alert type="error">
-            <AlertMessage>{`${errors.studyId.message}`}</AlertMessage>
-          </Alert>
-        )}
+        {errors.studyId && <Error message={`${errors.studyId.message}`} />}
         <HelperText>Select the study this project will belong to</HelperText>
       </div>
 
@@ -93,16 +90,8 @@ export default function ProjectFormStep1(props: Props) {
               </option>
             ))}
         </select>
-        {environmentsError && (
-          <Alert type="error">
-            <AlertMessage>{environmentsError}</AlertMessage>
-          </Alert>
-        )}
-        {errors.environmentId && (
-          <Alert type="error">
-            <AlertMessage>{`${errors.environmentId.message}`}</AlertMessage>
-          </Alert>
-        )}
+        {environmentsError && <Error message={environmentsError} />}
+        {errors.environmentId && <Error message={`${errors.environmentId.message}`} />}
         <HelperText>Select the environment where this project will be deployed</HelperText>
 
         {selectedEnvironmentId &&
@@ -188,11 +177,7 @@ export default function ProjectFormStep1(props: Props) {
           )}
         />
 
-        {errors.name && (
-          <Alert type="error">
-            <AlertMessage>{`${errors.name.message}`}</AlertMessage>
-          </Alert>
-        )}
+        {errors.name && <Error message={`${errors.name.message}`} />}
         <HelperText>
           {(() => {
             if (!selectedEnvironment) return "Select an environment to see naming requirements";

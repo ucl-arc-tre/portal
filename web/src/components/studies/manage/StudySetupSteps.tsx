@@ -7,7 +7,7 @@ import StudyAgreement from "./StudyAgreement";
 import Assets from "../../assets/Assets";
 import Loading from "../../ui/Loading";
 import { useAuth } from "@/hooks/useAuth";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 
 type StudySetupStepsProps = {
   study: Study;
@@ -73,11 +73,7 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
 
   return (
     <>
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={error} />}
 
       <StepProgress
         steps={studySteps}

@@ -1325,6 +1325,43 @@ export type GetUsersLookupResponses = {
 
 export type GetUsersLookupResponse = GetUsersLookupResponses[keyof GetUsersLookupResponses];
 
+export type GetUsersByUserIdData = {
+    body?: never;
+    path: {
+        /**
+         * User UUID
+         */
+        userId: string;
+    };
+    query?: never;
+    url: '/users/{userId}';
+};
+
+export type GetUsersByUserIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetUsersByUserIdResponses = {
+    200: UserData;
+};
+
+export type GetUsersByUserIdResponse = GetUsersByUserIdResponses[keyof GetUsersByUserIdResponses];
+
 export type PostUsersByUserIdTrainingData = {
     body: UserTrainingUpdate;
     path: {

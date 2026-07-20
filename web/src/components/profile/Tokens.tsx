@@ -7,6 +7,7 @@ import { deleteTokensByEnvironmentByTokenId, postTokensByEnvironment, getTokensB
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./Tokens.module.css";
 import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
+import Error from "../ui/Error";
 
 type Props = {
   environment: "tre" | "dsh";
@@ -171,11 +172,7 @@ export default function Tokens(props: Props) {
           </div>
         )}
 
-        {errorMessage && (
-          <Alert type="error" className={styles.alert}>
-            <AlertMessage>{errorMessage}</AlertMessage>
-          </Alert>
-        )}
+        {errorMessage && <Error message={errorMessage} />}
       </Box>
 
       {formOpen && (
@@ -196,11 +193,7 @@ export default function Tokens(props: Props) {
                   aria-invalid={!!errors.name}
                   className={errors.name ? styles.error : ""}
                 />
-                {errors.name && (
-                  <Alert type="error">
-                    <AlertMessage>{errors.name.message}</AlertMessage>
-                  </Alert>
-                )}
+                {errors.name && <Error message={errors.name.message} />}
               </div>
 
               <div className={styles.field}>
@@ -214,11 +207,7 @@ export default function Tokens(props: Props) {
                 </select>
               </div>
 
-              {formErrorMessage && (
-                <Alert type="error" className={styles.alert}>
-                  <AlertMessage>{formErrorMessage}</AlertMessage>
-                </Alert>
-              )}
+              {formErrorMessage && <Error message={formErrorMessage} />}
 
               <div className={styles.actions}>
                 <Button type="submit" disabled={isSubmitting} className={styles["submit-button"]}>

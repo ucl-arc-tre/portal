@@ -305,7 +305,25 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
-
+  /users/{userId}:
+    get:
+      description: Get a single user
+      parameters:
+        - $ref: "#/components/parameters/UserIdParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
   /users/{userId}/training:
     post:
       parameters:

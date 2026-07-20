@@ -1,6 +1,5 @@
 .chosen-name-dialog {
-  width: 100%;
-  max-width: 28rem;
+  width: clamp(28rem, 40rem, 45rem);
 }
 
 .form {
@@ -37,11 +36,6 @@
   outline-color: var(--green-200);
 }
 
-.error {
-  color: var(--error-text);
-  margin-bottom: 1rem;
-}
-
 .button-group {
   display: flex;
   gap: 0.5rem;
@@ -53,10 +47,4 @@
 .button-group button {
   margin: 0;
   vertical-align: middle;
-}
-
-@media (width >= 768px) {
-  .chosen-name-dialog {
-    width: 28rem;
-  }
 }

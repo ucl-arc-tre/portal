@@ -3,6 +3,7 @@ import styles from "./Feedback.module.css";
 import { useState } from "react";
 import Dialog from "./Dialog";
 import { Alert, AlertMessage, Textarea } from "../shared/uikitExports";
+import Error from "./Error";
 import Button from "./Button";
 import { postFeedback } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -99,11 +100,7 @@ export default function Feedback() {
                 </Button>
               </>
             )}
-            {error && (
-              <Alert type="error">
-                <AlertMessage>{error}</AlertMessage>
-              </Alert>
-            )}
+            {error && <Error message={error} />}
             {successMessage && (
               <Alert type="info">
                 <AlertMessage>{successMessage}</AlertMessage>

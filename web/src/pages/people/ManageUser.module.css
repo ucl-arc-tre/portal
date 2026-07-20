@@ -1,0 +1,35 @@
+.title {
+  margin-bottom: 1rem;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+
+  label {
+    font-weight: 600;
+    color: #555;
+  }
+
+  .agreement {
+    margin-bottom: 1rem;
+  }
+
+  .training-valid {
+    color: var(--green-100);
+  }
+
+  .training-invalid {
+    color: var(--red-100);
+  }
+
+  .training + .training {
+    margin-top: 1rem;
+  }
+
+  .role {
+    margin-bottom: 0.5rem;
+  }
+}

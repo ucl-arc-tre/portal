@@ -86,15 +86,6 @@
   font-size: 1.2rem;
 }
 
-.error {
-  color: var(--error-text);
-  background: var(--error-bg);
-  padding: 1rem;
-  border-radius: var(--default-border-radius);
-  border: 1px solid var(--error-border);
-  margin: 1rem 0;
-}
-
 .not-approved-section {
   max-width: 600px;
   margin: 2rem auto;

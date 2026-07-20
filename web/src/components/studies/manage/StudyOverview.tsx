@@ -1,6 +1,7 @@
 import { patchStudiesByStudyIdPending, Study, Asset } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
+import Error from "../../ui/Error";
 import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { useState } from "react";
 import styles from "./StudyDetails.module.css";
@@ -113,11 +114,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         />
       )}
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={error} />}
 
       {hasUnagreedAdmins && isStudyOwnerOrAdmin && (
         <Alert type="warning" className={styles["sutdy-admin-review"]}>
