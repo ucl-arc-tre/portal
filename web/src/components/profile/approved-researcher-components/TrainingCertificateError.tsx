@@ -1,9 +1,5 @@
+import { AlertMessage } from "@/components/shared/uikitExports";
 import styles from "./TrainingCertificateError.module.css";
-
-import dynamic from "next/dynamic";
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
 
 type TrainingCertificateErrorProps = {
   text: string;

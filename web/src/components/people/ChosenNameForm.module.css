@@ -1,5 +1,5 @@
 .chosen-name-dialog {
-  width: 40rem;
+  width: clamp(28rem, 40rem, 45rem);
 }
 
 .form {
@@ -34,11 +34,6 @@
 
 .input:focus {
   outline-color: var(--green-200);
-}
-
-.error {
-  color: var(--error-text);
-  margin-bottom: 1rem;
 }
 
 .button-group {

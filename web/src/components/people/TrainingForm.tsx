@@ -3,18 +3,11 @@ import styles from "./TrainingForm.module.css";
 import Button from "../ui/Button";
 import { postUsersByUserIdTraining, TrainingKind } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import dynamic from "next/dynamic";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Dialog from "../ui/Dialog";
 import { TrainingKindOptions } from "../shared/exports";
 import InfoTooltip from "../ui/InfoTooltip";
-
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
-const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
+import { Alert, AlertMessage } from "../shared/uikitExports";
 
 type TrainingFormProps = {
   userId: string;

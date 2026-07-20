@@ -138,11 +138,11 @@ export default function ManageUserPage() {
                   <p>
                     {getHumanReadableTrainingKind(training.kind)}{" "}
                     {training.is_valid ? (
-                      <span className={styles.valid}>
+                      <span className={styles["training-valid"]}>
                         <CheckIcon />
                       </span>
                     ) : (
-                      <span className={styles.invalid}>
+                      <span className={styles["training-invalid"]}>
                         <XIcon />
                       </span>
                     )}

@@ -17,6 +17,14 @@
     margin-bottom: 1rem;
   }
 
+  .training-valid {
+    color: var(--green-100);
+  }
+
+  .training-invalid {
+    color: var(--red-100);
+  }
+
   .training + .training {
     margin-top: 1rem;
   }
