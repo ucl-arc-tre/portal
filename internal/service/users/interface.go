@@ -22,7 +22,7 @@ type Interface interface {
 		csvContent []byte,
 		agreement types.Agreement,
 	) error
-	InviteExternalUser(ctx context.Context, invite entra.Invite) (types.User, error)
+	InviteUser(ctx context.Context, invite entra.Invite) (types.User, error)
 	Metrics() (*openapi.UserMetrics, error)
 	UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error)
 	CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error

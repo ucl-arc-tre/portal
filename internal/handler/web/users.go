@@ -144,7 +144,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 		return
 	}
 
-	if _, err := h.users.InviteExternalUser(ctx, invite); err != nil {
+	if _, err := h.users.InviteUser(ctx, invite); err != nil {
 		setError(ctx, err, "Failed to send invite")
 		return
 	}
