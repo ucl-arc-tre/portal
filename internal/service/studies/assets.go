@@ -200,6 +200,8 @@ func (s *Service) UpdateAsset(assetData openapi.AssetBase, studyID uuid.UUID, as
 	asset.ID = assetID
 	asset.StudyID = studyID
 	asset.CreatorUserID = existingAsset.CreatorUserID
+	asset.CreatedAt = existingAsset.CreatedAt
+	asset.UpdatedAt = time.Now()
 
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)

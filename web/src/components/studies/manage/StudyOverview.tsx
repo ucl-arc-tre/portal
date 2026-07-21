@@ -132,50 +132,62 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         </Alert>
       )}
 
+      {canRequestReview && (
+        <Alert type="info" className={styles["mark-ready-for-review-hint"]}>
+          <AlertMessage>
+            {
+              "Once you have added all assets and contracts please mark the study as 'Ready for Review'. The Information Governance (IG) team will then review and provide feedback."
+            }
+          </AlertMessage>
+        </Alert>
+      )}
+
       <div className={styles["header"]}>
         <h2>{study.title}</h2>
-        {isStudyOwnerOrAdmin && (
-          <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
-            Edit Study
-          </Button>
-        )}
-        {canRequestReview && (
-          <>
-            {affirmationDialogOpen && (
-              <Dialog setDialogOpen={setAffirmationDialogOpen}>
-                {assetsRequiringContracts.length > 0 && (
-                  <Alert type="warning" className={styles.outstanding}>
-                    <AlertMessage>
-                      Please note the following assets do not have an associated contract but have been flagged as
-                      requiring a contract:{" "}
-                      {assetsRequiringContracts.map((asset) => (
-                        <li key={asset.id}>
-                          <strong>{asset.title}</strong>
-                        </li>
-                      ))}
-                    </AlertMessage>
-                  </Alert>
-                )}
-                <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
-              </Dialog>
-            )}
+        <div className={styles["buttons"]}>
+          {isStudyOwnerOrAdmin && (
+            <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
+              Edit Study
+            </Button>
+          )}
+          {canRequestReview && (
+            <>
+              {affirmationDialogOpen && (
+                <Dialog setDialogOpen={setAffirmationDialogOpen}>
+                  {assetsRequiringContracts.length > 0 && (
+                    <Alert type="warning" className={styles.outstanding}>
+                      <AlertMessage>
+                        Please note the following assets do not have an associated contract but have been flagged as
+                        requiring a contract:{" "}
+                        {assetsRequiringContracts.map((asset) => (
+                          <li key={asset.id}>
+                            <strong>{asset.title}</strong>
+                          </li>
+                        ))}
+                      </AlertMessage>
+                    </Alert>
+                  )}
+                  <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
+                </Dialog>
+              )}
 
-            {study.approval_status !== "Pending" ? (
-              <Button
-                onClick={() => setAffirmationDialogOpen(true)}
-                disabled={isSubmittingReview || hasUnagreedAdmins}
-                size="small"
-                data-cy="study-ready-for-review-button"
-              >
-                {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
-              </Button>
-            ) : (
-              <Button disabled size="small">
-                Submitted for Review
-              </Button>
-            )}
-          </>
-        )}
+              {study.approval_status !== "Pending" ? (
+                <Button
+                  onClick={() => setAffirmationDialogOpen(true)}
+                  disabled={isSubmittingReview || hasUnagreedAdmins}
+                  size="small"
+                  data-cy="study-ready-for-review-button"
+                >
+                  {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
+                </Button>
+              ) : (
+                <Button disabled size="small">
+                  Submitted for Review
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <StudyDetails

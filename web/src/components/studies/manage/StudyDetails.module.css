@@ -5,6 +5,11 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 2rem;
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
+  }
 }
 
 .pre-description {
@@ -152,5 +157,9 @@
 }
 
 .outstanding {
+  margin-bottom: 1rem;
+}
+
+.mark-ready-for-review-hint {
   margin-bottom: 1rem;
 }
