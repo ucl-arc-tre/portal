@@ -1,65 +1,82 @@
 import Dialog from "@/components/ui/Dialog";
 import Button from "@/components/ui/Button";
 import styles from "./ChosenNameChangeModal.module.css";
+import { useState } from "react";
+import { postProfile } from "@/openapi";
+import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
+import { Alert, AlertMessage } from "../shared/uikitExports";
+import Error from "../ui/Error";
 
-type ChosenNameChangeModalProps = {
+type Props = {
   isOpen: boolean;
-  onClose: () => void;
+  setOpen: (open: boolean) => void;
+  onSuccess: () => void;
   currentChosenName?: string;
   username?: string;
 };
 
-const emailAddress = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.tre@ucl.ac.uk";
-const emailSubject = "TRE Portal: Chosen Name Change Request";
+export default function ChosenNameChangeModal({ isOpen, onSuccess, setOpen, currentChosenName }: Props) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [chosenName, setChosenName] = useState(currentChosenName ?? "");
 
-export default function ChosenNameChangeModal({
-  isOpen,
-  onClose,
-  currentChosenName,
-  username,
-}: ChosenNameChangeModalProps) {
+  const handleSubmit = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const response = await postProfile({
+        body: {
+          chosen_name: chosenName,
+        },
+      });
+
+      if (responseIsError(response)) {
+        setErrorMessage(`Failed to update chosen name: ${extractErrorMessage(response)}`);
+        return;
+      }
+      onSuccess();
+    } catch (error) {
+      console.error("Failed to update chosen name:", error);
+      setErrorMessage("Failed to update chosen name. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
-  const emailBody = `Dear UCL Information Governance,
-
-I would like to request a change to my chosen name in the UCL ARC Services Portal.
-
-Username: ${username || ""}
-Current chosen name: ${currentChosenName || "Not set"}
-Requested new chosen name: [Your desired chosen name]
-Reason for change: [Optional - please provide a brief reason]
-
-Thank you for your assistance.
-
-Kind regards`;
-
-  const encodedEmailBody = encodeURIComponent(emailBody);
-  const encodedEmailSubject = encodeURIComponent(emailSubject);
-
   return (
-    <Dialog setDialogOpen={onClose}>
-      <div className={styles.container}>
-        <h2>Request Chosen Name Change</h2>
+    <Dialog setDialogOpen={setOpen}>
+      <div>
+        <form onSubmit={handleSubmit} className="form">
+          <div className="field">
+            <label htmlFor="chosenName">Chosen Name</label>
+            <input
+              id="chosenName"
+              type="text"
+              value={chosenName}
+              onChange={(e) => setChosenName(e.target.value)}
+              required
+              minLength={3}
+              maxLength={100}
+              className={styles.input}
+            />
+          </div>
+          <Alert type="info">
+            <AlertMessage>
+              Please note that a name change may be subject to approval. If an approval is required the request will
+              remain in a pending state until approved.
+            </AlertMessage>
+          </Alert>
 
-        <div className={styles.description}>
-          <p>
-            To change your chosen name, please send an email to the UCL Information Governance team with your request
-            (template text provided using the &apos;Create Email&apos; button below).
-          </p>
-          <p>
-            <strong>Current chosen name:</strong> {currentChosenName || "Not set"}
-          </p>
-        </div>
-
-        <div className={styles.actions}>
-          <Button
-            as="a"
-            href={`mailto:${emailAddress}?subject=${encodedEmailSubject}&body=${encodedEmailBody}`}
-            variant="primary"
-          >
-            Create Email
+          <Button variant="primary" disabled={isSubmitting} type="submit" cy="request-name-change">
+            Request
           </Button>
-        </div>
+        </form>
+
+        {errorMessage && <Error message={errorMessage} />}
       </div>
     </Dialog>
   );

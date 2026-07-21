@@ -2,40 +2,6 @@
   width: clamp(28rem, 40rem, 45rem);
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin-inline: 4%;
-}
-
-.help-text {
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-}
-
-.form-group {
-  margin-bottom: 0.5rem;
-}
-
-.label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color, #ccc);
-  border-radius: var(--default-border-radius);
-  font-size: 1.4rem;
-}
-
-.input:focus {
-  outline-color: var(--green-200);
-}
-
 .button-group {
   display: flex;
   gap: 0.5rem;

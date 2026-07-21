@@ -19,4 +19,5 @@ type Interface interface {
 	NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error
 	NotifyAssetExpiry(ctx context.Context, assets []types.Asset, study types.Study) error
 	NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error
+	NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error
 }

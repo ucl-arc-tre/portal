@@ -33,15 +33,20 @@ export type NotificationsReadAll = {
     kind?: NotificationKind;
 };
 
-export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-expiry' | 'training-expiry' | 'iaa-assignment' | 'study-affirmation' | 'study-review' | 'study-owner-change';
+export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-expiry' | 'training-expiry' | 'iaa-assignment' | 'study-affirmation' | 'study-review' | 'study-owner-change' | 'user-name-change';
 
 export type Profile = {
     username: string;
     chosen_name: string;
+    requested_chosen_name?: string;
 };
 
 export type ProfileUpdate = {
     chosen_name: string;
+};
+
+export type ProfileUpdateResponse = {
+    requires_approval: boolean;
 };
 
 export type Agreement = {
@@ -139,6 +144,7 @@ export type UserData = {
     agreements: UserAgreements;
     training_record: ProfileTraining;
     chosen_name?: string;
+    requested_chosen_name?: string;
     is_valid_approved_researcher: boolean;
 };
 
@@ -1028,7 +1034,7 @@ export type PostProfileResponses = {
     /**
      * Successfully updated profile
      */
-    200: Profile;
+    200: ProfileUpdateResponse;
 };
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];

@@ -153,7 +153,7 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 }
 
 func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
-	var requestBody openapi.PutUsersUserIdAttributesJSONRequestBody
+	var requestBody openapi.PutUsersUserIdAttributesJSONBody
 	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
 		return
 	}

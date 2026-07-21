@@ -18,8 +18,9 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, openapi.Profile{
-		Username:   string(user.Username),
-		ChosenName: string(attributes.ChosenName),
+		Username:            string(user.Username),
+		ChosenName:          string(attributes.ChosenName),
+		RequestedChosenName: optionalStr[types.ChosenName, string](attributes.RequestedChosenName),
 	})
 }
 
@@ -29,13 +30,12 @@ func (h *Handler) PostProfile(ctx *gin.Context) {
 	if err := bindJSONOrSetError(ctx, &update); err != nil {
 		return
 	}
-	if err := h.users.SetUserChosenName(user, types.ChosenName(update.ChosenName)); err != nil {
+	data, err := h.users.ProfileUpdate(user, update)
+	if err != nil {
 		setError(ctx, err, "Failed to update chosen name")
 		return
 	}
-	ctx.JSON(http.StatusOK, openapi.ProfileUpdate{
-		ChosenName: update.ChosenName,
-	})
+	ctx.JSON(http.StatusOK, data)
 }
 
 func (h *Handler) PostProfileAgreements(ctx *gin.Context) {

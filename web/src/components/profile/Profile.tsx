@@ -31,8 +31,7 @@ type Props = {
 };
 
 export default function Profile({ userData, refreshAuth }: Props) {
-  const [chosenName, setChosenName] = useState<string>("");
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [profileData, setProfileData] = useState<ProfileData | undefined>(undefined);
   const [agreementsData, setAgreementsData] = useState<UserAgreements | null>(null);
   const [trainingData, setTrainingData] = useState<ProfileTraining | null>(null);
   const [profileComplete, setProfileComplete] = useState(false);
@@ -75,7 +74,6 @@ export default function Profile({ userData, refreshAuth }: Props) {
       const trainingExpiryUrgency = nhsdTraining?.completed_at ? computeExpiryUrgency(nhsdTraining.completed_at) : null;
       setExpiryUrgency(trainingExpiryUrgency);
 
-      setChosenName(profileResponse.data.chosen_name);
       setProfileData(profileResponse.data);
       setAgreementsData(agreementsResponse.data);
       setTrainingData(trainingResponse.data);
@@ -98,8 +96,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
     }
   };
 
-  const handleStepsComplete = (name: string) => {
-    setChosenName(name);
+  const handleStepsComplete = () => {
     setProfileComplete(true);
     setExpiryUrgency(null);
     refreshAuth();
@@ -126,7 +123,12 @@ export default function Profile({ userData, refreshAuth }: Props) {
 
   return (
     <div className={styles["profile-content-container"]}>
-      <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
+      <ProfileSummaryCard
+        profileData={profileData}
+        username={userData?.username}
+        roles={userData?.roles}
+        callback={() => fetchProfileData()}
+      />
       <CertificateReupload trainingData={trainingData} expiryUrgency={expiryUrgency} onReupload={fetchProfileData} />
     </div>
   );

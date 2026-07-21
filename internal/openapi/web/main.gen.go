@@ -541,6 +541,7 @@ const (
 	NotificationKindStudyOwnerChange NotificationKind = "study-owner-change"
 	NotificationKindStudyReview      NotificationKind = "study-review"
 	NotificationKindTrainingExpiry   NotificationKind = "training-expiry"
+	NotificationKindUserNameChange   NotificationKind = "user-name-change"
 )
 
 // Valid indicates whether the value is a known member of the NotificationKind enum.
@@ -561,6 +562,8 @@ func (e NotificationKind) Valid() bool {
 	case NotificationKindStudyReview:
 		return true
 	case NotificationKindTrainingExpiry:
+		return true
+	case NotificationKindUserNameChange:
 		return true
 	default:
 		return false
@@ -1153,8 +1156,9 @@ type NotificationsReadAll struct {
 
 // Profile defines model for Profile.
 type Profile struct {
-	ChosenName string `json:"chosen_name"`
-	Username   string `json:"username"`
+	ChosenName          string  `json:"chosen_name"`
+	RequestedChosenName *string `json:"requested_chosen_name,omitempty"`
+	Username            string  `json:"username"`
 }
 
 // ProfileTraining defines model for ProfileTraining.
@@ -1185,6 +1189,11 @@ type ProfileTrainingUpdate struct {
 // ProfileUpdate defines model for ProfileUpdate.
 type ProfileUpdate struct {
 	ChosenName string `json:"chosen_name"`
+}
+
+// ProfileUpdateResponse defines model for ProfileUpdateResponse.
+type ProfileUpdateResponse struct {
+	RequiresApproval bool `json:"requires_approval"`
 }
 
 // Project A project with base details (environment-agnostic)
@@ -1642,6 +1651,7 @@ type UserData struct {
 	Agreements                UserAgreements  `json:"agreements"`
 	ChosenName                *string         `json:"chosen_name,omitempty"`
 	IsValidApprovedResearcher bool            `json:"is_valid_approved_researcher"`
+	RequestedChosenName       *string         `json:"requested_chosen_name,omitempty"`
 	Roles                     []string        `json:"roles"`
 	TrainingRecord            ProfileTraining `json:"training_record"`
 	User                      User            `json:"user"`

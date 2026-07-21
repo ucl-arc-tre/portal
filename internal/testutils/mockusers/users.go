@@ -34,6 +34,10 @@ func (m *MockUsers) SetUserChosenName(user types.User, chosenName types.ChosenNa
 	panic("not implemented")
 }
 
+func (m *MockUsers) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*openapi.ProfileUpdateResponse, error) {
+	panic("not implemented")
+}
+
 func (m *MockUsers) ImportApprovedResearchersCSV(
 	ctx context.Context,
 	importer types.User,
