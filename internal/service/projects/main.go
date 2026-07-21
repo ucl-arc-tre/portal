@@ -15,6 +15,7 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -22,16 +23,18 @@ import (
 )
 
 type Service struct {
-	db           *gorm.DB
-	users        users.Interface
-	environments *environments.Service
+	db            *gorm.DB
+	users         users.Interface
+	environments  *environments.Service
+	notifications notifications.Interface
 }
 
 func New() *Service {
 	return &Service{
-		db:           graceful.NewDB(),
-		users:        users.New(),
-		environments: environments.New(),
+		db:            graceful.NewDB(),
+		users:         users.New(),
+		environments:  environments.New(),
+		notifications: notifications.New(),
 	}
 }
 
@@ -613,21 +616,35 @@ func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.P
 		return types.NewErrClientInvalidObjectF("failed to parse deployed update time: %s", err.Error())
 	}
 
-	subQuery := s.db.Model(&types.ProjectTRE{}).
-		Select("project_tres.id").
-		Joins("JOIN projects ON projects.id = project_tres.project_id").
-		Where("projects.name = ?", projectName)
+	project := types.Project{}
+	result := s.db.Preload("CreatorUser").Where("name = ?", projectName).First(&project)
 
-	result := s.db.Model(&types.ProjectTRE{}).
-		Where("id IN (?)", subQuery).
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project: parent project get error")
+	}
+
+	projectTRE := types.ProjectTRE{}
+	result = s.db.Where("project_id = ?", project.ID).First(&projectTRE)
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project: TRE project get error")
+	}
+	currentStatus := projectTRE.Status
+
+	result = s.db.Model(projectTRE).
+		Where("id = ?", projectTRE.ID).
 		Updates(types.ProjectTRE{
 			Status:                   status,
 			DeployedVersionUpdatedAt: &deployedVersionUpdatedAt,
 		})
 	if err := result.Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to update TRE project")
-	} else if result.RowsAffected == 0 {
-		return types.NewNotFoundError("tre project not found")
+	}
+
+	if currentStatus == types.ProjectTREStatusPendingCreation && status == types.ProjectTREStatusDeployed {
+		err := s.notifications.NotifyProjectDeployed(project, project.CreatorUser)
+		if err != nil {
+			log.Err(err).Msg("Failed to notify project deployed") // not fatal
+		}
 	}
 	return nil
 }
