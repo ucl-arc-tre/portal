@@ -379,6 +379,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 aria-invalid={!!errors.legal_basis}
                 className={`${styles["legal-basis"]} ${errors.legal_basis ? styles.error : ""}`}
               >
+                <option value="">Select legal basis</option>
                 <option value="public_task">
                   Public task: the processing is necessary for you to perform a task in the public interest or for your
                   official functions, and the task or function has a clear basis in law

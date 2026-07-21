@@ -78,7 +78,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
   const canEditStudyOwner =
     (isStudyOwner || isIGOps) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
-  const canRequestReview = study.approval_status !== "Approved" && isStudyOwner && !isIGOps;
+  const canRequestReview =
+    study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGOps;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const riskScore = calculateRiskScore(study, assets);
