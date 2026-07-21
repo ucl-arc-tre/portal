@@ -17,6 +17,7 @@ const (
 	NotificationKindStdyAffirmation  = NotificationKind("study-affirmation")
 	NotificationKindStudyReview      = NotificationKind("study-review")
 	NotificationKindStudyOwnerChange = NotificationKind("study-owner-change")
+	NotificationKindUserNameChange   = NotificationKind("user-name-change")
 )
 
 type Notification struct {

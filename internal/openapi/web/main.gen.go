@@ -541,6 +541,7 @@ const (
 	NotificationKindStudyOwnerChange NotificationKind = "study-owner-change"
 	NotificationKindStudyReview      NotificationKind = "study-review"
 	NotificationKindTrainingExpiry   NotificationKind = "training-expiry"
+	NotificationKindUserNameChange   NotificationKind = "user-name-change"
 )
 
 // Valid indicates whether the value is a known member of the NotificationKind enum.
@@ -561,6 +562,8 @@ func (e NotificationKind) Valid() bool {
 	case NotificationKindStudyReview:
 		return true
 	case NotificationKindTrainingExpiry:
+		return true
+	case NotificationKindUserNameChange:
 		return true
 	default:
 		return false

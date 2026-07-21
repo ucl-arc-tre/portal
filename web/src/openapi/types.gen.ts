@@ -33,7 +33,7 @@ export type NotificationsReadAll = {
     kind?: NotificationKind;
 };
 
-export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-expiry' | 'training-expiry' | 'iaa-assignment' | 'study-affirmation' | 'study-review' | 'study-owner-change';
+export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-expiry' | 'training-expiry' | 'iaa-assignment' | 'study-affirmation' | 'study-review' | 'study-owner-change' | 'user-name-change';
 
 export type Profile = {
     username: string;

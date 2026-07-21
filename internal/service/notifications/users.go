@@ -16,7 +16,7 @@ func (s *Service) NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []
 	notification := types.Notification{
 		Title: fmt.Sprintf("'%s' requested a name change", attrs.ChosenName),
 		Href:  new(fmt.Sprintf("/people/manage?userId=%s", attrs.User.ID.String())),
-		Kind:  new(types.NotificationKindStudyOwnerChange),
+		Kind:  new(types.NotificationKindUserNameChange),
 	}
 	return s.createForAll(notification, igOpsStaff)
 }

@@ -1456,6 +1456,7 @@ components:
         - study-affirmation
         - study-review
         - study-owner-change
+        - user-name-change
 
     Profile:
       type: object

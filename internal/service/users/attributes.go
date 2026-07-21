@@ -36,10 +36,6 @@ func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*o
 		response.RequiresApproval = true
 		attrs.RequestedChosenName = &requestedChosenName
 		err = s.db.Model(&attrs).Where("id = ?", attrs.ID).Updates(&attrs).Error
-
-		if err := s.notifyUserNameChange(attrs); err != nil {
-			log.Err(err).Msg("Failed to notify user name change") // not fatal
-		}
 	} else {
 		response.RequiresApproval = false
 		attrs.ChosenName = requestedChosenName
@@ -48,7 +44,16 @@ func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*o
 			RequestedChosenName: &requestedChosenName,
 		}).FirstOrCreate(&attrs).Error
 	}
-	return &response, types.NewErrFromGorm(err)
+	if err != nil {
+		return &response, types.NewErrFromGorm(err)
+	}
+
+	if response.RequiresApproval {
+		if err := s.notifyUserNameChange(attrs); err != nil {
+			log.Err(err).Msg("Failed to notify user name change") // not fatal
+		}
+	}
+	return &response, nil
 }
 
 func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName) error {
