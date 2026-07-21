@@ -82,7 +82,8 @@ export default function ProfileSummaryCard(props: Props) {
 
       <ChosenNameChangeModal
         isOpen={showChosenNameChangeModal}
-        onSuccses={() => {
+        setOpen={setShowChosenNameChangeModal}
+        onSuccess={() => {
           setShowChosenNameChangeModal(false);
           callback();
         }}

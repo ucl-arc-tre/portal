@@ -7,14 +7,15 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { Alert, AlertMessage } from "../shared/uikitExports";
 import Error from "../ui/Error";
 
-type ChosenNameChangeModalProps = {
+type Props = {
   isOpen: boolean;
-  onSuccses: () => void;
+  setOpen: (open: boolean) => void;
+  onSuccess: () => void;
   currentChosenName?: string;
   username?: string;
 };
 
-export default function ChosenNameChangeModal({ isOpen, onSuccses, currentChosenName }: ChosenNameChangeModalProps) {
+export default function ChosenNameChangeModal({ isOpen, onSuccess, setOpen, currentChosenName }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [chosenName, setChosenName] = useState(currentChosenName ?? "");
@@ -35,7 +36,7 @@ export default function ChosenNameChangeModal({ isOpen, onSuccses, currentChosen
         setErrorMessage(`Failed to update chosen name: ${extractErrorMessage(response)}`);
         return;
       }
-      onSuccses();
+      onSuccess();
     } catch (error) {
       console.error("Failed to update chosen name:", error);
       setErrorMessage("Failed to update chosen name. Please try again.");
@@ -47,7 +48,7 @@ export default function ChosenNameChangeModal({ isOpen, onSuccses, currentChosen
   if (!isOpen) return null;
 
   return (
-    <Dialog setDialogOpen={onSuccses}>
+    <Dialog setDialogOpen={setOpen}>
       <div>
         <form onSubmit={handleSubmit} className="form">
           <div className="field">
