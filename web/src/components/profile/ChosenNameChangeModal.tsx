@@ -70,7 +70,7 @@ export default function ChosenNameChangeModal({ isOpen, onSuccses, currentChosen
             </AlertMessage>
           </Alert>
 
-          <Button variant="primary" disabled={isSubmitting} type="submit">
+          <Button variant="primary" disabled={isSubmitting} type="submit" cy="request-name-change">
             Request
           </Button>
         </form>

@@ -41,7 +41,11 @@ export default function ProfileSummaryCard(props: Props) {
                 ) : (
                   <>
                     {chosenName}
-                    <EditIcon onClick={() => setShowChosenNameChangeModal(true)} label="Request chosen name change" />
+                    <EditIcon
+                      onClick={() => setShowChosenNameChangeModal(true)}
+                      label="Request chosen name change"
+                      cy="edit-chosen-name"
+                    />
                   </>
                 )
               ) : (
