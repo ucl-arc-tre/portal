@@ -78,7 +78,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
   const canEditStudyOwner =
     (isStudyOwner || isIGOps) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
-  const canRequestReview = study.approval_status !== "Approved" && isStudyOwner && !isIGOps;
+  const canRequestReview =
+    study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGOps;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
 
   const riskScore = calculateRiskScore(study, assets);
@@ -132,50 +133,42 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         </Alert>
       )}
 
+      {canRequestReview && (
+        <Alert type="info" className={styles["mark-ready-for-review-hint"]}>
+          <AlertMessage>
+            {
+              "Once you have added all assets and contracts please mark the study as 'Ready for Review'. The Information Governance (IG) team will then review and provide feedback."
+            }
+          </AlertMessage>
+        </Alert>
+      )}
+
       <div className={styles["header"]}>
         <h2>{study.title}</h2>
-        {isStudyOwnerOrAdmin && (
-          <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
-            Edit Study
-          </Button>
-        )}
-        {canRequestReview && (
-          <>
-            {affirmationDialogOpen && (
-              <Dialog setDialogOpen={setAffirmationDialogOpen}>
-                {assetsRequiringContracts.length > 0 && (
-                  <Alert type="warning" className={styles.outstanding}>
-                    <AlertMessage>
-                      Please note the following assets do not have an associated contract but have been flagged as
-                      requiring a contract:{" "}
-                      {assetsRequiringContracts.map((asset) => (
-                        <li key={asset.id}>
-                          <strong>{asset.title}</strong>
-                        </li>
-                      ))}
-                    </AlertMessage>
-                  </Alert>
-                )}
-                <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
-              </Dialog>
-            )}
+        <div className={styles["buttons"]}>
+          {isStudyOwnerOrAdmin && (
+            <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
+              Edit Study
+            </Button>
+          )}
 
-            {study.approval_status !== "Pending" ? (
-              <Button
-                onClick={() => setAffirmationDialogOpen(true)}
-                disabled={isSubmittingReview || hasUnagreedAdmins}
-                size="small"
-                data-cy="study-ready-for-review-button"
-              >
-                {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
-              </Button>
-            ) : (
-              <Button disabled size="small">
-                Submitted for Review
-              </Button>
-            )}
-          </>
-        )}
+          {canRequestReview && (
+            <Button
+              onClick={() => setAffirmationDialogOpen(true)}
+              disabled={isSubmittingReview || hasUnagreedAdmins}
+              size="small"
+              data-cy="study-ready-for-review-button"
+            >
+              {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
+            </Button>
+          )}
+
+          {study.approval_status === "Pending" && (
+            <Button disabled size="small">
+              Submitted for Review
+            </Button>
+          )}
+        </div>
       </div>
 
       <StudyDetails
@@ -193,6 +186,25 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
             fetchStudy(study.id);
           }}
         />
+      )}
+
+      {affirmationDialogOpen && (
+        <Dialog setDialogOpen={setAffirmationDialogOpen}>
+          {assetsRequiringContracts.length > 0 && (
+            <Alert type="warning" className={styles.outstanding}>
+              <AlertMessage>
+                Please note the following assets do not have an associated contract but have been flagged as requiring a
+                contract:{" "}
+                {assetsRequiringContracts.map((asset) => (
+                  <li key={asset.id}>
+                    <strong>{asset.title}</strong>
+                  </li>
+                ))}
+              </AlertMessage>
+            </Alert>
+          )}
+          <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
+        </Dialog>
       )}
     </Box>
   );

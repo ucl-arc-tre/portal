@@ -380,6 +380,10 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 className={`${styles["legal-basis"]} ${errors.legal_basis ? styles.error : ""}`}
               >
                 <option value="">Select legal basis</option>
+                <option value="public_task">
+                  Public task: the processing is necessary for you to perform a task in the public interest or for your
+                  official functions, and the task or function has a clear basis in law
+                </option>
                 <option value="consent">
                   Consent: the individual has given clear consent for you to process their personal data for a specific
                   purpose
@@ -394,10 +398,6 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 </option>
                 <option value="vital_interests">
                   Vital interests: the processing is necessary to protect someone&apos;s life
-                </option>
-                <option value="public_task">
-                  Public task: the processing is necessary for you to perform a task in the public interest or for your
-                  official functions, and the task or function has a clear basis in law
                 </option>
                 <option value="legitimate_interests">
                   Legitimate interests: the processing is necessary for your legitimate interests or the legitimate

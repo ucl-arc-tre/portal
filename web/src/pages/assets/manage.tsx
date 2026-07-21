@@ -220,6 +220,16 @@ export default function ManageAssetPage() {
               <span>{asset.description}</span>
             </div>
             <div className={styles.field}>
+              <label>Created:</label>
+              <span>{formatDate(asset.created_at)}</span>
+            </div>
+
+            <div className={styles.field}>
+              <label>Updated:</label>
+              <span>{formatDate(asset.updated_at)}</span>
+            </div>
+
+            <div className={styles.field}>
               <label>Source:</label>
               <span>{asset.source || "Unset"}</span>
             </div>
@@ -247,7 +257,7 @@ export default function ManageAssetPage() {
             )}
             <div className={styles.field}>
               <label>Legal Basis:</label>
-              <span>{asset.legal_basis}</span>
+              <span>{asset.legal_basis?.replaceAll("_", " ")}</span>
             </div>
             <div className={styles.field}>
               <label>Format:</label>
@@ -273,7 +283,7 @@ export default function ManageAssetPage() {
               <span>{asset.requires_contract ? "Yes" : "No"}</span>
             </div>
             <div className={styles.field}>
-              <label>Has DSPT:</label>
+              <label>Requires NHS DSPT:</label>
               <span>{asset.has_dspt ? "Yes" : "No"}</span>
             </div>
             <div className={styles.field}>
