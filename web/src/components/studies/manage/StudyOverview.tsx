@@ -151,42 +151,22 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
               Edit Study
             </Button>
           )}
-          {canRequestReview && (
-            <>
-              {affirmationDialogOpen && (
-                <Dialog setDialogOpen={setAffirmationDialogOpen}>
-                  {assetsRequiringContracts.length > 0 && (
-                    <Alert type="warning" className={styles.outstanding}>
-                      <AlertMessage>
-                        Please note the following assets do not have an associated contract but have been flagged as
-                        requiring a contract:{" "}
-                        {assetsRequiringContracts.map((asset) => (
-                          <li key={asset.id}>
-                            <strong>{asset.title}</strong>
-                          </li>
-                        ))}
-                      </AlertMessage>
-                    </Alert>
-                  )}
-                  <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
-                </Dialog>
-              )}
 
-              {study.approval_status !== "Pending" ? (
-                <Button
-                  onClick={() => setAffirmationDialogOpen(true)}
-                  disabled={isSubmittingReview || hasUnagreedAdmins}
-                  size="small"
-                  data-cy="study-ready-for-review-button"
-                >
-                  {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
-                </Button>
-              ) : (
-                <Button disabled size="small">
-                  Submitted for Review
-                </Button>
-              )}
-            </>
+          {canRequestReview && (
+            <Button
+              onClick={() => setAffirmationDialogOpen(true)}
+              disabled={isSubmittingReview || hasUnagreedAdmins}
+              size="small"
+              data-cy="study-ready-for-review-button"
+            >
+              {isSubmittingReview ? "Submitting..." : "Mark Ready for Review"}
+            </Button>
+          )}
+
+          {study.approval_status === "Pending" && (
+            <Button disabled size="small">
+              Submitted for Review
+            </Button>
           )}
         </div>
       </div>
@@ -206,6 +186,25 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
             fetchStudy(study.id);
           }}
         />
+      )}
+
+      {affirmationDialogOpen && (
+        <Dialog setDialogOpen={setAffirmationDialogOpen}>
+          {assetsRequiringContracts.length > 0 && (
+            <Alert type="warning" className={styles.outstanding}>
+              <AlertMessage>
+                Please note the following assets do not have an associated contract but have been flagged as requiring a
+                contract:{" "}
+                {assetsRequiringContracts.map((asset) => (
+                  <li key={asset.id}>
+                    <strong>{asset.title}</strong>
+                  </li>
+                ))}
+              </AlertMessage>
+            </Alert>
+          )}
+          <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
+        </Dialog>
       )}
     </Box>
   );
