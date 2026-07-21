@@ -329,6 +329,10 @@ func (s *Service) AllProjectTREs() ([]types.ProjectTRE, error) {
 	err := s.db.
 		Preload("Project").
 		Preload("TRERoleBindings.User").
+		Preload("Project.Study.Owner").
+		Preload("Project.Study.StudyAdmins.User").
+		Preload("UserConfigs.User").
+		Preload("UserConfigs.DesktopImage").
 		Joins("join projects on projects.id = project_tres.project_id").
 		Joins("join environments on environments.id = projects.environment_id").
 		Where("environments.name = ?", environments.TRE).
