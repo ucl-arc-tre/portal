@@ -12,7 +12,7 @@ export type Auth = {
      * - Additional dynamic resource-specific roles: Runtime roles like project_{id}_owner, study_{id}_admin
      *
      */
-    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff' | 'dsh-ops-staff'>;
+    roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff' | 'ig-admin' | 'dsh-ops-staff'>;
 };
 
 export type Notification = {

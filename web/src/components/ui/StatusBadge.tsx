@@ -91,10 +91,9 @@ function getStatusClassName(status: string | undefined): string {
 
 export default function StatusBadge(props: BadgeProps) {
   const { status, type, environment } = props;
-  const { userData } = useAuth();
-  const isOpsStaff = userData?.roles.includes("ig-ops-staff") ?? false;
+  const { isIGStaff } = useAuth();
 
-  const description = getDescription(type, status, environment, isOpsStaff);
+  const description = getDescription(type, status, environment, isIGStaff);
   return (
     <Badge className={getStatusClassName(status)} cy="status-badge">
       {status}

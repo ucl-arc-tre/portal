@@ -7,12 +7,14 @@ type AuthCtxValue = {
   isAuthed: boolean;
   userData: Auth | null;
   refreshAuth: () => Promise<void>;
+  isIGStaff: boolean;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
   authInProgress: true,
   isAuthed: false,
   userData: null,
+  isIGStaff: false,
   refreshAuth: () => Promise.resolve(),
 });
 
@@ -24,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userData, setUserData] = useState<Auth | null>(null);
 
   const cancelled = useRef(false);
+  const isIGStaff = (userData?.roles.includes("ig-admin") || userData?.roles.includes("ig-ops-staff")) ?? false;
 
   const refreshAuth = useCallback(async () => {
     try {
@@ -53,5 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [refreshAuth]);
 
-  return <AuthCtx.Provider value={{ authInProgress, isAuthed, userData, refreshAuth }}>{children}</AuthCtx.Provider>;
+  return (
+    <AuthCtx.Provider value={{ authInProgress, isAuthed, userData, refreshAuth, isIGStaff }}>
+      {children}
+    </AuthCtx.Provider>
+  );
 }

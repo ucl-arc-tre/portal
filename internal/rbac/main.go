@@ -25,6 +25,7 @@ const (
 	InformationAssetAdministrator = RoleName(openapi.AuthRolesInformationAssetAdministrator) // Has agreed to the study administrator agreement for at least one study
 	TreOpsStaff                   = ConfigRolename(openapi.AuthRolesTreOpsStaff)             // Lesser admin role for tre ops staff
 	IGOpsStaff                    = ConfigRolename(openapi.AuthRolesIgOpsStaff)              // Information governance operations staff
+	IGAdmin                       = ConfigRolename(openapi.AuthRolesIgAdmin)                 // Information governance administrator
 	DSHOpsStaff                   = ConfigRolename(openapi.AuthRolesDshOpsStaff)             // Data Safe Haven operations staff
 
 	ReadAction  = Action("read")
@@ -32,7 +33,7 @@ const (
 )
 
 var (
-	ConfigRoleNames = []ConfigRolename{Admin, TreOpsStaff, IGOpsStaff, DSHOpsStaff}
+	ConfigRoleNames = []ConfigRolename{Admin, TreOpsStaff, IGOpsStaff, IGAdmin, DSHOpsStaff}
 )
 
 var enforcer *casbin.Enforcer

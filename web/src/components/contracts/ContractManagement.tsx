@@ -21,10 +21,11 @@ export default function ContractManagement(props: ContractManagementProps) {
   const { study, contracts, someAssetsRequireContracts, fetchStudyContents } = props;
   const [showUploadModal, setShowUploadModal] = useState(false);
 
+  const isIgAdmin = userData?.roles.includes("ig-admin") ?? false;
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
-  const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
+  const canModify = isStudyOwner || isStudyAdmin || isIgAdmin;
   const [calloutExpanded, setCalloutExpanded] = useState(false);
 
   const handleUploadSuccess = () => {
@@ -41,7 +42,7 @@ export default function ContractManagement(props: ContractManagementProps) {
 
   return (
     <Box>
-      {isStudyOwnerOrAdmin ? (
+      {canModify ? (
         <>
           <div className={styles.header}>
             <h3>
@@ -83,7 +84,7 @@ export default function ContractManagement(props: ContractManagementProps) {
       {contracts.length === 0 ? (
         <div className={styles["empty-state"]}>
           <h4>No contracts uploaded</h4>
-          {isStudyOwnerOrAdmin && <p>Upload your first contract document to get started.</p>}
+          {canModify && <p>Upload your first contract document to get started.</p>}
         </div>
       ) : (
         <div className={styles["contracts-list"]}>
@@ -93,7 +94,7 @@ export default function ContractManagement(props: ContractManagementProps) {
         </div>
       )}
 
-      {isStudyOwnerOrAdmin && showUploadModal && (
+      {canModify && showUploadModal && (
         <ContractUploadForm
           study={study}
           onClose={() => {

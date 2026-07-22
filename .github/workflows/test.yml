@@ -83,6 +83,8 @@ jobs:
             - portal-e2e-tre@arctretest.onmicrosoft.com
           ig_ops_staff_usernames:
             - portal-e2e-ig@arctretest.onmicrosoft.com
+          ig_admin_usernames:
+            - portal-e2e-ig-admin@arctretest.onmicrosoft.com
           dsh_ops_staff_usernames:
             - portal-e2e-dsh@arctretest.onmicrosoft.com
           db:
