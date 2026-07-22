@@ -184,9 +184,10 @@ export default function ManageContractPage() {
             <label>Status:</label>
             <span>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</span>
           </div>
+
           <div className={styles.field}>
-            <label>Signatory:</label>
-            <span>{contract.organisation_signatory}</span>
+            <label>Created:</label>
+            <span>{formatDate(contract.created_at)}</span>
           </div>
 
           <div className={styles.field}>

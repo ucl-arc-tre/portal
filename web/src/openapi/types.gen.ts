@@ -715,7 +715,7 @@ export type ContractBase = {
     /**
      * Email of the organisation signatory
      */
-    organisation_signatory: string;
+    organisation_signatory?: string;
     /**
      * Other signatories to the contract. Could be name(s) or email(s)
      */

@@ -2442,7 +2442,6 @@ components:
       type: object
       required:
         - title
-        - organisation_signatory
         - status
         - asset_ids
       properties:
