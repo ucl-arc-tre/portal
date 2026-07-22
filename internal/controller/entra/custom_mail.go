@@ -203,7 +203,7 @@ func (c *Controller) SendStudySignoffExpiryNotification(ctx context.Context, ema
 	} else {
 		content += fmt.Sprintf("expires in %d days. ", days)
 	}
-	content += "Please login to the ARC Services Portal to re-affirm your Study details."
+	content += "Please log in to the ARC Services Portal to re-affirm your Study details."
 
 	subject := "Notification: Study affirmation expiry"
 	return c.sendCustomEmail(ctx, subject, []string{email}, content)
