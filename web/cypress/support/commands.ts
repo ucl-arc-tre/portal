@@ -37,6 +37,12 @@ declare global {
       loginAsIGOps(): Chainable<JQuery<HTMLElement>>;
 
       /**
+       * Custom command to login as a IG operations user
+       * @example cy.loginAsIGOps()
+       */
+      loginAsIGAdmin(): Chainable<JQuery<HTMLElement>>;
+
+      /**
        * Custom command to login as a TRE operations user
        * @example cy.loginAsTREOps()
        */
@@ -475,6 +481,27 @@ Cypress.Commands.add("loginAsIGOps", () => {
 
         log.snapshot("before");
         login(botIGUsername, botIGPassword);
+        log.snapshot("after");
+        log.end();
+      },
+      sessionOptions
+    );
+  });
+});
+
+Cypress.Commands.add("loginAsIGAdmin", () => {
+  cy.env(["botIGAdminUsername", "botIGAdminPassword"]).then(({ botIGAdminUsername, botIGAdminPassword }) => {
+    cy.session(
+      `login-ig-admin`,
+      () => {
+        const log = Cypress.log({
+          displayName: "Entra ID IG admin user Login",
+          message: [`🔐 Authenticating IG user`],
+          autoEnd: false,
+        });
+
+        log.snapshot("before");
+        login(botIGAdminUsername, botIGAdminPassword);
         log.snapshot("after");
         log.end();
       },
