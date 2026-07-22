@@ -222,7 +222,7 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 	assert.Equal(t, creator.ID, project.CreatorUserID)
 }
 
-func TestGetProjectTREDetails(t *testing.T) {
+func TestIntegration_GetProjectTREDetails(t *testing.T) {
 	svc, study, creator, treEnv, _ := setupProjectTRETest(t)
 
 	studyAdmin := types.StudyAdmin{
@@ -272,10 +272,12 @@ func TestGetProjectTREDetails(t *testing.T) {
 	require.NoError(t, svc.db.Create(&desktopImage).Error)
 
 	userConfig := types.ProjectTREUserConfig{
-		ProjectTREID:   projectTRE.ID,
-		UserID:         creator.ID,
-		UID:            1001,
-		DesktopImageID: &desktopImage.ID,
+		ProjectTREID:       projectTRE.ID,
+		UserID:             creator.ID,
+		UnixUsername:       "user1234",
+		TrustedEgressCIDRs: []string{"100.200.100.16/30"},
+		UID:                1001,
+		DesktopImageID:     &desktopImage.ID,
 	}
 	require.NoError(t, svc.db.Create(&userConfig).Error)
 
@@ -315,11 +317,13 @@ func TestGetProjectTREDetails(t *testing.T) {
 	require.Len(t, tre.UserConfigs, 1)
 	assert.Equal(t, userConfig.UID, tre.UserConfigs[0].UID)
 	assert.Equal(t, creator.Username, tre.UserConfigs[0].User.Username)
+	assert.Equal(t, userConfig.UnixUsername, tre.UserConfigs[0].UnixUsername)
+	assert.Equal(t, userConfig.TrustedEgressCIDRs, tre.UserConfigs[0].TrustedEgressCIDRs)
 	require.NotNil(t, tre.UserConfigs[0].DesktopImage)
 	assert.Equal(t, desktopImage.ImageId, tre.UserConfigs[0].DesktopImage.ImageId)
 }
 
-func TestGetAllProjectTREs(t *testing.T) {
+func TestIntegration_GetAllProjectTREs(t *testing.T) {
 	svc, study, creator, treEnv, otherEnv := setupProjectTRETest(t)
 
 	// Create TRE projects with possible statuses

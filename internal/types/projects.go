@@ -132,6 +132,8 @@ type ProjectTREUserConfig struct {
 	ProjectTREID                uuid.UUID `gorm:"not null;index"`
 	UserID                      uuid.UUID `gorm:"not null;index"`
 	UID                         int       `gorm:"not null"`
+	UnixUsername                string    `gorm:"not null;default:''"`
+	TrustedEgressCIDRs          []string  `gorm:"serializer:json"`
 	DesktopImageID              *uuid.UUID
 	DesktopRootVolumeSize       *GB
 	DesktopHomeVolumeSize       *GB
