@@ -160,11 +160,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   };
 
   const onSubmit = async (formData: ContractFormData) => {
-    // For upload mode, file is required
-    if (!editingContract && uploadFiles.length === 0) {
-      setError("Please select a file before submitting.");
-      return;
-    }
     setUploading(true);
     setIsSubmitting(true);
     setError(null);
