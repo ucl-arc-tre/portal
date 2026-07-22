@@ -151,7 +151,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 	validBase := openapi.ContractBase{
 		Title:                 "Valid Contract",
-		OrganisationSignatory: "user1@testIntegration.com",
+		OrganisationSignatory: new("user1@testIntegration.com"),
 		ThirdPartyName:        new("Third Party"),
 		Status:                openapi.ContractBaseStatusActive,
 		StartDate:             new(now.Format("2006-01-02")),
@@ -188,7 +188,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 		{
 			name: "invalid signatory",
 			modify: func(c *openapi.ContractBase) {
-				c.OrganisationSignatory = "bad@gmail.com"
+				c.OrganisationSignatory = new("bad@gmail.com")
 			},
 			expectErr: true,
 		},
@@ -321,7 +321,7 @@ func TestIntegration_CreateContract(t *testing.T) {
 
 	contractBase := openapi.ContractBase{
 		Title:                 "Integration Contract",
-		OrganisationSignatory: "user1@testIntegration.com",
+		OrganisationSignatory: new("user1@testIntegration.com"),
 		ThirdPartyName:        new("Third Party"),
 		Status:                openapi.ContractBaseStatusActive,
 		StartDate:             new("2024-01-01"),
@@ -333,7 +333,7 @@ func TestIntegration_CreateContract(t *testing.T) {
 	mockEntra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
 		Return([]types.Username{signatoryUser.Username}, nil)
 
-	mockUsers.On("PersistedUser", types.Username(contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
+	mockUsers.On("PersistedUser", types.Username(*contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
 
 	contract, err := svc.CreateContract(ctx, studyID, contractBase, creator)
 	assert.NoError(t, err)

@@ -1013,7 +1013,7 @@ type Contract struct {
 	ObjectsMetadata []ContractObjectMetadata `json:"objects_metadata"`
 
 	// OrganisationSignatory Email of the organisation signatory
-	OrganisationSignatory string `json:"organisation_signatory"`
+	OrganisationSignatory *string `json:"organisation_signatory,omitempty"`
 
 	// OtherSignatories Other signatories to the contract. Could be name(s) or email(s)
 	OtherSignatories *string `json:"other_signatories,omitempty"`
@@ -1058,7 +1058,7 @@ type ContractBase struct {
 	ExpiryDate *string `json:"expiry_date,omitempty"`
 
 	// OrganisationSignatory Email of the organisation signatory
-	OrganisationSignatory string `json:"organisation_signatory"`
+	OrganisationSignatory *string `json:"organisation_signatory,omitempty"`
 
 	// OtherSignatories Other signatories to the contract. Could be name(s) or email(s)
 	OtherSignatories *string `json:"other_signatories,omitempty"`

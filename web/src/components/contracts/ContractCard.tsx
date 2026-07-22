@@ -48,11 +48,6 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
     >
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
-          <span className={styles.label}>Organisation Signatory: </span>
-          <span className={styles.value}>{contract.organisation_signatory}</span>
-        </div>
-
-        <div className={styles["detail-item"]}>
           <span className={styles.label}>Third Party: </span>
           <span className={styles.value}>{contract.third_party_name}</span>
         </div>
