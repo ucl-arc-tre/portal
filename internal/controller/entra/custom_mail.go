@@ -132,7 +132,7 @@ func (c *Controller) SendCustomStudyReviewNotification(ctx context.Context, emai
 		subject = "Notification: Your Study has been approved!"
 		content = "Your Study has been approved! You will be notified when you have any contracts or assets approaching expiry."
 	case openapi.StudyApprovalStatusRejected:
-		content = "Your Study has not been approved, please review the feedback and request another review once the comments have been addressed."
+		content = "Your Study has not been approved. Please review the feedback and request another review once the comments have been addressed."
 		subject = "Notification: Unfortunately, your Study has not been approved"
 		if review.Feedback != nil {
 			content += " \nFeedback: " + *review.Feedback
