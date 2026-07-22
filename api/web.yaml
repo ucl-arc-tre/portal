@@ -1457,6 +1457,7 @@ components:
         - study-review
         - study-owner-change
         - user-name-change
+        - project-deployed
 
     Profile:
       type: object

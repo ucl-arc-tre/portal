@@ -57,7 +57,7 @@ test-integration:  ## Run integration tests
 	cd internal/testutils && \
 	docker compose -p $(INTTEST_PROJECT_NAME) build && \
 	docker compose -p $(INTTEST_PROJECT_NAME) up -d postgres-test && \
-	docker compose -p $(INTTEST_PROJECT_NAME) run --rm integration-tests && \
+	docker compose -p $(INTTEST_PROJECT_NAME) run integration-tests && \
 	docker compose -p $(INTTEST_PROJECT_NAME) down -v --remove-orphans
 
 test-e2e-cypress-dev: e2e-dependencies  ## Run Cypress locally against dockerised dev server
