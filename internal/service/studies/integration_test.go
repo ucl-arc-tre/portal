@@ -250,7 +250,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 			// set up mocks
 			mockEntra := new(mockcontrollers.MockEntra)
-			mockEntra.On("FindUsernames", ctx, base.OrganisationSignatory).
+			mockEntra.On("FindUsernames", ctx, *base.OrganisationSignatory).
 				Return(curTest.mockUsers, nil)
 
 			service := &Service{
@@ -330,7 +330,7 @@ func TestIntegration_CreateContract(t *testing.T) {
 	}
 
 	// set up mocks
-	mockEntra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
+	mockEntra.On("FindUsernames", ctx, *contractBase.OrganisationSignatory).
 		Return([]types.Username{signatoryUser.Username}, nil)
 
 	mockUsers.On("PersistedUser", types.Username(*contractBase.OrganisationSignatory)).Return(signatoryUser, nil)

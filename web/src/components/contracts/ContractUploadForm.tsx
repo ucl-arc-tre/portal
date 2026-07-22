@@ -54,8 +54,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const organisationName = process.env.NEXT_PUBLIC_ORGANISATION_NAME;
-
   const {
     register,
     handleSubmit,
