@@ -48,6 +48,11 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
     >
       <div className={styles.details}>
         <div className={styles["detail-item"]}>
+          <span className={styles.label}>Created: </span>
+          <span className={styles.value}>{formatDate(contract.created_at)}</span>
+        </div>
+
+        <div className={styles["detail-item"]}>
           <span className={styles.label}>Third Party: </span>
           <span className={styles.value}>{contract.third_party_name}</span>
         </div>
@@ -63,17 +68,13 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
           <span className={styles.label}>Expiry Date: </span>
           <span className={styles.value}>{contract.expiry_date ? formatDate(contract.expiry_date) : "None"}</span>
         </div>
-        <div className={styles["detail-item"]}>
-          <span className={styles.label}>Retention End Date: </span>
-          <span className={styles.value}>
-            {contract.retention_end_date ? formatDate(contract.retention_end_date) : "None"}
-          </span>
-        </div>
 
-        <div className={styles["detail-item"]}>
-          <span className={styles.label}>Uploaded: </span>
-          <span className={styles.value}>{formatDate(contract.created_at)}</span>
-        </div>
+        {contract.retention_end_date && (
+          <div className={styles["detail-item"]}>
+            <span className={styles.label}>Retention End Date: </span>
+            <span className={styles.value}>{formatDate(contract.retention_end_date)}</span>
+          </div>
+        )}
 
         <div className={styles["detail-item"]}>
           <span className={styles.label}>No. Linked Assets: </span>
