@@ -24,6 +24,8 @@ services:
     volumes:
       - type: volume
         target: /root/.cache/go-build
+      - type: volume
+        target: /go/pkg/mod
       - type: bind
         source: ../.. # actual project folder on your laptop
         target: /repo # where it appears inside the container, it is just an internal path, not tied to the real repo name
