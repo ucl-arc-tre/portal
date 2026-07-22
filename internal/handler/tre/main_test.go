@@ -1,10 +1,13 @@
 package tre
 
 import (
+	"maps"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -47,7 +50,8 @@ func TestToApiProjectResponse(t *testing.T) {
 				User: types.User{
 					Username: "user1@example.com",
 				},
-				UID: 1001,
+				UID:          1001,
+				UnixUsername: "user1unix",
 				DesktopImage: &types.ProjectTREVMImage{
 					ImageId: "ami-0001",
 				},
@@ -59,7 +63,9 @@ func TestToApiProjectResponse(t *testing.T) {
 				User: types.User{
 					Username: "user2@example.com",
 				},
-				UID: 1002,
+				UID:                1002,
+				UnixUsername:       "user2unix",
+				TrustedEgressCIDRs: []string{"50.40.50.16/28"},
 				DesktopImage: &types.ProjectTREVMImage{
 					ImageId: "ami-0002",
 				},
@@ -107,6 +113,12 @@ func TestToApiProjectResponse(t *testing.T) {
 			},
 			{
 				User: types.User{
+					Username: "user2@example.com",
+				},
+				Role: types.ProjectTRETrustedEgresser,
+			},
+			{
+				User: types.User{
 					Username: "user1@example.com",
 				},
 				Role: types.ProjectTREDesktopUser,
@@ -151,8 +163,8 @@ func TestToApiProjectResponse(t *testing.T) {
 
 	// Usernames
 	assert.Equal(t, 2, len(response.Usernames))
-	assert.Equal(t, "user1", response.Usernames["user1@example.com"])
-	assert.Equal(t, "user2", response.Usernames["user2@example.com"])
+	assert.Equal(t, "user1unix", response.Usernames["user1@example.com"])
+	assert.Equal(t, "user2unix", response.Usernames["user2@example.com"])
 
 	// Uids
 	assert.Equal(t, 2, len(response.Uids))
@@ -176,6 +188,12 @@ func TestToApiProjectResponse(t *testing.T) {
 	assert.Equal(t, 2, len(response.Downloaders))
 	assert.Contains(t, response.Downloaders, "user1@example.com")
 	assert.Contains(t, response.Downloaders, "user2@example.com")
+
+	// Trusted Downloaders
+	require.NotNil(t, response.TrustedDownloaders)
+	assert.Equal(t, 1, len(*response.TrustedDownloaders))
+	assert.Equal(t, "user2@example.com", slices.Collect(maps.Keys(*response.TrustedDownloaders))[0])
+	assert.Equal(t, []string{"50.40.50.16/28"}, (*response.TrustedDownloaders)["user2@example.com"])
 
 	// Desktop Users
 	assert.Equal(t, 2, len(response.DesktopUsers))

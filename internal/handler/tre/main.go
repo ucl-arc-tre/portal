@@ -110,42 +110,45 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 		Uids:                          map[string]int{},                         // Filled below
 		ApiUsers:                      []string{},                               // Filled below
 		Uploaders:                     []string{},                               // Filled below
-		Downloaders:                   []string{},                               // Filled below
 		EgressRequesters:              []string{},                               // Filled below
 		EgressCheckers:                []string{},                               // Filled below
+		Downloaders:                   []string{},                               // Filled below
+		TrustedDownloaders:            nil,                                      // Assigned below, if applicable
 		DesktopUsers:                  []string{},                               // Filled below
 		DesktopInstanceTypes:          map[string]openapi.DesktopInstanceType{}, // Filled below
 		EgressNumberRequiredApprovals: projectTRE.EgressNumberRequiredApprovals,
 		Airlock: openapi.Airlock{
+			HttpEnabled: true, // Always enabled
 			SshEnabled:  projectTRE.AirlockSSHEnabled,
 			SftpEnabled: projectTRE.AirlockSSHEnabled, // Same as SshEnabled
-			HttpEnabled: true,                         // Always enabled
 			Whitelist:   projectTRE.AirlockWhitelist,
 		},
 		RequestedVersionUpdatedAt: requestedVersionUpdatedAt(projectTRE),
 	}
 
 	// Populate user configs
-	for _, config := range projectTRE.UserConfigs {
-		username := string(config.User.Username)
+	trustedCIDRs := map[string][]string{}
+	for _, userConfig := range projectTRE.UserConfigs {
+		username := string(userConfig.User.Username)
+		trustedCIDRs[username] = userConfig.TrustedEgressCIDRs
 
 		// User identities
-		project.Usernames[username] = string(config.User.Username.LocalPart())
-		project.Uids[username] = int(config.UID)
+		project.Usernames[username] = userConfig.UnixUsername
+		project.Uids[username] = int(userConfig.UID)
 
 		// Desktop instance types
 		desktopInstanceType := openapi.DesktopInstanceType{}
-		if config.DesktopStandardInstanceType != nil {
-			desktopInstanceType.Standard = *config.DesktopStandardInstanceType
+		if userConfig.DesktopStandardInstanceType != nil {
+			desktopInstanceType.Standard = *userConfig.DesktopStandardInstanceType
 		}
-		if config.DesktopHPCInstanceType != nil {
-			desktopInstanceType.Hpc = *config.DesktopHPCInstanceType
+		if userConfig.DesktopHPCInstanceType != nil {
+			desktopInstanceType.Hpc = *userConfig.DesktopHPCInstanceType
 		}
-		if config.DesktopImage != nil {
-			desktopInstanceType.Image = config.DesktopImage.ImageId
+		if userConfig.DesktopImage != nil {
+			desktopInstanceType.Image = userConfig.DesktopImage.ImageId
 		}
-		if config.DesktopHomeVolumeSize != nil {
-			homeVolGB := int(*config.DesktopHomeVolumeSize)
+		if userConfig.DesktopHomeVolumeSize != nil {
+			homeVolGB := int(*userConfig.DesktopHomeVolumeSize)
 			desktopInstanceType.HomeVolumeGb = &homeVolGB
 		}
 		project.DesktopInstanceTypes[username] = desktopInstanceType
@@ -159,6 +162,11 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 			project.Uploaders = append(project.Uploaders, username)
 		case types.ProjectTREEgresser:
 			project.Downloaders = append(project.Downloaders, username)
+		case types.ProjectTRETrustedEgresser:
+			if project.TrustedDownloaders == nil {
+				project.TrustedDownloaders = &map[string][]string{}
+			}
+			(*project.TrustedDownloaders)[username] = trustedCIDRs[username]
 		case types.ProjectTREEgressRequester:
 			project.EgressRequesters = append(project.EgressRequesters, username)
 		case types.ProjectTREEgressChecker:

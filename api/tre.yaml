@@ -238,6 +238,13 @@ components:
           items:
             type: string
             description: Email of downloader
+        trusted_downloaders:
+          type: object
+          description: Email to CIDRs mappings of trusted downloaders
+          additionalProperties:
+            type: array
+            items:
+              type: string
         egress_requesters:
           type: array
           items:

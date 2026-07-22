@@ -121,6 +121,9 @@ type Project struct {
 	// RequestedVersionUpdatedAt Value of the updated_at field of requested version, in RFC3339 format
 	RequestedVersionUpdatedAt string `json:"requested_version_updated_at"`
 
+	// TrustedDownloaders Email to CIDRs mappings of trusted downloaders
+	TrustedDownloaders *map[string][]string `json:"trusted_downloaders,omitempty"`
+
 	// Uids Mapping of user emails to Linux UIDs
 	Uids      map[string]int `json:"uids"`
 	Uploaders []string       `json:"uploaders"`
