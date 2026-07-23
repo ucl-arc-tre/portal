@@ -8,6 +8,11 @@ type AuthCtxValue = {
   userData: Auth | null;
   refreshAuth: () => Promise<void>;
   isIGStaff: boolean;
+  isApprovedResearcher: boolean;
+  isTreOpsStaff: boolean;
+  isApprovedStaffResearcher: boolean;
+  isAdmin: boolean;
+  isIAO: boolean;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
@@ -15,6 +20,11 @@ const AuthCtx = createContext<AuthCtxValue>({
   isAuthed: false,
   userData: null,
   isIGStaff: false,
+  isApprovedResearcher: false,
+  isTreOpsStaff: false,
+  isApprovedStaffResearcher: false,
+  isIAO: false,
+  isAdmin: false,
   refreshAuth: () => Promise.resolve(),
 });
 
@@ -27,6 +37,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const cancelled = useRef(false);
   const isIGStaff = (userData?.roles.includes("ig-admin") || userData?.roles.includes("ig-ops-staff")) ?? false;
+  const isAdmin = userData?.roles.includes("admin") ?? false;
+  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff") ?? false;
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher") ?? false;
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
+  const isIAO = userData?.roles.includes("information-asset-owner") ?? false;
 
   const refreshAuth = useCallback(async () => {
     try {
@@ -57,7 +72,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshAuth]);
 
   return (
-    <AuthCtx.Provider value={{ authInProgress, isAuthed, userData, refreshAuth, isIGStaff }}>
+    <AuthCtx.Provider
+      value={{
+        authInProgress,
+        isAuthed,
+        userData,
+        refreshAuth,
+        isIGStaff,
+        isAdmin,
+        isApprovedResearcher,
+        isTreOpsStaff,
+        isApprovedStaffResearcher,
+        isIAO,
+      }}
+    >
       {children}
     </AuthCtx.Provider>
   );
