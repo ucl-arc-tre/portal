@@ -13,8 +13,8 @@ import (
 func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOpsStaff []types.User) error {
 	switch study.ApprovalStatus {
 	case types.StudyApprovalStatusApproved:
-		content := "Your study has been approved! You will be notified when you have any contracts or assets approaching expiry."
-		subject := "Notification: Your study has been approved!"
+		content := "Your Study has been approved! You will be notified when you have any contracts or assets approaching expiry."
+		subject := "Notification: Your Study has been approved!"
 		recipients := study.NotificationRecipients()
 		if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
 			log.Err(err).Msg("Failed to sent notify study review notification")
@@ -26,8 +26,8 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 		}
 		return s.createForAll(notification, recipients)
 	case types.StudyApprovalStatusRejected:
-		content := "Your study has not been approved, please review the feedback and request another review once the changes have been addressed."
-		subject := "Notification: Unfortunately, your study has not been approved"
+		content := "Your Study has not been approved, please review the feedback and request another review once the changes have been addressed."
+		subject := "Notification: Unfortunately, your Study has not been approved"
 		recipients := study.NotificationRecipients()
 		if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
 			log.Err(err).Msg("Failed to sent notify study review notification")
@@ -52,7 +52,7 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 }
 
 func (s *Service) NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error {
-	log.Debug().Any("oldOwner", study.Owner.Username).Msg("Notifying study owner change")
+	log.Debug().Any("oldOwner", study.Owner.Username).Msg("Notifying Study owner change")
 	notification := types.Notification{
 		Title:     fmt.Sprintf("Study '%s' is awaiting an owner change approval from '%s'", study.Title, study.Owner.Username),
 		Href:      new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
@@ -69,14 +69,16 @@ func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contr
 	}
 	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
 	if *days < 0 {
-		content = "You have a contract in the Study '" + study.Title + "' that has expired. Please sign in to the Portal to upload a new contract or update its status."
+		content = "You have a contract in the Study '" + study.Title + "' that has expired. "
 	} else if *days == 0 {
-		content += "today. Please sign in to the Portal to upload a new contract or update its status."
+		content += "today. "
 	} else if *days == 1 {
-		content += "tomorrow. Please sign in to the Portal to upload a new contract or update its status."
+		content += "tomorrow. "
 	} else {
-		content += "in " + fmt.Sprintf("%d", *days) + " days. Please sign in to the Portal to upload a new contract or update its status."
+		content += "in " + fmt.Sprintf("%d", *days) + " days. "
 	}
+	content += "Please sign in to the Portal to upload a new contract or update its status."
+
 	recipients := study.NotificationRecipients()
 	subject := fmt.Sprintf("Notification: Contract in '%s' is expiring", study.Title)
 	if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
@@ -92,8 +94,8 @@ func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contr
 }
 
 func (s *Service) NotifyIaaAssignment(ctx context.Context, iaa types.User, study types.Study) error {
-	content := "You have been added as an administrator to the Study '" + study.Title + "'. Please sign in to the Portal to view the study details and any upcoming tasks related to this role."
-	subject := "Notification: Study administrator assignment"
+	content := "You have been added as an Information Asset Administrator (IAA) to the Study '" + study.Title + "'. Please sign in to the Portal to view the Study details and sign the Administrator's Agreement."
+	subject := "Notification: Information Asset Administrator assignment"
 	if err := s.entra.SendEmail(ctx, subject, emails(iaa), content); err != nil {
 		log.Err(err).Msg("Failed to send contract IAA assignment notification email")
 	}
@@ -117,7 +119,7 @@ func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Stud
 	} else {
 		content += fmt.Sprintf("expires in %d days. ", days)
 	}
-	content += "Please login to the ARC Services Portal to complete the affirmation."
+	content += "Please log in to the ARC Services Portal to reaffirm your Study details."
 	subject := "Notification: Study affirmation expiry"
 	if err := s.entra.SendEmail(ctx, subject, emails(study.Owner), content); err != nil {
 		log.Err(err).Msg("Failed to send study affirmation expiry notification email")

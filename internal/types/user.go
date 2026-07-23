@@ -2,6 +2,7 @@ package types
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -14,6 +15,14 @@ type Username string // e.g. ccxyz@ucl.ac.uk
 
 func (u Username) IsValid() bool {
 	return usernameRegex.MatchString(string(u))
+}
+
+func (u Username) LocalPart() string {
+	local, _, ok := strings.Cut(string(u), "@")
+	if !ok {
+		return ""
+	}
+	return local
 }
 
 type ChosenName string // e.g. Alice Smith

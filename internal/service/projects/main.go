@@ -321,6 +321,32 @@ func (s *Service) genericProjectsQuery() *gorm.DB {
 		Joins("left join project_tres pt on pt.project_id = projects.id")
 }
 
+// Retrieve all active TRE projects together with role bindings and members.
+// Only projects with pending creation, deployed, or pending deletion status
+// are returned
+func (s *Service) AllProjectTREs() ([]types.ProjectTRE, error) {
+	var projectTREs []types.ProjectTRE
+	err := s.db.
+		Preload("Project").
+		Preload("TRERoleBindings.User").
+		Preload("Project.Study.Owner").
+		Preload("Project.Study.StudyAdmins.User").
+		Preload("UserConfigs.User").
+		Preload("UserConfigs.DesktopImage").
+		Joins("join projects on projects.id = project_tres.project_id").
+		Joins("join environments on environments.id = projects.environment_id").
+		Where("environments.name = ?", environments.TRE).
+		Where("projects.deleted_at IS NULL").
+		Where("project_tres.status IN ?", []types.ProjectTREStatus{
+			types.ProjectTREStatusPendingCreation,
+			types.ProjectTREStatusDeployed,
+			types.ProjectTREStatusPendingDeletion,
+		}).
+		Find(&projectTREs).Error
+
+	return projectTREs, types.NewErrFromGorm(err, "failed to retrieve project TREs")
+}
+
 // retrieves a single TRE project by ID with all related data
 func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error) {
 	var projectTRE types.ProjectTRE
@@ -745,7 +771,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			return types.NewErrClientInvalidObjectF("member uid and desktop config must be set")
 		}
 		var rootVolumeGb *uint
-		if v := member.DesktopConfig.RootVolumeGb; v != nil {
+		if v := member.DesktopConfig.RootVolumeGb; v != nil { // #nosec G115 -- volume gb size wont exceed MaxInt
 			rootVolumeGb = new(uint(*v))
 		}
 		userConfig := types.ProjectTREUserConfig{

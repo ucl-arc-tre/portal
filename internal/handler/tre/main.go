@@ -3,6 +3,7 @@ package tre
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -54,6 +55,20 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 	ctx.JSON(http.StatusOK, userStatus)
 }
 
+func (h *Handler) GetProjects(c *gin.Context) {
+	projectTREs, err := h.projects.AllProjectTREs()
+	if err != nil {
+		setError(c, err)
+		return
+	}
+
+	response := make([]openapi.Project, 0, len(projectTREs))
+	for _, tre := range projectTREs {
+		response = append(response, toApiProjectResponse(tre))
+	}
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *Handler) PostProjectsProjectName(ctx *gin.Context, projectName string) {
 	data := openapi.ProjectUpdate{}
 	if err := ctx.ShouldBindBodyWithJSON(&data); err != nil {
@@ -81,4 +96,99 @@ func (h *Handler) PostVmImages(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusNoContent)
+}
+
+// Convert TRE project to API project response type
+func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
+	project := openapi.Project{
+		Name:                          projectTRE.Project.Name,
+		Platform:                      string(projectTRE.Platform),
+		MonthlyBudget:                 float32(projectTRE.MonthlyBudget),
+		EncryptionKeyEnabled:          projectTRE.ExternalEncryptionEnabled,
+		Owners:                        projectOwners(projectTRE),
+		Usernames:                     map[string]string{},                      // Filled below
+		Uids:                          map[string]int{},                         // Filled below
+		ApiUsers:                      []string{},                               // Filled below
+		Uploaders:                     []string{},                               // Filled below
+		EgressRequesters:              []string{},                               // Filled below
+		EgressCheckers:                []string{},                               // Filled below
+		Downloaders:                   []string{},                               // Filled below
+		TrustedDownloaders:            nil,                                      // Assigned below, if applicable
+		DesktopUsers:                  []string{},                               // Filled below
+		DesktopInstanceTypes:          map[string]openapi.DesktopInstanceType{}, // Filled below
+		EgressNumberRequiredApprovals: projectTRE.EgressNumberRequiredApprovals,
+		Airlock: openapi.Airlock{
+			HttpEnabled: true, // Always enabled
+			SshEnabled:  projectTRE.AirlockSSHEnabled,
+			SftpEnabled: projectTRE.AirlockSSHEnabled, // Same as SshEnabled
+			Whitelist:   projectTRE.AirlockWhitelist,
+		},
+		RequestedVersionUpdatedAt: requestedVersionUpdatedAt(projectTRE),
+	}
+
+	// Populate user configs
+	trustedCIDRs := map[string][]string{}
+	for _, userConfig := range projectTRE.UserConfigs {
+		username := string(userConfig.User.Username)
+		trustedCIDRs[username] = userConfig.TrustedEgressCIDRs
+
+		// User identities
+		project.Usernames[username] = userConfig.UnixUsername
+		project.Uids[username] = int(userConfig.UID)
+
+		// Desktop instance types
+		desktopInstanceType := openapi.DesktopInstanceType{}
+		if userConfig.DesktopStandardInstanceType != nil {
+			desktopInstanceType.Standard = *userConfig.DesktopStandardInstanceType
+		}
+		if userConfig.DesktopHPCInstanceType != nil {
+			desktopInstanceType.Hpc = *userConfig.DesktopHPCInstanceType
+		}
+		if userConfig.DesktopImage != nil {
+			desktopInstanceType.Image = userConfig.DesktopImage.ImageId
+		}
+		if userConfig.DesktopHomeVolumeSize != nil {
+			homeVolGB := int(*userConfig.DesktopHomeVolumeSize)
+			desktopInstanceType.HomeVolumeGb = &homeVolGB
+		}
+		project.DesktopInstanceTypes[username] = desktopInstanceType
+	}
+
+	// Unwind role bindings into individual user lists
+	for _, binding := range projectTRE.TRERoleBindings {
+		username := string(binding.User.Username)
+		switch binding.Role {
+		case types.ProjectTREIngresser:
+			project.Uploaders = append(project.Uploaders, username)
+		case types.ProjectTREEgresser:
+			project.Downloaders = append(project.Downloaders, username)
+		case types.ProjectTRETrustedEgresser:
+			if project.TrustedDownloaders == nil {
+				project.TrustedDownloaders = &map[string][]string{}
+			}
+			(*project.TrustedDownloaders)[username] = trustedCIDRs[username]
+		case types.ProjectTREEgressRequester:
+			project.EgressRequesters = append(project.EgressRequesters, username)
+		case types.ProjectTREEgressChecker:
+			project.EgressCheckers = append(project.EgressCheckers, username)
+		case types.ProjectTREDesktopUser:
+			project.DesktopUsers = append(project.DesktopUsers, username)
+		case types.ProjectTREAPIUser:
+			project.ApiUsers = append(project.ApiUsers, username)
+		}
+	}
+	return project
+}
+
+func projectOwners(projectTRE types.ProjectTRE) []string {
+	owners := projectTRE.Project.Study.AdminUsernames()
+	owners = append(owners, string(projectTRE.Project.Study.Owner.Username))
+	return owners
+}
+
+func requestedVersionUpdatedAt(projectTRE types.ProjectTRE) string {
+	if projectTRE.RequestedVersionUpdatedAt != nil {
+		return projectTRE.RequestedVersionUpdatedAt.Format(time.RFC3339)
+	}
+	return ""
 }
