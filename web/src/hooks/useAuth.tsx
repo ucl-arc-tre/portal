@@ -8,6 +8,7 @@ type AuthCtxValue = {
   userData: Auth | null;
   refreshAuth: () => Promise<void>;
   isIGStaff: boolean;
+  isIGAdmin: boolean;
   isApprovedResearcher: boolean;
   isTreOpsStaff: boolean;
   isApprovedStaffResearcher: boolean;
@@ -21,6 +22,7 @@ const AuthCtx = createContext<AuthCtxValue>({
   isAuthed: false,
   userData: null,
   isIGStaff: false,
+  isIGAdmin: false,
   isApprovedResearcher: false,
   isTreOpsStaff: false,
   isApprovedStaffResearcher: false,
@@ -38,8 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userData, setUserData] = useState<Auth | null>(null);
 
   const cancelled = useRef(false);
-  const isIGStaff = (userData?.roles.includes("ig-admin") || userData?.roles.includes("ig-ops-staff")) ?? false;
   const isAdmin = userData?.roles.includes("admin") ?? false;
+  const isIGStaff = (userData?.roles.includes("ig-admin") || userData?.roles.includes("ig-ops-staff")) ?? false;
+  const isIGAdmin = userData?.roles.includes("ig-admin") ?? false;
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff") ?? false;
   const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff") ?? false;
   const isApprovedResearcher = userData?.roles.includes("approved-researcher") ?? false;
@@ -81,8 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthed,
         userData,
         refreshAuth,
-        isIGStaff,
         isAdmin,
+        isIGStaff,
+        isIGAdmin,
         isApprovedResearcher,
         isTreOpsStaff,
         isApprovedStaffResearcher,
