@@ -1,6 +1,7 @@
 package entra
 
 import (
+	"html/template"
 	"strings"
 
 	"github.com/google/uuid"
@@ -43,7 +44,7 @@ func (u UserPrincipalName) Username() types.Username {
 }
 
 type EmailTemplateParams struct {
-	Content   string
+	Content   template.HTML
 	PortalUrl string
 }
 

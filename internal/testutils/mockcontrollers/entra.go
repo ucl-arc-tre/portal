@@ -2,6 +2,7 @@ package mockcontrollers
 
 import (
 	"context"
+	"html/template"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
@@ -35,7 +36,7 @@ func (m *MockEntra) FindUsernames(ctx context.Context, query string) ([]types.Us
 	return args.Get(0).([]types.Username), args.Error(1)
 }
 
-func (m *MockEntra) SendEmail(ctx context.Context, subject string, emails []string, content string) error {
+func (m *MockEntra) SendEmail(ctx context.Context, subject string, emails []string, content template.HTML) error {
 	panic("not implemented")
 }
 

@@ -20,6 +20,7 @@ var (
 	baseMailTemplate = template.Must(template.New("baseMailTemplate").Parse(baseMailTemplateContent))
 )
 
+// WARNING: do not call with unstrusted  values
 func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	templateReader := new(bytes.Buffer)
 	err := baseMailTemplate.Execute(templateReader, params)
@@ -30,7 +31,7 @@ func newTemplatedEmailContent(params EmailTemplateParams) (*string, error) {
 	return &content, nil
 }
 
-func (c *Controller) SendEmail(ctx context.Context, subject string, emails []Email, content string) error {
+func (c *Controller) SendEmail(ctx context.Context, subject string, emails []Email, content template.HTML) error {
 
 	if len(emails) == 0 {
 		return types.NewErrInvalidObjectF("cannot send email to no recipients")
@@ -56,22 +57,6 @@ func (c *Controller) SendEmail(ctx context.Context, subject string, emails []Ema
 		return err
 	}
 	body.SetContent(emailContent)
-
-	// has attachments to allow banner to work
-	hasAttachments := true
-	message.SetHasAttachments(&hasAttachments)
-	banner := graphmodels.NewFileAttachment()
-	oDataType := "#microsoft.graph.fileAttachment"
-	banner.SetOdataType(&oDataType)
-	svgType := "image/svg+xml"
-	banner.SetContentType(&svgType)
-	svgName := "ucl-banner.svg"
-	banner.SetName(&svgName)
-	svgId := "uclBanner"
-	banner.SetContentId(&svgId)
-	banner.SetIsInline(&hasAttachments)
-
-	message.SetAttachments([]graphmodels.Attachmentable{banner})
 	message.SetBody(body)
 
 	// set up the recipients
