@@ -16,12 +16,11 @@ import { IconButton, XIcon } from "../shared/uikitExports";
 import router from "next/router";
 
 export default function UserTasks() {
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, isApprovedResearcher } = useAuth();
   const [notifications, setNotifications] = useState<Notification[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const completeProfileNotification = notifications?.find((notification) => notification.kind === "complete-profile");
   const needToCompleteProfile = completeProfileNotification !== undefined;
 

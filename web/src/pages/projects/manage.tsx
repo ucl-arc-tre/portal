@@ -31,7 +31,7 @@ import ProjectTabs from "@/components/projects/ProjectTabs";
 export default function ManageProjectPage() {
   const router = useRouter();
   const { projectId, environment } = router.query;
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, isAdmin, isTreOpsStaff, isApprovedResearcher } = useAuth();
   const [project, setProject] = useState<AnyProject | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,9 +43,6 @@ export default function ManageProjectPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isAdmin = userData?.roles.includes("admin");
-  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
   const canApprove = isAdmin || isTreOpsStaff;
   const canEdit =
     project?.creator_username == userData?.username ||

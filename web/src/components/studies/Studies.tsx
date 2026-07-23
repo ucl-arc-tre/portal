@@ -9,13 +9,11 @@ import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
 export default function Studies() {
-  const { userData, isIGStaff } = useAuth();
+  const { userData, isIGStaff, isApprovedStaffResearcher } = useAuth();
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
-
-  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
 
   if (!userData) return null;
 
