@@ -52,6 +52,34 @@ func (e VMImagePlatform) Valid() bool {
 	}
 }
 
+// Airlock defines model for Airlock.
+type Airlock struct {
+	// HttpEnabled Whether HTTP is enabled in airlock
+	HttpEnabled bool `json:"http_enabled"`
+
+	// SftpEnabled Whether SFTP is enabled in airlock
+	SftpEnabled bool `json:"sftp_enabled"`
+
+	// SshEnabled Whether SSH is enabled in airlock
+	SshEnabled bool     `json:"ssh_enabled"`
+	Whitelist  []string `json:"whitelist"`
+}
+
+// DesktopInstanceType defines model for DesktopInstanceType.
+type DesktopInstanceType struct {
+	// HomeVolumeGb Size of the home volume in GB
+	HomeVolumeGb *int `json:"home_volume_gb,omitempty"`
+
+	// Hpc HPC instance type
+	Hpc string `json:"hpc"`
+
+	// Image Image to use for the desktop instance
+	Image string `json:"image"`
+
+	// Standard Standard instance type
+	Standard string `json:"standard"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
@@ -60,6 +88,48 @@ type Error struct {
 // Ping defines model for Ping.
 type Ping struct {
 	Message string `json:"message"`
+}
+
+// Project defines model for Project.
+type Project struct {
+	Airlock  Airlock  `json:"airlock"`
+	ApiUsers []string `json:"api_users"`
+
+	// DesktopInstanceTypes Mapping of user email to desktop instance type configuration
+	DesktopInstanceTypes map[string]DesktopInstanceType `json:"desktop_instance_types"`
+	DesktopUsers         []string                       `json:"desktop_users"`
+	Downloaders          []string                       `json:"downloaders"`
+	EgressCheckers       []string                       `json:"egress_checkers"`
+
+	// EgressNumberRequiredApprovals Number of approvals required to egress/download
+	EgressNumberRequiredApprovals int      `json:"egress_number_required_approvals"`
+	EgressRequesters              []string `json:"egress_requesters"`
+
+	// EncryptionKeyEnabled Whether RDSS encryption is enabled
+	EncryptionKeyEnabled bool `json:"encryption_key_enabled"`
+
+	// MonthlyBudget Monthly budget in USD
+	MonthlyBudget float32 `json:"monthly_budget"`
+
+	// Name Unique project name
+	Name   string   `json:"name"`
+	Owners []string `json:"owners"`
+
+	// Platform TRE platform on which the project is hosted
+	Platform string `json:"platform"`
+
+	// RequestedVersionUpdatedAt Value of the updated_at field of requested version, in RFC3339 format
+	RequestedVersionUpdatedAt string `json:"requested_version_updated_at"`
+
+	// TrustedDownloaders Email to CIDRs mappings of trusted downloaders
+	TrustedDownloaders *map[string][]string `json:"trusted_downloaders,omitempty"`
+
+	// Uids Mapping of user emails to Linux UIDs
+	Uids      map[string]int `json:"uids"`
+	Uploaders []string       `json:"uploaders"`
+
+	// Usernames Mapping of emails to userids
+	Usernames map[string]string `json:"usernames"`
 }
 
 // ProjectUpdate defines model for ProjectUpdate.
@@ -123,6 +193,9 @@ type ServerInterface interface {
 	// (GET /ping)
 	GetPing(c *gin.Context)
 
+	// (GET /projects)
+	GetProjects(c *gin.Context)
+
 	// (POST /projects/{projectName})
 	PostProjectsProjectName(c *gin.Context, projectName string)
 
@@ -155,6 +228,21 @@ func (siw *ServerInterfaceWrapper) GetPing(c *gin.Context) {
 	}
 
 	siw.Handler.GetPing(c)
+}
+
+// GetProjects operation middleware
+func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
+
+	c.Set(string(JWTScopes), []string{"tre:r"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjects(c)
 }
 
 // PostProjectsProjectName operation middleware
@@ -258,5 +346,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 	router.GET(options.BaseURL+"/user-status", wrapper.GetUserStatus)
 	router.POST(options.BaseURL+"/vm-images", wrapper.PostVmImages)
+	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)
 	router.POST(options.BaseURL+"/projects/:projectName", wrapper.PostProjectsProjectName)
 }

@@ -38,6 +38,7 @@ func migrate(db *gorm.DB) error {
 		&types.ProjectTRE{},
 		&types.ProjectTRERoleBinding{},
 		&types.ProjectTREUserConfig{},
+		&types.ProjectTREVMImage{},
 		&types.ProjectAsset{},
 		&types.Notification{},
 	)
@@ -219,4 +220,238 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 	project := projectTRE.Project
 	assert.Equal(t, "proj123", project.Name)
 	assert.Equal(t, creator.ID, project.CreatorUserID)
+}
+
+func TestIntegration_GetProjectTREDetails(t *testing.T) {
+	svc, study, creator, treEnv, _ := setupProjectTRETest(t)
+
+	studyAdmin := types.StudyAdmin{
+		StudyID: study.ID,
+		UserID:  creator.ID,
+	}
+	require.NoError(t, svc.db.Create(&studyAdmin).Error)
+
+	project := types.Project{
+		Name:          "project123",
+		StudyID:       study.ID,
+		CreatorUserID: creator.ID,
+		EnvironmentID: treEnv.ID,
+	}
+	require.NoError(t, svc.db.Create(&project).Error)
+
+	requestedAt := time.Now().Truncate(time.Second)
+	deployedAt := requestedAt.Add(128 * time.Minute)
+
+	projectTRE := types.ProjectTRE{
+		ProjectID:                     project.ID,
+		EgressNumberRequiredApprovals: 2,
+		ExternalEncryptionEnabled:     true,
+		AirlockSSHEnabled:             true,
+		AirlockWhitelist:              types.ProjectTREWhitelist{"example.com"},
+		Status:                        types.ProjectTREStatusDeployed,
+		MonthlyBudget:                 400,
+		Platform:                      types.ProjectTREPlatformAWS,
+		RequestedVersionUpdatedAt:     &requestedAt,
+		DeployedVersionUpdatedAt:      &deployedAt,
+	}
+	require.NoError(t, svc.db.Create(&projectTRE).Error)
+
+	roleBinding := types.ProjectTRERoleBinding{
+		ProjectTREID: projectTRE.ID,
+		UserID:       creator.ID,
+		Role:         types.ProjectTREDesktopUser,
+	}
+	require.NoError(t, svc.db.Create(&roleBinding).Error)
+
+	desktopImage := types.ProjectTREVMImage{
+		Name:        "rhel10",
+		ImageId:     "ami-123",
+		Description: "Desktop image",
+		Platform:    types.ProjectTREPlatformAWS,
+	}
+	require.NoError(t, svc.db.Create(&desktopImage).Error)
+
+	userConfig := types.ProjectTREUserConfig{
+		ProjectTREID:       projectTRE.ID,
+		UserID:             creator.ID,
+		UnixUsername:       "user1234",
+		TrustedEgressCIDRs: []string{"100.200.100.16/30"},
+		UID:                1001,
+		DesktopImageID:     &desktopImage.ID,
+	}
+	require.NoError(t, svc.db.Create(&userConfig).Error)
+
+	projectTREs, err := svc.AllProjectTREs()
+	require.NoError(t, err)
+	require.Len(t, projectTREs, 1)
+
+	tre := projectTREs[0]
+
+	assert.Equal(t, project.Name, tre.Project.Name)
+	assert.Equal(t, creator.ID, tre.Project.CreatorUserID)
+	assert.Equal(t, study.ID, tre.Project.StudyID)
+	assert.Equal(t, treEnv.ID, tre.Project.EnvironmentID)
+
+	assert.Equal(t, projectTRE.ID, tre.ID)
+	assert.Equal(t, projectTRE.ProjectID, tre.ProjectID)
+	assert.Equal(t, projectTRE.EgressNumberRequiredApprovals, tre.EgressNumberRequiredApprovals)
+	assert.Equal(t, projectTRE.ExternalEncryptionEnabled, tre.ExternalEncryptionEnabled)
+	assert.Equal(t, projectTRE.AirlockSSHEnabled, tre.AirlockSSHEnabled)
+	assert.Equal(t, projectTRE.AirlockWhitelist, tre.AirlockWhitelist)
+	assert.Equal(t, projectTRE.Status, tre.Status)
+	assert.Equal(t, projectTRE.MonthlyBudget, tre.MonthlyBudget)
+	assert.Equal(t, projectTRE.Platform, tre.Platform)
+	require.NotNil(t, tre.RequestedVersionUpdatedAt)
+	assert.Equal(t, requestedAt, *tre.RequestedVersionUpdatedAt)
+	require.NotNil(t, tre.DeployedVersionUpdatedAt)
+	assert.Equal(t, deployedAt, *tre.DeployedVersionUpdatedAt)
+
+	assert.Equal(t, creator.Username, tre.Project.Study.Owner.Username)
+	require.Len(t, tre.Project.Study.StudyAdmins, 1)
+	assert.Equal(t, creator.Username, tre.Project.Study.StudyAdmins[0].User.Username)
+
+	require.Len(t, tre.TRERoleBindings, 1)
+	assert.Equal(t, types.ProjectTREDesktopUser, tre.TRERoleBindings[0].Role)
+	assert.Equal(t, creator.Username, tre.TRERoleBindings[0].User.Username)
+
+	require.Len(t, tre.UserConfigs, 1)
+	assert.Equal(t, userConfig.UID, tre.UserConfigs[0].UID)
+	assert.Equal(t, creator.Username, tre.UserConfigs[0].User.Username)
+	assert.Equal(t, userConfig.UnixUsername, tre.UserConfigs[0].UnixUsername)
+	assert.Equal(t, userConfig.TrustedEgressCIDRs, tre.UserConfigs[0].TrustedEgressCIDRs)
+	require.NotNil(t, tre.UserConfigs[0].DesktopImage)
+	assert.Equal(t, desktopImage.ImageId, tre.UserConfigs[0].DesktopImage.ImageId)
+}
+
+func TestIntegration_GetAllProjectTREs(t *testing.T) {
+	svc, study, creator, treEnv, otherEnv := setupProjectTRETest(t)
+
+	// Create TRE projects with possible statuses
+	for _, status := range []types.ProjectTREStatus{
+		types.ProjectTREStatusIncomplete,
+		types.ProjectTREStatusPendingApproval,
+		types.ProjectTREStatusPendingCreation,
+		types.ProjectTREStatusDeployed,
+		types.ProjectTREStatusPendingDeletion,
+	} {
+		createTREProject(t, svc.db, string(status)+"-project", study, creator, treEnv, status)
+	}
+
+	// Create and delete a TRE project
+	deleted := createTREProject(t, svc.db, "Deleted", study, creator, treEnv, types.ProjectTREStatusDeleted)
+	require.NoError(t, svc.db.Where("id = ?", deleted.ProjectID).Delete(&types.Project{}).Error)
+
+	// Create a non-TRE project
+	createNonTREProject(t, svc.db, study, creator, otherEnv, types.ProjectTREStatusDeployed)
+
+	projectTREs, err := svc.AllProjectTREs()
+	require.NoError(t, err)
+
+	// Should return only TRE projects with PendingCreation/Deployed/PendingDeletion
+	// statuses and are not deleted, so only 3 projects
+	require.Len(t, projectTREs, 3)
+	returnedStatuses := make([]types.ProjectTREStatus, 0, len(projectTREs))
+	for _, tre := range projectTREs {
+		returnedStatuses = append(returnedStatuses, tre.Status)
+	}
+	assert.Contains(t, returnedStatuses, types.ProjectTREStatusPendingCreation)
+	assert.Contains(t, returnedStatuses, types.ProjectTREStatusDeployed)
+	assert.Contains(t, returnedStatuses, types.ProjectTREStatusPendingDeletion)
+}
+
+func setupProjectTRETest(t *testing.T) (
+	*Service,
+	*types.Study,
+	*types.User,
+	*types.Environment,
+	*types.Environment,
+) {
+	t.Helper()
+
+	db := mockdb.NewTestDBSchema(t, migrate)
+	graceful.SetDBForTesting(db)
+	rbac.Init()
+
+	svc := &Service{
+		db: db,
+	}
+
+	creator := types.User{Username: "foo@testIntegration.com"}
+	require.NoError(t, db.Create(&creator).Error)
+
+	// TRE environment
+	treEnv := types.Environment{
+		Name: environments.TRE,
+		Tier: 3,
+	}
+	require.NoError(t, db.Create(&treEnv).Error)
+
+	// Non-TRE environment
+	otherEnv := types.Environment{
+		Name: "Not-a-TRE",
+		Tier: 1,
+	}
+	require.NoError(t, db.Create(&otherEnv).Error)
+
+	study := types.Study{
+		OwnerUserID:    creator.ID,
+		ApprovalStatus: string(openapi.ProjectTREStatusIncomplete),
+	}
+	require.NoError(t, db.Create(&study).Error)
+
+	return svc, &study, &creator, &treEnv, &otherEnv
+}
+
+func createTREProject(
+	t *testing.T,
+	db *gorm.DB,
+	name string,
+	study *types.Study,
+	creator *types.User,
+	treEnv *types.Environment,
+	status types.ProjectTREStatus,
+) *types.ProjectTRE {
+	t.Helper()
+
+	project := types.Project{
+		Name:          name,
+		StudyID:       study.ID,
+		CreatorUserID: creator.ID,
+		EnvironmentID: treEnv.ID,
+	}
+	require.NoError(t, db.Create(&project).Error)
+
+	projectTRE := types.ProjectTRE{
+		ProjectID:                     project.ID,
+		EgressNumberRequiredApprovals: 1,
+		Status:                        status,
+	}
+	require.NoError(t, db.Create(&projectTRE).Error)
+	return &projectTRE
+}
+
+func createNonTREProject(
+	t *testing.T,
+	db *gorm.DB,
+	study *types.Study,
+	creator *types.User,
+	otherEnv *types.Environment,
+	status types.ProjectTREStatus,
+) {
+	t.Helper()
+
+	nonTREProject := types.Project{
+		Name:          "nonTREproject",
+		StudyID:       study.ID,
+		CreatorUserID: creator.ID,
+		EnvironmentID: otherEnv.ID,
+	}
+	require.NoError(t, db.Create(&nonTREProject).Error)
+
+	nonTREProjectTRE := types.ProjectTRE{
+		ProjectID:                     nonTREProject.ID,
+		EgressNumberRequiredApprovals: 1,
+		Status:                        status,
+	}
+	require.NoError(t, db.Create(&nonTREProjectTRE).Error)
 }

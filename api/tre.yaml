@@ -70,6 +70,22 @@ paths:
           description: Unauthenticated
         "406":
           $ref: "#/components/responses/InvalidObject"
+  /projects:
+    get:
+      description: Get the list of TRE projects
+      security:
+        - JWT: ["tre:r"]
+      responses:
+        "200":
+          description: List of TRE projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthenticated
         "500":
           description: Internal server error
         default:
@@ -158,6 +174,148 @@ components:
           enum:
             - aws
             - condenser
+
+    Project:
+      type: object
+      required:
+        - name
+        - platform
+        - monthly_budget
+        - encryption_key_enabled
+        - owners
+        - api_users
+        - usernames
+        - uids
+        - uploaders
+        - downloaders
+        - egress_requesters
+        - egress_checkers
+        - desktop_users
+        - egress_number_required_approvals
+        - requested_version_updated_at
+        - airlock
+        - desktop_instance_types
+      properties:
+        name:
+          type: string
+          description: Unique project name
+        platform:
+          type: string
+          description: TRE platform on which the project is hosted
+        monthly_budget:
+          type: number
+          description: Monthly budget in USD
+        encryption_key_enabled:
+          type: boolean
+          description: Whether RDSS encryption is enabled
+        owners:
+          type: array
+          items:
+            type: string
+            description: Email of project IAO
+        api_users:
+          type: array
+          items:
+            type: string
+            description: Email of TRE API user
+        usernames:
+          type: object
+          description: Mapping of emails to userids
+          additionalProperties:
+            type: string
+        uids:
+          type: object
+          description: Mapping of user emails to Linux UIDs
+          additionalProperties:
+            type: integer
+        uploaders:
+          type: array
+          items:
+            type: string
+            description: Email of uploader
+        downloaders:
+          type: array
+          items:
+            type: string
+            description: Email of downloader
+        trusted_downloaders:
+          type: object
+          description: Email to CIDRs mappings of trusted downloaders
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        egress_requesters:
+          type: array
+          items:
+            type: string
+            description: Email of egress requester
+        egress_checkers:
+          type: array
+          items:
+            type: string
+            description: Email of egress checker
+        desktop_users:
+          type: array
+          items:
+            type: string
+            description: Email of desktop user
+        egress_number_required_approvals:
+          type: integer
+          description: Number of approvals required to egress/download
+        requested_version_updated_at:
+          type: string
+          description: Value of the updated_at field of requested version, in RFC3339 format
+        airlock:
+          $ref: "#/components/schemas/Airlock"
+        desktop_instance_types:
+          type: object
+          description: Mapping of user email to desktop instance type configuration
+          additionalProperties:
+            $ref: "#/components/schemas/DesktopInstanceType"
+
+    Airlock:
+      type: object
+      required:
+        - sftp_enabled
+        - ssh_enabled
+        - http_enabled
+        - whitelist
+      properties:
+        sftp_enabled:
+          type: boolean
+          description: Whether SFTP is enabled in airlock
+        ssh_enabled:
+          type: boolean
+          description: Whether SSH is enabled in airlock
+        http_enabled:
+          type: boolean
+          description: Whether HTTP is enabled in airlock
+        whitelist:
+          type: array
+          items:
+            type: string
+            description: Allowed hostname to connect to airlock
+
+    DesktopInstanceType:
+      type: object
+      required:
+        - image
+        - standard
+        - hpc
+      properties:
+        image:
+          type: string
+          description: Image to use for the desktop instance
+        standard:
+          type: string
+          description: Standard instance type
+        hpc:
+          type: string
+          description: HPC instance type
+        home_volume_gb:
+          type: integer
+          description: Size of the home volume in GB
 
     ProjectUpdate:
       type: object
