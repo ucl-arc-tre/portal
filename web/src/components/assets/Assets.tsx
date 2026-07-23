@@ -8,8 +8,9 @@ import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
-import { AlertMessage, Alert, InfoIcon } from "../shared/uikitExports";
+import { InfoIcon } from "../shared/uikitExports";
 import Box from "../ui/Box";
+import ErrorMessage from "../ui/Error";
 import { AssetDefinition } from "../shared/entityDefinitions";
 
 type AssetsProps = {
@@ -61,7 +62,13 @@ export default function Assets(props: AssetsProps) {
         <div className={styles.header}>
           <h3>
             Asset Management{" "}
-            <Button onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)} variant="tertiary" size="small" inline>
+            <Button
+              onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+              variant="tertiary"
+              size="small"
+              inline
+              aria-label="Toggle asset definition"
+            >
               <InfoIcon />
             </Button>
           </h3>
@@ -82,11 +89,7 @@ export default function Assets(props: AssetsProps) {
             </>
           )}
         </div>
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <ErrorMessage message={error} />}
 
         {infoCalloutExpanded && <AssetDefinition />}
 

@@ -75,16 +75,6 @@
   color: var(--color-text);
 }
 
-.error {
-  color: #721c24;
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.75rem;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: var(--default-border-radius);
-}
-
 .success {
   color: var(--color-success);
   font-size: 0.875rem;
@@ -125,7 +115,7 @@
 }
 
 .form-error {
-  color: #dc3545;
+  color: var(--error-text);
   font-size: 1rem;
   font-weight: 500;
 }

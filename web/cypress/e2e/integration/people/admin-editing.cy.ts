@@ -1,4 +1,6 @@
 describe("Admin can edit people", () => {
+  const editedName = "Alice Smith";
+
   beforeEach(() => {
     cy.clearCookies();
     cy.clearLocalStorage();
@@ -6,20 +8,31 @@ describe("Admin can edit people", () => {
     cy.visit("/people");
   });
 
-  it("can edit a person's training record", () => {
+  it("can edit a person's name", () => {
     cy.env(["botBaseUsername"]).then(({ botBaseUsername }) => {
       cy.get("[data-testid='ucl-uikit-search']").type("portal");
       cy.get("[data-testid='ucl-uikit-search-search-btn']").click();
-      cy.contains("tr", botBaseUsername).find("[data-cy='training']").contains("Edit").click();
+      cy.contains(`${botBaseUsername}`).click({ force: true });
+      cy.get('[data-cy="edit-name-button"]').click();
+      cy.get("#chosenName").clear().type(editedName);
+      cy.get('[data-cy="save-name"]').click();
+      cy.contains(editedName).should("be.visible");
+    });
+  });
 
+  it("can add a person's training record", () => {
+    cy.env(["botBaseUsername"]).then(({ botBaseUsername }) => {
+      cy.get("[data-testid='ucl-uikit-search']").type("portal");
+      cy.get("[data-testid='ucl-uikit-search-search-btn']").click();
+      cy.contains(`${botBaseUsername}`).click({ force: true });
+
+      cy.get('[data-cy="add-training-record"]').click();
       cy.get("select[name='training_kind']").select("NHS Digital E-learning for Health");
       cy.get("[data-cy=set-to-today]").click();
       cy.get("[name='training_date']").should("not.be.visible");
       cy.get("button").contains("Submit").click();
-      cy.contains("tr", botBaseUsername)
-        .find("[data-cy='training']")
-        .contains("NHS Digital E-learning for Health")
-        .should("be.visible");
+
+      cy.contains("NHS Digital E-learning for Health").should("be.visible");
     });
   });
 });
@@ -33,6 +46,7 @@ describe("Base cannot edit people", () => {
   });
 
   it("cannot access an edit button", () => {
-    cy.contains("Edit").should("not.exist");
+    cy.contains("You do not have permission to view this page").should("be.visible");
+    cy.contains("search").should("not.exist");
   });
 });

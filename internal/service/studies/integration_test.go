@@ -18,6 +18,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mocknotifications"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockusers"
 	"gorm.io/gorm"
 
@@ -150,7 +151,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 	validBase := openapi.ContractBase{
 		Title:                 "Valid Contract",
-		OrganisationSignatory: "user1@testIntegration.com",
+		OrganisationSignatory: new("user1@testIntegration.com"),
 		ThirdPartyName:        new("Third Party"),
 		Status:                openapi.ContractBaseStatusActive,
 		StartDate:             new(now.Format("2006-01-02")),
@@ -187,7 +188,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 		{
 			name: "invalid signatory",
 			modify: func(c *openapi.ContractBase) {
-				c.OrganisationSignatory = "bad@gmail.com"
+				c.OrganisationSignatory = new("bad@gmail.com")
 			},
 			expectErr: true,
 		},
@@ -249,7 +250,7 @@ func TestIntegration_ValidateContract(t *testing.T) {
 
 			// set up mocks
 			mockEntra := new(mockcontrollers.MockEntra)
-			mockEntra.On("FindUsernames", ctx, base.OrganisationSignatory).
+			mockEntra.On("FindUsernames", ctx, *base.OrganisationSignatory).
 				Return(curTest.mockUsers, nil)
 
 			service := &Service{
@@ -320,7 +321,7 @@ func TestIntegration_CreateContract(t *testing.T) {
 
 	contractBase := openapi.ContractBase{
 		Title:                 "Integration Contract",
-		OrganisationSignatory: "user1@testIntegration.com",
+		OrganisationSignatory: new("user1@testIntegration.com"),
 		ThirdPartyName:        new("Third Party"),
 		Status:                openapi.ContractBaseStatusActive,
 		StartDate:             new("2024-01-01"),
@@ -329,10 +330,10 @@ func TestIntegration_CreateContract(t *testing.T) {
 	}
 
 	// set up mocks
-	mockEntra.On("FindUsernames", ctx, contractBase.OrganisationSignatory).
+	mockEntra.On("FindUsernames", ctx, *contractBase.OrganisationSignatory).
 		Return([]types.Username{signatoryUser.Username}, nil)
 
-	mockUsers.On("PersistedUser", types.Username(contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
+	mockUsers.On("PersistedUser", types.Username(*contractBase.OrganisationSignatory)).Return(signatoryUser, nil)
 
 	contract, err := svc.CreateContract(ctx, studyID, contractBase, creator)
 	assert.NoError(t, err)
@@ -610,11 +611,13 @@ func TestIntegration_CreateStudy(t *testing.T) {
 
 	mockUsers := new(mockusers.MockUsers)
 	mockEntra := new(mockcontrollers.MockEntra)
+	mockNotifications := new(mocknotifications.MockNotifications)
 
 	service := &Service{
-		db:    db,
-		entra: mockEntra,
-		users: mockUsers,
+		db:            db,
+		entra:         mockEntra,
+		users:         mockUsers,
+		notifications: mockNotifications,
 	}
 
 	// Seed owner

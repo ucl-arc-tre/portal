@@ -46,7 +46,7 @@ func (m *Manager) checkAssetsExpiry() error {
 		}
 
 		log.Debug().Str("study", study.Title).Msg("Notifying assets expiry")
-		err := m.entra.SendAssetExpiryNotification(ctx, assetsShouldNotify, study)
+		err := m.notifications.NotifyAssetExpiry(ctx, assetsShouldNotify, study)
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func (m *Manager) checkContractsExpiry() error {
 		}
 
 		log.Debug().Str("study", study.Title).Str("contract", contract.Title).Msg("Notifying contract expiry")
-		err := m.entra.SendContractExpiryNotification(ctx, *contract, study)
+		err := m.notifications.NotifyContractExpiry(ctx, *contract, study)
 		if err != nil {
 			return err
 		}
@@ -122,9 +122,7 @@ func (m *Manager) checkTrainingCertificatesExpiry() error {
 			continue
 		}
 
-		recipient := string(trainingRecord.User.Username)
-		log.Debug().Any("username", recipient).Msg("Notifying training expiry")
-		err := m.entra.SendTrainingExpiryNotification(ctx, recipient, trainingRecord)
+		err := m.notifications.NotifyTrainingExpiry(ctx, trainingRecord)
 		if err != nil {
 			return err
 		}
@@ -152,7 +150,7 @@ func (m *Manager) checkStudySignoffExpiry() error {
 		}
 
 		log.Debug().Str("study", study.Title).Any("owner", study.Owner.Username).Msg("Notifying study signoff")
-		err := m.entra.SendStudySignoffExpiryNotification(ctx, string(study.Owner.Username), study)
+		err := m.notifications.NotifyStudySignoffExpiry(ctx, study)
 		if err != nil {
 			return err
 		}

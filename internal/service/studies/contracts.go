@@ -23,9 +23,20 @@ func (s *Service) validateContract(ctx context.Context, studyId uuid.UUID, data 
 		return types.NewErrClientInvalidObjectF("Title must be between 2 and 100 characters")
 	}
 
-	organisationSignatoryPattern := regexp.MustCompile(`^[^@]+@` + config.EntraTenantPrimaryDomain() + `$`)
-	if !organisationSignatoryPattern.MatchString(data.OrganisationSignatory) || entra.IsExternalUsername(types.Username(data.OrganisationSignatory)) {
-		return types.NewErrClientInvalidObjectF("Organisation signatory must be a valid internal email")
+	if signatory := data.OrganisationSignatory; signatory != nil {
+		organisationSignatoryPattern := regexp.MustCompile(`^[^@]+@` + config.EntraTenantPrimaryDomain() + `$`)
+		if !organisationSignatoryPattern.MatchString(*signatory) || entra.IsExternalUsername(types.Username(*signatory)) {
+			return types.NewErrClientInvalidObjectF("Organisation signatory must be a valid internal email")
+		}
+
+		signatoryUsernames, err := s.entra.FindUsernames(ctx, *data.OrganisationSignatory)
+		if err != nil {
+			log.Err(err).Msg("Failed to find usernames from entra")
+			return types.NewErrClientInvalidObjectF("Failed to lookup organisation signatory in EntraID")
+		} else if len(signatoryUsernames) != 1 {
+			log.Debug().Any("signatoryUsernames", signatoryUsernames).Msg("Found organisation Signatory")
+			return types.NewErrClientInvalidObjectF("Organisation signatory did not match one person")
+		}
 	}
 
 	if data.OtherSignatories != nil && !validation.OtherSignatoriesStringPattern.MatchString(*data.OtherSignatories) {
@@ -73,43 +84,36 @@ func (s *Service) validateContract(ctx context.Context, studyId uuid.UUID, data 
 		return types.NewErrClientInvalidObjectF("Did not find existing study assets")
 	}
 
-	signatoryUsernames, err := s.entra.FindUsernames(ctx, data.OrganisationSignatory)
-	if err != nil {
-		log.Err(err).Msg("Failed to find usernames from entra")
-		return types.NewErrClientInvalidObjectF("Failed to lookup organisation signatory in EntraID")
-	} else if len(signatoryUsernames) != 1 {
-		log.Debug().Any("signatoryUsernames", signatoryUsernames).Msg("Found organisation Signatory")
-		return types.NewErrClientInvalidObjectF("Organisation signatory did not match one person")
-	}
-
 	return nil
 }
 
 func (s *Service) CreateContract(
 	ctx context.Context,
 	studyID uuid.UUID,
-	contractBase openapi.ContractBase,
+	data openapi.ContractBase,
 	creator types.User,
 ) (*types.Contract, error) {
 	log.Debug().Msg("Storing contract")
 
-	if err := s.validateContract(ctx, studyID, contractBase); err != nil {
+	if err := s.validateContract(ctx, studyID, data); err != nil {
 		return nil, err
 	}
 
-	contract, err := contractFromBase(contractBase)
+	contract, err := contractFromBase(data)
 	if err != nil {
 		return nil, err
 	}
 	contract.StudyID = studyID
 	contract.CreatorUserID = creator.ID
 
-	signatory, err := s.persistedContractSignatory(ctx, contractBase.OrganisationSignatory)
-	if err != nil {
-		return nil, err
+	if data.OrganisationSignatory != nil {
+		signatory, err := s.persistedContractSignatory(ctx, *data.OrganisationSignatory)
+		if err != nil {
+			return nil, err
+		}
+		contract.SignatoryUserId = &signatory.ID
+		contract.SignatoryUser = signatory
 	}
-	contract.SignatoryUserId = &signatory.ID
-	contract.SignatoryUser = signatory
 
 	// Store the contract metadata in the database first to generate an ID
 	if err := s.db.Create(&contract).Error; err != nil {
@@ -260,7 +264,7 @@ func (s *Service) UpdateContract(
 	ctx context.Context,
 	studyID uuid.UUID,
 	contractID uuid.UUID,
-	contractBase openapi.ContractBase,
+	data openapi.ContractBase,
 ) (*types.Contract, error) {
 	log.Debug().Any("contractId", contractID).Msg("Updating contract")
 
@@ -268,23 +272,25 @@ func (s *Service) UpdateContract(
 		return nil, err
 	}
 
-	if err := s.validateContract(ctx, studyID, contractBase); err != nil {
+	if err := s.validateContract(ctx, studyID, data); err != nil {
 		return nil, err
 	}
 
-	contract, err := contractFromBase(contractBase)
+	contract, err := contractFromBase(data)
 	if err != nil {
 		return nil, err
 	}
 	contract.ID = contractID
 	contract.StudyID = studyID
 
-	signatory, err := s.persistedContractSignatory(ctx, contractBase.OrganisationSignatory)
-	if err != nil {
-		return nil, err
+	if data.OrganisationSignatory != nil {
+		signatory, err := s.persistedContractSignatory(ctx, *data.OrganisationSignatory)
+		if err != nil {
+			return nil, err
+		}
+		contract.SignatoryUserId = &signatory.ID
+		contract.SignatoryUser = signatory
 	}
-	contract.SignatoryUserId = &signatory.ID
-	contract.SignatoryUser = signatory
 
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)

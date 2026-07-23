@@ -1,4 +1,5 @@
-import { Alert, AlertMessage, Label } from "@/components/shared/uikitExports";
+import { Label } from "@/components/shared/uikitExports";
+import Error from "@/components/ui/Error";
 import styles from "./RadioOptions.module.css";
 import { FieldPath, FieldError, FieldValues, UseFormRegister } from "react-hook-form";
 
@@ -28,6 +29,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
               <input
                 type="radio"
                 value={option.value}
+                data-cy={`${name}-${option.value}`}
                 {...register(name, {
                   required: "Please select an option",
                 })}
@@ -38,11 +40,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
           );
         })}
       </div>
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{`${error.message}`}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={`${error.message}`} />}
     </div>
   );
 }

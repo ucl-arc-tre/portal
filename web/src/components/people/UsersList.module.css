@@ -1,0 +1,12 @@
+.list {
+  display: grid;
+  gap: 2rem;
+  margin-top: 0;
+  padding-top: 0.2rem;
+}
+
+.approved-researcher-badge {
+  background-color: #d1fae5;
+  color: #047857;
+  border-color: #34d399;
+}

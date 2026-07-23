@@ -2,6 +2,7 @@ import { getStudiesByStudyIdAgreements } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useEffect, useState } from "react";
 import styles from "./StudyAdminsAgreements.module.css";
+import Error from "@/components/ui/Error";
 
 type StudyAdminsAgreementsProps = {
   studyId: string;
@@ -56,11 +57,7 @@ export default function StudyAdminsAgreements(props: StudyAdminsAgreementsProps)
   if (completed) return null;
 
   if (error) {
-    return (
-      <div className={"error-message"}>
-        <strong>Error:</strong> {error}
-      </div>
-    );
+    return <Error message={error} />;
   }
 
   return (

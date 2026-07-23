@@ -5,6 +5,7 @@ package projects
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -12,9 +13,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
+	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockusers"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -36,6 +39,7 @@ func migrate(db *gorm.DB) error {
 		&types.ProjectTRERoleBinding{},
 		&types.ProjectTREUserConfig{},
 		&types.ProjectAsset{},
+		&types.Notification{},
 	)
 	if err != nil {
 		return err
@@ -44,7 +48,61 @@ func migrate(db *gorm.DB) error {
 	return nil
 }
 
-func TestCreateProjectTRE(t *testing.T) {
+func TestIntegration_UpdateProjectTREDeployedNotifiesCreator(t *testing.T) {
+	db := mockdb.NewTestDBSchema(t, migrate)
+	graceful.SetDBForTesting(db)
+
+	creator := types.User{Username: "bob@testIntegration.com"}
+	require.NoError(t, db.Create(&creator).Error)
+
+	study := types.Study{
+		OwnerUserID:                creator.ID,
+		Title:                      "Study 123",
+		DataControllerOrganisation: "UCL",
+		ApprovalStatus:             types.StudyApprovalStatusIncomplete,
+	}
+	require.NoError(t, db.Create(&study).Error)
+
+	treEnvironment := types.Environment{
+		Name: environments.TRE,
+		Tier: 2,
+	}
+	require.NoError(t, db.Create(&treEnvironment).Error)
+
+	project := types.Project{
+		Name:          "proj123",
+		CreatorUserID: creator.ID,
+		StudyID:       study.ID,
+		EnvironmentID: treEnvironment.ID,
+	}
+	require.NoError(t, db.Create(&project).Error)
+
+	projectTRE := types.ProjectTRE{
+		ProjectID: project.ID,
+		Status:    types.ProjectTREStatusPendingCreation,
+	}
+	require.NoError(t, db.Create(&projectTRE).Error)
+
+	svc := &Service{
+		db:            db,
+		notifications: notifications.New(),
+	}
+	data := treopenapi.ProjectUpdate{
+		Status:                   treopenapi.Deployed,
+		DeployedVersionUpdatedAt: time.Now().UTC().Format(config.TimeFormat),
+	}
+
+	require.NoError(t, svc.UpdateProjectTREDeployed(project.Name, data))
+
+	var notification types.Notification
+	require.NoError(t, db.Where("recipient_user_id = ?", creator.ID).First(&notification).Error)
+	assert.Equal(t, creator.ID, notification.RecipientUserID)
+	assert.Equal(t, "'proj123' has been deployed", notification.Title)
+	require.NotNil(t, notification.Kind)
+	assert.Equal(t, types.NotificationKindProjectDeployed, *notification.Kind)
+}
+
+func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 	// Note: Remove t.Parallel() from RBAC-dependent integration tests
 
 	// Create unique schema for this test

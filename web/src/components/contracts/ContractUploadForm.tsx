@@ -14,13 +14,12 @@ import {
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
-import { HelperText, AlertMessage, Alert, Label } from "../shared/uikitExports";
+import Error from "../ui/Error";
+import { HelperText, Label } from "../shared/uikitExports";
 
 type ContractFormData = {
   title: string;
-  organisationSignatory: string;
   thirdPartyName: string;
-  otherSignatories: string | undefined;
   status: "active" | "closed";
   retentionEndDate: string;
   startDate: string;
@@ -55,8 +54,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const organisationName = process.env.NEXT_PUBLIC_ORGANISATION_NAME;
-
   const {
     register,
     handleSubmit,
@@ -87,8 +84,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     if (editingContract) {
       reset({
         title: editingContract.title,
-        organisationSignatory: editingContract.organisation_signatory,
-        otherSignatories: editingContract.other_signatories,
         thirdPartyName: editingContract.third_party_name,
         status: editingContract.status,
         startDate: editingContract.start_date,
@@ -100,12 +95,10 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       // reset to defaults when not editing
       reset({
         status: "active",
-        organisationSignatory: "",
         thirdPartyName: "",
         startDate: "",
         expiryDate: "",
         retentionEndDate: "",
-        otherSignatories: undefined,
         assets: [],
       });
     }
@@ -165,24 +158,17 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   };
 
   const onSubmit = async (formData: ContractFormData) => {
-    // For upload mode, file is required
-    if (!editingContract && uploadFiles.length === 0) {
-      setError("Please select a file before submitting.");
-      return;
-    }
     setUploading(true);
     setIsSubmitting(true);
     setError(null);
 
     const body: ContractBase = {
       title: formData.title,
-      organisation_signatory: formData.organisationSignatory,
       third_party_name: formData.thirdPartyName,
       status: formData.status,
       start_date: formData.startDate,
       expiry_date: formData.expiryDate,
       retention_end_date: formData.retentionEndDate,
-      other_signatories: formData.otherSignatories,
       asset_ids: formData.assets.map((asset) => asset.value).filter((id) => id !== "") as string[],
     };
 
@@ -295,41 +281,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Title of the contract"
             />
-            {errors.title && <span className={styles["form-error"]}>{errors.title.message}</span>}
-          </div>
-
-          <div className={"field"}>
-            <Label htmlFor="organisationSignatoryEmail">{organisationName} Signatory *</Label>
-            <input
-              id="organisationSignatoryEmail"
-              type="text"
-              {...register("organisationSignatory", {
-                required: "Organisation Signatory is required",
-                pattern: {
-                  value: RegExp(`^[^@]+${process.env.NEXT_PUBLIC_DOMAIN_NAME}$`),
-                  message: `Must be a valid email address ending with ${process.env.NEXT_PUBLIC_DOMAIN_NAME}`,
-                },
-              })}
-              className={styles["form-input"]}
-              placeholder="Enter organisation signatory email"
-            />
-            {errors.organisationSignatory && (
-              <span className={styles["form-error"]}>{errors.organisationSignatory.message}</span>
-            )}
-          </div>
-
-          <div className={"field"}>
-            <Label htmlFor="title">Other Signatories</Label>
-            <input
-              id="otherSignatories"
-              type="text"
-              {...register("otherSignatories", {
-                maxLength: { value: 255, message: "Other Signatories must be less than 256 characters" },
-              })}
-              className={styles["form-input"]}
-              placeholder="e.g. Alice Smith, bob@example.com, NHS England"
-            />
-            {errors.otherSignatories && <span className={styles["form-error"]}>{errors.otherSignatories.message}</span>}
+            {errors.title && <Error message={errors.title.message} />}
           </div>
 
           <div className={"field"}>
@@ -345,7 +297,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Enter the other party in the contract (e.g. an organisation or a person)"
             />
-            {errors.thirdPartyName && <span className={styles["form-error"]}>{errors.thirdPartyName.message}</span>}
+            {errors.thirdPartyName && <Error message={errors.thirdPartyName.message} />}
           </div>
 
           <div className={"field"}>
@@ -360,7 +312,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               <option value="active">Active</option>
               <option value="closed">Closed</option>
             </select>
-            {errors.status && <span className={styles["form-error"]}>{errors.status.message}</span>}
+            {errors.status && <Error message={errors.status.message} />}
           </div>
 
           <div className={"field"}>
@@ -373,7 +325,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               })}
               className={styles["form-input"]}
             />
-            {errors.startDate && <span className={styles["form-error"]}>{errors.startDate.message}</span>}
+            {errors.startDate && <Error message={errors.startDate.message} />}
           </div>
 
           <div className={"field"}>
@@ -386,7 +338,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               })}
               className={styles["form-input"]}
             />
-            {errors.expiryDate && <span className={styles["form-error"]}>{errors.expiryDate.message}</span>}
+            {errors.expiryDate && <Error message={errors.expiryDate.message} />}
           </div>
 
           <div className={"field"}>
@@ -401,7 +353,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               This is the date until when you are required to keep the contract. eg. if the period is 5 years, enter the
               date 5 years from the expiry date
             </HelperText>
-            {errors.retentionEndDate && <span className={styles["form-error"]}>{errors.retentionEndDate.message}</span>}
+            {errors.retentionEndDate && <Error message={errors.retentionEndDate.message} />}
           </div>
         </div>
 
@@ -524,11 +476,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             Cancel
           </Button>
         </div>
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <Error message={error} />}
       </form>
     </Dialog>
   );

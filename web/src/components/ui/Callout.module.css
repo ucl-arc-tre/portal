@@ -1,6 +1,6 @@
 .callout {
   justify-self: center;
-  width: 80%;
+  max-width: 1000px;
   margin-bottom: 2rem;
   padding: 1.5rem;
   background-color: #f9f8fa;

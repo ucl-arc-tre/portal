@@ -1,20 +1,17 @@
-import { Control, Controller, FieldErrors, UseFormGetValues, UseFormRegister, useFieldArray } from "react-hook-form";
-import { Input, Alert, AlertMessage, HelperText, Textarea, Label } from "../../shared/uikitExports";
-import Button from "../../ui/Button";
+import { Control, Controller, FieldErrors, UseFormRegister, useFieldArray } from "react-hook-form";
+import { Input, HelperText, Textarea, Label } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import sharedStyles from "./StudyFormShared.module.css";
-import styles from "./StudyFormStep1.module.css";
+import UserLookup from "@/components/shared/UserLookup";
 
 type StudyFormStep1Props = {
   control: Control<StudyFormData>;
   errors: FieldErrors<StudyFormData>;
   register: UseFormRegister<StudyFormData>;
-  getValues: UseFormGetValues<StudyFormData>;
-  username: string;
+  ownerUsername: string;
 };
 
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
-
-export default function StudyFormStep1({ control, errors, register, getValues, username }: StudyFormStep1Props) {
+export default function StudyFormStep1({ control, errors, register, ownerUsername }: StudyFormStep1Props) {
   const { fields, append, remove } = useFieldArray<StudyFormData, "additionalStudyAdminUsernames", "id">({
     control,
     name: "additionalStudyAdminUsernames",
@@ -42,11 +39,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
             Study title must be 4-50 characters, start and end with a letter/number, only letters, numbers, spaces, and
             hyphens allowed
           </HelperText>
-          {errors.title && (
-            <Alert type="error">
-              <AlertMessage>{errors.title.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.title && <Error message={errors.title.message} />}
         </Label>
 
         <Label htmlFor="description">
@@ -63,11 +56,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
             }}
             render={({ field }) => <Textarea {...field} id="description" />}
           />
-          {errors.description && (
-            <Alert type="error">
-              <AlertMessage>{errors.description.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.description && <Error message={errors.description.message} />}
         </Label>
       </fieldset>
 
@@ -79,7 +68,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
             id="owner"
             {...register("owner")}
             readOnly={true}
-            value={username}
+            value={ownerUsername}
             inputClassName={sharedStyles.readonly}
           />
           <HelperText>
@@ -87,87 +76,25 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
           </HelperText>
         </Label>
 
-        <Label>
+        <Label htmlFor="lookup">
           Additional Study Administrator (optional):
           <fieldset className={sharedStyles.fieldset}>
             <HelperText style={{ marginBottom: "1rem" }}>
-              Add a UCL staff member who will help administrate this study. <strong>Must</strong> be valid UCL staff
-              usernames.
+              Add a UCL staff member who will help administrate this study. <strong>Must</strong> be valid UCL staff.
+              <br></br> Note that only <i>approved researchers</i> will appear in the search results.
             </HelperText>
-
-            {fields.map((field, index) => (
-              <div key={field.id} className={styles["admin-wrapper"]}>
-                <Label htmlFor={`admin-${index}`} className={styles["admin-label"]}>
-                  <Controller
-                    name={`additionalStudyAdminUsernames.${index}.value` as const}
-                    control={control}
-                    rules={{
-                      validate: {
-                        isNotEmpty: (value) => {
-                          if (!value || value.replace(domainName, "").trim() === "") {
-                            return "Username is required";
-                          }
-                          return true;
-                        },
-                        notEmailPart: (value) => {
-                          if (value.replace(domainName, "").includes("@")) {
-                            return `Enter only the username part (without ${domainName})`;
-                          }
-                          return true;
-                        },
-                        isUnique: (value) => {
-                          const allAdminUsernames = getValues(`additionalStudyAdminUsernames`).map(
-                            (admin) => admin.value
-                          );
-                          const duplicateCount = allAdminUsernames.filter((username) => username === value).length;
-                          return duplicateCount <= 1 || "Username has already been entered";
-                        },
-                      },
-                    }}
-                    render={({ field, fieldState }) => (
-                      <div className={styles["username-input-wrapper"]}>
-                        <div>
-                          <Input
-                            value={field.value?.replace(domainName, "") ?? ""}
-                            onChange={(e) => field.onChange(`${e.target.value}${domainName}`)}
-                            onBlur={field.onBlur}
-                            name={field.name}
-                            ref={field.ref}
-                            type="text"
-                            id={`admin-${index}`}
-                            placeholder="Valid UCL username"
-                          />
-                          <span className={styles["domain-suffix"]}>{domainName}</span>
-                        </div>
-
-                        {fieldState.error && (
-                          <Alert type="error">
-                            <AlertMessage>{fieldState.error.message}</AlertMessage>
-                          </Alert>
-                        )}
-                      </div>
-                    )}
-                  />
-                </Label>
-
-                <Button type="button" onClick={() => remove(index)} size="small" data-cy="remove-study-admin-button">
-                  Remove
-                </Button>
-              </div>
-            ))}
-
-            {getValues(`additionalStudyAdminUsernames`).length < 1 && (
-              <Button
-                type="button"
-                variant="secondary"
-                size="small"
-                onClick={() => append({ value: "" })}
-                style={{ marginTop: "0.5rem" }}
-                data-cy="add-study-admin-button"
-              >
-                Add Administrator
-              </Button>
-            )}
+            <UserLookup
+              filterByApprovedResearchers={true}
+              usernames={Array.from(fields, (field) => field.value)}
+              appendUsername={(value: string) => append({ value })}
+              removeUsername={(username: string) => {
+                const index = fields.findIndex((field) => field.value === username);
+                if (index !== -1) remove(index);
+              }}
+              filterExcludeUsername={ownerUsername}
+              limit={1} // only a single admin can be added
+            />
+            {errors.additionalStudyAdminUsernames && <Error message={errors.additionalStudyAdminUsernames.message} />}
           </fieldset>
         </Label>
 
@@ -180,11 +107,7 @@ export default function StudyFormStep1({ control, errors, register, getValues, u
             render={({ field }) => <Input {...field} type="text" id="controller" placeholder={`e.g. "UCL"`} />}
           />
           <HelperText>Enter the organization acting as data controller (e.g., &quot;UCL&quot;)</HelperText>
-          {errors.dataControllerOrganisation && (
-            <Alert type="error">
-              <AlertMessage>{errors.dataControllerOrganisation.message}</AlertMessage>
-            </Alert>
-          )}
+          {errors.dataControllerOrganisation && <Error message={errors.dataControllerOrganisation.message} />}
         </Label>
       </fieldset>
     </>

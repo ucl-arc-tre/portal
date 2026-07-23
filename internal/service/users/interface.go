@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -13,6 +15,7 @@ type Interface interface {
 	ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 	ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgreement, error)
 	Attributes(user types.User) (types.UserAttributes, error)
+	ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*openapi.ProfileUpdateResponse, error)
 	SetUserChosenName(user types.User, chosenName types.ChosenName) error
 	ImportApprovedResearchersCSV(
 		ctx context.Context,
@@ -20,8 +23,7 @@ type Interface interface {
 		csvContent []byte,
 		agreement types.Agreement,
 	) error
-	InviteExternalUser(ctx context.Context, email string, inviter types.User) (types.User, error)
-	CreateUserSponsorship(user types.User, sponsor types.User) (types.UserSponsorship, error)
+	InviteUser(ctx context.Context, invite entra.Invite) (types.User, error)
 	Metrics() (*openapi.UserMetrics, error)
 	UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error)
 	CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error
@@ -36,4 +38,5 @@ type Interface interface {
 	UserIds(usernames ...types.Username) (map[types.Username]uuid.UUID, error)
 	Find(ctx context.Context, query string) ([]openapi.UserData, error)
 	AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error)
+	UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error)
 }

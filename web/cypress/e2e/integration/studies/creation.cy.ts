@@ -18,6 +18,11 @@ describe("Study creation end-to-end", () => {
     cy.becomeApprovedResearcher();
   });
 
+  it("study admin should become an approved researcher", () => {
+    cy.loginAsAdmin();
+    cy.becomeApprovedResearcher();
+  });
+
   it("staff should successfully create a study", () => {
     cy.loginAsStaff();
 
@@ -52,18 +57,20 @@ describe("Study creation end-to-end", () => {
 
     // setup complete — tabs now visible, edit study to add then remove an admin
     cy.contains("Incomplete").should("be.visible");
+    cy.env(["botAdminUsername"]).then(({ botAdminUsername }) => {
+      const additionalAdminUsername = botAdminUsername.split("@")[0];
 
-    const additionalAdminUsernamePrefix = "portal-e2e-admin";
-
-    cy.get('[data-cy="edit-study-button"]').click();
-    cy.get('[data-cy="add-study-admin-button"]').click();
-    cy.get('[name="additionalStudyAdminUsernames.0.value"]').type(additionalAdminUsernamePrefix);
-    cy.get('[data-cy="next"]').click();
-    cy.get('[data-cy="next"]').click();
-    cy.get("button[type='submit']").contains("Update Study").click();
-    cy.contains("Update Study").should("not.exist");
-    cy.contains("Edit Study").should("exist");
-    cy.contains(additionalAdminUsernamePrefix).should("exist");
+      cy.get('[data-cy="edit-study-button"]').click();
+      cy.get('[data-cy="user-lookup"]').type(additionalAdminUsername);
+      cy.get('button[data-cy="user-lookup-submit"]').click();
+      cy.get('[data-cy="add-user-to-selection"]').first().click();
+      cy.get('[data-cy="next"]').click();
+      cy.get('[data-cy="next"]').click();
+      cy.get("button[type='submit']").contains("Update Study").click();
+      cy.contains("Update Study").should("not.exist");
+      cy.contains("Edit Study").should("exist");
+      cy.contains(additionalAdminUsername).should("exist");
+    });
   });
 
   it("admin should be able to agree to the study administrator agreement", () => {
@@ -84,7 +91,7 @@ describe("Study creation end-to-end", () => {
 
     // remove added study admin
     cy.get('[data-cy="edit-study-button"]').click();
-    cy.get('[data-cy="remove-study-admin-button"]').click();
+    cy.get('[data-cy="remove-user-from-selection"]').click();
     cy.get('[data-cy="next"]').click();
     cy.get('[data-cy="next"]').click();
     cy.get("button[type='submit']").click();
@@ -156,10 +163,6 @@ describe("Study creation end-to-end", () => {
 
     cy.get('[data-cy="add-contract"]').click();
     cy.get('[name="title"]').type(contractTitle);
-    cy.env(["botStaffUsername"]).then(({ botStaffUsername }) => {
-      cy.get('[name="organisationSignatory"]').type(botStaffUsername);
-    });
-    cy.get('[name="otherSignatories"]').type("other signatory");
     cy.get('[name="thirdPartyName"]').type("other");
     cy.get('[name="status"]').select("active");
     cy.get("input[name='startDate']").type("2024-01-01");
@@ -204,9 +207,6 @@ describe("Study creation end-to-end", () => {
 
     cy.get('[data-cy="add-contract"]').click();
     cy.get('[name="title"]').type(deleteContractTitle);
-    cy.env(["botStaffUsername"]).then(({ botStaffUsername }) => {
-      cy.get('[name="organisationSignatory"]').type(botStaffUsername);
-    });
     cy.get('[name="thirdPartyName"]').type("Third Party");
     cy.get('[name="status"]').select("active");
     cy.get("input[name='startDate']").type("2024-01-01");
@@ -247,6 +247,8 @@ describe("Study creation end-to-end", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
     cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('[data-testid="ucl-uikit-search"]').type(`${studyTitle}`);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).click();
     cy.get('[data-cy="study-approve-button"]').click();
   });

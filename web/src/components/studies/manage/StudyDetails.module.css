@@ -5,6 +5,11 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 2rem;
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
+  }
 }
 
 .pre-description {
@@ -145,4 +150,16 @@
     width: 100%;
     margin-bottom: 0.25rem;
   }
+}
+
+.sutdy-admin-review {
+  margin-bottom: 1rem;
+}
+
+.outstanding {
+  margin-bottom: 1rem;
+}
+
+.mark-ready-for-review-hint {
+  margin-bottom: 1rem;
 }

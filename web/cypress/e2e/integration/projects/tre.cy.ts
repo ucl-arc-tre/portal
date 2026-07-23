@@ -6,7 +6,7 @@ beforeEach(() => {
 describe("TRE project creation end-to-end", () => {
   const studyTitle = `study-tre-project-${Date.now()}`;
   const assetTitle = `asset-tre-project-${Date.now()}`;
-  let projectTitle = `tre${Date.now()}`.substring(0, 14); // todo
+  let projectTitle = `tre${Date.now()}`.substring(0, 14);
 
   const tokenName = `test-tre-${Date.now()}`;
   let tokenValue = "";
@@ -70,6 +70,16 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[name="name"]').type(projectTitle);
     cy.get('[data-cy="next-form-page-button"]').click();
 
+    cy.env(["botStaffUsername"]).then(({ botStaffUsername }) => {
+      cy.get('[data-cy="user-lookup"]').type(botStaffUsername);
+    });
+    cy.get('[data-cy="user-lookup-submit"]').click();
+    cy.env(["botStaffUsername"]).then(({ botStaffUsername }) => {
+      cy.get(`div[data-id="${botStaffUsername}"] [data-testid="ucl-uikit-button"]`).click();
+    });
+    cy.get('[data-cy="tre-member-role-dropdown"]').select("desktop_user");
+    cy.get('[data-cy="tre.requiresHPCDesktops-true"]').click({ force: true });
+    cy.get('[name="hpcInstances"]').select("t3a.large");
     cy.get('[name="tre.numRequiredEgressApprovals"]').check("1", { force: true });
     cy.get('[name="tre.externalEncryptionEnabled"]').check("false", { force: true });
 

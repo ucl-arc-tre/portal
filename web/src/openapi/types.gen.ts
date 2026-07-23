@@ -15,13 +15,38 @@ export type Auth = {
     roles: Array<'admin' | 'base' | 'staff' | 'approved-researcher' | 'approved-staff-researcher' | 'information-asset-owner' | 'information-asset-administrator' | 'tre-ops-staff' | 'ig-ops-staff' | 'dsh-ops-staff'>;
 };
 
+export type Notification = {
+    /**
+     * UUID of the notification
+     */
+    id: string;
+    title: string;
+    body?: string;
+    kind?: NotificationKind;
+    /**
+     * Local link to follow e.g. "/profile"
+     */
+    href?: string;
+};
+
+export type NotificationsReadAll = {
+    kind?: NotificationKind;
+};
+
+export type NotificationKind = 'complete-profile' | 'asset-expiry' | 'contract-expiry' | 'training-expiry' | 'iaa-assignment' | 'study-affirmation' | 'study-review' | 'study-owner-change' | 'user-name-change' | 'project-deployed';
+
 export type Profile = {
     username: string;
     chosen_name: string;
+    requested_chosen_name?: string;
 };
 
 export type ProfileUpdate = {
     chosen_name: string;
+};
+
+export type ProfileUpdateResponse = {
+    requires_approval: boolean;
 };
 
 export type Agreement = {
@@ -119,6 +144,14 @@ export type UserData = {
     agreements: UserAgreements;
     training_record: ProfileTraining;
     chosen_name?: string;
+    requested_chosen_name?: string;
+    is_valid_approved_researcher: boolean;
+};
+
+export type UserDataLookup = {
+    username: string;
+    chosen_name?: string;
+    is_valid_approved_researcher: boolean;
 };
 
 export type UserTrainingUpdate = {
@@ -524,14 +557,17 @@ export type ProjectTreUpdate = ProjectTreBase;
  */
 export type ProjectTreMember = {
     username: string;
+    desktop_config?: ProjectTreUserDesktopConfig;
     uid?: number;
-    desktop_config?: {
-        root_volume_gb?: number;
-    };
     /**
      * List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
      */
     roles: Array<ProjectTreRoleName>;
+};
+
+export type ProjectTreUserDesktopConfig = {
+    hpc_instance_type?: string;
+    root_volume_gb?: number;
 };
 
 /**
@@ -679,7 +715,7 @@ export type ContractBase = {
     /**
      * Email of the organisation signatory
      */
-    organisation_signatory: string;
+    organisation_signatory?: string;
     /**
      * Other signatories to the contract. Could be name(s) or email(s)
      */
@@ -770,6 +806,10 @@ export type TokenWithValue = Token & {
     value: string;
 };
 
+export type Feedback = {
+    message: string;
+};
+
 /**
  * User UUID
  */
@@ -805,6 +845,11 @@ export type ContractObjectIdParam = string;
  */
 export type EnvironmentParam = 'dsh' | 'tre';
 
+/**
+ * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+ */
+export type UserFindParam = string;
+
 export type GetAuthData = {
     body?: never;
     path?: never;
@@ -832,6 +877,120 @@ export type GetAuthResponses = {
 };
 
 export type GetAuthResponse = GetAuthResponses[keyof GetAuthResponses];
+
+export type GetNotificationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/notifications';
+};
+
+export type GetNotificationsErrors = {
+    /**
+     * Unauthenticated
+     */
+    401: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetNotificationsResponses = {
+    200: Array<Notification>;
+};
+
+export type GetNotificationsResponse = GetNotificationsResponses[keyof GetNotificationsResponses];
+
+export type PostNotificationsByNotificationIdReadData = {
+    body?: never;
+    path: {
+        /**
+         * ID of the notification to be updated
+         */
+        notificationId: string;
+    };
+    query?: never;
+    url: '/notifications/{notificationId}/read';
+};
+
+export type PostNotificationsByNotificationIdReadErrors = {
+    /**
+     * Unauthenticated
+     */
+    401: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostNotificationsByNotificationIdReadResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostNotificationsByNotificationIdReadResponse = PostNotificationsByNotificationIdReadResponses[keyof PostNotificationsByNotificationIdReadResponses];
+
+export type PostNotificationsReadData = {
+    body: NotificationsReadAll;
+    path?: never;
+    query?: never;
+    url: '/notifications/read';
+};
+
+export type PostNotificationsReadErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostNotificationsReadResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostNotificationsReadResponse = PostNotificationsReadResponses[keyof PostNotificationsReadResponses];
+
+export type PostFeedbackData = {
+    body: Feedback;
+    path?: never;
+    query?: never;
+    url: '/feedback';
+};
+
+export type PostFeedbackErrors = {
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostFeedbackResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type PostFeedbackResponse = PostFeedbackResponses[keyof PostFeedbackResponses];
 
 export type GetProfileData = {
     body?: never;
@@ -875,7 +1034,7 @@ export type PostProfileResponses = {
     /**
      * Successfully updated profile
      */
-    200: Profile;
+    200: ProfileUpdateResponse;
 };
 
 export type PostProfileResponse = PostProfileResponses[keyof PostProfileResponses];
@@ -1139,6 +1298,76 @@ export type GetUsersResponses = {
 
 export type GetUsersResponse = GetUsersResponses[keyof GetUsersResponses];
 
+export type GetUsersLookupData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+         */
+        find: string;
+    };
+    url: '/users/lookup';
+};
+
+export type GetUsersLookupErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetUsersLookupResponses = {
+    200: Array<UserDataLookup>;
+};
+
+export type GetUsersLookupResponse = GetUsersLookupResponses[keyof GetUsersLookupResponses];
+
+export type GetUsersByUserIdData = {
+    body?: never;
+    path: {
+        /**
+         * User UUID
+         */
+        userId: string;
+    };
+    query?: never;
+    url: '/users/{userId}';
+};
+
+export type GetUsersByUserIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetUsersByUserIdResponses = {
+    200: UserData;
+};
+
+export type GetUsersByUserIdResponse = GetUsersByUserIdResponses[keyof GetUsersByUserIdResponses];
+
 export type PostUsersByUserIdTrainingData = {
     body: UserTrainingUpdate;
     path: {
@@ -1260,6 +1489,14 @@ export type PostUsersInviteData = {
          * Email address of the person to be invited
          */
         email: string;
+        /**
+         * Optional name of study for notification
+         */
+        study_name?: string;
+        /**
+         * Optional name of project for notification
+         */
+        project_name?: string;
     };
     path?: never;
     query?: never;

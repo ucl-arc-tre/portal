@@ -14,6 +14,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockdb"
+	"github.com/ucl-arc-tre/portal/internal/testutils/mocknotifications"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -58,7 +59,8 @@ func TestPersistedUser_CreatesUser(t *testing.T) {
 	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
-		db: db,
+		db:            db,
+		notifications: &mocknotifications.MockNotifications{},
 	}
 
 	username := types.Username("bob@testIntegration.com")
@@ -112,7 +114,8 @@ func TestPersistedExternalUser_CreatesNewUser(t *testing.T) {
 	db := mockdb.NewTestDBSchema(t, migrate)
 
 	service := &Service{
-		db: db,
+		db:            db,
+		notifications: &mocknotifications.MockNotifications{},
 	}
 
 	user, err := service.PersistedExternalUser(
@@ -242,9 +245,9 @@ func TestCreateUserSponsorship(t *testing.T) {
 	}
 
 	user := createTestUser(t, db, "alice@testIntegration.com")
-	sponsor := createTestUser(t, db, "bob@testIntegration.com")
+	sponsor := types.Sponsor{User: createTestUser(t, db, "bob@testIntegration.com")}
 
-	got, err := service.CreateUserSponsorship(user, sponsor)
+	got, err := service.createUserSponsorship(user, sponsor)
 
 	require.NoError(t, err)
 

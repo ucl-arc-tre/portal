@@ -23,6 +23,74 @@ paths:
         default:
           description: Unexpected error
 
+  /notifications:
+    get:
+      description: Get a list of notifications
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        "401":
+          description: Unauthenticated
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /notifications/{notificationId}/read:
+    post:
+      description: Mark a single notification as read
+      parameters:
+        - in: path
+          name: notificationId
+          required: true
+          description: ID of the notification to be updated
+          schema:
+            type: string
+      responses:
+        "204":
+          description: OK
+        "401":
+          description: Unauthenticated
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /notifications/read:
+    post:
+      description: Mark all notifications of a kind as read
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationsReadAll"
+      responses:
+        "204":
+          description: OK
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /feedback:
+    post:
+      description: Submit some feedback for the portal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Feedback"
+      responses:
+        "204":
+          description: OK
+        "500":
+          description: Internal server error
+
   /profile:
     get:
       description: Users profile
@@ -35,7 +103,7 @@ paths:
         default:
           description: Unexpected error
     post:
-      description: Update own profile chosen name
+      description: Update own profile
       requestBody:
         required: true
         content:
@@ -48,7 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Profile"
+                $ref: "#/components/schemas/ProfileUpdateResponse"
         "500":
           description: Internal server error
         default:
@@ -202,12 +270,7 @@ paths:
     get:
       description: Get all the users a user has access to view
       parameters:
-        - in: query
-          name: find
-          required: true
-          description: user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
-          schema:
-            type: string
+        - $ref: "#/components/parameters/UserFindParam"
       responses:
         "200":
           content:
@@ -223,6 +286,44 @@ paths:
         default:
           description: Unexpected error
 
+  /users/lookup:
+    get:
+      description: Lookup users a user has access to view
+      parameters:
+        - $ref: "#/components/parameters/UserFindParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDataLookup"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+  /users/{userId}:
+    get:
+      description: Get a single user
+      parameters:
+        - $ref: "#/components/parameters/UserIdParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
   /users/{userId}/training:
     post:
       parameters:
@@ -317,6 +418,13 @@ paths:
                 email:
                   type: string
                   description: Email address of the person to be invited
+                study_name:
+                  type: string
+                  description: Optional name of study for notification
+                project_name:
+                  type: string
+                  description: Optional name of project for notification
+
       responses:
         "200":
           description: Successfully sent invite
@@ -1275,6 +1383,13 @@ components:
         enum:
           - dsh
           - tre
+    UserFindParam:
+      in: query
+      name: find
+      required: true
+      description: user details to lookup by in entra. This can be valid within the user principal name, email, given name or display name eg. "tom", "hughes", "ccaeaea", "laura@example"
+      schema:
+        type: string
 
   schemas:
     Auth:
@@ -1305,6 +1420,45 @@ components:
               - ig-ops-staff
               - dsh-ops-staff
 
+    Notification:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          description: UUID of the notification
+        title:
+          type: string
+        body:
+          type: string
+        kind:
+          $ref: "#/components/schemas/NotificationKind"
+        href:
+          type: string
+          description: Local link to follow e.g. "/profile"
+
+    NotificationsReadAll:
+      type: object
+      properties:
+        kind:
+          $ref: "#/components/schemas/NotificationKind"
+
+    NotificationKind:
+      type: string
+      enum:
+        - complete-profile
+        - asset-expiry
+        - contract-expiry
+        - training-expiry
+        - iaa-assignment
+        - study-affirmation
+        - study-review
+        - study-owner-change
+        - user-name-change
+        - project-deployed
+
     Profile:
       type: object
       required:
@@ -1315,6 +1469,8 @@ components:
           type: string
         chosen_name:
           type: string
+        requested_chosen_name:
+          type: string
 
     ProfileUpdate:
       type: object
@@ -1323,6 +1479,14 @@ components:
       properties:
         chosen_name:
           type: string
+
+    ProfileUpdateResponse:
+      type: object
+      required:
+        - requires_approval
+      properties:
+        requires_approval:
+          type: boolean
 
     Agreement:
       type: object
@@ -1462,6 +1626,7 @@ components:
         - roles
         - agreements
         - training_record
+        - is_valid_approved_researcher
       properties:
         user:
           $ref: "#/components/schemas/User"
@@ -1475,6 +1640,23 @@ components:
           $ref: "#/components/schemas/ProfileTraining"
         chosen_name:
           type: string
+        requested_chosen_name:
+          type: string
+        is_valid_approved_researcher:
+          type: boolean
+
+    UserDataLookup:
+      type: object
+      required:
+        - username
+        - is_valid_approved_researcher
+      properties:
+        username:
+          type: string
+        chosen_name:
+          type: string
+        is_valid_approved_researcher:
+          type: boolean
 
     UserTrainingUpdate:
       type: object
@@ -2045,18 +2227,23 @@ components:
       properties:
         username:
           type: string
+        desktop_config:
+          $ref: "#/components/schemas/ProjectTREUserDesktopConfig"
         uid:
           type: integer
-        desktop_config:
-          type: object
-          properties:
-            root_volume_gb:
-              type: integer
         roles:
           type: array
           description: List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
           items:
             $ref: "#/components/schemas/ProjectTRERoleName"
+
+    ProjectTREUserDesktopConfig:
+      type: object
+      properties:
+        hpc_instance_type:
+          type: string
+        root_volume_gb:
+          type: integer
 
     ProjectTRERoleName:
       type: string
@@ -2255,7 +2442,6 @@ components:
       type: object
       required:
         - title
-        - organisation_signatory
         - status
         - asset_ids
       properties:
@@ -2382,3 +2568,11 @@ components:
           properties:
             value:
               type: string
+
+    Feedback:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

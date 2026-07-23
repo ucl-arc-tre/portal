@@ -348,6 +348,11 @@ declare global {
       mockEnvironmentsTre(): Chainable<any>;
 
       /**
+       * Mock notifications
+       */
+      mockNotifications(notifications: Notification[]): Chainable<any>;
+
+      /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
        * @param selector - Optional selector to check specific element (defaults to entire page)
        * @example cy.checkAccessibility()
@@ -587,6 +592,18 @@ Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
   }).as("getChosenName");
 });
 
+export type Notification = {
+  title: string;
+  kind: string;
+};
+
+Cypress.Commands.add("mockNotifications", (notifications: Notification[]) => {
+  cy.intercept("GET", "/web/api/v0/notifications", {
+    statusCode: 200,
+    body: notifications,
+  }).as("getNotifications");
+});
+
 Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
   const confirmedAgreements = hasApprovedResearcher
     ? [
@@ -725,7 +742,6 @@ Cypress.Commands.add("mockAssetContractAccess", () => {
         retention_end_date: "2034-01-01",
         filename: "sample-contract.pdf",
         id: "contract-2",
-        organisation_signatory: "Sample Organisation 2",
         start_date: "2026-02-22",
         status: "active",
         study_id: "123456789",
@@ -745,7 +761,6 @@ Cypress.Commands.add("mockStudyContractAccess", () => {
         retention_end_date: "2026-01-01",
         filename: "sample-contract.pdf",
         id: "contract-1",
-        organisation_signatory: "Sample Organisation 3",
         start_date: "2026-02-22",
         status: "active",
         study_id: "123456789",

@@ -1,6 +1,6 @@
 import { Asset } from "@/openapi";
 import styles from "./AssetCard.module.css";
-import { Alert, AlertCircleIcon, AlertMessage } from "../shared/uikitExports";
+import { AlertCircleIcon } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
@@ -8,11 +8,13 @@ import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
 import { calculateRiskScorePerAsset } from "../studies/manage/StudyOverview";
 import Badge from "../ui/Badge";
+import Error from "../ui/Error";
 
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  involvesNHS: boolean | null | undefined;
+  involvesNHS?: boolean | null;
+  showRiskScore?: boolean;
 };
 
 const formatClassification = (classification: string) => {
@@ -37,7 +39,7 @@ const getClassificationClass = (classification: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, involvesNHS } = props;
+  const { studyId, asset, involvesNHS, showRiskScore = true } = props;
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,9 +97,15 @@ export default function AssetCard(props: AssetCardProps) {
       {asset.description && <p className={styles["asset-description"]}>{asset.description}</p>}
 
       <div className={styles["asset-details"]}>
+        {showRiskScore && (
+          <div className={styles["asset-detail"]}>
+            <span className={styles["asset-detail-label"]}>Risk Score:</span>
+            <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset, involvesNHS)}</span>
+          </div>
+        )}
         <div className={styles["asset-detail"]}>
-          <span className={styles["asset-detail-label"]}>Risk Score:</span>
-          <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset, involvesNHS)}</span>
+          <span className={styles["asset-detail-label"]}>Tier:</span>
+          <span className={styles["asset-detail-value"]}>{asset.tier}</span>
         </div>
         {asset.locations && asset.locations.length > 0 && (
           <div className={styles["asset-detail"]}>
@@ -130,11 +138,7 @@ export default function AssetCard(props: AssetCardProps) {
         </div>
       </div>
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={error} />}
     </Card>
   );
 }

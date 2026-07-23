@@ -33,16 +33,6 @@
   text-align: center;
 }
 
-.error {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: var(--default-border-radius);
-  font-size: 1rem;
-}
-
 .loading {
   margin-bottom: 1.5rem;
   padding: 2rem;
@@ -77,6 +67,7 @@
 }
 
 .contracts-list {
+  display: grid;
   width: 100%;
   max-width: 1200px;
   justify-self: center;

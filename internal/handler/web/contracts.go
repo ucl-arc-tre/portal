@@ -238,7 +238,7 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 	data := openapi.Contract{
 		Id:                    contract.ID.String(),
 		Title:                 contract.Title,
-		OrganisationSignatory: string(contract.SignatoryUser.Username),
+		OrganisationSignatory: new(string(contract.SignatoryUser.Username)),
 		ThirdPartyName:        contract.ThirdPartyName,
 		OtherSignatories:      contract.OtherSignatories,
 		Status:                openapi.ContractStatus(contract.Status),

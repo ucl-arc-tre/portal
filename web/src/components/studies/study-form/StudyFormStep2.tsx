@@ -1,5 +1,6 @@
 import { Control, Controller, FieldErrors, useWatch } from "react-hook-form";
-import { Alert, AlertMessage, HelperText, Label } from "../../shared/uikitExports";
+import { HelperText, Label } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep2.module.css";
 import YesNoUnsureButtons from "./YesNoUnsureButtons";
@@ -82,11 +83,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 />
               )}
             />
-            {errors.cagReference && (
-              <Alert type="error">
-                <AlertMessage>{errors.cagReference.message}</AlertMessage>
-              </Alert>
-            )}
+            {errors.cagReference && <Error message={errors.cagReference.message} />}
           </Label>
         )}
 
@@ -153,11 +150,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                 />
               )}
             />
-            {errors.irasId && (
-              <Alert type="error">
-                <AlertMessage>{errors.irasId.message}</AlertMessage>
-              </Alert>
-            )}
+            {errors.irasId && <Error message={errors.irasId.message} />}
           </Label>
         )}
       </fieldset>
@@ -220,11 +213,7 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
                     )}
                   />
                 </div>
-                {errors.nhsEnglandReference && (
-                  <Alert type="error">
-                    <AlertMessage>{errors.nhsEnglandReference.message}</AlertMessage>
-                  </Alert>
-                )}
+                {errors.nhsEnglandReference && <Error message={errors.nhsEnglandReference.message} />}
               </Label>
             )}
           </>

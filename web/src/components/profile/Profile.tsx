@@ -7,10 +7,11 @@ import {
   UserAgreements,
   ProfileTraining,
   Auth,
+  postNotificationsRead,
 } from "@/openapi";
 import { calculateExpiryUrgency } from "@/components/shared/exports";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import Error from "../ui/Error";
 import ProfileSetupSteps from "./ProfileSetupSteps";
 import ProfileSummaryCard from "./ProfileSummaryCard";
 import CertificateReupload from "./CertificateReupload";
@@ -30,8 +31,7 @@ type Props = {
 };
 
 export default function Profile({ userData, refreshAuth }: Props) {
-  const [chosenName, setChosenName] = useState<string>("");
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [profileData, setProfileData] = useState<ProfileData | undefined>(undefined);
   const [agreementsData, setAgreementsData] = useState<UserAgreements | null>(null);
   const [trainingData, setTrainingData] = useState<ProfileTraining | null>(null);
   const [profileComplete, setProfileComplete] = useState(false);
@@ -74,7 +74,6 @@ export default function Profile({ userData, refreshAuth }: Props) {
       const trainingExpiryUrgency = nhsdTraining?.completed_at ? computeExpiryUrgency(nhsdTraining.completed_at) : null;
       setExpiryUrgency(trainingExpiryUrgency);
 
-      setChosenName(profileResponse.data.chosen_name);
       setProfileData(profileResponse.data);
       setAgreementsData(agreementsResponse.data);
       setTrainingData(trainingResponse.data);
@@ -90,22 +89,25 @@ export default function Profile({ userData, refreshAuth }: Props) {
     fetchProfileData();
   }, [fetchProfileData]);
 
-  const handleStepsComplete = (name: string) => {
-    setChosenName(name);
+  const clearCompleteProfileCompleteNotification = async () => {
+    const response = await postNotificationsRead({ body: { kind: "complete-profile" } });
+    if (responseIsError(response)) {
+      console.log(`Failed to clear complete profile notfiication ${extractErrorMessage(response)}`);
+    }
+  };
+
+  const handleStepsComplete = () => {
     setProfileComplete(true);
     setExpiryUrgency(null);
     refreshAuth();
     fetchProfileData();
+    clearCompleteProfileCompleteNotification();
   };
 
   if (isLoading) return <Loading message="Loading your profile" />;
 
   if (errorMessage) {
-    return (
-      <Alert type="error">
-        <AlertMessage>{errorMessage}</AlertMessage>
-      </Alert>
-    );
+    return <Error message={errorMessage} />;
   }
 
   if (!profileComplete) {
@@ -121,7 +123,12 @@ export default function Profile({ userData, refreshAuth }: Props) {
 
   return (
     <div className={styles["profile-content-container"]}>
-      <ProfileSummaryCard chosenName={chosenName} username={userData?.username} roles={userData?.roles} />
+      <ProfileSummaryCard
+        profileData={profileData}
+        username={userData?.username}
+        roles={userData?.roles}
+        callback={() => fetchProfileData()}
+      />
       <CertificateReupload trainingData={trainingData} expiryUrgency={expiryUrgency} onReupload={fetchProfileData} />
     </div>
   );

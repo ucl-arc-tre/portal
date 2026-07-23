@@ -2,94 +2,80 @@ import { useAuth } from "@/hooks/useAuth";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import { useEffect, useState } from "react";
-import { getProfile, getStudies, Study } from "@/openapi";
+import {
+  getNotifications,
+  Notification,
+  postNotificationsByNotificationIdRead,
+  postNotificationsRead,
+} from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./UserTasks.module.css";
-import { AlertMessage, Alert } from "../shared/uikitExports";
-import { studySignoffWarningRequired } from "../shared/exports";
+import Error from "../ui/Error";
+import { IconButton, XIcon } from "../shared/uikitExports";
+import router from "next/router";
 
 export default function UserTasks() {
   const { authInProgress, isAuthed, userData } = useAuth();
-  const [chosenName, setChosenName] = useState<string | undefined>(undefined);
+  const [notifications, setNotifications] = useState<Notification[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasPendingStudies, setHasPendingStudies] = useState(false);
-  const [studiesRequiringSignoff, setStudiesRequiringSignoff] = useState<Study[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isIAO = userData?.roles.includes("information-asset-owner");
+  const completeProfileNotification = notifications?.find((notification) => notification.kind === "complete-profile");
+  const needToCompleteProfile = completeProfileNotification !== undefined;
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        const response = await getProfile();
+        const response = await getNotifications();
 
-        if (responseIsError(response) || !response.data) {
+        if (responseIsError(response)) {
           const errorMsg = extractErrorMessage(response);
-          setError(`Failed to load profile: ${errorMsg}`);
-          setChosenName("");
+          setError(`Failed to load notifications: ${errorMsg}`);
+          setNotifications(undefined);
           return;
         }
-        setChosenName(response.data.chosen_name || "");
+        setNotifications(response.data);
       } catch (error) {
-        console.error("Failed to get profile:", error);
-        setError("Failed to load profile. Please try again later.");
-        setChosenName("");
+        console.error("Failed to get notifications:", error);
+        setError("Failed to notifications. Please try again later.");
+        setNotifications(undefined);
       } finally {
         setIsLoading(false);
       }
     };
     if (isAuthed) {
-      fetchProfile();
+      fetchNotifications();
     }
   }, [isAuthed]);
 
-  useEffect(() => {
-    const fetchPendingStudies = async () => {
-      try {
-        const response = await getStudies({ query: { status: "Pending" } });
-        if (responseIsError(response) || !response.data) {
-          const errorMsg = extractErrorMessage(response);
-          setError(`Failed to load pending studies: ${errorMsg}`);
-          return;
-        }
-        if (response.data.length > 0) {
-          setHasPendingStudies(true);
-        }
-      } catch (error) {
-        console.error("Failed to get pending studies:", error);
-        setError("Failed to load pending studies. Please try again later.");
+  const clearNotification = async (notification: Notification) => {
+    try {
+      const response = await postNotificationsByNotificationIdRead({ path: { notificationId: notification.id } });
+      if (responseIsError(response)) {
+        setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
+        return;
       }
-    };
-    if (isIGOpsStaff) fetchPendingStudies();
-  }, [isIGOpsStaff]);
+      setNotifications(notifications?.filter((existingNotification) => existingNotification.id !== notification.id));
+    } catch (error) {
+      console.error("Failed to clear notification:", error);
+    }
+  };
 
-  useEffect(() => {
-    const fetchStudiesRequiringSignoff = async () => {
-      try {
-        const response = await getStudies({ query: { status: "Approved" } });
-        if (responseIsError(response) || !response.data) {
-          const errorMsg = extractErrorMessage(response);
-          setError(`Failed to load studies: ${errorMsg}`);
-          return;
-        }
-        const due = response.data.filter(
-          (study) =>
-            study.owner_username === userData?.username &&
-            study.last_signoff != null &&
-            studySignoffWarningRequired(study.last_signoff)
-        );
-        setStudiesRequiringSignoff(due);
-      } catch (error) {
-        console.error("Failed to get studies requiring signoff:", error);
-        setError("Failed to load studies. Please try again later.");
+  const clearAllNotifications = async () => {
+    try {
+      const response = await postNotificationsRead({ body: {} });
+      if (responseIsError(response)) {
+        setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
+        return;
       }
-    };
-    if (isIAO) fetchStudiesRequiringSignoff();
-  }, [isIAO, userData?.username]);
+      setNotifications([]);
+    } catch (error) {
+      console.error("Failed to clear notifications:", error);
+    }
+  };
 
   if (authInProgress) return null;
 
@@ -106,67 +92,67 @@ export default function UserTasks() {
 
   return (
     <div className={styles.container}>
-      <h2>Your Tasks</h2>
+      <div className={styles["header"]}>
+        <h2>Your Tasks</h2>
+        {notifications && notifications.length > 0 && !needToCompleteProfile && (
+          <Button
+            variant="secondary"
+            size="xsmall"
+            onClick={() => {
+              clearAllNotifications();
+            }}
+          >
+            Clear All
+          </Button>
+        )}
+      </div>
 
-      {error && (
-        <Alert type="error">
-          <AlertMessage>{error}</AlertMessage>
-        </Alert>
-      )}
+      {error && <Error message={error} />}
 
-      {!chosenName ? (
+      {needToCompleteProfile ? (
         <div className={styles["setup-prompt"]}>
           <h3>Complete Your Profile Setup</h3>
           <p>
             To get started with ARC services, please complete your profile setup including setting your chosen name.
           </p>
-          <Button href="/profile" size="large">
+          <Button href="/profile" variant="secondary" onClick={() => clearNotification(completeProfileNotification!)}>
             Complete Profile Setup
           </Button>
         </div>
-      ) : !isApprovedResearcher ? (
-        <div className={styles["researcher-prompt"]}>
-          <p>Complete your profile setup to become an approved researcher.</p>
-          <Button href="/profile" variant="secondary">
-            Continue Profile Setup
-          </Button>
-        </div>
       ) : (
+        !isApprovedResearcher && (
+          <div className={styles["researcher-prompt"]}>
+            <p>Complete your profile setup to become an approved researcher.</p>
+            <Button href="/profile" variant="secondary">
+              Become an Approved Researcher
+            </Button>
+          </div>
+        )
+      )}
+      {!needToCompleteProfile && notifications && notifications.length > 0 && (
+        <div className={styles["tasks"]}>
+          {notifications.map((notification) => (
+            <div className={styles["task"]} key={notification.id}>
+              <a
+                onClick={() => {
+                  if (notification.href) {
+                    router.push(notification.href);
+                  }
+                  clearNotification(notification);
+                }}
+              >
+                <p>{notification.title}</p>
+              </a>
+              <IconButton aria-label={"dissmss notification"} onClick={() => clearNotification(notification)}>
+                <XIcon aria-hidden="true" size={24} />
+              </IconButton>
+            </div>
+          ))}
+        </div>
+      )}
+      {notifications && notifications.length === 0 && (
         <div className={styles["completed-tasks"]}>
-          {isIGOpsStaff ? (
-            <>
-              {hasPendingStudies ? (
-                <>
-                  <p>There are studies to approve, check out the Studies page.</p>
-                  <Button href="/studies" size="large">
-                    View Studies
-                  </Button>
-                </>
-              ) : (
-                <p>You&apos;re all caught up! There are no studies to approve.</p>
-              )}
-            </>
-          ) : (
-            <>
-              {studiesRequiringSignoff.length > 0 ? (
-                <>
-                  {studiesRequiringSignoff.map((study) => (
-                    <div key={study.id} className={styles["signoff-task"]}>
-                      <p>
-                        Study confirmation is due for <strong>{study.title}</strong>.
-                      </p>
-
-                      <Button href={`/studies/manage?studyId=${study.id}`} size="small">
-                        Review Study
-                      </Button>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <p>You have completed all your tasks.</p>
-              )}
-            </>
-          )}
+          <p>You have completed all your tasks.</p>
         </div>
       )}
     </div>

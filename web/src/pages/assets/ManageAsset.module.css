@@ -86,15 +86,6 @@
   font-size: 1.2rem;
 }
 
-.error {
-  color: #dc3545;
-  background: #f8d7da;
-  padding: 1rem;
-  border-radius: var(--default-border-radius);
-  border: 1px solid #f5c6cb;
-  margin: 1rem 0;
-}
-
 .not-approved-section {
   max-width: 600px;
   margin: 2rem auto;

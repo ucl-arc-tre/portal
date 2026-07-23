@@ -28,7 +28,11 @@ func (s *Service) ImportApprovedResearchersCSV(
 		var user types.User
 		var err error
 		if entra.IsExternalUsername(record.Username) {
-			user, err = s.InviteExternalUser(ctx, string(record.Username), importer)
+			user, err = s.inviteExternalUser(ctx,
+				entra.Invite{
+					Recipient: string(record.Username),
+					Sponsor:   types.Sponsor{User: importer}},
+			)
 		} else {
 			user, err = s.PersistedUser(record.Username)
 		}

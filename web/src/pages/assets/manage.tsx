@@ -26,6 +26,7 @@ import ContractCard from "@/components/contracts/ContractCard";
 import { HelperText } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
+import ErrorMessage from "@/components/ui/Error";
 import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports";
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
@@ -147,7 +148,7 @@ export default function ManageAssetPage() {
     return (
       <div className={styles.container}>
         <Title text="Error" />
-        <p className={styles.error}>{error}</p>
+        <ErrorMessage message={error} />
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>
@@ -159,7 +160,7 @@ export default function ManageAssetPage() {
     return (
       <div className={styles.container}>
         <Title text="Not Found" />
-        <p className={styles.error}>Study or asset not found.</p>
+        <ErrorMessage message="Study or asset not found." />
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>
@@ -219,6 +220,16 @@ export default function ManageAssetPage() {
               <span>{asset.description}</span>
             </div>
             <div className={styles.field}>
+              <label>Created:</label>
+              <span>{formatDate(asset.created_at)}</span>
+            </div>
+
+            <div className={styles.field}>
+              <label>Updated:</label>
+              <span>{formatDate(asset.updated_at)}</span>
+            </div>
+
+            <div className={styles.field}>
               <label>Source:</label>
               <span>{asset.source || "Unset"}</span>
             </div>
@@ -246,7 +257,7 @@ export default function ManageAssetPage() {
             )}
             <div className={styles.field}>
               <label>Legal Basis:</label>
-              <span>{asset.legal_basis}</span>
+              <span>{asset.legal_basis?.replaceAll("_", " ")}</span>
             </div>
             <div className={styles.field}>
               <label>Format:</label>
@@ -272,7 +283,7 @@ export default function ManageAssetPage() {
               <span>{asset.requires_contract ? "Yes" : "No"}</span>
             </div>
             <div className={styles.field}>
-              <label>Has DSPT:</label>
+              <label>Requires NHS DSPT:</label>
               <span>{asset.has_dspt ? "Yes" : "No"}</span>
             </div>
             <div className={styles.field}>

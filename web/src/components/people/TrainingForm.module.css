@@ -1,5 +1,5 @@
 .training-dialog {
-  width: 28rem;
+  width: clamp(28rem, 40rem, 45rem);
 
   .form {
     text-align: center;

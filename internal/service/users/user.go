@@ -15,46 +15,56 @@ import (
 	"gorm.io/gorm"
 )
 
+func (s *Service) userData(user types.User) (*openapi.UserData, error) {
+
+	userData := &openapi.UserData{
+		User: openapi.User{
+			Id:       user.ID.String(),
+			Username: string(user.Username),
+		},
+		Roles: []string{},
+	}
+
+	attributes, err := s.Attributes(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get attributes for user: %w", err)
+	}
+	userData.ChosenName = new(string(attributes.ChosenName))
+	if attributes.RequestedChosenName != nil {
+		userData.RequestedChosenName = new(string(*attributes.RequestedChosenName))
+	}
+
+	agreements, err := s.ConfirmedAgreements(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get agreements for user: %w", err)
+	}
+	userData.Agreements.ConfirmedAgreements = agreements
+
+	roles, err := rbac.Roles(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get roles for user: %w", err)
+	}
+	for _, role := range roles {
+		userData.Roles = append(userData.Roles, string(role))
+	}
+
+	trainingRecords, err := s.TrainingRecords(user)
+	if err != nil {
+		return userData, fmt.Errorf("failed to get training for user: %w", err)
+	}
+	userData.TrainingRecord.TrainingRecords = trainingRecords
+	userData.IsValidApprovedResearcher = confirmedAgreementsIncludeApprovedResearcher(agreements) && trainingRecordsIncludeValidIg(trainingRecords)
+	return userData, nil
+}
+
 func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 	usersData := []openapi.UserData{}
-	// loops through all users given and get training, roles and agreements for each
-
 	for _, user := range users {
-		userData := openapi.UserData{
-			User: openapi.User{
-				Id:       user.ID.String(),
-				Username: string(user.Username),
-			},
-		}
-
-		attributes, err := s.Attributes(user)
+		userData, err := s.userData(user)
 		if err != nil {
-			return usersData, fmt.Errorf("failed to get attributes for user: %w", err)
+			return usersData, err
 		}
-		chosenNameStr := string(attributes.ChosenName)
-		userData.ChosenName = &chosenNameStr
-
-		agreements, err := s.ConfirmedAgreements(user)
-		if err != nil {
-			return usersData, fmt.Errorf("failed to get agreements for user: %w", err)
-		}
-		userData.Agreements.ConfirmedAgreements = agreements
-
-		roles, err := rbac.Roles(user)
-		if err != nil {
-			return usersData, fmt.Errorf("failed to get roles for user: %w", err)
-		}
-		for _, role := range roles {
-			userData.Roles = append(userData.Roles, string(role))
-		}
-
-		trainingRecords, err := s.TrainingRecords(user)
-		if err != nil {
-			return usersData, fmt.Errorf("failed to get training for user: %w", err)
-		}
-		userData.TrainingRecord.TrainingRecords = trainingRecords
-
-		usersData = append(usersData, userData)
+		usersData = append(usersData, *userData)
 	}
 	return usersData, nil
 }
@@ -75,6 +85,13 @@ func (s *Service) PersistedUser(username types.Username) (types.User, error) {
 		FirstOrCreate(&user)
 	if result.Error != nil {
 		return user, types.NewErrFromGorm(result.Error, "failed to get or create user")
+	}
+	if result.RowsAffected == 0 {
+		return user, nil
+	}
+	log.Info().Any("username", username).Msg("User created")
+	if err := s.notifications.NotifyToCompleteProfile(user); err != nil {
+		log.Err(err).Msg("Failed to notify user to complete profile") // not fatal
 	}
 	return user, nil
 }
@@ -127,11 +144,18 @@ func (s *Service) PersistedExternalUser(username types.Username, email Email) (t
 			tx.Rollback()
 			return types.User{}, types.NewErrFromGorm(err, "failed to set email for existing user")
 		}
+
 		log.Info().Str("email", email).Any("username", username).Msg("External user created")
 	}
-
-	err := tx.Commit().Error
-	return user, types.NewErrFromGorm(err, "failed to persist external user transaction")
+	if err := tx.Commit().Error; err != nil {
+		return user, types.NewErrFromGorm(err, "failed to persist external user transaction")
+	}
+	if !userExists {
+		if err := s.notifications.NotifyToCompleteProfile(user); err != nil {
+			log.Err(err).Msg("Failed to notify user to complete profile") // not fatal
+		}
+	}
+	return user, nil
 }
 
 func (s *Service) UserExistsWithEmailOrUsername(ctx context.Context, value string) (bool, error) {
@@ -220,6 +244,14 @@ func (s *Service) Find(ctx context.Context, query string) ([]openapi.UserData, e
 	}
 
 	return s.usersData(append(portalUsers, entraUsers...))
+}
+
+func (s *Service) UserDataById(userId uuid.UUID) (*openapi.UserData, error) {
+	user := types.User{}
+	if err := s.db.Where("id = ?", userId).First(&user).Error; err != nil {
+		return nil, types.NewErrFromGorm(err, "failed to find user")
+	}
+	return s.userData(user)
 }
 
 func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error) {

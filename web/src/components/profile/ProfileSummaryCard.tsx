@@ -2,15 +2,25 @@ import { useState } from "react";
 import ChosenNameChangeModal from "./ChosenNameChangeModal";
 import styles from "./ProfileSummaryCard.module.css";
 import EditIcon from "../ui/EditIcon";
+import InfoTooltip from "../ui/InfoTooltip";
+import { Profile as ProfileData } from "@/openapi";
 
-type ProfileSummaryCardProps = {
-  chosenName?: string;
+type Props = {
+  profileData?: ProfileData;
   username?: string;
   roles?: string[];
+  callback: () => void;
 };
 
-export default function ProfileSummaryCard({ chosenName, username, roles }: ProfileSummaryCardProps) {
+export default function ProfileSummaryCard(props: Props) {
+  const { profileData, username, roles, callback } = props;
   const [showChosenNameChangeModal, setShowChosenNameChangeModal] = useState(false);
+
+  const chosenName = profileData?.chosen_name;
+  const requestedChosenName = profileData?.requested_chosen_name;
+  const chosenNamePendingApproval =
+    requestedChosenName && profileData?.requested_chosen_name !== profileData?.chosen_name;
+
   return (
     <div className={styles["profile-summary-container"]}>
       <div className={styles.header}>
@@ -22,9 +32,24 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
           <div className={styles.field}>
             <span className={styles.label}>Chosen name:</span>
             <span className={styles.value}>
-              {chosenName || <span className={styles.placeholder}>Not set</span>}
-              {chosenName && (
-                <EditIcon onClick={() => setShowChosenNameChangeModal(true)} label="Request chosen name change" />
+              {chosenName ? (
+                chosenNamePendingApproval ? (
+                  <>
+                    {requestedChosenName}
+                    <InfoTooltip text="Name change pending approval" />
+                  </>
+                ) : (
+                  <>
+                    {chosenName}
+                    <EditIcon
+                      onClick={() => setShowChosenNameChangeModal(true)}
+                      label="Request chosen name change"
+                      cy="edit-chosen-name"
+                    />
+                  </>
+                )
+              ) : (
+                <span className={styles.placeholder}>Not set</span>
               )}
             </span>
           </div>
@@ -57,7 +82,11 @@ export default function ProfileSummaryCard({ chosenName, username, roles }: Prof
 
       <ChosenNameChangeModal
         isOpen={showChosenNameChangeModal}
-        onClose={() => setShowChosenNameChangeModal(false)}
+        setOpen={setShowChosenNameChangeModal}
+        onSuccess={() => {
+          setShowChosenNameChangeModal(false);
+          callback();
+        }}
         currentChosenName={chosenName}
         username={username}
       />

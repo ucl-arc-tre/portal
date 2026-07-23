@@ -15,7 +15,7 @@ import (
 
 const (
 	day   = 24 * time.Hour
-	month = 30 * day
+	Month = 30 * day
 
 	BaseWebURL = "/web/api/v0"
 	BaseTREURL = "/tre/api/v0"
@@ -35,7 +35,7 @@ const (
 
 	ServerShutdownGraceDuration = 10 * time.Second
 
-	StudySignoffValidity = 3 * month
+	StudySignoffValidity = 3 * Month
 )
 
 var k = koanf.New(".")
@@ -136,6 +136,7 @@ func EntraInvitedUserGroup() string {
 func SetforTesting(key string, value string) error {
 	return k.Set(key, value)
 }
+
 func AdminUsernames() []types.Username {
 	return usernames("admin_usernames")
 }
@@ -156,10 +157,24 @@ func NotificationsEnabled() bool {
 	return k.Bool("entra.notifications_enabled")
 }
 
+func Myservices() MyservicesCredentialBundle {
+	return MyservicesCredentialBundle{
+		Enabled:        k.Bool("myservices.enabled"),
+		URL:            k.String("myservices.url"),
+		TenantID:       k.String("myservices.entra.tenant_id"),
+		ClientID:       k.String("myservices.entra.client_id"),
+		ClientSecret:   k.String("myservices.entra.client_secret"),
+		APIClientID:    k.String("myservices.entra.api_client_id"),
+		SupportDomain:  k.String("myservices.support_domain"),
+		RequestorEmail: k.String("myservices.requestor_email"),
+	}
+}
+
 // Map of paths to strictly rate limit, so they are 'slow'
 func RateLimitSlowPaths() map[string]bool {
 	return map[string]bool{
 		BaseWebURL + "/users/invite": true,
+		BaseWebURL + "/feedback":     true,
 	}
 }
 

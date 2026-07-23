@@ -8,6 +8,7 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
+import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
 import { InfoIcon } from "../shared/uikitExports";
 
@@ -85,7 +86,7 @@ export default function Projects({ userData }: Props) {
     return (
       <div className={styles["error-section"]}>
         <h2>Error Loading Data</h2>
-        <p>{error}</p>
+        <Error message={error} />
         <Button onClick={fetchData}>Try Again</Button>
       </div>
     );
@@ -113,12 +114,13 @@ export default function Projects({ userData }: Props) {
         <>
           <div className={styles.header}>
             <h2>
-              {isOpsStaff ? "All Projects pending review" : "Your Projects"}{" "}
+              {isOpsStaff ? "All Projects" : "Your Projects"}{" "}
               <Button
                 onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
                 variant="tertiary"
                 size="small"
                 inline
+                aria-label="Toggle project definition"
               >
                 <InfoIcon />
               </Button>

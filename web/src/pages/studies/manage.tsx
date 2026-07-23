@@ -9,6 +9,7 @@ import ManageStudy from "@/components/studies/manage/ManageStudy";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
+import Error from "@/components/ui/Error";
 
 import styles from "./ManageStudyPage.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -102,7 +103,7 @@ export default function ManageStudyPage() {
         {defaultMeta}
         <div className={styles["error-section"]}>
           <h2>Error Loading Study</h2>
-          <p>{error}</p>
+          <Error message={error} />
           <div className={styles["error-recovery-actions"]}>
             <Button onClick={() => router.push("/studies")} variant="secondary">
               Back to Studies

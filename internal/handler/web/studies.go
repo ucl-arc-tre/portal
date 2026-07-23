@@ -201,22 +201,16 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		return
 	}
 
-	err = h.studies.UpdateStudyReview(studyUUID, review)
+	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
-		return
-	}
-
-	err = h.studies.SendReviewEmailNotification(ctx, studyUUID, review)
-	if err != nil {
-		setError(ctx, err, "Failed to send study notification")
 		return
 	}
 
 	ctx.Status(http.StatusOK)
 }
 
-// Called by the IAO to attest that study details are up to date, resetting the signoff timestamp
+// Called by the IAO to affirm that study details are up to date, resetting the signoff timestamp
 func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {
@@ -242,7 +236,7 @@ func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	err = h.studies.UpdateStudyReview(studyUUID, review)
+	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return
@@ -332,7 +326,7 @@ func (h *Handler) PostStudiesStudyIdOwnerRequest(ctx *gin.Context, studyId strin
 	}
 
 	user := middleware.GetUser(ctx)
-	if err := h.studies.UpdateStudyOwner(studyUUID, user, data); err != nil {
+	if err := h.studies.UpdateStudyOwner(ctx, studyUUID, user, data); err != nil {
 		setError(ctx, err, "Failed to update study owner")
 		return
 	}

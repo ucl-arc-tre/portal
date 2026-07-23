@@ -22,6 +22,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractUploadForm from "@/components/contracts/ContractUploadForm";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ContractObjectCard from "@/components/contracts/ContractObjectCard";
+import Error from "@/components/ui/Error";
 import { formatDate } from "@/components/shared/exports";
 import Box from "@/components/ui/Box";
 
@@ -118,7 +119,7 @@ export default function ManageContractPage() {
     return (
       <div className={styles.container}>
         <Title text="Error" />
-        <p className={styles.error}>{error}</p>
+        <Error message={error} />
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>
@@ -130,7 +131,7 @@ export default function ManageContractPage() {
     return (
       <div className={styles.container}>
         <Title text="Not Found" />
-        <p className={styles.error}>Study or contract not found.</p>
+        <Error message="Study or contract not found." />
         <Button onClick={() => router.push("/studies")} variant="secondary">
           Back to Studies
         </Button>
@@ -183,9 +184,10 @@ export default function ManageContractPage() {
             <label>Status:</label>
             <span>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</span>
           </div>
+
           <div className={styles.field}>
-            <label>Signatory:</label>
-            <span>{contract.organisation_signatory}</span>
+            <label>Created:</label>
+            <span>{formatDate(contract.created_at)}</span>
           </div>
 
           <div className={styles.field}>

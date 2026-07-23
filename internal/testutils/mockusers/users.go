@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 
@@ -32,6 +34,10 @@ func (m *MockUsers) SetUserChosenName(user types.User, chosenName types.ChosenNa
 	panic("not implemented")
 }
 
+func (m *MockUsers) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*openapi.ProfileUpdateResponse, error) {
+	panic("not implemented")
+}
+
 func (m *MockUsers) ImportApprovedResearchersCSV(
 	ctx context.Context,
 	importer types.User,
@@ -41,7 +47,7 @@ func (m *MockUsers) ImportApprovedResearchersCSV(
 	panic("not implemented")
 }
 
-func (m *MockUsers) InviteExternalUser(ctx context.Context, email string, inviter types.User) (types.User, error) {
+func (m *MockUsers) InviteUser(ctx context.Context, invite entra.Invite) (types.User, error) {
 	panic("not implemented")
 }
 
@@ -105,5 +111,9 @@ func (m *MockUsers) Find(ctx context.Context, query string) ([]openapi.UserData,
 }
 
 func (m *MockUsers) AllApprovedResearchers() ([]users.ApprovedResearcherExportRecord, error) {
+	panic("not implemented")
+}
+
+func (m *MockUsers) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error) {
 	panic("not implemented")
 }

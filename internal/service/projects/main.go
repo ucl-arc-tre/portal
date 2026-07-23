@@ -15,6 +15,7 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
+	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -22,16 +23,18 @@ import (
 )
 
 type Service struct {
-	db           *gorm.DB
-	users        users.Interface
-	environments *environments.Service
+	db            *gorm.DB
+	users         users.Interface
+	environments  *environments.Service
+	notifications notifications.Interface
 }
 
 func New() *Service {
 	return &Service{
-		db:           graceful.NewDB(),
-		users:        users.New(),
-		environments: environments.New(),
+		db:            graceful.NewDB(),
+		users:         users.New(),
+		environments:  environments.New(),
+		notifications: notifications.New(),
 	}
 }
 
@@ -262,6 +265,11 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return err
 	}
 
+	if err := s.createOrUpdateProjectTREUserConfigs(tx, projectTRE.ID, data.Members); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	if _, err := rbac.AddProjectTreOwnerRole(studyUUID, project.ID); err != nil {
 		tx.Rollback()
 		return err
@@ -298,6 +306,7 @@ func (s *Service) AllProjects() ([]GenericProject, error) {
 
 func (s *Service) genericProjectsQuery() *gorm.DB {
 	return s.db.Table("projects").
+		Order("projects.created_at DESC").
 		Select(`
 			projects.id,
 	  		projects.study_id,
@@ -321,13 +330,11 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("Project.Study").
 		Preload("Project.ProjectAssets.Asset").
 		Preload("TRERoleBindings.User").
+		Preload("UserConfigs.User").
 		Where("project_id = ?", projectId).
 		First(&projectTRE).Error
-	if err != nil {
-		return nil, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
-	}
 
-	return &projectTRE, nil
+	return &projectTRE, types.NewErrFromGorm(err, "failed to retrieve project TRE data")
 }
 
 func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
@@ -408,6 +415,73 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
 }
 
+func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+	existing := []types.ProjectTREUserConfig{}
+	if err := tx.Unscoped().Preload("User").Where("project_tre_id = ?", projectTREID).Find(&existing).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to list role bindings")
+	}
+
+	userIds, err := s.users.UserIds(treProjectMemberUsernames(members)...)
+	if err != nil {
+		return err
+	}
+
+	requested := []types.ProjectTREUserConfig{}
+	for _, member := range members {
+		if member.DesktopConfig == nil {
+			continue
+		}
+		if member.Uid != nil {
+			return types.NewErrInvalidObject("uid is not settable")
+		}
+		existingIdx := slices.IndexFunc(existing, func(u types.ProjectTREUserConfig) bool {
+			return u.User.Username == types.Username(member.Username)
+		})
+		userConfig := types.ProjectTREUserConfig{
+			ProjectTREID:           projectTREID,
+			UserID:                 userIds[types.Username(member.Username)],
+			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
+			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
+		}
+		if exists := existingIdx >= 0; exists {
+			existingConfig := existing[existingIdx]
+			userConfig.UID = existingConfig.UID
+		} else {
+			userConfig.UID, err = projectTRENextUid(append(existing, requested...))
+			if err != nil {
+				return err
+			}
+		}
+		requested = append(requested, userConfig)
+	}
+	for _, userConfig := range requested {
+		err := tx.Model(&userConfig).
+			Where("project_tre_id = ? AND user_id = ?", projectTREID, userConfig.UserID).
+			Assign(types.ProjectTREUserConfig{
+				DesktopHPCInstanceType: userConfig.DesktopHPCInstanceType,
+				DesktopRootVolumeSize:  userConfig.DesktopRootVolumeSize,
+			}).
+			Attrs(types.ProjectTREUserConfig{
+				UID: userConfig.UID,
+			}).
+			FirstOrCreate(&userConfig).
+			Error
+		if err != nil {
+			return types.NewErrFromGorm(err, "failed to create/update project tre config")
+		}
+	}
+	for _, userConfig := range existing {
+		hasUser := func(u types.ProjectTREUserConfig) bool { return u.User.Username == userConfig.User.Username }
+		isDeleted := !slices.ContainsFunc(requested, hasUser)
+		if isDeleted {
+			if err := tx.Delete(&userConfig).Error; err != nil {
+				return types.NewErrFromGorm(err, "failed to delete old user project tre config")
+			}
+		}
+	}
+	return nil
+}
+
 func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate) error {
 	if err := s.validateProjectTREUpdate(data, projectTRE); err != nil {
 		return err
@@ -445,6 +519,11 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 		return err
 	}
 
+	if err := s.createOrUpdateProjectTREUserConfigs(tx, projectTRE.ID, data.Members); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
 }
 
@@ -470,6 +549,12 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to delete project TRE role bindings")
+	}
+
+	err = tx.Where("project_tre_id = ?", projectTRE.ID).Delete(&types.ProjectTREUserConfig{}).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to delete project TRE user configs")
 	}
 
 	// Soft delete all ProjectAssets for this project
@@ -531,21 +616,35 @@ func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.P
 		return types.NewErrClientInvalidObjectF("failed to parse deployed update time: %s", err.Error())
 	}
 
-	subQuery := s.db.Model(&types.ProjectTRE{}).
-		Select("project_tres.id").
-		Joins("JOIN projects ON projects.id = project_tres.project_id").
-		Where("projects.name = ?", projectName)
+	project := types.Project{}
+	result := s.db.Preload("CreatorUser").Where("name = ?", projectName).First(&project)
 
-	result := s.db.Model(&types.ProjectTRE{}).
-		Where("id IN (?)", subQuery).
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project: parent project get error")
+	}
+
+	projectTRE := types.ProjectTRE{}
+	result = s.db.Where("project_id = ?", project.ID).First(&projectTRE)
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to update TRE project: TRE project get error")
+	}
+	currentStatus := projectTRE.Status
+
+	result = s.db.Model(projectTRE).
+		Where("id = ?", projectTRE.ID).
 		Updates(types.ProjectTRE{
 			Status:                   status,
 			DeployedVersionUpdatedAt: &deployedVersionUpdatedAt,
 		})
 	if err := result.Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to update TRE project")
-	} else if result.RowsAffected == 0 {
-		return types.NewNotFoundError("tre project not found")
+	}
+
+	if currentStatus == types.ProjectTREStatusPendingCreation && status == types.ProjectTREStatusDeployed {
+		err := s.notifications.NotifyProjectDeployed(project, project.CreatorUser)
+		if err != nil {
+			log.Err(err).Msg("Failed to notify project deployed") // not fatal
+		}
 	}
 	return nil
 }
@@ -650,17 +749,19 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			rootVolumeGb = new(uint(*v))
 		}
 		userConfig := types.ProjectTREUserConfig{
-			ProjectTREID:          projectTRE.ID,
-			UserID:                user.ID,
-			UID:                   *member.Uid,
-			DesktopRootVolumeSize: rootVolumeGb,
+			ProjectTREID:           projectTRE.ID,
+			UserID:                 user.ID,
+			UID:                    *member.Uid,
+			DesktopRootVolumeSize:  rootVolumeGb,
+			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
 		}
 		if err := tx.Where(types.ProjectTREUserConfig{ // NOTE: does not clear old associations
 			ProjectTREID: projectTRE.ID,
 			UserID:       user.ID,
 		}).Assign(types.ProjectTREUserConfig{
-			UID:                   *member.Uid,
-			DesktopRootVolumeSize: rootVolumeGb,
+			UID:                    *member.Uid,
+			DesktopRootVolumeSize:  rootVolumeGb,
+			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
 		}).FirstOrCreate(&userConfig).Error; err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create ProjectTREUserConfig")
@@ -680,4 +781,29 @@ func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Usern
 		usernames = append(usernames, types.Username(member.Username))
 	}
 	return usernames
+}
+
+func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	uid := validation.ProjectTREMinValidUid
+	for {
+		select {
+		case <-ctx.Done():
+			return -1, types.NewErrServerError("failed to find a new tre project uid")
+		default:
+		}
+		if !slices.ContainsFunc(userConfigs, func(u types.ProjectTREUserConfig) bool { return u.UID == uid }) {
+			break
+		}
+		uid++
+	}
+	return uid, nil
+}
+
+func optionalUint(i *int) *uint {
+	if i == nil {
+		return nil
+	}
+	return new(uint(*i))
 }

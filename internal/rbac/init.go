@@ -1,25 +1,15 @@
 package rbac
 
 import (
-	"fmt"
-
 	"github.com/casbin/casbin/v3"
 	"github.com/rs/zerolog/log"
-	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
-	"github.com/ucl-arc-tre/portal/internal/types"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
-
-var database *gorm.DB
 
 // Initialise the RBAC with roles and users
 func Init() {
 	log.Info().Msg("Seeding roles and static user role bindings")
-	database = graceful.NewDB()
-	enforcer := NewEnforcer(database)
-
+	enforcer := NewEnforcer(graceful.NewDB())
 	seedPolicies(enforcer)
 }
 
@@ -31,17 +21,15 @@ func seedPolicies(enforcer *casbin.Enforcer) {
 	addIgOpsStaffPolicy(enforcer)
 	addDSHOpsStaffPolicy(enforcer)
 
-	addUserRoleBindings(config.AdminUsernames(), Admin)
-	addUserRoleBindings(config.TreOpsStaffUsernames(), TreOpsStaff)
-	addUserRoleBindings(config.IGOpsStaffUsernames(), IGOpsStaff)
-	addUserRoleBindings(config.DSHOpsStaffUsernames(), DSHOpsStaff)
-
 	runMigrations()
 }
 
 func addBasePolicies(enforcer *casbin.Enforcer) {
 	policies := []Policy{
 		{RoleName: Base, Resource: "/auth", Action: ReadAction},
+		{RoleName: Base, Resource: "/notifications", Action: ReadAction},
+		{RoleName: Base, Resource: "/notifications/:id/read", Action: WriteAction},
+		{RoleName: Base, Resource: "/notifications/read", Action: WriteAction},
 		{RoleName: Base, Resource: "/profile", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile", Action: WriteAction},
 		{RoleName: Base, Resource: "/agreements/approved-researcher", Action: ReadAction},
@@ -51,6 +39,7 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 		{RoleName: Base, Resource: "/profile/training", Action: WriteAction},
 		{RoleName: Base, Resource: "/projects", Action: ReadAction},
 		{RoleName: Base, Resource: "/logout", Action: ReadAction},
+		{RoleName: Base, Resource: "/feedback", Action: WriteAction},
 	}
 	for _, policy := range policies {
 		mustAddPolicies(enforcer, policy)
@@ -64,6 +53,7 @@ func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-administrator", Action: ReadAction},
 		Policy{RoleName: InformationAssetOwner, Resource: "/users/invite", Action: WriteAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/users/lookup", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: WriteAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/environments", Action: ReadAction},
@@ -77,6 +67,7 @@ func addAdminPolicy(enforcer *casbin.Enforcer) {
 func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: TreOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/users/:id", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/projects/tre/admin/*", Action: WriteAction},
@@ -90,6 +81,7 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: IGOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/users/:id", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id/training", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id/attributes", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/metrics", Action: ReadAction},
@@ -105,6 +97,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: DSHOpsStaff, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/users/:id", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: WriteAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: ReadAction},
@@ -120,60 +113,4 @@ func mustAddPolicies(enforcer *casbin.Enforcer, policies ...Policy) {
 
 func addPolicy(enforcer *casbin.Enforcer, policy Policy) (bool, error) {
 	return enforcer.AddPolicy(string(policy.RoleName), policy.Resource, string(policy.Action))
-}
-
-func addUserRoleBindings(usernames []types.Username, role RoleName) {
-	removeOutdatedPersistedUserRoleBindings(usernames, role)
-	for _, user := range persistedUsers(usernames) {
-		_ = must(AddRole(user, role))
-	}
-}
-
-func persistedUsers(usernames []types.Username) []types.User {
-	db := database
-	users := []types.User{}
-	for _, username := range usernames {
-		if !username.IsValid() {
-			log.Error().Any("username", username).Msg("Cannot create a user with an invalid username")
-			continue
-		}
-		user := types.User{}
-		result := db.Clauses(clause.OnConflict{DoNothing: true}).
-			Where("username = ?", username).
-			Attrs(types.User{Username: username}).
-			FirstOrCreate(&user)
-		if result.Error != nil {
-			log.Err(result.Error).Any("username", username).Msg("Failed to create user")
-			continue
-		}
-		users = append(users, user)
-	}
-	return users
-}
-
-func removeOutdatedPersistedUserRoleBindings(usernames []types.Username, role RoleName) {
-	db := database
-	outdatedUsers := []types.User{}
-
-	userIdsWithRole, err := userIdsWithRole(role)
-	if err != nil {
-		panic(fmt.Sprintf("failed to get user ids from role [%v]", err))
-	}
-	if len(usernames) > 0 {
-		err = db.Where("id IN (?)", userIdsWithRole).Not("username IN (?)", usernames).Find(&outdatedUsers).Error
-	} else {
-		err = db.Where("id IN (?)", userIdsWithRole).Find(&outdatedUsers).Error
-	}
-	if err != nil {
-		panic(fmt.Sprintf("failed to get users with roles [%v]", err))
-	}
-	log.Debug().Any("outdatedUsers", outdatedUsers).Any("role", role).Msg("Users who are not in config")
-
-	// remove role bindings for outdated users
-	for _, user := range outdatedUsers {
-		_, err := RemoveRole(user, role)
-		if err != nil {
-			panic(fmt.Sprintf("failed to remove role for user [%v]", err))
-		}
-	}
 }

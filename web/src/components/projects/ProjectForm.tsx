@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   postProjectsTre,
   putProjectsTreByProjectId,
   ProjectTreRequest,
-  ProjectTreRoleName,
   Study,
   Environment,
   getStudiesByStudyIdAssets,
   Asset,
   getEnvironments,
+  ProjectTreMember,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName, ProjectFormData } from "@/types/projects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -19,10 +19,7 @@ import Dialog from "../ui/Dialog";
 import styles from "./ProjectForm.module.css";
 import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
-import { Alert, AlertMessage } from "../shared/uikitExports";
-
-// this should match the domain that is used for the entra ID users in the portal
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+import ErrorMessage from "../ui/Error";
 
 type Props = {
   approvedStudies: Study[];
@@ -43,6 +40,7 @@ export default function ProjectForm({
   const [environmentsError, setEnvironmentsError] = useState<string | null>(null);
   const [assets, setAssets] = useState<Asset[] | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
   const totalSteps = 2;
 
@@ -57,7 +55,13 @@ export default function ProjectForm({
       tre: undefined,
     },
   });
-  const { handleSubmit, watch, setValue, trigger } = methods;
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    trigger,
+    formState: { isValid },
+  } = methods;
 
   const selectedStudyId = watch("studyId");
   const selectedEnvironmentId = watch("environmentId");
@@ -106,7 +110,7 @@ export default function ProjectForm({
 
       const projectMembers =
         editingProject.members?.map((member) => ({
-          username: member.username.replace(domainName, ""),
+          username: member.username,
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
       setValue("members", projectMembers);
@@ -120,6 +124,15 @@ export default function ProjectForm({
         "tre.airlockWhitelist",
         (editingProject.airlock_whitelist ?? []).map((value) => ({ value }))
       );
+
+      const hasHPCDesktops = editingProject.members.some((member) => member.desktop_config?.hpc_instance_type);
+      setValue("tre.requiresHPCDesktops", hasHPCDesktops ? "true" : "false");
+
+      const userConfig = editingProject.members.map((member) => ({
+        username: member.username,
+        hpcInstance: member.desktop_config?.hpc_instance_type,
+      }));
+      setValue("tre.userConfig", userConfig);
     }
   }, [editingProject, setValue, environments]);
 
@@ -160,6 +173,10 @@ export default function ProjectForm({
     fetchAssets();
   }, [selectedStudyId, selectedEnvironmentId]);
 
+  useEffect(() => {
+    dialogContentRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [currentStep]);
+
   const nextStep = async () => {
     if (currentStep === totalSteps) return;
 
@@ -195,11 +212,20 @@ export default function ProjectForm({
             return;
           }
 
-          const treMembers = data.members
+          const hasHPCDesktops = watch("tre.requiresHPCDesktops");
+          const usersConfig = data.tre?.userConfig?.map((config) => ({
+            username: config.username,
+            desktop_config: {
+              hpc_instance_type: hasHPCDesktops ? config.hpcInstance : "",
+            },
+          }));
+
+          const treMembers: Array<ProjectTreMember> = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
-              username: `${researcher.username.trim()}${domainName}`,
-              roles: researcher.roles as ProjectTreRoleName[],
+              username: researcher.username,
+              roles: researcher.roles,
+              desktop_config: usersConfig?.find((config) => config.username == researcher.username)?.desktop_config,
             }));
 
           const airlockWhitelist =
@@ -228,13 +254,15 @@ export default function ProjectForm({
               members: treMembers,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
-              airlock_whitelist: airlockWhitelist.length > 0 ? airlockWhitelist : [],
+              airlock_whitelist: airlockWhitelist,
             };
             response = await postProjectsTre({ body: requestBody });
           }
           break;
         case "Data Safe Haven":
-          throw new Error("DSH projects are not yet supported");
+          setEnvironmentsError(
+            "DSH projects are not yet supported. Please use the Share Management Tool within the DSH or open a ticket on MyServices."
+          );
         default:
           throw new Error(`Unknown environment: ${selectedEnvironment.name}`);
       }
@@ -255,7 +283,7 @@ export default function ProjectForm({
   };
 
   return (
-    <Dialog setDialogOpen={handleCancelCreate}>
+    <Dialog setDialogOpen={handleCancelCreate} contentRef={dialogContentRef}>
       <div>
         <h2>{editingProject ? "Edit Project" : "Create New Project"}</h2>
 
@@ -270,11 +298,7 @@ export default function ProjectForm({
           ))}
         </div>
 
-        {error && (
-          <Alert type="error">
-            <AlertMessage>{error}</AlertMessage>
-          </Alert>
-        )}
+        {error && <ErrorMessage message={error} />}
 
         <FormProvider {...methods}>
           <form className="form" onSubmit={(e) => e.preventDefault()}>
@@ -289,9 +313,7 @@ export default function ProjectForm({
               />
             )}
 
-            {currentStep === 2 && isTREProject && (
-              <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject} />
-            )}
+            {currentStep === 2 && isTREProject && <ProjectTREStep fieldsDisabled={fieldsDisabled} />}
 
             <div className={styles.actions}>
               {currentStep > 1 && (
@@ -309,7 +331,7 @@ export default function ProjectForm({
               {currentStep === totalSteps && (
                 <Button
                   type="button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                   onClick={handleSubmit((data) => submitProject(data))}
                   cy="submit-project-button"
                 >
@@ -319,7 +341,7 @@ export default function ProjectForm({
                       : "Creating..."
                     : editingProject
                       ? "Update Project"
-                      : "Save Draft"}
+                      : "Create Project"}
                 </Button>
               )}
             </div>

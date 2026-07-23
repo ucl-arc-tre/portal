@@ -1,15 +1,15 @@
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import { ProjectFormData } from "@/types/projects";
-import Button from "@/components/ui/Button";
-import { ProjectTre, ProjectTreRoleName } from "@/openapi";
+import { ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
-
-// this should match the domain that is used for the entra ID users in the portal
-const domainName = process.env.NEXT_PUBLIC_DOMAIN_NAME || "@ucl.ac.uk";
+import UserLookup from "@/components/shared/UserLookup";
+import Button from "@/components/ui/Button";
+import { defaultDesktopInstance, hpcDesktopInstances } from "./desktops";
 
 // Mirrors backend validation in internal/validation/ip.go (IsIPv4OrFQDN).
 const ipv4Regex =
@@ -25,11 +25,10 @@ function isIPv4OrFQDN(value: string): boolean {
 
 type Props = {
   fieldsDisabled: boolean;
-  editingProject: ProjectTre | null | undefined;
 };
 
 export default function ProjectFormTREStep(props: Props) {
-  const { fieldsDisabled, editingProject } = props;
+  const { fieldsDisabled } = props;
   const {
     watch,
     control,
@@ -57,188 +56,197 @@ export default function ProjectFormTREStep(props: Props) {
     name: "tre.airlockWhitelist",
   });
 
+  const { append: appendUserConfig, update: updateUserConfig } = useFieldArray({
+    control,
+    name: "tre.userConfig",
+  });
+
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
   const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
   const members = watch("members");
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
   const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
+  const userConfig = watch("tre.userConfig");
+  const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
+  const requiresHPCDesktops = watch("tre.requiresHPCDesktops") === "true";
+
+  const isDesktopUser = (username: string): boolean => {
+    console.log(username);
+    return members.some((member) => member.username == username && member.roles.includes("desktop_user"));
+  };
 
   return (
     <>
       <div className="field">
         <Label htmlFor="members">Project users (optional):*</Label>
         <fieldset className="linkage-fieldset">
-          {researcherFields.map((field, index) => {
-            const researcher = members[index];
-            const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
+          <UserLookup
+            filterByApprovedResearchers={true}
+            usernames={Array.from(members, (member) => member.username)}
+            appendUsername={(value: string) => {
+              appendResearcher({ username: value, roles: [] });
+              if (!userConfig?.some((u) => u.username === value)) {
+                appendUserConfig({ username: value, hpcInstance: undefined });
+              }
+            }}
+            removeUsername={(username: string) => {
+              const index = researcherFields.findIndex((field) => field.username === username);
+              if (index !== -1) removeResearcher(index);
+            }}
+            roleControl={(user) => {
+              const memberIndex = members.findIndex((member) => member.username === user.username);
+              const researcher = members[memberIndex];
+              const availableRolesToAdd = rolesMap.filter(([roleName]) => !researcher?.roles?.includes(roleName));
 
-            return (
-              <div key={field.id} className="item-wrapper">
-                <div className={styles["researcher-content"]}>
-                  <div>
-                    <label htmlFor={`researcher-${index}`} className={styles["field-label"]}>
-                      Username:
-                    </label>
-                    <Controller
-                      name={`members.${index}.username` as const}
-                      control={control}
-                      rules={{
-                        required: "Username is required",
-                        validate: {
-                          isNotEmpty: (value) => {
-                            if (!value || value.trim() === "") {
-                              return "Username is required";
-                            }
-                            return true;
-                          },
-                          notEmailPart: (value) => {
-                            if (value.includes("@")) {
-                              return `Enter only the username part (without ${domainName})`;
-                            }
-                            return true;
-                          },
-                          isUnique: (value) => {
-                            const allUsernames = members.map((user) => user.username);
-                            const duplicateCount = allUsernames.filter((username) => username === value).length;
-                            return duplicateCount <= 1 || "Username has already been entered";
-                          },
-                        },
-                      }}
-                      render={({ field: usernameField, fieldState }) => (
-                        <div className={styles["username-input-wrapper"]}>
-                          <div>
-                            <input
-                              {...usernameField}
-                              id={`researcher-${index}`}
-                              type="text"
-                              placeholder="ccaxyz"
-                              disabled={
-                                fieldsDisabled ||
-                                editingProject?.members.some((member) => {
-                                  return member.username === getValues("members")[index].username + domainName;
-                                })
-                              }
-                            />
-                            <span className={styles["domain-suffix"]}>{domainName}</span>
-                          </div>
-                          {fieldState.error && (
-                            <Alert type="error">
-                              <AlertMessage>{fieldState.error.message}</AlertMessage>
-                            </Alert>
-                          )}
-                        </div>
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <label>Roles:</label>
-                    <Controller
-                      name={`members.${index}.roles` as const}
-                      control={control}
-                      rules={{
-                        validate: {
-                          hasAtLeastOneRole: (value) => {
-                            if (!value || value.length === 0) {
-                              return "At least one role is required";
-                            }
-                            return true;
-                          },
-                        },
-                      }}
-                      render={({ fieldState }) => (
-                        <div>
-                          {researcher?.roles && researcher.roles.length > 0 && (
-                            <div className={styles["role-tags"]}>
-                              {researcher.roles.map((role) => (
-                                <span key={role} className={styles["role-tag"]}>
-                                  {roles[role as ProjectTreRoleName].label}
-                                  <span className={styles["role-tooltip"]}>
-                                    <InfoTooltip text={roles[role as ProjectTreRoleName].description} />
-                                  </span>
-                                  <button
-                                    type="button"
-                                    className={styles["role-tag-remove"]}
-                                    onClick={() => {
-                                      const currentRoles = getValues(`members.${index}.roles`);
-                                      setValue(
-                                        `members.${index}.roles`,
-                                        currentRoles.filter((chosenRole) => chosenRole !== role),
-                                        { shouldValidate: true }
-                                      );
-                                    }}
-                                    aria-label={`Remove ${role} role`}
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {availableRolesToAdd.length > 0 && (
-                            <select
-                              className={`${styles["role-dropdown"]}`}
-                              value=""
-                              onChange={(e) => {
-                                if (e.target.value) {
-                                  const currentRoles = getValues(`members.${index}.roles`) || [];
+              return (
+                <Controller
+                  name={`members.${memberIndex}.roles` as const}
+                  control={control}
+                  rules={{
+                    validate: {
+                      hasAtLeastOneRole: (value) => {
+                        if (!value || value.length === 0) {
+                          return "At least one role is required";
+                        }
+                        return true;
+                      },
+                      hasDesktopIfNeeded: (value) => {
+                        const isEgressChecker = value.includes("egress_checker");
+                        const isEgressRequester = value.includes("egress_requester");
+                        const hasDesktop = value.includes("desktop_user");
+                        if ((isEgressChecker || isEgressRequester) && !hasDesktop) {
+                          return "Egress requesters and checkers must have the Desktop User role";
+                        }
+                        return true;
+                      },
+                    },
+                  }}
+                  render={({ fieldState }) => (
+                    <div className={styles.roles}>
+                      {researcher?.roles && researcher.roles.length > 0 && (
+                        <div className={styles["role-tags"]}>
+                          {researcher.roles.map((role) => (
+                            <span key={role} className={styles["role-tag"]}>
+                              {roles[role as ProjectTreRoleName].label}
+                              <span className={styles["role-tooltip"]}>
+                                <InfoTooltip text={roles[role as ProjectTreRoleName].description} />
+                              </span>
+                              <button
+                                type="button"
+                                className={styles["role-tag-remove"]}
+                                onClick={() => {
+                                  const currentRoles = getValues(`members.${memberIndex}.roles`);
                                   setValue(
-                                    `members.${index}.roles`,
-                                    [...currentRoles, e.target.value as ProjectTreRoleName],
+                                    `members.${memberIndex}.roles`,
+                                    currentRoles.filter((chosenRole) => chosenRole !== role),
                                     { shouldValidate: true }
                                   );
-                                }
-                              }}
-                              disabled={fieldsDisabled}
-                            >
-                              <option value="">+ Add role...</option>
-                              {availableRolesToAdd.map(([roleName, role]) => (
-                                <option key={roleName} value={roleName}>
-                                  {role.label}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          {fieldState.error && (
-                            <Alert type="error">
-                              <AlertMessage>{fieldState.error.message}</AlertMessage>
-                            </Alert>
-                          )}
+                                }}
+                                aria-label={`Remove ${role} role`}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
                         </div>
                       )}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => removeResearcher(index)}
-                  className="remove-button"
-                  aria-label={`Remove researcher ${index + 1}`}
-                >
-                  ×
-                </button>
-              </div>
-            );
-          })}
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="small"
-            onClick={() => appendResearcher({ username: "", roles: [] })}
-          >
-            Add Researcher
-          </Button>
+                      {availableRolesToAdd.length > 0 && (
+                        <select
+                          data-cy="tre-member-role-dropdown"
+                          className={styles["role-dropdown"]}
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              const currentRoles = getValues(`members.${memberIndex}.roles`) || [];
+                              setValue(
+                                `members.${memberIndex}.roles`,
+                                [...currentRoles, e.target.value as ProjectTreRoleName],
+                                { shouldValidate: true }
+                              );
+                            }
+                          }}
+                          disabled={fieldsDisabled}
+                        >
+                          <option value="">+ Add role...</option>
+                          {availableRolesToAdd.map(([roleName, role]) => (
+                            <option key={roleName} value={roleName}>
+                              {role.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {fieldState.error && <Error message={fieldState.error.message} />}
+                    </div>
+                  )}
+                />
+              );
+            }}
+          />
         </fieldset>
         <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
       </div>
 
+      {desktopUsers.length > 0 && (
+        <>
+          <RadioOptions
+            name="tre.requiresHPCDesktops"
+            label="Will any desktop users run compute intenstive workloads? *"
+            options={[
+              { name: "Yes", value: "true" },
+              { name: "No", value: "false" },
+            ]}
+            register={register}
+            error={errors.tre?.requiresHPCDesktops}
+          />
+          <HelperText>
+            Compute intensive workloads require more than a standard {defaultDesktopInstance.label} desktop. If you
+            require a GPU then please select yes. See the{" "}
+            <a href="https://docs.tre.arc.ucl.ac.uk/pricing/">documentation</a> for pricing information.
+          </HelperText>
+          {requiresHPCDesktops && userConfig && (
+            <div className="field">
+              <Label htmlFor="hpcInstances">HPC Desktops:</Label>
+              <fieldset className="linkage-fieldset">
+                {userConfig.map(
+                  (field, index) =>
+                    isDesktopUser(field.username) && (
+                      <div key={field.username} className="item-wrapper">
+                        {field.username}
+                        <select
+                          id="hpcInstances"
+                          name="hpcInstances"
+                          className={styles["userconfig-dropdown"]}
+                          onChange={(e) => {
+                            if (e.target.value === "") {
+                              updateUserConfig(index, { username: field.username, hpcInstance: "" });
+                            } else if (e.target.value) {
+                              updateUserConfig(index, { username: field.username, hpcInstance: e.target.value });
+                            }
+                          }}
+                          value={field.hpcInstance}
+                          disabled={fieldsDisabled}
+                        >
+                          <option value="">None</option>
+                          {hpcDesktopInstances.map((instance, index) => (
+                            <option key={index} value={instance.aws_value}>
+                              {instance.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )
+                )}
+              </fieldset>
+            </div>
+          )}
+        </>
+      )}
+
       <div>
         <RadioOptions
           name="tre.numRequiredEgressApprovals"
-          label="Number of required approvals to egress a file *"
+          label="Number of required approvals to egress files *"
           options={[
             { name: "1", value: "1" },
             { name: "2", value: "2" },
@@ -252,7 +260,7 @@ export default function ProjectFormTREStep(props: Props) {
           The TRE requires approvals on files to be egressed. Self approvals are permitted. See the{" "}
           <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
         </HelperText>
-        {numRequiredEgressApprovals === "1" && (
+        {numRequiredEgressApprovals === "1" && members.length > 1 && (
           <div className={styles["num-egress-approvals-alert"]}>
             <Alert type="warning">
               <AlertMessage>
@@ -345,11 +353,7 @@ export default function ProjectFormTREStep(props: Props) {
                         placeholder="192.168.0.1 or example.ucl.ac.uk"
                         disabled={fieldsDisabled}
                       />
-                      {fieldState.error && (
-                        <Alert type="error">
-                          <AlertMessage>{fieldState.error.message}</AlertMessage>
-                        </Alert>
-                      )}
+                      {fieldState.error && <Error message={fieldState.error.message} />}
                     </div>
                   )}
                 />

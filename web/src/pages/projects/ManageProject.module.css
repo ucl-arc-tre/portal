@@ -39,32 +39,6 @@
   margin-top: 1.5rem;
 }
 
-.error {
-  color: #d32f2f;
-  font-size: 1rem;
-  margin: 1rem 0;
-}
-
-.field {
-  display: grid;
-  grid-template-columns: 150px 1fr;
-  gap: 1rem;
-  padding: 0.75rem 0;
-}
-
-.field:last-child {
-  border-bottom: none;
-}
-
-.field label {
-  font-weight: 600;
-  color: #555;
-}
-
-.field span {
-  color: #333;
-}
-
 .status {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -75,14 +49,61 @@
   color: #1976d2;
 }
 
-.members-list {
+.field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+
+  label {
+    font-weight: 600;
+    color: #555;
+  }
+
+  span {
+    color: #333;
+  }
+
+  small {
+    font-size: 0.8rem !important;
+    font-weight: 400;
+    display: block;
+
+    button {
+      padding: 0;
+      margin: 0;
+      height: unset;
+      font-size: unset;
+    }
+  }
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.field-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+.field-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: var(--default-border-radius);
+}
+
+.field-item:last-child {
+  margin-bottom: 0;
+}
+
 .member-item {
   display: flex;
+  flex-wrap: wrap;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
@@ -92,11 +113,10 @@
   border: 1px solid #e1e5e9;
   border-radius: var(--default-border-radius);
   transition: all 0.2s ease;
-}
 
-.member-item:hover {
-  background: #f0f3f5;
-  border-color: var(--form-purple--light);
+  .desktop-configuration {
+    width: 100%;
+  }
 }
 
 .member-item:last-child {
@@ -104,7 +124,6 @@
 }
 
 .member-username {
-  font-weight: 600;
   color: #333;
   font-size: 1rem;
 }
@@ -125,30 +144,6 @@
   font-weight: 500;
   text-transform: capitalize;
   white-space: nowrap;
-}
-
-.assets-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.asset-item {
-  padding: 1rem;
-  margin-bottom: 1rem;
-  background: #f8f9fa;
-  border: 1px solid #e1e5e9;
-  border-radius: var(--default-border-radius);
-  transition: all 0.2s ease;
-}
-
-.asset-item:hover {
-  background: #f0f3f5;
-  border-color: var(--form-purple--light);
-}
-
-.asset-item:last-child {
-  margin-bottom: 0;
 }
 
 .asset-info strong {
@@ -176,6 +171,7 @@
 
 .empty-message {
   color: #666;
+  border: 1px solid #e1e5e9;
   font-style: italic;
   margin: 0;
   padding: 1rem;

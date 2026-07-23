@@ -25,16 +25,17 @@ type User struct {
 
 type UserAttributes struct {
 	Model
-	UserID     uuid.UUID
-	ChosenName ChosenName
-	Email      string // Should be set for external users
+	UserID              uuid.UUID
+	ChosenName          ChosenName
+	RequestedChosenName *ChosenName // User has requested a change which is pending approval
+	Email               string      // Should be set for external users
 
 	// Relationships
 	User User `gorm:"foreignKey:UserID"`
 }
 
 type Sponsor struct {
-	Username   Username
+	User
 	ChosenName ChosenName
 }
 

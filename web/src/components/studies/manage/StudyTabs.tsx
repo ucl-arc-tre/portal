@@ -12,7 +12,7 @@ type StudyTabsProps = {
 
 export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
   const router = useRouter();
-  const tab = (router.query.tab as string) ?? "study";
+  const tab = (router.query.tab as "study" | "assets" | "contracts") ?? "study";
   const setTab = (newTab: string) =>
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
 

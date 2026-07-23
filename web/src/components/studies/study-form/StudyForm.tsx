@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Dialog from "../../ui/Dialog";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { postStudies, putStudiesByStudyId, Study } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -129,13 +129,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
         {currentStep === 1 && (
-          <StudyFormStep1
-            control={control}
-            errors={errors}
-            register={register}
-            getValues={getValues}
-            username={username}
-          />
+          <StudyFormStep1 control={control} errors={errors} register={register} ownerUsername={username} />
         )}
 
         {currentStep === 2 && <StudyFormStep2 control={control} errors={errors} />}
@@ -150,13 +144,7 @@ export default function StudyForm(StudyProps: StudyProps) {
           onNext={nextStep}
         />
 
-        {error && (
-          <Alert type="error">
-            {error.split("\n").map((line, index) => (
-              <AlertMessage key={index}>{line}</AlertMessage>
-            ))}
-          </Alert>
-        )}
+        {error && <Error message={error} />}
       </form>
     </Dialog>
   );

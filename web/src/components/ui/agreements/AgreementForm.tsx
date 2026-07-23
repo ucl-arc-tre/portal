@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "@/components/ui/Button";
 import styles from "./AgreementForm.module.css";
-import dynamic from "next/dynamic";
-const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
-  ssr: false,
-});
+import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 
 const confirmationTextDefault = "By clicking agree, I confirm that I have read and understood the agreement.";
 
@@ -58,8 +55,10 @@ export default function AgreementForm(props: AgreementFormProps) {
   return (
     <div className={styles["agreement-form-container"]}>
       <Alert type="info">
-        Please <strong>read the above agreement carefully</strong>.{" "}
-        {canAgree ? "You can now agree." : <>Agreement possible in {secondsRemaining} seconds.</>}
+        <AlertMessage>
+          Please <strong>read the above agreement carefully</strong>.{" "}
+          {canAgree ? "You can now agree." : <>Agreement possible in {secondsRemaining} seconds.</>}
+        </AlertMessage>
       </Alert>
 
       <p className={styles["confirmation-text"]}>{confirmationText}</p>

@@ -17,7 +17,7 @@ import Assets from "../../assets/Assets";
 import ContractManagement from "../../contracts/ContractManagement";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import Error from "../../ui/Error";
 import Loading from "../../ui/Loading";
 import { studySignoffWarningRequired } from "../../shared/exports";
 import StudyAffirmation from "./StudyAffirmation";
@@ -42,7 +42,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const studyStepsCompleted = isLoading ? null : hasAsset && hasAgreed;
 
   const router = useRouter();
-  const tab = (router.query.tab as string) ?? "study";
+  const tab = (router.query.tab as "study" | "assets" | "contracts") ?? "study";
 
   const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
   const isStudyOwner =
@@ -116,11 +116,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   if (isLoading) return <Loading message="Loading study..." />;
 
   if (error) {
-    return (
-      <Alert type="error">
-        <AlertMessage>{error}</AlertMessage>
-      </Alert>
-    );
+    return <Error message={error} />;
   }
 
   if (studyStepsCompleted === false && !isIGOpsStaff) {
