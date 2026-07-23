@@ -1,48 +1,56 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<style>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style>
 			html {
 				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				background-color: #fafafa;
 			}
-			body,
-			footer {
-				max-width: 700px;
+
+			.header {
+			  margin-top: 2rem;
 			}
 
 			.content {
-				font-size: 18px;
-				padding-top: 2rem;
+				padding-top: 1rem;
+			}
+
+			.footer {
+			  font-size: 12px;
 			}
 
 			hr {
 				margin-top: 2rem;
 			}
-
-			footer {
-				font-size: 14px;
-			}
 		</style>
-	</head>
-	<header>
-		<img src="cid:uclBanner" alt="UCL banner" height="100" />
-	</header>
-	<body>
-		<div class="content">{{ .Content }}</div>
+</head>
+<body>
 
-		<hr />
-		<footer>
-			<p>
-				You can sign into the portal at
-				<a href="{{ .PortalUrl }}">{{ .PortalUrl }}</a>.
-			</p>
-			<p>
-				<em>
-					This is an automated message. This mailbox is monitored so you can
-					reply to this email if you need assistance.</em
-				>
-			</p>
-		</footer>
-	</body>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+  <tr>
+    <td align="center" style="padding: 0;">
+
+      <table border="0" cellpadding="0" cellspacing="0" width="600" style="width: 650px; margin: 0 auto;">
+        <tr>
+          <td align="left" style="padding: 20px;">
+            <div class="header">
+              <img alt="UCL Logo" height="60" src="https://cdn.ucl.ac.uk/logos/ucl/ucl-logo--primary.svg">
+            </div>
+            <h2>ARC Services Portal Notification</h2>
+            <div class="content">{{ .Content }}</div>
+            <hr>
+            <div class="footer">
+              <p>
+                You can sign into the portal at 				<a href="{{ .PortalUrl }}">{{ .PortalUrl }}</a>.
+              </p>
+              <p><em>This is an automated message. This mailbox is monitored so you can reply to this email if you need assistance.</em>
+              </p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
 </html>

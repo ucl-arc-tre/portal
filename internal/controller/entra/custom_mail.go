@@ -13,9 +13,6 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-//go:embed ucl-banner.svg
-var uclBannerSVGContent string
-
 //go:embed base_mail_template.html
 var baseMailTemplateContent string
 
@@ -73,8 +70,6 @@ func (c *Controller) SendEmail(ctx context.Context, subject string, emails []Ema
 	svgId := "uclBanner"
 	banner.SetContentId(&svgId)
 	banner.SetIsInline(&hasAttachments)
-
-	banner.SetContentBytes([]byte(uclBannerSVGContent))
 
 	message.SetAttachments([]graphmodels.Attachmentable{banner})
 	message.SetBody(body)
