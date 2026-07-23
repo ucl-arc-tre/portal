@@ -18,6 +18,11 @@ describe("Study creation end-to-end", () => {
     cy.becomeApprovedResearcher();
   });
 
+  it("ig admin should become an approved researcher", () => {
+    cy.loginAsIGAdmin();
+    cy.becomeApprovedResearcher();
+  });
+
   it("study admin should become an approved researcher", () => {
     cy.loginAsAdmin();
     cy.becomeApprovedResearcher();
@@ -71,6 +76,36 @@ describe("Study creation end-to-end", () => {
       cy.contains("Edit Study").should("exist");
       cy.contains(additionalAdminUsername).should("exist");
     });
+  });
+
+  it("ig admin should be able to edit the study", () => {
+    cy.loginAsIGAdmin();
+
+    cy.visit("/studies");
+    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('[data-testid="ucl-uikit-search"]').type(studyTitle);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
+    cy.contains(studyTitle).click();
+
+    cy.get('[data-cy="edit-study-button"]').click();
+    cy.get('[name="description"]').clear().type("IG admin edited description", { force: true });
+    cy.get('[data-cy="next"]').click();
+    cy.get('[data-cy="next"]').click();
+    cy.get("button[type='submit']").click();
+
+    cy.contains("IG admin edited description").should("exist");
+  });
+
+  it("ig ops should not be able to edit the study", () => {
+    cy.loginAsIGOps();
+
+    cy.visit("/studies");
+    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('[data-testid="ucl-uikit-search"]').type(studyTitle);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
+    cy.contains(studyTitle).click();
+
+    cy.get('[data-cy="edit-study-button"]').should("not.exist");
   });
 
   it("admin should be able to agree to the study administrator agreement", () => {

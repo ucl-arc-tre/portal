@@ -22,14 +22,14 @@ import TrainingForm from "@/components/people/TrainingForm";
 export default function ManageUserPage() {
   const router = useRouter();
   const { userId } = router.query;
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, isIGStaff } = useAuth();
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [chosenNameDialogOpen, setChosenNameDialogOpen] = useState(false);
   const [trainingDialogOpen, setTrainingDialogOpen] = useState(false);
   const userIdIsSet = userId && typeof userId === "string";
-  const canEdit = userData?.roles.includes("admin") || userData?.roles.includes("ig-ops-staff");
+  const canEdit = userData?.roles.includes("admin") || isIGStaff;
 
   const fetchData = async (userIdParam: string) => {
     setLoading(true);

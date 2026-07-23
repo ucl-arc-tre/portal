@@ -22,10 +22,12 @@ type AssetsProps = {
 export default function Assets(props: AssetsProps) {
   const { study, assets, setAssets } = props;
   const { userData } = useAuth();
-  const canModify =
-    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) ||
-    (!!userData && study.additional_study_admin_usernames.includes(userData.username)) ||
-    false;
+
+  const isIgAdmin = userData?.roles.includes("ig-admin") ?? false;
+  const isStudyOwner =
+    userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username;
+  const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData.username)) ?? false;
+  const canModify = isStudyOwner || isStudyAdmin || isIgAdmin;
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);

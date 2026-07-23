@@ -47,11 +47,11 @@ export default function ManageAssetPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-
+  const isIGAdmin = userData?.roles.includes("ig-admin");
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
-  const canModify = isStudyOwner || isStudyAdmin;
+  const canModify = isStudyOwner || isStudyAdmin || isIGAdmin;
 
   const handleAssetDelete = async () => {
     if (!study || !asset) return;

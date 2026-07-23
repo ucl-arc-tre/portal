@@ -55,6 +55,8 @@ func (s *Service) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, e
 		usernames = config.AdminUsernames()
 	case rbac.IGOpsStaff:
 		usernames = config.IGOpsStaffUsernames()
+	case rbac.IGAdmin:
+		usernames = config.IGAdminUsernames()
 	case rbac.DSHOpsStaff:
 		usernames = config.DSHOpsStaffUsernames()
 	case rbac.TreOpsStaff:

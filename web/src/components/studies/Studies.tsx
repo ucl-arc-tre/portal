@@ -9,13 +9,12 @@ import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
 export default function Studies() {
-  const { userData } = useAuth();
+  const { userData, isIGStaff } = useAuth();
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
 
-  const isOpsStaff = userData?.roles.includes("ig-ops-staff") ?? false;
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
 
   if (!userData) return null;
@@ -24,7 +23,7 @@ export default function Studies() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>
-          {isOpsStaff ? "Studies" : "Your Studies"}{" "}
+          {isIGStaff ? "Studies" : "Your Studies"}{" "}
           <Button
             onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
             variant="tertiary"
@@ -59,7 +58,7 @@ export default function Studies() {
 
       {infoCalloutExpanded && <StudyDefinition />}
 
-      {isOpsStaff ? <IGOpsStudies refreshToken={refreshToken} /> : <ResearcherStudies refreshToken={refreshToken} />}
+      {isIGStaff ? <IGOpsStudies refreshToken={refreshToken} /> : <ResearcherStudies refreshToken={refreshToken} />}
     </div>
   );
 }

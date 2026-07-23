@@ -19,6 +19,7 @@ func seedPolicies(enforcer *casbin.Enforcer) {
 	addAdminPolicy(enforcer)
 	addTreOpsStaffPolicy(enforcer)
 	addIgOpsStaffPolicy(enforcer)
+	addIgAdminPolicy(enforcer)
 	addDSHOpsStaffPolicy(enforcer)
 
 	runMigrations()
@@ -91,6 +92,20 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: WriteAction},
+	)
+}
+
+func addIgAdminPolicy(enforcer *casbin.Enforcer) {
+	mustAddPolicies(enforcer,
+		Policy{RoleName: IGAdmin, Resource: "/users", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/users/:id", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/users/:id/training", Action: WriteAction},
+		Policy{RoleName: IGAdmin, Resource: "/users/:id/attributes", Action: WriteAction},
+		Policy{RoleName: IGAdmin, Resource: "/users/metrics", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/users/invite", Action: WriteAction},
+		Policy{RoleName: IGAdmin, Resource: "/studies", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: WriteAction},
 	)
 }
 

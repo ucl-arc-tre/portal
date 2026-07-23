@@ -442,6 +442,7 @@ const (
 	AuthRolesApprovedStaffResearcher       AuthRoles = "approved-staff-researcher"
 	AuthRolesBase                          AuthRoles = "base"
 	AuthRolesDshOpsStaff                   AuthRoles = "dsh-ops-staff"
+	AuthRolesIgAdmin                       AuthRoles = "ig-admin"
 	AuthRolesIgOpsStaff                    AuthRoles = "ig-ops-staff"
 	AuthRolesInformationAssetAdministrator AuthRoles = "information-asset-administrator"
 	AuthRolesInformationAssetOwner         AuthRoles = "information-asset-owner"
@@ -461,6 +462,8 @@ func (e AuthRoles) Valid() bool {
 	case AuthRolesBase:
 		return true
 	case AuthRolesDshOpsStaff:
+		return true
+	case AuthRolesIgAdmin:
 		return true
 	case AuthRolesIgOpsStaff:
 		return true

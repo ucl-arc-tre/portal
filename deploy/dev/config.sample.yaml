@@ -9,6 +9,8 @@ tre_ops_staff_usernames: # Trusted research environment staff
   - bob@example.com
 ig_ops_staff_usernames: # Information governance operations staff
   - bob@example.com
+ig_admin_usernames: # Information governance administrators
+  - bob@example.com
 dsh_ops_staff_usernames: # Data safe haven operations staff
   - bob@example.com
 

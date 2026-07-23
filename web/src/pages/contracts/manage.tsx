@@ -41,8 +41,9 @@ export default function ManageContractPage() {
 
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
+  const isIGAdmin = userData?.roles.includes("ig-admin") ?? false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
-  const canModify = isStudyOwner || isStudyAdmin;
+  const canModify = isStudyOwner || isStudyAdmin || isIGAdmin;
   const canDelete = contract?.retention_end_date
     ? new Date(contract.retention_end_date) < new Date() && canModify
     : canModify;
@@ -225,6 +226,7 @@ export default function ManageContractPage() {
 
           <div className={styles.field}>
             <label>Files:</label>
+            {contract.objects_metadata.length === 0 && "None"}
             {contract.objects_metadata.map((obj) => (
               <ContractObjectCard
                 key={obj.id}

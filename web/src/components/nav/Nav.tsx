@@ -52,7 +52,7 @@ function NavItem(NavItemProps: NavItemProps) {
 export default function Nav() {
   const logoutUrl = client.getConfig().baseUrl + "/logout";
 
-  const { authInProgress, userData } = useAuth();
+  const { authInProgress, userData, isIGStaff } = useAuth();
   if (authInProgress) return null;
 
   const isAdmin = userData?.roles.includes("admin");
@@ -60,13 +60,12 @@ export default function Nav() {
   const isApprovedResearcher = userData?.roles.includes("approved-researcher");
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher");
   const isIAO = userData?.roles.includes("information-asset-owner");
-  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff");
 
-  const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGOpsStaff;
+  const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
   const canSeeProjects = isApprovedResearcher || isTreOpsStaff || isAdmin;
-  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGOpsStaff;
+  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
   const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;
-  const canSeeMetrics = isAdmin || isIGOpsStaff;
+  const canSeeMetrics = isAdmin || isIGStaff;
 
   return (
     <aside className={styles.sidebar}>

@@ -68,8 +68,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
   const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
-  const { userData } = useAuth();
-  const isIGOps = userData?.roles.includes("ig-ops-staff") ?? false;
+  const { userData, isIGStaff } = useAuth();
+  const isIGAdmin = userData?.roles.includes("ig-admin") || false;
   const isStudyOwner =
     (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
@@ -77,10 +77,11 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
 
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
   const canEditStudyOwner =
-    (isStudyOwner || isIGOps) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
+    (isStudyOwner || isIGStaff) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
   const canRequestReview =
-    study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGOps;
+    study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGStaff;
   const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
+  const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin;
 
   const riskScore = calculateRiskScore(study, assets);
 
@@ -146,7 +147,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       <div className={styles["header"]}>
         <h2>{study.title}</h2>
         <div className={styles["buttons"]}>
-          {isStudyOwnerOrAdmin && (
+          {canEditStudy && (
             <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
               Edit Study
             </Button>

@@ -83,6 +83,8 @@ jobs:
             - portal-e2e-tre@arctretest.onmicrosoft.com
           ig_ops_staff_usernames:
             - portal-e2e-ig@arctretest.onmicrosoft.com
+          ig_admin_usernames:
+            - portal-e2e-ig-admin@arctretest.onmicrosoft.com
           dsh_ops_staff_usernames:
             - portal-e2e-dsh@arctretest.onmicrosoft.com
           db:
@@ -116,6 +118,8 @@ jobs:
             "botStaff2Password": "${{ secrets.CYPRESS_BOT_STAFF2_PASSWORD }}",
             "botIGUsername": "portal-e2e-ig@arctretest.onmicrosoft.com",
             "botIGPassword": "${{ secrets.CYPRESS_BOT_IG_PASSWORD }}",
+            "botIGAdminUsername": "portal-e2e-ig-admin@arctretest.onmicrosoft.com",
+            "botIGAdminPassword": "${{ secrets.CYPRESS_BOT_IG_ADMIN_PASSWORD }}",
             "botTREUsername": "portal-e2e-tre@arctretest.onmicrosoft.com",
             "botTREPassword": "${{ secrets.CYPRESS_BOT_TRE_PASSWORD }}",
             "botDSHUsername": "portal-e2e-dsh@arctretest.onmicrosoft.com",

@@ -149,6 +149,10 @@ func IGOpsStaffUsernames() []types.Username {
 	return usernames("ig_ops_staff_usernames")
 }
 
+func IGAdminUsernames() []types.Username {
+	return usernames("ig_admin_usernames")
+}
+
 func DSHOpsStaffUsernames() []types.Username {
 	return usernames("dsh_ops_staff_usernames")
 }

@@ -28,7 +28,7 @@ type ManageStudyProps = {
 };
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
-  const { userData } = useAuth();
+  const { userData, isIGStaff } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const router = useRouter();
   const tab = (router.query.tab as "study" | "assets" | "contracts") ?? "study";
 
-  const isIGOpsStaff = userData?.roles.includes("ig-ops-staff") || false;
   const isStudyOwner =
     userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username;
 
@@ -119,7 +118,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     return <Error message={error} />;
   }
 
-  if (studyStepsCompleted === false && !isIGOpsStaff) {
+  if (studyStepsCompleted === false && !isIGStaff) {
     return (
       <StudySetupSteps
         study={study}
@@ -137,7 +136,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {showSignoffWarning && (
         <StudyAffirmation studyId={study.id} successCallback={() => fetchStudy(study.id)} isReaffirmation />
       )}
-      {isIGOpsStaff && study.approval_status !== "Incomplete" && (
+      {isIGStaff && study.approval_status !== "Incomplete" && (
         <AdminReview
           study={study}
           unagreedAdminUsernames={unagreedAdminUsernames}

@@ -6,15 +6,14 @@ import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import Metrics from "@/components/metrics/Metrics";
 
 export default function PeoplePage() {
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, isIGStaff } = useAuth();
 
   if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
   const isAdmin = userData?.roles.includes("admin");
-  const isIGOps = userData?.roles.includes("ig-ops-staff");
-  const canSeeMetrics = isIGOps || isAdmin;
+  const canSeeMetrics = isIGStaff || isAdmin;
 
   if (!canSeeMetrics)
     return (
