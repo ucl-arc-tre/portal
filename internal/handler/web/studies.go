@@ -210,7 +210,7 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 	ctx.Status(http.StatusOK)
 }
 
-// Called by the IAO to attest that study details are up to date, resetting the signoff timestamp
+// Called by the IAO to affirm that study details are up to date, resetting the signoff timestamp
 func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
 	if err != nil {

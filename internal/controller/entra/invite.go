@@ -19,6 +19,6 @@ func inviteEmailContent(invite Invite) string {
 	} else if invite.Sponsor.Username != "" {
 		content += " by " + string(invite.Sponsor.Username)
 	}
-	content += ".\nYou can login to the portal at " + config.PortalUrl() + "."
+	content += ".\nYou can login to the portal at " + config.PortalUrl() + ". The first thing you need to do is complete your profile."
 	return content
 }
