@@ -13,7 +13,7 @@ import (
 )
 
 type Authorizer struct {
-	enforcer *casbin.Enforcer
+	enforcer *casbin.SyncedEnforcer
 }
 
 // New authorization middleware. Assumes user has been set

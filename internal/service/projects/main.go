@@ -247,6 +247,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		AirlockSSHEnabled:             true, // Enable airlock ssh by default
 		AirlockWhitelist:              data.AirlockWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
+		Platform:                      types.ProjectTREPlatformAWS,
 	}
 
 	if err := tx.Create(&projectTRE).Error; err != nil {
