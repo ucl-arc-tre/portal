@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	year = 365 * day
+	year = 365 * Day
 )
 
 func TestDaysUntilTrainingExpiry(t *testing.T) {
@@ -21,11 +21,11 @@ func TestDaysUntilTrainingExpiry(t *testing.T) {
 	assert.Equal(t, 364, DaysUntilTrainingExpiry(record))
 	assert.False(t, ShouldNotifyTrainingExpiry(record))
 
-	record.CompletedAt = time.Now().Add(-(year + day + time.Hour))
+	record.CompletedAt = time.Now().Add(-(year + Day + time.Hour))
 	assert.Equal(t, -1, DaysUntilTrainingExpiry(record))
 	assert.True(t, ShouldNotifyTrainingExpiry(record))
 
-	record.CompletedAt = time.Now().Add(-(year + 180*day + time.Hour))
+	record.CompletedAt = time.Now().Add(-(year + 180*Day + time.Hour))
 	assert.Equal(t, -180, DaysUntilTrainingExpiry(record))
 	assert.False(t, ShouldNotifyTrainingExpiry(record))
 }
@@ -54,7 +54,7 @@ func TestContractShouldNotify(t *testing.T) {
 	c.ExpiryDate = &today
 	assert.True(t, ShouldNotifyContractExpiry(c))
 
-	yesterday := time.Now().Add(-1 * day)
+	yesterday := time.Now().Add(-1 * Day)
 	c.ExpiryDate = &yesterday
 	assert.True(t, ShouldNotifyContractExpiry(c))
 }

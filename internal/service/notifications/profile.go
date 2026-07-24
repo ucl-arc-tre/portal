@@ -3,6 +3,7 @@ package notifications
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -23,16 +24,17 @@ func (s *Service) NotifyTrainingExpiry(ctx context.Context, training types.UserT
 	log.Debug().Any("username", training.User.Username).Msg("Notifying training expiry")
 
 	days := config.DaysUntilTrainingExpiry(training)
-	content := "You have a training certificate that expires "
+	content := template.HTML("You have a training certificate that expires ")
 	if days < 0 {
-		content = "You have a training certificate that has expired. Please sign in to the Portal to upload a new certificate."
+		content = "You have a training certificate that has expired. "
 	} else if days == 0 {
-		content += "today. Please sign in to the Portal to upload a new certificate."
+		content += "today. "
 	} else if days == 1 {
-		content += "tomorrow. Please sign in to the Portal to upload a new certificate."
+		content += "tomorrow. "
 	} else {
-		content += "in " + fmt.Sprintf("%d", days) + " days. Please sign in to the Portal to upload a new certificate."
+		content += template.HTML("in " + fmt.Sprintf("%d", days) + " days. ") // #nosec G203 -- only int
 	}
+	content += "Please " + htmlHref("sign in", "/profile") + " to the Portal to upload a new certificate."
 
 	content += "\nPlease note that without valid training, your access to any environments may be revoked."
 	subject := "Notification: Your training certificate is due to expire soon"

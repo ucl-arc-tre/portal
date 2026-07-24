@@ -3,6 +3,7 @@ package notifications
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -11,9 +12,11 @@ import (
 )
 
 func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOpsStaff []types.User) error {
+	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
+
 	switch study.ApprovalStatus {
 	case types.StudyApprovalStatusApproved:
-		content := "Your Study has been approved! You will be notified when you have any contracts or assets approaching expiry."
+		content := "Your Study " + href + " has been approved! You will be notified when you have any contracts or assets approaching expiry."
 		subject := "Notification: Your Study has been approved!"
 		recipients := study.NotificationRecipients()
 		if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
@@ -25,8 +28,9 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 			Kind:  new(types.NotificationKindStudyReview),
 		}
 		return s.createForAll(notification, recipients)
+
 	case types.StudyApprovalStatusRejected:
-		content := "Your Study has not been approved, please review the feedback and request another review once the changes have been addressed."
+		content := "Your Study " + href + " has not been approved, please review the feedback and request another review once the changes have been addressed."
 		subject := "Notification: Unfortunately, your Study has not been approved"
 		recipients := study.NotificationRecipients()
 		if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
@@ -38,6 +42,7 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 			Kind:  new(types.NotificationKindStudyReview),
 		}
 		return s.createForAll(notification, recipients)
+
 	case types.StudyApprovalStatusPending:
 		notification := types.Notification{
 			Title: fmt.Sprintf("Study '%s' is pending approval", study.Title),
@@ -45,6 +50,7 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 			Kind:  new(types.NotificationKindStudyReview),
 		}
 		return s.createForAll(notification, igOpsStaff)
+
 	case types.StudyApprovalStatusIncomplete:
 		return nil // no action
 	}
@@ -67,15 +73,17 @@ func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contr
 	if days == nil {
 		return types.NewErrInvalidObject("cannot send expiry notification with nil days before expiry")
 	}
-	content := "You have a contract in the Study '" + study.Title + "' that is due to expire "
+
+	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
+	content := "You have a contract in the Study " + href + " "
 	if *days < 0 {
-		content = "You have a contract in the Study '" + study.Title + "' that has expired. "
+		content += "that has expired. "
 	} else if *days == 0 {
-		content += "today. "
+		content += "that is due to expire today. "
 	} else if *days == 1 {
-		content += "tomorrow. "
+		content += "that is due to expire tomorrow. "
 	} else {
-		content += "in " + fmt.Sprintf("%d", *days) + " days. "
+		content += template.HTML("that is due to expire in " + fmt.Sprintf("%d", *days) + " days. ") // #nosec G203 -- only int
 	}
 	content += "Please sign in to the Portal to upload a new contract or update its status."
 
@@ -94,7 +102,11 @@ func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contr
 }
 
 func (s *Service) NotifyIaaAssignment(ctx context.Context, iaa types.User, study types.Study) error {
-	content := "You have been added as an Information Asset Administrator (IAA) to the Study '" + study.Title + "'. Please sign in to the Portal to view the Study details and sign the Administrator's Agreement."
+	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
+
+	content := template.HTML(
+		"You have been added as an Information Asset Administrator (IAA) to the Study " + href +
+			". Please sign in to the Portal to view the Study details and sign the Administrator's Agreement.") // #nosec G203 -- href is trusted
 	subject := "Notification: Information Asset Administrator assignment"
 	if err := s.entra.SendEmail(ctx, subject, emails(iaa), content); err != nil {
 		log.Err(err).Msg("Failed to send contract IAA assignment notification email")
@@ -109,7 +121,9 @@ func (s *Service) NotifyIaaAssignment(ctx context.Context, iaa types.User, study
 
 func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error {
 	days := config.DaysUntilStudySignoffExpiry(&study)
-	content := "You are required to reaffirm details about your Study '" + study.Title + "'. Your current affirmation "
+
+	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
+	content := "You are required to reaffirm details about your Study " + href + ". Your current affirmation "
 	if days < 0 {
 		content += "has expired. "
 	} else if days == 0 {
@@ -117,7 +131,7 @@ func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Stud
 	} else if days == 1 {
 		content += "expires tomorrow. "
 	} else {
-		content += fmt.Sprintf("expires in %d days. ", days)
+		content += template.HTML(fmt.Sprintf("expires in %d days. ", days)) // #nosec G203 -- only int
 	}
 	content += "Please log in to the ARC Services Portal to reaffirm your Study details."
 	subject := "Notification: Study affirmation expiry"
@@ -142,8 +156,10 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 		return fmt.Errorf("cannot notify asset expiry with no assets in [%s]", study.Title)
 	}
 
+	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
+	content := "There are assets in your Study " + href + " that are close to expiring or have expired.\n"
+
 	var earliestExpiringAssetAt *time.Time
-	content := "There are assets in your Study '" + study.Title + "' that are close to expiring or have expired.\n"
 	for _, asset := range assets {
 		if asset.ExpiresAt != nil &&
 			(earliestExpiringAssetAt == nil || asset.ExpiresAt.Before(*earliestExpiringAssetAt)) {
@@ -154,11 +170,11 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 			log.Error().Str("study", study.Title).Msg("Attempted to send asset expiry notification with nil expiry")
 			continue
 		}
-		content += "- '" + asset.Title + "'"
+		content += template.HTML("- '" + template.HTMLEscapeString(asset.Title) + "'") // #nosec G203 -- untrusted is escaped
 		if *days < 0 {
-			content += fmt.Sprintf(" expired %d days ago.\n", -(*days))
+			content += template.HTML(fmt.Sprintf(" expired %d days ago.\n", -(*days))) // #nosec G203 -- only int
 		} else {
-			content += fmt.Sprintf(" expires in %d days.\n", *days)
+			content += template.HTML(fmt.Sprintf(" expires in %d days.\n", *days)) // #nosec G203 -- only int
 		}
 	}
 	if earliestExpiringAssetAt == nil {

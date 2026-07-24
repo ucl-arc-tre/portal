@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	day   = 24 * time.Hour
-	Month = 30 * day
+	Day   = 24 * time.Hour
+	Month = 30 * Day
 
 	BaseWebURL = "/web/api/v0"
 	BaseTREURL = "/tre/api/v0"
@@ -28,10 +28,10 @@ const (
 	MaxUploadBytes = 1e8          // 100 MB
 
 	TrainingValidityYears = 1
-	TrainingValidity      = TrainingValidityYears * 365 * day
+	TrainingValidity      = TrainingValidityYears * 365 * Day
 
 	MaxTokenValidForDays = 365
-	MaxTokenValidity     = MaxTokenValidForDays * day
+	MaxTokenValidity     = MaxTokenValidForDays * Day
 
 	ServerShutdownGraceDuration = 10 * time.Second
 

@@ -36,9 +36,9 @@ export default function Metrics() {
   const num_other = num_total - num_valid_training - num_expired_training;
 
   const data = [
-    { name: "Has valid training", value: num_valid_training, fill: "#0088FE" },
-    { name: "Does not have valid training", value: num_expired_training, fill: "#00C49F" },
-    { name: "Not completed agreement and/or training", value: num_other, fill: "#FFBB28" },
+    { name: "Approved Researchers with in-date training", value: num_valid_training, fill: "#00C49F" },
+    { name: "Approved Researchers with expired training", value: num_expired_training, fill: "#0088FE" },
+    { name: "Users who are not Approved Researchers", value: num_other, fill: "#FFBB28" },
   ];
 
   if (isLoading) return null;

@@ -157,6 +157,18 @@ func (c *Controller) findUserExternal(ctx context.Context, email Email) (graphmo
 	return users[0], nil
 }
 
+func (c *Controller) UserEmail(ctx context.Context, username types.Username) (Email, error) {
+	user, err := c.findUser(ctx, username)
+	if err != nil {
+		return "", err
+	}
+	email := user.GetMail()
+	if email == nil {
+		return "", types.NewNotFoundError(fmt.Errorf("user [%v] had no entra email", username))
+	}
+	return *email, nil
+}
+
 // checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type. Returns a cached response
 func (c *Controller) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
 	if username == "" {
@@ -226,7 +238,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, invite Invite) 
 
 	message := inviteEmailContent(invite)
 	messageInfo := graphmodels.NewInvitedUserMessageInfo()
-	messageInfo.SetCustomizedMessageBody(&message)
+	messageInfo.SetCustomizedMessageBody(new(string(message)))
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
 	sponsorUserData, err := c.userData(ctx, invite.Sponsor.Username)
