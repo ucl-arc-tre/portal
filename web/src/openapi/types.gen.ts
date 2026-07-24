@@ -566,6 +566,7 @@ export type ProjectTreMember = {
 };
 
 export type ProjectTreUserDesktopConfig = {
+    image_id?: string;
     hpc_instance_type?: string;
     root_volume_gb?: number;
 };
