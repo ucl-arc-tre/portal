@@ -2,24 +2,12 @@ package tasks
 
 import (
 	"context"
-	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
-
-const (
-	day = 24 * time.Hour
-)
-
-func (m *Manager) scheduleDailyChecks() {
-	m.mustEvery(day, m.checkAssetsExpiry, "checkAssetsExpiry")
-	m.mustEvery(day, m.checkContractsExpiry, "checkContractsExpiry")
-	m.mustEvery(day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
-	m.mustEvery(day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
-}
 
 func (m *Manager) checkAssetsExpiry() error {
 	if !config.NotificationsEnabled() {

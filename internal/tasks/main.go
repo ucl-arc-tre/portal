@@ -11,6 +11,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/service/notifications"
+	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"gorm.io/gorm"
 )
 
@@ -18,17 +19,28 @@ type Manager struct {
 	scheduler     gocron.Scheduler
 	db            *gorm.DB
 	notifications notifications.Interface
+	users         *users.Service
 }
 
 // Create a task manager instance
 func New() *Manager {
-	scheduler := newScheduler()
-	return &Manager{scheduler: scheduler, db: graceful.NewDB(), notifications: notifications.New()}
+	manager := Manager{
+		scheduler:     newScheduler(),
+		db:            graceful.NewDB(),
+		notifications: notifications.New(),
+		users:         users.New(),
+	}
+	return &manager
 }
 
 // Start the task manager - non blocking
 func (m *Manager) Start() {
-	m.scheduleDailyChecks()
+	m.mustEvery(config.Day, m.checkAssetsExpiry, "checkAssetsExpiry")
+	m.mustEvery(config.Day, m.checkContractsExpiry, "checkContractsExpiry")
+	m.mustEvery(config.Day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
+	m.mustEvery(config.Day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
+	m.mustEvery(config.Day, m.updateUserEmails, "updateUserEmails")
+
 	m.scheduler.Start()
 }
 
