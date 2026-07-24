@@ -51,7 +51,7 @@ export default function ProjectsPage() {
         Not all Project features work yet. We&apos;re actively working on adding more functionality!
       </Callout>
 
-      <Projects userData={userData} />
+      <Projects />
     </>
   );
 }
