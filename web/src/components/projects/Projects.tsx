@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Auth, Project, Study, getProjects, getStudies } from "@/openapi";
+import { Project, Study, getProjects, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import ProjectForm from "./ProjectForm";
@@ -11,12 +11,9 @@ import Dialog from "../ui/Dialog";
 import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
 import { InfoIcon } from "../shared/uikitExports";
+import { useAuth } from "@/hooks/useAuth";
 
-type Props = {
-  userData: Auth;
-};
-
-export default function Projects({ userData }: Props) {
+export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [studies, setStudies] = useState<Study[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,8 +22,8 @@ export default function Projects({ userData }: Props) {
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
-  const isApprovedStaffResearcher = !!userData?.roles?.includes("approved-staff-researcher");
-  const isOpsStaff = !!userData?.roles?.includes("tre-ops-staff");
+  const { isTreOpsStaff, isApprovedStaffResearcher } = useAuth();
+
   const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
 
   const fetchData = async () => {
@@ -96,7 +93,7 @@ export default function Projects({ userData }: Props) {
     return;
   }
 
-  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isOpsStaff) {
+  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isTreOpsStaff) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You don&apos;t have any approved Studies</h2>
@@ -114,7 +111,7 @@ export default function Projects({ userData }: Props) {
         <>
           <div className={styles.header}>
             <h2>
-              {isOpsStaff ? "All Projects" : "Your Projects"}{" "}
+              {isTreOpsStaff ? "All Projects" : "Your Projects"}{" "}
               <Button
                 onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
                 variant="tertiary"
@@ -159,7 +156,7 @@ export default function Projects({ userData }: Props) {
         />
       )}
 
-      {isOpsStaff && projects.length === 0 ? (
+      {isTreOpsStaff && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>No Projects are currently submitted for review</h2>
           <p>Projects created by users will appear here for approval.</p>
@@ -178,7 +175,7 @@ export default function Projects({ userData }: Props) {
           </Button>
         </div>
       ) : (
-        <ProjectCardsList projects={projects} isOpsStaff={isOpsStaff} />
+        <ProjectCardsList projects={projects} isOpsStaff={isTreOpsStaff} />
       )}
     </div>
   );

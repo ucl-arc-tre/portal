@@ -9,16 +9,12 @@ import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import PeopleSearch from "@/components/people/Search";
 
 export default function PeoplePage() {
-  const { authInProgress, isAuthed, userData, isIGStaff } = useAuth();
+  const { authInProgress, isAuthed, isIGStaff, isAdmin, isTreOpsStaff, isIAO, isDSHOpsStaff } = useAuth();
 
   if (authInProgress) return null;
 
   if (!isAuthed) return <LoginFallback />;
 
-  const isAdmin = userData?.roles.includes("admin");
-  const isIAO = userData?.roles.includes("information-asset-owner");
-  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff");
-  const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff");
   const canSearch = isTreOpsStaff || isAdmin || isIGStaff || isDSHOpsStaff;
 
   if (!isIAO && !canSearch) {

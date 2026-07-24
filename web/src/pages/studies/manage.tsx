@@ -21,12 +21,10 @@ const defaultMeta = (
 export default function ManageStudyPage() {
   const router = useRouter();
   const { studyId } = router.query;
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, isApprovedResearcher } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher") ?? false;
 
   const fetchStudy = async (id: string) => {
     if (!study) setIsLoading(true);

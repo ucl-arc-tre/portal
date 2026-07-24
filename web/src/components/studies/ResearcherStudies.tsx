@@ -15,12 +15,10 @@ type Props = {
 export default function ResearcherStudies(props: Props) {
   const { refreshToken } = props;
 
-  const { userData } = useAuth();
+  const { userData, isApprovedStaffResearcher } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [studies, setStudies] = useState<Study[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
 
   const fetchStudies = async () => {
     setIsLoading(true);

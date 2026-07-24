@@ -35,7 +35,7 @@ import Box from "@/components/ui/Box";
 export default function ManageAssetPage() {
   const router = useRouter();
   const { studyId, assetId } = router.query;
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, isApprovedResearcher, isIGAdmin, isIAO } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
   const [asset, setAsset] = useState<Asset | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
@@ -46,10 +46,7 @@ export default function ManageAssetPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
-  const isIGAdmin = userData?.roles.includes("ig-admin");
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
+  const isStudyOwner = (isIAO && study?.owner_username === userData?.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
   const canModify = isStudyOwner || isStudyAdmin || isIGAdmin;
 
