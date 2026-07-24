@@ -30,7 +30,7 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 		return s.createForAll(notification, recipients)
 
 	case types.StudyApprovalStatusRejected:
-		content := template.HTML("Your Study has not been approved, please review the feedback and request another review once the changes have been addressed.")
+		content := "Your Study " + href + " has not been approved, please review the feedback and request another review once the changes have been addressed."
 		subject := "Notification: Unfortunately, your Study has not been approved"
 		recipients := study.NotificationRecipients()
 		if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
