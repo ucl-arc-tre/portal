@@ -349,7 +349,9 @@ export default function ManageProjectPage() {
             </div>
             <div className={styles.field}>
               <label>Study:</label>
-              <span>{project.study_title}</span>
+              <span>
+                <a href={`/studies/manage?studyId=${project.study_id}`}>{project.study_title}</a>
+              </span>
             </div>
             <div className={styles.field}>
               <label>Number of approvals required for egress:</label>
