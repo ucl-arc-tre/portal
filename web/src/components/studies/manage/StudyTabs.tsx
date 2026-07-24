@@ -1,9 +1,6 @@
-import { useRouter } from "next/router";
 import { Asset, Contract } from "@/openapi";
-import Button from "../../ui/Button";
-import { AlertCircleIcon } from "../../shared/uikitExports";
 import { calculateExpiryUrgency } from "../../shared/exports";
-import styles from "./StudyTabs.module.css";
+import TabCollection from "@/components/shared/TabCollection";
 
 type StudyTabsProps = {
   assets: Asset[];
@@ -11,11 +8,6 @@ type StudyTabsProps = {
 };
 
 export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
-  const router = useRouter();
-  const tab = (router.query.tab as "study" | "assets" | "contracts") ?? "study";
-  const setTab = (newTab: string) =>
-    router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
-
   const assetsNeedAttention = assets.some((asset) => {
     if (asset.requires_contract && asset.contract_ids.length === 0) return true;
     if (asset.status === "active" && asset.expires_at) {
@@ -34,33 +26,12 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
   });
 
   return (
-    <div className={"tab-collection"}>
-      <Button
-        onClick={() => setTab("study")}
-        variant="secondary"
-        className={`tab ${tab === "study" ? "active" : ""}`}
-        cy="study-overview"
-      >
-        Study Overview
-      </Button>
-
-      <Button
-        onClick={() => setTab("assets")}
-        variant="secondary"
-        className={`tab ${tab === "assets" ? "active" : ""}`}
-        cy="study-assets"
-      >
-        Assets {assetsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
-      </Button>
-
-      <Button
-        onClick={() => setTab("contracts")}
-        variant="secondary"
-        className={`tab ${tab === "contracts" ? "active" : ""}`}
-        cy="study-contracts"
-      >
-        Contracts {contractsNeedAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
-      </Button>
-    </div>
+    <TabCollection
+      tabs={[
+        { name: "study", label: "Study Overview" },
+        { name: "assets", needsAttention: assetsNeedAttention },
+        { name: "contracts", needsAttention: contractsNeedAttention },
+      ]}
+    />
   );
 }

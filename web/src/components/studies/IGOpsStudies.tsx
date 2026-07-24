@@ -8,6 +8,7 @@ import Loading from "../ui/Loading";
 import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
+import TabCollection from "../shared/TabCollection";
 
 type Props = {
   refreshToken: number;
@@ -138,24 +139,12 @@ export default function IGOpsStudies(props: Props) {
 
   return (
     <>
-      <div className={"tab-collection"}>
-        <Button
-          onClick={() => setTab("pending")}
-          variant="secondary"
-          className={`tab ${tab === "pending" ? "active" : ""}`}
-        >
-          Pending Studies
-        </Button>
-
-        <Button
-          onClick={() => setTab("all")}
-          variant="secondary"
-          className={`tab ${tab === "all" ? "active" : ""}`}
-          data-cy="all-studies-tab-button"
-        >
-          All Studies
-        </Button>
-      </div>
+      <TabCollection
+        tabs={[
+          { name: "pending", label: "Pending Studies" },
+          { name: "all", label: "All Studies" },
+        ]}
+      />
 
       {tab === "pending" ? (
         <p>Studies submitted for review. Approve or request changes for each study.</p>
