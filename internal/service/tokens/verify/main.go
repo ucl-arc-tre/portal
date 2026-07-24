@@ -49,7 +49,7 @@ func (s *Service) ParseClaims(rawToken string) (*tokens.Claims, error) {
 	return &claims, nil
 }
 
-func (s *Service) Delete(id tokens.TokenId) {
+func Delete(id tokens.TokenId) {
 	cache.isRevoked.Remove(id)
 }
 

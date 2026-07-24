@@ -17,16 +17,14 @@ import (
 )
 
 type Service struct {
-	key    Ed25519KeyPair
-	db     *gorm.DB
-	verify VerifyInterface
+	key Ed25519KeyPair
+	db  *gorm.DB
 }
 
 func New() *Service {
 	service := Service{
-		db:     graceful.NewDB(),
-		key:    mustMakeEd25519KeyPair(),
-		verify: verify.New(),
+		db:  graceful.NewDB(),
+		key: mustMakeEd25519KeyPair(),
 	}
 	service.mustStoreVerificationKey()
 	return &service
@@ -93,6 +91,6 @@ func (s *Service) Delete(tokenId uuid.UUID, environmentId uuid.UUID) error {
 	if err != nil {
 		return types.NewErrFromGorm(err, "failed to delete token")
 	}
-	s.verify.Delete(tokenId)
+	verify.Delete(tokenId)
 	return nil
 }

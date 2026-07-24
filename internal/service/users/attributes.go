@@ -13,7 +13,7 @@ import (
 
 var (
 	chosenNamePattern   = regexp.MustCompile(`^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$`)
-	chosenNameMaxLength = 256
+	chosenNameMaxLength = 1000
 )
 
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {

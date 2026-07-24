@@ -13,10 +13,6 @@ var (
 
 func init() {
 	initOnce.Do(func() {
-		if cache != nil {
-			return // already set
-		}
-
 		cache = &Cache{
 			verificationKey: newTokenLRU[ed25519.PublicKey](),
 			isRevoked:       newTokenLRU[bool](),

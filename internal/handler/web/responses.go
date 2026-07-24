@@ -50,7 +50,8 @@ func setError(ctx *gin.Context, err error, messages ...string) {
 func bindJSONOrSetError(ctx *gin.Context, obj any) error {
 	mediaType, _, err := mime.ParseMediaType(ctx.GetHeader("Content-Type"))
 	if err != nil || mediaType != "application/json" {
-		setError(ctx, types.NewErrInvalidObject("content type must be JSON"))
+		err = types.NewErrInvalidObjectF("content type must be JSON: %w", err)
+		setError(ctx, err)
 		return err
 	}
 
