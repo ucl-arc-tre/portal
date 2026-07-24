@@ -9,8 +9,7 @@ import styles from "./StudiesPage.module.css";
 import Callout from "@/components/ui/Callout";
 
 export default function StudiesPage() {
-  const { authInProgress, isAuthed, userData } = useAuth();
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const { authInProgress, isAuthed, isApprovedResearcher } = useAuth();
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;

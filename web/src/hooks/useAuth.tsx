@@ -8,6 +8,13 @@ type AuthCtxValue = {
   userData: Auth | null;
   refreshAuth: () => Promise<void>;
   isIGStaff: boolean;
+  isIGAdmin: boolean;
+  isApprovedResearcher: boolean;
+  isTreOpsStaff: boolean;
+  isApprovedStaffResearcher: boolean;
+  isAdmin: boolean;
+  isIAO: boolean;
+  isDSHOpsStaff: boolean;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
@@ -15,6 +22,13 @@ const AuthCtx = createContext<AuthCtxValue>({
   isAuthed: false,
   userData: null,
   isIGStaff: false,
+  isIGAdmin: false,
+  isApprovedResearcher: false,
+  isTreOpsStaff: false,
+  isApprovedStaffResearcher: false,
+  isIAO: false,
+  isAdmin: false,
+  isDSHOpsStaff: false,
   refreshAuth: () => Promise.resolve(),
 });
 
@@ -26,7 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userData, setUserData] = useState<Auth | null>(null);
 
   const cancelled = useRef(false);
+  const isAdmin = userData?.roles.includes("admin") ?? false;
   const isIGStaff = (userData?.roles.includes("ig-admin") || userData?.roles.includes("ig-ops-staff")) ?? false;
+  const isIGAdmin = userData?.roles.includes("ig-admin") ?? false;
+  const isTreOpsStaff = userData?.roles.includes("tre-ops-staff") ?? false;
+  const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff") ?? false;
+  const isApprovedResearcher = userData?.roles.includes("approved-researcher") ?? false;
+  const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
+  const isIAO = userData?.roles.includes("information-asset-owner") ?? false;
 
   const refreshAuth = useCallback(async () => {
     try {
@@ -57,7 +78,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshAuth]);
 
   return (
-    <AuthCtx.Provider value={{ authInProgress, isAuthed, userData, refreshAuth, isIGStaff }}>
+    <AuthCtx.Provider
+      value={{
+        authInProgress,
+        isAuthed,
+        userData,
+        refreshAuth,
+        isAdmin,
+        isIGStaff,
+        isIGAdmin,
+        isApprovedResearcher,
+        isTreOpsStaff,
+        isApprovedStaffResearcher,
+        isIAO,
+        isDSHOpsStaff,
+      }}
+    >
       {children}
     </AuthCtx.Provider>
   );
