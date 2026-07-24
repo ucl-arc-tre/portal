@@ -36,16 +36,16 @@ var (
 	ConfigRoleNames = []ConfigRolename{Admin, TreOpsStaff, IGOpsStaff, IGAdmin, DSHOpsStaff}
 )
 
-var enforcer *casbin.Enforcer
+var enforcer *casbin.SyncedCachedEnforcer
 
 // Get a casbin policy enforcer. Singleton is initalised if not already
-func NewEnforcer(db *gorm.DB) *casbin.Enforcer {
+func NewEnforcer(db *gorm.DB) *casbin.SyncedCachedEnforcer {
 	if enforcer != nil {
 		return enforcer
 	}
 	log.Debug().Msg("Creating casbin enforcer")
 	adapter := must(gormadapter.NewAdapterByDB(db))
-	enforcer = must(casbin.NewEnforcer(makeCasbinModel(), adapter))
+	enforcer = must(casbin.NewSyncedCachedEnforcer(makeCasbinModel(), adapter))
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 	return enforcer

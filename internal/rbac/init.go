@@ -13,7 +13,7 @@ func Init() {
 	seedPolicies(enforcer)
 }
 
-func seedPolicies(enforcer *casbin.Enforcer) {
+func seedPolicies(enforcer *casbin.SyncedCachedEnforcer) {
 	addBasePolicies(enforcer)
 	addApprovedResearcherPolicies(enforcer)
 	addAdminPolicy(enforcer)
@@ -25,7 +25,7 @@ func seedPolicies(enforcer *casbin.Enforcer) {
 	runMigrations()
 }
 
-func addBasePolicies(enforcer *casbin.Enforcer) {
+func addBasePolicies(enforcer *casbin.SyncedCachedEnforcer) {
 	policies := []Policy{
 		{RoleName: Base, Resource: "/auth", Action: ReadAction},
 		{RoleName: Base, Resource: "/notifications", Action: ReadAction},
@@ -47,7 +47,7 @@ func addBasePolicies(enforcer *casbin.Enforcer) {
 	}
 }
 
-func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
+func addApprovedResearcherPolicies(enforcer *casbin.SyncedCachedEnforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
@@ -61,11 +61,11 @@ func addApprovedResearcherPolicies(enforcer *casbin.Enforcer) {
 	)
 }
 
-func addAdminPolicy(enforcer *casbin.Enforcer) {
+func addAdminPolicy(enforcer *casbin.SyncedCachedEnforcer) {
 	mustAddPolicies(enforcer, Policy{RoleName: Admin, Resource: "*", Action: "*"})
 }
 
-func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
+func addTreOpsStaffPolicy(enforcer *casbin.SyncedCachedEnforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: TreOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/users/:id", Action: ReadAction},
@@ -79,7 +79,7 @@ func addTreOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	)
 }
 
-func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
+func addIgOpsStaffPolicy(enforcer *casbin.SyncedCachedEnforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: IGOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/users/:id", Action: ReadAction},
@@ -95,7 +95,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	)
 }
 
-func addIgAdminPolicy(enforcer *casbin.Enforcer) {
+func addIgAdminPolicy(enforcer *casbin.SyncedCachedEnforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: IGAdmin, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/users/:id", Action: ReadAction},
@@ -109,7 +109,7 @@ func addIgAdminPolicy(enforcer *casbin.Enforcer) {
 	)
 }
 
-func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
+func addDSHOpsStaffPolicy(enforcer *casbin.SyncedCachedEnforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: DSHOpsStaff, Resource: "/users", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/users/:id", Action: ReadAction},
@@ -120,12 +120,12 @@ func addDSHOpsStaffPolicy(enforcer *casbin.Enforcer) {
 	)
 }
 
-func mustAddPolicies(enforcer *casbin.Enforcer, policies ...Policy) {
+func mustAddPolicies(enforcer *casbin.SyncedCachedEnforcer, policies ...Policy) {
 	for _, policy := range policies {
 		_ = must(addPolicy(enforcer, policy))
 	}
 }
 
-func addPolicy(enforcer *casbin.Enforcer, policy Policy) (bool, error) {
+func addPolicy(enforcer *casbin.SyncedCachedEnforcer, policy Policy) (bool, error) {
 	return enforcer.AddPolicy(string(policy.RoleName), policy.Resource, string(policy.Action))
 }
