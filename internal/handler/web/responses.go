@@ -3,7 +3,9 @@ package web
 import (
 	"errors"
 	"fmt"
+	"mime"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -13,7 +15,12 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func setError(ctx *gin.Context, err error, message string) {
+func setError(ctx *gin.Context, err error, messages ...string) {
+	message := strings.Join(messages, ": ")
+	if message == "" {
+		message = "none"
+	}
+
 	if err == nil {
 		panic(fmt.Errorf("set error called with nil error [%v]", message))
 	}
@@ -41,7 +48,14 @@ func setError(ctx *gin.Context, err error, message string) {
 }
 
 func bindJSONOrSetError(ctx *gin.Context, obj any) error {
-	err := ctx.ShouldBindJSON(&obj)
+	mediaType, _, err := mime.ParseMediaType(ctx.GetHeader("Content-Type"))
+	if err != nil || mediaType != "application/json" {
+		err = types.NewErrInvalidObjectF("content type must be JSON: %w", err)
+		setError(ctx, err)
+		return err
+	}
+
+	err = ctx.ShouldBindJSON(&obj)
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Invalid JSON object")
 	}

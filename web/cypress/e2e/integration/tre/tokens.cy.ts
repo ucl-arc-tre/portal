@@ -68,7 +68,8 @@ describe("Create use and delete TRE API tokens end-to-end", () => {
     cy.loginAsTREOps();
     cy.visit("/profile");
     cy.get(`button[aria-label="Delete ${tokenName}"]`).click();
-    cy.wait(10100); // wait for the cache to expire
+    cy.contains("TRE API Tokens").should("exist");
+    cy.wait(100); //  for the token to be deleted
   });
 
   it("the token should now return an unauthed", () => {

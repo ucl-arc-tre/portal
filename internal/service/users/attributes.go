@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	chosenNamePattern = regexp.MustCompile(`^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$`)
+	chosenNamePattern   = regexp.MustCompile(`^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$`)
+	chosenNameMaxLength = 1000
 )
 
 func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
@@ -22,6 +23,9 @@ func (s *Service) Attributes(user types.User) (types.UserAttributes, error) {
 }
 
 func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*openapi.ProfileUpdateResponse, error) {
+	if len(data.ChosenName) > chosenNameMaxLength {
+		return nil, types.NewErrClientInvalidObjectF("chosen name was too long")
+	}
 	if isValid := chosenNamePattern.MatchString(data.ChosenName) || data.ChosenName == ""; !isValid {
 		return nil, types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", data.ChosenName))
 	}
@@ -30,6 +34,7 @@ func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*o
 		return nil, types.NewErrFromGorm(err, "failed to find user attributes")
 	}
 	requestedChosenName := types.ChosenName(data.ChosenName)
+
 	response := openapi.ProfileUpdateResponse{}
 	var err error
 	if nameChangeRequiresApproval(attrs.ChosenName, requestedChosenName) {
