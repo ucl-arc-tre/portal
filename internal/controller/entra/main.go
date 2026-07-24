@@ -226,7 +226,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, invite Invite) 
 
 	message := inviteEmailContent(invite)
 	messageInfo := graphmodels.NewInvitedUserMessageInfo()
-	messageInfo.SetCustomizedMessageBody(&message)
+	messageInfo.SetCustomizedMessageBody(new(string(message)))
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
 	sponsorUserData, err := c.userData(ctx, invite.Sponsor.Username)
