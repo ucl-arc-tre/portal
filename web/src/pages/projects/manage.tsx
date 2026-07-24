@@ -26,7 +26,7 @@ import Error from "@/components/ui/Error";
 import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
-import ProjectTabs from "@/components/projects/ProjectTabs";
+import TabCollection from "@/components/shared/TabCollection";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -323,7 +323,9 @@ export default function ManageProjectPage() {
           )}
         </div>
 
-        <ProjectTabs />
+        <TabCollection
+          tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
+        />
 
         {tab === "project" && (
           <Box>
