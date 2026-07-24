@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/agreements"
@@ -271,10 +272,34 @@ func (s *Service) AllApprovedResearchers() ([]ApprovedResearcherExportRecord, er
 	return records, nil
 }
 
+func (s *Service) All() ([]types.User, error) {
+	users := []types.User{}
+	err := s.db.Find(&users).Error
+	return users, types.NewErrFromGorm(err, "failed to find users")
+}
+
 func (s *Service) dbApprovedResearcherJoins() *gorm.DB {
 	return s.db.Model(&types.User{}).
 		Joins("INNER JOIN user_agreement_confirmations ON users.id = user_id").
 		Joins("INNER JOIN agreements ON user_agreement_confirmations.agreement_id = agreements.id").
 		Joins("INNER JOIN user_training_records ON users.id = user_training_records.user_id").
 		Where("agreements.type = ? AND (user_training_records.kind = ? OR user_training_records.kind = ?)", agreements.ApprovedResearcherType, types.TrainingKindNHSD, types.TrainingKindUCLHIg)
+}
+
+func (s *Service) AssignEmailAddress(ctx context.Context, user types.User) error {
+	if entra.IsExternalUsername(user.Username) {
+		return nil // externals already have a set email address
+	}
+	email, err := s.entra.UserEmail(ctx, user.Username)
+	if err != nil {
+		return err
+	}
+	attrs := types.UserAttributes{UserID: user.ID}
+	err = s.db.
+		Where(&attrs).
+		Assign(types.UserAttributes{
+			Email: email,
+		}).
+		FirstOrCreate(&attrs).Error
+	return types.NewErrFromGorm(err, "failed to assign email")
 }
