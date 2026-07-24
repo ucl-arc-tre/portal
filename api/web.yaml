@@ -2241,6 +2241,8 @@ components:
     ProjectTREUserDesktopConfig:
       type: object
       properties:
+        image_id:
+          type: string
         hpc_instance_type:
           type: string
         root_volume_gb:

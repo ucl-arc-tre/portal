@@ -265,7 +265,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return err
 	}
 
-	if err := s.createOrUpdateProjectTREUserConfigs(tx, projectTRE.ID, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTREUserConfigs(tx, projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -441,9 +441,9 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
 }
 
-func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE types.ProjectTRE, members []openapi.ProjectTREMember) error {
 	existing := []types.ProjectTREUserConfig{}
-	if err := tx.Unscoped().Preload("User").Where("project_tre_id = ?", projectTREID).Find(&existing).Error; err != nil {
+	if err := tx.Unscoped().Preload("User").Preload("DesktopImage").Where("project_tre_id = ?", projectTRE.ID).Find(&existing).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list role bindings")
 	}
 
@@ -464,7 +464,7 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 			return u.User.Username == types.Username(member.Username)
 		})
 		userConfig := types.ProjectTREUserConfig{
-			ProjectTREID:           projectTREID,
+			ProjectTREID:           projectTRE.ID,
 			UserID:                 userIds[types.Username(member.Username)],
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
 			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
@@ -472,20 +472,31 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]
 			userConfig.UID = existingConfig.UID
+			userConfig.DesktopImageID = existingConfig.DesktopImageID
 		} else {
 			userConfig.UID, err = projectTRENextUid(append(existing, requested...))
 			if err != nil {
 				return err
 			}
+			image, err := latestTREDesktopImage(tx, projectTRE.Platform)
+			if errors.Is(err, types.ErrNotFound) {
+				log.Warn().Any("projectId", projectTRE.ID).Msg("Latest TRE project Desktop image not found")
+			} else if err != nil {
+				return err
+			} else {
+				userConfig.DesktopImageID = &image.ID
+			}
 		}
+
 		requested = append(requested, userConfig)
 	}
 	for _, userConfig := range requested {
 		err := tx.Model(&userConfig).
-			Where("project_tre_id = ? AND user_id = ?", projectTREID, userConfig.UserID).
+			Where("project_tre_id = ? AND user_id = ?", projectTRE.ID, userConfig.UserID).
 			Assign(types.ProjectTREUserConfig{
 				DesktopHPCInstanceType: userConfig.DesktopHPCInstanceType,
 				DesktopRootVolumeSize:  userConfig.DesktopRootVolumeSize,
+				DesktopImageID:         userConfig.DesktopImageID,
 			}).
 			Attrs(types.ProjectTREUserConfig{
 				UID: userConfig.UID,
@@ -506,6 +517,15 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTREID 
 		}
 	}
 	return nil
+}
+
+func latestTREDesktopImage(tx *gorm.DB, platform types.ProjectTREPlatform) (*types.ProjectTREVMImage, error) {
+	image := types.ProjectTREVMImage{
+		Kind:     types.ProjectTREProjectTREVMImageKindDesktop,
+		Platform: platform,
+	}
+	err := tx.Where(&image).Order("created_at desc").First(&image).Error
+	return &image, types.NewErrFromGorm(err, "failed to get latest desktop image")
 }
 
 func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate) error {
@@ -545,7 +565,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 		return err
 	}
 
-	if err := s.createOrUpdateProjectTREUserConfigs(tx, projectTRE.ID, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTREUserConfigs(tx, *projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -766,10 +786,25 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			log.Error().Any("username", member.Username).Msg("User did not have any rold bindings - skipping user config")
 			continue
 		}
-		if member.Uid == nil || member.DesktopConfig == nil {
+		if member.Uid == nil || member.DesktopConfig == nil || member.DesktopConfig.ImageId == nil {
 			tx.Rollback()
 			return types.NewErrClientInvalidObjectF("member uid and desktop config must be set")
 		}
+		if *member.DesktopConfig.ImageId == "" {
+			tx.Rollback()
+			return types.NewErrClientInvalidObjectF("desktop image id must be set")
+		}
+		image := types.ProjectTREVMImage{
+			Name:     fmt.Sprintf("Imported: %s", *member.DesktopConfig.ImageId),
+			ImageId:  *member.DesktopConfig.ImageId,
+			Kind:     types.ProjectTREProjectTREVMImageKindDesktop,
+			Platform: types.ProjectTREPlatform(data.Platform),
+		}
+		if err := tx.Where(&image).FirstOrCreate(&image).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to create project TRE image")
+		}
+
 		var rootVolumeGb *uint
 		if v := member.DesktopConfig.RootVolumeGb; v != nil { // #nosec G115 -- volume gb size wont exceed MaxInt
 			rootVolumeGb = new(uint(*v))
@@ -780,6 +815,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			UID:                    *member.Uid,
 			DesktopRootVolumeSize:  rootVolumeGb,
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
+			DesktopImageID:         &image.ID,
 		}
 		if err := tx.Where(types.ProjectTREUserConfig{ // NOTE: does not clear old associations
 			ProjectTREID: projectTRE.ID,
@@ -788,6 +824,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			UID:                    *member.Uid,
 			DesktopRootVolumeSize:  rootVolumeGb,
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
+			DesktopImageID:         &image.ID,
 		}).FirstOrCreate(&userConfig).Error; err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create ProjectTREUserConfig")

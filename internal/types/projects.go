@@ -63,12 +63,19 @@ const (
 
 var ProjectTREPlatforms = []ProjectTREPlatform{ProjectTREPlatformAWS, ProjectTREPlatformCondenser}
 
+type ProjectTREProjectTREVMImageKind string
+
+const (
+	ProjectTREProjectTREVMImageKindDesktop = "desktop"
+)
+
 type ProjectTREVMImage struct {
 	ModelAuditable
-	Name        string             `gorm:"not null"`
-	ImageId     string             `gorm:"not null;index:idx_id_platform,unique"` // e.g. AMI id
-	Description string             `gorm:"not null"`
-	Platform    ProjectTREPlatform `gorm:"not null;index:idx_id_platform,unique"`
+	Name        string                          `gorm:"not null"`
+	ImageId     string                          `gorm:"not null;index:idx_id_platform,unique"` // e.g. AMI id
+	Description string                          `gorm:"not null"`
+	Platform    ProjectTREPlatform              `gorm:"not null;index:idx_id_platform,unique"`
+	Kind        ProjectTREProjectTREVMImageKind `gorm:"not null;default:'desktop'"`
 }
 
 type ProjectTREStatus string
