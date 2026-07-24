@@ -3,6 +3,7 @@ package rbac
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/model"
@@ -38,7 +39,7 @@ var (
 
 var enforcer *casbin.SyncedCachedEnforcer
 
-// Get a casbin policy enforcer. Singleton is initalised if not already
+// Get a casbin policy enforcer. Singleton is initialised if not already
 func NewEnforcer(db *gorm.DB) *casbin.SyncedCachedEnforcer {
 	if enforcer != nil {
 		return enforcer
@@ -46,6 +47,7 @@ func NewEnforcer(db *gorm.DB) *casbin.SyncedCachedEnforcer {
 	log.Debug().Msg("Creating casbin enforcer")
 	adapter := must(gormadapter.NewAdapterByDB(db))
 	enforcer = must(casbin.NewSyncedCachedEnforcer(makeCasbinModel(), adapter))
+	enforcer.SetExpireTime(10 * time.Second)
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 	return enforcer
