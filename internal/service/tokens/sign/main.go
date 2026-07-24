@@ -10,20 +10,23 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/tokens"
+	"github.com/ucl-arc-tre/portal/internal/service/tokens/verify"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
 )
 
 type Service struct {
-	key Ed25519KeyPair
-	db  *gorm.DB
+	key    Ed25519KeyPair
+	db     *gorm.DB
+	verify VerifyInterface
 }
 
 func New() *Service {
 	service := Service{
-		db:  graceful.NewDB(),
-		key: mustMakeEd25519KeyPair(),
+		db:     graceful.NewDB(),
+		key:    mustMakeEd25519KeyPair(),
+		verify: verify.New(),
 	}
 	service.mustStoreVerificationKey()
 	return &service
@@ -88,7 +91,8 @@ func (s *Service) Create(token types.Token, scopes []string) (*TokenWithValue, e
 func (s *Service) Delete(tokenId uuid.UUID, environmentId uuid.UUID) error {
 	err := s.db.Delete(&types.Token{}, "id = ? AND environment_id = ?", tokenId, environmentId).Error
 	if err != nil {
-		return types.NewErrFromGorm(err)
+		return types.NewErrFromGorm(err, "failed to delete token")
 	}
+	s.verify.Delete(tokenId)
 	return nil
 }

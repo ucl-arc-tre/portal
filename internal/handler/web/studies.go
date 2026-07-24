@@ -149,8 +149,12 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 	}
 
 	user := middleware.GetUser(ctx)
-	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
-		setError(ctx, err, "Failed to confirm study agreement")
+	studies, err := h.studies.StudiesById(studyUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get study")
+		return
+	} else if len(studies) == 0 {
+		setError(ctx, types.NewNotFoundError("study not found"))
 		return
 	}
 
@@ -159,6 +163,17 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 		setError(ctx, err, "Failed to get agreement type")
 		return
 	}
+
+	if *agreementType == agreements.StudyOwnerType && studies[0].OwnerUserID != user.ID {
+		setError(ctx, types.NewErrInvalidObject("cannot sign study owner agreement if not the owner"))
+		return
+	}
+
+	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
+		setError(ctx, err, "Failed to confirm study agreement")
+		return
+	}
+
 	switch *agreementType {
 	case agreements.StudyOwnerType:
 		if _, err := rbac.AddRole(user, rbac.InformationAssetOwner); err != nil {

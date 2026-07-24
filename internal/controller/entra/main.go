@@ -131,6 +131,9 @@ func (c *Controller) findUserInternal(ctx context.Context, upn UserPrincipalName
 
 // Get the user data for an external user
 func (c *Controller) findUserExternal(ctx context.Context, email Email) (graphmodels.Userable, error) {
+	// Single quotes must be escaped. See: https://learn.microsoft.com/en-us/azure/search/query-odata-filter-orderby-syntax#escaping-special-characters-in-string-constants
+	email = strings.ReplaceAll(email, "'", "''") // ensure no odata injection
+
 	filterQuery := fmt.Sprintf(`mail eq '%s'`, email)
 	maxResults := int32(1)
 	configuration := &graphusers.UsersRequestBuilderGetRequestConfiguration{

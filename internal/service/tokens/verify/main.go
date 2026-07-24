@@ -16,24 +16,24 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	cache *Cache
+)
+
 const (
 	cacheTTL      = 10 * time.Second
 	cacheElements = 10000
 )
 
 type Service struct {
-	parser               *jwt.Parser
-	db                   *gorm.DB
-	verificationKeyCache *expirable.LRU[tokens.TokenId, ed25519.PublicKey]
-	isRevokedCache       *expirable.LRU[tokens.TokenId, bool]
+	parser *jwt.Parser
+	db     *gorm.DB
 }
 
 func New() *Service {
 	service := Service{
-		parser:               jwt.NewParser(jwt.WithIssuer(config.JWTIssuer())),
-		db:                   graceful.NewDB(),
-		verificationKeyCache: newTokenLRU[ed25519.PublicKey](),
-		isRevokedCache:       newTokenLRU[bool](),
+		parser: jwt.NewParser(jwt.WithIssuer(config.JWTIssuer())),
+		db:     graceful.NewDB(),
 	}
 	return &service
 }
@@ -47,6 +47,10 @@ func (s *Service) ParseClaims(rawToken string) (*tokens.Claims, error) {
 		return nil, err
 	}
 	return &claims, nil
+}
+
+func (s *Service) Delete(id tokens.TokenId) {
+	cache.isRevoked.Remove(id)
 }
 
 func (s *Service) verificationKeyForToken(token *jwt.Token) (any, error) {
@@ -70,7 +74,7 @@ func (s *Service) verificationKeyForToken(token *jwt.Token) (any, error) {
 }
 
 func (s *Service) isRevoked(id tokens.TokenId) (bool, error) {
-	if value, existsInCache := s.isRevokedCache.Get(id); existsInCache {
+	if value, existsInCache := cache.isRevoked.Get(id); existsInCache {
 		return value, nil
 	}
 	var exists bool
@@ -78,12 +82,12 @@ func (s *Service) isRevoked(id tokens.TokenId) (bool, error) {
 	if result.Error != nil {
 		return true, result.Error
 	}
-	_ = s.isRevokedCache.Add(id, !exists)
+	_ = cache.isRevoked.Add(id, !exists)
 	return !exists, nil
 }
 
 func (s *Service) verificationKey(id tokens.TokenId) (ed25519.PublicKey, error) {
-	if value, existsInCache := s.verificationKeyCache.Get(id); existsInCache {
+	if value, existsInCache := cache.verificationKey.Get(id); existsInCache {
 		return value, nil
 	}
 	var valueBase64 string
@@ -100,7 +104,7 @@ func (s *Service) verificationKey(id tokens.TokenId) (ed25519.PublicKey, error) 
 		return ed25519.PublicKey(""), err
 	}
 	publicKey := ed25519.PublicKey(keyBytes)
-	_ = s.verificationKeyCache.Add(id, publicKey)
+	_ = cache.verificationKey.Add(id, publicKey)
 	return publicKey, nil
 }
 

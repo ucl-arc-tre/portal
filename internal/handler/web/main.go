@@ -60,8 +60,7 @@ func (h *Handler) GetLogout(ctx *gin.Context) {
 
 func (h *Handler) PostFeedback(ctx *gin.Context) {
 	data := openapi.Feedback{}
-	if err := ctx.ShouldBindJSON(&data); err != nil {
-		setError(ctx, err, "Failed to parse json")
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
 	user := middleware.GetUser(ctx)
