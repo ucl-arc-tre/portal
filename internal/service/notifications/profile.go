@@ -32,7 +32,7 @@ func (s *Service) NotifyTrainingExpiry(ctx context.Context, training types.UserT
 	} else if days == 1 {
 		content += "tomorrow. "
 	} else {
-		content += template.HTML("in " + fmt.Sprintf("%d", days) + " days. ")
+		content += template.HTML("in " + fmt.Sprintf("%d", days) + " days. ") // #nosec G203 -- only int
 	}
 	content += "Please " + htmlHref("sign in", "/profile") + " to the Portal to upload a new certificate."
 

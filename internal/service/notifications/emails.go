@@ -22,5 +22,5 @@ func htmlHref(label string, relPath string) template.HTML {
 		`<a href="` + template.HTMLEscapeString(href) + `">` +
 			template.HTMLEscapeString(label) +
 			`</a>`,
-	)
+	) // #nosec G203 -- untrusted is escaped
 }

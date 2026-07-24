@@ -83,7 +83,7 @@ func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contr
 	} else if *days == 1 {
 		content += "that is due to expire tomorrow. "
 	} else {
-		content += template.HTML("that is due to expire in " + fmt.Sprintf("%d", *days) + " days. ")
+		content += template.HTML("that is due to expire in " + fmt.Sprintf("%d", *days) + " days. ") // #nosec G203 -- only int
 	}
 	content += "Please sign in to the Portal to upload a new contract or update its status."
 
@@ -106,7 +106,7 @@ func (s *Service) NotifyIaaAssignment(ctx context.Context, iaa types.User, study
 
 	content := template.HTML(
 		"You have been added as an Information Asset Administrator (IAA) to the Study " + href +
-			". Please sign in to the Portal to view the Study details and sign the Administrator's Agreement.")
+			". Please sign in to the Portal to view the Study details and sign the Administrator's Agreement.") // #nosec G203 -- href is trusted
 	subject := "Notification: Information Asset Administrator assignment"
 	if err := s.entra.SendEmail(ctx, subject, emails(iaa), content); err != nil {
 		log.Err(err).Msg("Failed to send contract IAA assignment notification email")
@@ -131,7 +131,7 @@ func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Stud
 	} else if days == 1 {
 		content += "expires tomorrow. "
 	} else {
-		content += template.HTML(fmt.Sprintf("expires in %d days. ", days))
+		content += template.HTML(fmt.Sprintf("expires in %d days. ", days)) // #nosec G203 -- only int
 	}
 	content += "Please log in to the ARC Services Portal to reaffirm your Study details."
 	subject := "Notification: Study affirmation expiry"
@@ -170,11 +170,11 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 			log.Error().Str("study", study.Title).Msg("Attempted to send asset expiry notification with nil expiry")
 			continue
 		}
-		content += template.HTML("- '" + template.HTMLEscapeString(asset.Title) + "'")
+		content += template.HTML("- '" + template.HTMLEscapeString(asset.Title) + "'") // #nosec G203 -- untrusted is escaped
 		if *days < 0 {
-			content += template.HTML(fmt.Sprintf(" expired %d days ago.\n", -(*days)))
+			content += template.HTML(fmt.Sprintf(" expired %d days ago.\n", -(*days))) // #nosec G203 -- only int
 		} else {
-			content += template.HTML(fmt.Sprintf(" expires in %d days.\n", *days))
+			content += template.HTML(fmt.Sprintf(" expires in %d days.\n", *days)) // #nosec G203 -- only int
 		}
 	}
 	if earliestExpiringAssetAt == nil {
