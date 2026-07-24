@@ -15,7 +15,7 @@ var (
 )
 
 func TestRBAC(t *testing.T) {
-	enforcer = must(casbin.NewSyncedCachedEnforcer(makeCasbinModel(), adapter))
+	enforcer = must(casbin.NewSyncedEnforcer(makeCasbinModel(), adapter))
 	bob := makeUser("3843ed01-1cb0-4cc8-a2fc-3556cc8f393a")
 	alice := makeUser("8ef0d19b-370c-40a6-a3ef-399dbebbbc8f")
 

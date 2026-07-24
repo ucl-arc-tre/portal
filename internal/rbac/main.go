@@ -3,7 +3,6 @@ package rbac
 import (
 	"fmt"
 	"slices"
-	"time"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/model"
@@ -37,17 +36,16 @@ var (
 	ConfigRoleNames = []ConfigRolename{Admin, TreOpsStaff, IGOpsStaff, IGAdmin, DSHOpsStaff}
 )
 
-var enforcer *casbin.SyncedCachedEnforcer
+var enforcer *casbin.SyncedEnforcer
 
 // Get a casbin policy enforcer. Singleton is initialised if not already
-func NewEnforcer(db *gorm.DB) *casbin.SyncedCachedEnforcer {
+func NewEnforcer(db *gorm.DB) *casbin.SyncedEnforcer {
 	if enforcer != nil {
 		return enforcer
 	}
 	log.Debug().Msg("Creating casbin enforcer")
 	adapter := must(gormadapter.NewAdapterByDB(db))
-	enforcer = must(casbin.NewSyncedCachedEnforcer(makeCasbinModel(), adapter))
-	enforcer.SetExpireTime(10 * time.Second)
+	enforcer = must(casbin.NewSyncedEnforcer(makeCasbinModel(), adapter))
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 	return enforcer

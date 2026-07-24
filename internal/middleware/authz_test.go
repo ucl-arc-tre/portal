@@ -17,8 +17,8 @@ var (
 	bobID   = uuid.MustParse("17dfc23a-51f6-49cc-b429-6a6a3f9ccf8e")
 )
 
-func newTestCasbinEnforcer() *casbin.SyncedCachedEnforcer {
-	enforcer, _ := casbin.NewSyncedCachedEnforcer("testdata/casbin_model.conf", "testdata/casbin_policy.csv")
+func newTestCasbinEnforcer() *casbin.SyncedEnforcer {
+	enforcer, _ := casbin.NewSyncedEnforcer("testdata/casbin_model.conf", "testdata/casbin_policy.csv")
 	return enforcer
 }
 
