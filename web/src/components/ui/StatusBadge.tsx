@@ -79,7 +79,7 @@ function getStatusClassName(status: string | undefined): string {
     return styles["status-pending"];
   } else if (status.includes("incomplete")) {
     return styles["status-incomplete"];
-  } else if (status.includes("approve") || status.includes("deploy")) {
+  } else if (status.includes("approve") || status.includes("deploy") || status === "active") {
     return styles["status-approved"];
   } else if (status.includes("reject")) {
     return styles["status-rejected"];

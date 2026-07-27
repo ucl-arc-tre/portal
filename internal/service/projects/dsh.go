@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/csv"
 	"io"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -38,8 +39,15 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 	}
 
 	studyCache := map[int]types.Study{} // caseref -> study
-
 	tx := s.db.Begin()
+
+	existingDshProjects := []types.ProjectDSH{}
+	if err := tx.Preload("Project").Find(&existingDshProjects).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to get current dsh projects")
+	}
+
+	importedDshProjects := []types.ProjectDSH{}
 	for _, record := range records {
 		if record.IsExternal() {
 			// NOTE: External members must be invited as approved researchers
@@ -51,23 +59,26 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 
 		var user *types.User
 		likelyUsername := types.Username(record.Member + "@" + config.EntraTenantPrimaryDomain())
-		if !likelyUsername.IsValid() {
+		if likelyUsername.IsValid() {
+			user, err = s.users.UserByUsername(likelyUsername)
+			if err != nil {
+				log.Debug().Msg("Failed to find user by username")
+			}
+		}
+		if user == nil {
 			usernames, err := s.entra.FindUsernames(ctx, record.MemEmailAddress)
 			if err != nil {
 				tx.Rollback()
 				return err
 			} else if len(usernames) != 1 {
+				tx.Rollback()
 				return types.NewErrInvalidObject("failed to find user")
 			}
 			if persistedUser, err := s.users.PersistedUser(usernames[0]); err != nil {
+				tx.Rollback()
 				return err
 			} else {
 				user = &persistedUser
-			}
-		} else {
-			user, err = s.users.UserByUsername(likelyUsername)
-			if err != nil {
-				return err
 			}
 		}
 
@@ -91,7 +102,7 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 			StudyID:       study.ID,
 			EnvironmentID: dsh.ID,
 		}
-		err := tx.Where("name = ?", record.ShareName).FirstOrCreate(&project).Error
+		err := tx.Where("name = ?", record.ShareName).Assign(project).FirstOrCreate(&project).Error
 		if err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create project")
@@ -99,12 +110,15 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 		projectDSH := types.ProjectDSH{
 			ProjectID: project.ID,
 			Status:    types.ProjectDSHStatusActive,
+			Project:   project,
 		}
 		err = tx.Where("project_id = ?", project.ID).FirstOrCreate(&projectDSH).Error
 		if err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create dshproject")
 		}
+		importedDshProjects = append(importedDshProjects, projectDSH)
+
 		err = tx.Where("project_dsh_id = ? AND user_id = ?", projectDSH.ID, user.ID).
 			Delete(&types.ProjectDSHRoleBinding{}).
 			Error
@@ -140,6 +154,20 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 		if _, err := rbac.AddProjectDshOwnerRole(study.ID, project.ID); err != nil {
 			return err
 
+		}
+	}
+
+	for _, existingDSHProject := range existingDshProjects {
+		nameMatches := func(p types.ProjectDSH) bool {
+			return p.Project.Name == existingDSHProject.Project.Name
+		}
+		if !slices.ContainsFunc(importedDshProjects, nameMatches) {
+			if err := tx.Delete(existingDSHProject).Error; err != nil {
+				log.Err(err).Msg("Failed to delete old DSH project")
+			}
+			if err := tx.Delete(existingDSHProject.Project).Error; err != nil {
+				log.Err(err).Msg("Failed to delete old DSH project")
+			}
 		}
 	}
 

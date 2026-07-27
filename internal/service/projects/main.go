@@ -300,11 +300,14 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 }
 
 // retrieves all projects (for admins and TRE ops staff)
-func (s *Service) AllProjects() ([]GenericProject, error) {
+func (s *Service) AllProjects(environments ...types.EnvironmentName) ([]GenericProject, error) {
 	var projects []GenericProject
-	err := s.genericProjectsQuery().
-		Where("projects.deleted_at IS NULL").
-		Scan(&projects).Error
+	query := s.genericProjectsQuery().
+		Where("projects.deleted_at IS NULL")
+	if len(environments) > 0 {
+		query = query.Where("environments.name IN ?", environments)
+	}
+	err := query.Scan(&projects).Error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
 }
 

@@ -19,21 +19,30 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 	var projects []projects.GenericProject
 	var err error
 
+	isDshOpsStaff, err := rbac.HasRole(user, rbac.DSHOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
 	isAdmin, err := rbac.HasRole(user, rbac.Admin)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
 
-	isTreOpsStaff, err := rbac.HasAnyListedRole(user, rbac.TreOpsStaff)
-	if err != nil {
-		setError(ctx, err, "Failed to check user roles")
-		return
-	}
-
-	if isAdmin || isTreOpsStaff {
-		// Admin & TRE ops staff: fetch ALL projects
+	if isAdmin {
 		projects, err = h.projects.AllProjects()
+	} else if isTreOpsStaff {
+		projects, err = h.projects.AllProjects(environments.TRE)
+	} else if isDshOpsStaff {
+		projects, err = h.projects.AllProjects(environments.DSH)
 	} else {
 		// Regular user: fetch only projects they own (via RBAC)
 		projects, err = h.projectsProjectOwner(user)
@@ -309,6 +318,7 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 		StudyTitle:      projectDSH.Project.Study.Title,
 		Assets:          new([]openapi.Asset{}),
 		Status:          openapi.ProjectDSHStatus(projectDSH.Status),
+		Members:         []openapi.ProjectDSHMember{},
 	}
 	for username, member := range members {
 		response.Members = append(response.Members, openapi.ProjectDSHMember{

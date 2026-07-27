@@ -22,9 +22,10 @@ export default function Projects() {
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
-  const { isTreOpsStaff, isApprovedStaffResearcher } = useAuth();
+  const { isAdmin, isTreOpsStaff, isDshOpsStaff, isApprovedStaffResearcher } = useAuth();
 
   const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
+  const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -93,7 +94,7 @@ export default function Projects() {
     return;
   }
 
-  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !isTreOpsStaff) {
+  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !canSeeAllProjects) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You don&apos;t have any approved Studies</h2>
@@ -111,7 +112,7 @@ export default function Projects() {
         <>
           <div className={styles.header}>
             <h2>
-              {isTreOpsStaff ? "All Projects" : "Your Projects"}{" "}
+              {canSeeAllProjects ? "All Projects" : "Your Projects"}{" "}
               <Button
                 onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
                 variant="tertiary"

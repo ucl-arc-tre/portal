@@ -9,7 +9,15 @@ import { Alert, AlertMessage } from "@/components/shared/uikitExports";
 import PeopleSearch from "@/components/people/Search";
 
 export default function PeoplePage() {
-  const { authInProgress, isAuthed, isIGStaff, isAdmin, isTreOpsStaff, isIAO, isDSHOpsStaff } = useAuth();
+  const {
+    authInProgress,
+    isAuthed,
+    isIGStaff,
+    isAdmin,
+    isTreOpsStaff,
+    isIAO,
+    isDshOpsStaff: isDSHOpsStaff,
+  } = useAuth();
 
   if (authInProgress) return null;
 

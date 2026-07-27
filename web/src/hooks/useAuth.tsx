@@ -14,7 +14,7 @@ type AuthCtxValue = {
   isApprovedStaffResearcher: boolean;
   isAdmin: boolean;
   isIAO: boolean;
-  isDSHOpsStaff: boolean;
+  isDshOpsStaff: boolean;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
@@ -28,7 +28,7 @@ const AuthCtx = createContext<AuthCtxValue>({
   isApprovedStaffResearcher: false,
   isIAO: false,
   isAdmin: false,
-  isDSHOpsStaff: false,
+  isDshOpsStaff: false,
   refreshAuth: () => Promise.resolve(),
 });
 
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isTreOpsStaff,
         isApprovedStaffResearcher,
         isIAO,
-        isDSHOpsStaff,
+        isDshOpsStaff: isDSHOpsStaff,
       }}
     >
       {children}
