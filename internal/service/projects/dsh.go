@@ -102,7 +102,7 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 			StudyID:       study.ID,
 			EnvironmentID: dsh.ID,
 		}
-		err := tx.Where("name = ?", record.ShareName).Assign(project).FirstOrCreate(&project).Error
+		err := tx.Where("name = ? AND environment_id = ?", record.ShareName, dsh.ID).FirstOrCreate(&project).Error
 		if err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create project")
@@ -150,10 +150,9 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 				}
 			}
 		}
-
 		if _, err := rbac.AddProjectDshOwnerRole(study.ID, project.ID); err != nil {
+			tx.Rollback()
 			return err
-
 		}
 	}
 

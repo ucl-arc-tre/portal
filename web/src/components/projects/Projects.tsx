@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [studies, setStudies] = useState<Study[]>([]);
+  const [studies, setStudies] = useState<Study[] | undefined>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
@@ -24,14 +24,19 @@ export default function Projects() {
 
   const { isAdmin, isTreOpsStaff, isDshOpsStaff, isApprovedStaffResearcher } = useAuth();
 
-  const approvedStudies = studies.filter((study) => study.approval_status === "Approved");
+  const approvedStudies = studies?.filter((study) => study.approval_status === "Approved");
   const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
+      let projectsResponse, studiesResponse;
+      if (canSeeAllProjects) {
+        projectsResponse = await getProjects();
+      } else {
+        [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
+      }
 
       if (responseIsError(projectsResponse) || !projectsResponse.data) {
         const errorMsg = extractErrorMessage(projectsResponse);
@@ -39,14 +44,14 @@ export default function Projects() {
         return;
       }
 
-      if (responseIsError(studiesResponse) || !studiesResponse.data) {
+      if (studiesResponse && (responseIsError(studiesResponse) || !studiesResponse.data)) {
         const errorMsg = extractErrorMessage(studiesResponse);
         setError(`Failed to fetch studies: ${errorMsg}`);
         return;
       }
 
       setProjects(projectsResponse.data);
-      setStudies(studiesResponse.data);
+      setStudies(studiesResponse?.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setError("Failed to load projects and studies. Please try again later.");
@@ -94,7 +99,7 @@ export default function Projects() {
     return;
   }
 
-  if (approvedStudies.length === 0 && isApprovedStaffResearcher && !canSeeAllProjects) {
+  if (!canSeeAllProjects && approvedStudies && approvedStudies.length === 0 && isApprovedStaffResearcher) {
     return (
       <div className={styles["no-projects-message"]}>
         <h2>You don&apos;t have any approved Studies</h2>
@@ -149,7 +154,7 @@ export default function Projects() {
         </Dialog>
       )}
 
-      {createProjectFormOpen && (
+      {createProjectFormOpen && approvedStudies && (
         <ProjectForm
           approvedStudies={approvedStudies}
           handleProjectCreated={handleProjectCreated}
