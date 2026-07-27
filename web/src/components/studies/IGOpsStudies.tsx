@@ -9,6 +9,7 @@ import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
 import TabCollection from "../shared/TabCollection";
+import { useRouter } from "next/router";
 
 type Props = {
   refreshToken: number;
@@ -20,12 +21,15 @@ export default function IGOpsStudies(props: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
   const [studies, setStudies] = useState<Study[]>([]);
-  const [tab, setTab] = useState("pending");
 
   const studiesPerPage = 12;
   const [searchQuery, setSearchQuery] = useState("");
   const [offset, setOffset] = useState(0);
   const [noMoreStudies, setNoMoreStudies] = useState(false);
+
+  const router = useRouter();
+  const tab = (router.query.tab as "all" | "pending") ?? "all";
+
   const fetchStudies = async (offset?: number) => {
     setIsLoading(true);
     setError(null);
