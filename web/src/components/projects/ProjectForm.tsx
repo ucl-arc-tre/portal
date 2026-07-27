@@ -10,6 +10,7 @@ import {
   Asset,
   getEnvironments,
   ProjectTreMember,
+  ProjectTre,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName, ProjectFormData } from "@/types/projects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -67,6 +68,7 @@ export default function ProjectForm({
   const selectedEnvironmentId = watch("environmentId");
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isTREProject = selectedEnvironment?.name == "ARC Trusted Research Environment";
+  const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";
 
   const fieldsDisabled = isSubmitting;
   const editing = editingProject !== null && editingProject !== undefined;
@@ -115,26 +117,29 @@ export default function ProjectForm({
         })) || [];
       setValue("members", projectMembers);
 
-      setValue("tre.numRequiredEgressApprovals", `${editingProject.num_required_egress_approvals}`);
-      setValue("tre.externalEncryptionEnabled", editingProject.external_encryption_enabled ? "true" : "false");
+      if (isTREProject) {
+        const editingTREProject = editingProject as ProjectTre;
+        setValue("tre.numRequiredEgressApprovals", `${editingTREProject.num_required_egress_approvals}`);
+        setValue("tre.externalEncryptionEnabled", editingTREProject.external_encryption_enabled ? "true" : "false");
 
-      const hasWhitelist = (editingProject.airlock_whitelist ?? []).length > 0;
-      setValue("tre.airlockExternalDataEnabled", hasWhitelist ? "true" : "false");
-      setValue(
-        "tre.airlockWhitelist",
-        (editingProject.airlock_whitelist ?? []).map((value) => ({ value }))
-      );
+        const hasWhitelist = (editingTREProject.airlock_whitelist ?? []).length > 0;
+        setValue("tre.airlockExternalDataEnabled", hasWhitelist ? "true" : "false");
+        setValue(
+          "tre.airlockWhitelist",
+          (editingTREProject.airlock_whitelist ?? []).map((value) => ({ value }))
+        );
 
-      const hasHPCDesktops = editingProject.members.some((member) => member.desktop_config?.hpc_instance_type);
-      setValue("tre.requiresHPCDesktops", hasHPCDesktops ? "true" : "false");
+        const hasHPCDesktops = editingTREProject.members.some((member) => member.desktop_config?.hpc_instance_type);
+        setValue("tre.requiresHPCDesktops", hasHPCDesktops ? "true" : "false");
 
-      const userConfig = editingProject.members.map((member) => ({
-        username: member.username,
-        hpcInstance: member.desktop_config?.hpc_instance_type,
-      }));
-      setValue("tre.userConfig", userConfig);
+        const userConfig = editingTREProject.members.map((member) => ({
+          username: member.username,
+          hpcInstance: member.desktop_config?.hpc_instance_type,
+        }));
+        setValue("tre.userConfig", userConfig);
+      }
     }
-  }, [editingProject, setValue, environments]);
+  }, [editingProject, setValue, environments, isTREProject]);
 
   useEffect(() => {
     if (!editingProject) {
@@ -322,7 +327,7 @@ export default function ProjectForm({
                 </Button>
               )}
 
-              {currentStep < totalSteps && (
+              {currentStep < totalSteps && !isDSHProject && (
                 <Button type="button" onClick={nextStep} cy="next-form-page-button">
                   Next →
                 </Button>

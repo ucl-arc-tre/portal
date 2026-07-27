@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"gorm.io/gorm"
 )
@@ -19,4 +20,19 @@ type GenericProject struct {
 	Status          string
 	EnvironmentName string
 	IsDeletable     bool
+}
+
+type DSHMemberImportRecord struct {
+	ShareName         string
+	Owner             string
+	Caseref           int
+	Member            string
+	MemEmailAddress   string
+	MemAccountEnabled bool
+	MemAllDisabled    bool
+	MemOutboundRights bool
+}
+
+func (d DSHMemberImportRecord) IsExternal() bool {
+	return entra.IsExternalUsername(types.Username(d.MemEmailAddress))
 }

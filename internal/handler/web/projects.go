@@ -8,6 +8,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -24,7 +25,7 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 		return
 	}
 
-	isTreOpsStaff, err := rbac.HasRole(user, rbac.TreOpsStaff)
+	isTreOpsStaff, err := rbac.HasAnyListedRole(user, rbac.TreOpsStaff)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
@@ -274,6 +275,48 @@ func (h *Handler) PostProjectsTreAdminImport(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	projectDSH, err := h.projects.ProjectDSHById(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get project")
+		return
+	}
+
+	members := map[types.Username]openapi.ProjectDSHMember{}
+	for _, roleBinding := range projectDSH.RoleBindings {
+		role := openapi.ProjectDSHRole(roleBinding.Role)
+		member, exists := members[roleBinding.User.Username]
+		if exists {
+			member.Roles = append(members[roleBinding.User.Username].Roles, role)
+		} else {
+			member.Roles = []openapi.ProjectDSHRole{role}
+		}
+		members[roleBinding.User.Username] = member
+	}
+
+	response := openapi.ProjectDSH{
+		Name:            projectDSH.Project.Name,
+		Id:              projectUUID.String(),
+		EnvironmentName: string(environments.DSH),
+		StudyId:         projectDSH.Project.Study.ID.String(),
+		StudyTitle:      projectDSH.Project.Study.Title,
+		Assets:          new([]openapi.Asset{}),
+		Status:          openapi.ProjectDSHStatus(projectDSH.Status),
+	}
+	for username, member := range members {
+		response.Members = append(response.Members, openapi.ProjectDSHMember{
+			Username: string(username),
+			Roles:    member.Roles,
+		})
+	}
+	ctx.JSON(http.StatusOK, response)
 }
 
 func optionalInt(i *uint) *int {

@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -24,6 +25,7 @@ import (
 
 type Service struct {
 	db            *gorm.DB
+	entra         *entra.Controller
 	users         users.Interface
 	environments  *environments.Service
 	notifications notifications.Interface
@@ -32,6 +34,7 @@ type Service struct {
 func New() *Service {
 	return &Service{
 		db:            graceful.NewDB(),
+		entra:         entra.New(),
 		users:         users.New(),
 		environments:  environments.New(),
 		notifications: notifications.New(),
@@ -316,10 +319,11 @@ func (s *Service) genericProjectsQuery() *gorm.DB {
 			projects.updated_at,
 			users.username as creator_username,
 			environments.name as environment_name,
-			COALESCE(pt.status, '') as status
+			COALESCE(pt.status, pd.status, '') as status
 		`).Joins("join users on users.id = projects.creator_user_id").
 		Joins("join environments on environments.id = projects.environment_id").
-		Joins("left join project_tres pt on pt.project_id = projects.id")
+		Joins("left join project_tres pt on pt.project_id = projects.id").
+		Joins("left join project_dshes pd on pd.project_id = projects.id")
 }
 
 // Retrieve all active TRE projects together with role bindings and members.

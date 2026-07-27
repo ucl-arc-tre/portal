@@ -108,9 +108,19 @@ func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID
 	return studyIDs, nil
 }
 
+// Add a project DSH owner role and add the role binding to
+// the parent study role so study owners inherit a project owner role
+func AddProjectDshOwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
+	return addProjectEnvOwnerRole("dsh", studyId, projectId)
+}
+
 // Add a project TRE owner role and add the role binding to
 // the parent study role so study owners inherit a project owner role
 func AddProjectTreOwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
+	return addProjectEnvOwnerRole("tre", studyId, projectId)
+}
+
+func addProjectEnvOwnerRole(env string, studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
 	projectOwnerRole := makeProjectOwnerRole(projectId)
 	roleName := projectOwnerRole.RoleName()
 
@@ -118,12 +128,12 @@ func AddProjectTreOwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error
 		{
 			RoleName: roleName,
 			Action:   "*",
-			Resource: fmt.Sprintf("/projects/tre/%v", projectId),
+			Resource: fmt.Sprintf("/projects/%s/%v", env, projectId),
 		},
 		{
 			RoleName: roleName,
 			Action:   "*",
-			Resource: fmt.Sprintf("/projects/tre/%v/*", projectId),
+			Resource: fmt.Sprintf("/projects/%s/%v/*", env, projectId),
 		},
 	}
 

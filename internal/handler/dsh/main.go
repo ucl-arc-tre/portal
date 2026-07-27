@@ -3,6 +3,7 @@ package dsh
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -10,18 +11,21 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/dsh"
+	"github.com/ucl-arc-tre/portal/internal/service/projects"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
+	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
 type Handler struct {
-	users   *users.Service
-	studies *studies.Service
+	users    *users.Service
+	studies  *studies.Service
+	projects *projects.Service
 }
 
 func New() *Handler {
 	log.Info().Msg("Creating DSH handler")
-	return &Handler{users: users.New(), studies: studies.New()}
+	return &Handler{users: users.New(), studies: studies.New(), projects: projects.New()}
 }
 
 func (h *Handler) GetPing(ctx *gin.Context) {
@@ -67,6 +71,21 @@ func (h *Handler) GetApprovedStudies(ctx *gin.Context) {
 	}
 
 	ctx.Data(http.StatusOK, "text/csv", b.Bytes())
+}
+
+func (h *Handler) PostImportShareMembers(ctx *gin.Context) {
+	content, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Failed to read body")
+		return
+	}
+
+	if err := h.projects.ImportDSHShareMembers(content); err != nil {
+		setError(ctx, err, "failed to import DSH members")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }
 
 func marshalTime(t time.Time) string {

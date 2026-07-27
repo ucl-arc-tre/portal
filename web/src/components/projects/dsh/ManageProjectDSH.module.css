@@ -1,0 +1,14 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+
+  h2 {
+    padding-top: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+  }
+}
