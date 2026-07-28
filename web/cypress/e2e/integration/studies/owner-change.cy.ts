@@ -62,7 +62,7 @@ describe("Study owner change end-to-end", () => {
   it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.contains(studyTitle).click();
     cy.get('[data-cy="study-approve-button"]').click();
   });
@@ -81,7 +81,7 @@ describe("Study owner change end-to-end", () => {
     cy.loginAsIGOps();
 
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.contains(studyTitle).click();
     cy.get('[data-cy="study-owner-change-approve-button"]').click();
   });

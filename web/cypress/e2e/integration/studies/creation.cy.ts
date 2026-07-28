@@ -82,7 +82,7 @@ describe("Study creation end-to-end", () => {
     cy.loginAsIGAdmin();
 
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(studyTitle);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).click();
@@ -100,7 +100,7 @@ describe("Study creation end-to-end", () => {
     cy.loginAsIGOps();
 
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(studyTitle);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).click();
@@ -272,7 +272,7 @@ describe("Study creation end-to-end", () => {
   it("ig ops should be able to search for a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains("article", studyTitle).should("exist");
@@ -281,7 +281,7 @@ describe("Study creation end-to-end", () => {
   it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(`${studyTitle}`);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).click();
