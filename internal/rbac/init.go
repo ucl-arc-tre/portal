@@ -117,6 +117,8 @@ func addDSHOpsStaffPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh", Action: WriteAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/tokens/dsh/*", Action: WriteAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/studies", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/studies/:id", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/projects/dsh/*", Action: ReadAction},
 	)

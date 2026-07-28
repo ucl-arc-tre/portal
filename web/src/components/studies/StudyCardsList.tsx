@@ -5,6 +5,7 @@ import { studySignoffWarningRequired } from "../shared/exports";
 import styles from "./StudyCardsList.module.css";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
+import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
   studies: Study[];
@@ -18,7 +19,16 @@ const studySortOrder = {
 };
 
 export default function StudyCardsList(props: Props) {
+  const { isIGStaff, userData } = useAuth();
   const { studies } = props;
+  const username = userData?.username;
+
+  const canManageStudy = (study: Study): boolean => {
+    return (
+      username !== undefined &&
+      (isIGStaff || study.owner_username === username || study.additional_study_admin_usernames.includes(username))
+    );
+  };
 
   return (
     <div className={styles["study-selection"]}>
@@ -42,7 +52,7 @@ export default function StudyCardsList(props: Props) {
                     )}
                 </div>
               }
-              manageUrl={`/studies/manage?studyId=${study.id}`}
+              manageUrl={`/studies/${canManageStudy(study) ? "manage" : "summary"}?studyId=${study.id}`}
             >
               <div className={styles["study-info"]}>
                 <span className={styles["study-caseref"]}>Case ref: {String(study.caseref).padStart(5, "0")}</span>
