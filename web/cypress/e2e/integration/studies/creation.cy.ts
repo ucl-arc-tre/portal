@@ -78,6 +78,17 @@ describe("Study creation end-to-end", () => {
     });
   });
 
+  it("dsh ops should become an approved researcher and be able to see the study", () => {
+    cy.loginAsDSHOps();
+    cy.becomeApprovedResearcher();
+    cy.visit("/studies");
+    cy.get('[data-testid="ucl-uikit-search"]').type(studyTitle);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
+    cy.contains(studyTitle).click();
+    cy.contains("Owner: ").should("be.visible"); // summary page should have the owner detailed
+    cy.contains(studyTitle).should("be.visible");
+  });
+
   it("ig admin should be able to edit the study", () => {
     cy.loginAsIGAdmin();
 
