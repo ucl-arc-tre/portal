@@ -3,19 +3,21 @@ import { Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import Button from "@/components/ui/Button";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import styles from "./IGOpsStudies.module.css";
+import styles from "./AllStudies.module.css";
 import Loading from "../ui/Loading";
 import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
 import TabCollection from "../shared/TabCollection";
 import { useRouter } from "next/router";
+import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
   refreshToken: number;
 };
 
-export default function IGOpsStudies(props: Props) {
+export default function AllStudies(props: Props) {
+  const { isIGStaff } = useAuth();
   const { refreshToken } = props;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -143,13 +145,15 @@ export default function IGOpsStudies(props: Props) {
 
   return (
     <>
-      <TabCollection
-        tabs={[
-          { name: "pending", label: "Pending Studies" },
-          { name: "all", label: "All Studies" },
-        ]}
-        defaultTab="all"
-      />
+      {isIGStaff && (
+        <TabCollection
+          tabs={[
+            { name: "pending", label: "Pending Studies" },
+            { name: "all", label: "All Studies" },
+          ]}
+          defaultTab="all"
+        />
+      )}
 
       {tab === "pending" ? (
         <p>Studies submitted for review. Approve or request changes for each study.</p>

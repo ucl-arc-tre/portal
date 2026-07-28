@@ -50,6 +50,15 @@ func TestRBAC(t *testing.T) {
 	assert.Len(t, aliceStudyIDsWithOwnerRole, 0)
 }
 
+func TestKeyMatch2(t *testing.T) {
+	assert.True(t, KeyMatch2("/foo/bar", "/foo/*"))
+	assert.False(t, KeyMatch2("/foo/bar", "/foo"))
+	assert.True(t, KeyMatch2("/foo/fa675287-9803-4146-9c36-9521b1ef2d14", "/foo/:id"))
+	assert.False(t, KeyMatch2("/foo/some-not-uuid", "/foo/:id"))
+	assert.False(t, KeyMatch2("/foo/fa675287-9803-4146-9c36-9521b1ef2d14", "/foo/bar"))
+	assert.False(t, KeyMatch2("/foo/fa675287-9803-4146-9c36-9521b1ef2d14/bar", "/foo/:id"))
+}
+
 func makeUser(id string) types.User {
 	return types.User{Model: types.Model{ID: uuid.MustParse(id)}}
 }

@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import IGOpsStudies from "./IGOpsStudies";
+import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
@@ -9,11 +9,12 @@ import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
 export default function Studies() {
-  const { userData, isIGStaff, isApprovedStaffResearcher } = useAuth();
+  const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
+  const canSeeAllStudies = isIGStaff || isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   if (!userData) return null;
 
@@ -21,7 +22,7 @@ export default function Studies() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>
-          {isIGStaff ? "Studies" : "Your Studies"}{" "}
+          {canSeeAllStudies ? "Studies" : "Your Studies"}{" "}
           <Button
             onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
             variant="tertiary"
@@ -56,7 +57,11 @@ export default function Studies() {
 
       {infoCalloutExpanded && <StudyDefinition />}
 
-      {isIGStaff ? <IGOpsStudies refreshToken={refreshToken} /> : <ResearcherStudies refreshToken={refreshToken} />}
+      {canSeeAllStudies ? (
+        <AllStudies refreshToken={refreshToken} />
+      ) : (
+        <ResearcherStudies refreshToken={refreshToken} />
+      )}
     </div>
   );
 }

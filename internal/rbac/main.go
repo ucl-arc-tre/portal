@@ -2,7 +2,9 @@ package rbac
 
 import (
 	"fmt"
+	"regexp"
 	"slices"
+	"strings"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/model"
@@ -47,7 +49,7 @@ func NewEnforcer(db *gorm.DB) *casbin.SyncedEnforcer {
 	adapter := must(gormadapter.NewAdapterByDB(db))
 	enforcer = must(casbin.NewSyncedEnforcer(makeCasbinModel(), adapter))
 	enforcer.EnableAutoSave(true) //  Auto persist a policy rule when it's added or removed
-	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
+	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", KeyMatch2)
 	return enforcer
 }
 
@@ -231,6 +233,18 @@ func must[T any](value T, err error) T {
 		panic(err)
 	}
 	return value
+}
+
+var (
+	keyMatch2Re = regexp.MustCompile(`:id`)
+)
+
+// KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
+// For example, "/foo/bar" matches "/foo/*", "/fa675287-9803-4146-9c36-9521b1ef2d14" matches "/:id".
+func KeyMatch2(key1 string, key2 string) bool {
+	key2 = strings.ReplaceAll(key2, "/*", "/.*")
+	key2 = keyMatch2Re.ReplaceAllString(key2, "$1[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$2")
+	return util.RegexMatch(key1, "^"+key2+"$")
 }
 
 // See: https://casbin.org/docs/syntax-for-models and https://casbin.org/editor/
