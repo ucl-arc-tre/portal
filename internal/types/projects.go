@@ -174,3 +174,38 @@ func (p ProjectAsset) UniqueKey() string {
 func (p ProjectAsset) IsDeleted() bool {
 	return p.ModelAuditable.IsDeleted()
 }
+
+type ProjectDSH struct {
+	ModelAuditable
+	ProjectID uuid.UUID        `gorm:"not null;index"`
+	Status    ProjectDSHStatus `gorm:"not null"`
+
+	// Relationships
+	Project      Project                 `gorm:"foreignKey:ProjectID"`
+	RoleBindings []ProjectDSHRoleBinding `gorm:"foreignKey:ProjectDSHID"`
+}
+
+type ProjectDSHRoleBinding struct {
+	ModelAuditable
+	ProjectDSHID uuid.UUID          `gorm:"not null;index"`
+	UserID       uuid.UUID          `gorm:"not null;index"`
+	Role         ProjectDSHRoleName `gorm:"not null;index"`
+
+	// Relationships
+	ProjectDSH ProjectDSH `gorm:"foreignKey:ProjectDSHID"`
+	User       User       `gorm:"foreignKey:UserID"`
+}
+
+type ProjectDSHRoleName string
+
+const (
+	ProjectDSHRoleNameRead     = "read"
+	ProjectDSHRoleNameWrite    = "write"
+	ProjectDSHRoleNameOutbound = "outbound"
+)
+
+type ProjectDSHStatus string
+
+const (
+	ProjectDSHStatusActive = "active"
+)

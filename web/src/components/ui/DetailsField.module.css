@@ -1,0 +1,38 @@
+.field {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+
+  label {
+    font-weight: 600;
+    color: #555;
+  }
+
+  span {
+    color: #333;
+  }
+
+  small {
+    font-size: 0.8rem !important;
+    font-weight: 400;
+    display: block;
+
+    button {
+      padding: 0;
+      margin: 0;
+      height: unset;
+      font-size: unset;
+    }
+  }
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.field-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

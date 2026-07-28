@@ -32,6 +32,7 @@ export default function ProjectFormStep1(props: Props) {
 
   const selectedEnvironmentId = watch("environmentId");
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
+  const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";
 
   const selectedAssetIds = watch("assetIds");
   const {
@@ -138,125 +139,127 @@ export default function ProjectFormStep1(props: Props) {
           })()}
       </div>
 
-      <div className="field">
-        <label htmlFor="name">Project Name *</label>
-        <Controller
-          name="name"
-          control={control}
-          rules={{
-            required: "Project name is required",
-            validate: {
-              format: (value) => {
-                if (!selectedEnvironment) return true; // Skip validation if no environment selected
+      {!isDSHProject && (
+        <div className="field">
+          <label htmlFor="name">Project Name *</label>
+          <Controller
+            name="name"
+            control={control}
+            rules={{
+              required: "Project name is required",
+              validate: {
+                format: (value) => {
+                  if (!selectedEnvironment) return true; // Skip validation if no environment selected
 
-                const validation = getProjectNameValidation(selectedEnvironment.name);
+                  const validation = getProjectNameValidation(selectedEnvironment.name);
 
-                if (value.length < validation.minLength) {
-                  return `Project name must be at least ${validation.minLength} characters`;
-                }
-                if (value.length > validation.maxLength) {
-                  return `Project name must be less than ${validation.maxLength} characters`;
-                }
-                if (!validation.pattern.test(value)) {
-                  return validation.patternMessage;
-                }
-                return true;
+                  if (value.length < validation.minLength) {
+                    return `Project name must be at least ${validation.minLength} characters`;
+                  }
+                  if (value.length > validation.maxLength) {
+                    return `Project name must be less than ${validation.maxLength} characters`;
+                  }
+                  if (!validation.pattern.test(value)) {
+                    return validation.patternMessage;
+                  }
+                  return true;
+                },
               },
-            },
-          }}
-          render={({ field }) => (
-            <input
-              {...field}
-              id="name"
-              type="text"
-              placeholder="e.g., myproject"
-              disabled={
-                fieldsDisabled || editing || !selectedEnvironment || selectedEnvironment.name === "Data Safe Haven"
-              }
-            />
-          )}
-        />
-
-        {errors.name && <Error message={`${errors.name.message}`} />}
-        <HelperText>
-          {(() => {
-            if (!selectedEnvironment) return "Select an environment to see naming requirements";
-            return getProjectNameValidation(selectedEnvironment.name).helperText;
-          })()}
-        </HelperText>
-      </div>
-
-      <div className="field">
-        <span className={styles["section-label"]}>Add assets (optional):</span>
-        <fieldset className="linkage-fieldset">
-          {assetFields.map((field, index) => (
-            <div key={field.id} className="item-wrapper">
-              <label htmlFor={`asset-${index}`} className="item-label">
-                Asset {index + 1}:
-              </label>
-              <Controller
-                name={`assetIds.${index}.value` as const}
-                control={control}
-                render={({ field }) => (
-                  <select
-                    {...field}
-                    id={`asset-${index}`}
-                    disabled={fieldsDisabled || !selectedStudyId || !selectedEnvironmentId || isLoadingAssets}
-                  >
-                    <option value="">
-                      {!selectedStudyId
-                        ? "Select a study first..."
-                        : !selectedEnvironmentId
-                          ? "Select an environment first..."
-                          : isLoadingAssets
-                            ? "Loading assets..."
-                            : assets.length === 0
-                              ? "No assets available for this study"
-                              : "Select an asset (optional)..."}
-                    </option>
-                    {assets &&
-                      assets.map((asset) => {
-                        const isCompatible =
-                          !selectedEnvironmentId || !selectedEnvironment || asset.tier <= selectedEnvironment.tier;
-                        const isAlreadySelected = selectedAssetIds.some(
-                          (selected, selectedIndex) => selected.value === asset.id && selectedIndex !== index
-                        );
-                        const label = isCompatible
-                          ? `${asset.title} (Tier ${asset.tier})`
-                          : `${asset.title} (Tier ${asset.tier}) - Incompatible with selected environment (max tier ${selectedEnvironment?.tier})`;
-
-                        return (
-                          <option key={asset.id} value={asset.id} disabled={!isCompatible || isAlreadySelected}>
-                            {label}
-                            {isAlreadySelected ? " - Already selected" : ""}
-                          </option>
-                        );
-                      })}
-                  </select>
-                )}
+            }}
+            render={({ field }) => (
+              <input
+                {...field}
+                id="name"
+                type="text"
+                placeholder="e.g., myproject"
+                disabled={fieldsDisabled || editing || !selectedEnvironment || isDSHProject}
               />
-              <Button
-                onClick={() => removeAsset(index)}
-                className="remove-button"
-                aria-label={`Remove contract ${index + 1}`}
-                type="button"
-              >
-                ×
-              </Button>
-            </div>
-          ))}
-          <Button
-            onClick={() => appendAsset({ value: "" })}
-            type="button"
-            variant="secondary"
-            size="small"
-            aria-label="Add Asset"
-          >
-            Add Asset
-          </Button>
-        </fieldset>
-        <HelperText>Optionally link this project to one or more existing assets from the selected study</HelperText>
-      </div>
+            )}
+          />
+
+          {errors.name && <Error message={`${errors.name.message}`} />}
+          <HelperText>
+            {(() => {
+              if (!selectedEnvironment) return "Select an environment to see naming requirements";
+              return getProjectNameValidation(selectedEnvironment.name).helperText;
+            })()}
+          </HelperText>
+        </div>
+      )}
+
+      {!isDSHProject && (
+        <div className="field">
+          <label>Add assets (optional):</label>
+          <fieldset className="linkage-fieldset">
+            {assetFields.map((field, index) => (
+              <div key={field.id} className="item-wrapper">
+                <label htmlFor={`asset-${index}`} className="item-label">
+                  Asset {index + 1}:
+                </label>
+                <Controller
+                  name={`assetIds.${index}.value` as const}
+                  control={control}
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      id={`asset-${index}`}
+                      disabled={fieldsDisabled || !selectedStudyId || !selectedEnvironmentId || isLoadingAssets}
+                    >
+                      <option value="">
+                        {!selectedStudyId
+                          ? "Select a study first..."
+                          : !selectedEnvironmentId
+                            ? "Select an environment first..."
+                            : isLoadingAssets
+                              ? "Loading assets..."
+                              : assets.length === 0
+                                ? "No assets available for this study"
+                                : "Select an asset (optional)..."}
+                      </option>
+                      {assets &&
+                        assets.map((asset) => {
+                          const isCompatible =
+                            !selectedEnvironmentId || !selectedEnvironment || asset.tier <= selectedEnvironment.tier;
+                          const isAlreadySelected = selectedAssetIds.some(
+                            (selected, selectedIndex) => selected.value === asset.id && selectedIndex !== index
+                          );
+                          const label = isCompatible
+                            ? `${asset.title} (Tier ${asset.tier})`
+                            : `${asset.title} (Tier ${asset.tier}) - Incompatible with selected environment (max tier ${selectedEnvironment?.tier})`;
+
+                          return (
+                            <option key={asset.id} value={asset.id} disabled={!isCompatible || isAlreadySelected}>
+                              {label}
+                              {isAlreadySelected ? " - Already selected" : ""}
+                            </option>
+                          );
+                        })}
+                    </select>
+                  )}
+                />
+                <Button
+                  onClick={() => removeAsset(index)}
+                  className="remove-button"
+                  aria-label={`Remove contract ${index + 1}`}
+                  type="button"
+                >
+                  ×
+                </Button>
+              </div>
+            ))}
+            <Button
+              onClick={() => appendAsset({ value: "" })}
+              type="button"
+              variant="secondary"
+              size="small"
+              aria-label="Add Asset"
+            >
+              Add Asset
+            </Button>
+          </fieldset>
+          <HelperText>Optionally link this project to one or more existing assets from the selected study</HelperText>
+        </div>
+      )}
     </>
   );
 }

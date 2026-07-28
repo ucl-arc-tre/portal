@@ -576,6 +576,42 @@ func (e NotificationKind) Valid() bool {
 	}
 }
 
+// Defines values for ProjectDSHRole.
+const (
+	Outbound ProjectDSHRole = "outbound"
+	Read     ProjectDSHRole = "read"
+	Write    ProjectDSHRole = "write"
+)
+
+// Valid indicates whether the value is a known member of the ProjectDSHRole enum.
+func (e ProjectDSHRole) Valid() bool {
+	switch e {
+	case Outbound:
+		return true
+	case Read:
+		return true
+	case Write:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ProjectDSHStatus.
+const (
+	ProjectDSHStatusActive ProjectDSHStatus = "active"
+)
+
+// Valid indicates whether the value is a known member of the ProjectDSHStatus enum.
+func (e ProjectDSHStatus) Valid() bool {
+	switch e {
+	case ProjectDSHStatusActive:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ProjectTRERoleName.
 const (
 	APIUser         ProjectTRERoleName = "API_user"
@@ -1224,6 +1260,33 @@ type Project struct {
 	// UpdatedAt Time in RFC3339 format when the project was last updated
 	UpdatedAt string `json:"updated_at"`
 }
+
+// ProjectDSH defines model for ProjectDSH.
+type ProjectDSH struct {
+	// Assets List of assets associated with this project
+	Assets          *[]Asset `json:"assets,omitempty"`
+	EnvironmentName string   `json:"environment_name"`
+	Id              string   `json:"id"`
+
+	// Members List of project members with their roles (can be empty)
+	Members    []ProjectDSHMember `json:"members"`
+	Name       string             `json:"name"`
+	Status     ProjectDSHStatus   `json:"status"`
+	StudyId    string             `json:"study_id"`
+	StudyTitle string             `json:"study_title"`
+}
+
+// ProjectDSHMember defines model for ProjectDSHMember.
+type ProjectDSHMember struct {
+	Roles    []ProjectDSHRole `json:"roles"`
+	Username string           `json:"username"`
+}
+
+// ProjectDSHRole defines model for ProjectDSHRole.
+type ProjectDSHRole string
+
+// ProjectDSHStatus defines model for ProjectDSHStatus.
+type ProjectDSHStatus string
 
 // ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
@@ -1909,6 +1972,9 @@ type ServerInterface interface {
 	// (GET /projects)
 	GetProjects(c *gin.Context)
 
+	// (GET /projects/dsh/{projectId})
+	GetProjectsDshProjectId(c *gin.Context, projectId ProjectIdParam)
+
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
 
@@ -2280,6 +2346,31 @@ func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
 	}
 
 	siw.Handler.GetProjects(c)
+}
+
+// GetProjectsDshProjectId operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsDshProjectId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsDshProjectId(c, projectId)
 }
 
 // GetProjectsTre operation middleware
@@ -3630,6 +3721,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
+	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.DELETE(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.DeleteStudiesStudyIdAssetsAssetId)

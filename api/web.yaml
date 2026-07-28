@@ -949,6 +949,26 @@ paths:
         default:
           description: Unexpected error
 
+  /projects/dsh/{projectId}:
+    get:
+      description: Get one DSH project with base project details joined in
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectDSH"
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -2316,6 +2336,65 @@ components:
         tier:
           type: integer
           description: Maximum data tier this environment can handle (assets with tier <= this value can be used)
+
+    ProjectDSH:
+      type: object
+      required:
+        - id
+        - study_id
+        - study_title
+        - status
+        - environment_name
+        - name
+        - members
+      properties:
+        id:
+          type: string
+        study_id:
+          type: string
+        study_title:
+          type: string
+        status:
+          $ref: "#/components/schemas/ProjectDSHStatus"
+        assets:
+          type: array
+          description: List of assets associated with this project
+          items:
+            $ref: "#/components/schemas/Asset"
+        environment_name:
+          type: string
+        name:
+          type: string
+        members:
+          type: array
+          description: List of project members with their roles (can be empty)
+          items:
+            $ref: "#/components/schemas/ProjectDSHMember"
+
+    ProjectDSHMember:
+      type: object
+      required:
+        - username
+        - roles
+      properties:
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectDSHRole"
+
+    ProjectDSHRole:
+      type: string
+      enum:
+        - read
+        - write
+        - outbound
+
+    ProjectDSHStatus:
+      type: string
+      enum:
+        - active
 
     EnvironmentName:
       type: string

@@ -75,6 +75,41 @@ paths:
         default:
           description: Unexpected error
 
+  /import/share-members:
+    post:
+      summary: Import
+      security:
+        - JWT: ["dsh:w"]
+      description: |
+        Upload a CSV file with fields, overwriting the current data
+        "ShareName": Name of the 'share' == project
+        "Owner": DSH username of the share owner
+        "CaseRef": Caseref study identifier
+        "Member": DSH username of the user associated to the project
+        "MemEmailAddress": Email address of the user, linkable to the IdP for internal and external users
+        "MemAccountEnabled":
+        "MemAccountCreated": Date in DD/MM/YYYY format
+        "MemAllDisabled":
+        "MemOutboundRights":
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "204":
+          description: OK
+        "403":
+          description: Forbidden
+        "406":
+          description: Study/user not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
 components:
   securitySchemes:
     JWT:

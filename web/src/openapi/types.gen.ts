@@ -607,6 +607,32 @@ export type Environment = {
     tier: number;
 };
 
+export type ProjectDsh = {
+    id: string;
+    study_id: string;
+    study_title: string;
+    status: ProjectDshStatus;
+    /**
+     * List of assets associated with this project
+     */
+    assets?: Array<Asset>;
+    environment_name: string;
+    name: string;
+    /**
+     * List of project members with their roles (can be empty)
+     */
+    members: Array<ProjectDshMember>;
+};
+
+export type ProjectDshMember = {
+    username: string;
+    roles: Array<ProjectDshRole>;
+};
+
+export type ProjectDshRole = 'read' | 'write' | 'outbound';
+
+export type ProjectDshStatus = 'active';
+
 export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven';
 
 /**
@@ -2322,6 +2348,43 @@ export type PostProjectsTreAdminImportResponses = {
 };
 
 export type PostProjectsTreAdminImportResponse = PostProjectsTreAdminImportResponses[keyof PostProjectsTreAdminImportResponses];
+
+export type GetProjectsDshByProjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Project UUID
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/dsh/{projectId}';
+};
+
+export type GetProjectsDshByProjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsDshByProjectIdResponses = {
+    200: ProjectDsh;
+};
+
+export type GetProjectsDshByProjectIdResponse = GetProjectsDshByProjectIdResponses[keyof GetProjectsDshByProjectIdResponses];
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;

@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -24,6 +25,7 @@ import (
 
 type Service struct {
 	db            *gorm.DB
+	entra         *entra.Controller
 	users         users.Interface
 	environments  *environments.Service
 	notifications notifications.Interface
@@ -32,6 +34,7 @@ type Service struct {
 func New() *Service {
 	return &Service{
 		db:            graceful.NewDB(),
+		entra:         entra.New(),
 		users:         users.New(),
 		environments:  environments.New(),
 		notifications: notifications.New(),
@@ -297,11 +300,14 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 }
 
 // retrieves all projects (for admins and TRE ops staff)
-func (s *Service) AllProjects() ([]GenericProject, error) {
+func (s *Service) AllProjects(environments ...types.EnvironmentName) ([]GenericProject, error) {
 	var projects []GenericProject
-	err := s.genericProjectsQuery().
-		Where("projects.deleted_at IS NULL").
-		Scan(&projects).Error
+	query := s.genericProjectsQuery().
+		Where("projects.deleted_at IS NULL")
+	if len(environments) > 0 {
+		query = query.Where("environments.name IN ?", environments)
+	}
+	err := query.Scan(&projects).Error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
 }
 
@@ -316,10 +322,11 @@ func (s *Service) genericProjectsQuery() *gorm.DB {
 			projects.updated_at,
 			users.username as creator_username,
 			environments.name as environment_name,
-			COALESCE(pt.status, '') as status
+			COALESCE(pt.status, pd.status, '') as status
 		`).Joins("join users on users.id = projects.creator_user_id").
 		Joins("join environments on environments.id = projects.environment_id").
-		Joins("left join project_tres pt on pt.project_id = projects.id")
+		Joins("left join project_tres pt on pt.project_id = projects.id").
+		Joins("left join project_dshes pd on pd.project_id = projects.id")
 }
 
 // Retrieve all active TRE projects together with role bindings and members.

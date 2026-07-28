@@ -1,0 +1,171 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+
+  h2 {
+    padding-top: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+  }
+}
+
+.not-approved-section {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: var(--default-border-radius);
+  border: 1px solid #e1e5e9;
+}
+
+.not-approved-section h2 {
+  color: #333;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-completion-action {
+  margin-top: 1.5rem;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--default-border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.field-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: var(--default-border-radius);
+}
+
+.field-item:last-child {
+  margin-bottom: 0;
+}
+
+.asset-info strong {
+  display: block;
+  color: #333;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.asset-info p {
+  color: #666;
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.asset-tier {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: var(--form-purple--light);
+  color: white !important;
+  border-radius: var(--default-border-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.empty-message {
+  color: #666;
+  border: 1px solid #e1e5e9;
+  font-style: italic;
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: var(--default-border-radius);
+}
+
+.approval-section {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  background: #e9ecef;
+  border: 1px solid #e1e5e9;
+  border-radius: var(--default-border-radius);
+}
+
+.approval-section h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.approval-info {
+  color: #2b2b2b;
+  font-size: 0.95rem;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.5;
+}
+
+.approval-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.delete-dialog {
+  padding: 1rem 0.5rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.delete-dialog h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.delete-dialog p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #1a1a1a;
+}
+
+.delete-dialog ul {
+  margin: 1rem 0 1.5rem 1.5rem;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.delete-dialog li {
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.delete-dialog strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.delete-dialog button {
+  margin: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .field {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .section {
+    padding: 1.5rem;
+  }
+}

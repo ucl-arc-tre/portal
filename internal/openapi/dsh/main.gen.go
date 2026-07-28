@@ -27,6 +27,9 @@ type ServerInterface interface {
 	// GetApprovedStudies Get all approved studies
 	// (GET /approved-studies)
 	GetApprovedStudies(c *gin.Context)
+	// PostImportShareMembers Import
+	// (POST /import/share-members)
+	PostImportShareMembers(c *gin.Context)
 	// GetPing Ping to check connectivity and auth
 	// (GET /ping)
 	GetPing(c *gin.Context)
@@ -69,6 +72,21 @@ func (siw *ServerInterfaceWrapper) GetApprovedStudies(c *gin.Context) {
 	}
 
 	siw.Handler.GetApprovedStudies(c)
+}
+
+// PostImportShareMembers operation middleware
+func (siw *ServerInterfaceWrapper) PostImportShareMembers(c *gin.Context) {
+
+	c.Set(string(JWTScopes), []string{"dsh:w"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostImportShareMembers(c)
 }
 
 // GetPing operation middleware
@@ -116,4 +134,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/ping", wrapper.GetPing)
 	router.GET(options.BaseURL+"/approved-studies", wrapper.GetApprovedStudies)
 	router.GET(options.BaseURL+"/approved-researchers", wrapper.GetApprovedResearchers)
+	router.POST(options.BaseURL+"/import/share-members", wrapper.PostImportShareMembers)
 }

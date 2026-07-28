@@ -40,6 +40,10 @@ func (s *Service) TRE() (types.Environment, error) {
 	return s.environment(TRE)
 }
 
+func (s *Service) DSH() (types.Environment, error) {
+	return s.environment(DSH)
+}
+
 func (s *Service) EnvironmentId(name types.EnvironmentName) (uuid.UUID, error) {
 	environment, err := s.environment(name)
 	if err != nil {
