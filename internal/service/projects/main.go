@@ -25,8 +25,8 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	uclEmailDomain        = "ucl.ac.uk"
+var (
+	uclEmailDomain        = config.EntraTenantPrimaryDomain()
 	maxUnixUsernameLength = 10
 )
 
