@@ -3,25 +3,21 @@ import Button from "../ui/Button";
 import { AlertCircleIcon } from "../shared/uikitExports";
 import styles from "./TabCollection.module.css";
 
-type StudyTabNames = "study" | "assets" | "contracts";
-type ProjectTabNames = "project" | "members" | "assets";
-type TabName = StudyTabNames | ProjectTabNames | "pending" | "all";
-
 type TabDefinition = {
-  name: TabName;
+  name: string;
   label?: string;
   needsAttention?: boolean;
 };
 
 type TabCollectionProps = {
   tabs: TabDefinition[];
-  defaultTab?: TabName;
+  defaultTab: string;
 };
 
 export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) {
   const router = useRouter();
-  const tab: TabName = (router.query.tab as TabName | undefined) ?? defaultTab ?? tabs[0]?.name;
-  const setTab = (newTab: TabName) =>
+  const tab = router.query.tab ?? defaultTab;
+  const setTab = (newTab: string) =>
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
 
   return (
