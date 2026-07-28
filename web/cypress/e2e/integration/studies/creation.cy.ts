@@ -145,7 +145,7 @@ describe("Study creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.contains(studyTitle).click();
-    cy.get('[data-cy="study-assets"]').click();
+    cy.get('button[data-cy="assets"]').click();
 
     cy.contains(assetTitle).click();
 
@@ -162,7 +162,7 @@ describe("Study creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.contains(studyTitle).click();
-    cy.get('[data-cy="study-assets"]').click();
+    cy.get('button[data-cy="assets"]').click();
 
     cy.get('[data-cy="add-asset-button"]').click({ force: true });
     cy.get("input#title").type(deleteAssetTitle);
@@ -185,7 +185,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="confirm-delete"]').click();
 
     cy.url().should("include", "/studies/manage");
-    cy.get('[data-cy="study-assets"]').click();
+    cy.get('button[data-cy="assets"]').click();
     cy.contains(deleteAssetTitle).should("not.exist");
   });
 
@@ -194,7 +194,7 @@ describe("Study creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.contains(studyTitle).click();
-    cy.get('[data-cy="study-contracts"]').click();
+    cy.get('button[data-cy="contracts"]').click();
 
     cy.get('[data-cy="add-contract"]').click();
     cy.get('[name="title"]').type(contractTitle);
@@ -238,7 +238,7 @@ describe("Study creation end-to-end", () => {
 
     cy.visit("/studies");
     cy.contains(studyTitle).click();
-    cy.get('[data-cy="study-contracts"]').click();
+    cy.get('button[data-cy="contracts"]').click();
 
     cy.get('[data-cy="add-contract"]').click();
     cy.get('[name="title"]').type(deleteContractTitle);
@@ -265,7 +265,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="confirm-delete"]').click();
 
     cy.url().should("include", "/studies/manage");
-    cy.get('[data-cy="study-contracts"]').click();
+    cy.get('button[data-cy="contracts"]').click();
     cy.contains(deleteContractTitle).should("not.exist");
   });
 
