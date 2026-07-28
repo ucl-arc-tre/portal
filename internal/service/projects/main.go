@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -466,6 +467,8 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 		return err
 	}
 
+	unixNames := treProjectUserConfigUnixUsernames(existing)
+
 	requested := []types.ProjectTREUserConfig{}
 	for _, member := range members {
 		if member.DesktopConfig == nil {
@@ -486,12 +489,25 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]
 			userConfig.UID = existingConfig.UID
+			userConfig.UnixUsername = existingConfig.UnixUsername
 			userConfig.DesktopImageID = existingConfig.DesktopImageID
 		} else {
 			userConfig.UID, err = projectTRENextUid(append(existing, requested...))
 			if err != nil {
 				return err
 			}
+
+			unixUsername := makeValidUnixUsername(member.Username)
+			if unixUsername == "" {
+				return types.NewErrInvalidObject("unable to derive Unix username from email")
+			}
+			if slices.Contains(unixNames, unixUsername) {
+				log.Warn().Any("unixUsername", unixUsername).Msg("Duplicate Unix username, appending UID")
+				unixUsername = unixUsername + "_" + strconv.Itoa(userConfig.UID)
+			}
+			userConfig.UnixUsername = unixUsername
+			unixNames = append(unixNames, unixUsername)
+
 			image, err := latestTREDesktopImage(tx, projectTRE.Platform)
 			if errors.Is(err, types.ErrNotFound) {
 				log.Warn().Any("projectId", projectTRE.ID).Msg("Latest TRE project Desktop image not found")
@@ -858,6 +874,14 @@ func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Usern
 		usernames = append(usernames, types.Username(member.Username))
 	}
 	return usernames
+}
+
+func treProjectUserConfigUnixUsernames(configs []types.ProjectTREUserConfig) []string {
+	unixUsernames := []string{}
+	for _, config := range configs {
+		unixUsernames = append(unixUsernames, config.UnixUsername)
+	}
+	return unixUsernames
 }
 
 func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
