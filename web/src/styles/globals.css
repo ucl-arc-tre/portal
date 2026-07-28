@@ -96,41 +96,6 @@ dialog {
   margin-inline: auto;
 }
 
-.tab-collection {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  position: relative;
-  margin-block: 1.8rem;
-
-  .tab {
-    border: none;
-    border-bottom: 2px solid var(--grey-border--light);
-    background-color: var(--background) !important;
-    transition: all 0.3s ease;
-    height: 2.5rem;
-
-    &:hover {
-      color: var(--form-purple--light);
-      border-bottom-color: var(--form-purple--light);
-      background-color: var(--background) !important;
-    }
-
-    &:focus-visible {
-      box-shadow: none;
-    }
-
-    &.active {
-      color: var(--ucl-accent);
-      border: 1px solid var(--grey-border--light);
-      border-top-left-radius: 5px;
-      border-top-right-radius: 5px;
-      border-block: 2px solid color-mix(in srgb, var(--grey-border--light) 20%, var(--ucl-accent) 80%);
-      border-bottom: none;
-    }
-  }
-}
-
 .delete-button-confirm {
   background-color: var(--red-100) !important;
   border-color: var(--red-100) !important;

@@ -53,7 +53,7 @@ describe("TRE project creation end-to-end", () => {
     cy.becomeApprovedResearcher();
 
     cy.visit("/studies");
-    cy.get('[data-cy="all-studies-tab-button"]').click();
+    cy.get('button[data-cy="all"]').click();
     cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(studyTitle).click();
