@@ -25,8 +25,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	uclEmailDomain        = config.EntraTenantPrimaryDomain()
+const (
 	maxUnixUsernameLength = 10
 )
 
@@ -903,18 +902,15 @@ func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
 }
 
 // Generates a valid Unix username of max 10 chars from a valid email address.
-// If the email is an internal UCL email having the ac.ucl.uk domain, then the
-// local part (i.e. the part before the '@') is returned. Otherwise, the
-// local part is used for generating the Unix username.
+// Both UCL and non-UCL email addresses are handled identically. The local
+// part of an email (i.e. the part before the '@') is used for generating a
+// valid Unix username by stripping or replacing invalid characters.
 //
 // Valid Unix username regex: ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$
 func makeValidUnixUsername(email string) (string, error) {
 	local, domain, _ := strings.Cut(email, "@")
 	if local == "" || domain == "" {
 		return "", errors.New("invalid email")
-	}
-	if domain == uclEmailDomain {
-		return local, nil
 	}
 
 	local = strings.ToLower(local)
