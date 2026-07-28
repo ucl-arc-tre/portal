@@ -497,8 +497,8 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 				return err
 			}
 
-			unixUsername := makeValidUnixUsername(member.Username)
-			if unixUsername == "" {
+			unixUsername, err := makeValidUnixUsername(member.Username)
+			if err != nil {
 				return types.NewErrInvalidObject("unable to derive Unix username from email")
 			}
 			if slices.Contains(unixNames, unixUsername) {
@@ -908,13 +908,13 @@ func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
 // local part is used for generating the Unix username.
 //
 // Valid Unix username regex: ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$
-func makeValidUnixUsername(email string) string {
+func makeValidUnixUsername(email string) (string, error) {
 	local, domain, _ := strings.Cut(email, "@")
 	if local == "" || domain == "" {
-		return ""
+		return "", errors.New("invalid email")
 	}
 	if domain == uclEmailDomain {
-		return local
+		return local, nil
 	}
 
 	local = strings.ToLower(local)
@@ -943,8 +943,11 @@ func makeValidUnixUsername(email string) string {
 		}
 	}
 
+	if b.Len() == 0 {
+		return "", errors.New("no valid characters")
+	}
 	unixUsername := b.String()
-	return unixUsername[:min(maxUnixUsernameLength, len(unixUsername))]
+	return unixUsername[:min(maxUnixUsernameLength, len(unixUsername))], nil
 }
 
 func optionalUint(i *int) *uint {
