@@ -15,7 +15,7 @@ type StudyOverviewProps = {
 };
 
 function getRiskClassification(score: number | undefined) {
-  if (!score) return undefined;
+  if (score === undefined) return undefined;
   if (score < 10) {
     return "low";
   } else if (score >= 10 && score < 30) {
