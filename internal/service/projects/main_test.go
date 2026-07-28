@@ -131,3 +131,83 @@ func TestValidateProjectTREBaseAcceptsValidWhitelist(t *testing.T) {
 		})
 	}
 }
+
+func TestMakeValidUnixUsername(t *testing.T) {
+	tests := []struct {
+		name  string
+		email string
+		want  string
+	}{
+		{
+			name:  "UCL email returns local part as-is",
+			email: "abcdef@ac.ucl.uk",
+			want:  "abcdef",
+		},
+		{
+			name:  "lowercase local part",
+			email: "foo123@example.com",
+			want:  "foo123",
+		},
+		{
+			name:  "uppercase is lowercased",
+			email: "Foo123@example.com",
+			want:  "foo123",
+		},
+		{
+			name:  "dot and plus characters map to underscore",
+			email: "john.doe+test@example.com",
+			want:  "john_doe_t",
+		},
+		{
+			name:  "leading digit replaced by underscore",
+			email: "123foo@example.com",
+			want:  "_23foo",
+		},
+		{
+			name:  "leading hyphen replaced by underscore",
+			email: "-abc@example.com",
+			want:  "_abc",
+		},
+		{
+			name:  "leading dot/plus character is dropped",
+			email: ".foo123@example.com",
+			want:  "foo123",
+		},
+		{
+			name:  "leading underscore allowed",
+			email: "_foo123@example.com",
+			want:  "_foo123",
+		},
+		{
+			name:  "username truncated to 10 characters",
+			email: "foo123456789@example.com",
+			want:  "foo1234567",
+		},
+		{
+			name:  "disallowed characters are dropped",
+			email: "a!b#c1%2@example.com",
+			want:  "abc12",
+		},
+		{
+			name:  "empty local part returns empty string",
+			email: "@example.com",
+			want:  "",
+		},
+		{
+			name:  "empty domain returns empty string",
+			email: "john.doe@",
+			want:  "",
+		},
+		{
+			name:  "no @ character returns empty string",
+			email: "notanemail",
+			want:  "",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, makeValidUnixUsername(tc.email))
+		})
+	}
+}

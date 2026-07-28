@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,6 +22,11 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
+)
+
+const (
+	uclEmailDomain        = "ucl.ac.uk"
+	maxUnixUsernameLength = 10
 )
 
 type Service struct {
@@ -870,6 +876,51 @@ func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
 		uid++
 	}
 	return uid, nil
+}
+
+// Generates a valid Unix username of max 10 chars from a valid email address.
+// If the email is an internal UCL email having the ac.ucl.uk domain, then the
+// local part (i.e. the part before the '@') is returned. Otherwise, the
+// local part is used for generating the Unix username.
+//
+// Valid Unix username regex: ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$
+func makeValidUnixUsername(email string) string {
+	local, domain, _ := strings.Cut(email, "@")
+	if local == "" || domain == "" {
+		return ""
+	}
+	if domain == uclEmailDomain {
+		return local
+	}
+
+	local = strings.ToLower(local)
+	var b strings.Builder
+	for _, r := range local {
+		if b.Len() >= maxUnixUsernameLength {
+			break
+		}
+		switch {
+		case r >= 'a' && r <= 'z':
+			b.WriteRune(r)
+		case (r >= '0' && r <= '9') || r == '_' || r == '-':
+			// Digits and '-' are not allowed as the first character,
+			// but '_' is allowed anywhere
+			if b.Len() == 0 && r != '_' {
+				b.WriteByte('_')
+			} else {
+				b.WriteRune(r)
+			}
+		case r == '.' || r == '+':
+			// Common email separators map to '_' but not as first char
+			// to keep names starting with a letter where possible
+			if b.Len() > 0 {
+				b.WriteRune('_')
+			}
+		}
+	}
+
+	unixUsername := b.String()
+	return unixUsername[:min(maxUnixUsernameLength, len(unixUsername))]
 }
 
 func optionalUint(i *int) *uint {
