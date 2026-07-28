@@ -3,9 +3,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { Study, getStudiesByStudyId } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-
 import MetaHead from "@/components/meta/Head";
-import ManageStudy from "@/components/studies/manage/ManageStudy";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";

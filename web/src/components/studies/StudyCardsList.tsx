@@ -19,14 +19,17 @@ const studySortOrder = {
 };
 
 export default function StudyCardsList(props: Props) {
-  const { isIGStaff, userData } = useAuth();
+  const { isAdmin, isIGStaff, userData } = useAuth();
   const { studies } = props;
   const username = userData?.username;
 
   const canManageStudy = (study: Study): boolean => {
     return (
       username !== undefined &&
-      (isIGStaff || study.owner_username === username || study.additional_study_admin_usernames.includes(username))
+      (isAdmin ||
+        isIGStaff ||
+        study.owner_username === username ||
+        study.additional_study_admin_usernames.includes(username))
     );
   };
 
