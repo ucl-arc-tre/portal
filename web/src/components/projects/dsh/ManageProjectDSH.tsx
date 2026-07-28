@@ -7,10 +7,10 @@ import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
 import Box from "@/components/ui/Box";
 import Error from "@/components/ui/Error";
-import ProjectTabs from "@/components/projects/ProjectTabs";
 import DetailsField from "@/components/ui/DetailsField";
 import { ProjectDsh } from "@/openapi";
 import ProjectMember from "../ProjectMember";
+import TabCollection from "@/components/shared/TabCollection";
 
 type Props = {
   project: ProjectDsh;
@@ -44,7 +44,10 @@ export default function ManageProjectDSH(props: Props) {
         <h2>{project.name}</h2>
       </div>
 
-      <ProjectTabs />
+      <TabCollection
+        tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }]}
+        defaultTab="project"
+      />
 
       {tab === "project" && (
         <Box>
@@ -69,8 +72,6 @@ export default function ManageProjectDSH(props: Props) {
           </div>
         </Box>
       )}
-
-      {tab === "assets" && "No assets"}
     </>
   );
 }

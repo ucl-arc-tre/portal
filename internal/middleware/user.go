@@ -43,6 +43,8 @@ func (u *UserSetter) setUser(ctx *gin.Context) {
 	if username == "" {
 		panic("username header unset")
 	}
+	// NOTE: dynamic roles are cached for the cache TTL. For staff membership
+	// this is ok. Care should be taken if other dynamic roles are set
 	if user, existsInCache := u.cache.Get(username); existsInCache {
 		ctx.Set(userContextKey, user)
 		return

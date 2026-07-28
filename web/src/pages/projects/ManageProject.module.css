@@ -62,6 +62,13 @@
 
   span {
     color: #333;
+    a {
+      color: var(--ucl-accent);
+      transition: color 0.3s ease;
+      &:hover {
+        color: var(--ucl-mid);
+      }
+    }
   }
 
   small {

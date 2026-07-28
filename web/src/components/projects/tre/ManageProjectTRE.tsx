@@ -21,9 +21,9 @@ import Error from "@/components/ui/Error";
 import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
-import ProjectTabs from "@/components/projects/ProjectTabs";
 import DetailsField from "@/components/ui/DetailsField";
 import ProjectMember from "../ProjectMember";
+import TabCollection from "@/components/shared/TabCollection";
 
 type Props = {
   project: ProjectTre;
@@ -235,7 +235,10 @@ export default function ManageProjectTRE(props: Props) {
         )}
       </div>
 
-      <ProjectTabs />
+      <TabCollection
+        tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
+        defaultTab="project"
+      />
 
       {tab === "project" && (
         <Box>

@@ -75,7 +75,8 @@ describe("Create use and delete DSH API tokens end-to-end", () => {
     cy.loginAsDSHOps();
     cy.visit("/profile");
     cy.get(`button[aria-label="Delete ${tokenName}"]`).click();
-    cy.wait(10100); // wait for the cache to expire
+    cy.contains("DSH API Tokens").should("exist");
+    cy.wait(100); // wait for the token to be deleted
   });
 
   it("the token should now return an unauthed", () => {

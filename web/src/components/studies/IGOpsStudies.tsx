@@ -8,6 +8,8 @@ import Loading from "../ui/Loading";
 import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
+import TabCollection from "../shared/TabCollection";
+import { useRouter } from "next/router";
 
 type Props = {
   refreshToken: number;
@@ -19,12 +21,15 @@ export default function IGOpsStudies(props: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
   const [studies, setStudies] = useState<Study[]>([]);
-  const [tab, setTab] = useState("pending");
 
   const studiesPerPage = 12;
   const [searchQuery, setSearchQuery] = useState("");
   const [offset, setOffset] = useState(0);
   const [noMoreStudies, setNoMoreStudies] = useState(false);
+
+  const router = useRouter();
+  const tab = (router.query.tab as "all" | "pending") ?? "all";
+
   const fetchStudies = async (offset?: number) => {
     setIsLoading(true);
     setError(null);
@@ -138,24 +143,13 @@ export default function IGOpsStudies(props: Props) {
 
   return (
     <>
-      <div className={"tab-collection"}>
-        <Button
-          onClick={() => setTab("pending")}
-          variant="secondary"
-          className={`tab ${tab === "pending" ? "active" : ""}`}
-        >
-          Pending Studies
-        </Button>
-
-        <Button
-          onClick={() => setTab("all")}
-          variant="secondary"
-          className={`tab ${tab === "all" ? "active" : ""}`}
-          data-cy="all-studies-tab-button"
-        >
-          All Studies
-        </Button>
-      </div>
+      <TabCollection
+        tabs={[
+          { name: "pending", label: "Pending Studies" },
+          { name: "all", label: "All Studies" },
+        ]}
+        defaultTab="all"
+      />
 
       {tab === "pending" ? (
         <p>Studies submitted for review. Approve or request changes for each study.</p>
