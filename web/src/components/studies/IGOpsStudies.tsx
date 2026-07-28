@@ -148,6 +148,7 @@ export default function IGOpsStudies(props: Props) {
           { name: "pending", label: "Pending Studies" },
           { name: "all", label: "All Studies" },
         ]}
+        defaultTab="all"
       />
 
       {tab === "pending" ? (

@@ -32,6 +32,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
         { name: "assets", needsAttention: assetsNeedAttention },
         { name: "contracts", needsAttention: contractsNeedAttention },
       ]}
+      defaultTab="study"
     />
   );
 }

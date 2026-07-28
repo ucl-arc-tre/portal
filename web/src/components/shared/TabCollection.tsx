@@ -15,11 +15,12 @@ type TabDefinition = {
 
 type TabCollectionProps = {
   tabs: TabDefinition[];
+  defaultTab?: TabName;
 };
 
-export default function TabCollection({ tabs }: TabCollectionProps) {
+export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) {
   const router = useRouter();
-  const tab: TabName = (router.query.tab as TabName | undefined) ?? tabs[0]?.name ?? "study";
+  const tab: TabName = (router.query.tab as TabName | undefined) ?? defaultTab ?? tabs[0]?.name;
   const setTab = (newTab: TabName) =>
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
 

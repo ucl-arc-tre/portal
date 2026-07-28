@@ -325,6 +325,7 @@ export default function ManageProjectPage() {
 
         <TabCollection
           tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
+          defaultTab="project"
         />
 
         {tab === "project" && (
