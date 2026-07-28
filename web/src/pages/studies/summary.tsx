@@ -48,7 +48,7 @@ export default function SummaryStudyPage() {
 
   if (!studyId) {
     router.push("/studies");
-    return;
+    return null;
   }
 
   return (

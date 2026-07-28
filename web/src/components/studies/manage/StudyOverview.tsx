@@ -58,7 +58,8 @@ const calculateBaseRiskScore = (study: Study) => {
 
 const calculateRiskScore = (study: Study, assets: Asset[] | undefined) => {
   const baseRiskScore = calculateBaseRiskScore(study);
-  if (!assets || assets.length === 0) return baseRiskScore;
+  if (assets === undefined) return undefined;
+  if (assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 

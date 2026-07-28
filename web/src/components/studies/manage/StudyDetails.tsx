@@ -9,12 +9,13 @@ import EditIcon from "@/components/ui/EditIcon";
 
 type StudyOverviewProps = {
   study: Study;
-  riskScore: number;
+  riskScore?: number;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
 };
 
-function getRiskClassification(score: number): string {
+function getRiskClassification(score: number | undefined) {
+  if (!score) return undefined;
   if (score < 10) {
     return "low";
   } else if (score >= 10 && score < 30) {
@@ -55,12 +56,14 @@ export default function StudyDetails(props: StudyOverviewProps) {
           </span>
         )}
 
-        <span className={styles["detail-item"]}>
-          Risk:{" "}
-          <Badge className={`${riskScoreStyle}`} cy="risk-badge">
-            {riskClassification} ({riskScore})
-          </Badge>
-        </span>
+        {riskScore !== undefined && (
+          <span className={styles["detail-item"]}>
+            Risk:{" "}
+            <Badge className={`${riskScoreStyle}`} cy="risk-badge">
+              {riskClassification} ({riskScore})
+            </Badge>
+          </span>
+        )}
 
         <span className={styles["detail-item"]}>
           Status: <StatusBadge status={study.approval_status} type="study" />
