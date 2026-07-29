@@ -71,14 +71,14 @@ func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
 func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) {
 	user := middleware.GetUser(ctx)
 
-	isAdminOrIGOps, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin)
+	canSeeAllStudies, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin, rbac.TreOpsStaff, rbac.DSHOpsStaff)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
 
 	var studies []types.Study
-	if isAdminOrIGOps {
+	if canSeeAllStudies {
 		studies, err = h.studiesAll(params)
 	} else {
 		studies, err = h.studiesStudyOwner(user)

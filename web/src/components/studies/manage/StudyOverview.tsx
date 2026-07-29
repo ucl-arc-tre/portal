@@ -17,9 +17,9 @@ import StudyOwnerEdit from "./StudyOwnerEdit";
 
 type StudyOverviewProps = {
   study: Study;
-  assets: Asset[];
+  assets?: Asset[];
   fetchStudy: (id: string) => Promise<void>;
-  unagreedAdminUsernames: string[];
+  unagreedAdminUsernames?: string[];
 };
 
 export const calculateRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boolean | undefined | null) => {
@@ -35,6 +35,7 @@ export const calculateRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boo
   });
   return assetScore;
 };
+
 const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
   let assetsRiskScore = 0;
 
@@ -55,9 +56,10 @@ const calculateBaseRiskScore = (study: Study) => {
   return score;
 };
 
-const calculateRiskScore = (study: Study, assets: Asset[]) => {
+const calculateRiskScore = (study: Study, assets: Asset[] | undefined) => {
   const baseRiskScore = calculateBaseRiskScore(study);
-  if (!assets || assets.length === 0) return baseRiskScore;
+  if (assets === undefined) return undefined;
+  if (assets.length === 0) return baseRiskScore;
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 
@@ -80,7 +82,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     (isStudyOwner || isIGStaff) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
   const canRequestReview =
     study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGStaff;
-  const hasUnagreedAdmins = unagreedAdminUsernames.length > 0;
+  const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
   const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin;
 
   const riskScore = calculateRiskScore(study, assets);
@@ -103,7 +105,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     setAffirmationDialogOpen(false);
   };
 
-  const assetsRequiringContracts = assets.filter((asset) => asset.requires_contract && asset.contract_ids.length === 0);
+  const assetsRequiringContracts =
+    assets?.filter((asset) => asset.requires_contract && asset.contract_ids.length === 0) ?? [];
 
   return (
     <Box>
