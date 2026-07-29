@@ -18,12 +18,14 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
   return (
     <fieldset className={sharedStyles.fieldset}>
       <div className={sharedStyles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
-        <div>The research is already registered with the UCL Data Protection Office</div>
+        <div>The study is or will be registered with the UCL Data Protection Office</div>
         <Controller
           name="isDataProtectionOfficeRegistered"
           control={control}
           defaultValue={undefined}
-          render={({ field }) => <YesNoUnsureButtons value={field.value} onChange={field.onChange} />}
+          render={({ field }) => (
+            <YesNoUnsureButtons value={field.value} onChange={field.onChange} unsureText="Not yet" />
+          )}
         />
       </div>
       {showDataProtectionNumber !== true && (
@@ -33,7 +35,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
             <a href="https://www.ucl.ac.uk/data-protection/guidance-staff-students-and-researchers/research/research-registration-guidance">
               UCL guidance
             </a>
-            .{" "}
+            .
           </AlertMessage>
         </Alert>
       )}

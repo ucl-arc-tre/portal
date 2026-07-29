@@ -84,6 +84,9 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGStaff;
   const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
   const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin;
+  const requiresDPORegistration = assets?.some(
+    (asset) => asset.data_types.includes("personal") || asset.data_types.includes("special_category_personal")
+  );
 
   const riskScore = calculateRiskScore(study, assets);
 
@@ -133,6 +136,15 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
             ))}
             . The study cannot be submitted for review until all administrators have agreed. Please inform all admins to
             log into the portal to sign the agreement.
+          </AlertMessage>
+        </Alert>
+      )}
+
+      {requiresDPORegistration && !study.is_data_protection_office_registered && (
+        <Alert type="warning" className={styles["dpo-registration-warning"]}>
+          <AlertMessage>
+            At least of the assets in this study contains personal data but the study does not have a Data Protection
+            Office (DPO) number registered. Please register with the DPO and add the registration number to the study.
           </AlertMessage>
         </Alert>
       )}
