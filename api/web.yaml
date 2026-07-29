@@ -475,9 +475,15 @@ paths:
           schema:
             type: string
         - in: query
-          name: owner_username
+          name: owner
           required: false
-          description: Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+          description: Username/name/email of the study owner. e.g. ccxyz@ucl.ac.uk, Bob Smith, bob.smith@ucl.ac.uk
+          schema:
+            type: string
+        - in: query
+          name: administrator
+          required: false
+          description: Username/name/email of a study administrator. e.g. ccxyz@ucl.ac.uk, Bob Smith, bob.smith@ucl.ac.uk
           schema:
             type: string
         - in: query

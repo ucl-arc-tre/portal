@@ -13,7 +13,8 @@ type QueryParams struct {
 	CaseRef        *int
 	ApprovalStatus *openapi.StudyApprovalStatus
 	FuzzyTitle     *string
-	OwnerUsername  *string
+	Owner          *string // username, email, name
+	Administrator  *string // username, email, name
 	Limit          int
 	Offset         int
 }

@@ -28,7 +28,8 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		ApprovalStatus: params.Status,
 		CaseRef:        params.Caseref,
 		FuzzyTitle:     params.FuzzyTitle,
-		OwnerUsername:  params.OwnerUsername,
+		Owner:          params.Owner,
+		Administrator:  params.Administrator,
 		Limit:          12,
 		Offset:         0,
 	}
@@ -39,7 +40,7 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		}
 		queryParams.CaseRef = &caseref
 	} else if params.QueryIsOwnerUsername() {
-		queryParams.OwnerUsername = params.Query
+		queryParams.Owner = params.Query
 	} else if params.Query != nil {
 		queryParams.FuzzyTitle = params.Query
 	}

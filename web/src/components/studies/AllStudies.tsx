@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Study, getStudies } from "@/openapi";
+import { GetStudiesData, Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import Button from "@/components/ui/Button";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -15,6 +15,28 @@ import { useAuth } from "@/hooks/useAuth";
 type Props = {
   refreshToken: number;
 };
+
+function studiesRequestData(raw: string): GetStudiesData {
+  const request: GetStudiesData = {
+    url: "/studies",
+  };
+  switch (true) {
+    case raw.includes("caseref:"):
+      request.query = { caseref: Number(raw.split("caseref:")[1]) };
+      return request;
+    case raw.includes("title:"):
+      request.query = { fuzzy_title: raw.split("title:")[1] };
+      return request;
+    case raw.includes("iao:"):
+      request.query = { owner: raw.split("iao:")[1] };
+      return request;
+    case raw.includes("iaa:"):
+      request.query = { administrator: raw.split("iaa:")[1] };
+      return request;
+  }
+  request.query = { query: raw };
+  return request;
+}
 
 export default function AllStudies(props: Props) {
   const { isIGStaff } = useAuth();
@@ -65,27 +87,8 @@ export default function AllStudies(props: Props) {
     setError(null);
     setSearchQuery(query);
     try {
-      let response;
-
-      switch (true) {
-        case query.includes("caseref:"):
-          response = await getStudies({
-            query: { caseref: Number(query.split("caseref:")[1]) },
-          });
-          break;
-        case query.includes("title:"):
-          response = await getStudies({
-            query: { fuzzy_title: query.split("title:")[1] },
-          });
-          break;
-        case query.includes("iao:"):
-          response = await getStudies({
-            query: { owner_username: query.split("iao:")[1] },
-          });
-          break;
-        default:
-          response = await getStudies({ query: { query: query } });
-      }
+      const request = studiesRequestData(query);
+      const response = await getStudies(request);
 
       if (responseIsError(response) || !response.data) {
         setError(`Search failed: ${extractErrorMessage(response)}`);
@@ -110,7 +113,14 @@ export default function AllStudies(props: Props) {
   const handlePageChange = async (newOffset: number) => {
     setError(null);
     try {
-      const response = await getStudies({ query: { offset: newOffset, limit: studiesPerPage, query: searchQuery } });
+      const request = studiesRequestData(searchQuery);
+      if (!request.query) {
+        request.query = {};
+      }
+      request.query.offset = newOffset;
+      request.query.limit = studiesPerPage;
+
+      const response = await getStudies(request);
       if (responseIsError(response) || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
         return;
@@ -168,10 +178,7 @@ export default function AllStudies(props: Props) {
               onClear={handleClearSearch}
             />
             <HelperText>
-              <small>
-                You can use keywords to narrow your search: caseref, title, iao. eg. `caseref:12345`
-                <br></br>Note that `iao` will search IAO usernames (UPI, eg. ccabcd)
-              </small>
+              <small>You can use keywords to narrow your search: caseref, title, iao, iaa. eg. `caseref:12345`</small>
             </HelperText>
           </div>
         </>

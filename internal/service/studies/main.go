@@ -157,8 +157,16 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 	if query.ApprovalStatus != nil {
 		db = db.Where("approval_status = ?", *query.ApprovalStatus)
 	}
-	if query.OwnerUsername != nil {
-		db = db.Joins("JOIN users ON studies.owner_user_id = users.id AND users.username = ?", *query.OwnerUsername)
+	if query.Owner != nil && query.Administrator != nil {
+		return []types.Study{}, types.NewErrClientInvalidObjectF("cannot query by admin and owner")
+	}
+	if query.Owner != nil {
+		db = db.Joins("JOIN users ON studies.owner_user_id = users.id LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
+			Where("users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.email % ?", *query.Owner, *query.Owner, *query.Owner)
+	}
+	if query.Administrator != nil {
+		db = db.Joins("JOIN study_admins ON study_admins.study_id=studies.id JOIN users ON study_admins.user_id=users.id LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
+			Where("study_admins.deleted_at IS NULL AND (users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.email % ?)", *query.Administrator, *query.Administrator, *query.Administrator)
 	}
 	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
 		db = db.Where("title % ?", *query.FuzzyTitle)
