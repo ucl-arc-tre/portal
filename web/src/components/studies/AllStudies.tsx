@@ -114,8 +114,11 @@ export default function AllStudies(props: Props) {
     setError(null);
     try {
       const request = studiesRequestData(searchQuery);
-      request.query!.offset = newOffset;
-      request.query!.limit = studiesPerPage;
+      if (!request.query) {
+        request.query = {};
+      }
+      request.query.offset = newOffset;
+      request.query.limit = studiesPerPage;
 
       const response = await getStudies(request);
       if (responseIsError(response) || !response.data) {
