@@ -85,7 +85,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
   const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin;
   const requiresDPORegistration = assets?.some(
-    (asset) => asset.data_types.includes("personal") || asset.data_types.includes("special_category_personal")
+    (asset) => asset.data_types?.includes("personal") || asset.data_types?.includes("special_category_personal")
   );
 
   const riskScore = calculateRiskScore(study, assets);
