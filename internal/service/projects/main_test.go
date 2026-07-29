@@ -2,6 +2,7 @@ package projects
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/google/uuid"
@@ -128,6 +129,110 @@ func TestValidateProjectTREBaseAcceptsValidWhitelist(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, svc.validateProjectTREBase(tc.base))
+		})
+	}
+}
+
+func TestMakeValidUnixUsername(t *testing.T) {
+	badEmailError := errors.New("invalid email")
+	invalidCharsError := errors.New("no valid characters")
+
+	tests := []struct {
+		name  string
+		email string
+		want  string
+		err   error
+	}{
+		{
+			name:  "UCL email returns local part as-is",
+			email: "abcdef@ac.ucl.uk",
+			want:  "abcdef",
+			err:   nil,
+		},
+		{
+			name:  "lowercase local part",
+			email: "foo123@example.com",
+			want:  "foo123",
+			err:   nil,
+		},
+		{
+			name:  "uppercase is lowercased",
+			email: "Foo123@example.com",
+			want:  "foo123",
+			err:   nil,
+		},
+		{
+			name:  "dot and plus characters map to underscore",
+			email: "john.doe+test@example.com",
+			want:  "john_doe_t",
+		},
+		{
+			name:  "leading digit replaced by underscore",
+			email: "123foo@example.com",
+			want:  "_23foo",
+			err:   nil,
+		},
+		{
+			name:  "leading hyphen replaced by underscore",
+			email: "-abc@example.com",
+			want:  "_abc",
+			err:   nil,
+		},
+		{
+			name:  "leading dot/plus character is dropped",
+			email: ".foo123@example.com",
+			want:  "foo123",
+			err:   nil,
+		},
+		{
+			name:  "leading underscore allowed",
+			email: "_foo123@example.com",
+			want:  "_foo123",
+			err:   nil,
+		},
+		{
+			name:  "username truncated to 10 characters",
+			email: "foo123456789@example.com",
+			want:  "foo1234567",
+			err:   nil,
+		},
+		{
+			name:  "disallowed characters are dropped",
+			email: "a!b#c1%2@example.com",
+			want:  "abc12",
+			err:   nil,
+		},
+		{
+			name:  "no valid characters in local part",
+			email: "#.%@example.com",
+			want:  "",
+			err:   invalidCharsError,
+		},
+		{
+			name:  "empty local part returns empty string",
+			email: "@example.com",
+			want:  "",
+			err:   badEmailError,
+		},
+		{
+			name:  "empty domain returns empty string",
+			email: "john.doe@",
+			want:  "",
+			err:   badEmailError,
+		},
+		{
+			name:  "no @ character returns empty string",
+			email: "notanemail",
+			want:  "",
+			err:   badEmailError,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			username, err := makeValidUnixUsername(tc.email)
+			assert.Equal(t, tc.err, err)
+			assert.Equal(t, tc.want, username)
 		})
 	}
 }

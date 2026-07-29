@@ -189,6 +189,7 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 					openapi.Ingresser,
 					openapi.APIUser,
 				},
+				DesktopConfig: &openapi.ProjectTREUserDesktopConfig{},
 			},
 		},
 	}
@@ -220,6 +221,20 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 	project := projectTRE.Project
 	assert.Equal(t, "proj123", project.Name)
 	assert.Equal(t, creator.ID, project.CreatorUserID)
+
+	// Member with desktop config should have a Unix username
+	var userConfig types.ProjectTREUserConfig
+	require.NoError(t, db.Preload("User").
+		Where("project_tre_id = ? AND user_id = ?", projectTRE.ID, user1.ID).
+		First(&userConfig).Error)
+	assert.Equal(t, "alice", userConfig.UnixUsername)
+
+	// Creator has no desktop config, so no user config should be created for them
+	var creatorConfigCount int64
+	require.NoError(t, db.Model(&types.ProjectTREUserConfig{}).
+		Where("project_tre_id = ? AND user_id = ?", projectTRE.ID, creator.ID).
+		Count(&creatorConfigCount).Error)
+	assert.Equal(t, int64(0), creatorConfigCount)
 }
 
 func TestIntegration_GetProjectTREDetails(t *testing.T) {

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,6 +23,10 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
+)
+
+const (
+	maxUnixUsernameLength = 10
 )
 
 type Service struct {
@@ -460,6 +466,8 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 		return err
 	}
 
+	unixNames := treProjectUserConfigUnixUsernames(existing)
+
 	requested := []types.ProjectTREUserConfig{}
 	for _, member := range members {
 		if member.DesktopConfig == nil {
@@ -480,12 +488,25 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]
 			userConfig.UID = existingConfig.UID
+			userConfig.UnixUsername = existingConfig.UnixUsername
 			userConfig.DesktopImageID = existingConfig.DesktopImageID
 		} else {
 			userConfig.UID, err = projectTRENextUid(append(existing, requested...))
 			if err != nil {
 				return err
 			}
+
+			unixUsername, err := makeValidUnixUsername(member.Username)
+			if err != nil {
+				return types.NewErrInvalidObject("unable to derive Unix username from email")
+			}
+			if slices.Contains(unixNames, unixUsername) {
+				log.Warn().Any("unixUsername", unixUsername).Msg("Duplicate Unix username, appending UID")
+				unixUsername = unixUsername + "_" + strconv.Itoa(userConfig.UID)
+			}
+			userConfig.UnixUsername = unixUsername
+			unixNames = append(unixNames, unixUsername)
+
 			image, err := latestTREDesktopImage(tx, projectTRE.Platform)
 			if errors.Is(err, types.ErrNotFound) {
 				log.Warn().Any("projectId", projectTRE.ID).Msg("Latest TRE project Desktop image not found")
@@ -854,6 +875,14 @@ func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Usern
 	return usernames
 }
 
+func treProjectUserConfigUnixUsernames(configs []types.ProjectTREUserConfig) []string {
+	unixUsernames := []string{}
+	for _, config := range configs {
+		unixUsernames = append(unixUsernames, config.UnixUsername)
+	}
+	return unixUsernames
+}
+
 func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -870,6 +899,51 @@ func projectTRENextUid(userConfigs []types.ProjectTREUserConfig) (int, error) {
 		uid++
 	}
 	return uid, nil
+}
+
+// Generates a valid Unix username of max 10 chars from a valid email address.
+// Both UCL and non-UCL email addresses are handled identically. The local
+// part of an email (i.e. the part before the '@') is used for generating a
+// valid Unix username by stripping or replacing invalid characters.
+//
+// Valid Unix username regex: ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$
+func makeValidUnixUsername(email string) (string, error) {
+	local, domain, _ := strings.Cut(email, "@")
+	if local == "" || domain == "" {
+		return "", errors.New("invalid email")
+	}
+
+	local = strings.ToLower(local)
+	var b strings.Builder
+	for _, r := range local {
+		if b.Len() >= maxUnixUsernameLength {
+			break
+		}
+		switch {
+		case r >= 'a' && r <= 'z':
+			b.WriteRune(r)
+		case (r >= '0' && r <= '9') || r == '_' || r == '-':
+			// Digits and '-' are not allowed as the first character,
+			// but '_' is allowed anywhere
+			if b.Len() == 0 && r != '_' {
+				b.WriteByte('_')
+			} else {
+				b.WriteRune(r)
+			}
+		case r == '.' || r == '+':
+			// Common email separators map to '_' but not as first char
+			// to keep names starting with a letter where possible
+			if b.Len() > 0 {
+				b.WriteRune('_')
+			}
+		}
+	}
+
+	if b.Len() == 0 {
+		return "", errors.New("no valid characters")
+	}
+	unixUsername := b.String()
+	return unixUsername[:min(maxUnixUsernameLength, len(unixUsername))], nil
 }
 
 func optionalUint(i *int) *uint {
