@@ -1795,8 +1795,11 @@ type GetStudiesParams struct {
 	// FuzzyTitle Fuzzy title to match on
 	FuzzyTitle *string `form:"fuzzy_title,omitempty" json:"fuzzy_title,omitempty"`
 
-	// OwnerUsername Full username of the study owner. e.g. ccxyz@ucl.ac.uk
-	OwnerUsername *string `form:"owner_username,omitempty" json:"owner_username,omitempty"`
+	// Owner Username/name/email of the study owner. e.g. ccxyz@ucl.ac.uk, Bob Smith, bob.smith@ucl.ac.uk
+	Owner *string `form:"owner,omitempty" json:"owner,omitempty"`
+
+	// Administrator Username/name/email of a study administrator. e.g. ccxyz@ucl.ac.uk, Bob Smith, bob.smith@ucl.ac.uk
+	Administrator *string `form:"administrator,omitempty" json:"administrator,omitempty"`
 
 	// Limit Maximum number of items to return
 	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
@@ -2578,11 +2581,19 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "owner_username" -------------
+	// ------------- Optional query parameter "owner" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner_username", c.Request.URL.Query(), &params.OwnerUsername, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner", c.Request.URL.Query(), &params.Owner, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner_username: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "administrator" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "administrator", c.Request.URL.Query(), &params.Administrator, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter administrator: %w", err), http.StatusBadRequest)
 		return
 	}
 

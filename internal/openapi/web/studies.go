@@ -12,7 +12,7 @@ var (
 )
 
 func (s GetStudiesParams) Valid() bool {
-	if s.Query != nil && (s.Caseref != nil || s.FuzzyTitle != nil || s.OwnerUsername != nil) {
+	if s.Query != nil && (s.Caseref != nil || s.FuzzyTitle != nil || s.Owner != nil || s.Administrator != nil) {
 		return false
 	}
 	if s.Status != nil && !s.Status.Valid() {

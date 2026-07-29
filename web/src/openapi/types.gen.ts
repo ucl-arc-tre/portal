@@ -1582,9 +1582,13 @@ export type GetStudiesData = {
          */
         fuzzy_title?: string;
         /**
-         * Full username of the study owner. e.g. ccxyz@ucl.ac.uk
+         * Username/name/email of the study owner. e.g. ccxyz@ucl.ac.uk, Bob Smith, bob.smith@ucl.ac.uk
          */
-        owner_username?: string;
+        owner?: string;
+        /**
+         * Username/name/email of a study administrator. e.g. ccxyz@ucl.ac.uk, Bob Smith, bob.smith@ucl.ac.uk
+         */
+        administrator?: string;
         /**
          * Maximum number of items to return
          */
