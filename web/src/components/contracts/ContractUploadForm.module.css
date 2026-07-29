@@ -50,6 +50,12 @@
   background-color: var(--color-primary-light);
 }
 
+.dragging {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  box-shadow: 0 0 0 2px var(--form-purple--shadow);
+}
+
 .upload-icon {
   font-size: 2rem;
   margin-bottom: 0.5rem;

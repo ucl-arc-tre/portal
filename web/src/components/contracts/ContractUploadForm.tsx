@@ -51,6 +51,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   const [isLoadingAssets, setIsLoadingAssets] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(editingContract ?? null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,32 +122,24 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     fetchAssets();
   }, [editingContract, reset, study.id]);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) {
-      setUploadFiles([]);
-      return;
-    }
+  const handleFiles = (files: FileList | File[]) => {
+    const filesArray = Array.from(files);
+    if (filesArray.length === 0) return;
 
     setError(null);
     setSuccess(false);
 
-    let filesError: undefined | string = undefined;
-    Array.from(event.target.files).forEach((file) => {
-      if (!file) {
-        filesError = "File was nil";
-        return;
-      }
-
+    const filesError = filesArray.reduce<string | undefined>((error, file) => {
+      if (error) return error;
       if (!validMimeTypes.includes(file.type)) {
-        filesError = `File format must be one of ${validMimeTypes}.`;
-        return;
+        return `File format must be one of ${validMimeTypes}.`;
       }
 
       if (file.size > 1e7) {
-        filesError = "File size must be less than 10MB.";
-        return;
+        return "File size must be less than 10MB.";
       }
-    });
+      return undefined;
+    }, undefined);
 
     if (filesError) {
       setUploadFiles([]);
@@ -154,7 +147,47 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       return;
     }
 
-    setUploadFiles(Array.from(event.target.files));
+    setUploadFiles(filesArray);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) {
+      setUploadFiles([]);
+      return;
+    }
+
+    handleFiles(event.target.files);
+  };
+
+  const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (event.dataTransfer.types.includes("Files")) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const relatedTarget = event.relatedTarget;
+    if (!relatedTarget || !(relatedTarget instanceof Node) || !event.currentTarget.contains(relatedTarget)) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+    handleFiles(event.dataTransfer.files);
   };
 
   const onSubmit = async (formData: ContractFormData) => {
@@ -202,7 +235,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
       setCurrentContract(response.data);
 
       while (uploadFiles.length > 0) {
-        const file = uploadFiles.pop()!;
+        const file = uploadFiles.pop();
+        if (!file) break;
         response = await postStudiesByStudyIdContractsByContractIdObjects({
           path: {
             studyId: study.id,
@@ -239,6 +273,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
 
   const clearFile = () => {
     setUploadFiles([]);
+    setIsDragging(false);
     setError(null);
     setSuccess(false);
     if (fileInputRef.current) {
@@ -249,6 +284,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   const handleClose = () => {
     reset();
     setUploadFiles([]);
+    setIsDragging(false);
     setError(null);
     setSuccess(false);
     if (fileInputRef.current) {
@@ -427,7 +463,13 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
         <h3>Files</h3>
 
         <div className={styles["upload-section"]}>
-          <div className={styles["file-input"]}>
+          <div
+            className={styles["file-input"]}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <input
               ref={fileInputRef}
               type="file"
@@ -437,9 +479,18 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               id="contract-file-input"
               multiple
             />
-            <Label htmlFor="contract-file-input" className={styles["file-label"]}>
+            <Label
+              htmlFor="contract-file-input"
+              className={`${styles["file-label"]} ${isDragging ? styles.dragging : ""}`}
+            >
               <div className={styles["upload-icon"]}>📄</div>
-              <span>{editingContract ? "Choose new file (optional)" : "Choose file to upload"}</span>
+              <span>
+                {isDragging
+                  ? "Drop files here"
+                  : editingContract
+                    ? "Choose or Drag and Drop file (optional)"
+                    : "Choose or Drag and Drop file to upload (optional)"}
+              </span>
             </Label>
           </div>
           <HelperText>Only PDF, Word, PNG, and JPEG files up to 10MB are accepted.</HelperText>
