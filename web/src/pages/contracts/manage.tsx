@@ -226,18 +226,20 @@ export default function ManageContractPage() {
 
           <div className={styles.field}>
             <label>Files:</label>
-            {contract.objects_metadata.length === 0 && "None"}
-            {contract.objects_metadata.map((obj) => (
-              <ContractObjectCard
-                key={obj.id}
-                id={obj.id}
-                contractId={contract.id}
-                studyId={study.id}
-                filename={obj.filename}
-                createdAt={formatDate(obj.created_at)}
-                canModify={canModify}
-              />
-            ))}
+            <div>
+              {contract.objects_metadata.length === 0 && "None"}
+              {contract.objects_metadata.map((obj) => (
+                <ContractObjectCard
+                  key={obj.id}
+                  id={obj.id}
+                  contractId={contract.id}
+                  studyId={study.id}
+                  filename={obj.filename}
+                  createdAt={formatDate(obj.created_at)}
+                  canModify={canModify}
+                />
+              ))}
+            </div>
           </div>
         </Box>
 
