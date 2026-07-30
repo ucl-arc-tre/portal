@@ -1,12 +1,12 @@
 import styles from "./YesNoUnsureButtons.module.css";
 
-export default function YesNoUnsureButtons({
-  value,
-  onChange,
-}: {
+type Props = {
   value: boolean | null | undefined;
   onChange: (value: boolean | null) => void;
-}) {
+  unsureText?: string;
+};
+
+export default function YesNoUnsureButtons({ value, onChange, unsureText = "Unsure" }: Props) {
   return (
     <div className={styles["button-group"]}>
       <button
@@ -26,7 +26,7 @@ export default function YesNoUnsureButtons({
         }}
         data-cy="option-unsure"
       >
-        Unsure
+        {unsureText}
       </button>
 
       <button
