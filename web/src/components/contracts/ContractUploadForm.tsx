@@ -487,9 +487,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               <span>
                 {isDragging
                   ? "Drop files here"
-                  : editingContract
-                    ? "Choose or Drag and Drop file (optional)"
-                    : "Choose or Drag and Drop file to upload (optional)"}
+                  : "Choose or Drag and Drop file to upload (optional)"}
               </span>
             </Label>
           </div>
