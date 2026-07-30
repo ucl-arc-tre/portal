@@ -27,7 +27,7 @@ export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) 
           key={tabDefinition.name}
           onClick={() => setTab(tabDefinition.name)}
           variant="secondary"
-          className={`${styles.tab} ${tab === tabDefinition.name ? "active" : ""}`}
+          className={`${styles.tab} ${tab === tabDefinition.name ? styles.active : ""}`}
           cy={tabDefinition.name}
         >
           {tabDefinition.label ? tabDefinition.label : tabDefinition.name}
