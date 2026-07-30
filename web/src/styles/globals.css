@@ -50,8 +50,8 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family:
-    Helvetica Neue,
     Helvetica,
+    Helvetica Neue,
     Arial,
     sans-serif;
   -webkit-font-smoothing: antialiased;
