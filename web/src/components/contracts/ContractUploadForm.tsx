@@ -484,11 +484,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={`${styles["file-label"]} ${isDragging ? styles.dragging : ""}`}
             >
               <div className={styles["upload-icon"]}>📄</div>
-              <span>
-                {isDragging
-                  ? "Drop files here"
-                  : "Choose or Drag and Drop file to upload (optional)"}
-              </span>
+              <span>{isDragging ? "Drop files here" : "Choose or Drag and Drop file to upload (optional)"}</span>
             </Label>
           </div>
           <HelperText>Only PDF, Word, PNG, and JPEG files up to 10MB are accepted.</HelperText>
