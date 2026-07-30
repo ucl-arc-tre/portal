@@ -1,6 +1,11 @@
 @import url(./form.css);
+@import url(https://cdn.ucl.ac.uk/ds/css/font.css);
 
 :root {
+  --ucl-font-sans: "DM Sans", Aptos, Arial, system-ui, sans-serif;
+  --ucl-font-sans-features: "ss01" 1, "ss02" 1, "ss03" 1, "ss04" 1, "ss07" 1;
+  --ucl-font-mono: "DM Mono", "Aptos Mono", Consolas, monospace;
+
   --background: #ffffff;
   --foreground: #171717;
 
@@ -46,14 +51,10 @@ body {
 }
 
 body {
-  /* fonts based on UCL theme */
   color: var(--foreground);
   background: var(--background);
-  font-family:
-    Helvetica,
-    Helvetica Neue,
-    Arial,
-    sans-serif;
+  font-family: var(--ucl-font-sans);
+  font-feature-settings: var(--ucl-font-sans-features);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
