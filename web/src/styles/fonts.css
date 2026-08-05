@@ -1,0 +1,121 @@
+/***** UCL Sans *****/
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-Regular.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-Italic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-Bold.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-Italic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-BoldItalic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-Light.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-ExtraLight.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-ExtraLightItalic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-ExtraLightItalic.otf") format("opentype");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-LightItalic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-MediumItalic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-SemiBold.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UCL Sans";
+  src:
+    url("./fonts/UCL_Sans/UCLSans-SemiBoldItalic.ttf") format("truetype"),
+    url("./fonts/UCL_Sans/UCLSans-SemiBoldItalic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}

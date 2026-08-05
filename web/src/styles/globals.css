@@ -1,8 +1,8 @@
 @import url(./form.css);
-@import url(https://cdn.ucl.ac.uk/ds/css/font.css);
+@import url(./fonts.css);
 
 :root {
-  --ucl-font-sans: "DM Sans", Aptos, Arial, system-ui, sans-serif;
+  --ucl-font-sans: "UCL Sans", "DM Sans", Aptos, Arial, system-ui, sans-serif;
   --ucl-font-sans-features: "ss01" 1, "ss02" 1, "ss03" 1, "ss04" 1, "ss07" 1;
   --ucl-font-mono: "DM Mono", "Aptos Mono", Consolas, monospace;
 
