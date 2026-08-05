@@ -24,6 +24,7 @@ func main() {
 	// serve fallback 404 page
 	router.NoRoute(func(c *gin.Context) {
 		c.Status(http.StatusNotFound)
+		c.Header("cache-control", "max-age=0, private, must-revalidate")
 		c.File("./404.html")
 	})
 
@@ -48,6 +49,7 @@ func registerHTMLRoutes(router *gin.Engine, dir string) {
 		}
 
 		router.GET(route, func(c *gin.Context) {
+			c.Header("cache-control", "max-age=0, private, must-revalidate")
 			c.File(filePath)
 		})
 	}
