@@ -23,7 +23,7 @@ func (p ProjectTRERequest) Base() ProjectTREBase {
 		NumRequiredEgressApprovals: p.NumRequiredEgressApprovals,
 		AssetIds:                   p.AssetIds,
 		Members:                    p.Members,
-		AirlockWhitelist:           p.AirlockWhitelist,
+		AirlockOutboundWhitelist:   p.AirlockOutboundWhitelist,
 	}
 }
 

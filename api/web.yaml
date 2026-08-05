@@ -2296,7 +2296,7 @@ components:
         - airlock_ssh_enabled
         - num_required_egress_approvals
         - external_encryption_enabled
-        - airlock_whitelist
+        - airlock_outbound_whitelist
         - monthly_budget
         - platform
       properties:
@@ -2316,7 +2316,7 @@ components:
           type: boolean
         airlock_ssh_enabled:
           type: boolean
-        airlock_whitelist:
+        airlock_outbound_whitelist:
           type: array
           items:
             type: string
@@ -2502,7 +2502,8 @@ components:
         - members
         - num_required_egress_approvals
         - external_encryption_enabled
-        - airlock_whitelist
+        - airlock_outbound_whitelist
+        - airlock_ssh_whitelist
       properties:
         asset_ids:
           type: array
@@ -2520,9 +2521,14 @@ components:
         external_encryption_enabled:
           type: boolean
           description: Is external encryption enabled for this project?
-        airlock_whitelist:
+        airlock_outbound_whitelist:
           type: array
-          description: List of IPs or FQDNs to whitelist for this project (can be empty)
+          description: List of IPs or FQDNs to whitelist for egress this project (can be empty)
+          items:
+            type: string
+        airlock_ssh_whitelist:
+          type: array
+          description: List of IPs or FQDNs to whitelist for egress this project (can be empty)
           items:
             type: string
 

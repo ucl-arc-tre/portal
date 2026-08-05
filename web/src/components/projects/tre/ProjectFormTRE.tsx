@@ -48,12 +48,21 @@ export default function ProjectFormTREStep(props: Props) {
   });
 
   const {
-    fields: whitelistFields,
-    append: appendWhitelist,
-    remove: removeWhitelist,
+    fields: outboundWhitelistFields,
+    append: appendOutboundWhitelist,
+    remove: removeOutboundWhitelist,
   } = useFieldArray({
     control,
-    name: "tre.airlockWhitelist",
+    name: "tre.airlockOutboundWhitelist",
+  });
+
+  const {
+    fields: sshWhitelistFields,
+    append: appendSSHWhitelist,
+    remove: removeSSHWhitelist,
+  } = useFieldArray({
+    control,
+    name: "tre.airlockSSHWhitelist",
   });
 
   const { append: appendUserConfig, update: updateUserConfig } = useFieldArray({
@@ -323,10 +332,10 @@ export default function ProjectFormTREStep(props: Props) {
         <div className="field">
           <Label>Airlock whitelist (optional):</Label>
           <fieldset className="linkage-fieldset">
-            {whitelistFields.map((field, index) => (
+            {outboundWhitelistFields.map((field, index) => (
               <div key={field.id} className="item-wrapper">
                 <Controller
-                  name={`tre.airlockWhitelist.${index}.value` as const}
+                  name={`tre.airlockOutboundWhitelist.${index}.value` as const}
                   control={control}
                   rules={{
                     validate: {
@@ -360,7 +369,7 @@ export default function ProjectFormTREStep(props: Props) {
 
                 <button
                   type="button"
-                  onClick={() => removeWhitelist(index)}
+                  onClick={() => removeOutboundWhitelist(index)}
                   className="remove-button"
                   aria-label={`Remove whitelist entry ${index + 1}`}
                 >
@@ -369,7 +378,12 @@ export default function ProjectFormTREStep(props: Props) {
               </div>
             ))}
 
-            <Button type="button" variant="secondary" size="small" onClick={() => appendWhitelist({ value: "" })}>
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              onClick={() => appendOutboundWhitelist({ value: "" })}
+            >
               Add IP / Domain
             </Button>
           </fieldset>

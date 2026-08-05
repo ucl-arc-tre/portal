@@ -30,6 +30,7 @@ type ProjectTRE struct {
 	ExternalEncryptionEnabled     bool                `gorm:"not null;default:false"`
 	AirlockSSHEnabled             bool                `gorm:"not null;default:true"`
 	AirlockWhitelist              ProjectTREWhitelist `gorm:"serializer:json"`
+	AirlockSSHWhitelist           ProjectTREWhitelist `gorm:"serializer:json"`
 	Status                        ProjectTREStatus    `gorm:"not null;default:'incomplete'"`
 	MonthlyBudget                 Dollars             `gorm:"not null;default:100"`
 	Platform                      ProjectTREPlatform  `gorm:"not null;default:'aws'"`

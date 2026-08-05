@@ -51,7 +51,10 @@ func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
 	if data.NumRequiredEgressApprovals < 1 {
 		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
 	}
-	for _, ip := range data.AirlockWhitelist {
+	whitelistHosts := []string{}
+	whitelistHosts = append(whitelistHosts, data.AirlockOutboundWhitelist...)
+	whitelistHosts = append(whitelistHosts, data.AirlockSshWhitelist...)
+	for _, ip := range whitelistHosts {
 		if !validation.IsIPv4OrFQDN(ip) {
 			return types.NewErrClientInvalidObjectF("airlock whitelist must contain only IPs or FQDNs")
 		}
@@ -254,7 +257,8 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
 		AirlockSSHEnabled:             true, // Enable airlock ssh by default
-		AirlockWhitelist:              data.AirlockWhitelist,
+		AirlockWhitelist:              data.AirlockOutboundWhitelist,
+		AirlockSSHWhitelist:           data.AirlockSshWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 		Platform:                      types.ProjectTREPlatformAWS,
 	}
@@ -570,7 +574,8 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	}
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
-	projectTRE.AirlockWhitelist = data.AirlockWhitelist
+	projectTRE.AirlockWhitelist = data.AirlockOutboundWhitelist
+	projectTRE.AirlockSSHWhitelist = data.AirlockSshWhitelist
 	projectTRE.RequestedVersionUpdatedAt = new(time.Now())
 
 	result := tx.Model(&types.ProjectTRE{}).
@@ -767,7 +772,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 			ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
 			AirlockSSHEnabled:             data.AirlockSshEnabled,
-			AirlockWhitelist:              data.AirlockWhitelist,
+			AirlockWhitelist:              data.AirlockOutboundWhitelist,
 			RequestedVersionUpdatedAt:     &now,
 			DeployedVersionUpdatedAt:      &now,
 			MonthlyBudget:                 data.MonthlyBudget,
