@@ -369,14 +369,14 @@ export default function ProjectFormTREStep(props: Props) {
                   )}
                 />
 
-                <button
+                <Button
                   type="button"
                   onClick={() => removeOutboundWhitelist(index)}
                   className="remove-button"
                   aria-label={`Remove whitelist entry ${index + 1}`}
                 >
                   ×
-                </button>
+                </Button>
               </div>
             ))}
 
@@ -453,14 +453,14 @@ export default function ProjectFormTREStep(props: Props) {
                   )}
                 />
 
-                <button
+                <Button
                   type="button"
                   onClick={() => removeSSHWhitelist(index)}
                   className="remove-button"
                   aria-label={`Remove whitelist entry ${index + 1}`}
                 >
                   ×
-                </button>
+                </Button>
               </div>
             ))}
 
