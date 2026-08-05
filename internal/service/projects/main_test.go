@@ -73,17 +73,22 @@ func TestCreateProjectTRE(t *testing.T) {
 		{
 			name:    "airlock whitelist with malformed entry",
 			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockOutboundWhitelist = whitelist("not an ip!") },
-			wantErr: "airlock whitelist must contain only IPs or FQDNs",
+			wantErr: "airlock outbound whitelist must contain only IPs or FQDNs",
+		},
+		{
+			name:    "airlock whitelist with malformed entry",
+			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockSshWhitelist = whitelist("not an ip!") },
+			wantErr: "airlock SSH whitelist must contain only IPs",
 		},
 		{
 			name:    "airlock whitelist rejects IPv6",
 			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockOutboundWhitelist = whitelist("::1") },
-			wantErr: "airlock whitelist must contain only IPs or FQDNs",
+			wantErr: "airlock outbound whitelist must contain only IPs or FQDNs",
 		},
 		{
 			name:    "airlock whitelist with one valid and one invalid entry",
 			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockOutboundWhitelist = whitelist("192.168.0.1", "bad host") },
-			wantErr: "airlock whitelist must contain only IPs or FQDNs",
+			wantErr: "airlock outbound whitelist must contain only IPs or FQDNs",
 		},
 	}
 

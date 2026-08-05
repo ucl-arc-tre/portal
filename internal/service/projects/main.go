@@ -51,12 +51,14 @@ func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
 	if data.NumRequiredEgressApprovals < 1 {
 		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
 	}
-	whitelistHosts := []string{}
-	whitelistHosts = append(whitelistHosts, data.AirlockOutboundWhitelist...)
-	whitelistHosts = append(whitelistHosts, data.AirlockSshWhitelist...)
-	for _, ip := range whitelistHosts {
+	for _, ip := range data.AirlockOutboundWhitelist {
 		if !validation.IsIPv4OrFQDN(ip) {
-			return types.NewErrClientInvalidObjectF("airlock whitelist must contain only IPs or FQDNs")
+			return types.NewErrClientInvalidObjectF("airlock outbound whitelist must contain only IPs or FQDNs")
+		}
+	}
+	for _, ip := range data.AirlockSshWhitelist {
+		if !validation.IsIPv4(ip) {
+			return types.NewErrClientInvalidObjectF("airlock SSH whitelist must contain only IPs")
 		}
 	}
 	return nil
