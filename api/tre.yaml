@@ -280,7 +280,7 @@ components:
         - sftp_enabled
         - ssh_enabled
         - http_enabled
-        - whitelist
+        - outbound_whitelist
       properties:
         sftp_enabled:
           type: boolean
@@ -291,11 +291,16 @@ components:
         http_enabled:
           type: boolean
           description: Whether HTTP is enabled in airlock
-        whitelist:
+        outbound_whitelist:
           type: array
           items:
             type: string
-            description: Allowed hostname to connect to airlock
+            description: Allowed hostnames to connect to airlock
+        ssh_whitelist:
+          type: array
+          items:
+            type: string
+            description: Allowed IPs to connect to airlock
 
     DesktopInstanceType:
       type: object

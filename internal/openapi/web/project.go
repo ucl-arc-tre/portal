@@ -24,6 +24,7 @@ func (p ProjectTRERequest) Base() ProjectTREBase {
 		AssetIds:                   p.AssetIds,
 		Members:                    p.Members,
 		AirlockOutboundWhitelist:   p.AirlockOutboundWhitelist,
+		AirlockSshWhitelist:        p.AirlockSshWhitelist,
 	}
 }
 

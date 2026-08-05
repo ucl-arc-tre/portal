@@ -262,7 +262,7 @@ func TestIntegration_GetProjectTREDetails(t *testing.T) {
 		EgressNumberRequiredApprovals: 2,
 		ExternalEncryptionEnabled:     true,
 		AirlockSSHEnabled:             true,
-		AirlockWhitelist:              types.ProjectTREWhitelist{"example.com"},
+		AirlockWhitelist:              types.Hosts{"example.com"},
 		Status:                        types.ProjectTREStatusDeployed,
 		MonthlyBudget:                 400,
 		Platform:                      types.ProjectTREPlatformAWS,

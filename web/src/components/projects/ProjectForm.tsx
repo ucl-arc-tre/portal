@@ -249,9 +249,7 @@ export default function ProjectForm({
 
           const airlockSSHWhitelist =
             data.tre.airlockSSHWhitelistEnabled === "true"
-              ? (data.tre.airlockOutboundWhitelist ?? [])
-                  .map((entry) => entry.value.trim())
-                  .filter((value) => value !== "")
+              ? (data.tre.airlockSSHWhitelist ?? []).map((entry) => entry.value.trim()).filter((value) => value !== "")
               : [];
 
           if (editingProject) {

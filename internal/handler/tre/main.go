@@ -118,10 +118,11 @@ func toApiProjectResponse(projectTRE types.ProjectTRE) openapi.Project {
 		DesktopInstanceTypes:          map[string]openapi.DesktopInstanceType{}, // Filled below
 		EgressNumberRequiredApprovals: projectTRE.EgressNumberRequiredApprovals,
 		Airlock: openapi.Airlock{
-			HttpEnabled: true, // Always enabled
-			SshEnabled:  projectTRE.AirlockSSHEnabled,
-			SftpEnabled: projectTRE.AirlockSSHEnabled, // Same as SshEnabled
-			Whitelist:   projectTRE.AirlockWhitelist,
+			HttpEnabled:       true, // Always enabled
+			SshEnabled:        projectTRE.AirlockSSHEnabled,
+			SftpEnabled:       projectTRE.AirlockSSHEnabled, // Same as SshEnabled
+			OutboundWhitelist: projectTRE.AirlockWhitelist,
+			SshWhitelist:      &projectTRE.AirlockSSHWhitelist,
 		},
 		RequestedVersionUpdatedAt: requestedVersionUpdatedAt(projectTRE),
 	}

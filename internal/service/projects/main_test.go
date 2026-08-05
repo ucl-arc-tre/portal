@@ -22,7 +22,7 @@ func validProjectTRERequest() openapi.ProjectTRERequest {
 	}
 }
 
-func whitelist(entries ...string) types.ProjectTREWhitelist {
+func whitelist(entries ...string) types.Hosts {
 	return entries
 }
 

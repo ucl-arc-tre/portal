@@ -17,10 +17,11 @@ const ipv4Regex =
 const fqdnRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 function isIPv4OrFQDN(value: string): boolean {
-  if (ipv4Regex.test(value)) {
-    return true;
-  }
-  return value.length <= 253 && fqdnRegex.test(value);
+  return value.length <= 253 && (fqdnRegex.test(value) || isIPv4(value));
+}
+
+function isIPv4(value: string): boolean {
+  return value.length <= 253 && ipv4Regex.test(value);
 }
 
 type Props = {
@@ -76,6 +77,7 @@ export default function ProjectFormTREStep(props: Props) {
   const members = watch("members");
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
   const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
+  const airlockSSHWhitelistEnabled = watch("tre.airlockSSHWhitelistEnabled");
   const userConfig = watch("tre.userConfig");
   const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
   const requiresHPCDesktops = watch("tre.requiresHPCDesktops") === "true";
@@ -330,7 +332,7 @@ export default function ProjectFormTREStep(props: Props) {
 
       {airlockExternalDataEnabled === "true" && (
         <div className="field">
-          <Label>Airlock whitelist (optional):</Label>
+          <Label>Airlock outbound whitelist (optional):</Label>
           <fieldset className="linkage-fieldset">
             {outboundWhitelistFields.map((field, index) => (
               <div key={field.id} className="item-wrapper">
@@ -388,8 +390,86 @@ export default function ProjectFormTREStep(props: Props) {
             </Button>
           </fieldset>
           <HelperText>
-            Optionally add IPs or domains (e.g. 127.0.0.1 or example.ucl.ac.uk) to whitelist in the TRE airlock for this
-            project.
+            Optionally add IPs (IPv4) or domains (e.g. 1.2.3.4 or example.ucl.ac.uk) to whitelist in the TRE airlock for
+            this project.
+          </HelperText>
+        </div>
+      )}
+
+      <div>
+        <RadioOptions
+          name="tre.airlockSSHWhitelistEnabled"
+          label="Will any data need to be uploaded from a location that does not have a browser? *"
+          options={[
+            { name: "Yes", value: "true" },
+            { name: "No", value: "false" },
+          ]}
+          register={register}
+          error={errors.tre?.airlockSSHWhitelistEnabled}
+        />
+        <HelperText>
+          To upload data via SSH or SFTP into the project airlock the location needs to be whitelisted. If uploading
+          from the same location as you have a browser your location will be automatically whitelisted. See the{" "}
+          <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
+        </HelperText>
+      </div>
+
+      {airlockSSHWhitelistEnabled === "true" && (
+        <div className="field">
+          <Label>Airlock SSH whitelist (optional):</Label>
+          <fieldset className="linkage-fieldset">
+            {sshWhitelistFields.map((field, index) => (
+              <div key={field.id} className="item-wrapper">
+                <Controller
+                  name={`tre.airlockSSHWhitelist.${index}.value` as const}
+                  control={control}
+                  rules={{
+                    validate: {
+                      isNotEmpty: (value) => {
+                        if (!value || value.trim() === "") {
+                          return "An IP is required";
+                        }
+                        return true;
+                      },
+                      isIPv4OrFQDN: (value) => {
+                        if (value && !isIPv4(value.trim())) {
+                          return "Must be a valid IPv4 address";
+                        }
+                        return true;
+                      },
+                    },
+                  }}
+                  render={({ field: whitelistField, fieldState }) => (
+                    <div>
+                      <input
+                        {...whitelistField}
+                        id={`airlock-ssh-whitelist-${index}`}
+                        type="text"
+                        placeholder="192.168.0.1"
+                        disabled={fieldsDisabled}
+                      />
+                      {fieldState.error && <Error message={fieldState.error.message} />}
+                    </div>
+                  )}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => removeSSHWhitelist(index)}
+                  className="remove-button"
+                  aria-label={`Remove whitelist entry ${index + 1}`}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+            <Button type="button" variant="secondary" size="small" onClick={() => appendSSHWhitelist({ value: "" })}>
+              Add IP
+            </Button>
+          </fieldset>
+          <HelperText>
+            Optionally add IPs (e.g. 1.2.3.4) to whitelist for SSH access to the TRE airlock for this project.
           </HelperText>
         </div>
       )}

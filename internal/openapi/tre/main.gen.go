@@ -55,14 +55,15 @@ func (e VMImagePlatform) Valid() bool {
 // Airlock defines model for Airlock.
 type Airlock struct {
 	// HttpEnabled Whether HTTP is enabled in airlock
-	HttpEnabled bool `json:"http_enabled"`
+	HttpEnabled       bool     `json:"http_enabled"`
+	OutboundWhitelist []string `json:"outbound_whitelist"`
 
 	// SftpEnabled Whether SFTP is enabled in airlock
 	SftpEnabled bool `json:"sftp_enabled"`
 
 	// SshEnabled Whether SSH is enabled in airlock
-	SshEnabled bool     `json:"ssh_enabled"`
-	Whitelist  []string `json:"whitelist"`
+	SshEnabled   bool      `json:"ssh_enabled"`
+	SshWhitelist *[]string `json:"ssh_whitelist,omitempty"`
 }
 
 // DesktopInstanceType defines model for DesktopInstanceType.
