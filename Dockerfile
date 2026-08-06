@@ -50,7 +50,7 @@ ENV NODE_ENV=$NODE_ENV
 
 # Will use .env.$(NODE_ENV)
 RUN --mount=type=cache,target=/app/node_modules \
-  npm ci && \
+  npm ci --ignore-scripts && \
   npm run build
 
 # -------------------------------------------------

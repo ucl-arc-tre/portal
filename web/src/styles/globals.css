@@ -1,4 +1,5 @@
 @import url(./form.css);
+@import "design-system-foundations-public/dist/assets/css/font.css";
 
 :root {
   --background: #ffffff;
@@ -46,16 +47,17 @@ body {
 }
 
 body {
-  /* fonts based on UCL theme */
   color: var(--foreground);
   background: var(--background);
-  font-family:
-    Helvetica,
-    Helvetica Neue,
-    Arial,
-    sans-serif;
+  font-family: var(--ucl-font-sans);
+  font-feature-settings: var(--ucl-font-sans-features);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+code,
+pre {
+  font-family: var(--ucl-font-mono);
 }
 
 html:has(dialog[open]) {
