@@ -1293,7 +1293,7 @@ type ProjectTRE struct {
 	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
 	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
 
-	// AirlockSshWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
+	// AirlockSshWhitelist List of IPs to whitelist for egress this project (can be empty)
 	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
@@ -1343,7 +1343,7 @@ type ProjectTREBase struct {
 	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
 	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
 
-	// AirlockSshWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
+	// AirlockSshWhitelist List of IPs to whitelist for egress this project (can be empty)
 	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
@@ -1388,7 +1388,7 @@ type ProjectTRERequest struct {
 	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
 	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
 
-	// AirlockSshWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
+	// AirlockSshWhitelist List of IPs to whitelist for egress this project (can be empty)
 	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)

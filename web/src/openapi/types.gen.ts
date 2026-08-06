@@ -733,7 +733,7 @@ export type ProjectTreBase = {
      */
     airlock_outbound_whitelist: Array<string>;
     /**
-     * List of IPs or FQDNs to whitelist for egress this project (can be empty)
+     * List of IPs to whitelist for egress this project (can be empty)
      */
     airlock_ssh_whitelist: Array<string>;
 };

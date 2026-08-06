@@ -29,6 +29,13 @@ type Props = {
   editingProject?: AnyProject | null;
 };
 
+function uniqueNonEmptyValues(array?: { value: string }[]): string[] {
+  if (!array) {
+    return [];
+  }
+  return [...new Set(array.map((item) => item.value.trim()).filter((item) => item !== ""))];
+}
+
 export default function ProjectForm({
   approvedStudies,
   handleProjectCreated,
@@ -242,15 +249,11 @@ export default function ProjectForm({
 
           const airlockOutboundWhitelist =
             data.tre.airlockExternalDataEnabled === "true"
-              ? (data.tre.airlockOutboundWhitelist ?? [])
-                  .map((entry) => entry.value.trim())
-                  .filter((value) => value !== "")
+              ? uniqueNonEmptyValues(data.tre.airlockOutboundWhitelist)
               : [];
 
           const airlockSSHWhitelist =
-            data.tre.airlockSSHWhitelistEnabled === "true"
-              ? (data.tre.airlockSSHWhitelist ?? []).map((entry) => entry.value.trim()).filter((value) => value !== "")
-              : [];
+            data.tre.airlockSSHWhitelistEnabled === "true" ? uniqueNonEmptyValues(data.tre.airlockSSHWhitelist) : [];
 
           if (editingProject) {
             // Update existing project (only members and assets)

@@ -2528,7 +2528,7 @@ components:
             type: string
         airlock_ssh_whitelist:
           type: array
-          description: List of IPs or FQDNs to whitelist for egress this project (can be empty)
+          description: List of IPs to whitelist for egress this project (can be empty)
           items:
             type: string
 
