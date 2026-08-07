@@ -1290,10 +1290,10 @@ type ProjectDSHStatus string
 
 // ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
-	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
+	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
 	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
 
-	// AirlockSshWhitelist List of IPs to whitelist for egress this project (can be empty)
+	// AirlockSshWhitelist List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
 	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
@@ -1340,10 +1340,10 @@ type ProjectTRE struct {
 
 // ProjectTREBase defines model for ProjectTREBase.
 type ProjectTREBase struct {
-	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
+	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
 	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
 
-	// AirlockSshWhitelist List of IPs to whitelist for egress this project (can be empty)
+	// AirlockSshWhitelist List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
 	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
@@ -1385,10 +1385,10 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
-	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress this project (can be empty)
+	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
 	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
 
-	// AirlockSshWhitelist List of IPs to whitelist for egress this project (can be empty)
+	// AirlockSshWhitelist List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
 	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
