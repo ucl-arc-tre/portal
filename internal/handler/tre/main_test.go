@@ -41,7 +41,7 @@ func TestToApiProjectResponse(t *testing.T) {
 		ExternalEncryptionEnabled:     true,
 		EgressNumberRequiredApprovals: 1,
 		AirlockSSHEnabled:             true,
-		AirlockWhitelist: types.ProjectTREWhitelist{
+		AirlockWhitelist: types.Hosts{
 			"example.com",
 			"104.18.18.104",
 		},
@@ -152,9 +152,9 @@ func TestToApiProjectResponse(t *testing.T) {
 	assert.True(t, response.Airlock.HttpEnabled)
 	assert.True(t, response.Airlock.SftpEnabled)
 	assert.True(t, response.Airlock.SshEnabled)
-	assert.Equal(t, 2, len(response.Airlock.Whitelist))
-	assert.Contains(t, response.Airlock.Whitelist, "example.com")
-	assert.Contains(t, response.Airlock.Whitelist, "104.18.18.104")
+	assert.Equal(t, 2, len(response.Airlock.OutboundWhitelist))
+	assert.Contains(t, response.Airlock.OutboundWhitelist, "example.com")
+	assert.Contains(t, response.Airlock.OutboundWhitelist, "104.18.18.104")
 
 	// Owners
 	assert.Equal(t, 2, len(response.Owners))

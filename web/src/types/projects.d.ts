@@ -22,7 +22,9 @@ type ProjectFormDataTRE = {
   numRequiredEgressApprovals: string;
   externalEncryptionEnabled: "false" | "true";
   airlockExternalDataEnabled?: "false" | "true";
-  airlockWhitelist?: { value: string }[];
+  airlockSSHWhitelistEnabled?: "false" | "true";
+  airlockOutboundWhitelist?: { value: string }[];
+  airlockSSHWhitelist?: { value: string }[];
   requiresHPCDesktops: "false" | "true";
   userConfig?: { username: string; hpcInstance: string | undefined }[];
 };

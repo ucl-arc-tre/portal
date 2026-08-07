@@ -51,9 +51,14 @@ func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
 	if data.NumRequiredEgressApprovals < 1 {
 		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
 	}
-	for _, ip := range data.AirlockWhitelist {
+	for _, ip := range data.AirlockOutboundWhitelist {
 		if !validation.IsIPv4OrFQDN(ip) {
-			return types.NewErrClientInvalidObjectF("airlock whitelist must contain only IPs or FQDNs")
+			return types.NewErrClientInvalidObjectF("airlock outbound whitelist must contain only IPs or FQDNs")
+		}
+	}
+	for _, ip := range data.AirlockSshWhitelist {
+		if !validation.IsIPv4(ip) {
+			return types.NewErrClientInvalidObjectF("airlock SSH whitelist must contain only IPs")
 		}
 	}
 	return nil
@@ -254,7 +259,8 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 		ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
 		AirlockSSHEnabled:             true, // Enable airlock ssh by default
-		AirlockWhitelist:              data.AirlockWhitelist,
+		AirlockWhitelist:              data.AirlockOutboundWhitelist,
+		AirlockSSHWhitelist:           data.AirlockSshWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 		Platform:                      types.ProjectTREPlatformAWS,
 	}
@@ -570,7 +576,8 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	}
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled
-	projectTRE.AirlockWhitelist = data.AirlockWhitelist
+	projectTRE.AirlockWhitelist = data.AirlockOutboundWhitelist
+	projectTRE.AirlockSSHWhitelist = data.AirlockSshWhitelist
 	projectTRE.RequestedVersionUpdatedAt = new(time.Now())
 
 	result := tx.Model(&types.ProjectTRE{}).
@@ -767,7 +774,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 			EgressNumberRequiredApprovals: data.NumRequiredEgressApprovals,
 			ExternalEncryptionEnabled:     data.ExternalEncryptionEnabled,
 			AirlockSSHEnabled:             data.AirlockSshEnabled,
-			AirlockWhitelist:              data.AirlockWhitelist,
+			AirlockWhitelist:              data.AirlockOutboundWhitelist,
 			RequestedVersionUpdatedAt:     &now,
 			DeployedVersionUpdatedAt:      &now,
 			MonthlyBudget:                 data.MonthlyBudget,

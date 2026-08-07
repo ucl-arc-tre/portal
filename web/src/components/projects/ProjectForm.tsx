@@ -29,6 +29,13 @@ type Props = {
   editingProject?: AnyProject | null;
 };
 
+function uniqueNonEmptyValues(array?: { value: string }[]): string[] {
+  if (!array) {
+    return [];
+  }
+  return [...new Set(array.map((item) => item.value.trim()).filter((item) => item !== ""))];
+}
+
 export default function ProjectForm({
   approvedStudies,
   handleProjectCreated,
@@ -122,11 +129,18 @@ export default function ProjectForm({
         setValue("tre.numRequiredEgressApprovals", `${editingTREProject.num_required_egress_approvals}`);
         setValue("tre.externalEncryptionEnabled", editingTREProject.external_encryption_enabled ? "true" : "false");
 
-        const hasWhitelist = (editingTREProject.airlock_whitelist ?? []).length > 0;
-        setValue("tre.airlockExternalDataEnabled", hasWhitelist ? "true" : "false");
+        const hasOutboundWhitelist = (editingTREProject.airlock_outbound_whitelist ?? []).length > 0;
+        setValue("tre.airlockExternalDataEnabled", hasOutboundWhitelist ? "true" : "false");
         setValue(
-          "tre.airlockWhitelist",
-          (editingTREProject.airlock_whitelist ?? []).map((value) => ({ value }))
+          "tre.airlockOutboundWhitelist",
+          (editingTREProject.airlock_outbound_whitelist ?? []).map((value) => ({ value }))
+        );
+
+        const hasSSHWhitelist = (editingTREProject.airlock_ssh_whitelist ?? []).length > 0;
+        setValue("tre.airlockSSHWhitelistEnabled", hasSSHWhitelist ? "true" : "false");
+        setValue(
+          "tre.airlockSSHWhitelist",
+          (editingTREProject.airlock_ssh_whitelist ?? []).map((value) => ({ value }))
         );
 
         const hasHPCDesktops = editingTREProject.members.some((member) => member.desktop_config?.hpc_instance_type);
@@ -233,10 +247,13 @@ export default function ProjectForm({
               desktop_config: usersConfig?.find((config) => config.username == researcher.username)?.desktop_config,
             }));
 
-          const airlockWhitelist =
+          const airlockOutboundWhitelist =
             data.tre.airlockExternalDataEnabled === "true"
-              ? (data.tre.airlockWhitelist ?? []).map((entry) => entry.value.trim()).filter((value) => value !== "")
+              ? uniqueNonEmptyValues(data.tre.airlockOutboundWhitelist)
               : [];
+
+          const airlockSSHWhitelist =
+            data.tre.airlockSSHWhitelistEnabled === "true" ? uniqueNonEmptyValues(data.tre.airlockSSHWhitelist) : [];
 
           if (editingProject) {
             // Update existing project (only members and assets)
@@ -247,7 +264,8 @@ export default function ProjectForm({
                 members: treMembers,
                 num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
                 external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
-                airlock_whitelist: airlockWhitelist,
+                airlock_outbound_whitelist: airlockOutboundWhitelist,
+                airlock_ssh_whitelist: airlockSSHWhitelist,
               },
             });
           } else {
@@ -259,7 +277,8 @@ export default function ProjectForm({
               members: treMembers,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
-              airlock_whitelist: airlockWhitelist,
+              airlock_outbound_whitelist: airlockOutboundWhitelist,
+              airlock_ssh_whitelist: airlockSSHWhitelist,
             };
             response = await postProjectsTre({ body: requestBody });
           }

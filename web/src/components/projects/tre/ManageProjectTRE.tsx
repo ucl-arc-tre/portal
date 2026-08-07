@@ -258,10 +258,10 @@ export default function ManageProjectTRE(props: Props) {
             label="External encryption enabled"
             value={project.external_encryption_enabled ? "Yes" : "No"}
           />
-          <DetailsField label="Airlock whitelist">
-            {project.airlock_whitelist && project.airlock_whitelist.length > 0 ? (
+          <DetailsField label="Airlock outbound whitelist">
+            {project.airlock_outbound_whitelist && project.airlock_outbound_whitelist.length > 0 ? (
               <ul className={styles["field-list"]}>
-                {project.airlock_whitelist.map((entry, index) => (
+                {project.airlock_outbound_whitelist.map((entry, index) => (
                   <li key={index} className={styles["field-item"]}>
                     {entry}
                   </li>
@@ -271,6 +271,21 @@ export default function ManageProjectTRE(props: Props) {
               <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
             )}
           </DetailsField>
+
+          <DetailsField label="Airlock SSH whitelist">
+            {project.airlock_ssh_whitelist && project.airlock_ssh_whitelist.length > 0 ? (
+              <ul className={styles["field-list"]}>
+                {project.airlock_ssh_whitelist.map((entry, index) => (
+                  <li key={index} className={styles["field-item"]}>
+                    {entry}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
+            )}
+          </DetailsField>
+
           <DetailsField label="Number of members" value={project.members ? project.members.length : 0} />
           <DetailsField label="Number of Assets" value={project.assets ? project.assets.length : 0} />
         </Box>
