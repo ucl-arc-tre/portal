@@ -45,10 +45,10 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest, ownerUsername string) error {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest, ownerUsername types.Username) error {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
-		if studyAdminUsername == ownerUsername {
+		if types.Username(studyAdminUsername) == ownerUsername {
 			errorMessage += fmt.Sprintf("• User '%s' is the study owner and cannot also be an admin\n\n", studyAdminUsername)
 			continue
 		}
@@ -83,7 +83,7 @@ func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool, ownerUsername string) error {
+func (s *Service) validateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool, ownerUsername types.Username) error {
 	if !validation.StudyTitlePattern.MatchString(studyData.Title) {
 		return types.NewErrClientInvalidObjectF("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, hyphens and apostrophes")
 	}
@@ -137,7 +137,7 @@ func (s *Service) validateStudyData(ctx context.Context, studyData openapi.Study
 }
 
 func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) error {
-	if err := s.validateStudyData(ctx, studyData, false, string(owner.Username)); err != nil {
+	if err := s.validateStudyData(ctx, studyData, false, owner.Username); err != nil {
 		return err
 	}
 
@@ -387,7 +387,7 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 	}
 	study := studies[0]
 
-	if err := s.validateStudyData(ctx, studyData, true, string(study.Owner.Username)); err != nil {
+	if err := s.validateStudyData(ctx, studyData, true, study.Owner.Username); err != nil {
 		return err
 	}
 
