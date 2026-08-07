@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
-import { Alert, AlertMessage, CheckSquareIcon, HelperText, InfoIcon, Input, Label } from "./uikitExports";
+import { Alert, AlertMessage, CheckSquareIcon, HelperText, Input, Label } from "./uikitExports";
 import Button from "../ui/Button";
 import { getUsersLookup, postUsersInvite, UserDataLookup } from "@/openapi";
 import styles from "./UserLookup.module.css";
@@ -277,7 +277,6 @@ export default function UserLookup(props: UserLookupProps) {
                 data-id={result.username}
               >
                 <div className={styles["user-info"]}>
-                  <InfoIcon />
                   <div>
                     <h4>{result.chosen_name ? result.chosen_name : result.username}</h4>
                     <p>{result.chosen_name && result.username}</p>
