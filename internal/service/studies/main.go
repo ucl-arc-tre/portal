@@ -45,9 +45,13 @@ func New() *Service {
 	}
 }
 
-func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest) error {
+func (s *Service) validateAdmins(ctx context.Context, studyData openapi.StudyRequest, ownerUsername string) error {
 	errorMessage := ""
 	for _, studyAdminUsername := range studyData.AdditionalStudyAdminUsernames {
+		if studyAdminUsername == ownerUsername {
+			errorMessage += fmt.Sprintf("• User '%s' is the study owner and cannot also be an admin\n\n", studyAdminUsername)
+			continue
+		}
 		isStaff, err := s.entra.IsStaffMember(ctx, types.Username(studyAdminUsername))
 		if errors.Is(err, types.ErrNotFound) {
 			errorMessage += fmt.Sprintf("• User '%s' not found in directory\n\n", studyAdminUsername)
@@ -79,7 +83,7 @@ func (s *Service) createStudyAdminUsers(studyData openapi.StudyRequest) ([]types
 	return admins, nil
 }
 
-func (s *Service) validateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool) error {
+func (s *Service) validateStudyData(ctx context.Context, studyData openapi.StudyRequest, isUpdate bool, ownerUsername string) error {
 	if !validation.StudyTitlePattern.MatchString(studyData.Title) {
 		return types.NewErrClientInvalidObjectF("study title must be 4-50 characters, start and end with a letter/number, and contain only letters, numbers, spaces, hyphens and apostrophes")
 	}
@@ -129,11 +133,11 @@ func (s *Service) validateStudyData(ctx context.Context, studyData openapi.Study
 		return types.NewErrClientInvalidObjectF("a study with the title [%v] already exists", studyData.Title)
 	}
 
-	return s.validateAdmins(ctx, studyData)
+	return s.validateAdmins(ctx, studyData, ownerUsername)
 }
 
 func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData openapi.StudyRequest) error {
-	if err := s.validateStudyData(ctx, studyData, false); err != nil {
+	if err := s.validateStudyData(ctx, studyData, false, string(owner.Username)); err != nil {
 		return err
 	}
 
@@ -375,10 +379,6 @@ func (s *Service) RecordStudySignoff(id uuid.UUID) error {
 }
 
 func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest) error {
-	if err := s.validateStudyData(ctx, studyData, true); err != nil {
-		return err
-	}
-
 	studies, err := s.StudiesById(id)
 	if err != nil {
 		return err
@@ -386,6 +386,11 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return types.NewNotFoundError("study not found")
 	}
 	study := studies[0]
+
+	if err := s.validateStudyData(ctx, studyData, true, string(study.Owner.Username)); err != nil {
+		return err
+	}
+
 	setStudyFromStudyData(&study, studyData)
 
 	studyAdminUsers, err := s.createStudyAdminUsers(studyData)
