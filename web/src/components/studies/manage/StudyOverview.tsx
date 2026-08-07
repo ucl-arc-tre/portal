@@ -143,8 +143,9 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
       {requiresDPORegistration && !study.is_data_protection_office_registered && (
         <Alert type="warning" className={styles["dpo-registration-warning"]}>
           <AlertMessage>
-            At least of the assets in this study contains personal data but the study does not have a Data Protection
-            Office (DPO) number registered. Please register with the DPO and add the registration number to the study.
+            At least one of the assets in this study contains personal data but the study does not have a Data
+            Protection Office (DPO) number registered. Please register with the DPO and add the registration number to
+            the study.
           </AlertMessage>
         </Alert>
       )}
