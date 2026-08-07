@@ -1,7 +1,7 @@
 debug: true
 
 # Deploy-time configurable list of role bindings for identity
-# These allow you to log into the portal as different users with different permissions
+# These allow you to log into the portal as different users who each have specific permissions
 # Ask a senior member of the team to generate these for you
 admin_usernames: # Global portal admins
   - bob@example.com
@@ -54,6 +54,7 @@ tre:
     username: password # pragma: allowlist secret
 
 # Integration with UCL myservices a IT service management
+# Find the relevant IDs in the project slack channel and generate secrets in the Azure portal
 myservices:
   enabled: true
   url: <CHANGE_ME> # e.g. https://myservices-api.example.com

@@ -19,17 +19,28 @@ Currently, the entities within the portal have the following relationships:
 2. Install [pre-commit](https://pre-commit.com/) (e.g. `pip install pre-commit` or
    `brew install pre-commit`), then run `pre-commit install` to set up the git hooks.
 3. Install the prerequisites: [node](https://nodejs.org/en/download),
-   [go](https://go.dev/doc/install) and
-   [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`.
-4. Install [Docker](https://docs.docker.com/get-started/get-docker/).
+   [go](https://go.dev/doc/install), and [Docker](https://docs.docker.com/get-started/get-docker/).
+4. Run `go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest` from the project root to install
+   [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen), then run
+   `cd web && npm install`.
 5. Create `deploy/dev/oauth2-proxy.cfg` from
    [deploy/dev/oauth2-proxy.sample.cfg](./deploy/dev/oauth2-proxy.sample.cfg).
 6. Create `deploy/dev/config.yaml` from
    [deploy/dev/config.sample.yaml](./deploy/dev/config.sample.yaml).
 7. Spin up a development environment by running `make dev`.
 
-Then go to <http://localhost:8000>. To destroy it run `make dev-destroy`. To see other commands run
-`make help`.
+Then go to <http://localhost:8000>.
+
+To destroy the dev environment run `make dev-destroy`. To see other commands run `make help`.
+
+### Updating oapi-codegen
+
+`oapi-codegen` isn't version-pinned, so an older local install can drift out of sync with
+`api/.config.yaml`. If `make dev` fails during the `codegen` step just re-run the install command from step 4 above to update it:
+
+```sh
+go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+```
 
 Modify, commit, push and open a pull request against `main` for review.
 
