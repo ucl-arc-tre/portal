@@ -672,6 +672,17 @@ func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
 	} else if !slices.Contains(types.ProjectTREPlatforms, types.ProjectTREPlatform(data.Platform)) {
 		return types.NewErrServerError("mismatch between api and db platform names")
 	}
+	var kind types.ProjectTREProjectTREVMImageKind
+	switch data.Kind {
+	case treopenapi.Desktop:
+		kind = types.ProjectTREProjectTREVMImageKindDesktop
+	case treopenapi.AirlockExternal:
+		kind = types.ProjectTREProjectTREVMImageKindAirlockExternal
+	case treopenapi.AirlockInternal:
+		kind = types.ProjectTREProjectTREVMImageKindAirlockInternal
+	default:
+		return types.NewErrClientInvalidObjectF("invalid kind")
+	}
 	platform := types.ProjectTREPlatform(data.Platform)
 	image := types.ProjectTREVMImage{}
 	result := s.db.Where(types.ProjectTREVMImage{ImageId: data.Id, Platform: platform}).
@@ -680,6 +691,7 @@ func (s *Service) CreateTREVMImage(data treopenapi.VMImage) error {
 			Name:        data.Name,
 			Description: data.Description,
 			Platform:    platform,
+			Kind:        kind,
 		}).
 		FirstOrCreate(&image)
 	return types.NewErrFromGorm(result.Error, "failed to create TRE project vm image")
