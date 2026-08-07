@@ -584,7 +584,7 @@ export type ProjectTreImport = {
     num_required_egress_approvals: number;
     external_encryption_enabled: boolean;
     airlock_ssh_enabled: boolean;
-    airlock_whitelist: Array<string>;
+    airlock_outbound_whitelist: Array<string>;
     monthly_budget: number;
     platform: string;
 };
@@ -729,9 +729,13 @@ export type ProjectTreBase = {
      */
     external_encryption_enabled: boolean;
     /**
-     * List of IPs or FQDNs to whitelist for this project (can be empty)
+     * List of IPs or FQDNs to whitelist for egress for this project (can be empty)
      */
-    airlock_whitelist: Array<string>;
+    airlock_outbound_whitelist: Array<string>;
+    /**
+     * List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
+     */
+    airlock_ssh_whitelist: Array<string>;
 };
 
 export type ContractBase = {

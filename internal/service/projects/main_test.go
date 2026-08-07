@@ -22,7 +22,7 @@ func validProjectTRERequest() openapi.ProjectTRERequest {
 	}
 }
 
-func whitelist(entries ...string) types.ProjectTREWhitelist {
+func whitelist(entries ...string) types.Hosts {
 	return entries
 }
 
@@ -72,18 +72,23 @@ func TestCreateProjectTRE(t *testing.T) {
 		},
 		{
 			name:    "airlock whitelist with malformed entry",
-			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockWhitelist = whitelist("not an ip!") },
-			wantErr: "airlock whitelist must contain only IPs or FQDNs",
+			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockOutboundWhitelist = whitelist("not an ip!") },
+			wantErr: "airlock outbound whitelist must contain only IPs or FQDNs",
+		},
+		{
+			name:    "airlock whitelist with malformed entry",
+			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockSshWhitelist = whitelist("not an ip!") },
+			wantErr: "airlock SSH whitelist must contain only IPs",
 		},
 		{
 			name:    "airlock whitelist rejects IPv6",
-			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockWhitelist = whitelist("::1") },
-			wantErr: "airlock whitelist must contain only IPs or FQDNs",
+			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockOutboundWhitelist = whitelist("::1") },
+			wantErr: "airlock outbound whitelist must contain only IPs or FQDNs",
 		},
 		{
 			name:    "airlock whitelist with one valid and one invalid entry",
-			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockWhitelist = whitelist("192.168.0.1", "bad host") },
-			wantErr: "airlock whitelist must contain only IPs or FQDNs",
+			mutate:  func(r *openapi.ProjectTRERequest) { r.AirlockOutboundWhitelist = whitelist("192.168.0.1", "bad host") },
+			wantErr: "airlock outbound whitelist must contain only IPs or FQDNs",
 		},
 	}
 
@@ -115,13 +120,13 @@ func TestValidateProjectTREBaseAcceptsValidWhitelist(t *testing.T) {
 		},
 		{
 			name: "empty whitelist",
-			base: openapi.ProjectTREBase{NumRequiredEgressApprovals: 1, AirlockWhitelist: whitelist()},
+			base: openapi.ProjectTREBase{NumRequiredEgressApprovals: 1, AirlockOutboundWhitelist: whitelist()},
 		},
 		{
 			name: "IPv4 and FQDN entries",
 			base: openapi.ProjectTREBase{
 				NumRequiredEgressApprovals: 1,
-				AirlockWhitelist:           whitelist("192.168.0.1", "example.com", "sub.example.co.uk"),
+				AirlockOutboundWhitelist:   whitelist("192.168.0.1", "example.com", "sub.example.co.uk"),
 			},
 		},
 	}

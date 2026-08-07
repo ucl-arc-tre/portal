@@ -21,4 +21,17 @@ func TestIsIPv4OrFQDN(t *testing.T) {
 		result := IsIPv4OrFQDN(tc.ip)
 		assert.Equal(t, tc.expect, result)
 	}
+
+	testCases = []struct {
+		ip     string
+		expect bool
+	}{
+		{"192.168.1.1", true},
+		{"example.ucl.ac.uk", false},
+		{"invalid-ip", false},
+		{"", false},
+	}
+	for _, tc := range testCases {
+		assert.Equal(t, tc.expect, IsIPv4(tc.ip))
+	}
 }

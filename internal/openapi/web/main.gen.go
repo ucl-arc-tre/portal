@@ -1290,8 +1290,11 @@ type ProjectDSHStatus string
 
 // ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
-	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
-	AirlockWhitelist []string `json:"airlock_whitelist"`
+	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
+	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
+
+	// AirlockSshWhitelist List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
+	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
@@ -1337,8 +1340,11 @@ type ProjectTRE struct {
 
 // ProjectTREBase defines model for ProjectTREBase.
 type ProjectTREBase struct {
-	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
-	AirlockWhitelist []string `json:"airlock_whitelist"`
+	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
+	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
+
+	// AirlockSshWhitelist List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
+	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
@@ -1355,8 +1361,8 @@ type ProjectTREBase struct {
 
 // ProjectTREImport defines model for ProjectTREImport.
 type ProjectTREImport struct {
+	AirlockOutboundWhitelist   []string           `json:"airlock_outbound_whitelist"`
 	AirlockSshEnabled          bool               `json:"airlock_ssh_enabled"`
-	AirlockWhitelist           []string           `json:"airlock_whitelist"`
 	Caseref                    int                `json:"caseref"`
 	ExternalEncryptionEnabled  bool               `json:"external_encryption_enabled"`
 	Members                    []ProjectTREMember `json:"members"`
@@ -1379,8 +1385,11 @@ type ProjectTREMember struct {
 
 // ProjectTRERequest Request payload for creating a new TRE project
 type ProjectTRERequest struct {
-	// AirlockWhitelist List of IPs or FQDNs to whitelist for this project (can be empty)
-	AirlockWhitelist []string `json:"airlock_whitelist"`
+	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
+	AirlockOutboundWhitelist []string `json:"airlock_outbound_whitelist"`
+
+	// AirlockSshWhitelist List of IPs to whitelist for SSH ingress to this project's airlock (can be empty)
+	AirlockSshWhitelist []string `json:"airlock_ssh_whitelist"`
 
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
