@@ -19,8 +19,7 @@ Currently, the entities within the portal have the following relationships:
 2. Install [pre-commit](https://pre-commit.com/) (e.g. `pip install pre-commit` or
    `brew install pre-commit`), then run `pre-commit install` to set up the git hooks.
 3. Install the prerequisites: [node](https://nodejs.org/en/download),
-   [go](https://go.dev/doc/install) and
-   [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). Then run `cd web && npm install`.
+   [go](https://go.dev/doc/install). Then run `cd web && npm install`.
 4. Install [Docker](https://docs.docker.com/get-started/get-docker/).
 5. Create `deploy/dev/oauth2-proxy.cfg` from
    [deploy/dev/oauth2-proxy.sample.cfg](./deploy/dev/oauth2-proxy.sample.cfg).
