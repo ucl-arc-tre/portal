@@ -161,6 +161,7 @@ components:
         - description
         - id
         - platform
+        - kind
       properties:
         name:
           type: string
@@ -169,6 +170,12 @@ components:
         id:
           type: string
           description: e.g. AMI id
+        kind:
+          type: string
+          enum:
+            - desktop
+            - airlock-internal
+            - airlock-external
         platform:
           type: string
           enum:
