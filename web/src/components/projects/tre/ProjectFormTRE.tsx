@@ -408,8 +408,9 @@ export default function ProjectFormTREStep(props: Props) {
           error={errors.tre?.airlockSSHWhitelistEnabled}
         />
         <HelperText>
-          To upload data via SSH or SFTP into the project airlock from a location different than your browser, that location needs to be whitelisted. See
-          the <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more information.
+          To upload data via SSH or SFTP into the project airlock from a location different than your browser, that
+          location needs to be whitelisted. See the <a href="https://docs.tre.arc.ucl.ac.uk/">documentation</a> for more
+          information.
         </HelperText>
       </div>
 
