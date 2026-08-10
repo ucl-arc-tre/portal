@@ -281,7 +281,7 @@ export default function UserLookup(props: UserLookupProps) {
                     </div>
                   </div>
                   {isExcludedOwner ? (
-                    <HelperText>Study owners can&apos;t be admins</HelperText>
+                    <HelperText>Study owners can&apos;t also be an admin on the same study</HelperText>
                   ) : (
                     selectedUsers.length < limit && (
                       <Button
