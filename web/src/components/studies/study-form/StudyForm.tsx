@@ -21,6 +21,7 @@ type StudyProps = {
 
 export default function StudyForm(StudyProps: StudyProps) {
   const { username, setIsFormOpen, onComplete, editingStudy } = StudyProps;
+  const ownerUsername = editingStudy?.owner_username ?? username;
   const {
     register,
     handleSubmit,
@@ -129,7 +130,7 @@ export default function StudyForm(StudyProps: StudyProps) {
 
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
         {currentStep === 1 && (
-          <StudyFormStep1 control={control} errors={errors} register={register} ownerUsername={username} />
+          <StudyFormStep1 control={control} errors={errors} register={register} ownerUsername={ownerUsername} />
         )}
 
         {currentStep === 2 && <StudyFormStep2 control={control} errors={errors} />}

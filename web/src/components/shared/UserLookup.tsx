@@ -140,10 +140,6 @@ export default function UserLookup(props: UserLookupProps) {
       const results = await fetchSearchResults(query);
       let filteredResults = results;
 
-      if (filterExcludeUsername) {
-        filteredResults = filteredResults.filter((result) => result.username !== filterExcludeUsername);
-      }
-
       if (filterByApprovedResearchers) {
         filteredResults = filteredResults.filter((result) => result.is_valid_approved_researcher);
       }
@@ -270,30 +266,37 @@ export default function UserLookup(props: UserLookupProps) {
           </Alert>
         ) : searchResults.length > 0 ? (
           <div id="search-results">
-            {searchResults.map((result) => (
-              <div
-                className={`${styles["user-item"]} ${styles.result}`}
-                key={result.username}
-                data-id={result.username}
-              >
-                <div className={styles["user-info"]}>
-                  <div>
-                    <h4>{result.chosen_name ? result.chosen_name : result.username}</h4>
-                    <p>{result.chosen_name && result.username}</p>
+            {searchResults.map((result) => {
+              const isExcludedOwner = result.username === filterExcludeUsername;
+              return (
+                <div
+                  className={`${styles["user-item"]} ${isExcludedOwner ? styles.disabled : styles.result}`}
+                  key={result.username}
+                  data-id={result.username}
+                >
+                  <div className={styles["user-info"]}>
+                    <div>
+                      <h4>{result.chosen_name ? result.chosen_name : result.username}</h4>
+                      <p>{result.chosen_name && result.username}</p>
+                    </div>
                   </div>
+                  {isExcludedOwner ? (
+                    <HelperText>Study owners can&apos;t also be an admin on the same study</HelperText>
+                  ) : (
+                    selectedUsers.length < limit && (
+                      <Button
+                        size="small"
+                        variant="secondary"
+                        onClick={() => handleAddUser(result)}
+                        data-cy="add-user-to-selection"
+                      >
+                        + Add
+                      </Button>
+                    )
+                  )}
                 </div>
-                {selectedUsers.length < limit && (
-                  <Button
-                    size="small"
-                    variant="secondary"
-                    onClick={() => handleAddUser(result)}
-                    data-cy="add-user-to-selection"
-                  >
-                    + Add
-                  </Button>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : null)}
 
