@@ -12,6 +12,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+//go:generate go tool oapi-codegen -generate "client,types" -package myservices -o main.gen.go api.yaml
+
 const (
 	sourceIdentity  = "arc-portal"
 	serviceInstance = "ARC Services Portal"
