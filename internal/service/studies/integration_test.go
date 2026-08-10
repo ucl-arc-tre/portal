@@ -584,7 +584,7 @@ func TestIntegration_ValidateStudyData(t *testing.T) {
 				entra: mockEntra,
 			}
 
-			err := svc.validateStudyData(context.Background(), req, curTest.isUpdate)
+			err := svc.validateStudyData(context.Background(), req, curTest.isUpdate, creator.Username)
 
 			if curTest.expectErr {
 				assert.NotNil(t, err)
