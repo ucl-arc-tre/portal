@@ -34,6 +34,27 @@ func (e ProjectUpdateStatus) Valid() bool {
 	}
 }
 
+// Defines values for VMImageKind.
+const (
+	AirlockExternal VMImageKind = "airlock-external"
+	AirlockInternal VMImageKind = "airlock-internal"
+	Desktop         VMImageKind = "desktop"
+)
+
+// Valid indicates whether the value is a known member of the VMImageKind enum.
+func (e VMImageKind) Valid() bool {
+	switch e {
+	case AirlockExternal:
+		return true
+	case AirlockInternal:
+		return true
+	case Desktop:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for VMImagePlatform.
 const (
 	Aws       VMImagePlatform = "aws"
@@ -160,9 +181,13 @@ type VMImage struct {
 
 	// Id e.g. AMI id
 	Id       string          `json:"id"`
+	Kind     VMImageKind     `json:"kind"`
 	Name     string          `json:"name"`
 	Platform VMImagePlatform `json:"platform"`
 }
+
+// VMImageKind defines model for VMImage.Kind.
+type VMImageKind string
 
 // VMImagePlatform defines model for VMImage.Platform.
 type VMImagePlatform string

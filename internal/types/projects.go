@@ -69,7 +69,9 @@ var ProjectTREPlatforms = []ProjectTREPlatform{ProjectTREPlatformAWS, ProjectTRE
 type ProjectTREProjectTREVMImageKind string
 
 const (
-	ProjectTREProjectTREVMImageKindDesktop = "desktop"
+	ProjectTREProjectTREVMImageKindDesktop         = "desktop"
+	ProjectTREProjectTREVMImageKindAirlockExternal = "airlock-external"
+	ProjectTREProjectTREVMImageKindAirlockInternal = "airlock-internal"
 )
 
 type ProjectTREVMImage struct {
