@@ -52,12 +52,20 @@ function NavItem(NavItemProps: NavItemProps) {
 export default function Nav() {
   const logoutUrl = client.getConfig().baseUrl + "/logout";
 
-  const { authInProgress, isIGStaff, isAdmin, isTreOpsStaff, isApprovedResearcher, isApprovedStaffResearcher, isIAO } =
-    useAuth();
+  const {
+    authInProgress,
+    isIGStaff,
+    isAdmin,
+    isDshOpsStaff,
+    isTreOpsStaff,
+    isApprovedResearcher,
+    isApprovedStaffResearcher,
+    isIAO,
+  } = useAuth();
   if (authInProgress) return null;
 
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
-  const canSeeProjects = isApprovedResearcher || isTreOpsStaff || isAdmin;
+  const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff;
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
   const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;
   const canSeeMetrics = isAdmin || isIGStaff;
@@ -72,9 +80,7 @@ export default function Nav() {
 
           {canSeeStudies && <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />}
 
-          {process.env.NEXT_PUBLIC_ENABLE_PROJECTS === "true" && canSeeProjects && (
-            <NavItem href="/projects" icon={<FileIcon />} title="Projects" />
-          )}
+          {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
 
           {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
 
