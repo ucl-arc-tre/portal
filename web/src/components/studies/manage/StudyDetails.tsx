@@ -15,7 +15,7 @@ type StudyOverviewProps = {
   isIGStaff: boolean;
 };
 
-function getRiskClassification(score: number | undefined) {
+export function getRiskClassification(score: number | undefined) {
   if (score === undefined) return undefined;
   if (score < 3) {
     return "manageable";

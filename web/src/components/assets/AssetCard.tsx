@@ -9,6 +9,7 @@ import Card from "../ui/Card";
 import { calculateRiskScorePerAsset } from "../studies/manage/StudyOverview";
 import Badge from "../ui/Badge";
 import Error from "../ui/Error";
+import { getRiskClassification } from "../studies/manage/StudyDetails";
 
 type AssetCardProps = {
   asset: Asset;
@@ -59,7 +60,7 @@ export default function AssetCard(props: AssetCardProps) {
     };
     isAssetCompleted();
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
-
+  const riskScore = calculateRiskScorePerAsset(asset);
   return (
     <Card
       key={asset.id}
@@ -100,8 +101,8 @@ export default function AssetCard(props: AssetCardProps) {
       <div className={styles["asset-details"]}>
         {showRiskScore && (
           <div className={styles["asset-detail"]}>
-            <span className={styles["asset-detail-label"]}>Risk Score:</span>
-            <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset)}</span>
+            <span className={styles["asset-detail-label"]}>Risk Level:</span>
+            <span className={styles["asset-detail-value"]}>{getRiskClassification(riskScore)}</span>
           </div>
         )}
         <div className={styles["asset-detail"]}>
