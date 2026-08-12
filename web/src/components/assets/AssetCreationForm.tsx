@@ -27,7 +27,7 @@ type AssetTierData = {
   is_leak_major_financial_loss: boolean | string;
   is_leak_major_reputational_damage: boolean | string;
   data_types: AssetDataType[];
-  protection: string;
+  protection: string | undefined;
   has_targeted_threat_actors: boolean | string;
   requires_tre: boolean | string;
 };
@@ -190,10 +190,17 @@ export default function AssetCreationForm(props: AssetFormProps) {
       setErrorMessage(null);
       setSuccessMessage(null);
 
+      const isPersonalOrSpecial =
+        data.data_types.includes("personal") || data.data_types.includes("special_category_personal");
+      const isSpecialCategoryPersonal = data.data_types.includes("special_category_personal");
+
       // Transform string boolean values to actual booleans for API
       const transformedAssetData: AssetFormData = {
         ...data,
         tier: calculateTier(data)!,
+        protection: isPersonalOrSpecial ? data.protection : undefined,
+        legal_basis: isPersonalOrSpecial ? data.legal_basis : undefined,
+        legal_basis_special: isSpecialCategoryPersonal ? data.legal_basis_special : undefined,
         expires_at: showExpiryDate ? data.expires_at : null,
         requires_contract: isTrue(data.requires_contract),
         has_dspt: isTrue(data.has_dspt),
