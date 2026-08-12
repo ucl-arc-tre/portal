@@ -218,6 +218,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         riskScore={riskScore}
         canEditOwner={canEditStudyOwner}
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
+        isIGStaff={isIGStaff}
       />
 
       {studyOwnerEditModalOpen && (

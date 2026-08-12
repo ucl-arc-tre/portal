@@ -15,6 +15,7 @@ type AssetCardProps = {
   studyId: string;
   involvesNHS?: boolean | null;
   showRiskScore?: boolean;
+  isIGStaff?: boolean;
 };
 
 const formatClassification = (classification: string) => {
@@ -100,7 +101,7 @@ export default function AssetCard(props: AssetCardProps) {
         {showRiskScore && (
           <div className={styles["asset-detail"]}>
             <span className={styles["asset-detail-label"]}>Risk Score:</span>
-            <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset, involvesNHS)}</span>
+            <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset)}</span>
           </div>
         )}
         <div className={styles["asset-detail"]}>

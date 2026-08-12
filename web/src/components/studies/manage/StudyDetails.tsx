@@ -12,25 +12,25 @@ type StudyOverviewProps = {
   riskScore?: number;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
+  isIGStaff: boolean;
 };
 
 function getRiskClassification(score: number | undefined) {
   if (score === undefined) return undefined;
-  if (score < 10) {
-    return "low";
-  } else if (score >= 10 && score < 30) {
-    return "moderate";
-  } else if (score >= 30 && score < 50) {
-    return "high";
-  } else if (score >= 50) {
-    return "very-high";
+  if (score < 3) {
+    return "manageable";
+  } else if (score >= 3 && score < 5) {
+    return "uncomfortable";
+  } else if (score >= 5 && score < 12) {
+    return "vulnerable";
+  } else if (score >= 12) {
+    return "critical";
   }
   return "default";
 }
 
 export default function StudyDetails(props: StudyOverviewProps) {
-  const { study, riskScore, setOwnerEditModal, canEditOwner } = props;
-  const standardRiskScoreStatement = "increases risk score by 5";
+  const { study, riskScore, setOwnerEditModal, canEditOwner, isIGStaff } = props;
 
   const riskClassification = getRiskClassification(riskScore);
   const riskScoreStyle = styles[`risk-score-${riskClassification}`];
@@ -60,7 +60,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           <span className={styles["detail-item"]}>
             Risk:{" "}
             <Badge className={`${riskScoreStyle}`} cy="risk-badge">
-              {riskClassification} ({riskScore})
+              {riskClassification} {isIGStaff && `(${riskScore}/16)`}
             </Badge>
           </span>
         )}
@@ -113,10 +113,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.involves_cag && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              CAG approval
-              <InfoTooltip text="increases risk score by 5" />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>CAG approval</dd>
           )}
 
           {study.involves_ethics_approval && (
@@ -144,10 +141,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.involves_nhs_england && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              NHS England involvement
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>NHS England involvement</dd>
           )}
 
           {study.involves_mnca && (
@@ -155,10 +149,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.requires_dspt && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              requires DSPT
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>requires DSPT</dd>
           )}
 
           {!study.is_nhs_associated && !study.involves_nhs_england && !study.involves_mnca && !study.requires_dspt && (
@@ -171,10 +162,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           <dt>Data</dt>
 
           {study.requires_dbs && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              requires DBS
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>requires DBS</dd>
           )}
 
           {study.is_data_protection_office_registered && (
@@ -182,10 +170,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.involves_third_party && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              third party
-              <InfoTooltip text="increases risk score by 5 if no mNCA" />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>third party</dd>
           )}
 
           {study.involves_external_users && (
@@ -203,7 +188,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           {study.involves_data_processing_outside_eea && (
             <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
               data processing outside EEA
-              <InfoTooltip text="increases risk score by 10" />
+              <InfoTooltip text="increases likelihood of compromise due to additional legal, contractual and regulatory considerations needed" />
             </dd>
           )}
 
