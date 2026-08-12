@@ -21,7 +21,7 @@
     "react-is": "^19.2.8",
     "react-markdown": "^10.1.0",
     "recharts": "^3.10.0",
-    "uikit-react-public": "^0.37.0",
+    "uikit-react-public": "^0.40.2",
     "design-system-foundations-public": "^0.1.6"
   },
   "devDependencies": {
