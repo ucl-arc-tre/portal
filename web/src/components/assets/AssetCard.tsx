@@ -14,7 +14,6 @@ import { getRiskClassification } from "../studies/manage/StudyDetails";
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  involvesNHS?: boolean | null;
   showRiskScore?: boolean;
   isIGStaff?: boolean;
 };
@@ -41,7 +40,7 @@ const getClassificationClass = (classification: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, involvesNHS, showRiskScore = true } = props;
+  const { studyId, asset, isIGStaff, showRiskScore = true } = props;
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -102,7 +101,10 @@ export default function AssetCard(props: AssetCardProps) {
         {showRiskScore && (
           <div className={styles["asset-detail"]}>
             <span className={styles["asset-detail-label"]}>Risk Level:</span>
-            <span className={styles["asset-detail-value"]}>{getRiskClassification(riskScore)}</span>
+            <span className={styles["asset-detail-value"]}>
+              {getRiskClassification(riskScore)}
+              {isIGStaff && `(${riskScore}/16)`}
+            </span>
           </div>
         )}
         <div className={styles["asset-detail"]}>

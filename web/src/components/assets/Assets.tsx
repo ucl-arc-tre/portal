@@ -21,13 +21,11 @@ type AssetsProps = {
 
 export default function Assets(props: AssetsProps) {
   const { study, assets, setAssets } = props;
-  const { userData } = useAuth();
+  const { userData, isIGAdmin, isIAO, isIGStaff } = useAuth();
 
-  const isIgAdmin = userData?.roles.includes("ig-admin") ?? false;
-  const isStudyOwner =
-    userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username;
+  const isStudyOwner = isIAO && study.owner_username === userData?.username;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData.username)) ?? false;
-  const canModify = isStudyOwner || isStudyAdmin || isIgAdmin;
+  const canModify = isStudyOwner || isStudyAdmin || isIGAdmin;
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
@@ -117,7 +115,7 @@ export default function Assets(props: AssetsProps) {
 
             <div className={styles["assets-grid"]}>
               {assets.map((asset) => (
-                <AssetCard key={asset.id} studyId={study.id} asset={asset} involvesNHS={study.involves_nhs_england} />
+                <AssetCard key={asset.id} studyId={study.id} asset={asset} isIGStaff={isIGStaff} />
               ))}
             </div>
           </div>
