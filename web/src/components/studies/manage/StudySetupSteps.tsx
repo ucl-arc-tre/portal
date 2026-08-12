@@ -67,7 +67,7 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
       description:
         "Create and manage at least one information asset. You can create more assets at any time. Note that contracts can also be attached to assets, in some cases this is required.",
       completed: hasAsset,
-      current: !hasAsset,
+      current: agreementCompleted && !hasAsset,
     },
   ];
 
