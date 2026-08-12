@@ -48,21 +48,21 @@
 }
 
 .step-icon-pending {
-  background-color: #fef2f2;
-  color: #b91c1c;
-  border: 2px solid #fecaca;
+  background-color: #f3f4f6;
+  color: #9499a4;
+  border: 2px solid #d1d5db;
 }
 
 .step-icon-current {
-  background-color: #0e8d3d;
+  background-color: #6b7280;
   color: white;
-  border: 2px solid #3f8257;
+  border: 2px solid #4b5563;
 }
 
 .step-icon-completed {
-  background-color: var(--green-200);
+  background-color: #218646;
   color: white;
-  border: 2px solid var(--green-200);
+  border: 2px solid #218646;
 }
 
 .step-icon-expiry-urgency-medium {
@@ -95,12 +95,12 @@
 }
 
 .step-title-pending {
-  color: #b80f0f;
+  color: #6b7280;
   font-weight: 600;
 }
 
 .step-title-current {
-  color: #16a34a;
+  color: #6b7280;
   font-weight: 700;
   font-size: 1.2rem;
 }
@@ -145,7 +145,7 @@
 }
 
 .step-connector-completed {
-  background-color: var(--green-200);
+  background-color: #218646;
 }
 
 .completion-container[open] > summary {
