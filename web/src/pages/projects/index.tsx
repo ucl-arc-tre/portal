@@ -17,10 +17,6 @@ export default function ProjectsPage() {
   if (authInProgress) return null;
   if (!isAuthed || !userData) return <LoginFallback />;
 
-  if (process.env.NEXT_PUBLIC_ENABLE_PROJECTS !== "true") {
-    return <div>Feature currently under development</div>;
-  }
-
   if (!isApprovedResearcher) {
     return (
       <>
@@ -47,9 +43,12 @@ export default function ProjectsPage() {
         description="View and modify projects in the ARC Services Portal"
       />
 
-      <Callout construction>
-        Not all Project features work yet. We&apos;re actively working on adding more functionality!
-      </Callout>
+      <Callout
+        construction
+        text={
+          "Only ARC TRE and Data Safe Haven projects are currently viewable here. We're working to onboard other environments and enable creation."
+        }
+      />
 
       <Projects />
     </>

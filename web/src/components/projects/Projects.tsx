@@ -26,6 +26,7 @@ export default function Projects() {
 
   const approvedStudies = studies?.filter((study) => study.approval_status === "Approved");
   const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin;
+  const creationEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_CREATION === "true";
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -95,10 +96,6 @@ export default function Projects() {
     );
   }
 
-  if (process.env.NEXT_PUBLIC_ENABLE_PROJECTS !== "true") {
-    return;
-  }
-
   if (!canSeeAllProjects && approvedStudies && approvedStudies.length === 0 && isApprovedStaffResearcher) {
     return (
       <div className={styles["no-projects-message"]}>
@@ -128,7 +125,7 @@ export default function Projects() {
                 <InfoIcon />
               </Button>
             </h2>
-            {isApprovedStaffResearcher && projects.length > 0 && (
+            {isApprovedStaffResearcher && projects.length > 0 && creationEnabled && (
               <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
                 Create Project
               </Button>
@@ -176,9 +173,11 @@ export default function Projects() {
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t created any Projects yet</h2>
           <ProjectDefinition />
-          <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
-            Create Your First Project
-          </Button>
+          {creationEnabled && (
+            <Button onClick={handleCreateProjectClick} size="large" cy="create-project-button">
+              Create Your First Project
+            </Button>
+          )}
         </div>
       ) : (
         <ProjectCardsList projects={projects} isOpsStaff={isTreOpsStaff} />
