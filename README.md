@@ -45,10 +45,16 @@ into `main`.
 
 ## Production
 
-[Production](https://portal.arc.ucl.ac.uk) is deployed manually by a senior member of the team. This
-is done by updating the portal version in a separate deployment repository to the desired commit.
-Production deployments are done at the team's discretion — typically once a set of changes has been
-verified on staging.
+[Production](https://portal.arc.ucl.ac.uk) is deployed by updating the portal version in a separate deployment repository to the latest release. Releases are made at the team's discretion — typically once a set of changes has been
+verified on staging. Once agreed, create a release by creating a tag on `main` (replacing `<x.y.z>` with the version number)
+
+```bash
+git switch main && git pull
+git tag v<x.y.z>
+git push origin tag v<x.y.z>
+```
+
+then [create a release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) based on the tag on GitHub. Pre-release release versions will not be deployed.
 
 For more information on production deployments, refer to the project Slack channel docs.
 
