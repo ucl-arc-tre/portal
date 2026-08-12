@@ -22,45 +22,68 @@ type StudyOverviewProps = {
   unagreedAdminUsernames?: string[];
 };
 
-export const calculateRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boolean | undefined | null) => {
-  const nhs_multiplier = 3;
-  let assetScore = 0;
+export const calculateRiskScorePerAsset = (asset: Asset) => {
+  let likelihoodScore = 0;
+  let impactScore = 0;
 
   asset.locations.forEach((assetLocation) => {
     const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
     if (!location) return;
-    assetScore += involvesNhsEngland
-      ? asset.tier * nhs_multiplier * location.riskScore
-      : asset.tier * location.riskScore;
+    if (location.riskScore > likelihoodScore) {
+      likelihoodScore = location.riskScore;
+    }
   });
+
+  if (asset.stored_outside_uk_eea === true) {
+    likelihoodScore += 1;
+  }
+
+  switch (asset.classification_impact) {
+    case "public":
+      impactScore += 0;
+      break;
+    case "confidential":
+    case "highly_confidential":
+      impactScore += 1;
+      break;
+    default:
+      break;
+  }
+  switch (asset.protection) {
+    case "anonymisation":
+      impactScore += 0;
+      break;
+    case "pseudonymisation":
+      impactScore += 1;
+      break;
+    case "identifiable_low_confidence_pseudonymisation":
+      impactScore += 2;
+      break;
+    default:
+      break;
+  }
+
+  const assetScore = likelihoodScore * impactScore;
+
   return assetScore;
 };
 
-const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
-  let assetsRiskScore = 0;
+const calculateHighestAssetRiskScore = (assets: Asset[]) => {
+  let highestAssetScore = 0;
 
   for (const asset of assets) {
-    assetsRiskScore += calculateRiskScorePerAsset(asset, involvesNhsEngland);
+    const assetScore = calculateRiskScorePerAsset(asset);
+    if (assetScore > highestAssetScore) {
+      highestAssetScore = assetScore;
+    }
   }
 
-  return score + assetsRiskScore;
-};
-
-const calculateBaseRiskScore = (study: Study) => {
-  let score = 0;
-  if (study.involves_data_processing_outside_eea) score += 10;
-  if (study.requires_dbs) score += 5;
-  if (study.requires_dspt) score += 5;
-  if (study.involves_third_party && !study.involves_mnca) score += 5;
-  if (study.involves_nhs_england || study.involves_cag) score += 5;
-  return score;
+  return highestAssetScore;
 };
 
 const calculateRiskScore = (study: Study, assets: Asset[] | undefined) => {
-  const baseRiskScore = calculateBaseRiskScore(study);
-  if (assets === undefined) return undefined;
-  if (assets.length === 0) return baseRiskScore;
-  return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
+  if (assets === undefined || assets.length === 0) return undefined;
+  return calculateHighestAssetRiskScore(assets);
 };
 
 export default function StudyOverview({ study, assets, fetchStudy, unagreedAdminUsernames }: StudyOverviewProps) {
