@@ -36,6 +36,8 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
 
   if (asset.stored_outside_uk_eea === true) {
     likelihoodScore += 1;
+    // to align with IG likelihood scale
+    if (likelihoodScore > 3) likelihoodScore = 6;
   }
 
   switch (asset.classification_impact) {
