@@ -45,8 +45,7 @@ into `main`.
 
 ## Production
 
-[Production](https://portal.arc.ucl.ac.uk) is deployed by updating the portal version in a separate deployment repository to the latest release. Releases are made at the team's discretion — typically once a set of changes has been
-verified on staging. Once agreed, create a release by creating a tag on `main` (replacing `<x.y.z>` with the version number)
+[Production](https://portal.arc.ucl.ac.uk) is deployed by updating the portal version in a separate deployment repository to the latest release. Releases are made at the team's discretion — typically once a set of changes has been verified on staging. Once agreed, create a release by creating a tag on `main` (replacing `<x.y.z>` with the version number)
 
 ```bash
 git switch main && git pull
