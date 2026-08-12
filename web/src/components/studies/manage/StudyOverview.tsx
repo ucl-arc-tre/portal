@@ -6,7 +6,6 @@ import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";
-import { storageLocationDefinitions } from "../../shared/storageDefinitions";
 
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
@@ -14,78 +13,13 @@ import Box from "@/components/ui/Box";
 import Dialog from "@/components/ui/Dialog";
 import StudyAffirmation from "./StudyAffirmation";
 import StudyOwnerEdit from "./StudyOwnerEdit";
+import { getStudyRiskLevel } from "./lib/riskScoreCalculations";
 
 type StudyOverviewProps = {
   study: Study;
   assets?: Asset[];
   fetchStudy: (id: string) => Promise<void>;
   unagreedAdminUsernames?: string[];
-};
-
-export const calculateRiskScorePerAsset = (asset: Asset) => {
-  let likelihoodScore = 0;
-  let impactScore = 0;
-
-  asset.locations.forEach((assetLocation) => {
-    const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
-    if (!location) return;
-    if (location.riskScore > likelihoodScore) {
-      likelihoodScore = location.riskScore;
-    }
-  });
-
-  if (asset.stored_outside_uk_eea === true) {
-    likelihoodScore += 1;
-    // to align with IG likelihood scale
-    if (likelihoodScore > 3) likelihoodScore = 6;
-  }
-
-  switch (asset.classification_impact) {
-    case "public":
-      impactScore += 0;
-      break;
-    case "confidential":
-    case "highly_confidential":
-      impactScore += 1;
-      break;
-    default:
-      break;
-  }
-  switch (asset.protection) {
-    case "anonymisation":
-      impactScore += 0;
-      break;
-    case "pseudonymisation":
-      impactScore += 1;
-      break;
-    case "identifiable_low_confidence_pseudonymisation":
-      impactScore += 2;
-      break;
-    default:
-      break;
-  }
-
-  const assetScore = likelihoodScore * impactScore;
-
-  return assetScore;
-};
-
-const calculateHighestAssetRiskScore = (assets: Asset[]) => {
-  let highestAssetScore = 0;
-
-  for (const asset of assets) {
-    const assetScore = calculateRiskScorePerAsset(asset);
-    if (assetScore > highestAssetScore) {
-      highestAssetScore = assetScore;
-    }
-  }
-
-  return highestAssetScore;
-};
-
-const calculateRiskScore = (study: Study, assets: Asset[] | undefined) => {
-  if (assets === undefined || assets.length === 0) return undefined;
-  return calculateHighestAssetRiskScore(assets);
 };
 
 export default function StudyOverview({ study, assets, fetchStudy, unagreedAdminUsernames }: StudyOverviewProps) {
@@ -95,10 +29,8 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
   const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
-  const { userData, isIGStaff } = useAuth();
-  const isIGAdmin = userData?.roles.includes("ig-admin") || false;
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
+  const { userData, isIGStaff, isIGAdmin, isIAO } = useAuth();
+  const isStudyOwner = (isIAO && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
@@ -113,7 +45,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
     (asset) => asset.data_types?.includes("personal") || asset.data_types?.includes("special_category_personal")
   );
 
-  const riskScore = calculateRiskScore(study, assets);
+  const riskLevel = getStudyRiskLevel(assets);
 
   const onEditComplete = () => {
     setIsFormOpen(false);
@@ -215,7 +147,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
 
       <StudyDetails
         study={study}
-        riskScore={riskScore}
+        riskLevel={riskLevel}
         canEditOwner={canEditStudyOwner}
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
         isIGStaff={isIGStaff}

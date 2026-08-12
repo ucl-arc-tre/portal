@@ -9,31 +9,16 @@ import EditIcon from "@/components/ui/EditIcon";
 
 type StudyOverviewProps = {
   study: Study;
-  riskScore?: number;
+  riskLevel?: { classification: string | undefined; score: number | undefined };
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
   isIGStaff: boolean;
 };
 
-export function getRiskClassification(score: number | undefined) {
-  if (score === undefined) return undefined;
-  if (score < 3) {
-    return "manageable";
-  } else if (score >= 3 && score < 5) {
-    return "uncomfortable";
-  } else if (score >= 5 && score < 12) {
-    return "vulnerable";
-  } else if (score >= 12) {
-    return "critical";
-  }
-  return "default";
-}
-
 export default function StudyDetails(props: StudyOverviewProps) {
-  const { study, riskScore, setOwnerEditModal, canEditOwner, isIGStaff } = props;
+  const { study, riskLevel, setOwnerEditModal, canEditOwner, isIGStaff } = props;
 
-  const riskClassification = getRiskClassification(riskScore);
-  const riskScoreStyle = styles[`risk-score-${riskClassification}`];
+  const riskScoreStyle = styles[`risk-score-${riskLevel?.classification}`];
 
   return (
     <>
@@ -56,11 +41,11 @@ export default function StudyDetails(props: StudyOverviewProps) {
           </span>
         )}
 
-        {riskScore !== undefined && (
+        {riskLevel?.classification !== undefined && (
           <span className={styles["detail-item"]}>
             Risk:{" "}
             <Badge className={`${riskScoreStyle}`} cy="risk-badge">
-              {riskClassification} {isIGStaff && `(${riskScore}/16)`}
+              {riskLevel.classification} {isIGStaff && `(${riskLevel.score}/16)`}
             </Badge>
           </span>
         )}
