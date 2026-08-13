@@ -7,13 +7,16 @@ export type RiskLevel = {
 };
 type RiskClassification = "manageable" | "uncomfortable" | "vulnerable" | "critical";
 
-export const riskScoreMax = 16;
+const maxLikelihoodScore = 4; // to align with IG likelihood scale
+const maxAssetLikelihoodScore = Math.max(...storageLocationDefinitions.map((def) => def.likelihoodScore));
 
-export const calculateRiskScorePerAsset = (asset: Asset) => {
+const maxAssetImpactScore = 6;
+const maxImpactScore = 4;
+
+export const riskScoreMax = maxImpactScore * maxLikelihoodScore;
+
+const calculateAssetLikelihoodScore = (asset: Asset) => {
   let likelihoodScore = 0;
-  let impactScore = 0;
-  const maxLikelihoodScore = 6; // to align with IG likelihood scale
-
   asset.locations.forEach((assetLocation) => {
     const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
     if (!location) return;
@@ -25,6 +28,13 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
   if (asset.stored_outside_uk_eea === true) {
     likelihoodScore += 1;
   }
+
+  // Likelihoods are relative, so normalise to make sure it's at most maxLikelihoodScore
+  return (Math.min(likelihoodScore, maxAssetLikelihoodScore) * maxLikelihoodScore) / maxAssetLikelihoodScore;
+};
+
+export const calculateRiskScorePerAsset = (asset: Asset) => {
+  let impactScore = 0;
 
   switch (asset.classification_impact) {
     case "public":
@@ -61,11 +71,11 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
     impactScore += 1;
   }
 
-  likelihoodScore = Math.min(likelihoodScore, maxLikelihoodScore);
-
+  impactScore *= maxImpactScore / maxAssetImpactScore; // normalise
+  const likelihoodScore = calculateAssetLikelihoodScore(asset);
   const assetScore = likelihoodScore * impactScore;
 
-  return assetScore;
+  return Math.round(assetScore);
 };
 
 const calculateHighestAssetRiskScore = (assets: Asset[]) => {

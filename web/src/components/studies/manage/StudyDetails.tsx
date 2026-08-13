@@ -18,7 +18,7 @@ type StudyOverviewProps = {
 
 export default function StudyDetails(props: StudyOverviewProps) {
   const { study, riskLevel, setOwnerEditModal, canEditOwner } = props;
-  const isIGStaff = useAuth();
+  const { isIGStaff } = useAuth();
 
   const riskScoreStyle = styles[`risk-score-${riskLevel?.classification}`];
 
