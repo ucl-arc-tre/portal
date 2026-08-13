@@ -61,19 +61,6 @@
   margin: 0;
 }
 
-.asset-info strong {
-  display: block;
-  color: #333;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.asset-info p {
-  color: #666;
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-}
-
 .asset-tier {
   display: inline-block;
   padding: 0.2rem 0.6rem;
