@@ -6,10 +6,10 @@ import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
-import { calculateRiskScorePerAsset } from "../studies/manage/lib/riskScoreCalculations";
+import { calculateRiskScorePerAsset } from "../../lib/riskScoreCalculations";
 import Badge from "../ui/Badge";
 import Error from "../ui/Error";
-import { getRiskClassification } from "../studies/manage/lib/riskScoreCalculations";
+import { getRiskClassification } from "../../lib/riskScoreCalculations";
 
 type AssetCardProps = {
   asset: Asset;

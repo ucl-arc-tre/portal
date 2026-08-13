@@ -13,7 +13,7 @@ import Box from "@/components/ui/Box";
 import Dialog from "@/components/ui/Dialog";
 import StudyAffirmation from "./StudyAffirmation";
 import StudyOwnerEdit from "./StudyOwnerEdit";
-import { getStudyRiskLevel } from "./lib/riskScoreCalculations";
+import { getStudyRiskLevel } from "../../../lib/riskScoreCalculations";
 
 type StudyOverviewProps = {
   study: Study;
