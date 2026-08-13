@@ -1,16 +1,29 @@
+import Link from "next/link";
 import { Project } from "@/openapi";
 import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
+import { HelperText } from "../shared/uikitExports";
 
 type Props = {
   projects: Project[];
-  isOpsStaff: boolean;
 };
 
 export default function ProjectCardsList(props: Props) {
   const { projects } = props;
+
+  if (projects.length === 0) {
+    return (
+      <HelperText>
+        No projects have been created for this study yet. Visit the{" "}
+        <Link href="/projects" className={styles.link}>
+          Projects
+        </Link>{" "}
+        page to create one.
+      </HelperText>
+    );
+  }
 
   return (
     <div className={styles["project-selection"]}>

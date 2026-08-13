@@ -1,4 +1,4 @@
-import { patchStudiesByStudyIdPending, Study, Asset } from "@/openapi";
+import { patchStudiesByStudyIdPending, Study, Asset, Contract, Project } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import Error from "../../ui/Error";
@@ -18,6 +18,8 @@ import StudyOwnerEdit from "./StudyOwnerEdit";
 type StudyOverviewProps = {
   study: Study;
   assets?: Asset[];
+  contracts?: Contract[];
+  projects?: Project[];
   fetchStudy: (id: string) => Promise<void>;
   unagreedAdminUsernames?: string[];
 };
@@ -63,7 +65,14 @@ const calculateRiskScore = (study: Study, assets: Asset[] | undefined) => {
   return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
 };
 
-export default function StudyOverview({ study, assets, fetchStudy, unagreedAdminUsernames }: StudyOverviewProps) {
+export default function StudyOverview({
+  study,
+  assets,
+  contracts,
+  projects,
+  fetchStudy,
+  unagreedAdminUsernames,
+}: StudyOverviewProps) {
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
@@ -195,6 +204,18 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
       />
 
+      <div className={styles["pre-description"]} data-cy="study-summary-counts">
+        <span className={styles["detail-item"]}>
+          Projects: <span className={styles["grey-value"]}>{projects?.length ?? 0}</span>
+        </span>
+        <span className={styles["detail-item"]}>
+          Assets: <span className={styles["grey-value"]}>{assets?.length ?? 0}</span>
+        </span>
+        <span className={styles["detail-item"]}>
+          Contracts: <span className={styles["grey-value"]}>{contracts?.length ?? 0}</span>
+        </span>
+      </div>
+
       {studyOwnerEditModalOpen && (
         <StudyOwnerEdit
           study={study}
@@ -220,6 +241,7 @@ export default function StudyOverview({ study, assets, fetchStudy, unagreedAdmin
               </AlertMessage>
             </Alert>
           )}
+
           <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
         </Dialog>
       )}

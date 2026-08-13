@@ -180,7 +180,7 @@ export default function Projects() {
           )}
         </div>
       ) : (
-        <ProjectCardsList projects={projects} isOpsStaff={isTreOpsStaff} />
+        <ProjectCardsList projects={projects} />
       )}
     </div>
   );
