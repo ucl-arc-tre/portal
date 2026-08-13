@@ -24,7 +24,14 @@ type StudyOverviewProps = {
   unagreedAdminUsernames?: string[];
 };
 
-export default function StudyOverview({ study, assets, projects fetchStudy, unagreedAdminUsernames }: StudyOverviewProps) {
+export default function StudyOverview({
+  study,
+  assets,
+  projects,
+  contracts,
+  fetchStudy,
+  unagreedAdminUsernames,
+}: StudyOverviewProps) {
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
