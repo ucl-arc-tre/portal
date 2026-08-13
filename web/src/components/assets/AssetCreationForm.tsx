@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
+import TextLink from "../ui/TextLink";
 import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
@@ -278,13 +279,13 @@ export default function AssetCreationForm(props: AssetFormProps) {
           <div className={styles["info-text"]}>
             <p>
               You should be aware of{" "}
-              <a
+              <TextLink
                 href="https://liveuclac.sharepoint.com/sites/ISD.InformationSecurityGroup/Team%20Documents/Policy/Information-Management-Policy_V1.2.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 UCL&apos;s policy on classifying information assets
-              </a>{" "}
+              </TextLink>{" "}
               before determining a classification.
             </p>
           </div>
@@ -369,13 +370,13 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 <p>
                   Select the most relevant legal basis from the six options available. To learn more about the legal
                   basis requirements refer to{" "}
-                  <a
+                  <TextLink
                     href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/a-guide-to-lawful-basis/"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     UK GDPR guidance
-                  </a>
+                  </TextLink>
                 </p>
               </div>
               <select
@@ -566,14 +567,9 @@ export default function AssetCreationForm(props: AssetFormProps) {
           <Label htmlFor="location">
             Where will these files/items be saved/stored and how will they be moved? Select all of the touchpoints that
             are relevant including backups. *{" "}
-            <a
-              href="/assets/definitions"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles["definitions-link"]}
-            >
+            <TextLink href="/assets/definitions" target="_blank" rel="noopener noreferrer">
               What do these options mean? (Must read)
-            </a>
+            </TextLink>
           </Label>
 
           <div className={styles["checkbox-group"]}>

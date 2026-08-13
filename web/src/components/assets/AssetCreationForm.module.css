@@ -38,30 +38,10 @@
   line-height: 1.4;
 }
 
-.info-text a {
-  color: #0066cc;
-  text-decoration: underline;
-}
-
-.info-text a:hover {
-  color: #004499;
-}
-
 .checkbox-group {
   display: flex;
   flex-direction: column;
   margin-top: 0.5rem;
-}
-
-.definitions-link {
-  color: var(--form-link);
-  text-decoration: underline;
-  font-weight: 500;
-}
-
-.definitions-link:hover {
-  color: var(--form-link-hover);
-  text-decoration: none;
 }
 
 .ucl-guidance {

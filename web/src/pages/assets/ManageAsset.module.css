@@ -4,17 +4,6 @@
   padding: 1rem;
 }
 
-.asset-info {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-
-  a {
-    color: var(--form-link);
-  }
-}
-
 .field {
   display: grid;
   grid-template-columns: 1fr;

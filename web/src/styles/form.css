@@ -111,9 +111,4 @@
     min-height: 100px;
     font-family: inherit;
   }
-
-  a {
-    text-decoration: underline;
-    color: var(--form-link);
-  }
 }
