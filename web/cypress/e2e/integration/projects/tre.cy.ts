@@ -106,6 +106,16 @@ describe("TRE project creation end-to-end", () => {
     cy.get('[data-cy="mark-project-ready-for-review-button"]').click();
   });
 
+  it("study's projects tab should show the created project", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).click();
+    cy.get('button[data-cy="projects"]').click();
+
+    cy.contains(projectTitle).should("be.visible");
+  });
+
   it("tre ops staff should be able to approve the project", () => {
     cy.loginAsTREOps();
     cy.becomeApprovedResearcher();

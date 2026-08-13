@@ -17,7 +17,7 @@ export default function ProjectCardsList(props: Props) {
     return (
       <HelperText>
         No projects have been created for this study yet. Visit the{" "}
-        <Link href="/projects" className={styles.link}>
+        <Link href="/projects" className={styles.link} data-cy="empty-projects-link">
           Projects
         </Link>{" "}
         page to create one.
