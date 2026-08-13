@@ -129,7 +129,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="study-details"]').should("be.visible");
   });
 
-  it("shiould be able to remove admin and request for review", () => {
+  it("should be able to remove admin and request for review", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
@@ -149,6 +149,20 @@ describe("Study creation end-to-end", () => {
 
     cy.contains("Case ref").should("exist");
     cy.contains("Last signed off").should("exist");
+  });
+
+  it("owner should see an empty projects tab linking to the projects page", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).click();
+    cy.get('button[data-cy="projects"]').click();
+
+    cy.contains("No projects have been created for this study yet.").should("be.visible");
+    cy.get('[data-cy="empty-projects-link"]').click();
+
+    cy.url().should("include", "/projects");
+    cy.get('[data-cy="create-project-button"]').should("be.visible");
   });
 
   it("owner should be able to edit an asset", () => {

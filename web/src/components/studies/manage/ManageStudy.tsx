@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import {
   Asset,
   Contract,
+  Project,
+  getProjects,
   getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdContracts,
@@ -15,6 +17,7 @@ import StudyTabs from "./StudyTabs";
 import AdminReview from "./AdminReview";
 import Assets from "../../assets/Assets";
 import ContractManagement from "../../contracts/ContractManagement";
+import ProjectCardsList from "../../projects/ProjectCardsList";
 import { useAuth } from "@/hooks/useAuth";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Error from "../../ui/Error";
@@ -34,6 +37,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [error, setError] = useState<string | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [agreements, setAgreements] = useState<StudyAgreements | null>(null);
   const [unagreedAdminUsernames, setUnagreedAdminUsernames] = useState<string[]>([]);
 
@@ -42,7 +46,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const studyStepsCompleted = isLoading ? null : hasAsset && hasAgreed;
 
   const router = useRouter();
-  const tab = (router.query.tab as "study" | "assets" | "contracts") ?? "study";
+  const tab = (router.query.tab as "study" | "projects" | "assets" | "contracts") ?? "study";
 
   const isStudyOwner =
     userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username;
@@ -68,10 +72,11 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     setIsLoading(true);
 
     try {
-      const [assetsResponse, contractsResponse, agreementsResponse] = await Promise.all([
+      const [assetsResponse, contractsResponse, agreementsResponse, projectsResponse] = await Promise.all([
         getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
         getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
         getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
+        getProjects(),
       ]);
 
       if (responseIsError(assetsResponse) || !assetsResponse.data) {
@@ -92,9 +97,16 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         return;
       }
 
+      if (responseIsError(projectsResponse) || !projectsResponse.data) {
+        const errorMsg = extractErrorMessage(projectsResponse);
+        setError(`Failed to load projects: ${errorMsg}`);
+        return;
+      }
+
       setAssets(assetsResponse.data);
       setContracts(contractsResponse.data);
       setAgreements(agreementsResponse.data);
+      setProjects(projectsResponse.data.filter((project) => project.study_id === study.id));
 
       checkStudyAdminAgreements(agreementsResponse.data.usernames);
     } catch (error) {
@@ -136,6 +148,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {showSignoffWarning && (
         <StudyAffirmation studyId={study.id} successCallback={() => fetchStudy(study.id)} isReaffirmation />
       )}
+
       {isIGStaff && study.approval_status !== "Incomplete" && (
         <AdminReview
           study={study}
@@ -143,12 +156,15 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           onReviewComplete={() => fetchStudy(study.id)}
         />
       )}
+
       <StudyTabs assets={assets} contracts={contracts} />
 
       {tab === "study" && (
         <StudyOverview
           study={study}
           assets={assets}
+          contracts={contracts}
+          projects={projects}
           fetchStudy={fetchStudy}
           unagreedAdminUsernames={unagreedAdminUsernames}
         />
@@ -164,6 +180,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           fetchStudyContents={fetchStudyContents}
         />
       )}
+
+      {tab === "projects" && <ProjectCardsList projects={projects} />}
     </>
   );
 }

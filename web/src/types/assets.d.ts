@@ -33,8 +33,8 @@ type AssetFormData = {
   source?: string | undefined;
   classification_impact: "public" | "confidential" | "highly_confidential";
   tier: number | string; // Can be string from form, converted to number
-  protection: AssetProtectionType;
-  legal_basis: string;
+  protection: AssetProtectionType | undefined;
+  legal_basis: string | undefined;
   legal_basis_special: AssetLegalSpecialType | undefined;
   format: string;
   has_expiry_date: boolean | string;

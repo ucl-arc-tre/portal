@@ -31,6 +31,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
         { name: "study", label: "Study Overview" },
         { name: "assets", needsAttention: assetsNeedAttention },
         { name: "contracts", needsAttention: contractsNeedAttention },
+        { name: "projects" },
       ]}
       defaultTab="study"
     />
