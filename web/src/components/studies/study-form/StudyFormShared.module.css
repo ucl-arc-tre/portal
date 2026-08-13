@@ -62,16 +62,6 @@
   align-content: center;
 }
 
-.form-link {
-  color: var(--form-link);
-  text-decoration: underline;
-}
-
-.form-link:hover {
-  color: var(--form-link--hover);
-  text-decoration: none;
-}
-
 .readonly {
   cursor: not-allowed;
 }

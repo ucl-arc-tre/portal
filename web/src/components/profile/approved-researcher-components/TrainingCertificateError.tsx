@@ -1,4 +1,5 @@
 import { AlertMessage } from "@/components/shared/uikitExports";
+import TextLink from "@/components/ui/TextLink";
 import styles from "./TrainingCertificateError.module.css";
 
 type TrainingCertificateErrorProps = {
@@ -19,11 +20,11 @@ export default function TrainingCertificateError(props: TrainingCertificateError
           <span>
             {" "}
             If you believe your certificate is valid please email it to{" "}
-            <a
+            <TextLink
               href={`mailto:${manualApprovalEmailAddress}?body=${manualApprovalEmailBody}&subject=${manualApprovalEmailSubject}`}
             >
               {manualApprovalEmailAddress}
-            </a>{" "}
+            </TextLink>{" "}
             for manual approval.
           </span>
         )}

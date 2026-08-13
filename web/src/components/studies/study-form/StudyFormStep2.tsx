@@ -1,6 +1,7 @@
 import { Control, Controller, FieldErrors, useWatch } from "react-hook-form";
 import { HelperText, Label } from "../../shared/uikitExports";
 import Error from "../../ui/Error";
+import TextLink from "../../ui/TextLink";
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep2.module.css";
 import YesNoUnsureButtons from "./YesNoUnsureButtons";
@@ -22,12 +23,9 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
         <div className={sharedStyles["option-field"]} data-cy="involvesUclSponsorship">
           <span>
             We will be seeking/have sought{" "}
-            <a
-              className={sharedStyles["form-link"]}
-              href="https://www.ucl.ac.uk/joint-research-office/new-studies/sponsorship-and-grant-submissions"
-            >
+            <TextLink href="https://www.ucl.ac.uk/joint-research-office/new-studies/sponsorship-and-grant-submissions">
               UCL sponsorship
-            </a>{" "}
+            </TextLink>{" "}
             of this research
           </span>
           <Controller
@@ -42,12 +40,9 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
           <span>
             {" "}
             We will be seeking/have sought approval from the{" "}
-            <a
-              className={sharedStyles["form-link"]}
-              href="https://www.hra.nhs.uk/about-us/committees-and-services/confidentiality-advisory-group/"
-            >
+            <TextLink href="https://www.hra.nhs.uk/about-us/committees-and-services/confidentiality-advisory-group/">
               Confidentiality Advisory Group
-            </a>{" "}
+            </TextLink>{" "}
             for this research
           </span>
           <Controller
@@ -90,12 +85,9 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
         <div className={sharedStyles["option-field"]} data-cy="involvesHraApproval">
           <span>
             We will be seeking/have sought{" "}
-            <a
-              className={sharedStyles["form-link"]}
-              href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/"
-            >
+            <TextLink href="https://www.hra.nhs.uk/approvals-amendments/what-approvals-do-i-need/hra-approval/">
               Health Research Authority Research Ethics Committee
-            </a>{" "}
+            </TextLink>{" "}
             approval of this research
           </span>
           <Controller
@@ -121,12 +113,9 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
           <Label htmlFor="irasId">
             <span>
               {" "}
-              <a
-                className={sharedStyles["form-link"]}
-                href="https://www.gov.uk/guidance/clinical-trials-for-medicines-apply-for-approval-in-the-uk#:~:text=Integrated%20Research%20Application%20System%20(IRAS)"
-              >
+              <TextLink href="https://www.gov.uk/guidance/clinical-trials-for-medicines-apply-for-approval-in-the-uk#:~:text=Integrated%20Research%20Application%20System%20(IRAS)">
                 IRAS
-              </a>{" "}
+              </TextLink>{" "}
               ID (if applicable)
             </span>
             <HelperText>7-digit ID</HelperText>
@@ -181,12 +170,9 @@ export default function StudyFormStep2({ control, errors }: StudyFormStep2Props)
             {showNhsEnglandRef !== false && (
               <Label htmlFor="nhsEnglandRef">
                 NHSE{" "}
-                <a
-                  className={sharedStyles["form-link"]}
-                  href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number."
-                >
+                <TextLink href="https://digital.nhs.uk/services/data-access-request-service-dars#:~:text=When%20you%20start%20the%20application%20process%20you%20will%20be%20assigned%20a%20NIC%20number.">
                   DARS NIC number
-                </a>{" "}
+                </TextLink>{" "}
                 (if applicable)
                 <HelperText>Format: DARS-NIC-XXXXXX-XXXXX-XX</HelperText>
                 <div className={styles["nhse-ref"]}>

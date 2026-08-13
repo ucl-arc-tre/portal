@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Box from "../ui/Box";
 import Dialog from "../ui/Dialog";
 import Button from "../ui/Button";
+import TextLink from "../ui/TextLink";
 import { useForm } from "react-hook-form";
 import { deleteTokensByEnvironmentByTokenId, postTokensByEnvironment, getTokensByEnvironment, Token } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -132,9 +133,9 @@ export default function Tokens(props: Props) {
           <div className={styles.list}>
             <p>No items to display</p>
             <HelperText>
-              <a href={`https://github.com/ucl-arc-tre/portal/blob/main/api/${environment}.yaml`}>
+              <TextLink href={`https://github.com/ucl-arc-tre/portal/blob/main/api/${environment}.yaml`}>
                 {environmentTitle} API
-              </a>{" "}
+              </TextLink>{" "}
               tokens can be used to query the state of approved researchers and studies from the portal.
             </HelperText>
           </div>
@@ -221,9 +222,9 @@ export default function Tokens(props: Props) {
             <div className={styles["token-container"]}>
               <Alert type="info">
                 Use this bearer token for the{" "}
-                <a href={`https://github.com/ucl-arc-tre/portal/blob/main/api/${environment}.yaml`}>
+                <TextLink href={`https://github.com/ucl-arc-tre/portal/blob/main/api/${environment}.yaml`}>
                   {environmentTitle} API
-                </a>{" "}
+                </TextLink>{" "}
                 with e.g.
                 <p className={styles.code}>
                   {environment === "dsh" &&
