@@ -8,8 +8,8 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
   asset.locations.forEach((assetLocation) => {
     const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
     if (!location) return;
-    if (location.riskScore > likelihoodScore) {
-      likelihoodScore = location.riskScore;
+    if (location.likelihoodScore > likelihoodScore) {
+      likelihoodScore = location.likelihoodScore;
     }
   });
 
