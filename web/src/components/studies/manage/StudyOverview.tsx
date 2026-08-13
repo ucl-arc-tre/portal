@@ -159,7 +159,6 @@ export default function StudyOverview({
         riskLevel={riskLevel}
         canEditOwner={canEditStudyOwner}
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
-        isIGStaff={isIGStaff}
       />
 
       <div className={styles["pre-description"]} data-cy="study-summary-counts">

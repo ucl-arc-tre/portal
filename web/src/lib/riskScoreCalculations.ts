@@ -1,11 +1,18 @@
 import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
 import { Asset } from "@/openapi";
 
+export type RiskLevel = {
+  classification: RiskClassification | undefined;
+  score: number | undefined;
+};
+type RiskClassification = "manageable" | "uncomfortable" | "vulnerable" | "critical";
+
+export const riskScoreMax = 16;
+
 export const calculateRiskScorePerAsset = (asset: Asset) => {
   let likelihoodScore = 0;
   let impactScore = 0;
   const maxLikelihoodScore = 6; // to align with IG likelihood scale
-  likelihoodScore = Math.min(likelihoodScore, maxLikelihoodScore);
 
   asset.locations.forEach((assetLocation) => {
     const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
@@ -54,6 +61,8 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
     impactScore += 1;
   }
 
+  likelihoodScore = Math.min(likelihoodScore, maxLikelihoodScore);
+
   const assetScore = likelihoodScore * impactScore;
 
   return assetScore;
@@ -72,7 +81,7 @@ const calculateHighestAssetRiskScore = (assets: Asset[]) => {
 
   return highestAssetScore;
 };
-export const getRiskClassification = (score: number | undefined) => {
+export const getRiskClassification = (score: number | undefined): RiskClassification | undefined => {
   if (score === undefined) return undefined;
   if (score < 3) {
     return "manageable";
@@ -83,7 +92,7 @@ export const getRiskClassification = (score: number | undefined) => {
   } else if (score >= 12) {
     return "critical";
   }
-  return "default";
+  return undefined;
 };
 
 export const getStudyRiskLevel = (assets: Asset[] | undefined) => {

@@ -6,17 +6,19 @@ import InfoTooltip from "../../ui/InfoTooltip";
 import { formatDate } from "../../shared/exports";
 import Badge from "@/components/ui/Badge";
 import EditIcon from "@/components/ui/EditIcon";
+import { RiskLevel, riskScoreMax } from "@/lib/riskScoreCalculations";
+import { useAuth } from "@/hooks/useAuth";
 
 type StudyOverviewProps = {
   study: Study;
-  riskLevel?: { classification: string | undefined; score: number | undefined };
+  riskLevel?: RiskLevel;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
-  isIGStaff: boolean;
 };
 
 export default function StudyDetails(props: StudyOverviewProps) {
-  const { study, riskLevel, setOwnerEditModal, canEditOwner, isIGStaff } = props;
+  const { study, riskLevel, setOwnerEditModal, canEditOwner } = props;
+  const isIGStaff = useAuth();
 
   const riskScoreStyle = styles[`risk-score-${riskLevel?.classification}`];
 
@@ -45,7 +47,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           <span className={styles["detail-item"]}>
             Risk:{" "}
             <Badge className={`${riskScoreStyle}`} cy="risk-badge">
-              {riskLevel.classification} {isIGStaff && `(${riskLevel.score}/16)`}
+              {riskLevel.classification} {isIGStaff && `(${riskLevel.score}/${riskScoreMax})`}
             </Badge>
           </span>
         )}
