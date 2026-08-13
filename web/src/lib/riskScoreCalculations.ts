@@ -4,6 +4,8 @@ import { Asset } from "@/openapi";
 export const calculateRiskScorePerAsset = (asset: Asset) => {
   let likelihoodScore = 0;
   let impactScore = 0;
+  const maxLikelihoodScore = 6; // to align with IG likelihood scale
+  likelihoodScore = Math.min(likelihoodScore, maxLikelihoodScore);
 
   asset.locations.forEach((assetLocation) => {
     const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
@@ -15,8 +17,6 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
 
   if (asset.stored_outside_uk_eea === true) {
     likelihoodScore += 1;
-    // to align with IG likelihood scale
-    if (likelihoodScore > 3) likelihoodScore = 6;
   }
 
   switch (asset.classification_impact) {
