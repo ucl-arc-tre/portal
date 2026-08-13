@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { Project } from "@/openapi";
 import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
+import TextLink from "../ui/TextLink";
 import { HelperText } from "../shared/uikitExports";
 
 type Props = {
@@ -17,9 +17,9 @@ export default function ProjectCardsList(props: Props) {
     return (
       <HelperText>
         No projects have been created for this study yet. Visit the{" "}
-        <Link href="/projects" className={styles.link} data-cy="empty-projects-link">
+        <TextLink href="/projects" cy="empty-projects-link">
           Projects
-        </Link>{" "}
+        </TextLink>{" "}
         page to create one.
       </HelperText>
     );

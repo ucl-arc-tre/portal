@@ -1,5 +1,6 @@
 import Button from "@/components/ui/Button";
 import LoginFallback from "@/components/ui/LoginFallback";
+import TextLink from "@/components/ui/TextLink";
 import { useAuth } from "@/hooks/useAuth";
 import { postProfileTraining } from "@/openapi";
 import { ChangeEvent, useState } from "react";
@@ -146,9 +147,9 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
         <p>
           All members of UCL who manage highly confidential research information must undertake annual training on
           handling sensitive information. Anyone with an &apos;.ac.uk&apos; or NHS email address can self-register for{" "}
-          <a href="https://portal.e-lfh.org.uk/Component/Details/544034">
+          <TextLink href="https://portal.e-lfh.org.uk/Component/Details/544034">
             NHS Digital Data Security Awareness Level 1 course
-          </a>{" "}
+          </TextLink>{" "}
           provided by e-Learning for Health. When asked, you can register your role as a &quot;Further Education and
           Higher Education Researcher (Education)&quot; which should provide you access to the course. We also accept
           Information Governance training from UCLH.

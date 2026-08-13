@@ -116,13 +116,4 @@
   p {
     padding-bottom: 0.5rem;
   }
-
-  a {
-    color: #0066cc;
-    text-decoration: underline;
-
-    &:hover {
-      color: #004499;
-    }
-  }
 }

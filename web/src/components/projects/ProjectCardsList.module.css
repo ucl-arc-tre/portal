@@ -21,15 +21,6 @@
   color: #555555;
 }
 
-.link {
-  color: var(--form-link);
-  text-decoration: underline;
-}
-
-.link:hover {
-  color: var(--form-link--hover);
-}
-
 @media (max-width: 768px) {
   .project-selection {
     width: 100%;

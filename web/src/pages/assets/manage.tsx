@@ -19,6 +19,7 @@ import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Button from "@/components/ui/Button";
+import TextLink from "@/components/ui/TextLink";
 
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -295,7 +296,7 @@ export default function ManageAssetPage() {
                   <HelperText>
                     <small>
                       To manage contracts, please navigate to the{" "}
-                      <a href={`/studies/manage?studyId=${study.id}`}>Study</a> page.
+                      <TextLink href={`/studies/manage?studyId=${study.id}`}>Study</TextLink> page.
                     </small>
                   </HelperText>
                 </label>
