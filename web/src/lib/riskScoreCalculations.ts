@@ -44,6 +44,16 @@ export const calculateRiskScorePerAsset = (asset: Asset) => {
       break;
   }
 
+  if (asset.is_leak_major_disruption) {
+    impactScore += 1;
+  }
+  if (asset.is_leak_major_financial_loss) {
+    impactScore += 1;
+  }
+  if (asset.is_leak_major_reputational_damage) {
+    impactScore += 1;
+  }
+
   const assetScore = likelihoodScore * impactScore;
 
   return assetScore;
