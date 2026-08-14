@@ -6,7 +6,7 @@ export type StorageLocationDefinition = {
     text: string;
     url: string;
   }>;
-  likelihoodScore: number; // 1-6
+  likelihoodScore: number; // see https://github.com/ucl-arc-tre/portal/issues/866 for details
 };
 
 export const storageLocationDefinitions: StorageLocationDefinition[] = [
