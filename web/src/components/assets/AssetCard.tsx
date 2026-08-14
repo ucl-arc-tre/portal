@@ -6,7 +6,7 @@ import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
-import { calculateRiskScorePerAsset, riskScoreMax } from "../../lib/riskScoreCalculations";
+import { calculateAssetRiskScore, riskScoreMax } from "../../lib/riskScoreCalculations";
 import Badge from "../ui/Badge";
 import Error from "../ui/Error";
 import { getRiskClassification } from "../../lib/riskScoreCalculations";
@@ -59,7 +59,9 @@ export default function AssetCard(props: AssetCardProps) {
     };
     isAssetCompleted();
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
-  const riskScore = calculateRiskScorePerAsset(asset);
+
+  const riskScore = calculateAssetRiskScore(asset);
+
   return (
     <Card
       key={asset.id}
