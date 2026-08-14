@@ -33,7 +33,7 @@ const calculateAssetLikelihoodScore = (asset: Asset) => {
   return (Math.min(likelihoodScore, maxAssetLikelihoodScore) * maxLikelihoodScore) / maxAssetLikelihoodScore;
 };
 
-export const calculateRiskScorePerAsset = (asset: Asset) => {
+export const calculateAssetRiskScore = (asset: Asset) => {
   let impactScore = 0;
 
   switch (asset.classification_impact) {
@@ -83,7 +83,7 @@ const calculateHighestAssetRiskScore = (assets: Asset[]) => {
   let highestAssetScore = 0;
 
   for (const asset of assets) {
-    const assetScore = calculateRiskScorePerAsset(asset);
+    const assetScore = calculateAssetRiskScore(asset);
     if (assetScore > highestAssetScore) {
       highestAssetScore = assetScore;
     }
