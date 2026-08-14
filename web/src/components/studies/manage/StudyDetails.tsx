@@ -9,14 +9,14 @@ import EditIcon from "@/components/ui/EditIcon";
 import { RiskLevel, riskScoreMax } from "@/lib/riskScoreCalculations";
 import { useAuth } from "@/hooks/useAuth";
 
-type StudyOverviewProps = {
+type StudyDetailsProps = {
   study: Study;
   riskLevel: RiskLevel | undefined;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
 };
 
-export default function StudyDetails(props: StudyOverviewProps) {
+export default function StudyDetails(props: StudyDetailsProps) {
   const { study, riskLevel, setOwnerEditModal, canEditOwner } = props;
   const { isIGStaff } = useAuth();
 
