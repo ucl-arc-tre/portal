@@ -20,8 +20,6 @@ export default function StudyDetails(props: StudyOverviewProps) {
   const { study, riskLevel, setOwnerEditModal, canEditOwner } = props;
   const { isIGStaff } = useAuth();
 
-  const riskScoreStyle = styles[`risk-score-${riskLevel?.classification}`];
-
   return (
     <>
       <div className={styles["pre-description"]} data-cy="study-details">
@@ -46,7 +44,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
         {riskLevel?.classification !== undefined && (
           <span className={styles["detail-item"]}>
             Risk:{" "}
-            <Badge className={`${riskScoreStyle}`} cy="risk-badge">
+            <Badge className={`${styles[`risk-score-${riskLevel?.classification}`]}`} cy="risk-badge">
               {riskLevel.classification} {isIGStaff && `(${riskLevel.score}/${riskScoreMax})`}
             </Badge>
           </span>
