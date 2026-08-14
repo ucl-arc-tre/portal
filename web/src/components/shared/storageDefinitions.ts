@@ -6,7 +6,7 @@ export type StorageLocationDefinition = {
     text: string;
     url: string;
   }>;
-  likelihoodScore: number; // 1-5
+  likelihoodScore: number; // 1-6
 };
 
 export const storageLocationDefinitions: StorageLocationDefinition[] = [
