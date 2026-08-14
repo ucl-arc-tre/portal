@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 type StudyOverviewProps = {
   study: Study;
-  riskLevel?: RiskLevel;
+  riskLevel: RiskLevel | undefined;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
 };

@@ -79,7 +79,7 @@ export const calculateAssetRiskScore = (asset: Asset) => {
 };
 
 const calculateHighestAssetRiskScore = (assets: Asset[]) => {
-  if (assets === undefined || assets.length === 0) return undefined;
+  if (assets.length === 0) return undefined;
   let highestAssetScore = 0;
 
   for (const asset of assets) {
