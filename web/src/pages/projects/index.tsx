@@ -10,9 +10,7 @@ import styles from "./ProjectsPage.module.css";
 
 export default function ProjectsPage() {
   const router = useRouter();
-  const { authInProgress, isAuthed, userData } = useAuth();
-
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
+  const { authInProgress, isAuthed, userData, isApprovedResearcher } = useAuth();
 
   if (authInProgress) return null;
   if (!isAuthed || !userData) return <LoginFallback />;

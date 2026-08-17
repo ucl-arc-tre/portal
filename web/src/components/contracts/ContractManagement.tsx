@@ -17,15 +17,13 @@ type ContractManagementProps = {
 };
 
 export default function ContractManagement(props: ContractManagementProps) {
-  const { userData } = useAuth();
+  const { userData, isIGAdmin, isIAO } = useAuth();
   const { study, contracts, someAssetsRequireContracts, fetchStudyContents } = props;
   const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const isIgAdmin = userData?.roles.includes("ig-admin") ?? false;
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData.username) || false;
+  const isStudyOwner = (isIAO && userData && study.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study.additional_study_admin_usernames.includes(userData?.username)) || false;
-  const canModify = isStudyOwner || isStudyAdmin || isIgAdmin;
+  const canModify = isStudyOwner || isStudyAdmin || isIGAdmin;
   const [calloutExpanded, setCalloutExpanded] = useState(false);
 
   const handleUploadSuccess = () => {

@@ -19,8 +19,7 @@ export default function StudyAgreement({ studyId, studyTitle, setAgreementComple
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { refreshAuth, userData } = useAuth();
-  const isIAO = userData?.roles.includes("information-asset-owner");
+  const { refreshAuth, isIAO } = useAuth();
   const studyRole = isOwner ? "Owner" : "Administrator";
 
   useEffect(() => {

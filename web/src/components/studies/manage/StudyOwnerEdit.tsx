@@ -15,10 +15,8 @@ type StudyOwnerEditProps = {
 export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
   const { setDialogOpen, study } = props;
 
-  const { userData } = useAuth();
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
-  const isIgOps = userData?.roles.includes("ig-ops-staff");
+  const { userData, isIAO, isIGStaff } = useAuth();
+  const isStudyOwner = (userData && isIAO && study.owner_username === userData?.username) || false;
 
   const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +37,7 @@ export default function StudyOwnerEdit(props: StudyOwnerEditProps) {
     const data = { path: { studyId: study.id }, body: { username: email } };
     let response;
     try {
-      if (isIgOps) {
+      if (isIGStaff) {
         response = await postStudiesAdminByStudyIdOwnerRequest(data);
       } else {
         response = await postStudiesByStudyIdOwnerRequest(data);
