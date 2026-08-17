@@ -29,7 +29,7 @@ import Box from "@/components/ui/Box";
 export default function ManageContractPage() {
   const router = useRouter();
   const { studyId, contractId } = router.query;
-  const { authInProgress, isAuthed, userData } = useAuth();
+  const { authInProgress, isAuthed, userData, isIAO, isIGAdmin, isApprovedResearcher } = useAuth();
   const [contract, setContract] = useState<Contract | null>(null);
   const [study, setStudy] = useState<Study | null>(null);
   const [loading, setLoading] = useState(false);
@@ -39,16 +39,12 @@ export default function ManageContractPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study?.owner_username === userData.username) || false;
-  const isIGAdmin = userData?.roles.includes("ig-admin") ?? false;
+  const isStudyOwner = (userData && isIAO && study?.owner_username === userData.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
   const canModify = isStudyOwner || isStudyAdmin || isIGAdmin;
   const canDelete = contract?.retention_end_date
     ? new Date(contract.retention_end_date) < new Date() && canModify
     : canModify;
-
-  const isApprovedResearcher = userData?.roles.includes("approved-researcher");
 
   const handleContractDelete = async () => {
     if (!study || !contract) return;

@@ -5,9 +5,9 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Tokens from "@/components/profile/Tokens";
 
 export default function ProfilePage() {
-  const { authInProgress, isAuthed, userData, refreshAuth } = useAuth();
-  const canSeeDSHTokens = userData?.roles.includes("dsh-ops-staff") || userData?.roles.includes("admin");
-  const canSeeTRETokens = userData?.roles.includes("tre-ops-staff") || userData?.roles.includes("admin");
+  const { authInProgress, isAuthed, userData, refreshAuth, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
+  const canSeeDSHTokens = isDshOpsStaff || isAdmin;
+  const canSeeTRETokens = isTreOpsStaff || isAdmin;
 
   if (authInProgress) return null;
 

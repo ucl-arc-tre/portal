@@ -31,7 +31,7 @@ type ManageStudyProps = {
 };
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
-  const { userData, isIGStaff } = useAuth();
+  const { userData, isIGStaff, isIAO } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,8 +48,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const router = useRouter();
   const tab = (router.query.tab as "study" | "projects" | "assets" | "contracts") ?? "study";
 
-  const isStudyOwner =
-    userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username;
+  const isStudyOwner = userData && isIAO && study.owner_username === userData?.username;
 
   const showSignoffWarning =
     isStudyOwner &&
