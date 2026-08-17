@@ -6,7 +6,6 @@ import { Alert, AlertMessage } from "../../shared/uikitExports";
 import { useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";
-import { storageLocationDefinitions } from "../../shared/storageDefinitions";
 
 import StudyDetails from "./StudyDetails";
 import StudyForm from "../study-form/StudyForm";
@@ -14,6 +13,7 @@ import Box from "@/components/ui/Box";
 import Dialog from "@/components/ui/Dialog";
 import StudyAffirmation from "./StudyAffirmation";
 import StudyOwnerEdit from "./StudyOwnerEdit";
+import { getStudyRiskLevel } from "../../../lib/riskScoreCalculations";
 
 type StudyOverviewProps = {
   study: Study;
@@ -24,52 +24,11 @@ type StudyOverviewProps = {
   unagreedAdminUsernames?: string[];
 };
 
-export const calculateRiskScorePerAsset = (asset: Asset, involvesNhsEngland: boolean | undefined | null) => {
-  const nhs_multiplier = 3;
-  let assetScore = 0;
-
-  asset.locations.forEach((assetLocation) => {
-    const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
-    if (!location) return;
-    assetScore += involvesNhsEngland
-      ? asset.tier * nhs_multiplier * location.riskScore
-      : asset.tier * location.riskScore;
-  });
-  return assetScore;
-};
-
-const calculateAssetsRiskScore = (assets: Asset[], score: number, involvesNhsEngland: boolean | undefined | null) => {
-  let assetsRiskScore = 0;
-
-  for (const asset of assets) {
-    assetsRiskScore += calculateRiskScorePerAsset(asset, involvesNhsEngland);
-  }
-
-  return score + assetsRiskScore;
-};
-
-const calculateBaseRiskScore = (study: Study) => {
-  let score = 0;
-  if (study.involves_data_processing_outside_eea) score += 10;
-  if (study.requires_dbs) score += 5;
-  if (study.requires_dspt) score += 5;
-  if (study.involves_third_party && !study.involves_mnca) score += 5;
-  if (study.involves_nhs_england || study.involves_cag) score += 5;
-  return score;
-};
-
-const calculateRiskScore = (study: Study, assets: Asset[] | undefined) => {
-  const baseRiskScore = calculateBaseRiskScore(study);
-  if (assets === undefined) return undefined;
-  if (assets.length === 0) return baseRiskScore;
-  return calculateAssetsRiskScore(assets, baseRiskScore, study.involves_nhs_england);
-};
-
 export default function StudyOverview({
   study,
   assets,
-  contracts,
   projects,
+  contracts,
   fetchStudy,
   unagreedAdminUsernames,
 }: StudyOverviewProps) {
@@ -79,10 +38,8 @@ export default function StudyOverview({
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
   const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
-  const { userData, isIGStaff } = useAuth();
-  const isIGAdmin = userData?.roles.includes("ig-admin") || false;
-  const isStudyOwner =
-    (userData?.roles.includes("information-asset-owner") && study.owner_username === userData?.username) || false;
+  const { userData, isIGStaff, isIGAdmin, isIAO } = useAuth();
+  const isStudyOwner = (isIAO && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
@@ -97,7 +54,7 @@ export default function StudyOverview({
     (asset) => asset.data_types?.includes("personal") || asset.data_types?.includes("special_category_personal")
   );
 
-  const riskScore = calculateRiskScore(study, assets);
+  const riskLevel = getStudyRiskLevel(assets);
 
   const onEditComplete = () => {
     setIsFormOpen(false);
@@ -199,7 +156,7 @@ export default function StudyOverview({
 
       <StudyDetails
         study={study}
-        riskScore={riskScore}
+        riskLevel={riskLevel}
         canEditOwner={canEditStudyOwner}
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
       />

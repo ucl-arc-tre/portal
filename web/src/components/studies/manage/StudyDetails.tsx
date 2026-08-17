@@ -6,34 +6,19 @@ import InfoTooltip from "../../ui/InfoTooltip";
 import { formatDate } from "../../shared/exports";
 import Badge from "@/components/ui/Badge";
 import EditIcon from "@/components/ui/EditIcon";
+import { RiskLevel, riskScoreMax } from "@/lib/riskScoreCalculations";
+import { useAuth } from "@/hooks/useAuth";
 
-type StudyOverviewProps = {
+type StudyDetailsProps = {
   study: Study;
-  riskScore?: number;
+  riskLevel: RiskLevel | undefined;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
 };
 
-function getRiskClassification(score: number | undefined) {
-  if (score === undefined) return undefined;
-  if (score < 10) {
-    return "low";
-  } else if (score >= 10 && score < 30) {
-    return "moderate";
-  } else if (score >= 30 && score < 50) {
-    return "high";
-  } else if (score >= 50) {
-    return "very-high";
-  }
-  return "default";
-}
-
-export default function StudyDetails(props: StudyOverviewProps) {
-  const { study, riskScore, setOwnerEditModal, canEditOwner } = props;
-  const standardRiskScoreStatement = "increases risk score by 5";
-
-  const riskClassification = getRiskClassification(riskScore);
-  const riskScoreStyle = styles[`risk-score-${riskClassification}`];
+export default function StudyDetails(props: StudyDetailsProps) {
+  const { study, riskLevel, setOwnerEditModal, canEditOwner } = props;
+  const { isIGStaff } = useAuth();
 
   return (
     <>
@@ -56,11 +41,11 @@ export default function StudyDetails(props: StudyOverviewProps) {
           </span>
         )}
 
-        {riskScore !== undefined && (
+        {riskLevel?.classification !== undefined && (
           <span className={styles["detail-item"]}>
             Risk:{" "}
-            <Badge className={`${riskScoreStyle}`} cy="risk-badge">
-              {riskClassification} ({riskScore})
+            <Badge className={`${styles[`risk-score-${riskLevel?.classification}`]}`} cy="risk-badge">
+              {riskLevel.classification} {isIGStaff && `(${riskLevel.score}/${riskScoreMax})`}
             </Badge>
           </span>
         )}
@@ -113,10 +98,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.involves_cag && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              CAG approval
-              <InfoTooltip text="increases risk score by 5" />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>CAG approval</dd>
           )}
 
           {study.involves_ethics_approval && (
@@ -144,10 +126,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.involves_nhs_england && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              NHS England involvement
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>NHS England involvement</dd>
           )}
 
           {study.involves_mnca && (
@@ -155,10 +134,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.requires_dspt && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              requires DSPT
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>requires DSPT</dd>
           )}
 
           {!study.is_nhs_associated && !study.involves_nhs_england && !study.involves_mnca && !study.requires_dspt && (
@@ -171,10 +147,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           <dt>Data</dt>
 
           {study.requires_dbs && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              requires DBS
-              <InfoTooltip text={standardRiskScoreStatement} />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>requires DBS</dd>
           )}
 
           {study.is_data_protection_office_registered && (
@@ -182,10 +155,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           )}
 
           {study.involves_third_party && (
-            <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
-              third party
-              <InfoTooltip text="increases risk score by 5 if no mNCA" />
-            </dd>
+            <dd className={`${styles.badge} ${styles["badge-no-risk-associated"]}`}>third party</dd>
           )}
 
           {study.involves_external_users && (
@@ -203,7 +173,7 @@ export default function StudyDetails(props: StudyOverviewProps) {
           {study.involves_data_processing_outside_eea && (
             <dd className={`${styles.badge} ${styles["badge-risk-associated"]}`}>
               data processing outside EEA
-              <InfoTooltip text="increases risk score by 10" />
+              <InfoTooltip text="increases likelihood of compromise due to additional legal, contractual and regulatory considerations needed" />
             </dd>
           )}
 

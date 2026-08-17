@@ -6,15 +6,15 @@ import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
-import { calculateRiskScorePerAsset } from "../studies/manage/StudyOverview";
+import { calculateAssetRiskScore, riskScoreMax, getRiskClassification } from "../../lib/riskScoreCalculations";
 import Badge from "../ui/Badge";
 import Error from "../ui/Error";
 
 type AssetCardProps = {
   asset: Asset;
   studyId: string;
-  involvesNHS?: boolean | null;
   showRiskScore?: boolean;
+  isIGStaff?: boolean;
 };
 
 const formatClassification = (classification: string) => {
@@ -39,7 +39,7 @@ const getClassificationClass = (classification: string) => {
 };
 
 export default function AssetCard(props: AssetCardProps) {
-  const { studyId, asset, involvesNHS, showRiskScore = true } = props;
+  const { studyId, asset, isIGStaff, showRiskScore = true } = props;
   const [isCompleted, setIsCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +58,8 @@ export default function AssetCard(props: AssetCardProps) {
     };
     isAssetCompleted();
   }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
+
+  const riskScore = calculateAssetRiskScore(asset);
 
   return (
     <Card
@@ -99,8 +101,11 @@ export default function AssetCard(props: AssetCardProps) {
       <div className={styles["asset-details"]}>
         {showRiskScore && (
           <div className={styles["asset-detail"]}>
-            <span className={styles["asset-detail-label"]}>Risk Score:</span>
-            <span className={styles["asset-detail-value"]}>{calculateRiskScorePerAsset(asset, involvesNHS)}</span>
+            <span className={styles["asset-detail-label"]}>Risk Level:</span>
+            <span className={styles["asset-detail-value"]}>
+              {getRiskClassification(riskScore)}
+              {isIGStaff && `(${riskScore}/${riskScoreMax})`}
+            </span>
           </div>
         )}
         <div className={styles["asset-detail"]}>
