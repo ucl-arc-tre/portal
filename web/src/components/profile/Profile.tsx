@@ -39,6 +39,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchProfileData = async () => {
     setIsLoading(true);
     setError(null);
@@ -87,7 +88,6 @@ export default function Profile({ userData, refreshAuth }: Props) {
 
   useEffect(() => {
     fetchProfileData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfileData]);
 
   const clearCompleteProfileCompleteNotification = async () => {

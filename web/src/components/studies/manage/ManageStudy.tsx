@@ -63,6 +63,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     setUnagreedAdminUsernames(unagreedAdminUsernames);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchStudyContents = async () => {
     setError(null);
     setIsLoading(true);
@@ -117,7 +118,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     if (study.id) {
       fetchStudyContents();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [study.id, fetchStudyContents]);
 
   if (!userData) return null;
