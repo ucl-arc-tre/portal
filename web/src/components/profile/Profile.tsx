@@ -87,6 +87,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
 
   useEffect(() => {
     fetchProfileData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProfileData]);
 
   const clearCompleteProfileCompleteNotification = async () => {

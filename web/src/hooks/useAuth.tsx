@@ -75,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled.current = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshAuth]);
 
   return (

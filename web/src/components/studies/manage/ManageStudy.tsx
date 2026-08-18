@@ -117,6 +117,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     if (study.id) {
       fetchStudyContents();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [study.id, fetchStudyContents]);
 
   if (!userData) return null;
