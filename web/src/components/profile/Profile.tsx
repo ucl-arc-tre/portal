@@ -89,20 +89,23 @@ export default function Profile({ userData, refreshAuth }: Props) {
     fetchProfileData();
   }, [fetchProfileData]);
 
-  const clearCompleteProfileCompleteNotification = async () => {
-    const response = await postNotificationsRead({ body: { kind: "complete-profile" } });
-    if (responseIsError(response)) {
-      console.log(`Failed to clear complete profile notfiication ${extractErrorMessage(response)}`);
+  const clearCompleteProfileCompleteNotification = useCallback(async () => {
+    try {
+      const response = await postNotificationsRead({ body: { kind: "complete-profile" } });
+      if (responseIsError(response)) {
+        setError(`Failed to clear complete profile notification: ${extractErrorMessage(response)}`);
+      }
+    } catch (error) {
+      console.error("Failed to clear complete profile notification:", error);
+      setError("Failed to clear complete profile notification. Please try again.");
     }
-  };
+  }, []);
 
-  const handleStepsComplete = () => {
-    setProfileComplete(true);
+  const handleStepsComplete = useCallback(async () => {
     setExpiryUrgency(null);
-    refreshAuth();
-    fetchProfileData();
-    clearCompleteProfileCompleteNotification();
-  };
+    await Promise.all([refreshAuth(), fetchProfileData(), clearCompleteProfileCompleteNotification()]);
+    setProfileComplete(true);
+  }, [refreshAuth, fetchProfileData, clearCompleteProfileCompleteNotification]);
 
   if (isLoading) return <Loading message="Loading your profile" />;
 

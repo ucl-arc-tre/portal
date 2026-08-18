@@ -114,7 +114,7 @@ export default function UserTasks() {
           <p>
             To get started with ARC services, please complete your profile setup including setting your chosen name.
           </p>
-          <Button href="/profile" variant="secondary" onClick={() => clearNotification(completeProfileNotification!)}>
+          <Button href="/profile" variant="secondary">
             Complete Profile Setup
           </Button>
         </div>
