@@ -64,6 +64,7 @@ describe("Accessibility - Profile Page", () => {
       cy.mockProfileChosenName("Test User"); // Has chosen name
       cy.mockProfileAgreements(true); // Agreement completed
       cy.mockProfileTraining(true, new Date().toISOString()); // Training completed
+      cy.mockClearCompleteProfileNotification();
 
       cy.visit("/profile");
       cy.waitForAuth();

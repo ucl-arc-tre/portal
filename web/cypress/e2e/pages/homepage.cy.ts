@@ -18,7 +18,7 @@ describe(`Homepage Tests`, () => {
 
       cy.visit("/");
       cy.waitForAuth();
-      cy.contains("Your Tasks").should("exist");
+      cy.contains("Your Notifications").should("exist");
     });
 
     it("can be logged into as an admin and encouraged to complete profile", () => {
@@ -28,17 +28,17 @@ describe(`Homepage Tests`, () => {
 
       cy.visit("/");
       cy.waitForAuth();
-      cy.contains("Your Tasks").should("exist");
+      cy.contains("Your Notifications").should("exist");
     });
   });
 
-  describe("User tasks", () => {
+  describe("User notifications", () => {
     beforeEach(() => {
       cy.loginAsBase();
       cy.visit("/");
     });
 
-    it("prompts to complete tasks profile is not complete", () => {
+    it("prompts to complete notification profile is not complete", () => {
       cy.mockNotifications([{ title: "complete your profile", kind: "complete-profile" }]);
 
       // Mock auth as approved researcher (complete profile)
@@ -51,7 +51,7 @@ describe(`Homepage Tests`, () => {
       cy.contains("Complete Your Profile Setup").should("be.visible");
     });
 
-    it("shows tasks complete when profile is complete", () => {
+    it("shows notifications complete when profile is complete", () => {
       cy.mockNotifications([]);
 
       // Mock auth as approved researcher (complete profile)
@@ -61,7 +61,7 @@ describe(`Homepage Tests`, () => {
       cy.waitForAuth();
       cy.wait("@getNotifications");
 
-      cy.contains("You have completed all your tasks").should("be.visible");
+      cy.contains("There are no notifications.").should("be.visible");
     });
 
     it("points to studies page for admin Approved Researcher", () => {

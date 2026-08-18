@@ -161,6 +161,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(true, new Date().toISOString()); // Training completed
+    cy.mockClearCompleteProfileNotification();
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -191,6 +192,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(true, getDateWithDaysRemaining(91));
+    cy.mockClearCompleteProfileNotification();
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -206,6 +208,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(true, getDateWithDaysRemaining(80));
+    cy.mockClearCompleteProfileNotification();
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -221,6 +224,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(true, getDateWithDaysRemaining(-1)); // Expired certificate
+    cy.mockClearCompleteProfileNotification();
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -236,6 +240,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(true, getDateWithDaysRemaining(31));
+    cy.mockClearCompleteProfileNotification();
 
     cy.visit("/profile");
     cy.waitForAuth();
@@ -251,6 +256,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.mockProfileChosenName("Complete User"); // Has chosen name
     cy.mockProfileAgreements(true); // Agreement completed
     cy.mockProfileTraining(true, getDateWithDaysRemaining(12));
+    cy.mockClearCompleteProfileNotification();
     cy.visit("/profile");
     cy.waitForAuth();
     cy.waitForProfileData();
