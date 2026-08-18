@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { getAuth } from "@/openapi";
 import { Auth } from "@/openapi";
 
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
   const isIAO = userData?.roles.includes("information-asset-owner") ?? false;
 
-  const refreshAuth = useCallback(async () => {
+  const refreshAuth = async () => {
     try {
       const response = await getAuth();
 
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       if (!cancelled.current) setAuthInProgress(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     refreshAuth();

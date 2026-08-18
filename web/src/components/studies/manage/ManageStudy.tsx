@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Asset,
@@ -56,17 +56,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     study.last_signoff != null &&
     studySignoffWarningRequired(study.last_signoff);
 
-  const checkStudyAdminAgreements = useCallback(
-    (studySignatures: string[]) => {
-      const unagreedAdminUsernames = study.additional_study_admin_usernames.filter(
-        (user) => !studySignatures.includes(user)
-      );
-      setUnagreedAdminUsernames(unagreedAdminUsernames);
-    },
-    [study.additional_study_admin_usernames]
-  );
+  const checkStudyAdminAgreements = (studySignatures: string[]) => {
+    const unagreedAdminUsernames = study.additional_study_admin_usernames.filter(
+      (user) => !studySignatures.includes(user)
+    );
+    setUnagreedAdminUsernames(unagreedAdminUsernames);
+  };
 
-  const fetchStudyContents = useCallback(async () => {
+  const fetchStudyContents = async () => {
     setError(null);
     setIsLoading(true);
 
@@ -114,7 +111,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, checkStudyAdminAgreements]);
+  };
 
   useEffect(() => {
     if (study.id) {
