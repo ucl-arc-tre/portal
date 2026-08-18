@@ -1,6 +1,6 @@
 import styles from "./index.module.css";
 import MetaHead from "@/components/meta/Head";
-import UserTasks from "@/components/index/UserTasks";
+import Notifications from "@/components/index/Notifications";
 import Title from "@/components/ui/Title";
 
 export default function Index() {
@@ -16,8 +16,8 @@ export default function Index() {
         />
       </div>
 
-      <div className={styles["task-wrapper"]}>
-        <UserTasks />
+      <div className={styles["notifications-wrapper"]}>
+        <Notifications />
       </div>
     </>
   );

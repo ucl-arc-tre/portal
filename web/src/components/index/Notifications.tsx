@@ -10,12 +10,12 @@ import {
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
-import styles from "./UserTasks.module.css";
+import styles from "./Notifications.module.css";
 import Error from "../ui/Error";
 import { IconButton, XIcon } from "../shared/uikitExports";
 import router from "next/router";
 
-export default function UserTasks() {
+export default function Notifications() {
   const { authInProgress, isAuthed, userData, isApprovedResearcher } = useAuth();
   const [notifications, setNotifications] = useState<Notification[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,7 @@ export default function UserTasks() {
         setNotifications(response.data);
       } catch (error) {
         console.error("Failed to get notifications:", error);
-        setError("Failed to notifications. Please try again later.");
+        setError("Failed to load notifications. Please try again later.");
         setNotifications(undefined);
       } finally {
         setIsLoading(false);
@@ -83,8 +83,8 @@ export default function UserTasks() {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <h2>Your Tasks</h2>
-        <Loading message="Loading your tasks..." />
+        <h2>Your Notifications</h2>
+        <Loading message="Loading your notifications..." />
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function UserTasks() {
   return (
     <div className={styles.container}>
       <div className={styles["header"]}>
-        <h2>Your Tasks</h2>
+        <h2>Your Notifications</h2>
         {notifications && notifications.length > 0 && !needToCompleteProfile && (
           <Button
             variant="secondary"
@@ -129,9 +129,9 @@ export default function UserTasks() {
         )
       )}
       {!needToCompleteProfile && notifications && notifications.length > 0 && (
-        <div className={styles["tasks"]}>
+        <div className={styles["notifications-list"]}>
           {notifications.map((notification) => (
-            <div className={styles["task"]} key={notification.id}>
+            <div className={styles["notification"]} key={notification.id}>
               <a
                 onClick={() => {
                   if (notification.href) {
@@ -142,16 +142,17 @@ export default function UserTasks() {
               >
                 <p>{notification.title}</p>
               </a>
-              <IconButton aria-label={"dissmss notification"} onClick={() => clearNotification(notification)}>
+              <IconButton aria-label={"dismiss notification"} onClick={() => clearNotification(notification)}>
                 <XIcon aria-hidden="true" size={24} />
               </IconButton>
             </div>
           ))}
         </div>
       )}
+
       {notifications && notifications.length === 0 && (
-        <div className={styles["completed-tasks"]}>
-          <p>You have completed all your tasks.</p>
+        <div className={styles["completed-notifications"]}>
+          <p>There are no notifications.</p>
         </div>
       )}
     </div>
