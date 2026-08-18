@@ -359,6 +359,12 @@ declare global {
       mockNotifications(notifications: Notification[]): Chainable<any>;
 
       /**
+       * Mock the complete-profile notification clear endpoint (POST /notifications/read).
+       * @example cy.mockClearCompleteProfileNotification()
+       */
+      mockClearCompleteProfileNotification(): Chainable<any>;
+
+      /**
        * Run accessibility check with axe-core (injects axe and checks for critical/serious violations)
        * @param selector - Optional selector to check specific element (defaults to entire page)
        * @example cy.checkAccessibility()
@@ -629,6 +635,10 @@ Cypress.Commands.add("mockNotifications", (notifications: Notification[]) => {
     statusCode: 200,
     body: notifications,
   }).as("getNotifications");
+});
+
+Cypress.Commands.add("mockClearCompleteProfileNotification", () => {
+  cy.intercept("POST", "/web/api/v0/notifications/read", { statusCode: 200 }).as("clearCompleteProfileNotification");
 });
 
 Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
