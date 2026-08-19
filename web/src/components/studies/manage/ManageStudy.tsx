@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Asset,
@@ -39,11 +39,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [agreements, setAgreements] = useState<StudyAgreements | null>(null);
-  const [unagreedAdminUsernames, setUnagreedAdminUsernames] = useState<string[]>([]);
 
   const hasAsset = assets.length > 0;
   const hasAgreed = agreements && userData && agreements.usernames.includes(userData.username);
   const studyStepsCompleted = isLoading ? null : hasAsset && hasAgreed;
+
+  const unagreedAdminUsernames = agreements
+    ? study.additional_study_admin_usernames.filter((user) => !agreements.usernames.includes(user))
+    : [];
 
   const router = useRouter();
   const tab = (router.query.tab as "study" | "projects" | "assets" | "contracts") ?? "study";
@@ -56,17 +59,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     study.last_signoff != null &&
     studySignoffWarningRequired(study.last_signoff);
 
-  const checkStudyAdminAgreements = useCallback(
-    (studySignatures: string[]) => {
-      const unagreedAdminUsernames = study.additional_study_admin_usernames.filter(
-        (user) => !studySignatures.includes(user)
-      );
-      setUnagreedAdminUsernames(unagreedAdminUsernames);
-    },
-    [study.additional_study_admin_usernames]
-  );
-
-  const fetchStudyContents = useCallback(async () => {
+  const fetchStudyContents = async () => {
     setError(null);
     setIsLoading(true);
 
@@ -106,21 +99,20 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       setContracts(contractsResponse.data);
       setAgreements(agreementsResponse.data);
       setProjects(projectsResponse.data.filter((project) => project.study_id === study.id));
-
-      checkStudyAdminAgreements(agreementsResponse.data.usernames);
     } catch (error) {
       console.error("Failed to get study contents:", error);
       setError("Failed to load study contents. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  }, [study.id, checkStudyAdminAgreements]);
+  };
 
   useEffect(() => {
     if (study.id) {
       fetchStudyContents();
     }
-  }, [study.id, fetchStudyContents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [study.id]);
 
   if (!userData) return null;
   if (isLoading) return <Loading message="Loading study..." />;

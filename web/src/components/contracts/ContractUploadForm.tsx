@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import {
@@ -60,7 +60,6 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
     control,
   } = useForm<ContractFormData>({
     defaultValues: {
@@ -68,7 +67,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
     },
   });
 
-  const selectedAssetIds = watch("assets");
+  const selectedAssetIds = useWatch({ control, name: "assets" });
   const {
     fields: assetFields,
     append: appendAsset,

@@ -1,4 +1,4 @@
-import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
 import Error from "../../ui/Error";
@@ -31,7 +31,6 @@ type Props = {
 export default function ProjectFormTREStep(props: Props) {
   const { fieldsDisabled } = props;
   const {
-    watch,
     control,
     getValues,
     setValue,
@@ -73,14 +72,14 @@ export default function ProjectFormTREStep(props: Props) {
 
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
-  const numRequiredEgressApprovals = watch("tre.numRequiredEgressApprovals");
-  const members = watch("members");
+  const numRequiredEgressApprovals = useWatch({ control, name: "tre.numRequiredEgressApprovals" });
+  const members = useWatch({ control, name: "members" });
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
-  const airlockExternalDataEnabled = watch("tre.airlockExternalDataEnabled");
-  const airlockSSHWhitelistEnabled = watch("tre.airlockSSHWhitelistEnabled");
-  const userConfig = watch("tre.userConfig");
+  const airlockExternalDataEnabled = useWatch({ control, name: "tre.airlockExternalDataEnabled" });
+  const airlockSSHWhitelistEnabled = useWatch({ control, name: "tre.airlockSSHWhitelistEnabled" });
+  const userConfig = useWatch({ control, name: "tre.userConfig" });
   const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
-  const requiresHPCDesktops = watch("tre.requiresHPCDesktops") === "true";
+  const requiresHPCDesktops = useWatch({ control, name: "tre.requiresHPCDesktops" }) === "true";
 
   const isDesktopUser = (username: string): boolean => {
     console.log(username);
