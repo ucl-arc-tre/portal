@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import {
   postProjectsTre,
   putProjectsTreByProjectId,
@@ -68,11 +68,12 @@ export default function ProjectForm({
     watch,
     setValue,
     trigger,
+    control,
     formState: { isValid },
   } = methods;
 
-  const selectedStudyId = watch("studyId");
-  const selectedEnvironmentId = watch("environmentId");
+  const selectedStudyId = useWatch({ control, name: "studyId" });
+  const selectedEnvironmentId = useWatch({ control, name: "environmentId" });
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isTREProject = selectedEnvironment?.name == "ARC Trusted Research Environment";
   const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";

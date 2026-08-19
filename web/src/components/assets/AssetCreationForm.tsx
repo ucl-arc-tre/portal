@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
@@ -84,7 +84,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
+    control,
   } = useForm<AssetFormData>({
     defaultValues: {
       title: "",
@@ -166,23 +166,27 @@ export default function AssetCreationForm(props: AssetFormProps) {
     }
   }, [editingAsset, reset]);
 
-  const dataTypesValue = watch("data_types");
-  const protectionValue = watch("protection");
-  const hasExpiryDateValue = watch("has_expiry_date");
-  const formatValue = watch("format");
-  const requiresTRE = isTrue(watch("requires_tre"));
-  const classificationImpactValue = watch("classification_impact");
+  const dataTypesValue = useWatch({ control, name: "data_types" });
+  const protectionValue = useWatch({ control, name: "protection" });
+  const hasExpiryDateValue = useWatch({ control, name: "has_expiry_date" });
+  const formatValue = useWatch({ control, name: "format" });
+  const requiresTRE = isTrue(useWatch({ control, name: "requires_tre" }));
+  const classificationImpactValue = useWatch({ control, name: "classification_impact" });
   const isPublic = classificationImpactValue === "public";
   const showUCLGuidanceText = protectionValue === "anonymisation" || protectionValue === "pseudonymisation";
   const showExpiryDate = isTrue(hasExpiryDateValue);
+  const isLeakMajorDisruption = useWatch({ control, name: "is_leak_major_disruption" });
+  const isLeakMajorFinancialLoss = useWatch({ control, name: "is_leak_major_financial_loss" });
+  const isLeakMajorReputationalDamage = useWatch({ control, name: "is_leak_major_reputational_damage" });
+  const hasTargetedThreatActors = useWatch({ control, name: "has_targeted_threat_actors" });
   const tier = calculateTier({
     classification_impact: classificationImpactValue,
-    is_leak_major_disruption: watch("is_leak_major_disruption"),
-    is_leak_major_financial_loss: watch("is_leak_major_financial_loss"),
-    is_leak_major_reputational_damage: watch("is_leak_major_reputational_damage"),
+    is_leak_major_disruption: isLeakMajorDisruption,
+    is_leak_major_financial_loss: isLeakMajorFinancialLoss,
+    is_leak_major_reputational_damage: isLeakMajorReputationalDamage,
     data_types: dataTypesValue,
     protection: protectionValue,
-    has_targeted_threat_actors: watch("has_targeted_threat_actors"),
+    has_targeted_threat_actors: hasTargetedThreatActors,
     requires_tre: requiresTRE,
   });
 
