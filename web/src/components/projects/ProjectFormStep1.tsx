@@ -1,4 +1,4 @@
-import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { HelperText } from "../shared/uikitExports";
 import Link from "next/link";
 import Error from "../ui/Error";
@@ -21,7 +21,6 @@ type Props = {
 export default function ProjectFormStep1(props: Props) {
   const { approvedStudies, assets, environments, environmentsError, fieldsDisabled, editing } = props;
   const {
-    watch,
     register,
     control,
     formState: { errors },
@@ -30,11 +29,11 @@ export default function ProjectFormStep1(props: Props) {
   const isLoadingEnvironments = environments === null;
   const isLoadingAssets = assets === null;
 
-  const selectedEnvironmentId = watch("environmentId");
+  const selectedEnvironmentId = useWatch({ control, name: "environmentId" });
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";
 
-  const selectedAssetIds = watch("assetIds");
+  const selectedAssetIds = useWatch({ control, name: "assetIds" });
   const {
     fields: assetFields,
     append: appendAsset,
@@ -44,7 +43,7 @@ export default function ProjectFormStep1(props: Props) {
     name: "assetIds",
   });
 
-  const selectedStudyId = watch("studyId");
+  const selectedStudyId = useWatch({ control, name: "studyId" });
 
   return (
     <>
