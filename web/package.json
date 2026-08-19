@@ -11,9 +11,12 @@
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome",
     "cypress:pages": "cypress run --headless --browser chrome --spec 'cypress/e2e/pages/**/*'",
-    "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
+    "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "design-system-foundations-public": "^0.1.6",
     "next": "16.2.11",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -21,8 +24,7 @@
     "react-is": "^19.2.8",
     "react-markdown": "^10.1.0",
     "recharts": "^3.10.0",
-    "uikit-react-public": "^0.40.2",
-    "design-system-foundations-public": "^0.1.6"
+    "uikit-react-public": "^0.40.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -36,6 +38,7 @@
     "eslint-config-next": "^16.2.11",
     "prettier": "^3.9.6",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.66.0"
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.11"
   }
 }
