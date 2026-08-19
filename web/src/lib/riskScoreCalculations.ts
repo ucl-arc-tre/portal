@@ -91,6 +91,7 @@ const calculateHighestAssetRiskScore = (assets: Asset[]) => {
 
   return highestAssetScore;
 };
+
 export const getRiskClassification = (score: number | undefined): RiskClassification | undefined => {
   if (score === undefined) return undefined;
   if (score < 3) {

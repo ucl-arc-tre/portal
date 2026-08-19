@@ -38,4 +38,23 @@ Dependabot has been enabled on the project repo to provide monthly package updat
 
 # Testing
 
-This project uses [Cypress](https://www.cypress.io/) for end-to-end testing. For testing documentation, setup instructions, and test organization see the [Cypress README](./cypress/README.md).
+## e2e tests
+
+This project uses [Cypress](https://www.cypress.io/) for end-to-end testing - see the [Cypress README](./cypress/README.md) for further instructions.
+
+## Unit tests
+
+Unit tests (e.g. for pure functions/calculations) use [Vitest](https://vitest.dev/). Test files are colocated next to the code they test, named `*.test.ts` (e.g. `src/lib/riskScoreCalculations.ts` is tested by `src/lib/riskScoreCalculations.test.ts`).
+
+Run them from `/web`:
+
+```shell script
+npm run test        # run once
+npm run test:watch  # re-run on file changes
+```
+
+Or from the repo root:
+
+```shell script
+make test-unit
+```
