@@ -63,7 +63,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     setUnagreedAdminUsernames(unagreedAdminUsernames);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchStudyContents = async () => {
     setError(null);
     setIsLoading(true);
@@ -118,7 +117,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     if (study.id) {
       fetchStudyContents();
     }
-  }, [study.id, fetchStudyContents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [study.id]);
 
   if (!userData) return null;
   if (isLoading) return <Loading message="Loading study..." />;

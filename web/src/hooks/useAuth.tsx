@@ -49,7 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
   const isIAO = userData?.roles.includes("information-asset-owner") ?? false;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const refreshAuth = async () => {
     try {
       const response = await getAuth();
@@ -76,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled.current = true;
     };
-  }, [refreshAuth]);
+  }, []);
 
   return (
     <AuthCtx.Provider
