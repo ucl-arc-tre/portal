@@ -75,6 +75,9 @@ describe("Study creation end-to-end", () => {
       cy.contains("Update Study").should("not.exist");
       cy.contains("Edit Study").should("exist");
       cy.contains(additionalAdminUsername).should("exist");
+
+      cy.contains("The following administrators have not yet agreed to the study agreement:").should("be.visible");
+      cy.contains(additionalAdminUsername).should("be.visible");
     });
   });
 
