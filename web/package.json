@@ -11,7 +11,9 @@
     "cypress:open": "cypress open",
     "cypress:headless": "cypress run --headless --browser chrome",
     "cypress:pages": "cypress run --headless --browser chrome --spec 'cypress/e2e/pages/**/*'",
-    "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'"
+    "cypress:integration": "cypress run --headless --browser chrome --spec 'cypress/e2e/integration/**/*'",
+    "test": "node --import tsx --test",
+    "test:watch": "node --import tsx --test --watch"
   },
   "dependencies": {
     "design-system-foundations-public": "^0.1.6",
@@ -36,6 +38,7 @@
     "eslint": "^10",
     "eslint-config-next": "^16.2.11",
     "prettier": "^3.9.6",
+    "tsx": "^4.23.12",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.66.0"
   }

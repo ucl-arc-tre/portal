@@ -49,6 +49,7 @@ test:  ## Run all tests
 
 test-unit:  ## Run unit tests
 	go test ./internal/...
+	cd web && npm run test
 
 test-integration:  ## Run integration tests
 	cd internal/testutils && \

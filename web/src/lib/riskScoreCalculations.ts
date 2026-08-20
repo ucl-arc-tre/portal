@@ -1,5 +1,5 @@
 import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
-import { Asset } from "@/openapi";
+import type { Asset } from "@/openapi";
 
 export type RiskLevel = {
   classification: RiskClassification | undefined;
@@ -91,6 +91,7 @@ const calculateHighestAssetRiskScore = (assets: Asset[]) => {
 
   return highestAssetScore;
 };
+
 export const getRiskClassification = (score: number | undefined): RiskClassification | undefined => {
   if (score === undefined) return undefined;
   if (score < 3) {
