@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import { calculateAssetRiskScore, getRiskClassification, getStudyRiskLevel } from "./riskScoreCalculations";
-import { Asset } from "@/openapi";
+import type { Asset } from "@/openapi";
 
 function makeAsset(overrides: Partial<Asset> = {}): Asset {
   return {
@@ -27,30 +28,30 @@ function makeAsset(overrides: Partial<Asset> = {}): Asset {
 
 describe("getRiskClassification", () => {
   it("classifies a score of 0 as manageable", () => {
-    expect(getRiskClassification(0)).toBe("manageable");
+    assert.strictEqual(getRiskClassification(0), "manageable");
   });
 
   it("does not classify a score of 2 as uncomfortable", () => {
-    expect(getRiskClassification(2)).not.toBe("uncomfortable");
+    assert.notStrictEqual(getRiskClassification(2), "uncomfortable");
   });
 
   it("classifies a score of 3 as uncomfortable", () => {
-    expect(getRiskClassification(3)).toBe("uncomfortable");
+    assert.strictEqual(getRiskClassification(3), "uncomfortable");
   });
 
   it("classifies a score of 5 as vulnerable", () => {
-    expect(getRiskClassification(5)).toBe("vulnerable");
+    assert.strictEqual(getRiskClassification(5), "vulnerable");
   });
 
   it("classifies a score of 12 as critical", () => {
-    expect(getRiskClassification(12)).toBe("critical");
+    assert.strictEqual(getRiskClassification(12), "critical");
   });
 });
 
 describe("getStudyRiskLevel", () => {
   it("returns undefined when there are no assets", () => {
-    expect(getStudyRiskLevel([])).toBeUndefined();
-    expect(getStudyRiskLevel(undefined)).toBeUndefined();
+    assert.strictEqual(getStudyRiskLevel([]), undefined);
+    assert.strictEqual(getStudyRiskLevel(undefined), undefined);
   });
 
   it("uses the highest-scoring asset to classify the study", () => {
@@ -66,7 +67,7 @@ describe("getStudyRiskLevel", () => {
 
     const result = getStudyRiskLevel([lowRiskAsset, highRiskAsset]);
 
-    expect(result?.score).toBe(calculateAssetRiskScore(highRiskAsset));
+    assert.strictEqual(result?.score, calculateAssetRiskScore(highRiskAsset));
   });
 });
 
@@ -79,6 +80,6 @@ describe("calculateAssetRiskScore", () => {
       locations: ["email"],
     });
 
-    expect(calculateAssetRiskScore(asset)).toBe(4);
+    assert.strictEqual(calculateAssetRiskScore(asset), 4);
   });
 });

@@ -44,13 +44,12 @@ This project uses [Cypress](https://www.cypress.io/) for end-to-end testing - se
 
 ## Unit tests
 
-Unit tests (e.g. for pure functions/calculations) use [Vitest](https://vitest.dev/). Test files are colocated next to the code they test, named `*.test.ts` (e.g. `src/lib/riskScoreCalculations.ts` is tested by `src/lib/riskScoreCalculations.test.ts`).
+Unit tests (e.g. for pure functions/calculations) use the test runner built in to node. Test files are colocated next to the code they test, named `*.test.ts` (e.g. `src/lib/riskScoreCalculations.ts` is tested by `src/lib/riskScoreCalculations.test.ts`).
 
 Run them from `/web`:
 
 ```shell script
-npm run test        # run once
-npm run test:watch  # re-run on file changes
+npm run test
 ```
 
 Or from the repo root:

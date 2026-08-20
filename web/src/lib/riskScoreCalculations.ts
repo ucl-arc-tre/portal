@@ -1,5 +1,5 @@
 import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
-import { Asset } from "@/openapi";
+import type { Asset } from "@/openapi";
 
 export type RiskLevel = {
   classification: RiskClassification | undefined;
