@@ -20,6 +20,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 )
 
+const defaultPageSize = 12 // number of items returned for pagination
+
 type Handler struct {
 	agreements    *agreements.Service
 	users         *users.Service

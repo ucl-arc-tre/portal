@@ -17,8 +17,8 @@ func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.En
 	if !params.Valid() {
 		return []projects.GenericProject{}, types.NewErrInvalidObject("invalid query param")
 	}
-	if params.Limit != nil && *params.Limit > 12 {
-		return []projects.GenericProject{}, types.NewErrInvalidObject("maxItems cannot be greater than 12")
+	if params.Limit != nil && *params.Limit > defaultPageSize {
+		return []projects.GenericProject{}, types.NewErrInvalidObjectF("maxItems cannot be greater than %d", defaultPageSize)
 	}
 	if params.Offset != nil && *params.Offset < 0 {
 		return []projects.GenericProject{}, types.NewErrInvalidObject("startIndex cannot be negative")
@@ -26,7 +26,7 @@ func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.En
 
 	queryParams := projects.QueryParams{
 		Owner:  params.Owner,
-		Limit:  12,
+		Limit:  defaultPageSize,
 		Offset: 0,
 	}
 	if params.QueryIsOwnerUsername() {

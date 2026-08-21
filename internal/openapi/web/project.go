@@ -29,14 +29,12 @@ func (p ProjectTRERequest) Base() ProjectTREBase {
 }
 
 func (p GetProjectsParams) Valid() bool {
-	return p.Query == nil || p.Owner == nil
+	bothQueryAndOwnerSet := p.Query != nil && p.Owner != nil
+	return !bothQueryAndOwnerSet
 }
 
 func (p GetProjectsParams) QueryIsOwnerUsername() bool {
-	if p.Query == nil {
-		return false
-	}
-	return types.Username(*p.Query).IsValid()
+	return queryIsOwnerUsername(p.Query)
 }
 
 func parseManyUUID(values []string) ([]uuid.UUID, error) {
