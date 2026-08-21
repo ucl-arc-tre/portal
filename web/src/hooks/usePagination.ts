@@ -13,8 +13,6 @@ export function usePagination<T>(props: Props<T>) {
   const [offset, setOffset] = useState(0);
   const [noMore, setNoMore] = useState(false);
 
-  // used for next/previous page navigation only: if the requested page comes back empty,
-  // stay on the current page (don't clear it) and just flag that there's nothing more to load.
   const goToOffset = async (newOffset: number) => {
     const items = await fetchPage(newOffset);
     if (items === undefined) return;
