@@ -165,15 +165,19 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 		return []types.Study{}, types.NewErrClientInvalidObjectF("cannot query by admin and owner")
 	}
 	if query.Owner != nil {
+		ownerLike := "%" + *query.Owner + "%"
 		db = db.Joins("JOIN users ON studies.owner_user_id = users.id LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
-			Where("users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.email % ?", *query.Owner, *query.Owner, *query.Owner)
+			Where("users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.chosen_name ILIKE ? OR user_attributes.email % ? OR user_attributes.email ILIKE ?",
+				*query.Owner, *query.Owner, ownerLike, *query.Owner, ownerLike)
 	}
 	if query.Administrator != nil {
+		administratorLike := "%" + *query.Administrator + "%"
 		db = db.Joins("JOIN study_admins ON study_admins.study_id=studies.id JOIN users ON study_admins.user_id=users.id LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
-			Where("study_admins.deleted_at IS NULL AND (users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.email % ?)", *query.Administrator, *query.Administrator, *query.Administrator)
+			Where("study_admins.deleted_at IS NULL AND (users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.chosen_name ILIKE ? OR user_attributes.email % ? OR user_attributes.email ILIKE ?)",
+				*query.Administrator, *query.Administrator, administratorLike, *query.Administrator, administratorLike)
 	}
 	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
-		db = db.Where("title % ?", *query.FuzzyTitle)
+		db = db.Where("title % ? OR title ILIKE ?", *query.FuzzyTitle, "%"+*query.FuzzyTitle+"%")
 	}
 	studies := []types.Study{}
 	err := db.Preload("StudyAdmins.User").Preload("Owner").Order("last_signoff DESC, updated_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&studies).Error

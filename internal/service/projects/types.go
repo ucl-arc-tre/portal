@@ -22,6 +22,13 @@ type GenericProject struct {
 	IsDeletable     bool
 }
 
+type QueryParams struct {
+	FuzzyName *string
+	Owner     *string // username, email, name
+	Limit     int
+	Offset    int
+}
+
 type DSHMemberImportRecord struct {
 	ShareName         string
 	Owner             string
