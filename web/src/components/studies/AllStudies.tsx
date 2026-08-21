@@ -51,7 +51,6 @@ export default function AllStudies(props: Props) {
   const router = useRouter();
   const tab = (router.query.tab as "all" | "pending") ?? "all";
 
-  // tab-aware fetch: ignores search/pagination, used for the initial/tab-switch/clear-search load
   const fetchStudies = async (offset?: number): Promise<Study[] | undefined> => {
     setError(null);
     try {
