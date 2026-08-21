@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { Project, Study, getProjects, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import ProjectForm from "./ProjectForm";
 import ProjectCardsList from "./ProjectCardsList";
+import AllProjects from "./AllProjects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
@@ -21,6 +22,7 @@ export default function Projects() {
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
+  const [refreshToken, refreshAllProjects] = useReducer((x) => x + 1, 0);
 
   const { isAdmin, isTreOpsStaff, isDshOpsStaff, isApprovedStaffResearcher } = useAuth();
 
@@ -76,6 +78,7 @@ export default function Projects() {
   const handleProjectCreated = () => {
     setCreateProjectFormOpen(false);
     fetchData();
+    refreshAllProjects();
   };
 
   const handleCancelCreate = () => {
@@ -179,6 +182,8 @@ export default function Projects() {
             </Button>
           )}
         </div>
+      ) : canSeeAllProjects ? (
+        <AllProjects refreshToken={refreshToken} />
       ) : (
         <ProjectCardsList projects={projects} />
       )}

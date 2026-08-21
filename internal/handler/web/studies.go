@@ -18,8 +18,8 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if !params.Valid() {
 		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
 	}
-	if params.Limit != nil && *params.Limit > 12 {
-		return []types.Study{}, types.NewErrInvalidObject("maxItems cannot be greater than 12")
+	if params.Limit != nil && *params.Limit > defaultPageSize {
+		return []types.Study{}, types.NewErrInvalidObjectF("maxItems cannot be greater than %d", defaultPageSize)
 	}
 	if params.Offset != nil && *params.Offset < 0 {
 		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
@@ -30,7 +30,7 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		FuzzyTitle:     params.FuzzyTitle,
 		Owner:          params.Owner,
 		Administrator:  params.Administrator,
-		Limit:          12,
+		Limit:          defaultPageSize,
 		Offset:         0,
 	}
 	if params.QueryIsCaseref() {
