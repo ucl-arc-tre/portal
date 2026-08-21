@@ -360,12 +360,7 @@ export default function ManageProjectTRE(props: Props) {
               <Button onClick={handleCancelDelete} variant="secondary" disabled={!!deleting}>
                 Cancel
               </Button>
-              <Button
-                onClick={handleConfirmDelete}
-                variant="primary-destructive"
-                disabled={!!deleting}
-                className={styles["delete-button-confirm"]}
-              >
+              <Button onClick={handleConfirmDelete} variant="primary-destructive" disabled={!!deleting}>
                 {deleting ? "Deleting..." : "Delete Project"}
               </Button>
             </div>

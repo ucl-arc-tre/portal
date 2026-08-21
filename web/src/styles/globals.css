@@ -97,21 +97,6 @@ dialog {
   margin-inline: auto;
 }
 
-.delete-button-confirm {
-  background-color: var(--red-100) !important;
-  border-color: var(--red-100) !important;
-  color: white !important;
-
-  &hover:not(:disabled) {
-    background-color: var(--red-200) !important;
-    border-color: var(--red-200) !important;
-  }
-
-  &:disabled {
-    opacity: 0.6 !important;
-  }
-}
-
 .expiry-urgency--low {
   font-size: 1.5rem;
   font-weight: 700;
