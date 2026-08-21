@@ -170,7 +170,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
               </Button>
 
               <Button
-                variant="secondary"
+                variant="primary-destructive"
                 className={styles["reject-button"]}
                 onClick={() => handleStudyStatusUpdate("Rejected", feedback)}
                 disabled={!!loadingAction}
