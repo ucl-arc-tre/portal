@@ -311,15 +311,29 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve projects")
 }
 
-// retrieves all projects (for admins and TRE ops staff)
-func (s *Service) AllProjects(environments ...types.EnvironmentName) ([]GenericProject, error) {
+// retrieves all projects (for admins and TRE/DSH ops staff), optionally filtered by search query params
+func (s *Service) AllProjects(query QueryParams, envs ...types.EnvironmentName) ([]GenericProject, error) {
 	var projects []GenericProject
-	query := s.genericProjectsQuery().
+	db := s.genericProjectsQuery().
 		Where("projects.deleted_at IS NULL")
-	if len(environments) > 0 {
-		query = query.Where("environments.name IN ?", environments)
+	if len(envs) > 0 {
+		db = db.Where("environments.name IN ?", envs)
 	}
-	err := query.Scan(&projects).Error
+	if query.FuzzyName != nil && *query.FuzzyName != "" {
+		nameLike := "%" + *query.FuzzyName + "%"
+		db = db.Where("projects.name % ? OR projects.name ILIKE ?", *query.FuzzyName, nameLike)
+	}
+	if query.Owner != nil && *query.Owner != "" {
+		ownerLike := "%" + *query.Owner + "%"
+		db = db.Joins("LEFT JOIN user_attributes ON user_attributes.user_id = users.id").
+			Where("users.username = ? OR user_attributes.chosen_name % ? OR user_attributes.chosen_name ILIKE ? OR user_attributes.email % ? OR user_attributes.email ILIKE ?",
+				*query.Owner, *query.Owner, ownerLike, *query.Owner, ownerLike)
+	}
+	if query.Limit > 0 {
+		db = db.Limit(query.Limit)
+	}
+	db = db.Offset(query.Offset)
+	err := db.Scan(&projects).Error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve all projects")
 }
 

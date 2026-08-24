@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -16,13 +17,16 @@ import (
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
 	if !params.Valid() {
-		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
+		return []types.Study{}, types.NewErrClientInvalidObject("invalid query param")
 	}
-	if params.Limit != nil && *params.Limit > 12 {
-		return []types.Study{}, types.NewErrInvalidObject("maxItems cannot be greater than 12")
+	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
+		return []types.Study{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+	}
+	if params.Limit != nil && *params.Limit <= 0 {
+		return []types.Study{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
 	}
 	if params.Offset != nil && *params.Offset < 0 {
-		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
+		return []types.Study{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
 	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,
@@ -30,7 +34,7 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 		FuzzyTitle:     params.FuzzyTitle,
 		Owner:          params.Owner,
 		Administrator:  params.Administrator,
-		Limit:          12,
+		Limit:          config.DefaultPageSize,
 		Offset:         0,
 	}
 	if params.QueryIsCaseref() {

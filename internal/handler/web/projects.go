@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
@@ -13,7 +14,40 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) GetProjects(ctx *gin.Context) {
+func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.EnvironmentName) ([]projects.GenericProject, error) {
+	if !params.Valid() {
+		return []projects.GenericProject{}, types.NewErrClientInvalidObject("invalid query param")
+	}
+	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
+		return []projects.GenericProject{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+	}
+	if params.Limit != nil && *params.Limit <= 0 {
+		return []projects.GenericProject{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
+	}
+	if params.Offset != nil && *params.Offset < 0 {
+		return []projects.GenericProject{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
+	}
+
+	queryParams := projects.QueryParams{
+		Owner:  params.Owner,
+		Limit:  config.DefaultPageSize,
+		Offset: 0,
+	}
+	if params.QueryIsOwnerUsername() {
+		queryParams.Owner = params.Query
+	} else if params.Query != nil {
+		queryParams.FuzzyName = params.Query
+	}
+	if params.Limit != nil {
+		queryParams.Limit = *params.Limit
+	}
+	if params.Offset != nil {
+		queryParams.Offset = *params.Offset
+	}
+	return h.projects.AllProjects(queryParams, envs...)
+}
+
+func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams) {
 	user := middleware.GetUser(ctx)
 
 	var projects []projects.GenericProject
@@ -38,11 +72,11 @@ func (h *Handler) GetProjects(ctx *gin.Context) {
 	}
 
 	if isAdmin {
-		projects, err = h.projects.AllProjects()
+		projects, err = h.projectsAll(params)
 	} else if isTreOpsStaff {
-		projects, err = h.projects.AllProjects(environments.TRE)
+		projects, err = h.projectsAll(params, environments.TRE)
 	} else if isDshOpsStaff {
-		projects, err = h.projects.AllProjects(environments.DSH)
+		projects, err = h.projectsAll(params, environments.DSH)
 	} else {
 		// Regular user: fetch only projects they own (via RBAC)
 		projects, err = h.projectsProjectOwner(user)

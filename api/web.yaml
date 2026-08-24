@@ -778,6 +778,31 @@ paths:
   /projects:
     get:
       description: Get all projects that a user has access to view (across all environments)
+      parameters:
+        - in: query
+          name: query
+          required: false
+          description: Fuzzy search on project name
+          schema:
+            type: string
+        - in: query
+          name: owner
+          required: false
+          description: Username of the project owner (creator)
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          description: Index of the first item to return
+          schema:
+            type: integer
       responses:
         "200":
           content:

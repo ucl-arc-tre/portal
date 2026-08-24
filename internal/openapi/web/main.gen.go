@@ -1787,6 +1787,21 @@ type UserFindParam = string
 // UserIdParam defines model for UserIdParam.
 type UserIdParam = string
 
+// GetProjectsParams defines parameters for GetProjects.
+type GetProjectsParams struct {
+	// Query Fuzzy search on project name
+	Query *string `form:"query,omitempty" json:"query,omitempty"`
+
+	// Owner Username of the project owner (creator)
+	Owner *string `form:"owner,omitempty" json:"owner,omitempty"`
+
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Offset Index of the first item to return
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+}
+
 // GetStudiesParams defines parameters for GetStudies.
 type GetStudiesParams struct {
 	// Status get studies by status
@@ -1982,7 +1997,7 @@ type ServerInterface interface {
 	PostProfileTraining(c *gin.Context)
 
 	// (GET /projects)
-	GetProjects(c *gin.Context)
+	GetProjects(c *gin.Context, params GetProjectsParams)
 
 	// (GET /projects/dsh/{projectId})
 	GetProjectsDshProjectId(c *gin.Context, projectId ProjectIdParam)
@@ -2350,6 +2365,44 @@ func (siw *ServerInterfaceWrapper) PostProfileTraining(c *gin.Context) {
 // GetProjects operation middleware
 func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
 
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetProjectsParams
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", c.Request.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter query: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "owner" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "owner", c.Request.URL.Query(), &params.Owner, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter owner: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -2357,7 +2410,7 @@ func (siw *ServerInterfaceWrapper) GetProjects(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetProjects(c)
+	siw.Handler.GetProjects(c, params)
 }
 
 // GetProjectsDshProjectId operation middleware

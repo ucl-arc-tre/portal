@@ -116,11 +116,13 @@ describe("TRE project creation end-to-end", () => {
     cy.contains(projectTitle).should("be.visible");
   });
 
-  it("tre ops staff should be able to approve the project", () => {
+  it("tre ops staff should be able to search for and approve the project", () => {
     cy.loginAsTREOps();
     cy.becomeApprovedResearcher();
     cy.visit("/projects");
 
+    cy.get('[data-testid="ucl-uikit-search"]').type(projectTitle);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains(projectTitle).click();
     cy.get(`[data-cy="accept-project-button"]`).click();
   });
