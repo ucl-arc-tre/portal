@@ -14,7 +14,7 @@ export const populateExistingFormData = (study: Study): StudyFormData => {
     dataControllerOrganisation: study.data_controller_organisation,
     cagReference: study.cag_reference || "",
     dataProtectionPrefix: dataProtectionPrefix,
-    dataProtectionDate: dataProtectionYear && dataProtectionMonth ? `${dataProtectionYear}-${dataProtectionMonth}` : "",
+    dataProtectionDate: dataProtectionYear && dataProtectionMonth ? `${dataProtectionYear}/${dataProtectionMonth}` : "",
     dataProtectionId: dataProtectionId,
     dataProtectionNumber: study.data_protection_number,
     nhsEnglandReference: study.nhs_england_reference?.split(/(?<=DARS-NIC-)(\d{6}-\d{5}-\d{2})/)[1] || "",

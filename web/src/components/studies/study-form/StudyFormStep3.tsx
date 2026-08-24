@@ -78,8 +78,22 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
                 control={control}
                 rules={{
                   required: showDataProtectionNumber ? "Registration date is required" : false,
+                  pattern: {
+                    value: /^\d{4}\/(?:0[1-9]|1[0-2])$/,
+                    message: "Registration date must use the format YYYY/MM",
+                  },
                 }}
-                render={({ field }) => <input {...field} type="month" id="dataProtectionDate" />}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    id="dataProtectionDate"
+                    inputMode="numeric"
+                    maxLength={7}
+                    placeholder="YYYY/MM"
+                    value={field.value ?? ""}
+                  />
+                )}
               />
 
               <Controller
