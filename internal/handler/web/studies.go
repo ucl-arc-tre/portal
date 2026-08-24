@@ -17,16 +17,16 @@ import (
 
 func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
 	if !params.Valid() {
-		return []types.Study{}, types.NewErrInvalidObject("invalid query param")
+		return []types.Study{}, types.NewErrClientInvalidObject("invalid query param")
 	}
 	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
-		return []types.Study{}, types.NewErrInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+		return []types.Study{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
-		return []types.Study{}, types.NewErrInvalidObject("maxItems must be greater than 0")
+		return []types.Study{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
 	}
 	if params.Offset != nil && *params.Offset < 0 {
-		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
+		return []types.Study{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
 	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,

@@ -16,16 +16,16 @@ import (
 
 func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.EnvironmentName) ([]projects.GenericProject, error) {
 	if !params.Valid() {
-		return []projects.GenericProject{}, types.NewErrInvalidObject("invalid query param")
+		return []projects.GenericProject{}, types.NewErrClientInvalidObject("invalid query param")
 	}
 	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
-		return []projects.GenericProject{}, types.NewErrInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+		return []projects.GenericProject{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
-		return []projects.GenericProject{}, types.NewErrInvalidObject("maxItems must be greater than 0")
+		return []projects.GenericProject{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
 	}
 	if params.Offset != nil && *params.Offset < 0 {
-		return []projects.GenericProject{}, types.NewErrInvalidObject("startIndex cannot be negative")
+		return []projects.GenericProject{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
 	}
 
 	queryParams := projects.QueryParams{
