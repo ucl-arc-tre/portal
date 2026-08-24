@@ -32,9 +32,6 @@ export const Label = dynamic(() => import("uikit-react-public").then((mod) => mo
 export const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
-export const AlertTitle = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Title), {
-  ssr: false,
-});
 export const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
   ssr: false,
 });
