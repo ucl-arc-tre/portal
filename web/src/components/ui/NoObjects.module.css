@@ -1,4 +1,4 @@
-.no-projects-message {
+.no-objects-message {
   text-align: center;
   padding: 4rem 2rem;
   background: #f8f9fa;
@@ -7,6 +7,6 @@
   border: 1px solid #dee2e6;
 }
 
-.no-projects-message h2 {
+.no-objects-message h2 {
   margin-bottom: 2rem;
 }

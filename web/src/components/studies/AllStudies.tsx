@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { GetStudiesData, Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import styles from "./AllStudies.module.css";
 import Loading from "../ui/Loading";
 import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
 import Pagination from "../ui/Pagination";
+import NoObjects from "../ui/NoObjects";
 import TabCollection from "../shared/TabCollection";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
@@ -165,11 +165,7 @@ export default function AllStudies(props: Props) {
 
       {isLoading && <Loading message="Loading studies..." />}
 
-      {!isLoading && studies.length === 0 && (
-        <div className={styles["no-studies-message"]}>
-          <h2>{emptyMessage}</h2>
-        </div>
-      )}
+      {!isLoading && studies.length === 0 && <NoObjects message={emptyMessage} />}
 
       {studies.length > 0 && (
         <>

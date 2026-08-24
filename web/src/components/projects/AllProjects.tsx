@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { GetProjectsData, Project, getProjects } from "@/openapi";
 import ProjectCardsList from "./ProjectCardsList";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import styles from "./AllProjects.module.css";
 import Loading from "../ui/Loading";
 import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
 import Pagination from "../ui/Pagination";
+import NoObjects from "../ui/NoObjects";
 import { usePagination, DEFAULT_PAGE_SIZE } from "@/hooks/usePagination";
 
 type Props = {
@@ -95,11 +95,7 @@ export default function AllProjects(props: Props) {
 
       {isLoading && <Loading message="Loading projects..." />}
 
-      {!isLoading && projects.length === 0 && (
-        <div className={styles["no-projects-message"]}>
-          <h2>No projects found</h2>
-        </div>
-      )}
+      {!isLoading && projects.length === 0 && <NoObjects message="No projects found" />}
 
       {projects.length > 0 && (
         <>
