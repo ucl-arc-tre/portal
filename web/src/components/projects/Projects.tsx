@@ -113,7 +113,7 @@ export default function Projects() {
 
   return (
     <div className={styles.container}>
-      {projects.length > 0 && (
+      {(canSeeAllProjects || projects.length > 0) && (
         <>
           <div className={styles.header}>
             <h2>
@@ -128,7 +128,7 @@ export default function Projects() {
                 <InfoIcon />
               </Button>
             </h2>
-            {isApprovedStaffResearcher && projects.length > 0 && creationEnabled && (
+            {isApprovedStaffResearcher && !canSeeAllProjects && projects.length > 0 && creationEnabled && (
               <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
                 Create Project
               </Button>
@@ -162,11 +162,8 @@ export default function Projects() {
         />
       )}
 
-      {isTreOpsStaff && projects.length === 0 ? (
-        <div className={styles["no-projects-message"]}>
-          <h2>No Projects are currently submitted for review</h2>
-          <p>Projects created by users will appear here for approval.</p>
-        </div>
+      {canSeeAllProjects ? (
+        <AllProjects refreshToken={refreshToken} />
       ) : !isApprovedStaffResearcher && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t been added to any Projects yet</h2>
@@ -182,8 +179,6 @@ export default function Projects() {
             </Button>
           )}
         </div>
-      ) : canSeeAllProjects ? (
-        <AllProjects refreshToken={refreshToken} />
       ) : (
         <ProjectCardsList projects={projects} />
       )}
