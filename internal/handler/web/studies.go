@@ -22,6 +22,9 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
 		return []types.Study{}, types.NewErrInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
 	}
+	if params.Limit != nil && *params.Limit <= 0 {
+		return []types.Study{}, types.NewErrInvalidObject("maxItems must be greater than 0")
+	}
 	if params.Offset != nil && *params.Offset < 0 {
 		return []types.Study{}, types.NewErrInvalidObject("startIndex cannot be negative")
 	}

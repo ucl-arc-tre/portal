@@ -21,6 +21,9 @@ func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.En
 	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
 		return []projects.GenericProject{}, types.NewErrInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
 	}
+	if params.Limit != nil && *params.Limit <= 0 {
+		return []projects.GenericProject{}, types.NewErrInvalidObject("maxItems must be greater than 0")
+	}
 	if params.Offset != nil && *params.Offset < 0 {
 		return []projects.GenericProject{}, types.NewErrInvalidObject("startIndex cannot be negative")
 	}
