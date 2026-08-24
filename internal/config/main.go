@@ -36,6 +36,8 @@ const (
 	ServerShutdownGraceDuration = 10 * time.Second
 
 	StudySignoffValidity = 3 * Month
+
+	DefaultPageSize = 12 // // number of items returned for pagination
 )
 
 var k = koanf.New(".")

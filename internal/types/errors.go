@@ -21,6 +21,12 @@ func (e ErrClientInvalidObject) Error() string {
 	return fmt.Sprintf("invalid object: %s", e.ClientReadableReason)
 }
 
+// New invalid object error with a reason that will be client readable
+// e.g. NewErrClientInvalidObject("mime type not valid")
+func NewErrClientInvalidObject(reason string) *ErrClientInvalidObject {
+	return &ErrClientInvalidObject{ClientReadableReason: reason}
+}
+
 // New invalid object error with a reason that will be client readable can be formatted
 // e.g. NewErrClientInvalidObjectF("mime type was [%v] not valid", mimeType)
 func NewErrClientInvalidObjectF(format string, objs ...any) *ErrClientInvalidObject {

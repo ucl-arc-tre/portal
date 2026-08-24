@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GetStudiesData, Study, getStudies } from "@/openapi";
 import StudyCardsList from "./StudyCardsList";
-import Button from "@/components/ui/Button";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import styles from "./AllStudies.module.css";
 import Loading from "../ui/Loading";
 import { HelperText } from "../shared/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
+import Pagination from "../ui/Pagination";
+import NoObjects from "../ui/NoObjects";
 import TabCollection from "../shared/TabCollection";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
+import { usePagination, DEFAULT_PAGE_SIZE } from "@/hooks/usePagination";
 
 type Props = {
   refreshToken: number;
@@ -45,110 +46,86 @@ export default function AllStudies(props: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setError] = useState<string | null>(null);
   const [studies, setStudies] = useState<Study[]>([]);
-
-  const studiesPerPage = 12;
-  const [searchQuery, setSearchQuery] = useState("");
-  const [offset, setOffset] = useState(0);
-  const [noMoreStudies, setNoMoreStudies] = useState(false);
+  const searchQueryRef = useRef("");
 
   const router = useRouter();
   const tab = (router.query.tab as "all" | "pending") ?? "all";
 
-  const fetchStudies = async (offset?: number) => {
-    setIsLoading(true);
+  const fetchStudies = async (offset?: number): Promise<Study[] | undefined> => {
     setError(null);
     try {
       const response =
         tab === "pending"
           ? await getStudies({ query: { status: "Pending" } })
           : offset
-            ? await getStudies({ query: { offset: offset, limit: studiesPerPage } })
-            : await getStudies({ query: { limit: studiesPerPage } });
+            ? await getStudies({ query: { offset: offset, limit: DEFAULT_PAGE_SIZE } })
+            : await getStudies({ query: { limit: DEFAULT_PAGE_SIZE } });
 
       if (responseIsError(response) || !response.data) {
         setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
-        return;
+        return undefined;
       }
-
       setStudies(response.data);
+      return response.data;
     } catch (error) {
       console.error("Failed to fetch studies:", error);
       setError("Failed to fetch studies. Please try again.");
-    } finally {
-      setIsLoading(false);
+      return undefined;
     }
   };
 
-  const handleSearch = async (query: string) => {
-    if (query !== searchQuery) {
-      setOffset(0);
-    }
-    setIsLoading(true);
-    setError(null);
-    setSearchQuery(query);
-    try {
-      const request = studiesRequestData(query);
-      const response = await getStudies(request);
-
-      if (responseIsError(response) || !response.data) {
-        setError(`Search failed: ${extractErrorMessage(response)}`);
-        return;
-      }
-      setStudies(response.data);
-    } catch (error) {
-      console.error("Search failed:", error);
-      setError("Search failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleClearSearch = () => {
-    setError(null);
-    setOffset(0);
-    fetchStudies(0);
-    setSearchQuery("");
-  };
-
-  const handlePageChange = async (newOffset: number) => {
+  // search-driven fetch: used for search submissions and next/prev pagination
+  const fetchPage = async (offset: number): Promise<Study[] | undefined> => {
     setError(null);
     try {
-      const request = studiesRequestData(searchQuery);
+      const request = studiesRequestData(searchQueryRef.current);
       if (!request.query) {
         request.query = {};
       }
-      request.query.offset = newOffset;
-      request.query.limit = studiesPerPage;
+      request.query.offset = offset;
+      request.query.limit = DEFAULT_PAGE_SIZE;
 
       const response = await getStudies(request);
       if (responseIsError(response) || !response.data) {
-        setError(`Failed to fetch studies: ${extractErrorMessage(response)}`);
-        return;
+        setError(`Search failed: ${extractErrorMessage(response)}`);
+        return undefined;
       }
-      if (response.data.length !== 0) {
-        setStudies(response.data);
-        setOffset(newOffset);
-        setNoMoreStudies(false);
-      } else {
-        setNoMoreStudies(true);
-      }
+      return response.data;
     } catch (error) {
-      console.error("Failed to fetch studies:", error);
+      console.error("Search failed:", error);
+      setError("Search failed. Please try again.");
+      return undefined;
     }
   };
 
-  const handleFetchNextPage = () => {
-    const newOffset = offset + studiesPerPage;
-    handlePageChange(newOffset);
+  const { offset, noMore, nextPage, previousPage, reset } = usePagination<Study>({
+    fetchPage,
+    onItemsFetched: setStudies,
+  });
+
+  const handleSearch = async (query: string) => {
+    searchQueryRef.current = query;
+    setIsLoading(true);
+    reset();
+    const items = await fetchPage(0);
+    if (items !== undefined) setStudies(items);
+    setIsLoading(false);
   };
 
-  const handleFetchPreviousPage = () => {
-    const newOffset = Math.max(0, offset - studiesPerPage);
-    handlePageChange(newOffset);
+  const handleClearSearch = async () => {
+    searchQueryRef.current = "";
+    setIsLoading(true);
+    reset();
+    await fetchStudies(0);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchStudies();
+    searchQueryRef.current = "";
+    setIsLoading(true);
+    reset();
+    fetchStudies().finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, refreshToken]);
 
   const emptyMessage = tab === "pending" ? "No studies pending approval" : "No studies found";
@@ -173,7 +150,7 @@ export default function AllStudies(props: Props) {
           <div>
             <Search
               placeholder="Search Studies"
-              onSearch={(query) => handleSearch(query)}
+              onSearch={handleSearch}
               id="study-search"
               onClear={handleClearSearch}
             />
@@ -188,48 +165,21 @@ export default function AllStudies(props: Props) {
 
       {isLoading && <Loading message="Loading studies..." />}
 
-      {!isLoading && studies.length === 0 && (
-        <div className={styles["no-studies-message"]}>
-          <h2>{emptyMessage}</h2>
-        </div>
-      )}
+      {!isLoading && studies.length === 0 && <NoObjects message={emptyMessage} />}
 
       {studies.length > 0 && (
         <>
           <StudyCardsList studies={studies} />
-
-          <div className={styles["pagination-container"]}>
-            <div className={styles["pagination-buttons"]}>
-              {(offset >= studiesPerPage || noMoreStudies) && (
-                <Button
-                  size="small"
-                  variant="secondary"
-                  className={styles["prev-button"]}
-                  onClick={handleFetchPreviousPage}
-                >
-                  Previous Page
-                </Button>
-              )}
-              <small>
-                Showing studies {offset + 1} - {offset + studies.length}
-              </small>
-              {studies.length >= studiesPerPage && (
-                <Button
-                  size="small"
-                  variant="secondary"
-                  className={styles["next-button"]}
-                  onClick={handleFetchNextPage}
-                  disabled={noMoreStudies}
-                >
-                  Next Page
-                </Button>
-              )}
-            </div>
-            <HelperText className={styles["pagination-help"]}>
-              {noMoreStudies && <div>No more studies available</div>}
-              <small>Please note these results have been ordered by date of IAO signoff</small>
-            </HelperText>
-          </div>
+          <Pagination
+            offset={offset}
+            pageSize={DEFAULT_PAGE_SIZE}
+            itemCount={studies.length}
+            noMore={noMore}
+            itemLabel="studies"
+            onNext={nextPage}
+            onPrevious={previousPage}
+            helpText={<small>Please note these results have been ordered by date of IAO signoff</small>}
+          />
         </>
       )}
     </>
