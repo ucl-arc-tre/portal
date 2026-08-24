@@ -1,5 +1,5 @@
 import Box from "../../ui/Box";
-import { Alert, AlertMessage, Textarea } from "../../shared/uikitExports";
+import { Alert, AlertMessage, Label, Textarea } from "../../shared/uikitExports";
 import Button from "../../ui/Button";
 import { useState } from "react";
 import {
@@ -130,7 +130,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
 
           <div className={styles["feedback-container"]}>
             <form className={styles["feedback-form"]}>
-              <label htmlFor="feedback">Feedback</label>
+              <Label htmlFor="feedback">Feedback</Label>
               <Textarea
                 name="feedback"
                 id="feedback"
@@ -194,7 +194,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
 
           <div className={styles["feedback-container"]}>
             <form className={styles["feedback-form"]}>
-              <label htmlFor="feedback">Feedback</label>
+              <Label htmlFor="feedback">Feedback</Label>
               <Textarea
                 name="feedback"
                 id="feedback"

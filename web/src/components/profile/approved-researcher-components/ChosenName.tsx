@@ -5,7 +5,7 @@ import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Button from "../../ui/Button";
 
 import styles from "./ChosenName.module.css";
-import { Alert, AlertMessage, Input } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, Input, Label } from "@/components/shared/uikitExports";
 
 type ProfileChosenNameProps = {
   chosenName: string;
@@ -62,9 +62,9 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles["input-group"]}>
-          <label htmlFor="nameInput" className={styles.label}>
+          <Label htmlFor="nameInput" className={styles.label}>
             Full Name
-          </label>
+          </Label>
           <Input
             id="nameInput"
             type="text"

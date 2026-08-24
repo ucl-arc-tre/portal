@@ -25,7 +25,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
       <div className={styles.group}>
         {options.map((option) => {
           return (
-            <label className={styles.label} key={option.name}>
+            <Label className={styles.label} key={option.name}>
               <input
                 type="radio"
                 value={option.value}
@@ -36,7 +36,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
                 className={styles.option}
               />
               {option.name}
-            </label>
+            </Label>
           );
         })}
       </div>

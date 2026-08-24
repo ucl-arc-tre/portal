@@ -24,7 +24,7 @@ import TextLink from "@/components/ui/TextLink";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
-import { HelperText } from "@/components/shared/uikitExports";
+import { HelperText, Label } from "@/components/shared/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import ErrorMessage from "@/components/ui/Error";
@@ -214,25 +214,25 @@ export default function ManageAssetPage() {
 
           <div className={styles.section}>
             <div className={styles.field}>
-              <label>Description:</label>
+              <Label>Description:</Label>
               <span>{asset.description}</span>
             </div>
             <div className={styles.field}>
-              <label>Created:</label>
+              <Label>Created:</Label>
               <span>{formatDate(asset.created_at)}</span>
             </div>
 
             <div className={styles.field}>
-              <label>Updated:</label>
+              <Label>Updated:</Label>
               <span>{formatDate(asset.updated_at)}</span>
             </div>
 
             <div className={styles.field}>
-              <label>Source:</label>
+              <Label>Source:</Label>
               <span>{asset.source || "Unset"}</span>
             </div>
             <div className={styles.field}>
-              <label>Status:</label>
+              <Label>Status:</Label>
               <span
                 className={`${styles.status} ${asset.status === "active" ? styles["status-active"] : styles["status-destroyed"]}`}
               >
@@ -240,58 +240,58 @@ export default function ManageAssetPage() {
               </span>
             </div>
             <div className={styles.field}>
-              <label>Classification:</label>
+              <Label>Classification:</Label>
               <span>{asset.classification_impact.replaceAll("_", " ")}</span>
             </div>
             <div className={styles.field}>
-              <label>Tier:</label>
+              <Label>Tier:</Label>
               <span>{asset.tier}</span>
             </div>
             {asset.protection && (
               <div className={styles.field}>
-                <label>Protection:</label>
+                <Label>Protection:</Label>
                 <span>{asset.protection.replaceAll("_", " ")}</span>
               </div>
             )}
             <div className={styles.field}>
-              <label>Legal Basis:</label>
+              <Label>Legal Basis:</Label>
               <span>{asset.legal_basis?.replaceAll("_", " ")}</span>
             </div>
             <div className={styles.field}>
-              <label>Format:</label>
+              <Label>Format:</Label>
               <span>{asset.format}</span>
             </div>
             <div className={styles.field}>
-              <label>Expiry Date:</label>
+              <Label>Expiry Date:</Label>
               <span>{asset.expires_at ? formatDate(asset.expires_at) : "None"}</span>
             </div>
             <div className={styles.field}>
-              <label>Locations:</label>
+              <Label>Locations:</Label>
               <span>{asset.locations.map((location) => location.replace(/_/g, " ")).join(", ")}</span>
             </div>
 
             <div className={styles.field}>
-              <label>Data types:</label>
+              <Label>Data types:</Label>
               {asset.data_types.length === 0 && "None"}
               <span>{asset.data_types.map((data_type) => data_type.replace(/_/g, " ")).join(", ")}</span>
             </div>
 
             <div className={styles.field}>
-              <label>Contract Required:</label>
+              <Label>Contract Required:</Label>
               <span>{asset.requires_contract ? "Yes" : "No"}</span>
             </div>
             <div className={styles.field}>
-              <label>Requires NHS DSPT:</label>
+              <Label>Requires NHS DSPT:</Label>
               <span>{asset.has_dspt ? "Yes" : "No"}</span>
             </div>
             <div className={styles.field}>
-              <label>Stored Outside UK/EEA:</label>
+              <Label>Stored Outside UK/EEA:</Label>
               <span>{asset.stored_outside_uk_eea ? "Yes" : "No"}</span>
             </div>
 
             {contracts.length > 0 && (
               <div className={styles.field}>
-                <label>
+                <Label>
                   Associated Contracts:
                   <HelperText>
                     <small>
@@ -299,7 +299,7 @@ export default function ManageAssetPage() {
                       <TextLink href={`/studies/manage?studyId=${study.id}`}>Study</TextLink> page.
                     </small>
                   </HelperText>
-                </label>
+                </Label>
                 <ul>
                   {contracts.map((contract) => (
                     <ContractCard key={contract.id} contract={contract} studyId={study.id} />

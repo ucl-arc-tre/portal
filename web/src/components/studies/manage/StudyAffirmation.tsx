@@ -1,5 +1,5 @@
 import Error from "@/components/ui/Error";
-import { Alert } from "@/components/shared/uikitExports";
+import { Alert, Label } from "@/components/shared/uikitExports";
 import styles from "./StudyAffirmation.module.css";
 import { useState } from "react";
 import { postStudiesByStudyIdSignoff } from "@/openapi";
@@ -68,7 +68,7 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
         </p>
 
         <div className={styles["signoff-checkbox"]}>
-          <label>
+          <Label>
             <input
               type="checkbox"
               checked={affirmationChecked}
@@ -77,7 +77,7 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
               data-cy="study-affirmation-confirm-checkbox"
             />{" "}
             I confirm the above details are correct.
-          </label>
+          </Label>
         </div>
 
         {affirmationError && <Error message={affirmationError} />}

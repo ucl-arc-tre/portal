@@ -2,7 +2,7 @@ import Link from "next/link";
 import styles from "./Feedback.module.css";
 import { useState } from "react";
 import Dialog from "./Dialog";
-import { Alert, AlertMessage, Textarea } from "../shared/uikitExports";
+import { Alert, AlertMessage, Label, Textarea } from "../shared/uikitExports";
 import Error from "./Error";
 import Button from "./Button";
 import { postFeedback } from "@/openapi";
@@ -85,7 +85,7 @@ export default function Feedback() {
 
             {!successMessage && (
               <>
-                <label htmlFor="feedback">
+                <Label htmlFor="feedback">
                   <Textarea
                     name="feedback"
                     id="feedback"
@@ -94,7 +94,7 @@ export default function Feedback() {
                     value={feedback}
                     onChange={handleFeedbackChange}
                   />
-                </label>
+                </Label>
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "Submitting..." : "Submit"}
                 </Button>
