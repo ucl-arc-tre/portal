@@ -221,6 +221,21 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		return
 	}
 
+	studies, err := h.studies.StudiesById(studyUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get study")
+		return
+	} else if len(studies) == 0 {
+		setError(ctx, types.NewNotFoundError("study not found"))
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	if studies[0].OwnerUserID == user.ID {
+		setError(ctx, types.NewErrClientInvalidObject("cannot review a study you own"))
+		return
+	}
+
 	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")

@@ -46,6 +46,7 @@ export default function ManageProjectTRE(props: Props) {
   const projectId = project.id;
   const canApprove = isAdmin || isTreOpsStaff;
   const canEdit =
+    isAdmin ||
     project?.creator_username == userData?.username ||
     (userData?.roles as string[]).includes(`project_${project.id}_owner`);
 
@@ -181,23 +182,19 @@ export default function ManageProjectTRE(props: Props) {
 
   return (
     <>
-      {!canApprove && project.status === "incomplete" && (
+      {!canApprove && canEdit && project.status === "incomplete" && (
         <div className={styles["approval-section"]}>
           <p className={styles["approval-info"]}>
             Please review your project details below. Once you are satisfied with the information provided, submit your
             project and an administrator will review it.
           </p>
           <div className={styles["approval-actions"]}>
-            {canEdit && (
-              <Button onClick={() => setShowEditForm(true)} size="small" variant="secondary" disabled={!editingEnabled}>
-                Edit
-              </Button>
-            )}
-            {canEdit && (
-              <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
-                {deleting ? "Deleting..." : "Delete"}
-              </Button>
-            )}
+            <Button onClick={() => setShowEditForm(true)} size="small" variant="secondary" disabled={!editingEnabled}>
+              Edit
+            </Button>
+            <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
 
             <Button
               onClick={handleSubmit}

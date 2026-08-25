@@ -65,7 +65,7 @@ export default function Nav() {
   if (authInProgress) return null;
 
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
-  const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff;
+  const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff || isIGStaff;
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
   const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;
   const canSeeMetrics = isAdmin || isIGStaff;

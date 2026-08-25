@@ -65,20 +65,20 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 		return
 	}
 
-	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	canSeeAllEnvironments, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
 
-	if isAdmin {
+	if canSeeAllEnvironments {
 		projects, err = h.projectsAll(params)
 	} else if isTreOpsStaff {
 		projects, err = h.projectsAll(params, environments.TRE)
 	} else if isDshOpsStaff {
 		projects, err = h.projectsAll(params, environments.DSH)
 	} else {
-		// Regular user: fetch only projects they own (via RBAC)
+		// Regular user: fetch only projects they own
 		projects, err = h.projectsProjectOwner(user)
 	}
 
@@ -293,6 +293,18 @@ func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId s
 func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId string) {
 	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
 	if err != nil {
+		return
+	}
+
+	projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get project")
+		return
+	}
+
+	user := middleware.GetUser(ctx)
+	if projectTRE.Project.CreatorUserID == user.ID {
+		setError(ctx, types.NewErrClientInvalidObject("cannot approve a project you own"))
 		return
 	}
 

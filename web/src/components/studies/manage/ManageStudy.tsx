@@ -24,6 +24,7 @@ import Error from "../../ui/Error";
 import Loading from "../../ui/Loading";
 import { studySignoffWarningRequired } from "../../shared/exports";
 import StudyAffirmation from "./StudyAffirmation";
+import { Alert, AlertMessage } from "../../shared/uikitExports";
 
 type ManageStudyProps = {
   study: Study;
@@ -51,7 +52,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const router = useRouter();
   const tab = (router.query.tab as "study" | "projects" | "assets" | "contracts") ?? "study";
 
-  const isStudyOwner = userData && isIAO && study.owner_username === userData?.username;
+  const isOwnStudy = study.owner_username === userData?.username;
+  const isStudyOwner = userData && isIAO && isOwnStudy;
 
   const showSignoffWarning =
     isStudyOwner &&
@@ -121,7 +123,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     return <Error message={error} />;
   }
 
-  if (studyStepsCompleted === false && !isIGStaff) {
+  if (studyStepsCompleted === false && (!isIGStaff || isOwnStudy)) {
     return (
       <StudySetupSteps
         study={study}
@@ -140,7 +142,15 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <StudyAffirmation studyId={study.id} successCallback={() => fetchStudy(study.id)} isReaffirmation />
       )}
 
-      {isIGStaff && study.approval_status !== "Incomplete" && (
+      {isIGStaff && isOwnStudy && (study.approval_status === "Pending" || study.approval_status === "Rejected") && (
+        <Alert type="info">
+          <AlertMessage>
+            You cannot approve your own study, please ask another member of the IG team to provide a review.
+          </AlertMessage>
+        </Alert>
+      )}
+
+      {isIGStaff && !isOwnStudy && study.approval_status !== "Incomplete" && (
         <AdminReview
           study={study}
           unagreedAdminUsernames={unagreedAdminUsernames}
