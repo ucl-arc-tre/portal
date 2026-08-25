@@ -8,7 +8,7 @@ import Button from "./Button";
 import { postFeedback } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
-const email = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.tre@ucl.ac.uk";
+const email = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.portal@ucl.ac.uk";
 const useMyservices = process.env.NEXT_PUBLIC_ENABLE_MYSERVICES === "true";
 
 export default function Feedback() {
