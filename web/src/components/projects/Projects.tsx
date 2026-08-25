@@ -27,9 +27,12 @@ export default function Projects() {
 
   const { userData, isAdmin, isTreOpsStaff, isDshOpsStaff, isIGStaff, isApprovedStaffResearcher } = useAuth();
 
-  // Studies the current user owns and can create Projects under (not just any study visible to them)
+  // Studies the current user owns or is an administrator on, and can create Projects under (not just any study that might be visible to e.g. ops staff)
   const myApprovedStudies = studies?.filter(
-    (study) => study.approval_status === "Approved" && study.owner_username === userData?.username
+    (study) =>
+      study.approval_status === "Approved" &&
+      (study.owner_username === userData?.username ||
+        (!!userData && study.additional_study_admin_usernames.includes(userData.username)))
   );
   const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff;
   const creationEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_CREATION === "true";
