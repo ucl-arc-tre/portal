@@ -344,7 +344,17 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 	return s.commitStudyTransaction(tx, &study)
 }
 
-func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review openapi.StudyReview) error {
+func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review openapi.StudyReview, reviewer types.User) error {
+	existingStudies, err := s.StudiesById(id)
+	if err != nil {
+		return err
+	} else if len(existingStudies) == 0 {
+		return types.NewNotFoundError("study not found")
+	}
+	if review.Status != openapi.StudyApprovalStatusPending && existingStudies[0].OwnerUserID == reviewer.ID {
+		return types.NewErrClientInvalidObject("cannot review a study you own")
+	}
+
 	study := types.Study{}
 	db := s.db.Model(&study).
 		Clauses(clause.Returning{}).
