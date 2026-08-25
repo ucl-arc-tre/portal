@@ -44,7 +44,7 @@ export default function ManageProjectTRE(props: Props) {
 
   const editingEnabled = project.status === "incomplete" || project.status === "deployed";
   const projectId = project.id;
-  const canApprove = isAdmin || isTreOpsStaff;
+  const canApprove = (isAdmin || isTreOpsStaff) && project?.creator_username !== userData?.username;
   const canEdit =
     isAdmin ||
     project?.creator_username == userData?.username ||
