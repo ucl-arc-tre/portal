@@ -296,21 +296,10 @@ func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, project
 		return
 	}
 
-	projectTRE, err := h.projects.ProjectTreById(projectUUID)
-	if err != nil {
-		setError(ctx, err, "Failed to get project")
-		return
-	}
-
-	user := middleware.GetUser(ctx)
-	if projectTRE.Project.CreatorUserID == user.ID {
-		setError(ctx, types.NewErrClientInvalidObject("cannot approve a project you own"))
-		return
-	}
-
 	// TODO: check that the project status is "Pending", otherwise return a 400??
 
-	err = h.projects.ApproveProject(projectUUID)
+	user := middleware.GetUser(ctx)
+	err = h.projects.ApproveProject(projectUUID, user)
 	if err != nil {
 		setError(ctx, err, "Failed to approve project")
 		return

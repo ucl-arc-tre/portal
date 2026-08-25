@@ -414,7 +414,15 @@ func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
 	return nil
 }
 
-func (s *Service) ApproveProject(projectId uuid.UUID) error {
+func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error {
+	projectTRE, err := s.ProjectTreById(projectId)
+	if err != nil {
+		return err
+	}
+	if projectTRE.Project.CreatorUserID == approver.ID {
+		return types.NewErrClientInvalidObject("cannot approve a project you own")
+	}
+
 	result := s.db.Model(&types.ProjectTRE{}).
 		Where("project_id = ?", projectId).
 		Where("status = ?", types.ProjectTREStatusPendingApproval).
