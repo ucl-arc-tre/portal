@@ -28,6 +28,15 @@ func (p ProjectTRERequest) Base() ProjectTREBase {
 	}
 }
 
+func (p GetProjectsParams) Valid() bool {
+	bothQueryAndOwnerSet := p.Query != nil && p.Owner != nil
+	return !bothQueryAndOwnerSet
+}
+
+func (p GetProjectsParams) QueryIsOwnerUsername() bool {
+	return queryIsOwnerUsername(p.Query)
+}
+
 func parseManyUUID(values []string) ([]uuid.UUID, error) {
 	uuids := []uuid.UUID{}
 	for _, value := range values {

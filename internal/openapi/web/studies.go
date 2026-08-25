@@ -31,8 +31,11 @@ func (s GetStudiesParams) QueryIsCaseref() bool {
 }
 
 func (s GetStudiesParams) QueryIsOwnerUsername() bool {
-	if s.Query == nil {
+	return queryIsOwnerUsername(s.Query)
+}
+func queryIsOwnerUsername(query *string) bool {
+	if query == nil {
 		return false
 	}
-	return types.Username(*s.Query).IsValid()
+	return types.Username(*query).IsValid()
 }

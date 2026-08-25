@@ -2035,7 +2035,24 @@ export type GetEnvironmentsResponse = GetEnvironmentsResponses[keyof GetEnvironm
 export type GetProjectsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Fuzzy search on project name
+         */
+        query?: string;
+        /**
+         * Username of the project owner (creator)
+         */
+        owner?: string;
+        /**
+         * Maximum number of items to return
+         */
+        limit?: number;
+        /**
+         * Index of the first item to return
+         */
+        offset?: number;
+    };
     url: '/projects';
 };
 

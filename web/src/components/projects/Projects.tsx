@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { Project, Study, getProjects, getStudies } from "@/openapi";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import ProjectForm from "./ProjectForm";
 import ProjectCardsList from "./ProjectCardsList";
+import AllProjects from "./AllProjects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import styles from "./Projects.module.css";
@@ -21,6 +22,7 @@ export default function Projects() {
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
+  const [refreshToken, refreshAllProjects] = useReducer((x) => x + 1, 0);
 
   const { isAdmin, isTreOpsStaff, isDshOpsStaff, isApprovedStaffResearcher } = useAuth();
 
@@ -76,6 +78,7 @@ export default function Projects() {
   const handleProjectCreated = () => {
     setCreateProjectFormOpen(false);
     fetchData();
+    refreshAllProjects();
   };
 
   const handleCancelCreate = () => {
@@ -110,7 +113,7 @@ export default function Projects() {
 
   return (
     <div className={styles.container}>
-      {projects.length > 0 && (
+      {(canSeeAllProjects || projects.length > 0) && (
         <>
           <div className={styles.header}>
             <h2>
@@ -125,7 +128,7 @@ export default function Projects() {
                 <InfoIcon />
               </Button>
             </h2>
-            {isApprovedStaffResearcher && projects.length > 0 && creationEnabled && (
+            {isApprovedStaffResearcher && !canSeeAllProjects && projects.length > 0 && creationEnabled && (
               <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
                 Create Project
               </Button>
@@ -159,11 +162,8 @@ export default function Projects() {
         />
       )}
 
-      {isTreOpsStaff && projects.length === 0 ? (
-        <div className={styles["no-projects-message"]}>
-          <h2>No Projects are currently submitted for review</h2>
-          <p>Projects created by users will appear here for approval.</p>
-        </div>
+      {canSeeAllProjects ? (
+        <AllProjects refreshToken={refreshToken} />
       ) : !isApprovedStaffResearcher && projects.length === 0 ? (
         <div className={styles["no-projects-message"]}>
           <h2>You haven&apos;t been added to any Projects yet</h2>

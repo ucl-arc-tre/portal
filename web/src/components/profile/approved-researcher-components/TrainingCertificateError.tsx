@@ -7,7 +7,7 @@ type TrainingCertificateErrorProps = {
   showExtra?: boolean;
 };
 
-const manualApprovalEmailAddress = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.tre@ucl.ac.uk";
+const manualApprovalEmailAddress = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "arc.portal@ucl.ac.uk";
 const manualApprovalEmailBody = encodeURI("Dear UCL Information Governance,\n\n ...");
 const manualApprovalEmailSubject = "Training certificate";
 
