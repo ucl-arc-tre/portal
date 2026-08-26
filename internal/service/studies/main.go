@@ -355,8 +355,11 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 		return types.NewErrClientInvalidObject("cannot review a study you own")
 	}
 
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
 	study := types.Study{}
-	db := s.db.Model(&study).
+	db := tx.Model(&study).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Update("approval_status", review.Status)
@@ -366,9 +369,11 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 	}
 
 	if err := db.Error; err != nil {
+		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to update study review")
 	}
 	if db.RowsAffected == 0 {
+		tx.Rollback()
 		return nil // nothing changed
 	}
 
@@ -378,8 +383,13 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 		Status:         types.StudyApprovalStatus(review.Status),
 		Feedback:       review.Feedback,
 	}
-	if err := s.db.Create(&feedbackEntry).Error; err != nil {
+	if err := tx.Create(&feedbackEntry).Error; err != nil {
+		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to record study feedback history")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit study review transaction")
 	}
 
 	if err := s.db.Preload("Owner").Preload("StudyAdmins").Preload("StudyAdmins.User").First(&study).Error; err != nil {
