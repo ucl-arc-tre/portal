@@ -1,6 +1,4 @@
-You are reminded that the UCL Information Security Policy, Data Protection Policy and UCL Computing Regulations are contractually mandated. Found here:
-
-www.ucl.ac.uk/information-security/information-security-policy
+You are reminded that the [UCL Information Security Policy](https://www.ucl.ac.uk/information-security/information-security-policy), [UCL Data Protection Policy](https://www.ucl.ac.uk/data-protection/policies/2026/mar/data-protection-policy) and [UCL Acceptable Use Policy](https://www.ucl.ac.uk/information-security/policies/2021/may/computing-regulations-acceptable-use-policy) are contractually mandated.
 
 Documented information for the use of UCL Trusted Research Environments can be found here:
 
