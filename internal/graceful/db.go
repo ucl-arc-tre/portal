@@ -155,7 +155,7 @@ func migrateNotifications(db *gorm.DB) {
 		return // nothing to migrate
 	}
 
-	// Before 2026/08/26 notifications that were read are treated as dismissed/deleted
+	// Before this migration notifications that were read are treated as dismissed/deleted
 	newestNotificationReadIsDeleted, _ := time.Parse(time.RFC3339, "2026-09-07T00:00:00+00:00")
 	err := db.Where("read_at IS NOT NULL AND read_at < ?", newestNotificationReadIsDeleted).Delete(&types.Notification{}).Error
 	if err != nil {

@@ -23,7 +23,7 @@ export default function Notifications() {
   const [error, setError] = useState<string | null>(null);
 
   const completeProfileNotification = notifications?.find((notification) => notification.kind === "complete-profile");
-  const needToCompleteProfile = completeProfileNotification !== undefined;
+  const needToCompleteProfile = completeProfileNotification !== undefined && !completeProfileNotification.read;
   const unreadCount = notifications?.filter((notification) => !notification.read).length ?? 0;
 
   const fetchNotifications = async () => {

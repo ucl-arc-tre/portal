@@ -7,7 +7,8 @@ import {
   UserAgreements,
   ProfileTraining,
   Auth,
-  postNotificationsRead,
+  getNotifications,
+  deleteNotificationsByNotificationId,
 } from "@/openapi";
 import { calculateExpiryUrgency } from "@/components/shared/exports";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -91,7 +92,18 @@ export default function Profile({ userData, refreshAuth }: Props) {
 
   const clearCompleteProfileCompleteNotification = async () => {
     try {
-      const response = await postNotificationsRead({ body: { kind: "complete-profile" } });
+      const readResponse = await getNotifications();
+      if (responseIsError(readResponse)) {
+        setError(`Failed to get notifications: ${extractErrorMessage(readResponse)}`);
+        return;
+      }
+      const profileCompleteNotification = readResponse.data?.find(
+        (notification) => notification.kind == "complete-profile"
+      );
+      if (!profileCompleteNotification) return;
+      const response = await deleteNotificationsByNotificationId({
+        path: { notificationId: profileCompleteNotification.id },
+      });
       if (responseIsError(response)) {
         setError(`Failed to clear complete profile notification: ${extractErrorMessage(response)}`);
       }
