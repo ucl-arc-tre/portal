@@ -25,7 +25,7 @@ import ContractObjectCard from "@/components/contracts/ContractObjectCard";
 import Error from "@/components/ui/Error";
 import { formatDate } from "@/components/shared/exports";
 import Box from "@/components/ui/Box";
-import Label from "uikit-react-public/dist/components/Label/Label";
+import { Label } from "@/components/shared/uikitExports";
 
 export default function ManageContractPage() {
   const router = useRouter();
