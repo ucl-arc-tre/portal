@@ -1,5 +1,5 @@
 import Error from "@/components/ui/Error";
-import { Alert, Label } from "@/components/shared/uikitExports";
+import { Alert, Checkbox, Label } from "@/components/shared/uikitExports";
 import styles from "./StudyAffirmation.module.css";
 import { useState } from "react";
 import { postStudiesByStudyIdSignoff } from "@/openapi";
@@ -69,8 +69,7 @@ export default function StudyAffirmation(props: StudyAffirmationProps) {
 
         <div className={styles["signoff-checkbox"]}>
           <Label>
-            <input
-              type="checkbox"
+            <Checkbox
               checked={affirmationChecked}
               onChange={(e) => setAffirmationChecked(e.target.checked)}
               disabled={isAttesting}
