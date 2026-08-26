@@ -26,7 +26,7 @@ describe("Study signoff warning", () => {
   });
 
   it("enables the confirm button only after checking the checkbox", () => {
-    cy.contains("I confirm the above details are correct").click();
+    cy.get("[data-cy='study-affirmation-confirm-checkbox']").click();
     cy.contains("Confirm Details").should("not.be.disabled");
   });
 
@@ -39,7 +39,7 @@ describe("Study signoff warning", () => {
 
     cy.intercept("POST", `/web/api/v0/studies/${studyId}/signoff`, { statusCode: 200 }).as("postSignoff");
 
-    cy.contains("I confirm the above details are correct").click();
+    cy.get("[data-cy='study-affirmation-confirm-checkbox']").click();
     cy.contains("Confirm Details").click();
 
     cy.wait("@postSignoff");
