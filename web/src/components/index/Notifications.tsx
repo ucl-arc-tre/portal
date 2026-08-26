@@ -6,13 +6,14 @@ import {
   getNotifications,
   Notification,
   postNotificationsByNotificationIdRead,
+  deleteNotificationsByNotificationId,
   postNotificationsRead,
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./Notifications.module.css";
 import Error from "../ui/Error";
-import { IconButton, XIcon } from "../shared/uikitExports";
+import { CheckIcon, IconButton, XIcon } from "../shared/uikitExports";
 import router from "next/router";
 
 export default function Notifications() {
@@ -24,35 +25,49 @@ export default function Notifications() {
   const completeProfileNotification = notifications?.find((notification) => notification.kind === "complete-profile");
   const needToCompleteProfile = completeProfileNotification !== undefined;
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getNotifications();
+  const fetchNotifications = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getNotifications();
 
-        if (responseIsError(response)) {
-          const errorMsg = extractErrorMessage(response);
-          setError(`Failed to load notifications: ${errorMsg}`);
-          setNotifications(undefined);
-          return;
-        }
-        setNotifications(response.data);
-      } catch (error) {
-        console.error("Failed to get notifications:", error);
-        setError("Failed to load notifications. Please try again later.");
+      if (responseIsError(response)) {
+        const errorMsg = extractErrorMessage(response);
+        setError(`Failed to load notifications: ${errorMsg}`);
         setNotifications(undefined);
-      } finally {
-        setIsLoading(false);
+        return;
       }
-    };
+      setNotifications(response.data);
+    } catch (error) {
+      console.error("Failed to get notifications:", error);
+      setError("Failed to load notifications. Please try again later.");
+      setNotifications(undefined);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (isAuthed) {
       fetchNotifications();
     }
   }, [isAuthed]);
 
-  const clearNotification = async (notification: Notification) => {
+  const readNotification = async (notification: Notification) => {
     try {
       const response = await postNotificationsByNotificationIdRead({ path: { notificationId: notification.id } });
+      if (responseIsError(response)) {
+        setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
+        return;
+      }
+      fetchNotifications();
+    } catch (error) {
+      console.error("Failed to clear notification:", error);
+    }
+  };
+
+  const dismissNotification = async (notification: Notification) => {
+    try {
+      const response = await deleteNotificationsByNotificationId({ path: { notificationId: notification.id } });
       if (responseIsError(response)) {
         setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
         return;
@@ -137,12 +152,17 @@ export default function Notifications() {
                   if (notification.href) {
                     router.push(notification.href);
                   }
-                  clearNotification(notification);
+                  readNotification(notification);
                 }}
               >
                 <p>{notification.title}</p>
               </a>
-              <IconButton aria-label={"dismiss notification"} onClick={() => clearNotification(notification)}>
+              {!notification.read && (
+                <IconButton aria-label={"read notification"} onClick={() => readNotification(notification)}>
+                  <CheckIcon aria-hidden="true" size={24} />
+                </IconButton>
+              )}
+              <IconButton aria-label={"dismiss notification"} onClick={() => dismissNotification(notification)}>
                 <XIcon aria-hidden="true" size={24} />
               </IconButton>
             </div>

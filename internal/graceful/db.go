@@ -64,6 +64,7 @@ func InitDB() {
 	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
 	migrateProjectStatus(db)
+	migrateNotifications(db)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
@@ -142,6 +143,15 @@ func RollbackTransactionOnPanic(tx *gorm.DB) {
 
 func mustExec(db *gorm.DB, sql string) {
 	err := db.Exec(sql).Error
+	if err != nil {
+		panic(err)
+	}
+}
+
+func migrateNotifications(db *gorm.DB) {
+	// Before 2026/08/26 notifications that were read are treated as dismissed/deleted
+	newestNotificationReadIsDeleted, _ := time.Parse(time.RFC3339, "2026-08-26T12:16:41+00:00")
+	err := db.Where("read_at IS NOT NULL AND read_at < ?", newestNotificationReadIsDeleted).Delete(&types.Notification{}).Error
 	if err != nil {
 		panic(err)
 	}

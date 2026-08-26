@@ -21,6 +21,7 @@ export type Notification = {
      */
     id: string;
     title: string;
+    read: boolean;
     body?: string;
     kind?: NotificationKind;
     /**
@@ -872,6 +873,11 @@ export type ContractIdParam = string;
 export type ContractObjectIdParam = string;
 
 /**
+ * Notification UUID
+ */
+export type NotificationIdParam = string;
+
+/**
  * Short environment name
  */
 export type EnvironmentParam = 'dsh' | 'tre';
@@ -937,11 +943,47 @@ export type GetNotificationsResponses = {
 
 export type GetNotificationsResponse = GetNotificationsResponses[keyof GetNotificationsResponses];
 
+export type DeleteNotificationsByNotificationIdData = {
+    body?: never;
+    path: {
+        /**
+         * Notification UUID
+         */
+        notificationId: string;
+    };
+    query?: never;
+    url: '/notifications/{notificationId}';
+};
+
+export type DeleteNotificationsByNotificationIdErrors = {
+    /**
+     * Unauthenticated
+     */
+    401: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type DeleteNotificationsByNotificationIdResponses = {
+    /**
+     * OK
+     */
+    204: void;
+};
+
+export type DeleteNotificationsByNotificationIdResponse = DeleteNotificationsByNotificationIdResponses[keyof DeleteNotificationsByNotificationIdResponses];
+
 export type PostNotificationsByNotificationIdReadData = {
     body?: never;
     path: {
         /**
-         * ID of the notification to be updated
+         * Notification UUID
          */
         notificationId: string;
     };

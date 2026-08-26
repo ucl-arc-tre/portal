@@ -4,7 +4,8 @@
   border-radius: var(--default-border-radius);
   padding: 1.5rem;
   margin: 2rem 0;
-  max-width: 50vw;
+  width: 50vw;
+  max-width: 500px;
   max-height: fit-content;
   justify-self: center;
 }

@@ -20,6 +20,10 @@ export const CheckSquareIcon = dynamic(() => import("uikit-react-public").then((
   ssr: false,
 });
 
+export const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
+  ssr: false,
+});
+
 //  COMPONENTS
 export const Input = dynamic(() => import("uikit-react-public").then((mod) => mod.Input), {
   ssr: false,
@@ -36,10 +40,6 @@ export const AlertTitle = dynamic(() => import("uikit-react-public").then((mod) 
   ssr: false,
 });
 export const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {
-  ssr: false,
-});
-
-export const CheckIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Check), {
   ssr: false,
 });
 
