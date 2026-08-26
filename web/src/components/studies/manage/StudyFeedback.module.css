@@ -1,0 +1,47 @@
+.feedback-alert {
+  margin-bottom: 1rem;
+}
+
+.history-list {
+  list-style: none;
+  margin-top: 1rem;
+  padding: 0;
+  max-height: 32rem;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+}
+
+.history-item {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-dialog {
+  width: 95% !important;
+  min-height: 30rem;
+}
+
+.history-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+  overflow-x: auto;
+}
+
+.history-meta span {
+  white-space: nowrap;
+}
+
+.history-item p {
+  margin: 0.75rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid #dee2e6;
+  color: #212529;
+}

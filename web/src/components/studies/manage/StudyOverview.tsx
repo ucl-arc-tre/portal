@@ -1,4 +1,4 @@
-import { patchStudiesByStudyIdPending, Study, Asset, Contract, Project } from "@/openapi";
+import { patchStudiesByStudyIdPending, Study, Asset, Contract, Project, StudyFeedbackEntry } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import Error from "../../ui/Error";
@@ -13,6 +13,7 @@ import Box from "@/components/ui/Box";
 import Dialog from "@/components/ui/Dialog";
 import StudyAffirmation from "./StudyAffirmation";
 import StudyOwnerEdit from "./StudyOwnerEdit";
+import StudyFeedback from "./StudyFeedback";
 import { getStudyRiskLevel } from "../../../lib/riskScoreCalculations";
 
 type StudyOverviewProps = {
@@ -22,6 +23,7 @@ type StudyOverviewProps = {
   projects?: Project[];
   fetchStudy: (id: string) => Promise<void>;
   unagreedAdminUsernames?: string[];
+  feedbackHistory: StudyFeedbackEntry[];
 };
 
 export default function StudyOverview({
@@ -31,6 +33,7 @@ export default function StudyOverview({
   contracts,
   fetchStudy,
   unagreedAdminUsernames,
+  feedbackHistory,
 }: StudyOverviewProps) {
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -78,6 +81,8 @@ export default function StudyOverview({
 
   return (
     <Box>
+      <StudyFeedback feedbackHistory={feedbackHistory} approvalStatus={study.approval_status} />
+
       {isFormOpen && userData && (
         <StudyForm
           username={userData.username}

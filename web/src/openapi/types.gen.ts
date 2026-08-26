@@ -516,6 +516,7 @@ export type ContractImport = {
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
 export type StudyFeedbackEntry = {
+    id: string;
     /**
      * Time in RFC3339 format when this feedback was recorded
      */

@@ -1617,6 +1617,7 @@ type StudyFeedbackEntry struct {
 	// CreatedAt Time in RFC3339 format when this feedback was recorded
 	CreatedAt        string  `json:"created_at"`
 	Feedback         *string `json:"feedback,omitempty"`
+	Id               string  `json:"id"`
 	ReviewerUsername string  `json:"reviewer_username"`
 
 	// Status Current approval status

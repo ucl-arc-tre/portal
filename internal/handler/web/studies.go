@@ -442,6 +442,7 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 
 func studyFeedbackToOpenApiEntry(data types.StudyFeedback) openapi.StudyFeedbackEntry {
 	return openapi.StudyFeedbackEntry{
+		Id:               data.ID.String(),
 		CreatedAt:        openapi.FormatTime(data.CreatedAt),
 		ReviewerUsername: string(data.Reviewer.Username),
 		Status:           openapi.StudyApprovalStatus(data.Status),

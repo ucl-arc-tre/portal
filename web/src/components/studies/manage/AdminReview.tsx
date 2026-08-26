@@ -6,6 +6,7 @@ import {
   StudyApprovalStatus,
   postStudiesAdminByStudyIdReview,
   Study,
+  StudyFeedbackEntry,
   postStudiesAdminByStudyIdOwnerApprove,
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -17,13 +18,20 @@ type AdminReviewProps = {
   study: Study;
   unagreedAdminUsernames: string[];
   onReviewComplete: () => Promise<void>;
+  feedbackHistory: StudyFeedbackEntry[];
 };
 
-export default function AdminReview({ study, unagreedAdminUsernames, onReviewComplete }: AdminReviewProps) {
+export default function AdminReview({
+  study,
+  unagreedAdminUsernames,
+  onReviewComplete,
+  feedbackHistory,
+}: AdminReviewProps) {
   const { userData } = useAuth();
   const [loadingAction, setLoadingAction] = useState<StudyApprovalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState(study.feedback ?? "");
+  const latestFeedback = feedbackHistory[feedbackHistory.length - 1]?.feedback;
+  const [feedback, setFeedback] = useState(latestFeedback ?? "");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [feedbackRequired, setFeedbackRequired] = useState(false);
 

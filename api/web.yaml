@@ -2241,10 +2241,13 @@ components:
     StudyFeedbackEntry:
       type: object
       required:
+        - id
         - created_at
         - reviewer_username
         - status
       properties:
+        id:
+          type: string
         created_at:
           type: string
           description: Time in RFC3339 format when this feedback was recorded
