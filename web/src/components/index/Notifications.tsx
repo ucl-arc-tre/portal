@@ -79,7 +79,9 @@ export default function Notifications() {
         setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
         return;
       }
-      setNotifications(notifications?.filter((existingNotification) => existingNotification.id !== notification.id));
+      setNotifications((currentNotifications) =>
+        currentNotifications?.filter((currentNotification) => currentNotification.id !== notification.id)
+      );
     } catch (error) {
       console.error("Failed to clear notification:", error);
     }
