@@ -359,8 +359,7 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 	db := s.db.Model(&study).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
-		Update("approval_status", review.Status).
-		Update("feedback", review.Feedback)
+		Update("approval_status", review.Status)
 
 	if review.Status == openapi.StudyApprovalStatusApproved {
 		db = db.Update("last_signoff", time.Now())
@@ -372,6 +371,17 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 	if db.RowsAffected == 0 {
 		return nil // nothing changed
 	}
+
+	feedbackEntry := types.StudyFeedback{
+		StudyID:        id,
+		ReviewerUserID: reviewer.ID,
+		Status:         types.StudyApprovalStatus(review.Status),
+		Feedback:       review.Feedback,
+	}
+	if err := s.db.Create(&feedbackEntry).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to record study feedback history")
+	}
+
 	if err := s.db.Preload("Owner").Preload("StudyAdmins").Preload("StudyAdmins.User").First(&study).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to get study after update")
 	}
@@ -384,6 +394,12 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 		log.Err(err).Msg("Failed to notify") // not fatal
 	}
 	return nil
+}
+
+func (s *Service) StudyFeedbackHistory(id uuid.UUID) ([]types.StudyFeedback, error) {
+	entries := []types.StudyFeedback{}
+	err := s.db.Preload("Reviewer").Where("study_id = ?", id).Order("created_at ASC").Find(&entries).Error
+	return entries, types.NewErrFromGorm(err, "failed to get study feedback history")
 }
 
 func (s *Service) RecordStudySignoff(id uuid.UUID) error {

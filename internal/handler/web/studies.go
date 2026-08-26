@@ -209,6 +209,26 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, studyAgreements)
 }
 
+func (h *Handler) GetStudiesStudyIdFeedback(ctx *gin.Context, studyId string) {
+	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
+	if err != nil {
+		return
+	}
+
+	history, err := h.studies.StudyFeedbackHistory(studyUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get study feedback history")
+		return
+	}
+
+	entries := []openapi.StudyFeedbackEntry{}
+	for _, entry := range history {
+		entries = append(entries, studyFeedbackToOpenApiEntry(entry))
+	}
+
+	ctx.JSON(http.StatusOK, entries)
+}
+
 // Called by IG Ops staff to approve or reject a study, optionally with feedback
 func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
 	review := openapi.StudyReview{}
@@ -408,7 +428,6 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 		InvolvesParticipantConsent:       data.InvolvesParticipantConsent,
 		InvolvesIndirectDataCollection:   data.InvolvesIndirectDataCollection,
 		InvolvesDataProcessingOutsideEea: data.InvolvesDataProcessingOutsideEea,
-		Feedback:                         data.Feedback,
 		CreatedAt:                        openapi.FormatTime(data.CreatedAt),
 		UpdatedAt:                        openapi.FormatTime(data.UpdatedAt),
 		LastSignoff:                      openapi.FormatOptionalTime(data.LastSignoff),
@@ -419,4 +438,13 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 		study.PendingNewOwnerUsername = new(string(latestOwnerChange.ToUser.Username))
 	}
 	return study
+}
+
+func studyFeedbackToOpenApiEntry(data types.StudyFeedback) openapi.StudyFeedbackEntry {
+	return openapi.StudyFeedbackEntry{
+		CreatedAt:        openapi.FormatTime(data.CreatedAt),
+		ReviewerUsername: string(data.Reviewer.Username),
+		Status:           openapi.StudyApprovalStatus(data.Status),
+		Feedback:         data.Feedback,
+	}
 }

@@ -1451,7 +1451,6 @@ type Study struct {
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
-	Feedback    *string `json:"feedback,omitempty"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
@@ -1611,6 +1610,17 @@ type StudyBase struct {
 
 	// Title Title of the study
 	Title string `json:"title"`
+}
+
+// StudyFeedbackEntry defines model for StudyFeedbackEntry.
+type StudyFeedbackEntry struct {
+	// CreatedAt Time in RFC3339 format when this feedback was recorded
+	CreatedAt        string  `json:"created_at"`
+	Feedback         *string `json:"feedback,omitempty"`
+	ReviewerUsername string  `json:"reviewer_username"`
+
+	// Status Current approval status
+	Status StudyApprovalStatus `json:"status"`
 }
 
 // StudyImport defines model for StudyImport.
@@ -2103,6 +2113,9 @@ type ServerInterface interface {
 
 	// (GET /studies/{studyId}/contracts/{contractId}/objects/{contractObjectId})
 	GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c *gin.Context, studyId StudyIdParam, contractId ContractIdParam, contractObjectId ContractObjectIdParam)
+
+	// (GET /studies/{studyId}/feedback)
+	GetStudiesStudyIdFeedback(c *gin.Context, studyId StudyIdParam)
 
 	// (POST /studies/{studyId}/owner-request)
 	PostStudiesStudyIdOwnerRequest(c *gin.Context, studyId StudyIdParam)
@@ -3394,6 +3407,31 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdObjectsCo
 	siw.Handler.GetStudiesStudyIdContractsContractIdObjectsContractObjectId(c, studyId, contractId, contractObjectId)
 }
 
+// GetStudiesStudyIdFeedback operation middleware
+func (siw *ServerInterfaceWrapper) GetStudiesStudyIdFeedback(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStudiesStudyIdFeedback(c, studyId)
+}
+
 // PostStudiesStudyIdOwnerRequest operation middleware
 func (siw *ServerInterfaceWrapper) PostStudiesStudyIdOwnerRequest(c *gin.Context) {
 
@@ -3804,6 +3842,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/logout", wrapper.GetLogout)
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
+	router.GET(options.BaseURL+"/studies/:studyId/feedback", wrapper.GetStudiesStudyIdFeedback)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)
 	router.DELETE(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.DeleteStudiesStudyIdContractsContractId)
