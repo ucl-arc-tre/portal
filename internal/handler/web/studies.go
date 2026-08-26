@@ -221,7 +221,8 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 		return
 	}
 
-	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
+	user := middleware.GetUser(ctx)
+	err = h.studies.UpdateStudyReview(ctx, studyUUID, review, user)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return
@@ -256,7 +257,8 @@ func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	err = h.studies.UpdateStudyReview(ctx, studyUUID, review)
+	user := middleware.GetUser(ctx)
+	err = h.studies.UpdateStudyReview(ctx, studyUUID, review, user)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return

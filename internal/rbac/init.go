@@ -94,6 +94,8 @@ func addIgOpsStaffPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: WriteAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/projects/dsh/*", Action: ReadAction},
 	)
 }
 
@@ -108,6 +110,8 @@ func addIgAdminPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: IGAdmin, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: WriteAction},
+		Policy{RoleName: IGAdmin, Resource: "/projects/tre/*", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/projects/dsh/*", Action: ReadAction},
 	)
 }
 
