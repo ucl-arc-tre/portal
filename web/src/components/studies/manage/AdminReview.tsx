@@ -43,11 +43,13 @@ export default function AdminReview({
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
-    if (event.target.value.length > 0) setFeedbackRequired(false);
+    if (event.target.value.trim().length > 0) setFeedbackRequired(false);
   };
 
   const handleStudyStatusUpdate = async (newStatus: StudyApprovalStatus, feedbackContent?: string) => {
-    if ((newStatus === "Rejected" || (newStatus === "Approved" && status === "Approved")) && !feedbackContent) {
+    const trimmedFeedback = feedbackContent?.trim() || undefined;
+
+    if ((newStatus === "Rejected" || (newStatus === "Approved" && status === "Approved")) && !trimmedFeedback) {
       setFeedbackRequired(true);
       return;
     }
@@ -59,7 +61,7 @@ export default function AdminReview({
     try {
       const response = await postStudiesAdminByStudyIdReview({
         path: { studyId: study.id },
-        body: { status: newStatus, feedback: feedbackContent },
+        body: { status: newStatus, feedback: trimmedFeedback },
       });
 
       if (responseIsError(response)) {
@@ -216,7 +218,11 @@ export default function AdminReview({
 
             <div className={styles["buttons-container"]}>
               <Button onClick={() => handleStudyStatusUpdate("Approved", feedback)} disabled={!!loadingAction}>
-                {loadingAction === "Approved" ? "Saving..." : feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
+                {loadingAction === "Approved"
+                  ? "Saving..."
+                  : feedback.trim().length > 0
+                    ? "Update Feedback"
+                    : "Add Feedback"}
               </Button>
             </div>
 
