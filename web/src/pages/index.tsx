@@ -16,9 +16,7 @@ export default function Index() {
         />
       </div>
 
-      <div className={styles["notifications-wrapper"]}>
-        <Notifications />
-      </div>
+      <Notifications />
     </>
   );
 }

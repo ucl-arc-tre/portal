@@ -24,6 +24,7 @@ export default function Notifications() {
 
   const completeProfileNotification = notifications?.find((notification) => notification.kind === "complete-profile");
   const needToCompleteProfile = completeProfileNotification !== undefined;
+  const unreadCount = notifications?.filter((notification) => !notification.read).length ?? 0;
 
   const fetchNotifications = async () => {
     setIsLoading(true);
@@ -53,15 +54,21 @@ export default function Notifications() {
   }, [isAuthed]);
 
   const readNotification = async (notification: Notification) => {
+    if (notification.read) return;
+
     try {
       const response = await postNotificationsByNotificationIdRead({ path: { notificationId: notification.id } });
       if (responseIsError(response)) {
-        setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
+        setError(`Failed to mark notification as read: ${extractErrorMessage(response)}`);
         return;
       }
-      fetchNotifications();
+      setNotifications((currentNotifications) =>
+        currentNotifications?.map((currentNotification) =>
+          currentNotification.id === notification.id ? { ...currentNotification, read: true } : currentNotification
+        )
+      );
     } catch (error) {
-      console.error("Failed to clear notification:", error);
+      console.error("Failed to mark notification as read:", error);
     }
   };
 
@@ -78,16 +85,18 @@ export default function Notifications() {
     }
   };
 
-  const clearAllNotifications = async () => {
+  const markAllNotificationsAsRead = async () => {
     try {
       const response = await postNotificationsRead({ body: {} });
       if (responseIsError(response)) {
-        setError(`Failed to clear notification: ${extractErrorMessage(response)}`);
+        setError(`Failed to mark notifications as read: ${extractErrorMessage(response)}`);
         return;
       }
-      setNotifications([]);
+      setNotifications((currentNotifications) =>
+        currentNotifications?.map((notification) => ({ ...notification, read: true }))
+      );
     } catch (error) {
-      console.error("Failed to clear notifications:", error);
+      console.error("Failed to mark notifications as read:", error);
     }
   };
 
@@ -106,17 +115,18 @@ export default function Notifications() {
 
   return (
     <div className={styles.container}>
-      <div className={styles["header"]}>
-        <h2>Your Notifications</h2>
-        {notifications && notifications.length > 0 && !needToCompleteProfile && (
-          <Button
-            variant="secondary"
-            size="xsmall"
-            onClick={() => {
-              clearAllNotifications();
-            }}
-          >
-            Clear All
+      <div className={styles.header}>
+        <div className={styles.headerText}>
+          <h2>Your Notifications</h2>
+          {notifications && notifications.length > 0 && !needToCompleteProfile && (
+            <p className={styles.summary} aria-live="polite">
+              {unreadCount === 0 ? "You're all caught up" : `${unreadCount} unread`}
+            </p>
+          )}
+        </div>
+        {unreadCount > 0 && !needToCompleteProfile && (
+          <Button variant="secondary" size="xsmall" onClick={markAllNotificationsAsRead}>
+            Mark all as read
           </Button>
         )}
       </div>
@@ -144,30 +154,53 @@ export default function Notifications() {
         )
       )}
       {!needToCompleteProfile && notifications && notifications.length > 0 && (
-        <div className={styles["notifications-list"]}>
-          {notifications.map((notification) => (
-            <div className={styles["notification"]} key={notification.id}>
-              <a
-                onClick={() => {
-                  if (notification.href) {
-                    router.push(notification.href);
-                  }
-                  readNotification(notification);
-                }}
-              >
-                <p>{notification.title}</p>
-              </a>
-              {!notification.read && (
-                <IconButton aria-label={"read notification"} onClick={() => readNotification(notification)}>
-                  <CheckIcon aria-hidden="true" size={24} />
-                </IconButton>
-              )}
-              <IconButton aria-label={"dismiss notification"} onClick={() => dismissNotification(notification)}>
-                <XIcon aria-hidden="true" size={24} />
-              </IconButton>
-            </div>
-          ))}
-        </div>
+        <ul className={styles.notificationsList}>
+          {notifications.map((notification) => {
+            const stateClass = notification.read ? styles.read : styles.unread;
+
+            return (
+              <li className={`${styles.notification} ${stateClass}`} key={notification.id}>
+                <span className={styles.stateIndicator} aria-hidden="true" />
+                <div className={styles.notificationContent}>
+                  {!notification.read && <span className={styles.status}>Unread</span>}
+                  <button
+                    className={styles.notificationLink}
+                    type="button"
+                    onClick={() => {
+                      if (notification.href) {
+                        router.push(notification.href);
+                      }
+                      readNotification(notification);
+                    }}
+                  >
+                    <span className={styles.notificationTitle}>{notification.title}</span>
+                    {notification.body && <span className={styles.notificationBody}>{notification.body}</span>}
+                  </button>
+                </div>
+                <div className={styles.notificationActions}>
+                  {!notification.read && (
+                    <IconButton
+                      className={styles.iconButton}
+                      aria-label={`Mark “${notification.title}” as read`}
+                      title="Mark as read"
+                      onClick={() => readNotification(notification)}
+                    >
+                      <CheckIcon aria-hidden="true" size={22} />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    className={styles.iconButton}
+                    aria-label={`Dismiss “${notification.title}”`}
+                    title="Dismiss"
+                    onClick={() => dismissNotification(notification)}
+                  >
+                    <XIcon aria-hidden="true" size={22} />
+                  </IconButton>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       {notifications && notifications.length === 0 && (

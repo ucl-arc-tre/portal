@@ -1,17 +1,15 @@
 .container {
   background: var(--background);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--grey-border--light);
   border-radius: var(--default-border-radius);
-  padding: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
   margin: 2rem 0;
-  width: 50vw;
-  max-width: 500px;
-  max-height: fit-content;
+  width: min(100%, 500px);
   justify-self: center;
 }
 
 .container h2 {
-  margin: 0 0 1.5rem 0;
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--foreground);
@@ -21,9 +19,21 @@
   display: flex;
   width: 100%;
   flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.headerText {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.summary {
+  color: var(--text--secondary);
+  font-size: 0.875rem;
 }
 
 .setup-prompt {
@@ -74,29 +84,154 @@
   font-weight: 500;
 }
 
-.notifications-list {
-  padding-left: 1rem;
-  padding-right: 1rem;
+.notificationsList {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  list-style: none;
 }
 
 .notification {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 0;
-  font-weight: 500;
-  background-color: #fafafa;
+  display: grid;
+  grid-template-columns: 0.25rem minmax(0, 1fr) auto;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid #dfe1e5;
   border-radius: var(--default-border-radius);
-  padding-left: 1rem;
-  padding-right: 1rem;
-
-  a:hover {
-    cursor: pointer;
-    color: var(--ucl-accent);
-  }
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
 }
 
-.notification + .notification {
-  border-top: 1px solid var(--ucl-mid);
+.notification:hover {
+  border-color: #b8a4c4;
+  box-shadow: 0 3px 10px rgb(44 4 66 / 8%);
+}
+
+.unread {
+  background: #faf6ff;
+  border-color: #d8b9fa;
+}
+
+.read {
+  background: #fafafa;
+  color: var(--text--secondary);
+}
+
+.stateIndicator {
+  background: #b8bdc7;
+}
+
+.unread .stateIndicator {
+  background: var(--ucl-accent);
+}
+
+.notificationContent {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+}
+
+.status {
+  border: 1px solid #c9cdd4;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  color: var(--text--secondary);
+  background: var(--background);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.unread .status {
+  border-color: #c59aed;
+  color: var(--ucl-mid);
+  background: #f3e7ff;
+}
+
+.notificationLink {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.notificationLink:hover .notificationTitle {
+  color: var(--ucl-mid);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.notificationLink:focus-visible {
+  border-radius: 2px;
+  outline: 3px solid var(--ucl-accent);
+  outline-offset: 3px;
+}
+
+.notificationTitle {
+  color: var(--foreground);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.unread .notificationTitle {
+  color: var(--ucl-dark);
+  font-weight: 600;
+}
+
+.notificationBody {
+  color: var(--text--secondary);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.notificationActions {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-left: 1px solid rgb(206 209 215 / 70%);
+}
+
+.iconButton {
+  display: grid !important;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50% !important;
+  place-items: center;
+}
+
+.iconButton:hover {
+  background: rgb(80 7 120 / 8%) !important;
+}
+
+@media (max-width: 520px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .notification {
+    grid-template-columns: 0.25rem minmax(0, 1fr);
+  }
+
+  .notificationActions {
+    grid-column: 2;
+    justify-content: flex-end;
+    padding-top: 0;
+    border-left: 0;
+  }
 }
