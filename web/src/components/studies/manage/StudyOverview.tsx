@@ -38,7 +38,7 @@ export default function StudyOverview({
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
   const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
 
-  const { userData, isIGStaff, isIGAdmin, isIAO } = useAuth();
+  const { userData, isIGStaff, isIGAdmin, isIAO, isAdmin } = useAuth();
   const isStudyOwner = (isIAO && study.owner_username === userData?.username) || false;
   const isStudyAdmin = (!!userData && study.additional_study_admin_usernames.includes(userData.username)) || false;
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
@@ -46,10 +46,9 @@ export default function StudyOverview({
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
   const canEditStudyOwner =
     (isStudyOwner || isIGStaff) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
-  const canRequestReview =
-    study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner && !isIGStaff;
+  const canRequestReview = study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner;
   const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
-  const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin;
+  const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin || isAdmin;
   const requiresDPORegistration = assets?.some(
     (asset) => asset.data_types?.includes("personal") || asset.data_types?.includes("special_category_personal")
   );

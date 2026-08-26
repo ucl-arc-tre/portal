@@ -65,20 +65,20 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 		return
 	}
 
-	isAdmin, err := rbac.HasRole(user, rbac.Admin)
+	canSeeAllEnvironments, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin)
 	if err != nil {
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
 
-	if isAdmin {
+	if canSeeAllEnvironments {
 		projects, err = h.projectsAll(params)
 	} else if isTreOpsStaff {
 		projects, err = h.projectsAll(params, environments.TRE)
 	} else if isDshOpsStaff {
 		projects, err = h.projectsAll(params, environments.DSH)
 	} else {
-		// Regular user: fetch only projects they own (via RBAC)
+		// Regular user: fetch only projects they own
 		projects, err = h.projectsProjectOwner(user)
 	}
 
@@ -298,7 +298,8 @@ func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, project
 
 	// TODO: check that the project status is "Pending", otherwise return a 400??
 
-	err = h.projects.ApproveProject(projectUUID)
+	user := middleware.GetUser(ctx)
+	err = h.projects.ApproveProject(projectUUID, user)
 	if err != nil {
 		setError(ctx, err, "Failed to approve project")
 		return
