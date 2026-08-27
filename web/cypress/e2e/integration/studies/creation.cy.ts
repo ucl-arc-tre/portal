@@ -306,6 +306,19 @@ describe("Study creation end-to-end", () => {
     cy.contains("article", studyTitle).should("exist");
   });
 
+  it("ig ops should be able to give feedback", () => {
+    cy.loginAsIGOps();
+    cy.visit("/studies");
+    cy.get('button[data-cy="all"]').click();
+    cy.get('[data-testid="ucl-uikit-search"]').type(`${studyTitle}`);
+    cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
+    cy.contains(studyTitle).click();
+
+    cy.get("#feedback").clear().type("Please add more detail");
+    cy.contains("Request Changes").click();
+    cy.contains("Updated successfully").should("be.visible");
+  });
+
   it("ig ops should be able to approve a study", () => {
     cy.loginAsIGOps();
     cy.visit("/studies");
@@ -316,7 +329,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="study-approve-button"]').click();
   });
 
-  it("staff should see an approved study", () => {
+  it("staff should see an approved study and feedback history", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
@@ -324,5 +337,12 @@ describe("Study creation end-to-end", () => {
 
     cy.contains(studyTitle).click();
     cy.contains("Last signed off").should("exist");
+
+    cy.contains("This study has new feedback:").should("not.exist");
+    cy.get('[data-cy="view-feedback-history-button"]').click();
+    cy.get('[data-cy="study-feedback-history"]').within(() => {
+      cy.contains("Updates Requested").should("be.visible");
+      cy.contains("Please add more detail").should("be.visible");
+    });
   });
 });
