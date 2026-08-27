@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -42,11 +41,10 @@ func (s *Service) NotifyTrainingExpiry(ctx context.Context, training types.UserT
 		return err
 	}
 	notification := types.Notification{
-		Title:     "Your training is expiring soon",
-		Body:      new("Please update your training soon"),
-		Href:      new("/profile"),
-		Kind:      new(types.NotificationKindTrainingExpiry),
-		ExpiresAt: new(time.Now().Add(config.TrainingValidity / 2)),
+		Title: "Your training is expiring soon",
+		Body:  new("Please update your training soon"),
+		Href:  new("/profile"),
+		Kind:  new(types.NotificationKindTrainingExpiry),
 	}
 	return s.create(notification, training.User)
 }
