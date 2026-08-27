@@ -7,7 +7,7 @@ import { formatDate } from "../../shared/exports";
 import EditIcon from "@/components/ui/EditIcon";
 import { RiskLevel } from "@/lib/riskScoreCalculations";
 import { useAuth } from "@/hooks/useAuth";
-import RiskClassificationBadge from "@/components/shared/RiskLevelBadge";
+import RiskLevelBadge from "@/components/shared/RiskLevelBadge";
 
 type StudyDetailsProps = {
   study: Study;
@@ -43,7 +43,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
         {riskLevel?.classification !== undefined && (
           <span className={styles["detail-item"]}>
-            Risk: <RiskClassificationBadge riskScore={riskLevel.score || 0} isIGStaff={!!isIGStaff} />
+            Risk: <RiskLevelBadge riskScore={riskLevel.score || 0} isIGStaff={!!isIGStaff} />
           </span>
         )}
 

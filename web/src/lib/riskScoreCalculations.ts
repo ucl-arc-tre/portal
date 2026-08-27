@@ -92,7 +92,7 @@ const calculateHighestAssetRiskScore = (assets: Asset[]) => {
   return highestAssetScore;
 };
 
-export const getRiskClassification = (score: number | undefined): RiskClassification | undefined => {
+export const getRiskLevel = (score: number | undefined): RiskClassification | undefined => {
   if (score === undefined) return undefined;
   if (score < 3) {
     return "manageable";
@@ -109,6 +109,6 @@ export const getRiskClassification = (score: number | undefined): RiskClassifica
 export const getStudyRiskLevel = (assets: Asset[] | undefined) => {
   if (assets === undefined || assets.length === 0) return undefined;
   const score = calculateHighestAssetRiskScore(assets);
-  const classification = getRiskClassification(score);
+  const classification = getRiskLevel(score);
   return { classification, score };
 };

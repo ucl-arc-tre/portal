@@ -32,7 +32,7 @@ import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports"
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
 import Box from "@/components/ui/Box";
-import RiskClassificationBadge from "@/components/shared/RiskLevelBadge";
+import RiskLevelBadge from "@/components/shared/RiskLevelBadge";
 import { calculateAssetRiskScore } from "@/lib/riskScoreCalculations";
 
 export default function ManageAssetPage() {
@@ -246,7 +246,7 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Risk Level:</label>
-              <RiskClassificationBadge riskScore={riskScore || 0} isIGStaff={!!isIGStaff} />
+              <RiskLevelBadge riskScore={riskScore || 0} isIGStaff={!!isIGStaff} />
             </div>
             <div className={styles.field}>
               <label>Classification:</label>
