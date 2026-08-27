@@ -4,19 +4,19 @@ import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { formatDate } from "../../shared/exports";
 import EditIcon from "@/components/ui/EditIcon";
-import { RiskLevel } from "@/lib/riskScoreCalculations";
+import { RiskInfo } from "@/lib/riskScoreCalculations";
 import { useAuth } from "@/hooks/useAuth";
 import RiskLevelBadge from "@/components/shared/RiskLevelBadge";
 
 type StudyDetailsProps = {
   study: Study;
-  riskLevel: RiskLevel | undefined;
+  riskInfo: RiskInfo | undefined;
   setOwnerEditModal: ((show: boolean) => void) | undefined;
   canEditOwner: boolean;
 };
 
 export default function StudyDetails(props: StudyDetailsProps) {
-  const { study, riskLevel, setOwnerEditModal, canEditOwner } = props;
+  const { study, riskInfo, setOwnerEditModal, canEditOwner } = props;
   const { isIGStaff } = useAuth();
 
   return (
@@ -40,9 +40,9 @@ export default function StudyDetails(props: StudyDetailsProps) {
           </span>
         )}
 
-        {riskLevel?.classification !== undefined && (
+        {riskInfo?.level !== undefined && (
           <span className={styles["detail-item"]}>
-            Risk: <RiskLevelBadge riskScore={riskLevel.score || 0} isIGStaff={!!isIGStaff} />
+            Risk: <RiskLevelBadge riskScore={riskInfo.score || 0} isIGStaff={!!isIGStaff} />
           </span>
         )}
 
