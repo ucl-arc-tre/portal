@@ -34,7 +34,6 @@ type Study struct {
 	InvolvesIndirectDataCollection   *bool               `gorm:""`
 	InvolvesDataProcessingOutsideEea *bool               `gorm:""`
 	ApprovalStatus                   StudyApprovalStatus `gorm:"not null"`
-	Feedback                         *string             `gorm:"type:text"`
 	LastSignoff                      *time.Time
 	// caseref sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	// study_caseref_seq defined in internal/graceful/db.go
@@ -88,6 +87,18 @@ type StudyOwnerChangelog struct {
 	User     User  `gorm:"foreignKey:UserID"`
 	FromUser User  `gorm:"foreignKey:FromUserID"`
 	ToUser   User  `gorm:"foreignKey:ToUserID"`
+}
+
+type StudyFeedback struct {
+	Model
+	StudyID        uuid.UUID           `gorm:"not null;index"`
+	ReviewerUserID uuid.UUID           `gorm:"not null;index"`
+	Status         StudyApprovalStatus `gorm:"not null"`
+	Feedback       *string             `gorm:"type:text"`
+
+	// Relationships
+	Study    Study `gorm:"foreignKey:StudyID"`
+	Reviewer User  `gorm:"foreignKey:ReviewerUserID"`
 }
 
 // Queried via the DSH API
