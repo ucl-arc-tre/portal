@@ -6,9 +6,10 @@ import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
-import { calculateAssetRiskScore, riskScoreMax, getRiskClassification } from "../../lib/riskScoreCalculations";
+import { calculateAssetRiskScore } from "../../lib/riskScoreCalculations";
 import Badge from "../ui/Badge";
 import Error from "../ui/Error";
+import RiskLevelBadge from "../shared/RiskLevelBadge";
 
 type AssetCardProps = {
   asset: Asset;
@@ -103,8 +104,7 @@ export default function AssetCard(props: AssetCardProps) {
           <div className={styles["asset-detail"]}>
             <span className={styles["asset-detail-label"]}>Risk Level:</span>
             <span className={styles["asset-detail-value"]}>
-              {getRiskClassification(riskScore)}
-              {isIGStaff && `(${riskScore}/${riskScoreMax})`}
+              <RiskLevelBadge riskScore={riskScore} isIGStaff={!!isIGStaff} />
             </span>
           </div>
         )}
