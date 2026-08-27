@@ -40,8 +40,9 @@ func (s *Service) NotifyTrainingExpiry(ctx context.Context, training types.UserT
 	if err := s.entra.SendEmail(ctx, subject, emails(training.User), content); err != nil {
 		return err
 	}
+	expiresAt := config.TrainingExpiresAt(training)
 	notification := types.Notification{
-		Title: "Your training is expiring soon",
+		Title: fmt.Sprintf("Your training expires on %d/%d/%d", expiresAt.Year(), expiresAt.Month(), expiresAt.Day()),
 		Body:  new("Please update your training soon"),
 		Href:  new("/profile"),
 		Kind:  new(types.NotificationKindTrainingExpiry),
