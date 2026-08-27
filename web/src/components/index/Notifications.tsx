@@ -137,10 +137,21 @@ export default function Notifications() {
 
       {needToCompleteProfile ? (
         <div className={styles["setup-prompt"]}>
-          <h3>Complete Your Profile Setup</h3>
+          <div className={styles["setup-prompt-header"]}>
+            <h3>Complete Your Profile Setup</h3>
+            <IconButton
+              className={styles.iconButton}
+              aria-label={`Dismiss “${completeProfileNotification.title}”`}
+              title="Dismiss"
+              onClick={() => dismissNotification(completeProfileNotification)}
+            >
+              <XIcon aria-hidden="true" size={22} />
+            </IconButton>
+          </div>
           <p>
             To get started with ARC services, please complete your profile setup including setting your chosen name.
           </p>
+
           <Button href="/profile" variant="secondary">
             Complete Profile Setup
           </Button>
