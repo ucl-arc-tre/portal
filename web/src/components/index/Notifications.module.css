@@ -40,6 +40,20 @@
   text-align: center;
 }
 
+.setup-prompt-header {
+  display: flex;
+  align-items: center;
+}
+
+.setup-prompt-header::before {
+  flex: 0 0 2.25rem;
+  content: "";
+}
+
+.setup-prompt-header h3 {
+  flex: 1;
+}
+
 .setup-prompt h3 {
   margin: 1rem 0 1rem 0;
   color: var(--foreground);
@@ -64,6 +78,11 @@
   margin: 0 0 1rem 0;
   color: #475569;
   font-size: 0.875rem;
+}
+
+.researcher-prompt-action {
+  display: flex;
+  justify-content: center;
 }
 
 .completed-notifications {

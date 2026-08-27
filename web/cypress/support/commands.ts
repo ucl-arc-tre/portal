@@ -300,6 +300,12 @@ declare global {
       mockStudyContractsEmpty(): Chainable<any>;
 
       /**
+       * Mock empty feedback history for a study
+       * @example cy.mockStudyFeedbackEmpty()
+       */
+      mockStudyFeedbackEmpty(): Chainable<any>;
+
+      /**
        * Mock empty contracts list for an asset
        * @example cy.mockContractsEmpty()
        */
@@ -359,7 +365,7 @@ declare global {
       mockNotifications(notifications: Notification[]): Chainable<any>;
 
       /**
-       * Mock the complete-profile notification clear endpoint (POST /notifications/read).
+       * Mock finding and deleting a read complete-profile notification.
        * @example cy.mockClearCompleteProfileNotification()
        */
       mockClearCompleteProfileNotification(): Chainable<any>;
@@ -638,7 +644,23 @@ Cypress.Commands.add("mockNotifications", (notifications: Notification[]) => {
 });
 
 Cypress.Commands.add("mockClearCompleteProfileNotification", () => {
-  cy.intercept("POST", "/web/api/v0/notifications/read", { statusCode: 200 }).as("clearCompleteProfileNotification");
+  const notificationId = "00000000-0000-0000-0000-000000000001";
+
+  cy.intercept("GET", "/web/api/v0/notifications", {
+    statusCode: 200,
+    body: [
+      {
+        id: notificationId,
+        title: "Complete your profile",
+        kind: "complete-profile",
+        read: true,
+      },
+    ],
+  }).as("getCompleteProfileNotification");
+
+  cy.intercept("DELETE", `/web/api/v0/notifications/${notificationId}`, { statusCode: 200 }).as(
+    "clearCompleteProfileNotification"
+  );
 });
 
 Cypress.Commands.add("mockProfileAgreements", (hasApprovedResearcher: boolean) => {
@@ -892,6 +914,11 @@ Cypress.Commands.add("mockStudyContractsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-empty.json",
   }).as("getStudyContractsEmpty");
+});
+Cypress.Commands.add("mockStudyFeedbackEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/feedback", {
+    fixture: "study-feedback-empty.json",
+  }).as("getStudyFeedbackEmpty");
 });
 Cypress.Commands.add("mockAssetContractsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {

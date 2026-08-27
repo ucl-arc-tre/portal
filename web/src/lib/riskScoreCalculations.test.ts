@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { calculateAssetRiskScore, getRiskClassification, getStudyRiskLevel } from "./riskScoreCalculations";
+import { calculateAssetRiskScore, getRiskLevel, getStudyRiskInfo } from "./riskScoreCalculations";
 import type { Asset } from "@/openapi";
 
 function makeAsset(overrides: Partial<Asset> = {}): Asset {
@@ -26,32 +26,32 @@ function makeAsset(overrides: Partial<Asset> = {}): Asset {
   };
 }
 
-describe("getRiskClassification", () => {
+describe("getRiskLevel", () => {
   it("classifies a score of 0 as manageable", () => {
-    assert.strictEqual(getRiskClassification(0), "manageable");
+    assert.strictEqual(getRiskLevel(0), "manageable");
   });
 
   it("does not classify a score of 2 as uncomfortable", () => {
-    assert.notStrictEqual(getRiskClassification(2), "uncomfortable");
+    assert.notStrictEqual(getRiskLevel(2), "uncomfortable");
   });
 
   it("classifies a score of 3 as uncomfortable", () => {
-    assert.strictEqual(getRiskClassification(3), "uncomfortable");
+    assert.strictEqual(getRiskLevel(3), "uncomfortable");
   });
 
   it("classifies a score of 5 as vulnerable", () => {
-    assert.strictEqual(getRiskClassification(5), "vulnerable");
+    assert.strictEqual(getRiskLevel(5), "vulnerable");
   });
 
   it("classifies a score of 12 as critical", () => {
-    assert.strictEqual(getRiskClassification(12), "critical");
+    assert.strictEqual(getRiskLevel(12), "critical");
   });
 });
 
-describe("getStudyRiskLevel", () => {
+describe("getStudyRiskInfo", () => {
   it("returns undefined when there are no assets", () => {
-    assert.strictEqual(getStudyRiskLevel([]), undefined);
-    assert.strictEqual(getStudyRiskLevel(undefined), undefined);
+    assert.strictEqual(getStudyRiskInfo([]), undefined);
+    assert.strictEqual(getStudyRiskInfo(undefined), undefined);
   });
 
   it("uses the highest-scoring asset to classify the study", () => {
@@ -65,7 +65,7 @@ describe("getStudyRiskLevel", () => {
       locations: ["data_entry"],
     });
 
-    const result = getStudyRiskLevel([lowRiskAsset, highRiskAsset]);
+    const result = getStudyRiskInfo([lowRiskAsset, highRiskAsset]);
 
     assert.strictEqual(result?.score, calculateAssetRiskScore(highRiskAsset));
   });

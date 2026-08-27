@@ -137,10 +137,21 @@ export default function Notifications() {
 
       {needToCompleteProfile ? (
         <div className={styles["setup-prompt"]}>
-          <h3>Complete Your Profile Setup</h3>
+          <div className={styles["setup-prompt-header"]}>
+            <h3>Complete Your Profile Setup</h3>
+            <IconButton
+              className={styles.iconButton}
+              aria-label={`Dismiss “${completeProfileNotification.title}”`}
+              title="Dismiss"
+              onClick={() => dismissNotification(completeProfileNotification)}
+            >
+              <XIcon aria-hidden="true" size={22} />
+            </IconButton>
+          </div>
           <p>
             To get started with ARC services, please complete your profile setup including setting your chosen name.
           </p>
+
           <Button href="/profile" variant="secondary">
             Complete Profile Setup
           </Button>
@@ -149,9 +160,11 @@ export default function Notifications() {
         !isApprovedResearcher && (
           <div className={styles["researcher-prompt"]}>
             <p>Complete your profile setup to become an approved researcher.</p>
-            <Button href="/profile" variant="secondary">
-              Become an Approved Researcher
-            </Button>
+            <div className={styles["researcher-prompt-action"]}>
+              <Button href="/profile" variant="secondary">
+                Become an Approved Researcher
+              </Button>
+            </div>
           </div>
         )
       )}
@@ -205,7 +218,7 @@ export default function Notifications() {
         </ul>
       )}
 
-      {notifications && notifications.length === 0 && (
+      {notifications && isApprovedResearcher && notifications.length === 0 && (
         <div className={styles["completed-notifications"]}>
           <p>There are no notifications.</p>
         </div>

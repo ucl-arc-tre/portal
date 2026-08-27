@@ -1,0 +1,28 @@
+.risk-level-manageable {
+  background: var(--green-badge-bg);
+  color: var(--green-badge-text);
+  border-color: var(--green-badge-text);
+}
+
+.risk-level-uncomfortable {
+  background: var(--yellow-badge-bg);
+  color: var(--yellow-badge-text);
+  border-color: var(--yellow-badge-border);
+}
+
+.risk-level-vulnerable {
+  background: var(--orange-badge-bg);
+  color: var(--orange-badge-text);
+  border-color: var(--orange-badge-text);
+}
+
+.risk-level-critical {
+  background: var(--red-badge-bg);
+  color: var(--red-badge-text);
+  border-color: var(--red-badge-text);
+}
+
+.risk-level-default {
+  background: var(--grey-badge-bg);
+  color: var(--grey-badge-text);
+}

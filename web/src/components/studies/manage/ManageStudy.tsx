@@ -8,8 +8,10 @@ import {
   getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdContracts,
+  getStudiesByStudyIdFeedback,
   Study,
   StudyAgreements,
+  StudyFeedbackEntry,
 } from "@/openapi";
 import StudyOverview from "./StudyOverview";
 import StudySetupSteps from "./StudySetupSteps";
@@ -40,6 +42,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [agreements, setAgreements] = useState<StudyAgreements | null>(null);
+  const [feedbackHistory, setFeedbackHistory] = useState<StudyFeedbackEntry[]>([]);
 
   const hasAsset = assets.length > 0;
   const hasAgreed = agreements && userData && agreements.usernames.includes(userData.username);
@@ -66,12 +69,14 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     setIsLoading(true);
 
     try {
-      const [assetsResponse, contractsResponse, agreementsResponse, projectsResponse] = await Promise.all([
-        getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
-        getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
-        getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
-        getProjects(),
-      ]);
+      const [assetsResponse, contractsResponse, agreementsResponse, projectsResponse, feedbackResponse] =
+        await Promise.all([
+          getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
+          getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
+          getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
+          getProjects(),
+          getStudiesByStudyIdFeedback({ path: { studyId: study.id } }),
+        ]);
 
       if (responseIsError(assetsResponse) || !assetsResponse.data) {
         const errorMsg = extractErrorMessage(assetsResponse);
@@ -97,10 +102,17 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         return;
       }
 
+      if (responseIsError(feedbackResponse) || !feedbackResponse.data) {
+        const errorMsg = extractErrorMessage(feedbackResponse);
+        setError(`Failed to load feedback history: ${errorMsg}`);
+        return;
+      }
+
       setAssets(assetsResponse.data);
       setContracts(contractsResponse.data);
       setAgreements(agreementsResponse.data);
       setProjects(projectsResponse.data.filter((project) => project.study_id === study.id));
+      setFeedbackHistory(feedbackResponse.data);
     } catch (error) {
       console.error("Failed to get study contents:", error);
       setError("Failed to load study contents. Please try again later.");
@@ -155,6 +167,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           study={study}
           unagreedAdminUsernames={unagreedAdminUsernames}
           onReviewComplete={() => fetchStudy(study.id)}
+          feedbackHistory={feedbackHistory}
         />
       )}
 
@@ -168,6 +181,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           projects={projects}
           fetchStudy={fetchStudy}
           unagreedAdminUsernames={unagreedAdminUsernames}
+          feedbackHistory={feedbackHistory}
         />
       )}
 
