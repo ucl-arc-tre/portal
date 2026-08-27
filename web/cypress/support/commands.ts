@@ -300,6 +300,12 @@ declare global {
       mockStudyContractsEmpty(): Chainable<any>;
 
       /**
+       * Mock empty feedback history for a study
+       * @example cy.mockStudyFeedbackEmpty()
+       */
+      mockStudyFeedbackEmpty(): Chainable<any>;
+
+      /**
        * Mock empty contracts list for an asset
        * @example cy.mockContractsEmpty()
        */
@@ -892,6 +898,11 @@ Cypress.Commands.add("mockStudyContractsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/contracts", {
     fixture: "contracts-empty.json",
   }).as("getStudyContractsEmpty");
+});
+Cypress.Commands.add("mockStudyFeedbackEmpty", () => {
+  cy.intercept("GET", "/web/api/v0/studies/*/feedback", {
+    fixture: "study-feedback-empty.json",
+  }).as("getStudyFeedbackEmpty");
 });
 Cypress.Commands.add("mockAssetContractsEmpty", () => {
   cy.intercept("GET", "/web/api/v0/studies/*/assets/*/contracts", {

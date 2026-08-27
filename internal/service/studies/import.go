@@ -41,7 +41,6 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		InvolvesParticipantConsent:       data.InvolvesParticipantConsent,
 		InvolvesDataProcessingOutsideEea: data.InvolvesDataProcessingOutsideEea,
 		InvolvesIndirectDataCollection:   data.InvolvesIndirectDataCollection,
-		Feedback:                         data.Feedback,
 	}
 	if !openapi.StudyApprovalStatus(data.ApprovalStatus).Valid() {
 		return nil, types.NewErrInvalidObject("invalid approval status")

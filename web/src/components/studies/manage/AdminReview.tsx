@@ -6,6 +6,7 @@ import {
   StudyApprovalStatus,
   postStudiesAdminByStudyIdReview,
   Study,
+  StudyFeedbackEntry,
   postStudiesAdminByStudyIdOwnerApprove,
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
@@ -17,13 +18,20 @@ type AdminReviewProps = {
   study: Study;
   unagreedAdminUsernames: string[];
   onReviewComplete: () => Promise<void>;
+  feedbackHistory: StudyFeedbackEntry[];
 };
 
-export default function AdminReview({ study, unagreedAdminUsernames, onReviewComplete }: AdminReviewProps) {
+export default function AdminReview({
+  study,
+  unagreedAdminUsernames,
+  onReviewComplete,
+  feedbackHistory,
+}: AdminReviewProps) {
   const { userData } = useAuth();
   const [loadingAction, setLoadingAction] = useState<StudyApprovalStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState(study.feedback ?? "");
+  const latestFeedback = feedbackHistory[feedbackHistory.length - 1]?.feedback;
+  const [feedback, setFeedback] = useState(latestFeedback ?? "");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [feedbackRequired, setFeedbackRequired] = useState(false);
 
@@ -35,11 +43,13 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
 
   const handleFeedbackChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFeedback(event.target.value);
-    if (event.target.value.length > 0) setFeedbackRequired(false);
+    if (event.target.value.trim().length > 0) setFeedbackRequired(false);
   };
 
   const handleStudyStatusUpdate = async (newStatus: StudyApprovalStatus, feedbackContent?: string) => {
-    if ((newStatus === "Rejected" || (newStatus === "Approved" && status === "Approved")) && !feedbackContent) {
+    const trimmedFeedback = feedbackContent?.trim() || undefined;
+
+    if ((newStatus === "Rejected" || (newStatus === "Approved" && status === "Approved")) && !trimmedFeedback) {
       setFeedbackRequired(true);
       return;
     }
@@ -51,7 +61,7 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
     try {
       const response = await postStudiesAdminByStudyIdReview({
         path: { studyId: study.id },
-        body: { status: newStatus, feedback: feedbackContent },
+        body: { status: newStatus, feedback: trimmedFeedback },
       });
 
       if (responseIsError(response)) {
@@ -208,7 +218,11 @@ export default function AdminReview({ study, unagreedAdminUsernames, onReviewCom
 
             <div className={styles["buttons-container"]}>
               <Button onClick={() => handleStudyStatusUpdate("Approved", feedback)} disabled={!!loadingAction}>
-                {loadingAction === "Approved" ? "Saving..." : feedback.length > 0 ? "Update Feedback" : "Add Feedback"}
+                {loadingAction === "Approved"
+                  ? "Saving..."
+                  : feedback.trim().length > 0
+                    ? "Update Feedback"
+                    : "Add Feedback"}
               </Button>
             </div>
 
