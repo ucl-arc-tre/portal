@@ -107,9 +107,9 @@ export const getRiskLevel = (score: number | undefined): RiskLevel | undefined =
   return undefined;
 };
 
-export const getStudyRiskLevel = (assets: Asset[] | undefined) => {
+export const getStudyRiskInfo = (assets: Asset[] | undefined) => {
   if (assets === undefined || assets.length === 0) return undefined;
   const score = calculateHighestAssetRiskScore(assets);
-  const classification = getRiskLevel(score);
-  return { classification, score };
+  const level = getRiskLevel(score);
+  return { level, score };
 };

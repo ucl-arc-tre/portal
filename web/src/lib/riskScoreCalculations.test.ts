@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { calculateAssetRiskScore, getRiskLevel, getStudyRiskLevel } from "./riskScoreCalculations";
+import { calculateAssetRiskScore, getRiskLevel, getStudyRiskInfo } from "./riskScoreCalculations";
 import type { Asset } from "@/openapi";
 
 function makeAsset(overrides: Partial<Asset> = {}): Asset {
@@ -48,10 +48,10 @@ describe("getRiskLevel", () => {
   });
 });
 
-describe("getStudyRiskLevel", () => {
+describe("getStudyRiskInfo", () => {
   it("returns undefined when there are no assets", () => {
-    assert.strictEqual(getStudyRiskLevel([]), undefined);
-    assert.strictEqual(getStudyRiskLevel(undefined), undefined);
+    assert.strictEqual(getStudyRiskInfo([]), undefined);
+    assert.strictEqual(getStudyRiskInfo(undefined), undefined);
   });
 
   it("uses the highest-scoring asset to classify the study", () => {
@@ -65,7 +65,7 @@ describe("getStudyRiskLevel", () => {
       locations: ["data_entry"],
     });
 
-    const result = getStudyRiskLevel([lowRiskAsset, highRiskAsset]);
+    const result = getStudyRiskInfo([lowRiskAsset, highRiskAsset]);
 
     assert.strictEqual(result?.score, calculateAssetRiskScore(highRiskAsset));
   });
