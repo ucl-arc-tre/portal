@@ -32,11 +32,13 @@ import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports"
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
 import Box from "@/components/ui/Box";
+import RiskClassificationBadge from "@/components/shared/RiskLevelBadge";
+import { calculateAssetRiskScore } from "@/lib/riskScoreCalculations";
 
 export default function ManageAssetPage() {
   const router = useRouter();
   const { studyId, assetId } = router.query;
-  const { authInProgress, isAuthed, userData, isApprovedResearcher, isIGAdmin, isIAO } = useAuth();
+  const { authInProgress, isAuthed, userData, isApprovedResearcher, isIGAdmin, isIAO, isIGStaff } = useAuth();
   const [study, setStudy] = useState<Study | null>(null);
   const [asset, setAsset] = useState<Asset | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
@@ -46,6 +48,7 @@ export default function ManageAssetPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [riskScore, setRiskScore] = useState<number | null>(null);
 
   const isStudyOwner = (isIAO && study?.owner_username === userData?.username) || false;
   const isStudyAdmin = (userData && study?.additional_study_admin_usernames.includes(userData?.username)) || false;
@@ -111,6 +114,7 @@ export default function ManageAssetPage() {
         return;
       }
       setAsset(assetResponse.data);
+      setRiskScore(calculateAssetRiskScore(assetResponse.data));
       if (assetResponse.data.contract_ids.length > 0) {
         const contractsResponse = await getStudiesByStudyIdAssetsByAssetIdContracts({
           path: { studyId: studyIdParam, assetId: assetIdParam },
@@ -238,6 +242,10 @@ export default function ManageAssetPage() {
               >
                 {asset.status}
               </span>
+            </div>
+            <div className={styles.field}>
+              <label>Risk Level:</label>
+              <RiskClassificationBadge riskScore={riskScore || 0} isIGStaff={!!isIGStaff} />
             </div>
             <div className={styles.field}>
               <label>Classification:</label>

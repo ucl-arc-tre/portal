@@ -44,35 +44,6 @@
   margin-left: 0.2rem;
 }
 
-.risk-score-manageable {
-  background: #ccebcc;
-  color: #397d3b;
-  border-color: #397d3b;
-}
-
-.risk-score-uncomfortable {
-  background: #fff9c4;
-  color: #968911;
-  border-color: #968911;
-}
-
-.risk-score-vulnerable {
-  background: #ffe0b2;
-  color: #9c5e03;
-  border-color: #9c5e03;
-}
-
-.risk-score-critical {
-  background: #ffcdd2;
-  color: #a63838;
-  border-color: #a63838;
-}
-
-.risk-score-default {
-  background: #f3f4f6;
-  color: #374151;
-}
-
 .ownership {
   display: flex;
   flex-direction: row;
@@ -124,7 +95,7 @@
 }
 
 .badge-risk-associated {
-  background-color: #f2eee2;
+  background-color: var(--orange-badge-bg);
   color: #55331c;
   border: 1px solid #a17f4c;
 

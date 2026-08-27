@@ -4,10 +4,10 @@ import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
 import { formatDate } from "../../shared/exports";
-import Badge from "@/components/ui/Badge";
 import EditIcon from "@/components/ui/EditIcon";
-import { RiskLevel, riskScoreMax } from "@/lib/riskScoreCalculations";
+import { RiskLevel } from "@/lib/riskScoreCalculations";
 import { useAuth } from "@/hooks/useAuth";
+import RiskClassificationBadge from "@/components/shared/RiskLevelBadge";
 
 type StudyDetailsProps = {
   study: Study;
@@ -43,10 +43,7 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
         {riskLevel?.classification !== undefined && (
           <span className={styles["detail-item"]}>
-            Risk:{" "}
-            <Badge className={`${styles[`risk-score-${riskLevel?.classification}`]}`} cy="risk-badge">
-              {riskLevel.classification} {isIGStaff && `(${riskLevel.score}/${riskScoreMax})`}
-            </Badge>
+            Risk: <RiskClassificationBadge riskScore={riskLevel.score || 0} isIGStaff={!!isIGStaff} />
           </span>
         )}
 
