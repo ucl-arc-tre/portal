@@ -36,6 +36,26 @@
 
   --default-border-radius: 2px;
   --button-border-radius: 4px;
+
+  /* badges */
+  --green-badge-bg: #d4edda;
+  --green-badge-text: var(--green-300);
+
+  --yellow-badge-bg: #fff3c4;
+  --yellow-badge-text: #732600;
+  --yellow-badge-border: #d29f1e;
+
+  --orange-badge-bg: #ffe0b2;
+  --orange-badge-text: #9c5e03;
+
+  --red-badge-bg: #ffcdd2;
+  --red-badge-text: #a63838;
+
+  --grey-badge-bg: #f3f4f6;
+  --grey-badge-text: #374151;
+
+  --blue-badge-bg: #e7f3ff;
+  --blue-badge-text: #0c5aa6;
 }
 
 html,
