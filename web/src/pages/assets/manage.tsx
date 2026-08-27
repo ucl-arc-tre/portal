@@ -88,6 +88,7 @@ export default function ManageAssetPage() {
     }
 
     setAsset(response.data);
+    setRiskScore(calculateAssetRiskScore(response.data));
     setShowEditModal(false);
   };
 
