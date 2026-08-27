@@ -34,6 +34,7 @@ func InitDB() {
 		&types.Study{},
 		&types.StudyAdmin{},
 		&types.StudyOwnerChangelog{},
+		&types.StudyFeedback{},
 		&types.StudyAgreementSignature{},
 		&types.Asset{},
 		&types.AssetLocation{},
@@ -63,7 +64,7 @@ func InitDB() {
 	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
-	migrateProjectStatus(db)
+	migrateStudyFeedback(db)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
@@ -147,11 +148,14 @@ func mustExec(db *gorm.DB, sql string) {
 	}
 }
 
-func migrateProjectStatus(db *gorm.DB) {
+// Study.Feedback has been replaced by the StudyFeedback table
+// no production studies had a value in this column so we can safely remove it
+// see issue ticket 906 for more details
+func migrateStudyFeedback(db *gorm.DB) {
 	migrator := db.Migrator()
 
-	if migrator.HasColumn(&types.Project{}, "approval_status") {
-		err := migrator.DropColumn(&types.Project{}, "approval_status")
+	if migrator.HasColumn(&types.Study{}, "feedback") {
+		err := migrator.DropColumn(&types.Study{}, "feedback")
 		if err != nil {
 			panic(err)
 		}

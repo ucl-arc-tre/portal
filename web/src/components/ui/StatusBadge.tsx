@@ -23,10 +23,15 @@ function getStudyDescription(status: StudyApprovalStatus | undefined, isOpsStaff
     case "Approved":
       return "This study has been approved.";
     case "Rejected":
-      return "This study has been rejected. Please review feedback and make necessary changes.";
+      return "Updates have been requested for this study. Please review feedback and make necessary changes.";
   }
 
   return "Status information not available.";
+}
+
+// The "Rejected" approval status is displayed as "Updates Requested" so the owner has to to make changes and resubmit.
+function getStudyBadgeText(status: StudyApprovalStatus | string | undefined): string | undefined {
+  return status === "Rejected" ? "Updates Requested" : status;
 }
 
 function getProjectTREDescription(
@@ -96,7 +101,7 @@ export default function StatusBadge(props: BadgeProps) {
   const description = getDescription(type, status, environment, isIGStaff);
   return (
     <Badge className={getStatusClassName(status)} cy="status-badge">
-      {status}
+      {type === "study" ? getStudyBadgeText(status) : status}
       <span className={styles["tooltip-wrapper"]}>
         <InfoTooltip text={description} />
       </span>

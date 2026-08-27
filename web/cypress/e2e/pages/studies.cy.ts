@@ -13,6 +13,7 @@ describe("Study signoff warning", () => {
     cy.mockInformationAssetsWithSampleNoContracts();
     cy.mockStudyContractsEmpty();
     cy.mockStudyAgreementsConfirmed();
+    cy.mockStudyFeedbackEmpty();
 
     cy.intercept("GET", `/web/api/v0/studies/${studyId}`, { fixture: "study-approved.json" }).as("getStudy");
     cy.visit(`/studies/manage?studyId=${studyId}`);
