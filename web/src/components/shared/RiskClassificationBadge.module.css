@@ -1,0 +1,28 @@
+.risk-classification-manageable {
+  background: var(--green-badge-bg);
+  color: var(--green-badge-text);
+  border-color: var(--green-badge-text);
+}
+
+.risk-classification-uncomfortable {
+  background: var(--yellow-badge-bg);
+  color: var(--yellow-badge-text);
+  border-color: var(--yellow-badge-border);
+}
+
+.risk-classification-vulnerable {
+  background: var(--orange-badge-bg);
+  color: var(--orange-badge-text);
+  border-color: var(--orange-badge-text);
+}
+
+.risk-classification-critical {
+  background: var(--red-badge-bg);
+  color: var(--red-badge-text);
+  border-color: var(--red-badge-text);
+}
+
+.risk-classification-default {
+  background: var(--grey-badge-bg);
+  color: var(--grey-badge-text);
+}
