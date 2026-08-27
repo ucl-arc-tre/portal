@@ -18,16 +18,17 @@ type Props<T extends FieldValues> = {
 
 export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
   const { name, label, options, register, error } = props;
-  // label wrapping the input is base HTML as the UIkit component interferes with selecting the radio option
 
   return (
     <div className="field" data-cy={name}>
       <Label htmlFor={name}>{label}</Label>
       <div className={styles.group}>
         {options.map((option) => {
+          const id = `${name}-${option.value}`;
           return (
-            <label className={styles.label} key={option.name}>
+            <Label className={styles.label} key={option.name} htmlFor={id}>
               <input
+                id={id}
                 type="radio"
                 value={option.value}
                 data-cy={`${name}-${option.value}`}
@@ -37,7 +38,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
                 className={styles.option}
               />
               {option.name}
-            </label>
+            </Label>
           );
         })}
       </div>
