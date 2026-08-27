@@ -1,0 +1,49 @@
+.history-dialog {
+  width: 95% !important;
+  min-height: 30rem;
+}
+
+.history-list {
+  list-style: none;
+  margin-top: 1rem;
+  padding: 0;
+  max-height: 32rem;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+}
+
+.history-item {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.history-item:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-meta {
+  display: grid;
+  grid-template-columns: 14rem 1fr 10rem;
+  gap: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.history-meta span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item p {
+  margin: 0.75rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid #dee2e6;
+  color: #212529;
+}

@@ -1,5 +1,4 @@
 import { Study } from "@/openapi";
-import { Alert } from "../../shared/uikitExports";
 import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
@@ -189,22 +188,6 @@ export default function StudyDetails(props: StudyDetailsProps) {
               </dd>
             )}
         </dl>
-
-        {study.feedback && (
-          <Alert type={study.approval_status === "Approved" ? "info" : "warning"} className={styles["feedback-alert"]}>
-            <h4>This study has been given the following feedback:</h4>
-            <p>{study.feedback}</p>
-
-            {study.approval_status !== "Approved" && (
-              <>
-                <hr></hr>
-                <small>
-                  <em>Please adjust as appropriate and request another review.</em>
-                </small>
-              </>
-            )}
-          </Alert>
-        )}
       </div>
     </>
   );

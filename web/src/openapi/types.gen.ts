@@ -417,7 +417,6 @@ export type Study = StudyBase & {
      */
     updated_at: string;
     approval_status: StudyApprovalStatus;
-    feedback?: string;
     /**
      * Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
      */
@@ -516,6 +515,17 @@ export type ContractImport = {
  * Current approval status
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+
+export type StudyFeedbackEntry = {
+    id: string;
+    /**
+     * Time in RFC3339 format when this feedback was recorded
+     */
+    created_at: string;
+    reviewer_username: string;
+    status: StudyApprovalStatus;
+    feedback?: string;
+};
 
 export type ProjectTreStatus = 'incomplete' | 'pending-approval' | 'pending-creation' | 'deployed' | 'pending-update' | 'pending-deletion' | 'deleted';
 
@@ -2813,6 +2823,46 @@ export type PostStudiesByStudyIdAgreementsResponses = {
      */
     200: unknown;
 };
+
+export type GetStudiesByStudyIdFeedbackData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/feedback';
+};
+
+export type GetStudiesByStudyIdFeedbackErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetStudiesByStudyIdFeedbackResponses = {
+    /**
+     * List of feedback history entries for the study
+     */
+    200: Array<StudyFeedbackEntry>;
+};
+
+export type GetStudiesByStudyIdFeedbackResponse = GetStudiesByStudyIdFeedbackResponses[keyof GetStudiesByStudyIdFeedbackResponses];
 
 export type GetStudiesByStudyIdContractsData = {
     body?: never;
