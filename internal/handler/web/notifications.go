@@ -66,7 +66,7 @@ func (h *Handler) DeleteNotificationsNotificationId(ctx *gin.Context, notificati
 	}
 	user := middleware.GetUser(ctx)
 	if err := h.notifications.Delete(id, user); err != nil {
-		setError(ctx, err, "Failed to read notification")
+		setError(ctx, err, "Failed to delete notification")
 		return
 	}
 	ctx.Status(http.StatusNoContent)

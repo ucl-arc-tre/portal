@@ -35,7 +35,7 @@ func (s *Service) Delete(id uuid.UUID, user types.User) error {
 	err := s.db.Where("id = ? AND recipient_user_id = ?", id, user.ID).
 		Delete(&types.Notification{}).
 		Error
-	return types.NewErrFromGorm(err, "failed to read notification")
+	return types.NewErrFromGorm(err, "failed to dismiss notification")
 }
 
 func (s *Service) Read(id uuid.UUID, user types.User) error {
