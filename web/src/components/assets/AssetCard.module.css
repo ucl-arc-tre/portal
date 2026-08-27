@@ -14,27 +14,27 @@
 }
 
 .asset-classification-public {
-  background: #d4edda;
-  color: #155724;
-  border-color: #155724;
+  background: var(--green-badge-bg);
+  color: var(--green-badge-text);
+  border-color: var(--green-badge-text);
 }
 
 .asset-classification-confidential {
-  background: #fff3cd;
-  color: #856404;
-  border-color: #856404;
+  background: var(--orange-badge-bg);
+  color: var(--orange-badge-text);
+  border-color: var(--orange-badge-text);
 }
 
 .asset-classification-highly-confidential {
-  background: #f8d7da;
-  color: var(--error-text);
-  border-color: var(--error-text);
+  background: var(--red-badge-bg);
+  color: var(--red-badge-text);
+  border-color: var(--red-badge-text);
 }
 
 .asset-protection {
-  background: #e7f3ff;
-  color: #0c5aa6;
-  border-color: #0c5aa6;
+  background: var(--blue-badge-bg);
+  color: var(--blue-badge-text);
+  border-color: var(--blue-badge-text);
 }
 
 .asset-description {

@@ -15,7 +15,7 @@ import StudyAffirmation from "./StudyAffirmation";
 import StudyOwnerEdit from "./StudyOwnerEdit";
 import StudyFeedback from "./StudyFeedback";
 import StudyFeedbackHistory from "./StudyFeedbackHistory";
-import { getStudyRiskLevel } from "../../../lib/riskScoreCalculations";
+import { getStudyRiskInfo } from "../../../lib/riskScoreCalculations";
 
 type StudyOverviewProps = {
   study: Study;
@@ -57,7 +57,7 @@ export default function StudyOverview({
     (asset) => asset.data_types?.includes("personal") || asset.data_types?.includes("special_category_personal")
   );
 
-  const riskLevel = getStudyRiskLevel(assets);
+  const riskInfo = getStudyRiskInfo(assets);
 
   const onEditComplete = () => {
     setIsFormOpen(false);
@@ -163,7 +163,7 @@ export default function StudyOverview({
 
       <StudyDetails
         study={study}
-        riskLevel={riskLevel}
+        riskInfo={riskInfo}
         canEditOwner={canEditStudyOwner}
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
       />
