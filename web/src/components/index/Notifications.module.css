@@ -66,6 +66,11 @@
   font-size: 0.875rem;
 }
 
+.researcher-prompt-action {
+  display: flex;
+  justify-content: center;
+}
+
 .completed-notifications {
   text-align: center;
   padding: 1.5rem;

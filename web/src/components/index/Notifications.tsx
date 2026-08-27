@@ -149,9 +149,11 @@ export default function Notifications() {
         !isApprovedResearcher && (
           <div className={styles["researcher-prompt"]}>
             <p>Complete your profile setup to become an approved researcher.</p>
-            <Button href="/profile" variant="secondary">
-              Become an Approved Researcher
-            </Button>
+            <div className={styles["researcher-prompt-action"]}>
+              <Button href="/profile" variant="secondary">
+                Become an Approved Researcher
+              </Button>
+            </div>
           </div>
         )
       )}
@@ -205,7 +207,7 @@ export default function Notifications() {
         </ul>
       )}
 
-      {notifications && notifications.length === 0 && (
+      {notifications && isApprovedResearcher && notifications.length === 0 && (
         <div className={styles["completed-notifications"]}>
           <p>There are no notifications.</p>
         </div>

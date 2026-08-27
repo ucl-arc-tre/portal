@@ -63,7 +63,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
       setChosenName(name);
       setErrorMessage(null);
-      clearCompleteProfileCompleteNotification();
+      await clearCompleteProfileCompleteNotification();
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit name. Please try again.");
