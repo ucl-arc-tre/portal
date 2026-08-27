@@ -1,11 +1,12 @@
 import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
 import type { Asset } from "@/openapi";
 
-export type RiskLevel = {
-  classification: RiskClassification | undefined;
+type RiskLevel = "manageable" | "uncomfortable" | "vulnerable" | "critical";
+
+export type RiskInfo = {
+  level: RiskLevel | undefined;
   score: number | undefined;
 };
-type RiskClassification = "manageable" | "uncomfortable" | "vulnerable" | "critical";
 
 const maxLikelihoodScore = 4; // to align with IG likelihood scale
 const maxAssetLikelihoodScore = Math.max(...storageLocationDefinitions.map((def) => def.likelihoodScore));
@@ -92,7 +93,7 @@ const calculateHighestAssetRiskScore = (assets: Asset[]) => {
   return highestAssetScore;
 };
 
-export const getRiskLevel = (score: number | undefined): RiskClassification | undefined => {
+export const getRiskLevel = (score: number | undefined): RiskLevel | undefined => {
   if (score === undefined) return undefined;
   if (score < 3) {
     return "manageable";
