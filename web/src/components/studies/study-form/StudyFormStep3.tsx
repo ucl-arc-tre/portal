@@ -18,7 +18,7 @@ export default function StudyFormStep3({ control, errors, controllerValue }: Stu
   return (
     <fieldset className={sharedStyles.fieldset}>
       <div className={sharedStyles["option-field"]} data-cy="isDataProtectionOfficeRegistered">
-        <div>The study is or will be registered with the UCL Data Protection Office</div>
+        <div>The study is registered with the UCL Data Protection Office</div>
         <Controller
           name="isDataProtectionOfficeRegistered"
           control={control}
