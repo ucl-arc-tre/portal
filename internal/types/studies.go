@@ -116,7 +116,7 @@ func (s Study) AdminUsernames() []string {
 	return usernames
 }
 
-func (s Study) IsAdmin(userID uuid.UUID) bool {
+func (s Study) IsStudyAdmin(userID uuid.UUID) bool {
 	for _, studyAdmin := range s.StudyAdmins {
 		if studyAdmin.UserID == userID {
 			return true

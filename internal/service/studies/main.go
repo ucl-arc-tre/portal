@@ -353,7 +353,7 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 	}
 	existingStudy := existingStudies[0]
 	if review.Status != openapi.StudyApprovalStatusPending &&
-		(existingStudy.OwnerUserID == reviewer.ID || existingStudy.IsAdmin(reviewer.ID)) {
+		(existingStudy.OwnerUserID == reviewer.ID || existingStudy.IsStudyAdmin(reviewer.ID)) {
 		return types.NewErrClientInvalidObject("cannot review a study you own or are an administrator of")
 	}
 
