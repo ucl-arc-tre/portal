@@ -14,7 +14,6 @@
 }
 
 .field label {
-  font-weight: 700;
   color: #495057;
 }
 
@@ -34,6 +33,7 @@
     background: #d4edda;
     color: #155724;
   }
+
   &.status-destroyed {
     background: #dad8d8;
     color: #302728;
@@ -89,10 +89,6 @@
   .field {
     grid-template-columns: 150px 1fr;
     gap: 1rem;
-  }
-
-  .field label {
-    font-weight: 600;
   }
 
   .actions {

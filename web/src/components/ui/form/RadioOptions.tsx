@@ -24,9 +24,11 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
       <Label htmlFor={name}>{label}</Label>
       <div className={styles.group}>
         {options.map((option) => {
+          const id = `${name}-${option.value}`;
           return (
-            <label className={styles.label} key={option.name}>
+            <Label className={styles.label} key={option.name} htmlFor={id}>
               <input
+                id={id}
                 type="radio"
                 value={option.value}
                 data-cy={`${name}-${option.value}`}
@@ -36,7 +38,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
                 className={styles.option}
               />
               {option.name}
-            </label>
+            </Label>
           );
         })}
       </div>

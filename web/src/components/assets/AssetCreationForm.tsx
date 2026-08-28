@@ -314,16 +314,17 @@ export default function AssetCreationForm(props: AssetFormProps) {
           <Label htmlFor="location">Which data types are included in this asset? Please check all that apply</Label>
           <div className={styles["checkbox-group"]}>
             {assetDataTypeDefinitions.map((dataType) => (
-              <label key={dataType.value} className={styles["checkbox-label"]}>
+              <Label key={dataType.value} className={styles["checkbox-label"]} htmlFor={`data-type-${dataType.value}`}>
                 <input
                   type="checkbox"
+                  id={`data-type-${dataType.value}`}
                   value={dataType.value}
                   {...register("data_types", {})}
                   className={styles.checkbox}
                 />
                 {dataType.name}
                 {dataType.definition && <InfoTooltip text={dataType.definition!} />}
-              </label>
+              </Label>
             ))}
           </div>
 
@@ -578,9 +579,10 @@ export default function AssetCreationForm(props: AssetFormProps) {
 
           <div className={styles["checkbox-group"]}>
             {storageLocationDefinitions.map((storage) => (
-              <label key={storage.value} className={styles["checkbox-label"]}>
+              <Label key={storage.value} className={styles["checkbox-label"]} htmlFor={`location-${storage.value}`}>
                 <input
                   type="checkbox"
+                  id={`location-${storage.value}`}
                   value={storage.value}
                   {...register("locations", {
                     required: "At least one location must be selected",
@@ -589,7 +591,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
                 />
                 {storage.name}
                 <InfoTooltip text={storage.definition} />
-              </label>
+              </Label>
             ))}
           </div>
 

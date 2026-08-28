@@ -4,7 +4,7 @@ import styles from "./ChosenNameChangeModal.module.css";
 import { useState } from "react";
 import { postProfile } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import { Alert, AlertMessage, Label } from "../shared/uikitExports";
 import Error from "../ui/Error";
 
 type Props = {
@@ -52,7 +52,7 @@ export default function ChosenNameChangeModal({ isOpen, onSuccess, setOpen, curr
       <div>
         <form onSubmit={handleSubmit} className="form">
           <div className="field">
-            <label htmlFor="chosenName">Chosen Name</label>
+            <Label htmlFor="chosenName">Chosen Name</Label>
             <input
               id="chosenName"
               type="text"

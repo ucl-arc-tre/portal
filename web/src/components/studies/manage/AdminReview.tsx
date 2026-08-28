@@ -1,5 +1,5 @@
 import Box from "../../ui/Box";
-import { Alert, AlertMessage, Textarea } from "../../shared/uikitExports";
+import { Alert, AlertMessage, Label, Textarea } from "../../shared/uikitExports";
 import Button from "../../ui/Button";
 import { useState } from "react";
 import {
@@ -140,7 +140,7 @@ export default function AdminReview({
 
           <div className={styles["feedback-container"]}>
             <form className={styles["feedback-form"]}>
-              <label htmlFor="feedback">Feedback</label>
+              <Label htmlFor="feedback">Feedback</Label>
               <Textarea
                 name="feedback"
                 id="feedback"
@@ -180,7 +180,7 @@ export default function AdminReview({
               </Button>
 
               <Button
-                variant="secondary"
+                variant="primary-destructive"
                 className={styles["reject-button"]}
                 onClick={() => handleStudyStatusUpdate("Rejected", feedback)}
                 disabled={!!loadingAction}
@@ -204,7 +204,7 @@ export default function AdminReview({
 
           <div className={styles["feedback-container"]}>
             <form className={styles["feedback-form"]}>
-              <label htmlFor="feedback">Feedback</label>
+              <Label htmlFor="feedback">Feedback</Label>
               <Textarea
                 name="feedback"
                 id="feedback"
