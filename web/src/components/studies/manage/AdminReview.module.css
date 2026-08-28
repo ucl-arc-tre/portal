@@ -19,15 +19,8 @@
 }
 
 .reject-button {
-  color: #a50909 !important;
-  border: 2px solid #a50909 !important;
   margin-inline: 0.4rem;
   transition: all 0.3s ease;
-
-  &:hover:not(:disabled) {
-    background-color: #a50909 !important;
-    color: #fff !important;
-  }
 }
 
 .heading {

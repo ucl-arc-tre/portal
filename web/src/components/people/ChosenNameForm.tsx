@@ -5,7 +5,7 @@ import { putUsersByUserIdAttributes } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";
 import Error from "@/components/ui/Error";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText, Label } from "../shared/uikitExports";
 
 type Props = {
   userId: string;
@@ -54,9 +54,9 @@ export default function ChosenNameForm(props: Props) {
     <Dialog setDialogOpen={() => setChosenNameDialogOpen(false)} className={styles["chosen-name-dialog"]}>
       <form onSubmit={handleSubmit} className="form">
         <div className="field">
-          <label htmlFor="chosenName" className={styles.label}>
+          <Label htmlFor="chosenName" className={styles.label}>
             Chosen Name
-          </label>
+          </Label>
           <input
             id="chosenName"
             type="text"

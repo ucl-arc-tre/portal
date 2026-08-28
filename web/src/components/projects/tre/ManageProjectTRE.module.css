@@ -61,16 +61,6 @@
   margin: 0;
 }
 
-.asset-tier {
-  display: inline-block;
-  padding: 0.2rem 0.6rem;
-  background: var(--form-purple--light);
-  color: white !important;
-  border-radius: var(--default-border-radius);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
 .empty-message {
   color: #666;
   border: 1px solid #e1e5e9;

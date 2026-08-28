@@ -21,6 +21,12 @@
 
 .signoff-checkbox {
   margin-top: 0.75rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 .signoff-button-container {

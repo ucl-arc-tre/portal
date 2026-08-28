@@ -1,5 +1,5 @@
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText, Label } from "../shared/uikitExports";
 import Link from "next/link";
 import Error from "../ui/Error";
 import Button from "../ui/Button";
@@ -48,7 +48,7 @@ export default function ProjectFormStep1(props: Props) {
   return (
     <>
       <div className="field">
-        <label htmlFor="studyId">Study *</label>
+        <Label htmlFor="studyId">Study *</Label>
         <select
           id="studyId"
           {...register("studyId", {
@@ -68,7 +68,7 @@ export default function ProjectFormStep1(props: Props) {
       </div>
 
       <div className="field">
-        <label htmlFor="environmentId">Environment *</label>
+        <Label htmlFor="environmentId">Environment *</Label>
         <select
           id="environmentId"
           {...register("environmentId", {
@@ -140,7 +140,7 @@ export default function ProjectFormStep1(props: Props) {
 
       {!isDSHProject && (
         <div className="field">
-          <label htmlFor="name">Project Name *</label>
+          <Label htmlFor="name">Project Name *</Label>
           <Controller
             name="name"
             control={control}
@@ -188,13 +188,13 @@ export default function ProjectFormStep1(props: Props) {
 
       {!isDSHProject && (
         <div className="field">
-          <label>Add assets (optional):</label>
+          <Label>Add assets (optional):</Label>
           <fieldset className="linkage-fieldset">
             {assetFields.map((field, index) => (
               <div key={field.id} className="item-wrapper">
-                <label htmlFor={`asset-${index}`} className="item-label">
+                <Label htmlFor={`asset-${index}`} className="item-label">
                   Asset {index + 1}:
-                </label>
+                </Label>
                 <Controller
                   name={`assetIds.${index}.value` as const}
                   control={control}

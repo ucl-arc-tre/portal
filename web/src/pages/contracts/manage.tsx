@@ -25,6 +25,7 @@ import ContractObjectCard from "@/components/contracts/ContractObjectCard";
 import Error from "@/components/ui/Error";
 import { formatDate } from "@/components/shared/exports";
 import Box from "@/components/ui/Box";
+import { Label } from "@/components/shared/uikitExports";
 
 export default function ManageContractPage() {
   const router = useRouter();
@@ -178,50 +179,50 @@ export default function ManageContractPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Status:</label>
+            <Label>Status:</Label>
             <span>{contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}</span>
           </div>
 
           <div className={styles.field}>
-            <label>Created:</label>
+            <Label>Created:</Label>
             <span>{formatDate(contract.created_at)}</span>
           </div>
 
           <div className={styles.field}>
-            <label>Third Party:</label>
+            <Label>Third Party:</Label>
             <span>{contract.third_party_name}</span>
           </div>
 
           {contract.other_signatories && (
             <div className={styles.field}>
-              <label>Other Signatories:</label>
+              <Label>Other Signatories:</Label>
               <span>{contract.other_signatories}</span>
             </div>
           )}
 
           {contract.start_date && (
             <div className={styles.field}>
-              <label>Start date:</label>
+              <Label>Start date:</Label>
               <span>{formatDate(contract.start_date)}</span>
             </div>
           )}
 
           {contract.expiry_date && (
             <div className={styles.field}>
-              <label>Expiry date:</label>
+              <Label>Expiry date:</Label>
               <span>{formatDate(contract.expiry_date)}</span>
             </div>
           )}
 
           {contract.retention_end_date && (
             <div className={styles.field}>
-              <label>Retention Period End Date:</label>
+              <Label>Retention Period End Date:</Label>
               <span>{formatDate(contract.retention_end_date)}</span>
             </div>
           )}
 
           <div className={styles.field}>
-            <label>Files:</label>
+            <Label>Files:</Label>
             <div>
               {contract.objects_metadata.length === 0 && "None"}
               {contract.objects_metadata.map((obj) => (
