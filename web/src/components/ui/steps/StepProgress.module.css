@@ -66,9 +66,9 @@
 }
 
 .step-icon-expiry-urgency-medium {
-  background-color: #b75301;
+  background-color: var(--expiry-urgency--medium);
   color: white;
-  border: 2px solid #b75301;
+  border: 2px solid var(--expiry-urgency--medium);
 }
 
 .step-number {

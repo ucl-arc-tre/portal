@@ -135,7 +135,3 @@ dialog {
   font-weight: 700;
   color: var(--expiry-urgency--medium);
 }
-
-.actions-icon {
-  height: 1rem;
-}

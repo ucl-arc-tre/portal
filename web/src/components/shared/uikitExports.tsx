@@ -1,5 +1,11 @@
 import dynamic from "next/dynamic";
 //  ICONS
+
+// NB: icons have sizes, common customisations are exported for convenience; the default is 24
+export const iconSizeSmall = 16;
+export const iconSizeMedium = 22;
+export const iconSizeLarge = 32;
+
 export const XIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.X), {
   ssr: false,
 });

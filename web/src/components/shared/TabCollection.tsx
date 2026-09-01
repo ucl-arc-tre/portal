@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Button from "../ui/Button";
-import { AlertCircleIcon } from "../shared/uikitExports";
+import { AlertCircleIcon, iconSizeSmall } from "../shared/uikitExports";
 import styles from "./TabCollection.module.css";
 
 type TabDefinition = {
@@ -31,7 +31,9 @@ export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) 
           cy={tabDefinition.name}
         >
           {tabDefinition.label ? tabDefinition.label : tabDefinition.name}
-          {tabDefinition.needsAttention && <AlertCircleIcon className={styles["needs-attention"]} />}
+          {tabDefinition.needsAttention && (
+            <AlertCircleIcon className={styles["needs-attention"]} size={iconSizeSmall} />
+          )}
         </Button>
       ))}
     </div>

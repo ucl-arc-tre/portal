@@ -13,7 +13,7 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./Notifications.module.css";
 import Error from "../ui/Error";
-import { CheckIcon, IconButton, XIcon } from "../shared/uikitExports";
+import { CheckIcon, IconButton, iconSizeMedium, XIcon } from "../shared/uikitExports";
 import router from "next/router";
 
 export default function Notifications() {
@@ -145,7 +145,7 @@ export default function Notifications() {
               title="Dismiss"
               onClick={() => dismissNotification(completeProfileNotification)}
             >
-              <XIcon aria-hidden="true" size={22} />
+              <XIcon aria-hidden="true" size={iconSizeMedium} />
             </IconButton>
           </div>
           <p>
@@ -200,7 +200,7 @@ export default function Notifications() {
                       title="Mark as read"
                       onClick={() => readNotification(notification)}
                     >
-                      <CheckIcon aria-hidden="true" size={22} />
+                      <CheckIcon aria-hidden="true" size={iconSizeMedium} />
                     </IconButton>
                   )}
                   <IconButton
@@ -209,7 +209,7 @@ export default function Notifications() {
                     title="Dismiss"
                     onClick={() => dismissNotification(notification)}
                   >
-                    <XIcon aria-hidden="true" size={22} />
+                    <XIcon aria-hidden="true" size={iconSizeMedium} />
                   </IconButton>
                 </div>
               </li>

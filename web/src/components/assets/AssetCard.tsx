@@ -1,6 +1,6 @@
 import { Asset } from "@/openapi";
 import styles from "./AssetCard.module.css";
-import { AlertCircleIcon } from "../shared/uikitExports";
+import { AlertCircleIcon, iconSizeSmall } from "../shared/uikitExports";
 import { useEffect, useState } from "react";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
@@ -89,7 +89,7 @@ export default function AssetCard(props: AssetCardProps) {
 
           {!isCompleted && (
             <small className={styles["asset-incomplete__message"]}>
-              <AlertCircleIcon className={`${styles["asset-incomplete__icon"]} actions-icon`} />
+              <AlertCircleIcon className={styles["asset-incomplete__icon"]} size={iconSizeSmall} />
               This asset requires a contract that has not yet been added. You can manage contracts under the Contracts
               tab.
             </small>

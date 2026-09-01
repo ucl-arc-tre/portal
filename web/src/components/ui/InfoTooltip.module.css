@@ -4,8 +4,6 @@
   margin-inline: 0.2rem;
 
   .icon {
-    height: 15px;
-    width: 15px;
     color: var(--text--secondary);
     vertical-align: top;
   }
