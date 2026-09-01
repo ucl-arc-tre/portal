@@ -46,7 +46,7 @@ export default function ContractManagement(props: ContractManagementProps) {
             <h3>
               Contract Management{" "}
               <Button onClick={() => setCalloutExpanded(!calloutExpanded)} variant="tertiary" size="small" inline>
-                <InfoIcon className={styles.icon} />
+                <InfoIcon />
               </Button>
             </h3>
             <Button onClick={() => setShowUploadModal(true)} variant="secondary" size="small" cy="add-contract">
