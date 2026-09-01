@@ -1,4 +1,4 @@
-import { CheckIcon } from "@/components/shared/uikitExports";
+import { CheckIcon, iconSizeMedium } from "@/components/shared/uikitExports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
@@ -43,9 +43,9 @@ function StepList({ steps, ariaLabel }: { steps: Step[]; ariaLabel?: string }) {
                 }`}
               >
                 {step.expiryUrgency && step.expiryUrgency.level !== "low" ? (
-                  <AlertTriangleIcon className={styles["alert-triangle-icon"]} />
+                  <AlertTriangleIcon size={iconSizeMedium} />
                 ) : step.completed ? (
-                  <CheckIcon className={styles["check-icon"]} />
+                  <CheckIcon size={iconSizeMedium} />
                 ) : (
                   <span className={styles["step-number"]}>{stepIndex + 1}</span>
                 )}
