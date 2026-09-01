@@ -688,3 +688,30 @@ func TestIntegration_CreateStudy(t *testing.T) {
 	assert.Contains(t, adminIDs, admin2.ID)
 
 }
+
+func TestIntegration_UpdateStudyReview_BlocksAdminSelfReview(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	db := mockdb.NewTestDBSchema(t, migrate)
+	svc := &Service{db: db, entra: &mockcontrollers.MockEntra{}}
+
+	owner := types.User{Username: "owner@testIntegration.com"}
+	require.NoError(t, db.Create(&owner).Error)
+
+	admin := types.User{Username: "admin@testIntegration.com"}
+	require.NoError(t, db.Create(&admin).Error)
+
+	study := types.Study{
+		OwnerUserID:    owner.ID,
+		ApprovalStatus: string(openapi.StudyApprovalStatusPending),
+	}
+	require.NoError(t, db.Create(&study).Error)
+	require.NoError(t, db.Create(&types.StudyAdmin{StudyID: study.ID, UserID: admin.ID}).Error)
+
+	review := openapi.StudyReview{Status: openapi.StudyApprovalStatusApproved}
+
+	err := svc.UpdateStudyReview(ctx, study.ID, review, admin)
+
+	assert.ErrorContains(t, err, "cannot review a study you own or are an administrator of")
+}
