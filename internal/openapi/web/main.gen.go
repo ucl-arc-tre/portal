@@ -1185,6 +1185,7 @@ type Notification struct {
 	// Id UUID of the notification
 	Id    string            `json:"id"`
 	Kind  *NotificationKind `json:"kind,omitempty"`
+	Read  bool              `json:"read"`
 	Title string            `json:"title"`
 }
 
@@ -1786,6 +1787,9 @@ type ContractObjectIdParam = string
 // EnvironmentParam defines model for EnvironmentParam.
 type EnvironmentParam string
 
+// NotificationIdParam defines model for NotificationIdParam.
+type NotificationIdParam = string
+
 // ProjectIdParam defines model for ProjectIdParam.
 type ProjectIdParam = string
 
@@ -1986,8 +1990,11 @@ type ServerInterface interface {
 	// (POST /notifications/read)
 	PostNotificationsRead(c *gin.Context)
 
+	// (DELETE /notifications/{notificationId})
+	DeleteNotificationsNotificationId(c *gin.Context, notificationId NotificationIdParam)
+
 	// (POST /notifications/{notificationId}/read)
-	PostNotificationsNotificationIdRead(c *gin.Context, notificationId string)
+	PostNotificationsNotificationIdRead(c *gin.Context, notificationId NotificationIdParam)
 
 	// (GET /profile)
 	GetProfile(c *gin.Context)
@@ -2273,6 +2280,31 @@ func (siw *ServerInterfaceWrapper) PostNotificationsRead(c *gin.Context) {
 	siw.Handler.PostNotificationsRead(c)
 }
 
+// DeleteNotificationsNotificationId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteNotificationsNotificationId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "notificationId" -------------
+	var notificationId NotificationIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter notificationId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteNotificationsNotificationId(c, notificationId)
+}
+
 // PostNotificationsNotificationIdRead operation middleware
 func (siw *ServerInterfaceWrapper) PostNotificationsNotificationIdRead(c *gin.Context) {
 
@@ -2280,7 +2312,7 @@ func (siw *ServerInterfaceWrapper) PostNotificationsNotificationIdRead(c *gin.Co
 	_ = err
 
 	// ------------- Path parameter "notificationId" -------------
-	var notificationId string
+	var notificationId NotificationIdParam
 
 	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
 	if err != nil {
@@ -3789,6 +3821,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/auth", wrapper.GetAuth)
 	router.GET(options.BaseURL+"/notifications", wrapper.GetNotifications)
+	router.DELETE(options.BaseURL+"/notifications/:notificationId", wrapper.DeleteNotificationsNotificationId)
 	router.POST(options.BaseURL+"/notifications/:notificationId/read", wrapper.PostNotificationsNotificationIdRead)
 	router.POST(options.BaseURL+"/notifications/read", wrapper.PostNotificationsRead)
 	router.POST(options.BaseURL+"/feedback", wrapper.PostFeedback)
