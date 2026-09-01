@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -41,12 +40,12 @@ func (s *Service) NotifyTrainingExpiry(ctx context.Context, training types.UserT
 	if err := s.entra.SendEmail(ctx, subject, emails(training.User), content); err != nil {
 		return err
 	}
+	expiresAt := config.TrainingExpiresAt(training)
 	notification := types.Notification{
-		Title:     "Your training is expiring soon",
-		Body:      new("Please update your training soon"),
-		Href:      new("/profile"),
-		Kind:      new(types.NotificationKindTrainingExpiry),
-		ExpiresAt: new(time.Now().Add(config.TrainingValidity / 2)),
+		Title: fmt.Sprintf("Your training expires on %d/%d/%d", expiresAt.Year(), expiresAt.Month(), expiresAt.Day()),
+		Body:  new("Please update your training soon"),
+		Href:  new("/profile"),
+		Kind:  new(types.NotificationKindTrainingExpiry),
 	}
 	return s.create(notification, training.User)
 }

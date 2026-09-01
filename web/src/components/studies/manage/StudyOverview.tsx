@@ -50,7 +50,8 @@ export default function StudyOverview({
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
   const canEditStudyOwner =
     (isStudyOwner || isIGStaff) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
-  const canRequestReview = study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwner;
+  const canRequestReview =
+    study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwnerOrAdmin;
   const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
   const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin || isAdmin;
   const requiresDPORegistration = assets?.some(
