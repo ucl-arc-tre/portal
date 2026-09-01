@@ -92,8 +92,12 @@ func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contr
 	if err := s.entra.SendEmail(ctx, subject, emails(recipients...), content); err != nil {
 		log.Err(err).Msg("Failed to send contract expiry notification email")
 	}
+	title := fmt.Sprintf("Contract in '%s' expires in %d days", study.Title, *days)
+	if *days < 0 {
+		title = fmt.Sprintf("Contract in '%s' has expired", study.Title)
+	}
 	notification := types.Notification{
-		Title:     fmt.Sprintf("Contract in '%s' expires in %d days", study.Title, *days),
+		Title:     title,
 		Href:      new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
 		Kind:      new(types.NotificationKindContractExpiry),
 		ExpiresAt: new(contract.ExpiryDate.Add(3 * config.Month)),

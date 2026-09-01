@@ -57,6 +57,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
   const isOwnStudy = study.owner_username === userData?.username;
   const isStudyOwner = userData && isIAO && isOwnStudy;
+  const isStudyAdmin = study.additional_study_admin_usernames.includes(userData?.username ?? "");
 
   const showSignoffWarning =
     isStudyOwner &&
@@ -135,7 +136,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     return <Error message={error} />;
   }
 
-  if (studyStepsCompleted === false && (!isIGStaff || isOwnStudy)) {
+  if (studyStepsCompleted === false && (!isIGStaff || isOwnStudy || isStudyAdmin)) {
     return (
       <StudySetupSteps
         study={study}
@@ -154,15 +155,18 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <StudyAffirmation studyId={study.id} successCallback={() => fetchStudy(study.id)} isReaffirmation />
       )}
 
-      {isIGStaff && isOwnStudy && (study.approval_status === "Pending" || study.approval_status === "Rejected") && (
-        <Alert type="info">
-          <AlertMessage>
-            You cannot approve your own study, please ask another member of the IG team to provide a review.
-          </AlertMessage>
-        </Alert>
-      )}
+      {isIGStaff &&
+        (isOwnStudy || isStudyAdmin) &&
+        (study.approval_status === "Pending" || study.approval_status === "Rejected") && (
+          <Alert type="info">
+            <AlertMessage>
+              You cannot review or approve a study you own or are an administrator of, please ask another member of the
+              IG team to provide a review.
+            </AlertMessage>
+          </Alert>
+        )}
 
-      {isIGStaff && !isOwnStudy && study.approval_status !== "Incomplete" && (
+      {isIGStaff && !isOwnStudy && !isStudyAdmin && study.approval_status !== "Incomplete" && (
         <AdminReview
           study={study}
           unagreedAdminUsernames={unagreedAdminUsernames}
