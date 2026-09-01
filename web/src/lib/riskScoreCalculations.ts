@@ -8,11 +8,11 @@ export type RiskInfo = {
   score: number | undefined;
 };
 
-const maxLikelihoodScore = 4; // to align with IG likelihood scale
-const maxAssetLikelihoodScore = Math.max(...storageLocationDefinitions.map((def) => def.likelihoodScore));
+const maxLikelihoodScore = 4; // to align with UCL risk framework
+const maxAssetLikelihoodScore = Math.max(...storageLocationDefinitions.map((def) => def.likelihoodScore)) + 2;
 
-const maxAssetImpactScore = 6;
-const maxImpactScore = 4;
+const maxAssetImpactScore = 7;
+const maxImpactScore = 4; // to align with UCL risk framework
 
 export const riskScoreMax = maxImpactScore * maxLikelihoodScore;
 
@@ -29,9 +29,12 @@ const calculateAssetLikelihoodScore = (asset: Asset) => {
   if (asset.stored_outside_uk_eea === true) {
     likelihoodScore += 1;
   }
+  if (asset.has_targeted_threat_actors) {
+    likelihoodScore += 1;
+  }
 
   // Likelihoods are relative, so normalise to make sure it's at most maxLikelihoodScore
-  return (Math.min(likelihoodScore, maxAssetLikelihoodScore) * maxLikelihoodScore) / maxAssetLikelihoodScore;
+  return Math.ceil((Math.min(likelihoodScore, maxAssetLikelihoodScore) * maxLikelihoodScore) / maxAssetLikelihoodScore);
 };
 
 export const calculateAssetRiskScore = (asset: Asset) => {
@@ -42,8 +45,10 @@ export const calculateAssetRiskScore = (asset: Asset) => {
       impactScore += 0;
       break;
     case "confidential":
-    case "highly_confidential":
       impactScore += 1;
+      break;
+    case "highly_confidential":
+      impactScore += 2;
       break;
     default:
       break;
@@ -72,11 +77,9 @@ export const calculateAssetRiskScore = (asset: Asset) => {
     impactScore += 1;
   }
 
-  impactScore *= maxImpactScore / maxAssetImpactScore; // normalise
+  impactScore = Math.ceil((maxImpactScore / maxAssetImpactScore) * impactScore); // normalise
   const likelihoodScore = calculateAssetLikelihoodScore(asset);
-  const assetScore = likelihoodScore * impactScore;
-
-  return Math.round(assetScore);
+  return Math.round(likelihoodScore * impactScore);
 };
 
 const calculateHighestAssetRiskScore = (assets: Asset[]) => {

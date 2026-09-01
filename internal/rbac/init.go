@@ -29,6 +29,7 @@ func addBasePolicies(enforcer *casbin.SyncedEnforcer) {
 	policies := []Policy{
 		{RoleName: Base, Resource: "/auth", Action: ReadAction},
 		{RoleName: Base, Resource: "/notifications", Action: ReadAction},
+		{RoleName: Base, Resource: "/notifications/:id", Action: WriteAction},
 		{RoleName: Base, Resource: "/notifications/:id/read", Action: WriteAction},
 		{RoleName: Base, Resource: "/notifications/read", Action: WriteAction},
 		{RoleName: Base, Resource: "/profile", Action: ReadAction},

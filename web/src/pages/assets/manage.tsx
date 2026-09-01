@@ -246,7 +246,7 @@ export default function ManageAssetPage() {
             </div>
             <div className={styles.field}>
               <label>Risk Level:</label>
-              <RiskLevelBadge riskScore={riskScore || 0} isIGStaff={!!isIGStaff} />
+              {riskScore === null ? "Unknown" : <RiskLevelBadge riskScore={riskScore} isIGStaff={!!isIGStaff} />}
             </div>
             <div className={styles.field}>
               <Label>Classification:</Label>

@@ -58,6 +58,13 @@ func TestIntegration_CreateAndClearNotifications(t *testing.T) {
 	time.Sleep(50 * time.Millisecond)
 	notifs, err = svc.Find(user)
 	assert.NoError(t, err)
+	assert.Len(t, notifs, 1)
+	assert.NotNil(t, notifs[0].ReadAt)
+
+	err = svc.Delete(notifs[0].ID, user)
+	assert.NoError(t, err)
+	notifs, err = svc.Find(user)
+	assert.NoError(t, err)
 	assert.Len(t, notifs, 0)
 
 	notif.Title = "TestIntegration_CreateAndClearNotifications_2"
