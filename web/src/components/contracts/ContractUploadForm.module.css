@@ -37,7 +37,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 1.5rem;
   border: 2px dashed var(--color-border);
   border-radius: var(--default-border-radius);
   background-color: var(--color-background-secondary);
@@ -131,10 +131,6 @@
   flex-direction: column;
   gap: 1rem;
   margin-top: 1rem;
-}
-
-.file-label {
-  padding: 1.5rem;
 }
 
 @media (width >=768px) {

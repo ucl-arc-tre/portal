@@ -27,8 +27,15 @@ func New() *Service {
 
 func (s *Service) Find(user types.User) ([]types.Notification, error) {
 	notifications := []types.Notification{}
-	err := s.db.Where("recipient_user_id = ? AND read_at IS NULL", user.ID).Find(&notifications).Error
+	err := s.db.Where("recipient_user_id = ?", user.ID).Find(&notifications).Error
 	return notifications, types.NewErrFromGorm(err, "failed to find user notifications")
+}
+
+func (s *Service) Delete(id uuid.UUID, user types.User) error {
+	err := s.db.Where("id = ? AND recipient_user_id = ?", id, user.ID).
+		Delete(&types.Notification{}).
+		Error
+	return types.NewErrFromGorm(err, "failed to dismiss notification")
 }
 
 func (s *Service) Read(id uuid.UUID, user types.User) error {

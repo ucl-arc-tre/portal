@@ -64,6 +64,7 @@ func InitDB() {
 	// sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
+	migrateNotifications(db)
 	migrateStudyFeedback(db)
 
 	if err := db.AutoMigrate(models...); err != nil {
@@ -148,10 +149,26 @@ func mustExec(db *gorm.DB, sql string) {
 	}
 }
 
+func migrateNotifications(db *gorm.DB) {
+	migrator := db.Migrator()
+
+	if !migrator.HasTable("notifications") {
+		return // nothing to migrate
+	}
+
+	// Before this migration notifications that were read are treated as dismissed/deleted
+	newestNotificationReadIsDeleted, _ := time.Parse(time.RFC3339, "2026-09-07T00:00:00+00:00")
+	err := db.Where("read_at IS NOT NULL AND read_at < ?", newestNotificationReadIsDeleted).Delete(&types.Notification{}).Error
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Study.Feedback has been replaced by the StudyFeedback table
 // no production studies had a value in this column so we can safely remove it
 // see issue ticket 906 for more details
 func migrateStudyFeedback(db *gorm.DB) {
+
 	migrator := db.Migrator()
 
 	if migrator.HasColumn(&types.Study{}, "feedback") {

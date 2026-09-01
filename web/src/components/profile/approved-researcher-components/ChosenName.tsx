@@ -1,11 +1,11 @@
 import { SubmitEvent, useState } from "react";
-import { postProfile } from "@/openapi";
+import { deleteNotificationsByNotificationId, getNotifications, postProfile } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Button from "../../ui/Button";
 
 import styles from "./ChosenName.module.css";
-import { Alert, AlertMessage, Input } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, Input, Label } from "@/components/shared/uikitExports";
 
 type ProfileChosenNameProps = {
   chosenName: string;
@@ -20,6 +20,29 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const regex = /^[\p{L}\p{M}}\s\-'’]+[\s][\p{L}\p{M}}\s\-\.'’]+$/u;
+
+  const clearCompleteProfileCompleteNotification = async () => {
+    try {
+      const readResponse = await getNotifications();
+      if (responseIsError(readResponse)) {
+        setErrorMessage(`Failed to get notifications: ${extractErrorMessage(readResponse)}`);
+        return;
+      }
+      const profileCompleteNotification = readResponse.data?.find(
+        (notification) => notification.kind == "complete-profile"
+      );
+      if (!profileCompleteNotification) return;
+      const response = await deleteNotificationsByNotificationId({
+        path: { notificationId: profileCompleteNotification.id },
+      });
+      if (responseIsError(response)) {
+        setErrorMessage(`Failed to clear complete profile notification: ${extractErrorMessage(response)}`);
+      }
+    } catch (error) {
+      console.error("Failed to clear complete profile notification:", error);
+      setErrorMessage("Failed to clear complete profile notification. Please try again.");
+    }
+  };
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,6 +63,7 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
       setChosenName(name);
       setErrorMessage(null);
+      await clearCompleteProfileCompleteNotification();
     } catch (error) {
       console.error("There was a problem submitting your request:", error);
       setErrorMessage("Failed to submit name. Please try again.");
@@ -62,9 +86,9 @@ export default function ProfileChosenName(props: ProfileChosenNameProps) {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles["input-group"]}>
-          <label htmlFor="nameInput" className={styles.label}>
+          <Label htmlFor="nameInput" className={styles.label}>
             Full Name
-          </label>
+          </Label>
           <Input
             id="nameInput"
             type="text"

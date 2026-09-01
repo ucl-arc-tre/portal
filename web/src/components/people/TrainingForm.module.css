@@ -33,7 +33,6 @@
     }
   }
 
-  /* training only - put in new file? */
   .date {
     display: flex;
     flex-direction: column;
