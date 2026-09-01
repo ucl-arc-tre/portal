@@ -116,6 +116,15 @@ func (s Study) AdminUsernames() []string {
 	return usernames
 }
 
+func (s Study) IsStudyAdmin(user User) bool {
+	for _, studyAdmin := range s.StudyAdmins {
+		if studyAdmin.UserID == user.ID {
+			return true
+		}
+	}
+	return false
+}
+
 func (s Study) NotificationRecipients() []User {
 	recipients := []User{s.Owner}
 	for _, studyAdmin := range s.StudyAdmins {

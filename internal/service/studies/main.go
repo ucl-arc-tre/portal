@@ -351,8 +351,10 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 	} else if len(existingStudies) == 0 {
 		return types.NewNotFoundError("study not found")
 	}
-	if review.Status != openapi.StudyApprovalStatusPending && existingStudies[0].OwnerUserID == reviewer.ID {
-		return types.NewErrClientInvalidObject("cannot review a study you own")
+	existingStudy := existingStudies[0]
+	if review.Status != openapi.StudyApprovalStatusPending &&
+		(existingStudy.OwnerUserID == reviewer.ID || existingStudy.IsStudyAdmin(reviewer)) {
+		return types.NewErrClientInvalidObject("cannot review a study you own or are an administrator of")
 	}
 
 	tx := s.db.Begin()
