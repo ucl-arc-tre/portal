@@ -2,11 +2,12 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #0070e8;
+  color: var(--ucl-accent);
+  transition: all 0.3s;
 }
 
 .this:hover {
-  color: #0056b3;
+  color: var(--ucl-mid);
 }
 
 .this:focus {
