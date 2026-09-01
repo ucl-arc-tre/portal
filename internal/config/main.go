@@ -217,9 +217,12 @@ func ProcessIdentity() string {
 	return value
 }
 
+func TrainingExpiresAt(trainingRecord types.UserTrainingRecord) time.Time {
+	return trainingRecord.CompletedAt.Add(TrainingValidity)
+}
+
 func DaysUntilTrainingExpiry(trainingRecord types.UserTrainingRecord) Days {
-	expiresAt := trainingRecord.CompletedAt.Add(TrainingValidity)
-	return daysUntil(expiresAt)
+	return daysUntil(TrainingExpiresAt(trainingRecord))
 }
 
 func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {

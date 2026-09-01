@@ -27,6 +27,7 @@ func (h *Handler) GetNotifications(ctx *gin.Context) {
 			Body:  notification.Body,
 			Href:  notification.Href,
 			Kind:  kind,
+			Read:  notification.ReadAt != nil,
 		})
 	}
 	ctx.JSON(http.StatusOK, data)
@@ -53,6 +54,19 @@ func (h *Handler) PostNotificationsRead(ctx *gin.Context) {
 	user := middleware.GetUser(ctx)
 	if err := h.notifications.ReadAll(user, data); err != nil {
 		setError(ctx, err, "Failed to read notification")
+		return
+	}
+	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) DeleteNotificationsNotificationId(ctx *gin.Context, notificationId string) {
+	id, err := parseUUIDOrSetError(ctx, notificationId)
+	if err != nil {
+		return
+	}
+	user := middleware.GetUser(ctx)
+	if err := h.notifications.Delete(id, user); err != nil {
+		setError(ctx, err, "Failed to delete notification")
 		return
 	}
 	ctx.Status(http.StatusNoContent)
