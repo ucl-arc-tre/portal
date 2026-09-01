@@ -33,10 +33,11 @@ export const Label = dynamic(() => import("uikit-react-public").then((mod) => mo
   ssr: false,
 });
 
-export const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
+export const Checkbox = dynamic(() => import("uikit-react-public").then((mod) => mod.Checkbox), {
   ssr: false,
 });
-export const AlertTitle = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Title), {
+
+export const Alert = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert), {
   ssr: false,
 });
 export const AlertMessage = dynamic(() => import("uikit-react-public").then((mod) => mod.Alert.Message), {

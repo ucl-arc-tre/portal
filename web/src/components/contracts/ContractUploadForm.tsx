@@ -398,9 +398,9 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
             <fieldset className="linkage-fieldset">
               {assetFields.map((field, index) => (
                 <div key={field.id} className="item-wrapper">
-                  <label htmlFor={`asset-${index}`} className="item-label">
+                  <Label htmlFor={`asset-${index}`} className="item-label">
                     Asset {index + 1}:
-                  </label>
+                  </Label>
 
                   <Controller
                     name={`assets.${index}.value` as const}

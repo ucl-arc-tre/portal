@@ -1,4 +1,5 @@
 import styles from "./DetailsField.module.css";
+import { Label } from "@/components/shared/uikitExports";
 
 type Props = {
   label: string;
@@ -11,7 +12,7 @@ export default function DetailsField(props: Props) {
 
   return (
     <div className={styles.field}>
-      <label>{label}:</label>
+      <Label>{label}:</Label>
       <span>
         {value}
         {children}

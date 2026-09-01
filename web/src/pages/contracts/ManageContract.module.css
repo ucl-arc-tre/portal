@@ -53,7 +53,6 @@
 }
 
 .field label {
-  font-weight: 700;
   color: #495057;
 }
 
@@ -65,10 +64,6 @@
   .field {
     grid-template-columns: 150px 1fr;
     gap: 1rem;
-  }
-
-  .field label {
-    font-weight: 600;
   }
 
   .actions {

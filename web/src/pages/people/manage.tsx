@@ -16,7 +16,7 @@ import styles from "./ManageUser.module.css";
 import ChosenNameForm from "@/components/people/ChosenNameForm";
 import EditIcon from "@/components/ui/EditIcon";
 import { formatTime, getHumanReadableTrainingKind } from "@/components/shared/exports";
-import { CheckIcon, XIcon } from "@/components/shared/uikitExports";
+import { CheckIcon, Label, XIcon } from "@/components/shared/uikitExports";
 import TrainingForm from "@/components/people/TrainingForm";
 
 export default function ManageUserPage() {
@@ -126,12 +126,12 @@ export default function ManageUserPage() {
         <Box>
           <h3 className={styles["title"]}>{chosenNameUnset ? user.user.username : user.chosen_name}</h3>
           <div className={styles.field}>
-            <label>Username: </label>
+            <Label>Username: </Label>
             <span>{user.user.username}</span>
           </div>
 
           <div className={styles.field}>
-            <label>Chosen name: </label>
+            <Label>Chosen name: </Label>
             <span>
               {chosenNameUnset ? "Not set" : user.chosen_name}{" "}
               {canEdit && (
@@ -146,7 +146,7 @@ export default function ManageUserPage() {
 
           {user.requested_chosen_name && !hasRequestedChosenName && canEdit && (
             <div className={styles.field}>
-              <label>Requested chosen name: </label>
+              <Label>Requested chosen name: </Label>
               <span>
                 {user.requested_chosen_name}{" "}
                 {canEdit && (
@@ -165,7 +165,7 @@ export default function ManageUserPage() {
           )}
 
           <div className={styles.field}>
-            <label>Agreements: </label>
+            <Label>Agreements: </Label>
             {user.agreements.confirmed_agreements.length === 0 && "None"}
             {user.agreements.confirmed_agreements.map((agreement) => (
               <div key={agreement.agreement_type} className={styles["agreement"]}>
@@ -176,7 +176,7 @@ export default function ManageUserPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Training: </label>
+            <Label>Training: </Label>
             <div className={styles.trainingRecord}>
               {!trainingRecords || (trainingRecords.length === 0 && "None")}
               {trainingRecords?.map((training) => (
@@ -217,7 +217,7 @@ export default function ManageUserPage() {
           </div>
 
           <div className={styles.field}>
-            <label>Roles: </label>
+            <Label>Roles: </Label>
             <div>
               {nonBaseRoles.length === 0 && "None"}
               {nonBaseRoles.map((role) => (

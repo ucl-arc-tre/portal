@@ -7,7 +7,7 @@ import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Dialog from "../ui/Dialog";
 import { TrainingKindOptions } from "../shared/exports";
 import InfoTooltip from "../ui/InfoTooltip";
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import { Alert, AlertMessage, Label } from "../shared/uikitExports";
 
 type TrainingFormProps = {
   userId: string;
@@ -88,10 +88,10 @@ export default function TrainingForm(TrainingFormProps: TrainingFormProps) {
           ))}
         </select>
         <div className={styles.date}>
-          <label htmlFor="display_date">
+          <Label htmlFor="display_date">
             Date valid from{" "}
             <InfoTooltip text="The date the training was completed, this can be found on the certificate." />
-          </label>
+          </Label>
           <input
             type="date"
             name="display_date"
