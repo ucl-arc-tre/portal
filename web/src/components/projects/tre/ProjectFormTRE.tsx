@@ -82,7 +82,6 @@ export default function ProjectFormTREStep(props: Props) {
   const requiresHPCDesktops = useWatch({ control, name: "tre.requiresHPCDesktops" }) === "true";
 
   const isDesktopUser = (username: string): boolean => {
-    console.log(username);
     return members.some((member) => member.username == username && member.roles.includes("desktop_user"));
   };
 

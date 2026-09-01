@@ -80,6 +80,23 @@ describe("calculateAssetRiskScore", () => {
       locations: ["email"],
     });
 
-    assert.strictEqual(calculateAssetRiskScore(asset), 4);
+    assert.strictEqual(calculateAssetRiskScore(asset), 6);
+  });
+
+  it("scores a highly confidential, identifiable asset in an other location as 16", () => {
+    const asset = makeAsset({
+      data_types: ["personal"],
+      classification_impact: "highly_confidential",
+      protection: "identifiable_low_confidence_pseudonymisation",
+      locations: ["other_location"],
+      stored_outside_uk_eea: true,
+      has_dspt: true,
+      has_targeted_threat_actors: true,
+      is_leak_major_disruption: true,
+      is_leak_major_financial_loss: true,
+      is_leak_major_reputational_damage: true,
+    });
+
+    assert.strictEqual(calculateAssetRiskScore(asset), 16);
   });
 });
