@@ -40,16 +40,25 @@ paths:
           description: Internal server error
         default:
           description: Unexpected error
+  /notifications/{notificationId}:
+    delete:
+      description: Delete/dismiss a notification
+      parameters:
+        - $ref: "#/components/parameters/NotificationIdParam"
+      responses:
+        "204":
+          description: OK
+        "401":
+          description: Unauthenticated
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
   /notifications/{notificationId}/read:
     post:
       description: Mark a single notification as read
       parameters:
-        - in: path
-          name: notificationId
-          required: true
-          description: ID of the notification to be updated
-          schema:
-            type: string
+        - $ref: "#/components/parameters/NotificationIdParam"
       responses:
         "204":
           description: OK
@@ -1447,6 +1456,13 @@ components:
       description: Contract object UUID
       schema:
         type: string
+    NotificationIdParam:
+      in: path
+      name: notificationId
+      required: true
+      description: Notification UUID
+      schema:
+        type: string
     EnvironmentParam:
       in: path
       name: environment
@@ -1500,12 +1516,15 @@ components:
       required:
         - id
         - title
+        - read
       properties:
         id:
           type: string
           description: UUID of the notification
         title:
           type: string
+        read:
+          type: boolean
         body:
           type: string
         kind:
