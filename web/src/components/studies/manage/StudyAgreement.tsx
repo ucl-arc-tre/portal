@@ -15,7 +15,8 @@ type StudyAgreementProps = {
   isOwner: boolean;
 };
 
-export default function StudyAgreement({ studyId, studyTitle, setAgreementCompleted, isOwner }: StudyAgreementProps) {
+export default function StudyAgreement(props: StudyAgreementProps) {
+  const { studyId, studyTitle, setAgreementCompleted, isOwner } = props;
   const [studyAgreementText, setStudyAgreementText] = useState<Agreement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
