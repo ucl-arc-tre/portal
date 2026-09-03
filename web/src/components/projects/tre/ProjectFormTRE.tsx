@@ -88,7 +88,7 @@ export default function ProjectFormTREStep(props: Props) {
   return (
     <>
       <div className="field">
-        <Label htmlFor="members">Project users (optional):*</Label>
+        <Label htmlFor="members">Project users (optional):</Label>
         <fieldset className="linkage-fieldset">
           <UserLookup
             filterByApprovedResearchers={true}
