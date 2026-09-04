@@ -39,16 +39,26 @@ export function getHumanReadableTrainingKind(trainingKind: string) {
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-export function studySignoffWarningRequired(lastSignoff: string): boolean {
+const WARNING_THRESHOLD_DAYS = 30;
+
+function warningRequired(lastCheckedDate: string, validityDays: number): boolean {
+  const lastChecked = new Date(lastCheckedDate); // e.g. "2024-01-01"
+  const millisecondsDiff = Date.now() - lastChecked.getTime(); // e.g. 90 days (in milliseconds)
+  const daysSinceLastChecked = Math.floor(millisecondsDiff / MS_PER_DAY); // e.g. 90 days
+  const daysRemaining = validityDays - daysSinceLastChecked; // e.g. 0 days remaining
+
+  return daysRemaining <= WARNING_THRESHOLD_DAYS;
+}
+
+// study signoff is annual once a study has a project, otherwise it defaults to 90 days
+export function studySignoffWarningRequired(lastSignoff: string, hasProject: boolean): boolean {
+  const validityDays = hasProject ? 365 : 90;
+  return warningRequired(lastSignoff, validityDays);
+}
+
+export function projectAccessReviewWarningRequired(lastAccessReview: string): boolean {
   const validityDays = 90;
-  const warningThresholdDays = 30;
-
-  const lastSignoffDate = new Date(lastSignoff); // e.g. "2024-01-01"
-  const millisecondsDiff = Date.now() - lastSignoffDate.getTime(); // e.g. 90 days (in milliseconds)
-  const daysSinceSignoff = Math.floor(millisecondsDiff / MS_PER_DAY); // e.g. 90 days
-  const daysRemaining = validityDays - daysSinceSignoff; // e.g. 0 days remaining
-
-  return daysRemaining <= warningThresholdDays;
+  return warningRequired(lastAccessReview, validityDays);
 }
 
 export function calculateExpiryUrgency(expiryDate: Date): ExpiryUrgency | null {

@@ -48,7 +48,7 @@ export default function StudyCardsList(props: Props) {
                   <StatusBadge status={study.approval_status} type="study" />
                   {study.approval_status === "Approved" &&
                     study.last_signoff != null &&
-                    studySignoffWarningRequired(study.last_signoff) && (
+                    studySignoffWarningRequired(study.last_signoff, study.has_project) && (
                       <Badge className={styles["signoff-warning-tag"]} cy="study-confirmation-badge">
                         Study Confirmation due
                       </Badge>
