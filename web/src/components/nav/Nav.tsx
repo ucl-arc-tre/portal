@@ -87,8 +87,6 @@ export default function Nav() {
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
         <MenuSection>
-          <h2>Menu</h2>
-          <hr />
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
 
           {canSeeStudies && (

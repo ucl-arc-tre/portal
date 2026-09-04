@@ -6,15 +6,6 @@
   width: 180px;
   padding: 1rem;
   background-color: var(--nav-base);
-
-  h2 {
-    font-weight: 400;
-  }
-
-  hr {
-    border-color: var(--ucl-accent);
-    margin-bottom: 0.8rem;
-  }
 }
 
 .logout {
