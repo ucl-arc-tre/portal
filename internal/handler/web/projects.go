@@ -364,14 +364,15 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 	}
 
 	response := openapi.ProjectDSH{
-		Name:            projectDSH.Project.Name,
-		Id:              projectUUID.String(),
-		EnvironmentName: string(environments.DSH),
-		StudyId:         projectDSH.Project.Study.ID.String(),
-		StudyTitle:      projectDSH.Project.Study.Title,
-		Assets:          new([]openapi.Asset{}),
-		Status:          openapi.ProjectDSHStatus(projectDSH.Status),
-		Members:         []openapi.ProjectDSHMember{},
+		Name:             projectDSH.Project.Name,
+		Id:               projectUUID.String(),
+		EnvironmentName:  string(environments.DSH),
+		StudyId:          projectDSH.Project.Study.ID.String(),
+		StudyTitle:       projectDSH.Project.Study.Title,
+		Assets:           new([]openapi.Asset{}),
+		Status:           openapi.ProjectDSHStatus(projectDSH.Status),
+		LastAccessReview: openapi.FormatOptionalTime(projectDSH.Project.LastAccessReview),
+		Members:          []openapi.ProjectDSHMember{},
 	}
 	for username, member := range members {
 		response.Members = append(response.Members, openapi.ProjectDSHMember{
@@ -380,6 +381,21 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 		})
 	}
 	ctx.JSON(http.StatusOK, response)
+}
+
+// Called by an IAO/IAA to confirm access rights for this project have been reviewed, resetting the review timestamp
+func (h *Handler) PostProjectsDshProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID); err != nil {
+		setError(ctx, err, "Failed to record project access review signoff")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
 
 func optionalInt(i *uint) *int {

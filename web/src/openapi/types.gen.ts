@@ -634,6 +634,10 @@ export type ProjectDsh = {
     environment_name: string;
     name: string;
     /**
+     * Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+     */
+    last_access_review?: string | null;
+    /**
      * List of project members with their roles (can be empty)
      */
     members: Array<ProjectDshMember>;
@@ -2512,6 +2516,44 @@ export type GetProjectsDshByProjectIdResponses = {
 };
 
 export type GetProjectsDshByProjectIdResponse = GetProjectsDshByProjectIdResponses[keyof GetProjectsDshByProjectIdResponses];
+
+export type PostProjectsDshByProjectIdAccessReviewSignoffData = {
+    body?: never;
+    path: {
+        /**
+         * Project UUID
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/dsh/{projectId}/access-review-signoff';
+};
+
+export type PostProjectsDshByProjectIdAccessReviewSignoffErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsDshByProjectIdAccessReviewSignoffResponses = {
+    /**
+     * Access review signoff recorded successfully
+     */
+    200: unknown;
+};
 
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;

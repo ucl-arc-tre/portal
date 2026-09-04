@@ -190,7 +190,7 @@ export default function ManageProjectTRE(props: Props) {
   return (
     <>
       {showAccessReviewWarning && (
-        <ProjectAccessReview projectId={project.id} successCallback={async () => fetchData()} />
+        <ProjectAccessReview projectId={project.id} environment="tre" successCallback={async () => fetchData()} />
       )}
 
       {!canApprove && canEdit && project.status === "incomplete" && (

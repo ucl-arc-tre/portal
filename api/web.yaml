@@ -1026,6 +1026,23 @@ paths:
         default:
           description: Unexpected error
 
+  /projects/dsh/{projectId}/access-review-signoff:
+    post:
+      description: Record that an IAO/IAA has reviewed access rights for this project, resetting the review timestamp
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          description: Access review signoff recorded successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -2477,6 +2494,10 @@ components:
           type: string
         name:
           type: string
+        last_access_review:
+          type: string
+          nullable: true
+          description: Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
         members:
           type: array
           description: List of project members with their roles (can be empty)

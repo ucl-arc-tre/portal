@@ -2,17 +2,21 @@ import Error from "@/components/ui/Error";
 import { Alert, Checkbox, Label } from "@/components/shared/uikitExports";
 import styles from "./ProjectAccessReview.module.css";
 import { useState } from "react";
-import { postProjectsTreByProjectIdAccessReviewSignoff } from "@/openapi";
+import {
+  postProjectsTreByProjectIdAccessReviewSignoff,
+  postProjectsDshByProjectIdAccessReviewSignoff,
+} from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 
 type ProjectAccessReviewProps = {
   projectId: string;
+  environment: "tre" | "dsh";
   successCallback: () => Promise<void>;
 };
 
 export default function ProjectAccessReview(props: ProjectAccessReviewProps) {
-  const { projectId, successCallback } = props;
+  const { projectId, environment, successCallback } = props;
 
   const [reviewChecked, setReviewChecked] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
@@ -21,7 +25,11 @@ export default function ProjectAccessReview(props: ProjectAccessReviewProps) {
   const handleSignoff = async () => {
     setReviewError(null);
     setIsReviewing(true);
-    const response = await postProjectsTreByProjectIdAccessReviewSignoff({ path: { projectId: projectId } });
+    const signoff =
+      environment === "tre"
+        ? postProjectsTreByProjectIdAccessReviewSignoff
+        : postProjectsDshByProjectIdAccessReviewSignoff;
+    const response = await signoff({ path: { projectId: projectId } });
     if (responseIsError(response)) {
       setReviewError(extractErrorMessage(response));
     } else {

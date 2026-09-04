@@ -1272,6 +1272,9 @@ type ProjectDSH struct {
 	EnvironmentName string   `json:"environment_name"`
 	Id              string   `json:"id"`
 
+	// LastAccessReview Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+	LastAccessReview *string `json:"last_access_review,omitempty"`
+
 	// Members List of project members with their roles (can be empty)
 	Members    []ProjectDSHMember `json:"members"`
 	Name       string             `json:"name"`
@@ -2029,6 +2032,9 @@ type ServerInterface interface {
 	// (GET /projects/dsh/{projectId})
 	GetProjectsDshProjectId(c *gin.Context, projectId ProjectIdParam)
 
+	// (POST /projects/dsh/{projectId}/access-review-signoff)
+	PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
+
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
 
@@ -2494,6 +2500,31 @@ func (siw *ServerInterfaceWrapper) GetProjectsDshProjectId(c *gin.Context) {
 	}
 
 	siw.Handler.GetProjectsDshProjectId(c, projectId)
+}
+
+// PostProjectsDshProjectIdAccessReviewSignoff operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsDshProjectIdAccessReviewSignoff(c, projectId)
 }
 
 // GetProjectsTre operation middleware
@@ -3905,6 +3936,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
+	router.POST(options.BaseURL+"/projects/dsh/:projectId/access-review-signoff", wrapper.PostProjectsDshProjectIdAccessReviewSignoff)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.DELETE(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.DeleteStudiesStudyIdAssetsAssetId)

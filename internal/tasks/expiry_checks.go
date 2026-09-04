@@ -164,15 +164,24 @@ func (m *Manager) checkProjectAccessReviewExpiry() error {
 
 	ctx := context.Background()
 
-	// WIP - DSH projects arent enabled yet so just implementing TRE for now
 	projects := []types.Project{}
 	result := m.db.
 		Joins("JOIN project_tres ON project_tres.project_id = projects.id AND project_tres.status = ?", types.ProjectTREStatusDeployed).
-		Preload("Study.Owner").Preload("Study.StudyAdmins.User").
+		Preload("Study.Owner").Preload("Study.StudyAdmins.User").Preload("Environment").
 		Find(&projects)
 	if result.Error != nil {
 		return types.NewErrFromGorm(result.Error, "failed to get TRE projects")
 	}
+
+	dshProjects := []types.Project{}
+	result = m.db.
+		Joins("JOIN project_dshes ON project_dshes.project_id = projects.id AND project_dshes.status = ?", types.ProjectDSHStatusActive).
+		Preload("Study.Owner").Preload("Study.StudyAdmins.User").Preload("Environment").
+		Find(&dshProjects)
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get DSH projects")
+	}
+	projects = append(projects, dshProjects...)
 
 	for _, project := range projects {
 		if !config.ShouldNotifyProjectAccessReviewExpiry(&project) {
