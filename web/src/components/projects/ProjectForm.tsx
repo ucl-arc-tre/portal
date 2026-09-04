@@ -363,7 +363,7 @@ export default function ProjectForm({
                   {isSubmitting
                     ? editingProject
                       ? "Updating..."
-                      : "Creating..."
+                      : "Saving..."
                     : editingProject
                       ? "Update Project"
                       : "Save Project"}
