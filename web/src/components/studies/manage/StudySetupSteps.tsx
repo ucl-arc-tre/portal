@@ -53,6 +53,11 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
 
   if (isCheckingAgreement) return <Loading message="Checking study setup..." />;
 
+  const handleAgreementCompleted = (completed: boolean) => {
+    setAgreementCompleted(completed);
+    if (completed) window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const studySteps: Step[] = [
     {
       id: "study-agreement",
@@ -88,7 +93,7 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
         <StudyAgreement
           studyId={study.id}
           studyTitle={study.title}
-          setAgreementCompleted={setAgreementCompleted}
+          setAgreementCompleted={handleAgreementCompleted}
           isOwner={isStudyOwner}
         />
       )}
