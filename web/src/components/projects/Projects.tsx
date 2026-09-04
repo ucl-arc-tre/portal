@@ -125,7 +125,7 @@ export default function Projects() {
         <>
           <div className={styles.header}>
             <h2>
-              {canSeeAllProjects ? "All Projects" : "Your Projects"}{" "}
+              {canSeeAllProjects ? "All Projects" : "All of Your Projects"}{" "}
               <Button
                 onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
                 variant="tertiary"

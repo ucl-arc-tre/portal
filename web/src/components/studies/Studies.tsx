@@ -22,7 +22,7 @@ export default function Studies() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>
-          {canSeeAllStudies ? "Studies" : "Your Studies"}{" "}
+          {canSeeAllStudies ? "All Studies" : "All of Your Studies"}{" "}
           <Button
             onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
             variant="tertiary"

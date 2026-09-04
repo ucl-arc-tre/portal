@@ -26,7 +26,8 @@ import Error from "../../ui/Error";
 import Loading from "../../ui/Loading";
 import { studySignoffWarningRequired } from "../../shared/exports";
 import StudyAffirmation from "./StudyAffirmation";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import { Alert, AlertMessage, HelperText } from "../../shared/uikitExports";
+import TextLink from "@/components/ui/TextLink";
 
 type ManageStudyProps = {
   study: Study;
@@ -200,7 +201,19 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
-      {tab === "projects" && <ProjectCardsList projects={projects} />}
+      {tab === "projects" && (
+        <>
+          <HelperText>
+            To see all your projects or create a new one, go to the{" "}
+            <TextLink href="/projects" cy="empty-projects-link">
+              Projects
+            </TextLink>{" "}
+            page
+          </HelperText>
+          <br></br>
+          <ProjectCardsList projects={projects} />
+        </>
+      )}
     </>
   );
 }
