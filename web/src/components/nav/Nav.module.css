@@ -6,6 +6,10 @@
   width: 180px;
   padding: 1rem;
   background-color: var(--nav-base);
+
+  a {
+    white-space: nowrap;
+  }
 }
 
 .logout {
