@@ -109,11 +109,9 @@ export default function Nav() {
         </MenuSection>
         <MenuDivider />
         <MenuSection>
-          <SecondaryMenuItem>
-            <Button variant="tertiary" href={logoutUrl}>
-              Log out <LogoutIcon size={iconSizeSmall} />
-            </Button>
-          </SecondaryMenuItem>
+          <a href={logoutUrl}>
+            <SecondaryMenuItem icon={<LogoutIcon size={iconSizeSmall} />}>Log out</SecondaryMenuItem>
+          </a>
         </MenuSection>
       </nav>
     </aside>
