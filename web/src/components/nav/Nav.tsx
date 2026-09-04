@@ -1,6 +1,5 @@
 import { usePathname } from "next/navigation";
 import styles from "./Nav.module.css";
-import Button from "../ui/Button";
 import dynamic from "next/dynamic";
 import { ReactElement } from "react";
 import { client } from "@/openapi/client.gen";
