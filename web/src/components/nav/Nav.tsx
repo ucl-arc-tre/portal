@@ -56,11 +56,11 @@ function NavItem(NavItemProps: NavItemProps) {
   );
 
   return (
-    <PrimaryMenuItem active={isActive} icon={icon}>
-      <Button href={href} variant="tertiary">
+    <a href={href}>
+      <PrimaryMenuItem active={isActive} icon={icon}>
         {title}
-      </Button>
-    </PrimaryMenuItem>
+      </PrimaryMenuItem>
+    </a>
   );
 }
 
