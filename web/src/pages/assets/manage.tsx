@@ -34,6 +34,7 @@ import AssetCreationForm from "@/components/assets/AssetCreationForm";
 import Box from "@/components/ui/Box";
 import RiskLevelBadge from "@/components/shared/RiskLevelBadge";
 import { calculateAssetRiskScore } from "@/lib/riskScoreCalculations";
+import LifecycleStatusBadge from "@/components/ui/LifecycleStatusBadge";
 
 export default function ManageAssetPage() {
   const router = useRouter();
@@ -236,16 +237,12 @@ export default function ManageAssetPage() {
               <Label>Source:</Label>
               <span>{asset.source || "Unset"}</span>
             </div>
-            <div className={styles.field}>
+            <div className={`${styles.field} ${styles["badge-field"]}`}>
               <Label>Status:</Label>
-              <span
-                className={`${styles.status} ${asset.status === "active" ? styles["status-active"] : styles["status-destroyed"]}`}
-              >
-                {asset.status}
-              </span>
+              <LifecycleStatusBadge status={asset.status} />
             </div>
-            <div className={styles.field}>
-              <label>Risk Level:</label>
+            <div className={`${styles.field} ${styles["badge-field"]}`}>
+              <Label>Risk Level:</Label>
               {riskScore === null ? "Unknown" : <RiskLevelBadge riskScore={riskScore} isIGStaff={!!isIGStaff} />}
             </div>
             <div className={styles.field}>
