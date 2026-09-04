@@ -11,18 +11,3 @@
     white-space: nowrap;
   }
 }
-
-.logout {
-  width: 150px;
-  font-weight: 400 !important;
-  color: var(--ucl-accent);
-  transition: background-color 0.3s ease;
-
-  svg {
-    width: 1rem;
-  }
-
-  &:hover {
-    background-color: var(--purple--background);
-  }
-}
