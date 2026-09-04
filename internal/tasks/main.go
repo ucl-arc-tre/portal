@@ -39,6 +39,7 @@ func (m *Manager) Start() {
 	m.mustEvery(config.Day, m.checkContractsExpiry, "checkContractsExpiry")
 	m.mustEvery(config.Day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
 	m.mustEvery(config.Day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
+	m.mustEvery(config.Day, m.checkProjectAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	m.mustEvery(config.Day, m.updateUserEmails, "updateUserEmails")
 
 	m.scheduler.Start()

@@ -35,7 +35,10 @@ const (
 
 	ServerShutdownGraceDuration = 10 * time.Second
 
-	StudySignoffValidity = 3 * Month
+	StudySignoffValidityDefault = 3 * Month
+	StudySignoffValidityAnnual  = 365 * Day
+
+	ProjectAccessReviewValidity = 3 * Month
 
 	DefaultPageSize = 12 // // number of items returned for pagination
 )
@@ -233,19 +236,43 @@ func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {
 	return shouldNotifyExpiry(daysUntilExpiry)
 }
 
-func DaysUntilStudySignoffExpiry(study *types.Study) Days {
+// StudySignoffValidity is annual once a study has a project, otherwise it defaults to 90 days
+func StudySignoffValidity(hasProject bool) time.Duration {
+	if hasProject {
+		return StudySignoffValidityAnnual
+	}
+	return StudySignoffValidityDefault
+}
+
+func DaysUntilStudySignoffExpiry(study *types.Study, hasProject bool) Days {
 	if study == nil || study.LastSignoff == nil {
 		log.Warn().Msg("nil study or lastSignoff - no days until expiry")
 		return 0
 	}
-	return daysUntil(study.LastSignoff.Add(StudySignoffValidity))
+	return daysUntil(study.LastSignoff.Add(StudySignoffValidity(hasProject)))
 }
 
-func ShouldNotifyStudySignoffExpiry(study *types.Study) bool {
+func ShouldNotifyStudySignoffExpiry(study *types.Study, hasProject bool) bool {
 	if study == nil || study.LastSignoff == nil {
 		return false
 	}
-	daysUntilExpiry := DaysUntilStudySignoffExpiry(study)
+	daysUntilExpiry := DaysUntilStudySignoffExpiry(study, hasProject)
+	return shouldNotifyExpiry(daysUntilExpiry)
+}
+
+func DaysUntilProjectAccessReviewExpiry(project *types.Project) Days {
+	if project == nil || project.LastAccessReview == nil {
+		log.Warn().Msg("nil project or lastAccessReview - no days until expiry")
+		return 0
+	}
+	return daysUntil(project.LastAccessReview.Add(ProjectAccessReviewValidity))
+}
+
+func ShouldNotifyProjectAccessReviewExpiry(project *types.Project) bool {
+	if project == nil || project.LastAccessReview == nil {
+		return false
+	}
+	daysUntilExpiry := DaysUntilProjectAccessReviewExpiry(project)
 	return shouldNotifyExpiry(daysUntilExpiry)
 }
 

@@ -3,8 +3,10 @@ import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
+import Badge from "../ui/Badge";
 import TextLink from "../ui/TextLink";
 import { HelperText } from "../shared/uikitExports";
+import { projectAccessReviewWarningRequired } from "../shared/exports";
 
 type Props = {
   projects: Project[];
@@ -36,7 +38,16 @@ export default function ProjectCardsList(props: Props) {
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
               headerContent={
-                <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+                <div className={styles["status-indicator"]}>
+                  <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+                  {(project.status === "deployed" || project.status === "active") &&
+                    project.last_access_review != null &&
+                    projectAccessReviewWarningRequired(project.last_access_review) && (
+                      <Badge className={styles["access-review-warning-tag"]} cy="project-access-review-badge">
+                        Access Review due
+                      </Badge>
+                    )}
+                </div>
               }
             >
               <div className={styles["project-info"]}>

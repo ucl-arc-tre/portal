@@ -10,6 +10,17 @@
   padding-top: 0.2rem;
 }
 
+.status-indicator {
+  justify-self: flex-end;
+}
+
+.access-review-warning-tag {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffc107;
+  margin-left: 0.5rem;
+}
+
 .project-environment {
   margin: 0 0 0.5rem 0;
   color: #424242;

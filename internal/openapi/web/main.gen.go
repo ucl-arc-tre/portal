@@ -1251,6 +1251,9 @@ type Project struct {
 	// Id Unique identifier for the project
 	Id string `json:"id"`
 
+	// LastAccessReview Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+	LastAccessReview *string `json:"last_access_review,omitempty"`
+
 	// Name Name of the project
 	Name   string `json:"name"`
 	Status string `json:"status"`
@@ -1268,6 +1271,9 @@ type ProjectDSH struct {
 	Assets          *[]Asset `json:"assets,omitempty"`
 	EnvironmentName string   `json:"environment_name"`
 	Id              string   `json:"id"`
+
+	// LastAccessReview Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+	LastAccessReview *string `json:"last_access_review,omitempty"`
 
 	// Members List of project members with their roles (can be empty)
 	Members    []ProjectDSHMember `json:"members"`
@@ -1318,6 +1324,9 @@ type ProjectTRE struct {
 
 	// IsPendingDeploymentUpdate Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
 	IsPendingDeploymentUpdate bool `json:"is_pending_deployment_update"`
+
+	// LastAccessReview Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+	LastAccessReview *string `json:"last_access_review,omitempty"`
 
 	// Members List of project members with their roles (can be empty)
 	Members []ProjectTREMember `json:"members"`
@@ -1452,6 +1461,9 @@ type Study struct {
 
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
+
+	// HasProject Whether this study has at least one project (determines whether signoff validity is annual or 90 days)
+	HasProject bool `json:"has_project"`
 
 	// Id Unique identifier for the study
 	Id string `json:"id"`
@@ -2020,6 +2032,9 @@ type ServerInterface interface {
 	// (GET /projects/dsh/{projectId})
 	GetProjectsDshProjectId(c *gin.Context, projectId ProjectIdParam)
 
+	// (POST /projects/dsh/{projectId}/access-review-signoff)
+	PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
+
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
 
@@ -2040,6 +2055,9 @@ type ServerInterface interface {
 
 	// (PUT /projects/tre/{projectId})
 	PutProjectsTreProjectId(c *gin.Context, projectId ProjectIdParam)
+
+	// (POST /projects/tre/{projectId}/access-review-signoff)
+	PostProjectsTreProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
 
 	// (PATCH /projects/tre/{projectId}/pending)
 	PatchProjectsTreProjectIdPending(c *gin.Context, projectId ProjectIdParam)
@@ -2484,6 +2502,31 @@ func (siw *ServerInterfaceWrapper) GetProjectsDshProjectId(c *gin.Context) {
 	siw.Handler.GetProjectsDshProjectId(c, projectId)
 }
 
+// PostProjectsDshProjectIdAccessReviewSignoff operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsDshProjectIdAccessReviewSignoff(c, projectId)
+}
+
 // GetProjectsTre operation middleware
 func (siw *ServerInterfaceWrapper) GetProjectsTre(c *gin.Context) {
 
@@ -2621,6 +2664,31 @@ func (siw *ServerInterfaceWrapper) PutProjectsTreProjectId(c *gin.Context) {
 	}
 
 	siw.Handler.PutProjectsTreProjectId(c, projectId)
+}
+
+// PostProjectsTreProjectIdAccessReviewSignoff operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsTreProjectIdAccessReviewSignoff(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsTreProjectIdAccessReviewSignoff(c, projectId)
 }
 
 // PatchProjectsTreProjectIdPending operation middleware
@@ -3864,9 +3932,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)
 	router.PUT(options.BaseURL+"/projects/tre/:projectId", wrapper.PutProjectsTreProjectId)
 	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
+	router.POST(options.BaseURL+"/projects/tre/:projectId/access-review-signoff", wrapper.PostProjectsTreProjectIdAccessReviewSignoff)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
+	router.POST(options.BaseURL+"/projects/dsh/:projectId/access-review-signoff", wrapper.PostProjectsDshProjectIdAccessReviewSignoff)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.DELETE(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.DeleteStudiesStudyIdAssetsAssetId)
