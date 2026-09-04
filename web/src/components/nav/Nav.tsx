@@ -1,10 +1,10 @@
 import { usePathname } from "next/navigation";
 import styles from "./Nav.module.css";
-import Button from "../ui/Button";
 import dynamic from "next/dynamic";
 import { ReactElement } from "react";
 import { client } from "@/openapi/client.gen";
 import { useAuth } from "@/hooks/useAuth";
+import { iconSizeSmall } from "../shared/uikitExports";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -18,9 +18,6 @@ const FolderIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const FileIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.File), {
   ssr: false,
 });
-const PaperclipIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Paperclip), {
-  ssr: false,
-});
 const UsersIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Users), {
   ssr: false,
 });
@@ -30,22 +27,39 @@ const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const MetricsIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Disc), {
   ssr: false,
 });
+const MenuSection = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Section), {
+  ssr: false,
+});
+const SecondaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.SecondaryItem), {
+  ssr: false,
+});
+const PrimaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.PrimaryItem), {
+  ssr: false,
+});
+const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
+  ssr: false,
+});
 
 type NavItemProps = {
   href: string;
   icon: ReactElement;
   title: string;
-  className?: string;
+  additionalPaths?: string[];
 };
 function NavItem(NavItemProps: NavItemProps) {
-  const { href, icon, title, className } = NavItemProps;
+  const { href, icon, title, additionalPaths = [] } = NavItemProps;
   const pathname = usePathname();
+  const paths = [href, ...additionalPaths];
+  const isActive = paths.some((path) =>
+    path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(`${path}/`)
+  );
+
   return (
-    <li className={pathname === href ? styles.active : className || ""}>
-      <Button href={href} variant="tertiary" icon={icon}>
+    <a href={href}>
+      <PrimaryMenuItem active={isActive} icon={icon}>
         {title}
-      </Button>
-    </li>
+      </PrimaryMenuItem>
+    </a>
   );
 }
 
@@ -67,33 +81,38 @@ export default function Nav() {
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
   const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff || isIGStaff;
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
-  const canSeeAssets = false; // todo https://github.com/ucl-arc-tre/portal/issues/7 // isIAO || isAdmin;
   const canSeeMetrics = isAdmin || isIGStaff;
 
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
-        <h2>Menu</h2>
-        <hr />
-        <ul className={styles.nav__list}>
+        <MenuSection>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
 
-          {canSeeStudies && <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />}
+          {canSeeStudies && (
+            <NavItem
+              href="/studies"
+              additionalPaths={["/assets", "/contracts"]}
+              icon={<FolderIcon />}
+              title="Studies"
+            />
+          )}
 
           {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
-
-          {canSeeAssets && <NavItem href="/assets" icon={<PaperclipIcon />} title="Assets" />}
 
           {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
 
           {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
-        </ul>
+        </MenuSection>
+        <MenuDivider />
+        <MenuSection>
+          <a href={logoutUrl}>
+            <SecondaryMenuItem icon={<LogoutIcon size={iconSizeSmall} />}>Log out</SecondaryMenuItem>
+          </a>
+        </MenuSection>
       </nav>
-      <Button variant="tertiary" className={styles.logout} href={logoutUrl}>
-        Log out <LogoutIcon />
-      </Button>
     </aside>
   );
 }
