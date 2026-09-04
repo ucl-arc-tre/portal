@@ -91,14 +91,15 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 	response := []openapi.Project{}
 	for _, project := range projects {
 		response = append(response, openapi.Project{
-			Id:              project.ID.String(),
-			Name:            project.Name,
-			StudyId:         project.StudyId.String(),
-			CreatorUsername: string(project.CreatorUsername),
-			CreatedAt:       openapi.FormatTime(project.CreatedAt),
-			UpdatedAt:       openapi.FormatTime(project.UpdatedAt),
-			EnvironmentName: openapi.EnvironmentName(project.EnvironmentName),
-			Status:          project.Status,
+			Id:               project.ID.String(),
+			Name:             project.Name,
+			StudyId:          project.StudyId.String(),
+			CreatorUsername:  string(project.CreatorUsername),
+			CreatedAt:        openapi.FormatTime(project.CreatedAt),
+			UpdatedAt:        openapi.FormatTime(project.UpdatedAt),
+			EnvironmentName:  openapi.EnvironmentName(project.EnvironmentName),
+			Status:           project.Status,
+			LastAccessReview: openapi.FormatOptionalTime(project.LastAccessReview),
 		})
 	}
 
@@ -197,6 +198,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		Assets:                     assets,
 		Members:                    extractProjectMembers(projectTRE),
 		AssetIds:                   nil,
+		LastAccessReview:           openapi.FormatOptionalTime(projectTRE.Project.LastAccessReview),
 	}
 	if projectTRE.DeployedVersionUpdatedAt != nil &&
 		projectTRE.RequestedVersionUpdatedAt != nil &&
@@ -273,6 +275,21 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 	}
 
 	return members
+}
+
+// Called by an IAO/IAA to confirm access rights for this project have been reviewed, resetting the review timestamp
+func (h *Handler) PostProjectsTreProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
+	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
+	if err != nil {
+		return
+	}
+
+	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID); err != nil {
+		setError(ctx, err, "Failed to record project access review signoff")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
 }
 
 func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId string) {

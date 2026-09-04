@@ -422,6 +422,10 @@ export type Study = StudyBase & {
      */
     last_signoff?: string | null;
     /**
+     * Whether this study has at least one project (determines whether signoff validity is annual or 90 days)
+     */
+    has_project: boolean;
+    /**
      * Unique 5-digit reference number for the study, assigned on creation
      */
     caseref: number;
@@ -676,6 +680,10 @@ export type Project = {
      */
     updated_at: string;
     environment_name: EnvironmentName;
+    /**
+     * Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+     */
+    last_access_review?: string | null;
 };
 
 /**
@@ -716,6 +724,10 @@ export type ProjectTre = ProjectTreBase & {
      * Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
      */
     is_pending_deployment_update: boolean;
+    /**
+     * Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
+     */
+    last_access_review?: string | null;
     /**
      * List of assets associated with this project
      */
@@ -2349,6 +2361,44 @@ export type PatchProjectsTreByProjectIdPendingErrors = {
 export type PatchProjectsTreByProjectIdPendingResponses = {
     /**
      * Project submitted successfully
+     */
+    200: unknown;
+};
+
+export type PostProjectsTreByProjectIdAccessReviewSignoffData = {
+    body?: never;
+    path: {
+        /**
+         * Project UUID
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}/access-review-signoff';
+};
+
+export type PostProjectsTreByProjectIdAccessReviewSignoffErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsTreByProjectIdAccessReviewSignoffResponses = {
+    /**
+     * Access review signoff recorded successfully
      */
     200: unknown;
 };

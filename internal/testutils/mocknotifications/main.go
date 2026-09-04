@@ -40,7 +40,7 @@ func (s *MockNotifications) NotifyIaaAssignment(ctx context.Context, iaa types.U
 	return nil
 }
 
-func (s *MockNotifications) NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error {
+func (s *MockNotifications) NotifyStudySignoffExpiry(ctx context.Context, study types.Study, hasProject bool) error {
 	panic("not-implemented")
 }
 
@@ -57,5 +57,9 @@ func (s *MockNotifications) NotifyUserNameChange(attrs types.UserAttributes, igO
 }
 
 func (s *MockNotifications) NotifyProjectDeployed(project types.Project, user types.User) error {
+	panic("not-implemented")
+}
+
+func (s *MockNotifications) NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error {
 	panic("not-implemented")
 }
