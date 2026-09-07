@@ -1,13 +1,13 @@
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import InfoTooltip from "../../ui/InfoTooltip";
-import { HelperText, Alert, AlertMessage, Label } from "../../shared/uikitExports";
+import { HelperText, Alert, AlertMessage, Label } from "../../ui/uikitExports";
 import Error from "../../ui/Error";
 import { ProjectFormData } from "@/types/projects";
 import { ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
-import UserLookup from "@/components/shared/UserLookup";
+import UserLookup from "@/components/ui/UserLookup";
 import Button from "@/components/ui/Button";
 import { defaultDesktopInstance, hpcDesktopInstances } from "./desktops";
 

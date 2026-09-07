@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { ReactElement } from "react";
 import { client } from "@/openapi/client.gen";
 import { useAuth } from "@/hooks/useAuth";
-import { iconSizeSmall } from "../shared/uikitExports";
+import { iconSizeSmall } from "../ui/uikitExports";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,

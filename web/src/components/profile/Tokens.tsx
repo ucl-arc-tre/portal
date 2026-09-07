@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { deleteTokensByEnvironmentByTokenId, postTokensByEnvironment, getTokensByEnvironment, Token } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./Tokens.module.css";
-import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
+import { Alert, AlertMessage, HelperText, Label } from "../ui/uikitExports";
 import Error from "../ui/Error";
 
 type Props = {

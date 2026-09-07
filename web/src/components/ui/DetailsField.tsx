@@ -1,5 +1,5 @@
 import styles from "./DetailsField.module.css";
-import { Label } from "@/components/shared/uikitExports";
+import { Label } from "@/components/ui/uikitExports";
 
 type Props = {
   label: string;

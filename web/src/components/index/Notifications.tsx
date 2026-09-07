@@ -13,7 +13,7 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Button from "@/components/ui/Button";
 import styles from "./Notifications.module.css";
 import Error from "../ui/Error";
-import { CheckIcon, IconButton, iconSizeMedium, XIcon } from "../shared/uikitExports";
+import { CheckIcon, IconButton, iconSizeMedium, XIcon } from "../ui/uikitExports";
 import router from "next/router";
 
 export default function Notifications() {

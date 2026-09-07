@@ -1,4 +1,4 @@
-import { AlertMessage } from "@/components/shared/uikitExports";
+import { AlertMessage } from "@/components/ui/uikitExports";
 import TextLink from "@/components/ui/TextLink";
 import styles from "./TrainingCertificateError.module.css";
 

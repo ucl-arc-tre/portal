@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import Button from "../ui/Button";
-import { AlertCircleIcon, iconSizeSmall } from "../shared/uikitExports";
+import Button from "./Button";
+import { AlertCircleIcon, iconSizeSmall } from "./uikitExports";
 import styles from "./TabCollection.module.css";
 
 type TabDefinition = {

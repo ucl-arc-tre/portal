@@ -5,7 +5,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage } from "@/components/ui/uikitExports";
 import PeopleSearch from "@/components/people/Search";
 
 export default function PeoplePage() {

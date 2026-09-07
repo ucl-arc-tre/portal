@@ -1,5 +1,5 @@
 import Error from "@/components/ui/Error";
-import { Alert, Checkbox, Label } from "@/components/shared/uikitExports";
+import { Alert, Checkbox, Label } from "@/components/ui/uikitExports";
 import styles from "./StudyAffirmation.module.css";
 import { useState } from "react";
 import { postStudiesByStudyIdSignoff } from "@/openapi";

@@ -1,4 +1,4 @@
-import { Label } from "@/components/shared/uikitExports";
+import { Label } from "@/components/ui/uikitExports";
 import Error from "@/components/ui/Error";
 import styles from "./RadioOptions.module.css";
 import { FieldPath, FieldError, FieldValues, UseFormRegister } from "react-hook-form";

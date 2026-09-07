@@ -1,9 +1,9 @@
 import { ReactElement, useEffect, useState } from "react";
 import { Alert, AlertMessage, CheckSquareIcon, HelperText, Input, Label } from "./uikitExports";
-import Button from "../ui/Button";
+import Button from "./Button";
 import { getUsersLookup, postUsersInvite, UserDataLookup } from "@/openapi";
 import styles from "./UserLookup.module.css";
-import Loading from "../ui/Loading";
+import Loading from "./Loading";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 const selectedUserCache = new Map<string, Promise<UserDataLookup | null>>();

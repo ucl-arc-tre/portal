@@ -3,7 +3,7 @@ import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { InfoIcon } from "../shared/uikitExports";
+import { InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";

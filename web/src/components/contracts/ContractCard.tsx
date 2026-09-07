@@ -3,6 +3,7 @@ import styles from "./ContractCard.module.css";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import ExpiryWarning from "../ui/ExpiryWarning";
 import Card from "../ui/Card";
+import LifecycleStatusBadge from "../ui/LifecycleStatusBadge";
 
 type ContractCardProps = {
   contract: Contract;
@@ -10,19 +11,6 @@ type ContractCardProps = {
 };
 
 export default function ContractCard({ studyId, contract }: ContractCardProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        if (contract.expiry_date && new Date(contract.expiry_date) < new Date()) {
-          return styles["status-expired"];
-        } else return styles["status-active"];
-
-      case "closed":
-        return styles["status-closed"];
-      default:
-        return styles["status-default"];
-    }
-  };
   const expiryUrgency =
     contract.status === "active" && contract.expiry_date
       ? calculateExpiryUrgency(new Date(contract.expiry_date))
@@ -32,13 +20,7 @@ export default function ContractCard({ studyId, contract }: ContractCardProps) {
     <Card
       key={contract.id}
       title={contract.title}
-      headerContent={
-        <div className={styles["status-indicator"]}>
-          <span className={`${styles.status} ${getStatusColor(contract.status)}`}>
-            {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
-          </span>
-        </div>
-      }
+      headerContent={<LifecycleStatusBadge status={contract.status} />}
       manageUrl={`/contracts/manage?studyId=${studyId}&contractId=${contract.id}`}
       isWarning={!!expiryUrgency}
       footerContent={

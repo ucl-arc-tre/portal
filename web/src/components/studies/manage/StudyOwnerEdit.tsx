@@ -1,4 +1,4 @@
-import { Alert, AlertMessage, Input, Label } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, Input, Label } from "@/components/ui/uikitExports";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import Loading from "@/components/ui/Loading";

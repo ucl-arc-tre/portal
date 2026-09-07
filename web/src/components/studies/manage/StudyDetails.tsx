@@ -6,7 +6,7 @@ import { formatDate } from "../../shared/exports";
 import EditIcon from "@/components/ui/EditIcon";
 import { RiskInfo } from "@/lib/riskScoreCalculations";
 import { useAuth } from "@/hooks/useAuth";
-import RiskLevelBadge from "@/components/shared/RiskLevelBadge";
+import RiskLevelBadge from "@/components/ui/RiskLevelBadge";
 
 type StudyDetailsProps = {
   study: Study;
