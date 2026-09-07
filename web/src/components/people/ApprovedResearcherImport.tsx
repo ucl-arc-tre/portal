@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import styles from "./ApprovedResearcherImport.module.css";
 import Loading from "../ui/Loading";
 import Dialog from "../ui/Dialog";
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import { Alert, AlertMessage } from "../ui/uikitExports";
 
 export default function ApprovedResearcherImport() {
   const inputRef = useRef<HTMLInputElement>(null);

@@ -5,7 +5,7 @@ import ContractCard from "./ContractCard";
 import { Contract, Study } from "@/openapi";
 import styles from "./ContractManagement.module.css";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, InfoIcon } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, InfoIcon } from "@/components/ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { ContractDefinition } from "../shared/entityDefinitions";
 

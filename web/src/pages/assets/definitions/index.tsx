@@ -1,6 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
-import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
+import { storageLocationDefinitions } from "@/components/ui/storageDefinitions";
 
 import styles from "./definitions.module.css";
 import Callout from "@/components/ui/Callout";

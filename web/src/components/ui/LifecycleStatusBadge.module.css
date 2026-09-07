@@ -1,0 +1,14 @@
+.lifecycle-badge {
+  justify-self: start;
+}
+
+.status-active {
+  background: var(--green-badge-bg);
+  color: var(--green-badge-text);
+}
+
+.status-destroyed,
+.status-closed {
+  background: var(--gray-badge-bg);
+  color: var(--gray-badge-text);
+}

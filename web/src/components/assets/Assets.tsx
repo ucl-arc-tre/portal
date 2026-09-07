@@ -8,7 +8,7 @@ import Button from "@/components/ui/Button";
 import AssetCard from "./AssetCard";
 
 import styles from "./Assets.module.css";
-import { InfoIcon } from "../shared/uikitExports";
+import { InfoIcon } from "../ui/uikitExports";
 import Box from "../ui/Box";
 import ErrorMessage from "../ui/Error";
 import { AssetDefinition } from "../shared/entityDefinitions";

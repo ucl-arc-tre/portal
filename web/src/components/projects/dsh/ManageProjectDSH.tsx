@@ -10,7 +10,7 @@ import Error from "@/components/ui/Error";
 import DetailsField from "@/components/ui/DetailsField";
 import { ProjectDsh } from "@/openapi";
 import ProjectMember from "../ProjectMember";
-import TabCollection from "@/components/shared/TabCollection";
+import TabCollection from "@/components/ui/TabCollection";
 
 type Props = {
   project: ProjectDsh;

@@ -1,5 +1,5 @@
 import Button from "./Button";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText } from "./uikitExports";
 import styles from "./Pagination.module.css";
 
 type Props = {

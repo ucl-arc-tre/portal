@@ -1,6 +1,6 @@
 import { Asset } from "@/openapi";
 import styles from "./AssetCard.module.css";
-import { AlertCircleIcon, iconSizeSmall } from "../shared/uikitExports";
+import { AlertCircleIcon, iconSizeSmall } from "../ui/uikitExports";
 import { useEffect, useState } from "react";
 import { calculateExpiryUrgency, formatDate } from "../shared/exports";
 import { checkAllRequiredAssetContractsLinked } from "../studies/manage/lib/assetContractLinks";
@@ -9,7 +9,7 @@ import Card from "../ui/Card";
 import { calculateAssetRiskScore } from "../../lib/riskScoreCalculations";
 import Badge from "../ui/Badge";
 import Error from "../ui/Error";
-import RiskLevelBadge from "../shared/RiskLevelBadge";
+import RiskLevelBadge from "../ui/RiskLevelBadge";
 
 type AssetCardProps = {
   asset: Asset;

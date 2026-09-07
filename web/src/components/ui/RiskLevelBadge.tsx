@@ -1,6 +1,6 @@
 import styles from "./RiskLevelBadge.module.css";
 import { getRiskLevel, riskScoreMax } from "../../lib/riskScoreCalculations";
-import Badge from "../ui/Badge";
+import Badge from "./Badge";
 
 export default function RiskLevelBadge({ riskScore, isIGStaff }: { riskScore: number; isIGStaff: boolean }) {
   const riskLevel = getRiskLevel(riskScore);

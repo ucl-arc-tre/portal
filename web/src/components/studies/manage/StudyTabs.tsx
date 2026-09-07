@@ -1,6 +1,6 @@
 import { Asset, Contract } from "@/openapi";
 import { calculateExpiryUrgency } from "../../shared/exports";
-import TabCollection from "@/components/shared/TabCollection";
+import TabCollection from "@/components/ui/TabCollection";
 
 type StudyTabsProps = {
   assets: Asset[];

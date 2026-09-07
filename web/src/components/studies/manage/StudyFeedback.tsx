@@ -1,5 +1,5 @@
 import { StudyApprovalStatus, StudyFeedbackEntry } from "@/openapi";
-import { Alert } from "../../shared/uikitExports";
+import { Alert } from "../../ui/uikitExports";
 import styles from "./StudyFeedback.module.css";
 
 type StudyFeedbackProps = {

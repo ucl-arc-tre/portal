@@ -4,10 +4,10 @@ import { useForm, useWatch } from "react-hook-form";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 import TextLink from "../ui/TextLink";
-import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
+import { storageLocationDefinitions } from "@/components/ui/storageDefinitions";
 
 import styles from "./AssetCreationForm.module.css";
-import { Alert, AlertMessage, HelperText, Label } from "../shared/uikitExports";
+import { Alert, AlertMessage, HelperText, Label } from "../ui/uikitExports";
 import { Asset } from "@/openapi";
 import InfoTooltip from "../ui/InfoTooltip";
 import Error from "../ui/Error";

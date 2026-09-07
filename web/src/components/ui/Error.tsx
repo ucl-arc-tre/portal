@@ -1,4 +1,4 @@
-import { Alert, AlertMessage } from "../shared/uikitExports";
+import { Alert, AlertMessage } from "./uikitExports";
 
 type Props = {
   message?: string;

@@ -23,7 +23,7 @@ import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projec
 import AssetCard from "@/components/assets/AssetCard";
 import DetailsField from "@/components/ui/DetailsField";
 import ProjectMember from "../ProjectMember";
-import TabCollection from "@/components/shared/TabCollection";
+import TabCollection from "@/components/ui/TabCollection";
 
 type Props = {
   project: ProjectTre;

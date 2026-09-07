@@ -1,4 +1,4 @@
-import { AlertCircleIcon, iconSizeSmall } from "../shared/uikitExports";
+import { AlertCircleIcon, iconSizeSmall } from "./uikitExports";
 import styles from "./ExpiryWarning.module.css";
 type ExpiryWarningProps = {
   expiryUrgency: ExpiryUrgency;

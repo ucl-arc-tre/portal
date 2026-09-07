@@ -5,7 +5,7 @@ import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Button from "../../ui/Button";
 
 import styles from "./ChosenName.module.css";
-import { Alert, AlertMessage, Input, Label } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, Input, Label } from "@/components/ui/uikitExports";
 
 type ProfileChosenNameProps = {
   chosenName: string;

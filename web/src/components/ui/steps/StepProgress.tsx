@@ -1,4 +1,4 @@
-import { CheckIcon, iconSizeMedium } from "@/components/shared/uikitExports";
+import { CheckIcon, iconSizeMedium } from "@/components/ui/uikitExports";
 import Button from "../Button";
 import styles from "./StepProgress.module.css";
 import dynamic from "next/dynamic";
