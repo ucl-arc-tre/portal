@@ -1462,9 +1462,6 @@ type Study struct {
 	// Description Description of the study
 	Description *string `json:"description,omitempty"`
 
-	// HasProject Whether this study has at least one project (determines whether signoff validity is annual or 90 days)
-	HasProject bool `json:"has_project"`
-
 	// Id Unique identifier for the study
 	Id string `json:"id"`
 

@@ -6,6 +6,7 @@ services:
     environment:
       PORT: "8080"
       IS_TESTING: true
+      PROJECT_ACCESS_REVIEW_ENABLED: true
     volumes:
       - ./config.yaml:/etc/portal/config.yaml:ro
     depends_on:

@@ -153,7 +153,9 @@ export default function ManageProjectTRE(props: Props) {
     setDeleteError(null);
   };
 
+  const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
   const showAccessReviewWarning =
+    accessReviewEnabled &&
     canEdit &&
     project.status === "deployed" &&
     (project.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));

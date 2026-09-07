@@ -422,10 +422,6 @@ export type Study = StudyBase & {
      */
     last_signoff?: string | null;
     /**
-     * Whether this study has at least one project (determines whether signoff validity is annual or 90 days)
-     */
-    has_project: boolean;
-    /**
      * Unique 5-digit reference number for the study, assigned on creation
      */
     caseref: number;

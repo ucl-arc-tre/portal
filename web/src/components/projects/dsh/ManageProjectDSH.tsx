@@ -23,9 +23,11 @@ export default function ManageProjectDSH(props: Props) {
   const { project, fetchData } = props;
   const { authInProgress, isAuthed, isAdmin, userData } = useAuth();
 
+  const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
   const canReviewAccess =
     isAdmin || ((userData?.roles as string[] | undefined)?.includes(`project_${project?.id}_owner`) ?? false);
   const showAccessReviewWarning =
+    accessReviewEnabled &&
     canReviewAccess &&
     project?.status === "active" &&
     (project?.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));

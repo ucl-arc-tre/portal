@@ -35,8 +35,7 @@ const (
 
 	ServerShutdownGraceDuration = 10 * time.Second
 
-	StudySignoffValidityDefault = 3 * Month
-	StudySignoffValidityAnnual  = 365 * Day
+	StudySignoffValidity = 365 * Day
 
 	ProjectAccessReviewValidity = 3 * Month
 
@@ -67,6 +66,11 @@ func IsDevDeploy() bool {
 
 func IsTesting() bool {
 	return os.Getenv("IS_TESTING") == "true"
+}
+
+// reports whether the project access review feature (reminder emails/notifications) is enabled. Disabled by default.
+func ProjectAccessReviewEnabled() bool {
+	return os.Getenv("PROJECT_ACCESS_REVIEW_ENABLED") == "true"
 }
 
 func DBDataSourceName() string {
@@ -236,27 +240,19 @@ func ShouldNotifyTrainingExpiry(trainingRecord types.UserTrainingRecord) bool {
 	return shouldNotifyExpiry(daysUntilExpiry)
 }
 
-// StudySignoffValidity is annual once a study has a project, otherwise it defaults to 90 days
-func StudySignoffValidity(hasProject bool) time.Duration {
-	if hasProject {
-		return StudySignoffValidityAnnual
-	}
-	return StudySignoffValidityDefault
-}
-
-func DaysUntilStudySignoffExpiry(study *types.Study, hasProject bool) Days {
+func DaysUntilStudySignoffExpiry(study *types.Study) Days {
 	if study == nil || study.LastSignoff == nil {
 		log.Warn().Msg("nil study or lastSignoff - no days until expiry")
 		return 0
 	}
-	return daysUntil(study.LastSignoff.Add(StudySignoffValidity(hasProject)))
+	return daysUntil(study.LastSignoff.Add(StudySignoffValidity))
 }
 
-func ShouldNotifyStudySignoffExpiry(study *types.Study, hasProject bool) bool {
+func ShouldNotifyStudySignoffExpiry(study *types.Study) bool {
 	if study == nil || study.LastSignoff == nil {
 		return false
 	}
-	daysUntilExpiry := DaysUntilStudySignoffExpiry(study, hasProject)
+	daysUntilExpiry := DaysUntilStudySignoffExpiry(study)
 	return shouldNotifyExpiry(daysUntilExpiry)
 }
 

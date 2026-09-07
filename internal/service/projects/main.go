@@ -298,30 +298,6 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	return nil
 }
 
-// returns whether a study has any (non-deleted) projects
-func (s *Service) StudyHasProjects(studyID uuid.UUID) (bool, error) {
-	var count int64
-	err := s.db.Model(&types.Project{}).Where("study_id = ?", studyID).Count(&count).Error
-	return count > 0, types.NewErrFromGorm(err, "failed to check whether study has projects")
-}
-
-// returns a set of study IDs (out of those given) that have at least one (non-deleted) project.
-func (s *Service) StudyIDsWithProjects(studyIDs []uuid.UUID) (map[uuid.UUID]bool, error) {
-	result := map[uuid.UUID]bool{}
-	if len(studyIDs) == 0 {
-		return result, nil
-	}
-	var matched []uuid.UUID
-	err := s.db.Model(&types.Project{}).Distinct().Where("study_id IN ?", studyIDs).Pluck("study_id", &matched).Error
-	if err != nil {
-		return result, types.NewErrFromGorm(err, "failed to check which studies have projects")
-	}
-	for _, studyID := range matched {
-		result[studyID] = true
-	}
-	return result, nil
-}
-
 func (s *Service) RecordProjectAccessReviewSignoff(id uuid.UUID) error {
 	now := time.Now()
 	db := s.db.Model(&types.Project{}).Where("id = ?", id).Update("last_access_review", now)

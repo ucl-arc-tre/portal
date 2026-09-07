@@ -3,7 +3,6 @@ package tasks
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -133,23 +132,13 @@ func (m *Manager) checkStudySignoffExpiry() error {
 		return types.NewErrFromGorm(result.Error, "failed to get studies")
 	}
 
-	studyIDsWithProjects := map[uuid.UUID]bool{}
-	var projectStudyIDs []uuid.UUID
-	if err := m.db.Model(&types.Project{}).Distinct().Pluck("study_id", &projectStudyIDs).Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to get study ids with projects")
-	}
-	for _, studyID := range projectStudyIDs {
-		studyIDsWithProjects[studyID] = true
-	}
-
 	for _, study := range studies {
-		hasProject := studyIDsWithProjects[study.ID]
-		if !config.ShouldNotifyStudySignoffExpiry(&study, hasProject) {
+		if !config.ShouldNotifyStudySignoffExpiry(&study) {
 			continue
 		}
 
 		log.Debug().Str("study", study.Title).Any("owner", study.Owner.Username).Msg("Notifying study signoff")
-		err := m.notifications.NotifyStudySignoffExpiry(ctx, study, hasProject)
+		err := m.notifications.NotifyStudySignoffExpiry(ctx, study)
 		if err != nil {
 			return err
 		}

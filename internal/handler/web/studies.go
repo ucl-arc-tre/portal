@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -94,19 +93,9 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 		return
 	}
 
-	studyIDs := make([]uuid.UUID, len(studies))
-	for i, study := range studies {
-		studyIDs[i] = study.ID
-	}
-	studyIDsWithProjects, err := h.projects.StudyIDsWithProjects(studyIDs)
-	if err != nil {
-		setError(ctx, err, "Failed to check which studies have projects")
-		return
-	}
-
 	response := []openapi.Study{}
 	for _, study := range studies {
-		response = append(response, studyToOpenApiStudy(study, studyIDsWithProjects[study.ID]))
+		response = append(response, studyToOpenApiStudy(study))
 	}
 
 	ctx.JSON(http.StatusOK, response)
@@ -128,13 +117,7 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	hasProject, err := h.projects.StudyHasProjects(studyUUID)
-	if err != nil {
-		setError(ctx, err, "Failed to check whether study has projects")
-		return
-	}
-
-	ctx.JSON(http.StatusOK, studyToOpenApiStudy(studies[0], hasProject))
+	ctx.JSON(http.StatusOK, studyToOpenApiStudy(studies[0]))
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
@@ -335,8 +318,7 @@ func (h *Handler) PostStudiesAdminImport(ctx *gin.Context) {
 		return
 	}
 
-	// a newly imported study wont have any projects yet, so just pass false
-	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study, false))
+	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study))
 }
 
 func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId string) {
@@ -417,7 +399,7 @@ func (h *Handler) PostStudiesAdminStudyIdOwnerApprove(ctx *gin.Context, studyId 
 
 // Helper functions
 
-func studyToOpenApiStudy(data types.Study, hasProject bool) openapi.Study {
+func studyToOpenApiStudy(data types.Study) openapi.Study {
 	study := openapi.Study{
 		Id:                               data.ID.String(),
 		Title:                            data.Title,
@@ -449,7 +431,6 @@ func studyToOpenApiStudy(data types.Study, hasProject bool) openapi.Study {
 		CreatedAt:                        openapi.FormatTime(data.CreatedAt),
 		UpdatedAt:                        openapi.FormatTime(data.UpdatedAt),
 		LastSignoff:                      openapi.FormatOptionalTime(data.LastSignoff),
-		HasProject:                       hasProject,
 		Caseref:                          data.Caseref,
 	}
 	latestOwnerChange := data.LatestOwnerChange()

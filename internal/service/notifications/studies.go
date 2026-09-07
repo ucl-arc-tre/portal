@@ -123,8 +123,8 @@ func (s *Service) NotifyIaaAssignment(ctx context.Context, iaa types.User, study
 	return s.create(notification, iaa)
 }
 
-func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Study, hasProject bool) error {
-	days := config.DaysUntilStudySignoffExpiry(&study, hasProject)
+func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error {
+	days := config.DaysUntilStudySignoffExpiry(&study)
 
 	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
 	content := "You are required to reaffirm details about your Study " + href + ". Your current affirmation "
@@ -148,9 +148,9 @@ func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Stud
 		Kind:  new(types.NotificationKindStdyAffirmation),
 	}
 	if study.LastSignoff == nil {
-		notification.ExpiresAt = new(study.CreatedAt.Add(config.StudySignoffValidity(hasProject)))
+		notification.ExpiresAt = new(study.CreatedAt.Add(config.StudySignoffValidity))
 	} else {
-		notification.ExpiresAt = new(study.LastSignoff.Add(config.StudySignoffValidity(hasProject)))
+		notification.ExpiresAt = new(study.LastSignoff.Add(config.StudySignoffValidity))
 	}
 	return s.create(notification, study.Owner)
 }

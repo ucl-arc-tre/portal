@@ -2101,7 +2101,6 @@ components:
             - updated_at
             - approval_status
             - caseref
-            - has_project
           properties:
             id:
               type: string
@@ -2118,9 +2117,6 @@ components:
               type: string
               nullable: true
               description: Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
-            has_project:
-              type: boolean
-              description: Whether this study has at least one project (determines whether signoff validity is annual or 90 days)
             caseref:
               type: integer
               description: Unique 5-digit reference number for the study, assigned on creation

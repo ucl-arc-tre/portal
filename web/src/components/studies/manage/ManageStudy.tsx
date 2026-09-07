@@ -63,7 +63,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     isStudyOwner &&
     study.approval_status === "Approved" &&
     study.last_signoff != null &&
-    studySignoffWarningRequired(study.last_signoff, study.has_project);
+    studySignoffWarningRequired(study.last_signoff);
 
   const fetchStudyContents = async () => {
     setError(null);

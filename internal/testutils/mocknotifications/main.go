@@ -40,7 +40,7 @@ func (s *MockNotifications) NotifyIaaAssignment(ctx context.Context, iaa types.U
 	return nil
 }
 
-func (s *MockNotifications) NotifyStudySignoffExpiry(ctx context.Context, study types.Study, hasProject bool) error {
+func (s *MockNotifications) NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error {
 	panic("not-implemented")
 }
 

@@ -50,9 +50,8 @@ function warningRequired(lastCheckedDate: string, validityDays: number): boolean
   return daysRemaining <= WARNING_THRESHOLD_DAYS;
 }
 
-// study signoff is annual once a study has a project, otherwise it defaults to 90 days
-export function studySignoffWarningRequired(lastSignoff: string, hasProject: boolean): boolean {
-  const validityDays = hasProject ? 365 : 90;
+export function studySignoffWarningRequired(lastSignoff: string): boolean {
+  const validityDays = 365;
   return warningRequired(lastSignoff, validityDays);
 }
 
