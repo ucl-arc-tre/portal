@@ -2,7 +2,7 @@ import Link from "next/link";
 import styles from "./Feedback.module.css";
 import { useState } from "react";
 import Dialog from "./Dialog";
-import { Alert, AlertMessage, Label, Textarea } from "../shared/uikitExports";
+import { Alert, AlertMessage, Label, Textarea } from "./uikitExports";
 import Error from "./Error";
 import Button from "./Button";
 import { postFeedback } from "@/openapi";

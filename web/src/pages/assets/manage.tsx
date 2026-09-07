@@ -24,7 +24,7 @@ import TextLink from "@/components/ui/TextLink";
 import styles from "./ManageAsset.module.css";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContractCard from "@/components/contracts/ContractCard";
-import { HelperText, Label } from "@/components/shared/uikitExports";
+import { HelperText, Label } from "@/components/ui/uikitExports";
 import ApprovedResearcherFallback from "@/components/ui/ApprovedResearcherFallback";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import ErrorMessage from "@/components/ui/Error";
@@ -32,7 +32,7 @@ import { calculateExpiryUrgency, formatDate } from "@/components/shared/exports"
 import ExpiryWarning from "@/components/ui/ExpiryWarning";
 import AssetCreationForm from "@/components/assets/AssetCreationForm";
 import Box from "@/components/ui/Box";
-import RiskLevelBadge from "@/components/shared/RiskLevelBadge";
+import RiskLevelBadge from "@/components/ui/RiskLevelBadge";
 import { calculateAssetRiskScore } from "@/lib/riskScoreCalculations";
 import LifecycleStatusBadge from "@/components/ui/LifecycleStatusBadge";
 

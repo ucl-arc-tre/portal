@@ -1,5 +1,5 @@
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form";
-import { HelperText, Label } from "../shared/uikitExports";
+import { HelperText, Label } from "../ui/uikitExports";
 import Link from "next/link";
 import Error from "../ui/Error";
 import Button from "../ui/Button";

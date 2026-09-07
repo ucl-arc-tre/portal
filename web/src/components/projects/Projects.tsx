@@ -11,7 +11,7 @@ import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
 import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
-import { InfoIcon } from "../shared/uikitExports";
+import { InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Projects() {

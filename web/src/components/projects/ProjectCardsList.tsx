@@ -4,7 +4,7 @@ import StatusBadge from "../ui/StatusBadge";
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
 import TextLink from "../ui/TextLink";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText } from "../ui/uikitExports";
 
 type Props = {
   projects: Project[];

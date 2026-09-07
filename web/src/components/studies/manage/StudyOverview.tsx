@@ -2,7 +2,7 @@ import { patchStudiesByStudyIdPending, Study, Asset, Contract, Project, StudyFee
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import Error from "../../ui/Error";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import { Alert, AlertMessage } from "../../ui/uikitExports";
 import { useState } from "react";
 import styles from "./StudyDetails.module.css";
 import Button from "../../ui/Button";

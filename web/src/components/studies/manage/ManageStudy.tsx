@@ -26,7 +26,7 @@ import Error from "../../ui/Error";
 import Loading from "../../ui/Loading";
 import { studySignoffWarningRequired } from "../../shared/exports";
 import StudyAffirmation from "./StudyAffirmation";
-import { Alert, AlertMessage } from "../../shared/uikitExports";
+import { Alert, AlertMessage } from "../../ui/uikitExports";
 
 type ManageStudyProps = {
   study: Study;

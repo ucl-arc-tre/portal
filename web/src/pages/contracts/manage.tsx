@@ -25,7 +25,7 @@ import ContractObjectCard from "@/components/contracts/ContractObjectCard";
 import Error from "@/components/ui/Error";
 import { formatDate } from "@/components/shared/exports";
 import Box from "@/components/ui/Box";
-import { Label } from "@/components/shared/uikitExports";
+import { Label } from "@/components/ui/uikitExports";
 import LifecycleStatusBadge from "@/components/ui/LifecycleStatusBadge";
 
 export default function ManageContractPage() {

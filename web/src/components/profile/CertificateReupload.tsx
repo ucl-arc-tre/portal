@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ProfileTraining } from "@/openapi";
 import TrainingCertificate from "./approved-researcher-components/TrainingCertificate";
 import Button from "../ui/Button";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage } from "@/components/ui/uikitExports";
 import styles from "./CertificateReupload.module.css";
 import { formatDate } from "../shared/exports";
 

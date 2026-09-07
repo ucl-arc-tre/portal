@@ -1,4 +1,4 @@
-import { storageLocationDefinitions } from "@/components/shared/storageDefinitions";
+import { storageLocationDefinitions } from "@/components/ui/storageDefinitions";
 import type { Asset } from "@/openapi";
 
 type RiskLevel = "manageable" | "uncomfortable" | "vulnerable" | "critical";

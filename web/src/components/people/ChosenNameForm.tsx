@@ -5,7 +5,7 @@ import { putUsersByUserIdAttributes } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ChosenNameForm.module.css";
 import Error from "@/components/ui/Error";
-import { HelperText, Label } from "../shared/uikitExports";
+import { HelperText, Label } from "../ui/uikitExports";
 
 type Props = {
   userId: string;
