@@ -1,6 +1,6 @@
 import Button from "@/components/ui/Button";
 import { useState } from "react";
-import { Input, Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Input, Alert, AlertMessage, Label } from "../ui/uikitExports";
 import styles from "./ExternalInvite.module.css";
 import { postUsersInvite } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";

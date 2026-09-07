@@ -10,9 +10,9 @@ import Error from "@/components/ui/Error";
 import DetailsField from "@/components/ui/DetailsField";
 import { ProjectDsh } from "@/openapi";
 import ProjectMember from "../ProjectMember";
-import TabCollection from "@/components/shared/TabCollection";
-import ProjectAccessReview from "@/components/projects/ProjectAccessReview";
+import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
+import ProjectAccessReview from "../ProjectAccessReview";
 
 type Props = {
   project: ProjectDsh;

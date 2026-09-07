@@ -4,7 +4,7 @@ import styles from "./ChosenNameChangeModal.module.css";
 import { useState } from "react";
 import { postProfile } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
-import { Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Alert, AlertMessage, Label } from "../ui/uikitExports";
 import Error from "../ui/Error";
 
 type Props = {

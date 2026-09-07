@@ -2,7 +2,7 @@ import MetaHead from "@/components/meta/Head";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage } from "@/components/ui/uikitExports";
 import Metrics from "@/components/metrics/Metrics";
 
 export default function PeoplePage() {

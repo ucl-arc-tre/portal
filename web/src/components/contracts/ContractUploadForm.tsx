@@ -15,7 +15,7 @@ import {
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import styles from "./ContractUploadForm.module.css";
 import Error from "../ui/Error";
-import { HelperText, Label } from "../shared/uikitExports";
+import { HelperText, Label } from "../ui/uikitExports";
 
 type ContractFormData = {
   title: string;

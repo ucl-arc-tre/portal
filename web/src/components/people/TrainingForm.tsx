@@ -7,7 +7,7 @@ import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Dialog from "../ui/Dialog";
 import { TrainingKindOptions } from "../shared/exports";
 import InfoTooltip from "../ui/InfoTooltip";
-import { Alert, AlertMessage, Label } from "../shared/uikitExports";
+import { Alert, AlertMessage, Label } from "../ui/uikitExports";
 
 type TrainingFormProps = {
   userId: string;

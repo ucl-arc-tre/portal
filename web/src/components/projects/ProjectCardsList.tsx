@@ -5,7 +5,7 @@ import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
 import TextLink from "../ui/TextLink";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText } from "../ui/uikitExports";
 import { projectAccessReviewWarningRequired } from "../shared/exports";
 
 type Props = {

@@ -7,7 +7,7 @@ import Error from "../ui/Error";
 import UsersList from "./UsersList";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Search from "../ui/Search";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText } from "../ui/uikitExports";
 import styles from "./Search.module.css";
 
 export default function PeopleSearch() {

@@ -1,5 +1,5 @@
 import Box from "../../ui/Box";
-import { Alert, AlertMessage, Label, Textarea } from "../../shared/uikitExports";
+import { Alert, AlertMessage, Label, Textarea } from "../../ui/uikitExports";
 import Button from "../../ui/Button";
 import { useState } from "react";
 import {

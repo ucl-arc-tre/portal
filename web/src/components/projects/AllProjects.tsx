@@ -3,7 +3,7 @@ import { GetProjectsData, Project, getProjects } from "@/openapi";
 import ProjectCardsList from "./ProjectCardsList";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Loading from "../ui/Loading";
-import { HelperText } from "../shared/uikitExports";
+import { HelperText } from "../ui/uikitExports";
 import Error from "../ui/Error";
 import Search from "../ui/Search";
 import Pagination from "../ui/Pagination";

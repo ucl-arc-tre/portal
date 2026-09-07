@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "@/components/ui/Button";
 import styles from "./AgreementForm.module.css";
-import { Alert, AlertMessage } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage } from "@/components/ui/uikitExports";
 
 const confirmationTextDefault = "By clicking agree, I confirm that I have read and understood the agreement.";
 

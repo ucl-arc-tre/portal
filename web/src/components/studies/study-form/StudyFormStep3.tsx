@@ -1,5 +1,5 @@
 import { Control, Controller, FieldErrors, useWatch } from "react-hook-form";
-import { Alert, AlertMessage, HelperText, Label } from "../../shared/uikitExports";
+import { Alert, AlertMessage, HelperText, Label } from "../../ui/uikitExports";
 import Error from "../../ui/Error";
 import sharedStyles from "./StudyFormShared.module.css";
 import styles from "./StudyFormStep3.module.css";

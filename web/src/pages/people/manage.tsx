@@ -16,7 +16,7 @@ import styles from "./ManageUser.module.css";
 import ChosenNameForm from "@/components/people/ChosenNameForm";
 import EditIcon from "@/components/ui/EditIcon";
 import { formatTime, getHumanReadableTrainingKind } from "@/components/shared/exports";
-import { CheckIcon, Label, XIcon } from "@/components/shared/uikitExports";
+import { CheckIcon, Label, XIcon } from "@/components/ui/uikitExports";
 import TrainingForm from "@/components/people/TrainingForm";
 
 export default function ManageUserPage() {

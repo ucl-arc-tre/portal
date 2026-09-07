@@ -8,7 +8,7 @@ import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, Input } from "@/components/shared/uikitExports";
+import { Alert, AlertMessage, Input } from "@/components/ui/uikitExports";
 
 interface SubmitEvent extends React.SubmitEvent<HTMLFormElement> {
   target: HTMLFormElement & {

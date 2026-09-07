@@ -1,8 +1,8 @@
 import { Control, Controller, FieldErrors, UseFormRegister, useFieldArray } from "react-hook-form";
-import { Input, HelperText, Textarea, Label } from "../../shared/uikitExports";
+import { Input, HelperText, Textarea, Label } from "../../ui/uikitExports";
 import Error from "../../ui/Error";
 import sharedStyles from "./StudyFormShared.module.css";
-import UserLookup from "@/components/shared/UserLookup";
+import UserLookup from "@/components/ui/UserLookup";
 
 type StudyFormStep1Props = {
   control: Control<StudyFormData>;
