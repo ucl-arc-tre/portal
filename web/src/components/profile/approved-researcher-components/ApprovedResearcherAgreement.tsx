@@ -11,10 +11,11 @@ import ErrorMessage from "@/components/ui/Error";
 type ApprovedResearcherAgreementProps = {
   setAgreementCompleted: (completed: boolean) => void;
   agreementCompleted: boolean;
+  onAgreementAccepted: () => void;
 };
 
 export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgreementProps) {
-  const { setAgreementCompleted, agreementCompleted } = props;
+  const { setAgreementCompleted, agreementCompleted, onAgreementAccepted } = props;
 
   const { authInProgress, isAuthed } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
@@ -78,6 +79,7 @@ export default function ApprovedResearcherAgreement(props: ApprovedResearcherAgr
       const errorMsg = extractErrorMessage(response);
       throw new Error(errorMsg);
     }
+    onAgreementAccepted();
   };
 
   return (
