@@ -11,7 +11,7 @@ import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
 import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
-import { InfoIcon } from "../ui/uikitExports";
+import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Projects() {
@@ -125,7 +125,7 @@ export default function Projects() {
         <>
           <div className={styles.header}>
             <h2>
-              {canSeeAllProjects ? "All Projects" : "All of Your Projects"}{" "}
+              {canSeeAllProjects ? "All Projects" : "Your Projects"}{" "}
               <Button
                 onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
                 variant="tertiary"
@@ -143,6 +143,13 @@ export default function Projects() {
             )}
           </div>
           <div className={styles.line}></div>
+          <HelperText>
+            This page contains all the Projects you have access to. You may have access by owning or being added to a
+            Project as a member.{" "}
+            {isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff
+              ? "As an ops user, you have additional privileges."
+              : ""}
+          </HelperText>
         </>
       )}
 
