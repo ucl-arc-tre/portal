@@ -437,7 +437,15 @@ func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error
 	if result.RowsAffected == 0 {
 		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
 	}
-	return types.NewErrFromGorm(result.Error, "failed to approve project")
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to approve project")
+	}
+
+	// initialise the access review timestamp
+	if err := s.db.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
+	}
+	return nil
 }
 
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {
