@@ -13,6 +13,7 @@ import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
 import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/router";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -24,6 +25,7 @@ export default function Projects() {
   const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [refreshToken, refreshAllProjects] = useReducer((x) => x + 1, 0);
+  const router = useRouter();
 
   const { userData, isAdmin, isTreOpsStaff, isDshOpsStaff, isIGStaff, isApprovedStaffResearcher } = useAuth();
 
@@ -68,6 +70,12 @@ export default function Projects() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (router.isReady) {
+      setCreateProjectFormOpen(router.query.create === "true");
+    }
+  }, [router.isReady, router.query.create]);
 
   const handleCreateProjectClick = () => {
     if (!isApprovedStaffResearcher) {
