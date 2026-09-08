@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"net/url"
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -22,7 +23,7 @@ func (s *Service) NotifyProjectDeployed(project types.Project, user types.User) 
 func (s *Service) NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error {
 	days := config.DaysUntilProjectAccessReviewExpiry(&project)
 
-	path := fmt.Sprintf("/projects/manage?projectId=%s&environment=%s", project.ID.String(), project.Environment.Name)
+	path := fmt.Sprintf("/projects/manage?projectId=%s&environment=%s", project.ID.String(), url.QueryEscape(string(project.Environment.Name)))
 	href := htmlHref(fmt.Sprintf("'%s'", project.Name), path)
 	content := "A review of people access and role assignments is due for Project " + href + ". Your current review "
 	if days < 0 {
