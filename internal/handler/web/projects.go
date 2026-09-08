@@ -277,19 +277,8 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 	return members
 }
 
-// Called by an IAO/IAA to confirm access rights for this project have been reviewed, resetting the review timestamp
 func (h *Handler) PostProjectsTreProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
-
-	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID); err != nil {
-		setError(ctx, err, "Failed to record project access review signoff")
-		return
-	}
-
-	ctx.Status(http.StatusOK)
+	h.postProjectsProjectIdAccessReviewSignoff(ctx, projectId)
 }
 
 func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId string) {
@@ -383,8 +372,12 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-// Called by an IAO/IAA to confirm access rights for this project have been reviewed, resetting the review timestamp
 func (h *Handler) PostProjectsDshProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
+	h.postProjectsProjectIdAccessReviewSignoff(ctx, projectId)
+}
+
+// Called by an IAO/IAA to confirm access rights for this project have been reviewed, resetting the review timestamp
+func (h *Handler) postProjectsProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
 	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
 	if err != nil {
 		return
