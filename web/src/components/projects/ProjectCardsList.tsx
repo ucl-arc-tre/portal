@@ -42,7 +42,9 @@ export default function ProjectCardsList(props: Props) {
                 <div className={styles["status-indicator"]}>
                   <StatusBadge status={project.status} type="project" environment={project.environment_name} />
                   {accessReviewEnabled &&
-                    (project.status === "deployed" || project.status === "active") &&
+                    project.status !== "incomplete" &&
+                    project.status !== "pending-approval" &&
+                    project.status !== "deleted" &&
                     project.last_access_review != null &&
                     projectAccessReviewWarningRequired(project.last_access_review) && (
                       <Badge className={styles["access-review-warning-tag"]} cy="project-access-review-badge">

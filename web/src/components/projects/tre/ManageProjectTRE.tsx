@@ -154,10 +154,14 @@ export default function ManageProjectTRE(props: Props) {
   };
 
   const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
+  // access review is relevant from approval onward - excludes pre-approval (incomplete, pending-approval)
+  // and deleted, since there's no confirmed member/role assignment to review yet or any longer
+  const isApprovedOrLater =
+    project.status !== "incomplete" && project.status !== "pending-approval" && project.status !== "deleted";
   const showAccessReviewWarning =
     accessReviewEnabled &&
     canEdit &&
-    project.status === "deployed" &&
+    isApprovedOrLater &&
     (project.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));
 
   const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
