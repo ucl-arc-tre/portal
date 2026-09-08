@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Profile as ProfileData, UserAgreements, ProfileTraining } from "@/openapi";
 import ProfileChosenName from "./approved-researcher-components/ChosenName";
 import ApprovedResearcherAgreement from "./approved-researcher-components/ApprovedResearcherAgreement";
@@ -15,6 +15,15 @@ type Props = {
 };
 
 export default function ProfileSetupSteps({ profileData, agreementsData, trainingData, onStepsComplete }: Props) {
+  const stepsPromptRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSteps = () => {
+    stepsPromptRef.current?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      block: "start",
+    });
+  };
+
   const [chosenName, setChosenName] = useState(profileData.chosen_name);
   const [agreementCompleted, setAgreementCompleted] = useState(
     agreementsData.confirmed_agreements.some((a) => a.agreement_type === "approved-researcher")
@@ -28,7 +37,13 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
   const isComplete = hasChosenName && agreementCompleted && trainingCertificateCompleted;
 
   useEffect(() => {
-    if (isComplete) onStepsComplete(chosenName);
+    if (isComplete) {
+      window.scrollTo({
+        top: 0,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      });
+      onStepsComplete(chosenName);
+    }
   }, [isComplete, chosenName, onStepsComplete]);
 
   const steps: Step[] = [
@@ -64,7 +79,9 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
         ariaLabel="Profile setup progress"
       />
 
-      <StepArrow />
+      <div ref={stepsPromptRef}>
+        <StepArrow />
+      </div>
 
       {!hasChosenName && <ProfileChosenName chosenName={chosenName} setChosenName={setChosenName} />}
 
@@ -73,8 +90,16 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
           <ApprovedResearcherAgreement
             setAgreementCompleted={setAgreementCompleted}
             agreementCompleted={agreementCompleted}
+            onAgreementAccepted={() => {
+              if (!trainingCertificateCompleted) scrollToSteps();
+            }}
           />
-          <TrainingCertificate setTrainingCertificateCompleted={setTrainingCertificateCompleted} />
+          <TrainingCertificate
+            setTrainingCertificateCompleted={(completed) => {
+              if (completed && !agreementCompleted) scrollToSteps();
+              setTrainingCertificateCompleted(completed);
+            }}
+          />
         </div>
       )}
     </>
