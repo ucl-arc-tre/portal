@@ -40,7 +40,7 @@ func (m *Manager) Start() {
 	m.mustEvery(config.Day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
 	m.mustEvery(config.Day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
 	if config.ProjectAccessReviewEnabled() {
-		m.mustEvery(20*time.Second, m.checkProjectAccessReviewExpiry, "checkProjectAccessReviewExpiry") // TEMP: revert to config.Day before committing
+		m.mustEvery(config.Day, m.checkProjectAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	}
 	m.mustEvery(config.Day, m.updateUserEmails, "updateUserEmails")
 
