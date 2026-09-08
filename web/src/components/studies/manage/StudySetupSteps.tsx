@@ -55,7 +55,7 @@ export default function StudySetupSteps({ study, assets, setAssets, onStepsCompl
 
   const handleAgreementCompleted = (completed: boolean) => {
     setAgreementCompleted(completed);
-    if (completed) window.scrollTo({ top: 0, behavior: "smooth" });
+    if (completed) window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const studySteps: Step[] = [
