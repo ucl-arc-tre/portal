@@ -3,7 +3,7 @@ import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { InfoIcon } from "../ui/uikitExports";
+import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
@@ -22,7 +22,7 @@ export default function Studies() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>
-          {canSeeAllStudies ? "All Studies" : "All of Your Studies"}{" "}
+          {canSeeAllStudies ? "All Studies" : "Your Studies"}{" "}
           <Button
             onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
             variant="tertiary"
@@ -56,6 +56,12 @@ export default function Studies() {
       <div className={styles.line}></div>
 
       {infoCalloutExpanded && <StudyDefinition />}
+      <HelperText>
+        This page contains all the Studies you have access to. You may have access by being the IAO or IAA.{" "}
+        {isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff
+          ? "As an ops user, you have additional privileges."
+          : ""}
+      </HelperText>
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />

@@ -143,18 +143,16 @@ export default function Projects() {
             )}
           </div>
           <div className={styles.line}></div>
-          <HelperText>
-            This page contains all the Projects you have access to. You may have access by owning or being added to a
-            Project as a member.{" "}
-            {isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff
-              ? "As an ops user, you have additional privileges."
-              : ""}
-          </HelperText>
         </>
       )}
-
-      {infoCalloutExpanded && <ProjectDefinition />}
-
+      {infoCalloutExpanded && <ProjectDefinition />}{" "}
+      <HelperText>
+        This page contains all the Projects you have access to. You may have access by owning or being added to a
+        Project as a member.{" "}
+        {isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff
+          ? "As an ops user, you have additional privileges."
+          : ""}
+      </HelperText>
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
           <h2>UCL Staff Only</h2>
@@ -168,7 +166,6 @@ export default function Projects() {
           </div>
         </Dialog>
       )}
-
       {showNoStudiesModal && (
         <Dialog setDialogOpen={setShowNoStudiesModal} cy="no-studies-modal">
           <h2>You don&apos;t have any approved Studies</h2>
@@ -182,7 +179,6 @@ export default function Projects() {
           </div>
         </Dialog>
       )}
-
       {createProjectFormOpen && myApprovedStudies && (
         <ProjectForm
           approvedStudies={myApprovedStudies}
@@ -190,7 +186,6 @@ export default function Projects() {
           handleCancelCreate={handleCancelCreate}
         />
       )}
-
       {canSeeAllProjects ? (
         <AllProjects refreshToken={refreshToken} />
       ) : !isApprovedStaffResearcher && projects.length === 0 ? (
