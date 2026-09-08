@@ -19,7 +19,7 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
 
   const scrollToSteps = () => {
     stepsPromptRef.current?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      behavior: "auto",
       block: "start",
     });
   };
@@ -40,7 +40,7 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
     if (isComplete) {
       window.scrollTo({
         top: 0,
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        behavior: "auto",
       });
       onStepsComplete(chosenName);
     }
