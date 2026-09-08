@@ -48,6 +48,9 @@ entra:
 
   notifications_enabled: true # enables email notifications triggered by gocron
 
+project_access_review:
+  enabled: false # enables the project access review feature (reminder emails/notifications, UI checkbox)
+
 url: <CHANGE_ME> # eg. https://portal.arc.ucl.ac.uk
 tre:
   users: # Map of usernames to passwords for HTTP basic auth

@@ -7,7 +7,6 @@ services:
     environment:
       PORT: "8080"
       IS_DEV_DEPLOY: true
-      PROJECT_ACCESS_REVIEW_ENABLED: true
     volumes:
       - ./config.yaml:/etc/portal/config.yaml:ro
       - type: bind

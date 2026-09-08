@@ -68,11 +68,6 @@ func IsTesting() bool {
 	return os.Getenv("IS_TESTING") == "true"
 }
 
-// reports whether the project access review feature (reminder emails/notifications) is enabled. Disabled by default.
-func ProjectAccessReviewEnabled() bool {
-	return os.Getenv("PROJECT_ACCESS_REVIEW_ENABLED") == "true"
-}
-
 func DBDataSourceName() string {
 	return k.String("db.dsn")
 }
@@ -168,6 +163,11 @@ func DSHOpsStaffUsernames() []types.Username {
 
 func NotificationsEnabled() bool {
 	return k.Bool("entra.notifications_enabled")
+}
+
+// reports whether the project access review feature (reminder emails/notifications) is enabled. Disabled by default.
+func ProjectAccessReviewEnabled() bool {
+	return k.Bool("project_access_review.enabled")
 }
 
 func Myservices() MyservicesCredentialBundle {
