@@ -9,10 +9,11 @@ import (
 
 type Project struct {
 	ModelAuditable
-	Name          string    `gorm:"not null"`
-	CreatorUserID uuid.UUID `gorm:"not null;index"`
-	StudyID       uuid.UUID `gorm:"index"`
-	EnvironmentID uuid.UUID `gorm:"not null;index"`
+	Name             string    `gorm:"not null"`
+	CreatorUserID    uuid.UUID `gorm:"not null;index"`
+	StudyID          uuid.UUID `gorm:"index"`
+	EnvironmentID    uuid.UUID `gorm:"not null;index"`
+	LastAccessReview *time.Time
 
 	// Relationships
 	Study         Study          `gorm:"foreignKey:StudyID"`

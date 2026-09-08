@@ -3,8 +3,10 @@ import StatusBadge from "../ui/StatusBadge";
 
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
+import Badge from "../ui/Badge";
 import TextLink from "../ui/TextLink";
 import { HelperText } from "../ui/uikitExports";
+import { projectAccessReviewWarningRequired } from "../shared/exports";
 
 type Props = {
   projects: Project[];
@@ -12,6 +14,7 @@ type Props = {
 
 export default function ProjectCardsList(props: Props) {
   const { projects } = props;
+  const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
 
   if (projects.length === 0) {
     return (
@@ -36,7 +39,19 @@ export default function ProjectCardsList(props: Props) {
               title={project.name}
               manageUrl={`/projects/manage?projectId=${project.id}&environment=${project.environment_name}`}
               headerContent={
-                <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+                <div className={styles["status-indicator"]}>
+                  <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+                  {accessReviewEnabled &&
+                    project.status !== "incomplete" &&
+                    project.status !== "pending-approval" &&
+                    project.status !== "deleted" &&
+                    project.last_access_review != null &&
+                    projectAccessReviewWarningRequired(project.last_access_review) && (
+                      <Badge className={styles["access-review-warning-tag"]} cy="project-access-review-badge">
+                        Access Review due
+                      </Badge>
+                    )}
+                </div>
               }
             >
               <div className={styles["project-info"]}>

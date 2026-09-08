@@ -35,7 +35,15 @@ func TestDaysUntilStudySignoffExpiry(t *testing.T) {
 
 	now := time.Now()
 	study := types.Study{LastSignoff: &now}
-	assert.Equal(t, 89, DaysUntilStudySignoffExpiry(&study))
+	assert.Equal(t, 364, DaysUntilStudySignoffExpiry(&study))
+}
+
+func TestDaysUntilProjectAccessReviewExpiry(t *testing.T) {
+	assert.Equal(t, 0, DaysUntilProjectAccessReviewExpiry(nil))
+
+	now := time.Now()
+	project := types.Project{LastAccessReview: &now}
+	assert.Equal(t, 89, DaysUntilProjectAccessReviewExpiry(&project))
 }
 
 func TestContractShouldNotify(t *testing.T) {

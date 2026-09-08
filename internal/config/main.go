@@ -35,7 +35,9 @@ const (
 
 	ServerShutdownGraceDuration = 10 * time.Second
 
-	StudySignoffValidity = 3 * Month
+	StudySignoffValidity = 365 * Day
+
+	ProjectAccessReviewValidity = 3 * Month
 
 	DefaultPageSize = 12 // // number of items returned for pagination
 )
@@ -163,6 +165,11 @@ func NotificationsEnabled() bool {
 	return k.Bool("entra.notifications_enabled")
 }
 
+// reports whether the project access review feature (reminder emails/notifications) is enabled. Disabled by default.
+func ProjectAccessReviewEnabled() bool {
+	return k.Bool("project_access_review.enabled")
+}
+
 func Myservices() MyservicesCredentialBundle {
 	return MyservicesCredentialBundle{
 		Enabled:        k.Bool("myservices.enabled"),
@@ -246,6 +253,22 @@ func ShouldNotifyStudySignoffExpiry(study *types.Study) bool {
 		return false
 	}
 	daysUntilExpiry := DaysUntilStudySignoffExpiry(study)
+	return shouldNotifyExpiry(daysUntilExpiry)
+}
+
+func DaysUntilProjectAccessReviewExpiry(project *types.Project) Days {
+	if project == nil || project.LastAccessReview == nil {
+		log.Warn().Msg("nil project or lastAccessReview - no days until expiry")
+		return 0
+	}
+	return daysUntil(project.LastAccessReview.Add(ProjectAccessReviewValidity))
+}
+
+func ShouldNotifyProjectAccessReviewExpiry(project *types.Project) bool {
+	if project == nil || project.LastAccessReview == nil {
+		return false
+	}
+	daysUntilExpiry := DaysUntilProjectAccessReviewExpiry(project)
 	return shouldNotifyExpiry(daysUntilExpiry)
 }
 

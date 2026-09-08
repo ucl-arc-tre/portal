@@ -11,6 +11,8 @@ import DetailsField from "@/components/ui/DetailsField";
 import { ProjectDsh } from "@/openapi";
 import ProjectMember from "../ProjectMember";
 import TabCollection from "@/components/ui/TabCollection";
+import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
+import ProjectAccessReview from "../ProjectAccessReview";
 
 type Props = {
   project: ProjectDsh;
@@ -18,8 +20,17 @@ type Props = {
 };
 
 export default function ManageProjectDSH(props: Props) {
-  const { project } = props;
-  const { authInProgress, isAuthed } = useAuth();
+  const { project, fetchData } = props;
+  const { authInProgress, isAuthed, isAdmin, userData } = useAuth();
+
+  const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
+  const canReviewAccess =
+    isAdmin || ((userData?.roles as string[] | undefined)?.includes(`project_${project?.id}_owner`) ?? false);
+  const showAccessReviewWarning =
+    accessReviewEnabled &&
+    canReviewAccess &&
+    project?.status === "active" &&
+    (project?.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));
 
   const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
 
@@ -40,6 +51,10 @@ export default function ManageProjectDSH(props: Props) {
 
   return (
     <>
+      {showAccessReviewWarning && (
+        <ProjectAccessReview projectId={project.id} environment="dsh" successCallback={async () => fetchData()} />
+      )}
+
       <div className={styles.header}>
         <h2>{project.name}</h2>
       </div>
