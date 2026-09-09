@@ -22,7 +22,6 @@ export default function Projects() {
   const [error, setError] = useState<string | null>(null);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [showNoStudiesModal, setShowNoStudiesModal] = useState(false);
-  const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [refreshToken, refreshAllProjects] = useReducer((x) => x + 1, 0);
   const router = useRouter();
@@ -38,6 +37,8 @@ export default function Projects() {
   );
   const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff;
   const creationEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_CREATION === "true";
+
+  const isFormOpen = router.query.create === "true";
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -71,12 +72,6 @@ export default function Projects() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (router.isReady) {
-      setCreateProjectFormOpen(router.query.create === "true");
-    }
-  }, [router.isReady, router.query.create]);
-
   const handleCreateProjectClick = () => {
     if (!isApprovedStaffResearcher) {
       setShowUclStaffModal(true);
@@ -88,17 +83,17 @@ export default function Projects() {
       return;
     }
 
-    setCreateProjectFormOpen(true);
+    router.push("/projects?create=true");
   };
 
   const handleProjectCreated = () => {
-    setCreateProjectFormOpen(false);
+    router.push("/projects");
     fetchData();
     refreshAllProjects();
   };
 
   const handleCancelCreate = () => {
-    setCreateProjectFormOpen(false);
+    router.push("/projects");
   };
 
   if (isLoading) {
@@ -180,7 +175,7 @@ export default function Projects() {
           </div>
         </Dialog>
       )}
-      {createProjectFormOpen && myApprovedStudies && (
+      {isFormOpen && myApprovedStudies && (
         <ProjectForm
           approvedStudies={myApprovedStudies}
           handleProjectCreated={handleProjectCreated}
