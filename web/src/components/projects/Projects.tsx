@@ -38,7 +38,7 @@ export default function Projects() {
   const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff;
   const creationEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_CREATION === "true";
 
-  const isFormOpen = router.query.create === "true";
+const isFormOpen = router.isReady && router.query.create === "true";
 
   const fetchData = async () => {
     setIsLoading(true);
