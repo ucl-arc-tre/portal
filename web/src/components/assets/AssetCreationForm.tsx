@@ -453,7 +453,7 @@ export default function AssetCreationForm(props: AssetFormProps) {
           </div>
         )}
 
-        {!dataTypesValue.includes("personal") && !dataTypesValue.includes("special_category_personal") && !isPublic && (
+        {(tier ?? 0) < 3 && !isPublic && (
           <RadioOptions
             name="requires_tre"
             label="Does this asset require an ISO27001 certified Trusted Research Environment to be stored or processed? *"
@@ -466,43 +466,40 @@ export default function AssetCreationForm(props: AssetFormProps) {
           />
         )}
 
-        {!dataTypesValue.includes("personal") &&
-          !dataTypesValue.includes("special_category_personal") &&
-          !requiresTRE &&
-          !isPublic && (
-            <>
-              <RadioOptions
-                name="is_leak_major_financial_loss"
-                label="Would disclosure of this asset result in significant financial loss? *"
-                options={[
-                  { name: "Yes", value: "true" },
-                  { name: "No", value: "false" },
-                ]}
-                register={register}
-                error={errors.is_leak_major_financial_loss}
-              />
-              <RadioOptions
-                name="is_leak_major_disruption"
-                label="Would disclosure of this asset result in major disruption to UCL? *"
-                options={[
-                  { name: "Yes", value: "true" },
-                  { name: "No", value: "false" },
-                ]}
-                register={register}
-                error={errors.is_leak_major_disruption}
-              />
-              <RadioOptions
-                name="is_leak_major_reputational_damage"
-                label="Would disclosure of this asset result in significant reputational damage to UCL? *"
-                options={[
-                  { name: "Yes", value: "true" },
-                  { name: "No", value: "false" },
-                ]}
-                register={register}
-                error={errors.is_leak_major_reputational_damage}
-              />
-            </>
-          )}
+        {!isPublic && (
+          <>
+            <RadioOptions
+              name="is_leak_major_financial_loss"
+              label="Would disclosure of this asset result in significant financial loss? *"
+              options={[
+                { name: "Yes", value: "true" },
+                { name: "No", value: "false" },
+              ]}
+              register={register}
+              error={errors.is_leak_major_financial_loss}
+            />
+            <RadioOptions
+              name="is_leak_major_disruption"
+              label="Would disclosure of this asset result in major disruption to UCL? *"
+              options={[
+                { name: "Yes", value: "true" },
+                { name: "No", value: "false" },
+              ]}
+              register={register}
+              error={errors.is_leak_major_disruption}
+            />
+            <RadioOptions
+              name="is_leak_major_reputational_damage"
+              label="Would disclosure of this asset result in significant reputational damage to UCL? *"
+              options={[
+                { name: "Yes", value: "true" },
+                { name: "No", value: "false" },
+              ]}
+              register={register}
+              error={errors.is_leak_major_reputational_damage}
+            />
+          </>
+        )}
 
         {(tier ?? 0) >= 3 && (
           <RadioOptions
