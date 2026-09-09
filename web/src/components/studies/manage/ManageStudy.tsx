@@ -204,7 +204,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {tab === "projects" && (
         <>
           <HelperText>
-            To see all your projects or create a new one, go to the{" "}
+            All Projects belonging to this Study. <br></br> To see all of your Projects or create a new one, go to the{" "}
             <TextLink href="/projects?create=true">Projects</TextLink> page
           </HelperText>
           <br></br>

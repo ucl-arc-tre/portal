@@ -153,14 +153,7 @@ export default function Projects() {
           <div className={styles.line}></div>
         </>
       )}
-      {infoCalloutExpanded && <ProjectDefinition />}{" "}
-      <HelperText>
-        This page contains all the Projects you have access to. You may have access by owning or being added to a
-        Project as a member.{" "}
-        {isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff
-          ? "As an ops user, you have additional privileges."
-          : ""}
-      </HelperText>
+      {infoCalloutExpanded && <ProjectDefinition />} <HelperText>All Projects you have access to</HelperText>
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
           <h2>UCL Staff Only</h2>

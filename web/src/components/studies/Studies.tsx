@@ -56,12 +56,7 @@ export default function Studies() {
       <div className={styles.line}></div>
 
       {infoCalloutExpanded && <StudyDefinition />}
-      <HelperText>
-        This page contains all the Studies you have access to. You may have access by being the IAO or IAA.{" "}
-        {isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff
-          ? "As an ops user, you have additional privileges."
-          : ""}
-      </HelperText>
+      <HelperText>All Studies you have access to</HelperText>
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />
