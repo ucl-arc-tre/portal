@@ -63,7 +63,7 @@ function calculateTier(data: AssetTierData): number | undefined {
   const is_special_category_personal = data.data_types.includes("special_category_personal");
   const is_strongly_protected = data.protection == "anonymisation" || data.protection == "pseudonymisation";
 
-  if (anyTrue(is_impact_4_or_5, is_special_category_personal, data.requires_tre)) {
+  if (anyTrue(is_impact_4_or_5, data.requires_tre)) {
     return isTrue(data.has_targeted_threat_actors) ? 4 : 3;
   }
 
