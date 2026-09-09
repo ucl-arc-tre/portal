@@ -21,4 +21,5 @@ type Interface interface {
 	NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error
 	NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error
 	NotifyProjectDeployed(project types.Project, user types.User) error
+	NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error
 }

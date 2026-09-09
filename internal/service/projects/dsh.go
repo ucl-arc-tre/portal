@@ -107,6 +107,15 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to create project")
 		}
+
+		// initialise the access review timestamp the first time a DSH project is imported
+		if project.LastAccessReview == nil {
+			if err := tx.Model(&project).Update("last_access_review", time.Now()).Error; err != nil {
+				tx.Rollback()
+				return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
+			}
+		}
+
 		projectDSH := types.ProjectDSH{
 			ProjectID: project.ID,
 			Status:    types.ProjectDSHStatusActive,

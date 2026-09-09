@@ -298,6 +298,12 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	return nil
 }
 
+func (s *Service) RecordProjectAccessReviewSignoff(id uuid.UUID) error {
+	now := time.Now()
+	db := s.db.Model(&types.Project{}).Where("id = ?", id).Update("last_access_review", now)
+	return types.NewErrFromGorm(db.Error, "failed to record project access review signoff")
+}
+
 // retrieves projects by their IDs
 func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error) {
 	if len(projectIds) == 0 {
@@ -346,6 +352,7 @@ func (s *Service) genericProjectsQuery() *gorm.DB {
 			projects.name,
 			projects.created_at,
 			projects.updated_at,
+			projects.last_access_review,
 			users.username as creator_username,
 			environments.name as environment_name,
 			COALESCE(pt.status, pd.status, '') as status
@@ -430,7 +437,15 @@ func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error
 	if result.RowsAffected == 0 {
 		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
 	}
-	return types.NewErrFromGorm(result.Error, "failed to approve project")
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to approve project")
+	}
+
+	// initialise the access review timestamp
+	if err := s.db.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
+	}
+	return nil
 }
 
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {

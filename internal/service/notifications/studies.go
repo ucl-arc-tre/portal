@@ -148,9 +148,9 @@ func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Stud
 		Kind:  new(types.NotificationKindStdyAffirmation),
 	}
 	if study.LastSignoff == nil {
-		notification.ExpiresAt = new(study.CreatedAt.Add(3 * config.Month))
+		notification.ExpiresAt = new(study.CreatedAt.Add(config.StudySignoffValidity))
 	} else {
-		notification.ExpiresAt = new(study.LastSignoff.Add(3 * config.Month))
+		notification.ExpiresAt = new(study.LastSignoff.Add(config.StudySignoffValidity))
 	}
 	return s.create(notification, study.Owner)
 }

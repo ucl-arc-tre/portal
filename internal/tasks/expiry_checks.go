@@ -145,3 +145,43 @@ func (m *Manager) checkStudySignoffExpiry() error {
 	}
 	return nil
 }
+
+func (m *Manager) checkProjectAccessReviewExpiry() error {
+	if !config.NotificationsEnabled() {
+		return nil
+	}
+
+	ctx := context.Background()
+
+	projects := []types.Project{}
+	result := m.db.
+		Joins("JOIN project_tres ON project_tres.project_id = projects.id AND project_tres.status = ?", types.ProjectTREStatusDeployed).
+		Preload("Study.Owner").Preload("Study.StudyAdmins.User").Preload("Environment").
+		Find(&projects)
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get TRE projects")
+	}
+
+	dshProjects := []types.Project{}
+	result = m.db.
+		Joins("JOIN project_dshes ON project_dshes.project_id = projects.id AND project_dshes.status = ?", types.ProjectDSHStatusActive).
+		Preload("Study.Owner").Preload("Study.StudyAdmins.User").Preload("Environment").
+		Find(&dshProjects)
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get DSH projects")
+	}
+	projects = append(projects, dshProjects...)
+
+	for _, project := range projects {
+		if !config.ShouldNotifyProjectAccessReviewExpiry(&project) {
+			continue
+		}
+
+		log.Debug().Str("project", project.Name).Msg("Notifying project access review")
+		err := m.notifications.NotifyProjectAccessReviewExpiry(ctx, project)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
