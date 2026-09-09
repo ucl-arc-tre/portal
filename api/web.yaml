@@ -952,6 +952,23 @@ paths:
         default:
           description: Unexpected error
 
+  /projects/tre/{projectId}/access-review-signoff:
+    post:
+      description: Record that an IAO/IAA has reviewed access rights for this project, resetting the review timestamp
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          description: Access review signoff recorded successfully
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /projects/tre/admin/{projectId}/approve:
     post:
       description: Approve a TRE project (admin/TRE ops staff only)
@@ -1000,6 +1017,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjectDSH"
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /projects/dsh/{projectId}/access-review-signoff:
+    post:
+      description: Record that an IAO/IAA has reviewed access rights for this project, resetting the review timestamp
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          description: Access review signoff recorded successfully
         "403":
           description: Forbidden
         "404":
@@ -2456,6 +2490,10 @@ components:
           type: string
         name:
           type: string
+        last_access_review:
+          type: string
+          nullable: true
+          description: Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
         members:
           type: array
           description: List of project members with their roles (can be empty)
@@ -2528,6 +2566,10 @@ components:
           description: Time in RFC3339 format when the project was last updated
         environment_name:
           $ref: "#/components/schemas/EnvironmentName"
+        last_access_review:
+          type: string
+          nullable: true
+          description: Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
 
     ProjectTRE:
       type: object
@@ -2575,6 +2617,10 @@ components:
             is_pending_deployment_update:
               type: boolean
               description: Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
+            last_access_review:
+              type: string
+              nullable: true
+              description: Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
             assets:
               type: array
               description: List of assets associated with this project

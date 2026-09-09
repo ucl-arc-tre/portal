@@ -24,6 +24,8 @@ import AssetCard from "@/components/assets/AssetCard";
 import DetailsField from "@/components/ui/DetailsField";
 import ProjectMember from "../ProjectMember";
 import TabCollection from "@/components/ui/TabCollection";
+import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
+import ProjectAccessReview from "../ProjectAccessReview";
 
 type Props = {
   project: ProjectTre;
@@ -151,6 +153,15 @@ export default function ManageProjectTRE(props: Props) {
     setDeleteError(null);
   };
 
+  const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
+  const isApprovedOrLater =
+    project.status !== "incomplete" && project.status !== "pending-approval" && project.status !== "deleted";
+  const showAccessReviewWarning =
+    accessReviewEnabled &&
+    canEdit &&
+    isApprovedOrLater &&
+    (project.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));
+
   const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
 
   if (authInProgress) return <Loading />;
@@ -182,6 +193,10 @@ export default function ManageProjectTRE(props: Props) {
 
   return (
     <>
+      {showAccessReviewWarning && (
+        <ProjectAccessReview projectId={project.id} environment="tre" successCallback={async () => fetchData()} />
+      )}
+
       {!canApprove && canEdit && project.status === "incomplete" && (
         <div className={styles["approval-section"]}>
           <p className={styles["approval-info"]}>
