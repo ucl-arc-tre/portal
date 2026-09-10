@@ -205,8 +205,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <>
           <HelperText>
             Only projects for this Study are shown here. Visit the <TextLink href="/projects">Projects</TextLink> page
-            to see the full list of everything you have access to, or create a new{" "}
-            <TextLink href="/projects?create=true">Project</TextLink>
+            to see the full list of everything you have access to, or create a {" "}
+            <TextLink href="/projects?create=true">new Project</TextLink>
           </HelperText>
           <br></br>
           <ProjectCardsList projects={projects} />
