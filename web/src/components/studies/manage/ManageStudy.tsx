@@ -205,8 +205,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <>
           <HelperText>
             {projects.length === 0
-              ? "No projects have been created for this study yet."
-              : "Only projects for this Study are shown here."}{" "}
+              ? "No Projects have been created for this Study yet."
+              : "Only Projects for this Study are shown here."}{" "}
             Visit the <TextLink href="/projects">Projects</TextLink> page to see the full list of everything you have
             access to, or create a <TextLink href="/projects?create=true">new Project</TextLink>
           </HelperText>

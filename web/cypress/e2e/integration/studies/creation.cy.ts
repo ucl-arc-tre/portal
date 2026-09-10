@@ -161,8 +161,7 @@ describe("Study creation end-to-end", () => {
     cy.contains(studyTitle).click();
     cy.get('button[data-cy="projects"]').click();
 
-    cy.contains("No projects have been created for this study yet.").should("be.visible");
-    cy.get('[data-cy="empty-projects-link"]').click();
+    cy.contains("No Projects have been created for this Study yet.").should("be.visible").click();
 
     cy.url().should("include", "/projects");
     cy.get('[data-cy="create-project-button"]').should("be.visible");
