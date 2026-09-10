@@ -204,9 +204,11 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
       {tab === "projects" && (
         <>
           <HelperText>
-            Only projects for this Study are shown here. Visit the <TextLink href="/projects">Projects</TextLink> page
-            to see the full list of everything you have access to, or create a{" "}
-            <TextLink href="/projects?create=true">new Project</TextLink>
+            {projects.length === 0
+              ? "No projects have been created for this study yet."
+              : "Only projects for this Study are shown here."}{" "}
+            Visit the <TextLink href="/projects">Projects</TextLink> page to see the full list of everything you have
+            access to, or create a <TextLink href="/projects?create=true">new Project</TextLink>
           </HelperText>
           <br></br>
           <ProjectCardsList projects={projects} />
