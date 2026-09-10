@@ -4,8 +4,6 @@ import StatusBadge from "../ui/StatusBadge";
 import styles from "./ProjectCardsList.module.css";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
-import TextLink from "../ui/TextLink";
-import { HelperText } from "../ui/uikitExports";
 import { projectAccessReviewWarningRequired } from "../shared/exports";
 
 type Props = {
@@ -15,18 +13,6 @@ type Props = {
 export default function ProjectCardsList(props: Props) {
   const { projects } = props;
   const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
-
-  if (projects.length === 0) {
-    return (
-      <HelperText>
-        No projects have been created for this study yet. Visit the{" "}
-        <TextLink href="/projects" cy="empty-projects-link">
-          Projects
-        </TextLink>{" "}
-        page to create one.
-      </HelperText>
-    );
-  }
 
   return (
     <div className={styles["project-selection"]}>
