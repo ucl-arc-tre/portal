@@ -1,5 +1,14 @@
+.tab-collection {
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem !important;
+}
+
 .tab {
   text-transform: capitalize !important;
+
+  svg {
+    margin-inline: 0.25rem;
+  }
 }
 
 .needs-attention {

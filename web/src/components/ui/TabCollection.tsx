@@ -27,7 +27,7 @@ export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) 
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
 
   return (
-    <Tabs defaultValue={defaultTab} onValueChange={setTab}>
+    <Tabs defaultValue={defaultTab} onValueChange={setTab} className={styles["tab-collection"]}>
       {tabs.map((tabDefinition) => (
         <Tab key={tabDefinition.name} value={tabDefinition.name} data-cy={tabDefinition.name} className={styles.tab}>
           {tabDefinition.label ? tabDefinition.label : tabDefinition.name}
