@@ -11,8 +11,9 @@ import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
 import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
-import { InfoIcon } from "../ui/uikitExports";
+import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/router";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -21,9 +22,9 @@ export default function Projects() {
   const [error, setError] = useState<string | null>(null);
   const [showUclStaffModal, setShowUclStaffModal] = useState(false);
   const [showNoStudiesModal, setShowNoStudiesModal] = useState(false);
-  const [createProjectFormOpen, setCreateProjectFormOpen] = useState(false);
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [refreshToken, refreshAllProjects] = useReducer((x) => x + 1, 0);
+  const router = useRouter();
 
   const { userData, isAdmin, isTreOpsStaff, isDshOpsStaff, isIGStaff, isApprovedStaffResearcher } = useAuth();
 
@@ -36,6 +37,8 @@ export default function Projects() {
   );
   const canSeeAllProjects = isTreOpsStaff || isDshOpsStaff || isAdmin || isIGStaff;
   const creationEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_CREATION === "true";
+
+  const isFormOpen = router.isReady && router.query.create === "true";
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -80,17 +83,17 @@ export default function Projects() {
       return;
     }
 
-    setCreateProjectFormOpen(true);
+    router.push("/projects?create=true");
   };
 
   const handleProjectCreated = () => {
-    setCreateProjectFormOpen(false);
+    router.push("/projects");
     fetchData();
     refreshAllProjects();
   };
 
   const handleCancelCreate = () => {
-    setCreateProjectFormOpen(false);
+    router.push("/projects");
   };
 
   if (isLoading) {
@@ -145,9 +148,7 @@ export default function Projects() {
           <div className={styles.line}></div>
         </>
       )}
-
-      {infoCalloutExpanded && <ProjectDefinition />}
-
+      {infoCalloutExpanded && <ProjectDefinition />} <HelperText>All Projects you have access to</HelperText>
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">
           <h2>UCL Staff Only</h2>
@@ -161,7 +162,6 @@ export default function Projects() {
           </div>
         </Dialog>
       )}
-
       {showNoStudiesModal && (
         <Dialog setDialogOpen={setShowNoStudiesModal} cy="no-studies-modal">
           <h2>You don&apos;t have any approved Studies</h2>
@@ -175,15 +175,13 @@ export default function Projects() {
           </div>
         </Dialog>
       )}
-
-      {createProjectFormOpen && myApprovedStudies && (
+      {isFormOpen && myApprovedStudies && (
         <ProjectForm
           approvedStudies={myApprovedStudies}
           handleProjectCreated={handleProjectCreated}
           handleCancelCreate={handleCancelCreate}
         />
       )}
-
       {canSeeAllProjects ? (
         <AllProjects refreshToken={refreshToken} />
       ) : !isApprovedStaffResearcher && projects.length === 0 ? (

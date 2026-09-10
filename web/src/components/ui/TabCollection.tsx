@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
-import Button from "./Button";
 import { AlertCircleIcon, iconSizeSmall } from "./uikitExports";
 import styles from "./TabCollection.module.css";
+import dynamic from "next/dist/shared/lib/dynamic";
 
 type TabDefinition = {
   name: string;
@@ -14,28 +14,28 @@ type TabCollectionProps = {
   defaultTab: string;
 };
 
+const Tabs = dynamic(() => import("uikit-react-public").then((mod) => mod.Tabs), {
+  ssr: false,
+});
+const Tab = dynamic(() => import("uikit-react-public").then((mod) => mod.Tabs.Tab), {
+  ssr: false,
+});
+
 export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) {
   const router = useRouter();
-  const tab = router.query.tab ?? defaultTab;
   const setTab = (newTab: string) =>
     router.push({ query: { ...router.query, tab: newTab } }, undefined, { shallow: true });
 
   return (
-    <div className={styles["tab-collection"]}>
+    <Tabs defaultValue={defaultTab} onValueChange={setTab} className={styles["tab-collection"]}>
       {tabs.map((tabDefinition) => (
-        <Button
-          key={tabDefinition.name}
-          onClick={() => setTab(tabDefinition.name)}
-          variant="secondary"
-          className={`${styles.tab} ${tab === tabDefinition.name ? styles.active : ""}`}
-          cy={tabDefinition.name}
-        >
+        <Tab key={tabDefinition.name} value={tabDefinition.name} data-cy={tabDefinition.name} className={styles.tab}>
           {tabDefinition.label ? tabDefinition.label : tabDefinition.name}
           {tabDefinition.needsAttention && (
             <AlertCircleIcon className={styles["needs-attention"]} size={iconSizeSmall} />
           )}
-        </Button>
+        </Tab>
       ))}
-    </div>
+    </Tabs>
   );
 }
