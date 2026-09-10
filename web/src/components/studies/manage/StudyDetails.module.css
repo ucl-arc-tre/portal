@@ -9,6 +9,10 @@
   .buttons {
     display: flex;
     gap: 1rem;
+
+    button {
+      height: auto;
+    }
   }
 }
 
