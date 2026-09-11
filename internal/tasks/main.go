@@ -38,9 +38,9 @@ func (m *Manager) Start() {
 	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 0), m.checkAssetsExpiry, "checkAssetsExpiry")
 	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 2), m.checkContractsExpiry, "checkContractsExpiry")
 	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 4), m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
-	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 6), m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 6), m.checkStudiesSignoffExpiry, "checkStudySignoffExpiry")
 	if config.ProjectAccessReviewEnabled() {
-		m.scheduleDailyAt(gocron.NewAtTime(3, 0, 8), m.checkProjectAccessReviewExpiry, "checkProjectAccessReviewExpiry")
+		m.scheduleDailyAt(gocron.NewAtTime(3, 0, 8), m.checkProjectsAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	}
 	m.scheduleDailyAt(gocron.NewAtTime(3, 1, 0), m.updateUserEmails, "updateUserEmails")
 
