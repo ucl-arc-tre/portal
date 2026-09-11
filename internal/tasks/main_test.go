@@ -19,9 +19,14 @@ func TestTaskManager(t *testing.T) {
 	}
 
 	manager := Manager{scheduler: scheduler}
-	manager.mustEvery(50*time.Millisecond, setCalled, "test")
+	now := time.Now()
+	manager.scheduleDailyAt(
+		gocron.NewAtTime(uint(now.Hour()), uint(now.Minute()), uint(now.Second())+2),
+		setCalled,
+		"test",
+	)
 	manager.scheduler.Start()
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(2050 * time.Millisecond)
 
 	manager.Shutdown()
 

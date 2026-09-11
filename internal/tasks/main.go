@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"fmt"
-	"time"
 
 	gormlock "github.com/go-co-op/gocron-gorm-lock/v2"
 	"github.com/go-co-op/gocron/v2"
@@ -35,14 +34,15 @@ func New() *Manager {
 
 // Start the task manager - non blocking
 func (m *Manager) Start() {
-	m.mustEvery(config.Day, m.checkAssetsExpiry, "checkAssetsExpiry")
-	m.mustEvery(config.Day, m.checkContractsExpiry, "checkContractsExpiry")
-	m.mustEvery(config.Day, m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
-	m.mustEvery(config.Day, m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
+	// NOTE: Scheduled tasks are offset to minimise concurrent database load
+	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 0), m.checkAssetsExpiry, "checkAssetsExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 2), m.checkContractsExpiry, "checkContractsExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 4), m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 6), m.checkStudySignoffExpiry, "checkStudySignoffExpiry")
 	if config.ProjectAccessReviewEnabled() {
-		m.mustEvery(config.Day, m.checkProjectAccessReviewExpiry, "checkProjectAccessReviewExpiry")
+		m.scheduleDailyAt(gocron.NewAtTime(3, 0, 8), m.checkProjectAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	}
-	m.mustEvery(config.Day, m.updateUserEmails, "updateUserEmails")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 1, 0), m.updateUserEmails, "updateUserEmails")
 
 	m.scheduler.Start()
 }
@@ -56,12 +56,14 @@ func (m *Manager) Shutdown() {
 }
 
 // Schedule a function to run repeatedly with a delay and unique name
-func (m *Manager) mustEvery(delay time.Duration, function func() error, name string) {
+func (m *Manager) scheduleDailyAt(
+	at gocron.AtTime,
+	function func() error,
+	name string,
+) {
 	job, err := m.scheduler.NewJob(
-		gocron.DurationJob(delay),
+		gocron.DailyJob(1, gocron.NewAtTimes(at)),
 		gocron.NewTask(function),
-		// gocron.WithStartAt(gocron.WithStartDateTime(time.Now().Add(1*time.Minute))), // comment in for debug
-		gocron.WithStartAt(gocron.WithStartDateTime(timeBoundary(delay))),
 		gocron.WithName(name),
 		gocron.WithSingletonMode(gocron.LimitModeReschedule), // prevent parallel execution
 		gocron.WithEventListeners(
@@ -94,10 +96,4 @@ func newScheduler() gocron.Scheduler {
 		panic(fmt.Errorf("failed to create gocron scheduler: %w", err))
 	}
 	return scheduler
-}
-
-// Get the next time boundary for a time. e.g. if the time is
-// 10:01 and the delay is 5 minutes then the boundary is 10:05
-func timeBoundary(delay time.Duration) time.Time {
-	return time.Now().UTC().Add(delay).Truncate(delay)
 }
