@@ -116,11 +116,44 @@ func (s *Service) NotifyIaaAssignment(ctx context.Context, iaa types.User, study
 		log.Err(err).Msg("Failed to send contract IAA assignment notification email")
 	}
 	notification := types.Notification{
-		Title: fmt.Sprintf("You have been added as an administrator in '%s'", study.Title),
+		Title: fmt.Sprintf("You have been added as an administrator to '%s'", study.Title),
 		Href:  new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
 		Kind:  new(types.NotificationKindIaaAssignment),
 	}
 	return s.create(notification, iaa)
+}
+
+func (s *Service) NotifyIaaRemoval(ctx context.Context, removedAdmin types.User, study types.Study) error {
+	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
+	subject := "Notification: Information Asset Administrator removal"
+
+	ownerContent := template.HTML(
+		fmt.Sprintf("%s has been removed as an administrator from the Study ", removedAdmin.Username)) +
+		href + ". They will no longer be able to make changes to this Study."
+	if err := s.entra.SendEmail(ctx, subject, emails(study.Owner), ownerContent); err != nil {
+		log.Err(err).Msg("Failed to send IAA removal notification email to study owner")
+	}
+	ownerNotification := types.Notification{
+		Title: fmt.Sprintf("%s has been removed as an administrator from '%s'", removedAdmin.Username, study.Title),
+		Href:  new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
+		Kind:  new(types.NotificationKindIaaRemoval),
+	}
+	if err := s.create(ownerNotification, study.Owner); err != nil {
+		return err
+	}
+
+	adminContent := template.HTML(
+		"You have been removed as an administrator from the Study ") +
+		href + ". You will no longer be able to make changes to this Study."
+	if err := s.entra.SendEmail(ctx, subject, emails(removedAdmin), adminContent); err != nil {
+		log.Err(err).Msg("Failed to send IAA removal notification email to removed admin")
+	}
+	adminNotification := types.Notification{
+		Title: fmt.Sprintf("You have been removed as an administrator from '%s'", study.Title),
+		Href:  new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
+		Kind:  new(types.NotificationKindIaaRemoval),
+	}
+	return s.create(adminNotification, removedAdmin)
 }
 
 func (s *Service) NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error {

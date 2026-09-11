@@ -16,6 +16,7 @@ type Interface interface {
 	NotifyTrainingExpiry(ctx context.Context, training types.UserTrainingRecord) error
 	NotifyStudyReview(ctx context.Context, study types.Study, igOpsStaff []types.User) error
 	NotifyIaaAssignment(ctx context.Context, iaa types.User, study types.Study) error
+	NotifyIaaRemoval(ctx context.Context, removedAdmin types.User, study types.Study) error
 	NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error
 	NotifyAssetExpiry(ctx context.Context, assets []types.Asset, study types.Study) error
 	NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error

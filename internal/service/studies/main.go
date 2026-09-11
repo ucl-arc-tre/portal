@@ -274,6 +274,9 @@ func (s *Service) createStudyAdmins(tx *StudyTransaction, users []types.User, st
 		studyAdminInRequested := slices.Contains(userIds, studyAdmin.UserID)
 		if !studyAdminInRequested {
 			log.Debug().Any("username", studyAdmin.User.Username).Msg("Deleting study admin")
+			if !studyAdmin.IsDeleted() {
+				tx.removedIAAs = append(tx.removedIAAs, studyAdmin.User)
+			}
 			if err := tx.db.Delete(&studyAdmin).Error; err != nil {
 				return types.NewErrFromGorm(err, "failed to delete study admin")
 			}
@@ -582,7 +585,7 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 }
 
 func (s *Service) newStudyTransaction(ctx context.Context) *StudyTransaction {
-	return &StudyTransaction{ctx: ctx, db: s.db.Begin(), newIAAs: []types.User{}}
+	return &StudyTransaction{ctx: ctx, db: s.db.Begin(), newIAAs: []types.User{}, removedIAAs: []types.User{}}
 }
 
 func (s *Service) commitStudyTransaction(tx *StudyTransaction, study *types.Study) error {
@@ -596,6 +599,11 @@ func (s *Service) commitStudyTransaction(tx *StudyTransaction, study *types.Stud
 		for _, user := range tx.newIAAs {
 			if err := s.notifications.NotifyIaaAssignment(ctx, user, *study); err != nil {
 				log.Err(err).Any("username", user.Username).Msg("Failed to send IAA assignment email")
+			}
+		}
+		for _, user := range tx.removedIAAs {
+			if err := s.notifications.NotifyIaaRemoval(ctx, user, *study); err != nil {
+				log.Err(err).Any("username", user.Username).Msg("Failed to send IAA removal email")
 			}
 		}
 	}()
