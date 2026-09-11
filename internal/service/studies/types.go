@@ -25,14 +25,16 @@ type ContractObject struct {
 }
 
 type StudyTransaction struct {
-	ctx     context.Context
-	db      *gorm.DB
-	newIAAs []types.User // Newly added administrations that require notifications
+	ctx         context.Context
+	db          *gorm.DB
+	newIAAs     []types.User // Newly added study admins who require notifications
+	removedIAAs []types.User // Removed study admins who require notifications
 }
 
 func (s *StudyTransaction) Rollback() {
 	s.db.Rollback()
 	s.newIAAs = []types.User{}
+	s.removedIAAs = []types.User{}
 }
 
 func (s *StudyTransaction) RollbackOnPanic() {
