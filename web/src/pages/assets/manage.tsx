@@ -259,10 +259,12 @@ export default function ManageAssetPage() {
                 <span>{asset.protection.replaceAll("_", " ")}</span>
               </div>
             )}
-            <div className={styles.field}>
-              <Label>Legal Basis:</Label>
-              <span>{asset.legal_basis?.replaceAll("_", " ")}</span>
-            </div>
+            {asset.legal_basis && (
+              <div className={styles.field}>
+                <Label>Legal Basis:</Label>
+                <span>{asset.legal_basis?.replaceAll("_", " ")}</span>
+              </div>
+            )}
             <div className={styles.field}>
               <Label>Format:</Label>
               <span>{asset.format}</span>
