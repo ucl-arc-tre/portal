@@ -127,7 +127,7 @@ func (s *Service) NotifyIaaRemoval(ctx context.Context, removedAdmin types.User,
 	href := htmlHref(fmt.Sprintf("'%s'", study.Title), fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String()))
 	subject := "Notification: Information Asset Administrator removal"
 
-	ownerContent := template.HTML(
+	ownerContent := template.HTML( // #nosec G203 -- href and username are trusted, not user-supplied HTML
 		fmt.Sprintf("%s has been removed as an administrator from the Study ", removedAdmin.Username)) +
 		href + ". They will no longer be able to make changes to this Study."
 	if err := s.entra.SendEmail(ctx, subject, emails(study.Owner), ownerContent); err != nil {
@@ -142,7 +142,7 @@ func (s *Service) NotifyIaaRemoval(ctx context.Context, removedAdmin types.User,
 		return err
 	}
 
-	adminContent := template.HTML(
+	adminContent := template.HTML( // #nosec G203 -- href is trusted, not user-supplied HTML
 		"You have been removed as an administrator from the Study ") +
 		href + ". You will no longer be able to make changes to this Study."
 	if err := s.entra.SendEmail(ctx, subject, emails(removedAdmin), adminContent); err != nil {
