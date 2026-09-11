@@ -11,3 +11,10 @@
     white-space: nowrap;
   }
 }
+
+.sectionLabel {
+  margin: 0.75rem 0 0.25rem;
+  padding: 0 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
