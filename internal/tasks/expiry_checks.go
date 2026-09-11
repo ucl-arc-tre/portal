@@ -57,7 +57,7 @@ func (m *Manager) checkContractsExpiry() error {
 
 	for _, study := range studies {
 
-		contract := earliestExpringContractShouldNotifyExpiry(study)
+		contract := earliestExpiringContractShouldNotifyExpiry(study)
 		if contract == nil {
 			continue
 		}
@@ -74,7 +74,7 @@ func (m *Manager) checkContractsExpiry() error {
 
 // Return the contract with the most urgent expiry notification.
 // Returns nil if there are no contracts that should notify the expiry for
-func earliestExpringContractShouldNotifyExpiry(study types.Study) *types.Contract {
+func earliestExpiringContractShouldNotifyExpiry(study types.Study) *types.Contract {
 	var expiringContract *types.Contract
 	for _, contract := range study.Contracts {
 		if !config.ShouldNotifyContractExpiry(contract) {
