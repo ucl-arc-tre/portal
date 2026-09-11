@@ -36,13 +36,13 @@ func New() *Manager {
 func (m *Manager) Start() {
 	// NOTE: Scheduled tasks are offset to minimise concurrent database load
 	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 0), m.checkAssetsExpiry, "checkAssetsExpiry")
-	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 2), m.checkContractsExpiry, "checkContractsExpiry")
-	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 4), m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
-	m.scheduleDailyAt(gocron.NewAtTime(3, 0, 6), m.checkStudiesSignoffExpiry, "checkStudySignoffExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 1, 0), m.checkContractsExpiry, "checkContractsExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 2, 0), m.checkTrainingCertificatesExpiry, "checkTrainingCertificatesExpiry")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 3, 0), m.checkStudiesSignoffExpiry, "checkStudySignoffExpiry")
 	if config.ProjectAccessReviewEnabled() {
-		m.scheduleDailyAt(gocron.NewAtTime(3, 0, 8), m.checkProjectsAccessReviewExpiry, "checkProjectAccessReviewExpiry")
+		m.scheduleDailyAt(gocron.NewAtTime(3, 4, 0), m.checkProjectsAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	}
-	m.scheduleDailyAt(gocron.NewAtTime(3, 1, 0), m.updateUserEmails, "updateUserEmails")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 5, 0), m.updateUserEmails, "updateUserEmails")
 
 	m.scheduler.Start()
 }
