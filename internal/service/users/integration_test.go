@@ -31,6 +31,7 @@ func migrate(db *gorm.DB) error {
 		&types.UserTrainingRecord{},
 		&types.UserAttributes{},
 		&types.UserSponsorship{},
+		&types.AuditEvent{},
 	)
 	if err != nil {
 		return err
