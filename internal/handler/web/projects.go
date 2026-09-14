@@ -383,7 +383,7 @@ func (h *Handler) postProjectsProjectIdAccessReviewSignoff(ctx *gin.Context, pro
 		return
 	}
 
-	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID); err != nil {
+	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID, middleware.GetUser(ctx)); err != nil {
 		setError(ctx, err, "Failed to record project access review signoff")
 		return
 	}

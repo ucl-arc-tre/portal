@@ -24,6 +24,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -305,10 +306,26 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	return nil
 }
 
-func (s *Service) RecordProjectAccessReviewSignoff(id uuid.UUID) error {
-	now := time.Now()
-	db := s.db.Model(&types.Project{}).Where("id = ?", id).Update("last_access_review", now)
-	return types.NewErrFromGorm(db.Error, "failed to record project access review signoff")
+func (s *Service) RecordProjectAccessReviewSignoff(id uuid.UUID, signer types.User) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	var project types.Project
+	db := tx.Model(&project).Clauses(clause.Returning{}).Where("id = ?", id).Update("last_access_review", time.Now())
+	if err := db.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to record project access review signoff")
+	} else if db.RowsAffected == 0 {
+		tx.Rollback()
+		return types.NewNotFoundError("project not found")
+	}
+
+	if err := audit.LogProjectAccessReviewSignoff(tx, signer, project); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit project access review signoff transaction")
 }
 
 // retrieves projects by their IDs

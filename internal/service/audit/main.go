@@ -130,3 +130,13 @@ func LogProjectTREMemberAssignment(tx *gorm.DB, updater types.User, bindings []t
 	}
 	return createOrError(tx, &event, "failed to record project TRE member assignment audit event")
 }
+
+func LogProjectAccessReviewSignoff(tx *gorm.DB, signer types.User, project types.Project) error {
+	event := types.AuditEvent{
+		UserID:    signer.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    project.EventObject(),
+		Body:      fmt.Sprintf("Access review for project '%s' signed off.", project.Name),
+	}
+	return createOrError(tx, &event, "failed to record project access review signoff audit event")
+}
