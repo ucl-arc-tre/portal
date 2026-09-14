@@ -17,6 +17,7 @@ import (
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/audit"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
@@ -287,6 +288,11 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}
 
 	if _, err := rbac.AddProjectTreOwnerRole(studyUUID, project.ID); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := audit.LogProjectCreation(tx, creator, project); err != nil {
 		tx.Rollback()
 		return err
 	}

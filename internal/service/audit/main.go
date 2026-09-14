@@ -99,3 +99,13 @@ func LogStudySignoff(tx *gorm.DB, signer types.User, study types.Study) error {
 	}
 	return createOrError(tx, &event, "failed to record study signoff audit event")
 }
+
+func LogProjectCreation(tx *gorm.DB, creator types.User, project types.Project) error {
+	event := types.AuditEvent{
+		UserID:    creator.ID,
+		Operation: types.AuditOperationCreate,
+		Object:    project.EventObject(),
+		Body:      fmt.Sprintf("Project '%s' created.", project.Name),
+	}
+	return createOrError(tx, &event, "failed to record project creation audit event")
+}
