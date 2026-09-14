@@ -28,7 +28,7 @@ func LogStudyFeedback(tx *gorm.DB, reviewer types.User, feedback types.StudyFeed
 		},
 		Body: body,
 	}
-	return types.NewErrFromGorm(tx.Create(&event).Error, "failed to record study feedback audit event")
+	return createOrError(tx, &event, "failed to record study feedback audit event")
 }
 
 func LogTrainingUpdate(tx *gorm.DB, updater types.User, record types.UserTrainingRecord) error {
@@ -41,7 +41,7 @@ func LogTrainingUpdate(tx *gorm.DB, updater types.User, record types.UserTrainin
 		},
 		Body: fmt.Sprintf("Training '%s' updated to completed at '%s'", record.Kind, marshalTime(record.CompletedAt)),
 	}
-	return types.NewErrFromGorm(tx.Create(&event).Error, "failed to record study feedback audit event")
+	return createOrError(tx, &event, "failed to record study feedback audit event")
 }
 
 func LogStudyCreation(tx *gorm.DB, creator types.User, study types.Study) error {
@@ -55,7 +55,35 @@ func LogStudyCreation(tx *gorm.DB, creator types.User, study types.Study) error 
 		},
 		Body: fmt.Sprintf("Study '%s' created.", study.Title),
 	}
-	return types.NewErrFromGorm(tx.Create(&event).Error, "failed to record study creation audit event")
+	return createOrError(tx, &event, "failed to record study creation audit event")
+}
+
+func LogStudyAdministratorAssignment(tx *gorm.DB, updater types.User, administrator types.User, study types.Study) error {
+	event := types.AuditEvent{
+		UserID:    updater.ID,
+		Operation: types.AuditOperationUpdate,
+		Object: types.AuditEventObject{
+			ID:   study.ID,
+			Name: &study.Title,
+			Type: types.AuditEventObjectTypeStudy,
+		},
+		Body: fmt.Sprintf("User '%s' (%s) assigned as an administrator of study '%s'.", administrator.Username, administrator.ID, study.Title),
+	}
+	return createOrError(tx, &event, "failed to record study administrator assignment audit event")
+}
+
+func LogStudyAdministratorRemoval(tx *gorm.DB, updater types.User, administrator types.User, study types.Study) error {
+	event := types.AuditEvent{
+		UserID:    updater.ID,
+		Operation: types.AuditOperationUpdate,
+		Object: types.AuditEventObject{
+			ID:   study.ID,
+			Name: &study.Title,
+			Type: types.AuditEventObjectTypeStudy,
+		},
+		Body: fmt.Sprintf("User '%s' (%s) removed as an administrator of study '%s'.", administrator.Username, administrator.ID, study.Title),
+	}
+	return createOrError(tx, &event, "failed to record study administrator removal audit event")
 }
 
 // func LogStudyUpdate() {

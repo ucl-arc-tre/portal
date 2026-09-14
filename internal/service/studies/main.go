@@ -350,7 +350,7 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 		return err
 	}
 
-	return s.commitStudyTransaction(tx, &study)
+	return s.commitStudyTransaction(tx, owner, &study)
 }
 
 func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review openapi.StudyReview, reviewer types.User) error {
@@ -434,7 +434,7 @@ func (s *Service) RecordStudySignoff(id uuid.UUID) error {
 	return types.NewErrFromGorm(db.Error, "failed to record study signoff")
 }
 
-func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest) error {
+func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest, updater types.User) error {
 	studies, err := s.StudiesById(id)
 	if err != nil {
 		return err
@@ -468,7 +468,7 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
 
-	return s.commitStudyTransaction(tx, &study)
+	return s.commitStudyTransaction(tx, updater, &study)
 }
 
 func (s *Service) UpdateStudyOwner(ctx context.Context, studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
@@ -596,10 +596,28 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 }
 
 func (s *Service) newStudyTransaction(ctx context.Context) *StudyTransaction {
-	return &StudyTransaction{ctx: ctx, db: s.db.Begin(), newIAAs: []types.User{}, removedIAAs: []types.User{}}
+	return &StudyTransaction{
+		ctx:         ctx,
+		db:          s.db.Begin(),
+		newIAAs:     []types.User{},
+		removedIAAs: []types.User{},
+	}
 }
 
-func (s *Service) commitStudyTransaction(tx *StudyTransaction, study *types.Study) error {
+func (s *Service) commitStudyTransaction(tx *StudyTransaction, updater types.User, study *types.Study) error {
+	for _, user := range tx.newIAAs {
+		if err := audit.LogStudyAdministratorAssignment(tx.db, updater, user, *study); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	for _, user := range tx.removedIAAs {
+		if err := audit.LogStudyAdministratorRemoval(tx.db, updater, user, *study); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	if err := commitTransaction(tx.db); err != nil {
 		return err
 	}

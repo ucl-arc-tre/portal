@@ -298,7 +298,7 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	err = h.studies.UpdateStudy(ctx, studyUUID, studyData)
+	err = h.studies.UpdateStudy(ctx, studyUUID, studyData, middleware.GetUser(ctx))
 	if err != nil {
 		setError(ctx, err, "Failed to update study")
 		return

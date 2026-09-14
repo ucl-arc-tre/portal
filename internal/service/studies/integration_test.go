@@ -38,6 +38,7 @@ func migrate(db *gorm.DB) error {
 		&types.StudyAdmin{},
 		&types.StudyOwnerChangelog{},
 		&types.StudyFeedback{},
+		&types.AuditEvent{},
 		&types.Asset{},
 		&types.AssetLocation{},
 		&types.Contract{},
