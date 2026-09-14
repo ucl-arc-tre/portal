@@ -428,10 +428,27 @@ func (s *Service) StudyFeedbackHistory(id uuid.UUID) ([]types.StudyFeedback, err
 	return entries, types.NewErrFromGorm(err, "failed to get study feedback history")
 }
 
-func (s *Service) RecordStudySignoff(id uuid.UUID) error {
-	now := time.Now()
-	db := s.db.Model(&types.Study{}).Where("id = ?", id).Update("last_signoff", now)
-	return types.NewErrFromGorm(db.Error, "failed to record study signoff")
+func (s *Service) RecordStudySignoff(id uuid.UUID, signer types.User) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	var study types.Study
+	db := tx.Model(&study).Clauses(clause.Returning{}).Where("id = ?", id).Update("last_signoff", time.Now())
+	if err := db.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to record study signoff")
+	}
+	if db.RowsAffected == 0 {
+		tx.Rollback()
+		return types.NewNotFoundError("study not found")
+	}
+
+	if err := audit.LogStudySignoff(tx, signer, study); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return commitTransaction(tx)
 }
 
 func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest, updater types.User) error {

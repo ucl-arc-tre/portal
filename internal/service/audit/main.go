@@ -89,3 +89,13 @@ func LogStudyOwnerChangeApproval(tx *gorm.DB, approver types.User, study types.S
 	}
 	return createOrError(tx, &event, "failed to record study owner change approval audit event")
 }
+
+func LogStudySignoff(tx *gorm.DB, signer types.User, study types.Study) error {
+	event := types.AuditEvent{
+		UserID:    signer.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("Study '%s' signed off.", study.Title),
+	}
+	return createOrError(tx, &event, "failed to record study signoff audit event")
+}
