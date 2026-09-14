@@ -15,14 +15,15 @@ const (
 type AuditEventObjectType string
 
 const (
-	AuditEventObjectTypeStudy   = AuditEventObjectType("study")
-	AuditEventObjectTypeProject = AuditEventObjectType("project")
+	AuditEventObjectTypeStudy          = AuditEventObjectType("study")
+	AuditEventObjectTypeProject        = AuditEventObjectType("project")
+	AuditEventObjectTypeTrainingRecord = AuditEventObjectType("training-record")
 )
 
 type AuditEventObject struct {
 	ID   uuid.UUID
-	Name string
-	Type string
+	Name *string
+	Type AuditEventObjectType
 }
 
 type AuditEvent struct {

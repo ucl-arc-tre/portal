@@ -394,7 +394,7 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 		return types.NewErrFromGorm(err, "failed to record study feedback history")
 	}
 
-	if err := audit.LogStudyFeedback(tx, reviewer, &feedbackEntry); err != nil {
+	if err := audit.LogStudyFeedback(tx, reviewer, feedbackEntry); err != nil {
 		tx.Rollback()
 		return err
 	}

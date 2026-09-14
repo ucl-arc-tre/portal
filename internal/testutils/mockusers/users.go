@@ -63,7 +63,7 @@ func (m *MockUsers) UpdateTraining(user types.User, data openapi.ProfileTraining
 	panic("not implemented")
 }
 
-func (m *MockUsers) CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error {
+func (m *MockUsers) CreateTrainingRecord(updater types.User, record types.UserTrainingRecord) error {
 	panic("not implemented")
 }
 
