@@ -345,6 +345,11 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 		return err
 	}
 
+	if err := audit.LogStudyCreation(tx.db, owner, study); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return s.commitStudyTransaction(tx, &study)
 }
 

@@ -43,3 +43,25 @@ func LogTrainingUpdate(tx *gorm.DB, updater types.User, record types.UserTrainin
 	}
 	return types.NewErrFromGorm(tx.Create(&event).Error, "failed to record study feedback audit event")
 }
+
+func LogStudyCreation(tx *gorm.DB, creator types.User, study types.Study) error {
+	event := types.AuditEvent{
+		UserID:    creator.ID,
+		Operation: types.AuditOperationCreate,
+		Object: types.AuditEventObject{
+			ID:   study.ID,
+			Name: &study.Title,
+			Type: types.AuditEventObjectTypeStudy,
+		},
+		Body: fmt.Sprintf("Study '%s' created.", study.Title),
+	}
+	return types.NewErrFromGorm(tx.Create(&event).Error, "failed to record study creation audit event")
+}
+
+// func LogStudyUpdate() {
+//
+// }
+//
+// func LogStudySignoff() {
+//
+// }
