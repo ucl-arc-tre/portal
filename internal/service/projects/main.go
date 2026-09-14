@@ -271,13 +271,18 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		return types.NewErrFromGorm(err, "failed to create project TRE")
 	}
 
+	if err := audit.LogProjectCreation(tx, creator, project); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	if err := s.createOrUpdateProjectAssets(tx, project.ID, data); err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, &projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -288,11 +293,6 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}
 
 	if _, err := rbac.AddProjectTreOwnerRole(studyUUID, project.ID); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	if err := audit.LogProjectCreation(tx, creator, project); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -477,10 +477,10 @@ func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID
 	return graceful.UpdateManyExisting(tx, existingProjectAssets, requestedAssets)
 }
 
-func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTRE *types.ProjectTRE, members []openapi.ProjectTREMember) error {
 	// Get all existing role bindings (including soft-deleted)
 	existingBindings := []types.ProjectTRERoleBinding{}
-	if err := tx.Unscoped().Where("project_tre_id = ?", projectTREID).Find(&existingBindings).Error; err != nil {
+	if err := tx.Unscoped().Where("project_tre_id = ?", projectTRE.ID).Find(&existingBindings).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list role bindings")
 	}
 
@@ -493,7 +493,7 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 	for _, member := range members {
 		for _, role := range member.Roles {
 			roleBinding := types.ProjectTRERoleBinding{
-				ProjectTREID: projectTREID,
+				ProjectTREID: projectTRE.ID,
 				UserID:       userIds[types.Username(member.Username)],
 				Role:         types.ProjectTRERoleName(role),
 			}
@@ -639,7 +639,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 		return err
 	}
 
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
