@@ -109,3 +109,24 @@ func LogProjectCreation(tx *gorm.DB, creator types.User, project types.Project) 
 	}
 	return createOrError(tx, &event, "failed to record project creation audit event")
 }
+
+func LogProjectTREMemberAssignment(tx *gorm.DB, updater types.User, bindings []types.ProjectTRERoleBinding, project types.Project) error {
+	body := fmt.Sprintf("TRE member role assignments for project '%s':", project.Name)
+	if len(bindings) == 0 {
+		body += " none."
+	}
+	for _, binding := range bindings {
+		if binding.User.Username == "" {
+			return types.NewErrInvalidObject("user missing username")
+		}
+		body += fmt.Sprintf("\nUser %s (%s): '%s'.", binding.User.Username, binding.UserID, binding.Role)
+	}
+
+	event := types.AuditEvent{
+		UserID:    updater.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    project.EventObject(),
+		Body:      body,
+	}
+	return createOrError(tx, &event, "failed to record project TRE member assignment audit event")
+}

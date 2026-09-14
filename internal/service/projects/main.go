@@ -264,6 +264,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		AirlockSSHWhitelist:           data.AirlockSshWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 		Platform:                      types.ProjectTREPlatformAWS,
+		Project:                       project,
 	}
 
 	if err := tx.Create(&projectTRE).Error; err != nil {
@@ -282,7 +283,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, &projectTRE, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, creator, &projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -477,7 +478,7 @@ func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID
 	return graceful.UpdateManyExisting(tx, existingProjectAssets, requestedAssets)
 }
 
-func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTRE *types.ProjectTRE, members []openapi.ProjectTREMember) error {
+func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, updater types.User, projectTRE *types.ProjectTRE, members []openapi.ProjectTREMember) error {
 	// Get all existing role bindings (including soft-deleted)
 	existingBindings := []types.ProjectTRERoleBinding{}
 	if err := tx.Unscoped().Where("project_tre_id = ?", projectTRE.ID).Find(&existingBindings).Error; err != nil {
@@ -491,14 +492,24 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTRE *
 
 	requestedBindings := []types.ProjectTRERoleBinding{}
 	for _, member := range members {
+		userId := userIds[types.Username(member.Username)]
 		for _, role := range member.Roles {
 			roleBinding := types.ProjectTRERoleBinding{
 				ProjectTREID: projectTRE.ID,
-				UserID:       userIds[types.Username(member.Username)],
+				UserID:       userId,
 				Role:         types.ProjectTRERoleName(role),
+				User: types.User{
+					Model:    types.Model{ID: userId},
+					Username: types.Username(member.Username),
+				},
 			}
 			requestedBindings = append(requestedBindings, roleBinding)
 		}
+	}
+
+	if err := audit.LogProjectTREMemberAssignment(tx, updater, requestedBindings, projectTRE.Project); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
@@ -606,7 +617,7 @@ func latestTREDesktopImage(tx *gorm.DB, platform types.ProjectTREPlatform) (*typ
 	return &image, types.NewErrFromGorm(err, "failed to get latest desktop image")
 }
 
-func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate) error {
+func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate, updater types.User) error {
 	if err := s.validateProjectTREUpdate(data, projectTRE); err != nil {
 		return err
 	}
@@ -639,7 +650,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 		return err
 	}
 
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, updater, projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
