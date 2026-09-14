@@ -54,6 +54,7 @@ func InitDB() {
 		&types.TokenVerificationKey{},
 		&types.Token{},
 		&types.Notification{},
+		&types.AuditEvent{},
 	}
 	db := NewDB()
 	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)

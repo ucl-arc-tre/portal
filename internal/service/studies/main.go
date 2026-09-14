@@ -15,6 +15,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/audit"
 	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -391,6 +392,11 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 	if err := tx.Create(&feedbackEntry).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to record study feedback history")
+	}
+
+	if err := audit.LogStudyFeedback(tx, reviewer, &feedbackEntry); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {
