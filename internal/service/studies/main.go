@@ -511,6 +511,11 @@ func (s *Service) UpdateStudyOwner(ctx context.Context, studyUUID uuid.UUID, use
 		return types.NewErrFromGorm(err, "failed to create StudyOwnerChangeLog record")
 	}
 
+	if err := audit.LogStudyOwnerChangeRequest(tx, user, study, study.Owner, *newOwner); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	if err := commitTransaction(tx); err != nil {
 		return err
 	}
@@ -588,6 +593,11 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 	}
 
 	if _, err := rbac.RemoveStudyOwnerRole(oldOwner, studyUUID); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := audit.LogStudyOwnerChangeApproval(tx, user, study, oldOwner, *newOwner); err != nil {
 		tx.Rollback()
 		return err
 	}

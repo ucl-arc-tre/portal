@@ -21,12 +21,8 @@ func LogStudyFeedback(tx *gorm.DB, reviewer types.User, feedback types.StudyFeed
 	event := types.AuditEvent{
 		UserID:    reviewer.ID,
 		Operation: types.AuditOperationUpdate,
-		Object: types.AuditEventObject{
-			ID:   study.ID,
-			Name: &study.Title,
-			Type: types.AuditEventObjectTypeStudy,
-		},
-		Body: body,
+		Object:    study.EventObject(),
+		Body:      body,
 	}
 	return createOrError(tx, &event, "failed to record study feedback audit event")
 }
@@ -48,12 +44,8 @@ func LogStudyCreation(tx *gorm.DB, creator types.User, study types.Study) error 
 	event := types.AuditEvent{
 		UserID:    creator.ID,
 		Operation: types.AuditOperationCreate,
-		Object: types.AuditEventObject{
-			ID:   study.ID,
-			Name: &study.Title,
-			Type: types.AuditEventObjectTypeStudy,
-		},
-		Body: fmt.Sprintf("Study '%s' created.", study.Title),
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("Study '%s' created.", study.Title),
 	}
 	return createOrError(tx, &event, "failed to record study creation audit event")
 }
@@ -62,12 +54,8 @@ func LogStudyAdministratorAssignment(tx *gorm.DB, updater types.User, administra
 	event := types.AuditEvent{
 		UserID:    updater.ID,
 		Operation: types.AuditOperationUpdate,
-		Object: types.AuditEventObject{
-			ID:   study.ID,
-			Name: &study.Title,
-			Type: types.AuditEventObjectTypeStudy,
-		},
-		Body: fmt.Sprintf("User '%s' (%s) assigned as an administrator of study '%s'.", administrator.Username, administrator.ID, study.Title),
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("User '%s' (%s) assigned as an administrator of study '%s'.", administrator.Username, administrator.ID, study.Title),
 	}
 	return createOrError(tx, &event, "failed to record study administrator assignment audit event")
 }
@@ -76,20 +64,28 @@ func LogStudyAdministratorRemoval(tx *gorm.DB, updater types.User, administrator
 	event := types.AuditEvent{
 		UserID:    updater.ID,
 		Operation: types.AuditOperationUpdate,
-		Object: types.AuditEventObject{
-			ID:   study.ID,
-			Name: &study.Title,
-			Type: types.AuditEventObjectTypeStudy,
-		},
-		Body: fmt.Sprintf("User '%s' (%s) removed as an administrator of study '%s'.", administrator.Username, administrator.ID, study.Title),
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("User '%s' (%s) removed as an administrator of study '%s'.", administrator.Username, administrator.ID, study.Title),
 	}
 	return createOrError(tx, &event, "failed to record study administrator removal audit event")
 }
 
-// func LogStudyUpdate() {
-//
-// }
-//
-// func LogStudySignoff() {
-//
-// }
+func LogStudyOwnerChangeRequest(tx *gorm.DB, requester types.User, study types.Study, fromOwner types.User, toOwner types.User) error {
+	event := types.AuditEvent{
+		UserID:    requester.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("Study owner change requested from '%s' (%s) to '%s' (%s).", fromOwner.Username, fromOwner.ID, toOwner.Username, toOwner.ID),
+	}
+	return createOrError(tx, &event, "failed to record study owner change request audit event")
+}
+
+func LogStudyOwnerChangeApproval(tx *gorm.DB, approver types.User, study types.Study, fromOwner types.User, toOwner types.User) error {
+	event := types.AuditEvent{
+		UserID:    approver.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("Study owner change approved from '%s' (%s) to '%s' (%s).", fromOwner.Username, fromOwner.ID, toOwner.Username, toOwner.ID),
+	}
+	return createOrError(tx, &event, "failed to record study owner change approval audit event")
+}

@@ -47,6 +47,14 @@ type Study struct {
 	OwnerChangelogs []StudyOwnerChangelog `gorm:"foreignKey:StudyID"`
 }
 
+func (s Study) EventObject() AuditEventObject {
+	return AuditEventObject{
+		ID:   s.ID,
+		Name: new(fmt.Sprintf("%s (%d)", s.Title, s.Caseref)),
+		Type: AuditEventObjectTypeStudy,
+	}
+}
+
 // Latest study owner changelog record. Optional
 func (s Study) LatestOwnerChange() *StudyOwnerChangelog {
 	var latest *StudyOwnerChangelog
