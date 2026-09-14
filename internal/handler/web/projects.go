@@ -240,7 +240,7 @@ func (h *Handler) DeleteProjectsTreProjectId(ctx *gin.Context, projectId string)
 		return
 	}
 
-	err = h.projects.DeleteProjectTRE(projectUUID)
+	err = h.projects.DeleteProjectTRE(projectUUID, middleware.GetUser(ctx))
 	if err != nil {
 		setError(ctx, err, "Failed to delete project")
 		return

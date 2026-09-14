@@ -140,3 +140,13 @@ func LogProjectAccessReviewSignoff(tx *gorm.DB, signer types.User, project types
 	}
 	return createOrError(tx, &event, "failed to record project access review signoff audit event")
 }
+
+func LogProjectTREDeleted(tx *gorm.DB, deleter types.User, project types.Project) error {
+	event := types.AuditEvent{
+		UserID:    deleter.ID,
+		Operation: types.AuditOperationDelete,
+		Object:    project.EventObject(),
+		Body:      fmt.Sprintf("TRE project '%s' deleted.", project.Name),
+	}
+	return createOrError(tx, &event, "failed to record project TRE deletion audit event")
+}

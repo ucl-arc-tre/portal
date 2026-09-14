@@ -680,13 +680,13 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
 }
 
-func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
+func (s *Service) DeleteProjectTRE(projectId uuid.UUID, deleter types.User) error {
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// Retrieve the ProjectTRE
 	var projectTRE types.ProjectTRE
-	err := tx.Where("project_id = ?", projectId).First(&projectTRE).Error
+	err := tx.Preload("Project").Where("project_id = ?", projectId).First(&projectTRE).Error
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to find project TRE")
@@ -729,6 +729,11 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to delete project")
+	}
+
+	if err := audit.LogProjectTREDeleted(tx, deleter, projectTRE.Project); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit delete project transaction")
