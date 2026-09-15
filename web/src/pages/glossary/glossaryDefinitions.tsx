@@ -33,3 +33,11 @@ export default function EntityGlossaryDefinition({ word }: { word: keyof typeof 
     </Card>
   );
 }
+
+export function RoleGlossaryDefinition({ word }: { word: keyof typeof roleDefinitions }) {
+  return (
+    <Card title={word}>
+      <em>{roleDefinitions[word]}</em>
+    </Card>
+  );
+}
