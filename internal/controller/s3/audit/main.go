@@ -1,7 +1,9 @@
-package s3
+package s3audit
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -21,11 +23,6 @@ type ClientInterface interface {
 		input *awsS3.GetObjectInput,
 		optFns ...func(*awsS3.Options),
 	) (*awsS3.GetObjectOutput, error)
-	DeleteObject(
-		ctx context.Context,
-		input *awsS3.DeleteObjectInput,
-		optFns ...func(*awsS3.Options),
-	) (*awsS3.DeleteObjectOutput, error)
 }
 
 type Controller struct {
@@ -34,7 +31,7 @@ type Controller struct {
 }
 
 func New() *Controller {
-	credentials := config.S3ObjectCredentials()
+	credentials := config.S3AuditCredentials()
 	log.Debug().Any("accessKeyId", credentials.AccessKeyId).Msg("Creating S3 controller")
 	config, err := awsConfig.LoadDefaultConfig(
 		context.Background(),
@@ -45,7 +42,7 @@ func New() *Controller {
 			},
 		}),
 
-		awsConfig.WithRegion(config.S3ObjectRegion()),
+		awsConfig.WithRegion(config.S3AuditRegion()),
 	)
 	if err != nil {
 		log.Err(err).Msg("Failed to load AWS config. Returning a nil controller")
@@ -62,42 +59,17 @@ func New() *Controller {
 	return &controller
 }
 
-func (c *Controller) StoreObject(ctx context.Context, metadata ObjectMetadata, obj types.S3Object) error {
-	log.Debug().Any("metadata", metadata).Msg("Uploading S3 object")
-	_, err := c.uploader.Upload(ctx, &awsS3.PutObjectInput{
-		Bucket: aws.String(config.S3ObjectBucketName()),
-		Key:    aws.String(metadata.Key()),
-		Body:   obj.Content,
+func (c *Controller) Upload(batch AuditBatch) error {
+	date := time.Now().Format(time.DateOnly) // e.g. 2026-02-01
+	key := fmt.Sprintf("audit/batch_%s_%d", date, batch.BatchNumber)
+	log.Debug().Any("key", key).Msg("Uploading S3 audit batch")
+
+	_, err := c.uploader.Upload(context.Background(), &awsS3.PutObjectInput{
+		Bucket: aws.String(config.S3AuditBucketName()),
+		Key:    aws.String(key),
+		Body:   batch.Body,
 	})
 	return types.NewErrServerError(err)
-}
-
-func (c *Controller) GetObject(ctx context.Context, metadata ObjectMetadata) (types.S3Object, error) {
-	log.Debug().Any("metadata", metadata).Msg("Downloading S3 object")
-	output, err := c.client.GetObject(ctx, &awsS3.GetObjectInput{
-		Bucket: aws.String(config.S3ObjectBucketName()),
-		Key:    aws.String(metadata.Key()),
-	})
-	if err != nil {
-		return types.S3Object{}, types.NewErrServerError(err)
-	}
-	object := types.S3Object{
-		Content:  output.Body,
-		NumBytes: output.ContentLength,
-	}
-	return object, nil
-}
-
-func (c *Controller) DeleteObject(metadata ObjectMetadata) error {
-	log.Debug().Any("metadata", metadata).Msg("Deleting S3 object")
-	_, err := c.client.DeleteObject(context.Background(), &awsS3.DeleteObjectInput{
-		Bucket: aws.String(config.S3ObjectBucketName()),
-		Key:    aws.String(metadata.Key()),
-	})
-	if err != nil {
-		return types.NewErrServerError(err)
-	}
-	return nil
 }
 
 func makeResolver() awsS3.EndpointResolverV2 {
@@ -107,7 +79,7 @@ func makeResolver() awsS3.EndpointResolverV2 {
 	}
 	if s3DevHostIsSet {
 		log.Warn().Msg("S3DevHost is set - using dev resolver for s3")
-		return dev.DevResolver{Bucket: config.S3ObjectBucketName()}
+		return dev.DevResolver{Bucket: config.S3AuditBucketName()}
 	}
 	return awsS3.NewDefaultEndpointResolverV2()
 }

@@ -100,9 +100,14 @@ jobs:
           s3:
             dev:
               host: s3:8333
-            bucket: bucket-name
-            access_key_id: s3
-            secret_access_key: s3
+            object:
+              bucket: bucket-name
+              access_key_id: s3
+              secret_access_key: s3
+            audit:
+              bucket: bucket-name
+              access_key_id: s3
+              secret_access_key: s3
           entra:
             tenant_id: ${{ secrets.OAUTH2PROXY_TENANT_ID }}
             client_id: ${{ secrets.OAUTH2PROXY_CLIENT_ID }}

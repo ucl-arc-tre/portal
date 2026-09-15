@@ -10,7 +10,9 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/config"
 )
 
-type DevResolver struct{}
+type DevResolver struct {
+	Bucket string
+}
 
 func (r DevResolver) ResolveEndpoint(ctx context.Context, params awsS3.EndpointParameters) (
 	awsEndpoints.Endpoint, error,
@@ -18,7 +20,7 @@ func (r DevResolver) ResolveEndpoint(ctx context.Context, params awsS3.EndpointP
 	uri := url.URL{
 		Scheme: "http",
 		Host:   config.S3DevHost(),
-		Path:   config.S3BucketName(),
+		Path:   r.Bucket,
 	}
 	return awsEndpoints.Endpoint{URI: uri}, nil
 }
