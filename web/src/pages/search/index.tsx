@@ -3,6 +3,7 @@ import LoginFallback from "@/components/ui/LoginFallback";
 import Title from "@/components/ui/Title";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertMessage } from "@/components/ui/uikitExports";
+import IGSearch from "@/components/search/IGSearch";
 
 export default function SearchPage() {
   const { authInProgress, isAuthed, isIGStaff, isAdmin } = useAuth();
@@ -31,6 +32,7 @@ export default function SearchPage() {
         centered
         description={"Search studies, assets, contracts, projects and people in the ARC Services Portal"}
       />
+      <IGSearch />
     </>
   );
 }
