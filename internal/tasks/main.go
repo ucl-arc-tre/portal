@@ -20,7 +20,7 @@ type Manager struct {
 	db            *gorm.DB
 	notifications notifications.Interface
 	users         *users.Service
-	s3Audit       *s3audit.Controller
+	s3Audit       s3audit.Interface
 }
 
 // Create a task manager instance

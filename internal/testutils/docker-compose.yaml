@@ -34,5 +34,6 @@ services:
       - go
       - test
       - ./internal/service/...
+      - ./internal/tasks/...
       - -tags=integration
       - -v
