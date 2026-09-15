@@ -42,7 +42,7 @@ const SecondaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) 
 const PrimaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.PrimaryItem), {
   ssr: false,
 });
-const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
+export const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
   ssr: false,
 });
 
