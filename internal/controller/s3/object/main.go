@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/s3/dev"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -106,7 +107,7 @@ func makeResolver() awsS3.EndpointResolverV2 {
 	}
 	if s3DevHostIsSet {
 		log.Warn().Msg("S3DevHost is set - using dev resolver for s3")
-		return DevResolver{}
+		return dev.DevResolver{}
 	}
 	return awsS3.NewDefaultEndpointResolverV2()
 }

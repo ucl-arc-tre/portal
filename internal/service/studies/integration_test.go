@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/ucl-arc-tre/portal/internal/config"
-	"github.com/ucl-arc-tre/portal/internal/controller/s3"
+	"github.com/ucl-arc-tre/portal/internal/controller/s3/object"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/testutils/mockcontrollers"
