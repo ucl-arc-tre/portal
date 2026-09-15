@@ -37,7 +37,7 @@ func LogTrainingUpdate(tx *gorm.DB, updater types.User, record types.UserTrainin
 		},
 		Body: fmt.Sprintf("Training '%s' updated to completed at '%s'", record.Kind, marshalTime(record.CompletedAt)),
 	}
-	return createOrError(tx, &event, "failed to record study feedback audit event")
+	return createOrError(tx, &event, "failed to record training update audit event")
 }
 
 func LogStudyCreation(tx *gorm.DB, creator types.User, study types.Study) error {

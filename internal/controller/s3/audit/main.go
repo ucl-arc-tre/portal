@@ -33,7 +33,6 @@ type Controller struct {
 
 func New() *Controller {
 	credentials := config.S3AuditCredentials()
-	log.Debug().Any("accessKeyId", credentials.AccessKeyId).Msg("Creating S3 controller")
 	config, err := awsConfig.LoadDefaultConfig(
 		context.Background(),
 		awsConfig.WithCredentialsProvider(awsCredentials.StaticCredentialsProvider{
