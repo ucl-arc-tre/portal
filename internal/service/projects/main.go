@@ -454,22 +454,34 @@ func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error
 		return types.NewErrClientInvalidObject("cannot approve a project you own")
 	}
 
-	result := s.db.Model(&types.ProjectTRE{}).
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	result := tx.Model(&types.ProjectTRE{}).
 		Where("project_id = ?", projectId).
 		Where("status = ?", types.ProjectTREStatusPendingApproval).
 		Update("status", types.ProjectTREStatusPendingCreation)
-	if result.RowsAffected == 0 {
-		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
-	}
 	if result.Error != nil {
+		tx.Rollback()
 		return types.NewErrFromGorm(result.Error, "failed to approve project")
+	}
+	if result.RowsAffected == 0 {
+		tx.Rollback()
+		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
 	}
 
 	// initialise the access review timestamp
-	if err := s.db.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+	if err := tx.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
 	}
-	return nil
+
+	if err := audit.LogProjectTREApproval(tx, approver, projectTRE.Project); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit project approval transaction")
 }
 
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {

@@ -110,6 +110,16 @@ func LogProjectCreation(tx *gorm.DB, creator types.User, project types.Project) 
 	return createOrError(tx, &event, "failed to record project creation audit event")
 }
 
+func LogProjectTREApproval(tx *gorm.DB, approver types.User, project types.Project) error {
+	event := types.AuditEvent{
+		UserID:    approver.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    project.EventObject(),
+		Body:      fmt.Sprintf("TRE project '%s' approved.", project.Name),
+	}
+	return createOrError(tx, &event, "failed to record project TRE approval audit event")
+}
+
 func LogProjectTREMemberAssignment(tx *gorm.DB, updater types.User, bindings []types.ProjectTRERoleBinding, project types.Project) error {
 	body := fmt.Sprintf("TRE member role assignments for project '%s':", project.Name)
 	if len(bindings) == 0 {
