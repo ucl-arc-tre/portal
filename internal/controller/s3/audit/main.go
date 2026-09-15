@@ -10,6 +10,7 @@ import (
 	awsCredentials "github.com/aws/aws-sdk-go-v2/credentials"
 	awsS3Manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	awsS3 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
@@ -61,7 +62,7 @@ func New() *Controller {
 
 func (c *Controller) Upload(batch AuditBatch) error {
 	date := time.Now().Format(time.DateOnly) // e.g. 2026-02-01
-	key := fmt.Sprintf("audit/batch_%s_%d", date, batch.BatchNumber)
+	key := fmt.Sprintf("audit/%s/%s.jsonl", date, uuid.NewString())
 	log.Debug().Any("key", key).Msg("Uploading S3 audit batch")
 
 	_, err := c.uploader.Upload(context.Background(), &awsS3.PutObjectInput{

@@ -34,6 +34,7 @@ type AuditEvent struct {
 	Operation AuditOperation
 	Object    AuditEventObject `gorm:"serializer:json"`
 	Body      string           `gorm:"not null"`
+	Uploaded  bool             `gorm:"not null"`
 
 	// Relationships
 	User User `gorm:"foreignKey:UserID"`

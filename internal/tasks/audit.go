@@ -10,22 +10,27 @@ import (
 )
 
 const (
-	maxAuditEventBatchSize = 10_000 // assume 1KB per event, so max is ~10,000 rows = 10 MB
+	maxAuditEventBatchSize = 1_000 // assume 1KB per event, so max is ~1,000 rows = 1 MB
 )
 
 func (m *Manager) uploadAuditLog() error {
-	var auditEventCount int64
-	if err := m.db.Model(&types.AuditEvent{}).Count(&auditEventCount).Error; err != nil {
-		return types.NewErrFromGorm(err, "failed to count audit events")
-	}
-
 	events := []types.AuditEvent{}
 	result := m.db.Preload("User").
-		FindInBatches(&events, maxAuditEventBatchSize, func(_ *gorm.DB, batchNumber int) error {
-			return m.uploadAuditLogBatch(events, batchNumber)
+		Where("uploaded = false").
+		FindInBatches(&events, maxAuditEventBatchSize, func(tx *gorm.DB, batchNumber int) error {
+			if err := m.uploadAuditLogBatch(events, batchNumber); err != nil {
+				return err
+			}
+			for i, event := range events {
+				event.Uploaded = true
+				events[i] = event
+			}
+			return types.NewErrFromGorm(tx.Save(&events).Error, "failed to save")
 		})
-
-	return types.NewErrFromGorm(result.Error, "failed to find audit events in batches")
+	if err := result.Error; err != nil {
+		return types.NewErrFromGorm(result.Error, "failed to find audit events in batches")
+	}
+	return nil
 }
 
 func (m *Manager) uploadAuditLogBatch(events []types.AuditEvent, batchNumber int) error {

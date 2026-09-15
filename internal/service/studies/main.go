@@ -290,6 +290,7 @@ func (s *Service) createStudyAdmins(tx *StudyTransaction, users []types.User, st
 			if err := tx.db.Unscoped().Model(&studyAdmin).Update("deleted_at", nil).Error; err != nil {
 				return types.NewErrFromGorm(err, "failed to undelete study admin")
 			}
+			tx.newIAAs = append(tx.newIAAs, studyAdmin.User)
 		}
 	}
 
