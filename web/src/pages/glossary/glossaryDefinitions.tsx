@@ -15,11 +15,33 @@ const DSHEntityDefinitions = {
   environment: "Environments do not exist within the DSH, the DSH is the Environment",
 };
 
-const roleDefinitions = {
-  approved_researcher: "An Approved Researcher is one who has provided sufficient ceertification of security training",
-  approved_staff_researcher: "An Approved Staff Researcher is an Approved Researcher with UCL staff status",
-  iao: "An Information Asset Owner (IAO) is an Approved Researcher who owns a Study and is responsible for the data within it",
-  iaa: "An Information Asset Administrator (IAA) is an Approved Researcher who is responsible for managing access to a Study and its data",
+const TREEntityDefinitions = {
+  study: "Studies are the same",
+  project: "Projects are the same",
+  asset: "Assets are the same",
+  contract: "Contracts are the same",
+  environment: "Environments do not exist within the TRE, the TRE is the Environment",
+};
+
+export const roleDefinitions = {
+  approved_researcher: {
+    definition: "One who has provided sufficient certification of security training",
+    label: "Approved Researcher",
+  },
+  approved_staff_researcher: {
+    definition: "An Approved Researcher with UCL staff status",
+    label: "Approved Staff Researcher",
+  },
+  iao: {
+    definition:
+      "An Approved Researcher who owns a Study and is responsible for the data within it. Also referenced as IAO",
+    label: "Information Asset Owner",
+  },
+  iaa: {
+    definition:
+      "An Approved Researcher who is responsible for managing access to a Study and its data. Also referenced as IAA",
+    label: "Information Asset Administrator",
+  },
 };
 
 export default function EntityGlossaryDefinition({ word }: { word: keyof typeof portalEntityDefinitions }) {
@@ -30,14 +52,17 @@ export default function EntityGlossaryDefinition({ word }: { word: keyof typeof 
       <p>
         <strong>In DSH:</strong> {DSHEntityDefinitions[word]}
       </p>
+      <p>
+        <strong>In TRE:</strong> {TREEntityDefinitions[word]}
+      </p>
     </Card>
   );
 }
 
 export function RoleGlossaryDefinition({ word }: { word: keyof typeof roleDefinitions }) {
   return (
-    <Card title={word}>
-      <em>{roleDefinitions[word]}</em>
+    <Card title={roleDefinitions[word].label}>
+      <em>{roleDefinitions[word].definition}</em>
     </Card>
   );
 }
