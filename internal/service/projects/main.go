@@ -17,12 +17,14 @@ import (
 	treopenapi "github.com/ucl-arc-tre/portal/internal/openapi/tre"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/audit"
 	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -263,11 +265,17 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		AirlockSSHWhitelist:           data.AirlockSshWhitelist,
 		Status:                        types.ProjectTREStatusIncomplete,
 		Platform:                      types.ProjectTREPlatformAWS,
+		Project:                       project,
 	}
 
 	if err := tx.Create(&projectTRE).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create project TRE")
+	}
+
+	if err := audit.LogProjectCreation(tx, creator, project); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	if err := s.createOrUpdateProjectAssets(tx, project.ID, data); err != nil {
@@ -276,7 +284,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	}
 
 	// Create ProjectTRERoleBinding records for each member+role
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, creator, &projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -298,10 +306,26 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 	return nil
 }
 
-func (s *Service) RecordProjectAccessReviewSignoff(id uuid.UUID) error {
-	now := time.Now()
-	db := s.db.Model(&types.Project{}).Where("id = ?", id).Update("last_access_review", now)
-	return types.NewErrFromGorm(db.Error, "failed to record project access review signoff")
+func (s *Service) RecordProjectAccessReviewSignoff(id uuid.UUID, signer types.User) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	var project types.Project
+	db := tx.Model(&project).Clauses(clause.Returning{}).Where("id = ?", id).Update("last_access_review", time.Now())
+	if err := db.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to record project access review signoff")
+	} else if db.RowsAffected == 0 {
+		tx.Rollback()
+		return types.NewNotFoundError("project not found")
+	}
+
+	if err := audit.LogProjectAccessReviewSignoff(tx, signer, project); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit project access review signoff transaction")
 }
 
 // retrieves projects by their IDs
@@ -430,22 +454,34 @@ func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error
 		return types.NewErrClientInvalidObject("cannot approve a project you own")
 	}
 
-	result := s.db.Model(&types.ProjectTRE{}).
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	result := tx.Model(&types.ProjectTRE{}).
 		Where("project_id = ?", projectId).
 		Where("status = ?", types.ProjectTREStatusPendingApproval).
 		Update("status", types.ProjectTREStatusPendingCreation)
-	if result.RowsAffected == 0 {
-		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
-	}
 	if result.Error != nil {
+		tx.Rollback()
 		return types.NewErrFromGorm(result.Error, "failed to approve project")
+	}
+	if result.RowsAffected == 0 {
+		tx.Rollback()
+		return types.NewErrInvalidObjectF("project must be in pending approval status to be approved")
 	}
 
 	// initialise the access review timestamp
-	if err := s.db.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+	if err := tx.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
 	}
-	return nil
+
+	if err := audit.LogProjectTREApproval(tx, approver, projectTRE.Project); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit project approval transaction")
 }
 
 func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID, project openapi.ProjectWithAssets) error {
@@ -471,10 +507,10 @@ func (s *Service) createOrUpdateProjectAssets(tx *gorm.DB, projectUUID uuid.UUID
 	return graceful.UpdateManyExisting(tx, existingProjectAssets, requestedAssets)
 }
 
-func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID uuid.UUID, members []openapi.ProjectTREMember) error {
+func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, updater types.User, projectTRE *types.ProjectTRE, members []openapi.ProjectTREMember) error {
 	// Get all existing role bindings (including soft-deleted)
 	existingBindings := []types.ProjectTRERoleBinding{}
-	if err := tx.Unscoped().Where("project_tre_id = ?", projectTREID).Find(&existingBindings).Error; err != nil {
+	if err := tx.Unscoped().Where("project_tre_id = ?", projectTRE.ID).Find(&existingBindings).Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to list role bindings")
 	}
 
@@ -485,14 +521,24 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, projectTREID
 
 	requestedBindings := []types.ProjectTRERoleBinding{}
 	for _, member := range members {
+		userId := userIds[types.Username(member.Username)]
 		for _, role := range member.Roles {
 			roleBinding := types.ProjectTRERoleBinding{
-				ProjectTREID: projectTREID,
-				UserID:       userIds[types.Username(member.Username)],
+				ProjectTREID: projectTRE.ID,
+				UserID:       userId,
 				Role:         types.ProjectTRERoleName(role),
+				User: types.User{
+					Model:    types.Model{ID: userId},
+					Username: types.Username(member.Username),
+				},
 			}
 			requestedBindings = append(requestedBindings, roleBinding)
 		}
+	}
+
+	if err := audit.LogProjectTREMemberAssignment(tx, updater, requestedBindings, projectTRE.Project); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	return graceful.UpdateManyExisting(tx, existingBindings, requestedBindings)
@@ -600,7 +646,7 @@ func latestTREDesktopImage(tx *gorm.DB, platform types.ProjectTREPlatform) (*typ
 	return &image, types.NewErrFromGorm(err, "failed to get latest desktop image")
 }
 
-func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate) error {
+func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate, updater types.User) error {
 	if err := s.validateProjectTREUpdate(data, projectTRE); err != nil {
 		return err
 	}
@@ -633,7 +679,7 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 		return err
 	}
 
-	if err := s.createOrUpdateProjectTRERoleBindings(tx, projectTRE.ID, data.Members); err != nil {
+	if err := s.createOrUpdateProjectTRERoleBindings(tx, updater, projectTRE, data.Members); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -646,13 +692,13 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
 }
 
-func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
+func (s *Service) DeleteProjectTRE(projectId uuid.UUID, deleter types.User) error {
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
 	// Retrieve the ProjectTRE
 	var projectTRE types.ProjectTRE
-	err := tx.Where("project_id = ?", projectId).First(&projectTRE).Error
+	err := tx.Preload("Project").Where("project_id = ?", projectId).First(&projectTRE).Error
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to find project TRE")
@@ -695,6 +741,11 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID) error {
 	if err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to delete project")
+	}
+
+	if err := audit.LogProjectTREDeleted(tx, deleter, projectTRE.Project); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit delete project transaction")

@@ -56,6 +56,8 @@ func (h *Handler) GetUsersLookup(ctx *gin.Context, params openapi.GetUsersLookup
 }
 
 func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
+	updater := middleware.GetUser(ctx)
+
 	var update openapi.UserTrainingUpdate
 	if err := bindJSONOrSetError(ctx, &update); err != nil {
 		return
@@ -81,8 +83,14 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 		setError(ctx, err, "Failed to get person")
 		return
 	}
+	record := types.UserTrainingRecord{
+		UserID:      user.ID,
+		User:        *user,
+		Kind:        update.TypesTrainingKind(),
+		CompletedAt: trainingDate,
+	}
 
-	if err := h.users.CreateTrainingRecord(*user, update.TypesTrainingKind(), trainingDate); err != nil {
+	if err := h.users.CreateTrainingRecord(updater, record); err != nil {
 		setError(ctx, err, "Failed to update training validity")
 		return
 	}

@@ -43,7 +43,12 @@ func (s *Service) ImportApprovedResearchersCSV(
 			return err
 		}
 		if record.NHSDTrainingCompletedAt != nil {
-			if err := s.CreateTrainingRecord(user, types.TrainingKindNHSD, *record.NHSDTrainingCompletedAt); err != nil {
+			if err := s.CreateTrainingRecord(importer, types.UserTrainingRecord{
+				UserID:      user.ID,
+				User:        user,
+				Kind:        types.TrainingKindNHSD,
+				CompletedAt: *record.NHSDTrainingCompletedAt,
+			}); err != nil {
 				return err
 			}
 		}

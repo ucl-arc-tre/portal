@@ -72,19 +72,38 @@ func DBDataSourceName() string {
 	return k.String("db.dsn")
 }
 
-func S3Credentials() S3CredentialBundle {
+func S3ObjectCredentials() S3CredentialBundle {
 	return S3CredentialBundle{
-		AccessKeyId:     k.String("s3.access_key_id"),
-		SecretAccessKey: k.String("s3.secret_access_key"),
+		AccessKeyId:     k.String("s3.object.access_key_id"),
+		SecretAccessKey: k.String("s3.object.secret_access_key"),
 	}
 }
 
-func S3Region() string {
-	return k.String("s3.region")
+func S3AuditRegion() string {
+	return k.String("s3.audit.region")
 }
 
-func S3BucketName() string {
-	return k.String("s3.bucket")
+func S3AuditBucketName() string {
+	return k.String("s3.audit.bucket")
+}
+
+func S3AuditEnabled() bool {
+	return S3AuditBucketName() != ""
+}
+
+func S3AuditCredentials() S3CredentialBundle {
+	return S3CredentialBundle{
+		AccessKeyId:     k.String("s3.audit.access_key_id"),
+		SecretAccessKey: k.String("s3.audit.secret_access_key"),
+	}
+}
+
+func S3ObjectRegion() string {
+	return k.String("s3.object.region")
+}
+
+func S3ObjectBucketName() string {
+	return k.String("s3.object.bucket")
 }
 
 func S3DevHost() string {
