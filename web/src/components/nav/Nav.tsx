@@ -27,6 +27,9 @@ const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const MetricsIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Disc), {
   ssr: false,
 });
+const SearchIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Search), {
+  ssr: false,
+});
 const MenuSection = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Section), {
   ssr: false,
 });
@@ -81,7 +84,7 @@ export default function Nav() {
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
   const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff || isIGStaff;
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
-  const canSeeMetrics = isAdmin || isIGStaff;
+  const canSeeIGOpsTools = isAdmin || isIGStaff;
 
   return (
     <aside className={styles.sidebar}>
@@ -102,10 +105,20 @@ export default function Nav() {
 
           {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
 
-          {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
-
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </MenuSection>
+
+        {canSeeIGOpsTools && (
+          <>
+            <MenuDivider />
+            <p className={styles.sectionLabel}>IG Ops</p>
+            <MenuSection>
+              <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />
+              <NavItem href="/search" icon={<SearchIcon />} title="Search" />
+            </MenuSection>
+          </>
+        )}
+
         <MenuDivider />
         <MenuSection>
           <a href={logoutUrl}>
