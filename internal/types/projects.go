@@ -22,6 +22,14 @@ type Project struct {
 	ProjectAssets []ProjectAsset `gorm:"foreignKey:ProjectID"`
 }
 
+func (p Project) EventObject() AuditEventObject {
+	return AuditEventObject{
+		ID:   p.ID,
+		Name: &p.Name,
+		Type: AuditEventObjectTypeProject,
+	}
+}
+
 type Dollars = int
 
 type ProjectTRE struct {

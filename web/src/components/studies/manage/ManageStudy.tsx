@@ -207,12 +207,18 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
             {projects.length === 0
               ? "No Projects have been created for this Study yet."
               : "Only Projects for this Study are shown here."}{" "}
-            Visit the{" "}
-            <TextLink href="/projects" data-cy="projects-page">
-              Projects
-            </TextLink>{" "}
-            page to see the full list of everything you have access to, or create a{" "}
-            <TextLink href="/projects?create=true">new Project</TextLink>
+            {study.approval_status === "Approved" ? (
+              <>
+                Visit the{" "}
+                <TextLink href="/projects" data-cy="projects-page">
+                  Projects
+                </TextLink>{" "}
+                page to see the full list of everything you have access to, or create a{" "}
+                <TextLink href="/projects?create=true">new Project</TextLink>
+              </>
+            ) : (
+              "Once the study is approved you will be able to create a project."
+            )}
           </HelperText>
           <br></br>
           <ProjectCardsList projects={projects} />

@@ -14,6 +14,7 @@ const (
 	NotificationKindAssetExpiry         = NotificationKind("asset-expiry")
 	NotificationKindTrainingExpiry      = NotificationKind("training-expiry")
 	NotificationKindIaaAssignment       = NotificationKind("iaa-assignment")
+	NotificationKindIaaRemoval          = NotificationKind("iaa-removal")
 	NotificationKindStdyAffirmation     = NotificationKind("study-affirmation")
 	NotificationKindStudyReview         = NotificationKind("study-review")
 	NotificationKindStudyOwnerChange    = NotificationKind("study-owner-change")

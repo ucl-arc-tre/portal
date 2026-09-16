@@ -226,7 +226,7 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		return
 	}
 
-	if err := h.projects.UpdateProjectTRE(projectTRE, projectUpdateData); err != nil {
+	if err := h.projects.UpdateProjectTRE(projectTRE, projectUpdateData, middleware.GetUser(ctx)); err != nil {
 		setError(ctx, err, "Failed to update project")
 		return
 	}
@@ -240,7 +240,7 @@ func (h *Handler) DeleteProjectsTreProjectId(ctx *gin.Context, projectId string)
 		return
 	}
 
-	err = h.projects.DeleteProjectTRE(projectUUID)
+	err = h.projects.DeleteProjectTRE(projectUUID, middleware.GetUser(ctx))
 	if err != nil {
 		setError(ctx, err, "Failed to delete project")
 		return
@@ -383,7 +383,7 @@ func (h *Handler) postProjectsProjectIdAccessReviewSignoff(ctx *gin.Context, pro
 		return
 	}
 
-	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID); err != nil {
+	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID, middleware.GetUser(ctx)); err != nil {
 		setError(ctx, err, "Failed to record project access review signoff")
 		return
 	}

@@ -162,10 +162,6 @@ describe("Study creation end-to-end", () => {
     cy.get('button[data-cy="projects"]').click();
 
     cy.contains("No Projects have been created for this Study yet.").should("be.visible");
-    cy.get('[data-cy="projects-page"]').click();
-
-    cy.url().should("include", "/projects");
-    cy.get('[data-cy="create-project-button"]').should("be.visible");
   });
 
   it("owner should be able to edit an asset", () => {
@@ -329,7 +325,7 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-cy="study-approve-button"]').click();
   });
 
-  it("staff should see an approved study and feedback history", () => {
+  it("staff should see an approved study", () => {
     cy.loginAsStaff();
 
     cy.visit("/studies");
@@ -337,6 +333,25 @@ describe("Study creation end-to-end", () => {
 
     cy.contains(studyTitle).click();
     cy.contains("Last signed off").should("exist");
+  });
+
+  it("staff should be linked to create projects", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).click();
+
+    cy.get('button[data-cy="projects"]').click();
+    cy.get('[data-cy="projects-page"]').click();
+    cy.url().should("include", "/projects");
+    cy.get('[data-cy="create-project-button"]').should("be.visible");
+  });
+
+  it("staff should see feedback history", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).click();
 
     cy.contains("This study has new feedback:").should("not.exist");
     cy.get('[data-cy="view-feedback-history-button"]').click();

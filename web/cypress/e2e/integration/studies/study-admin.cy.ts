@@ -117,4 +117,30 @@ describe("IG staff as a study admin end-to-end", () => {
     cy.get('[data-cy="study-approve-button"]').click();
     cy.contains("Approved").should("be.visible");
   });
+
+  it("study owner should be able to remove the admin, and the owner is notified", () => {
+    cy.loginAsStaff();
+
+    cy.visit("/studies");
+    cy.contains(studyTitle).click();
+
+    cy.get('[data-cy="edit-study-button"]').click();
+    cy.get('[data-cy="remove-user-from-selection"]').first().click();
+    cy.get('[data-cy="next"]').click();
+    cy.get('[data-cy="next"]').click();
+    cy.get("button[type='submit']").contains("Update Study").click();
+    cy.contains("Update Study").should("not.exist");
+
+    cy.env(["botIGUsername"]).then(({ botIGUsername }) => {
+      cy.visit("/");
+      cy.contains(`${botIGUsername} has been removed as an administrator from '${studyTitle}'`).should("exist");
+    });
+  });
+
+  it("the removed admin should also be notified", () => {
+    cy.loginAsIGOps();
+
+    cy.visit("/");
+    cy.contains(`You have been removed as an administrator from '${studyTitle}'`).should("exist");
+  });
 });
