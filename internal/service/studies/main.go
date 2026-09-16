@@ -11,10 +11,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
-	"github.com/ucl-arc-tre/portal/internal/controller/s3"
+	s3 "github.com/ucl-arc-tre/portal/internal/controller/s3/object"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/audit"
 	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
 	"github.com/ucl-arc-tre/portal/internal/types"
@@ -289,6 +290,7 @@ func (s *Service) createStudyAdmins(tx *StudyTransaction, users []types.User, st
 			if err := tx.db.Unscoped().Model(&studyAdmin).Update("deleted_at", nil).Error; err != nil {
 				return types.NewErrFromGorm(err, "failed to undelete study admin")
 			}
+			tx.newIAAs = append(tx.newIAAs, studyAdmin.User)
 		}
 	}
 
@@ -344,7 +346,12 @@ func (s *Service) createStudy(ctx context.Context, owner types.User, studyData o
 		return err
 	}
 
-	return s.commitStudyTransaction(tx, &study)
+	if err := audit.LogStudyCreation(tx.db, owner, study); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return s.commitStudyTransaction(tx, owner, &study)
 }
 
 func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review openapi.StudyReview, reviewer types.User) error {
@@ -393,6 +400,11 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 		return types.NewErrFromGorm(err, "failed to record study feedback history")
 	}
 
+	if err := audit.LogStudyFeedback(tx, reviewer, feedbackEntry); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	if err := tx.Commit().Error; err != nil {
 		return types.NewErrFromGorm(err, "failed to commit study review transaction")
 	}
@@ -417,13 +429,30 @@ func (s *Service) StudyFeedbackHistory(id uuid.UUID) ([]types.StudyFeedback, err
 	return entries, types.NewErrFromGorm(err, "failed to get study feedback history")
 }
 
-func (s *Service) RecordStudySignoff(id uuid.UUID) error {
-	now := time.Now()
-	db := s.db.Model(&types.Study{}).Where("id = ?", id).Update("last_signoff", now)
-	return types.NewErrFromGorm(db.Error, "failed to record study signoff")
+func (s *Service) RecordStudySignoff(id uuid.UUID, signer types.User) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	var study types.Study
+	db := tx.Model(&study).Clauses(clause.Returning{}).Where("id = ?", id).Update("last_signoff", time.Now())
+	if err := db.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to record study signoff")
+	}
+	if db.RowsAffected == 0 {
+		tx.Rollback()
+		return types.NewNotFoundError("study not found")
+	}
+
+	if err := audit.LogStudySignoff(tx, signer, study); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return commitTransaction(tx)
 }
 
-func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest) error {
+func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest, updater types.User) error {
 	studies, err := s.StudiesById(id)
 	if err != nil {
 		return err
@@ -457,7 +486,7 @@ func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData opena
 		return types.NewErrFromGorm(err, "failed to update study")
 	}
 
-	return s.commitStudyTransaction(tx, &study)
+	return s.commitStudyTransaction(tx, updater, &study)
 }
 
 func (s *Service) UpdateStudyOwner(ctx context.Context, studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
@@ -498,6 +527,11 @@ func (s *Service) UpdateStudyOwner(ctx context.Context, studyUUID uuid.UUID, use
 	if err := tx.Create(&changeEvent).Error; err != nil { // NOTE: must not be first or create. Log is immutable
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create StudyOwnerChangeLog record")
+	}
+
+	if err := audit.LogStudyOwnerChangeRequest(tx, user, study, study.Owner, *newOwner); err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	if err := commitTransaction(tx); err != nil {
@@ -581,14 +615,37 @@ func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data o
 		return err
 	}
 
+	if err := audit.LogStudyOwnerChangeApproval(tx, user, study, oldOwner, *newOwner); err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return commitTransaction(tx)
 }
 
 func (s *Service) newStudyTransaction(ctx context.Context) *StudyTransaction {
-	return &StudyTransaction{ctx: ctx, db: s.db.Begin(), newIAAs: []types.User{}, removedIAAs: []types.User{}}
+	return &StudyTransaction{
+		ctx:         ctx,
+		db:          s.db.Begin(),
+		newIAAs:     []types.User{},
+		removedIAAs: []types.User{},
+	}
 }
 
-func (s *Service) commitStudyTransaction(tx *StudyTransaction, study *types.Study) error {
+func (s *Service) commitStudyTransaction(tx *StudyTransaction, updater types.User, study *types.Study) error {
+	for _, user := range tx.newIAAs {
+		if err := audit.LogStudyAdministratorAssignment(tx.db, updater, user, *study); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	for _, user := range tx.removedIAAs {
+		if err := audit.LogStudyAdministratorRemoval(tx.db, updater, user, *study); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	if err := commitTransaction(tx.db); err != nil {
 		return err
 	}

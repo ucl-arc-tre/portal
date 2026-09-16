@@ -41,6 +41,7 @@ func migrate(db *gorm.DB) error {
 		&types.ProjectTREVMImage{},
 		&types.ProjectAsset{},
 		&types.Notification{},
+		&types.AuditEvent{},
 	)
 	if err != nil {
 		return err

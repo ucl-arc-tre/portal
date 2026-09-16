@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/ucl-arc-tre/portal/internal/controller/s3"
+	s3 "github.com/ucl-arc-tre/portal/internal/controller/s3/object"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 

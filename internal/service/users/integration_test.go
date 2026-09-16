@@ -31,6 +31,7 @@ func migrate(db *gorm.DB) error {
 		&types.UserTrainingRecord{},
 		&types.UserAttributes{},
 		&types.UserSponsorship{},
+		&types.AuditEvent{},
 	)
 	if err != nil {
 		return err
@@ -283,7 +284,12 @@ func TestCreateNHSDTrainingRecord(t *testing.T) {
 
 	completedAt := time.Now().UTC()
 
-	err := service.CreateTrainingRecord(user, types.TrainingKindNHSD, completedAt)
+	err := service.CreateTrainingRecord(user, types.UserTrainingRecord{
+		UserID:      user.ID,
+		User:        user,
+		Kind:        types.TrainingKindNHSD,
+		CompletedAt: completedAt,
+	})
 
 	require.NoError(t, err)
 

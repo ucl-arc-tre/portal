@@ -26,7 +26,7 @@ type Interface interface {
 	InviteUser(ctx context.Context, invite entra.Invite) (types.User, error)
 	Metrics() (*openapi.UserMetrics, error)
 	UpdateTraining(user types.User, data openapi.ProfileTrainingUpdate) (openapi.ProfileTrainingResponse, error)
-	CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error
+	CreateTrainingRecord(updater types.User, record types.UserTrainingRecord) error
 	TrainingRecords(user types.User) ([]openapi.TrainingRecord, error)
 	TrainingExpiresAt(user types.User, kind types.TrainingKind) (*time.Time, error)
 	PersistedUser(username types.Username) (types.User, error)

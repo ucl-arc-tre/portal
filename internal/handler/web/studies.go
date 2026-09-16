@@ -258,7 +258,7 @@ func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	if err := h.studies.RecordStudySignoff(studyUUID); err != nil {
+	if err := h.studies.RecordStudySignoff(studyUUID, middleware.GetUser(ctx)); err != nil {
 		setError(ctx, err, "Failed to record study signoff")
 		return
 	}
@@ -298,7 +298,7 @@ func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	err = h.studies.UpdateStudy(ctx, studyUUID, studyData)
+	err = h.studies.UpdateStudy(ctx, studyUUID, studyData, middleware.GetUser(ctx))
 	if err != nil {
 		setError(ctx, err, "Failed to update study")
 		return

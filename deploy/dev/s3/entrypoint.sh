@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BUCKET_NAME="bucket-name" # Must match s3.bucket in the api config.yaml
+BUCKET_NAME="bucket-name" # Must match s3.object.bucket and s3.audit.bucket in the api config.yaml
 
 # See https://github.com/seaweedfs/seaweedfs/issues/6542
 weed server \

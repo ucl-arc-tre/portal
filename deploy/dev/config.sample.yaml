@@ -21,12 +21,20 @@ s3:
   dev: # Required S3 config in dev
     host: s3:8333 # Host:port of the s3 service
 
-  bucket: bucket-name # Must exist in staging/prod and will be created in dev. In dev it must match the value in s3/entrypoint.sh
-  region: eu-west-2 # AWS region the bucket exists in
+  object: # S3 bucket to store e.g. contract file objects (.pdf etc.)
+    bucket: bucket-name # Must exist in staging/prod and will be created in dev. In dev it must match the value in s3/entrypoint.sh
+    region: eu-west-2 # AWS region the bucket exists in
 
-  # Access keys for user with S3:GetObject and S3:PutObject on the bucket
-  access_key_id: s3
-  secret_access_key: s3 # pragma: allowlist secret
+    # Access keys for user with S3:GetObject and S3:PutObject on the bucket
+    access_key_id: s3
+    secret_access_key: s3 # pragma: allowlist secret
+
+  audit: # S3 bucket which will contain the transaction audit log, should be WORM (object lock) enabled
+    bucket: bucket-name
+    region: eu-west-2
+    # Access keys for user with S3:PutObject on the bucket
+    access_key_id: s3
+    secret_access_key: s3 # pragma: allowlist secret
 
 # For the below configs the relevant Azure tenant and app registration names can be found in the project slack channel
 entra:

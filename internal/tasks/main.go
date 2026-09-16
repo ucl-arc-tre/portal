@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	s3audit "github.com/ucl-arc-tre/portal/internal/controller/s3/audit"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	"github.com/ucl-arc-tre/portal/internal/service/notifications"
 	"github.com/ucl-arc-tre/portal/internal/service/users"
@@ -19,6 +20,7 @@ type Manager struct {
 	db            *gorm.DB
 	notifications notifications.Interface
 	users         *users.Service
+	s3Audit       s3audit.Interface
 }
 
 // Create a task manager instance
@@ -28,6 +30,7 @@ func New() *Manager {
 		db:            graceful.NewDB(),
 		notifications: notifications.New(),
 		users:         users.New(),
+		s3Audit:       s3audit.New(),
 	}
 	return &manager
 }
@@ -43,6 +46,9 @@ func (m *Manager) Start() {
 		m.scheduleDailyAt(gocron.NewAtTime(3, 4, 0), m.checkProjectsAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	}
 	m.scheduleDailyAt(gocron.NewAtTime(3, 5, 0), m.updateUserEmails, "updateUserEmails")
+	if config.S3AuditEnabled() {
+		m.scheduleDailyAt(gocron.NewAtTime(4, 0, 0), m.uploadAuditLog, "uploadAuditLog")
+	}
 
 	m.scheduler.Start()
 }

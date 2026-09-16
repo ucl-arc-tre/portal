@@ -6,7 +6,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/service/audit"
 	"github.com/ucl-arc-tre/portal/internal/service/users/certificate"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -53,7 +55,12 @@ func (s *Service) UpdateTraining(user types.User, data openapi.ProfileTrainingUp
 	response.CertificateIsValid = &cert.IsValid
 	if cert.IsValid {
 		response.CertificateIssuedAt = new(cert.IssuedAt.Format(config.TimeFormat))
-		if err := s.CreateTrainingRecord(user, types.TrainingKind(kind), cert.IssuedAt); err != nil {
+		if err := s.CreateTrainingRecord(user, types.UserTrainingRecord{
+			UserID:      user.ID,
+			User:        user,
+			Kind:        types.TrainingKind(kind),
+			CompletedAt: cert.IssuedAt,
+		}); err != nil {
 			return response, err
 		}
 	}
@@ -74,19 +81,34 @@ func (s *Service) hasValidApprovedResearcherTrainingRecord(user types.User) (boo
 }
 
 // Create a NHSD training record for a user and update the approved researcher status if required
-func (s *Service) CreateTrainingRecord(user types.User, kind types.TrainingKind, completedAt time.Time) error {
-	record := types.UserTrainingRecord{
-		UserID: user.ID,
-		Kind:   kind,
+func (s *Service) CreateTrainingRecord(updater types.User, record types.UserTrainingRecord) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	err := tx.
+		Where(&types.UserTrainingRecord{
+			UserID: record.UserID,
+			Kind:   record.Kind,
+		}).
+		Assign(types.UserTrainingRecord{
+			Model:       types.Model{CreatedAt: time.Now()},
+			CompletedAt: record.CompletedAt,
+		}).
+		FirstOrCreate(&record).Error
+	if err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to set user training record")
 	}
-	result := s.db.Where(&record).Assign(types.UserTrainingRecord{
-		Model:       types.Model{CreatedAt: time.Now()},
-		CompletedAt: completedAt,
-	}).FirstOrCreate(&record)
-	if result.Error != nil {
-		return types.NewErrFromGorm(result.Error)
+
+	if err := audit.LogTrainingUpdate(tx, updater, record); err != nil {
+		tx.Rollback()
+		return err
 	}
-	return s.updateApprovedResearcherStatus(user)
+
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit user training record")
+	}
+	return s.updateApprovedResearcherStatus(record.User)
 }
 
 // returns all training records for a user

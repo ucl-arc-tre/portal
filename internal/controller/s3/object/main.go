@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/ucl-arc-tre/portal/internal/config"
+	"github.com/ucl-arc-tre/portal/internal/controller/s3/dev"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -33,8 +34,7 @@ type Controller struct {
 }
 
 func New() *Controller {
-	credentials := config.S3Credentials()
-	log.Debug().Any("accessKeyId", credentials.AccessKeyId).Msg("Creating S3 controller")
+	credentials := config.S3ObjectCredentials()
 	config, err := awsConfig.LoadDefaultConfig(
 		context.Background(),
 		awsConfig.WithCredentialsProvider(awsCredentials.StaticCredentialsProvider{
@@ -44,7 +44,7 @@ func New() *Controller {
 			},
 		}),
 
-		awsConfig.WithRegion(config.S3Region()),
+		awsConfig.WithRegion(config.S3ObjectRegion()),
 	)
 	if err != nil {
 		log.Err(err).Msg("Failed to load AWS config. Returning a nil controller")
@@ -64,7 +64,7 @@ func New() *Controller {
 func (c *Controller) StoreObject(ctx context.Context, metadata ObjectMetadata, obj types.S3Object) error {
 	log.Debug().Any("metadata", metadata).Msg("Uploading S3 object")
 	_, err := c.uploader.Upload(ctx, &awsS3.PutObjectInput{
-		Bucket: aws.String(config.S3BucketName()),
+		Bucket: aws.String(config.S3ObjectBucketName()),
 		Key:    aws.String(metadata.Key()),
 		Body:   obj.Content,
 	})
@@ -74,7 +74,7 @@ func (c *Controller) StoreObject(ctx context.Context, metadata ObjectMetadata, o
 func (c *Controller) GetObject(ctx context.Context, metadata ObjectMetadata) (types.S3Object, error) {
 	log.Debug().Any("metadata", metadata).Msg("Downloading S3 object")
 	output, err := c.client.GetObject(ctx, &awsS3.GetObjectInput{
-		Bucket: aws.String(config.S3BucketName()),
+		Bucket: aws.String(config.S3ObjectBucketName()),
 		Key:    aws.String(metadata.Key()),
 	})
 	if err != nil {
@@ -90,7 +90,7 @@ func (c *Controller) GetObject(ctx context.Context, metadata ObjectMetadata) (ty
 func (c *Controller) DeleteObject(metadata ObjectMetadata) error {
 	log.Debug().Any("metadata", metadata).Msg("Deleting S3 object")
 	_, err := c.client.DeleteObject(context.Background(), &awsS3.DeleteObjectInput{
-		Bucket: aws.String(config.S3BucketName()),
+		Bucket: aws.String(config.S3ObjectBucketName()),
 		Key:    aws.String(metadata.Key()),
 	})
 	if err != nil {
@@ -106,7 +106,7 @@ func makeResolver() awsS3.EndpointResolverV2 {
 	}
 	if s3DevHostIsSet {
 		log.Warn().Msg("S3DevHost is set - using dev resolver for s3")
-		return DevResolver{}
+		return dev.DevResolver{Bucket: config.S3ObjectBucketName()}
 	}
 	return awsS3.NewDefaultEndpointResolverV2()
 }
