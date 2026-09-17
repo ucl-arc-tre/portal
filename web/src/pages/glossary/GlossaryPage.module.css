@@ -17,7 +17,7 @@
 
 .entity-definitions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 2fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
   gap: 1rem;
 
   h3 {
