@@ -50,10 +50,10 @@ export default function EntityGlossaryDefinition({ word }: { word: keyof typeof 
       <em>{portalEntityDefinitions[word]}</em>
       <MenuDivider />
       <p>
-        <strong>In DSH:</strong> {DSHEntityDefinitions[word]}
+        <strong>DSH:</strong> {DSHEntityDefinitions[word]}
       </p>
       <p>
-        <strong>In TRE:</strong> {TREEntityDefinitions[word]}
+        <strong>TRE:</strong> {TREEntityDefinitions[word]}
       </p>
     </Card>
   );
