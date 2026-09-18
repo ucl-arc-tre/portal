@@ -27,7 +27,13 @@ const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const MetricsIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Disc), {
   ssr: false,
 });
+const GlossaryIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Type), {
+  ssr: false,
+});
 const MenuSection = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Section), {
+  ssr: false,
+});
+const MenuHeading = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Heading), {
   ssr: false,
 });
 const SecondaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.SecondaryItem), {
@@ -36,7 +42,7 @@ const SecondaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) 
 const PrimaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.PrimaryItem), {
   ssr: false,
 });
-const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
+export const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
   ssr: false,
 });
 
@@ -105,6 +111,11 @@ export default function Nav() {
           {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
+        </MenuSection>
+        <MenuDivider />
+        <MenuSection>
+          <MenuHeading>Help</MenuHeading>
+          <NavItem href="/glossary" icon={<GlossaryIcon />} title="Glossary" />
         </MenuSection>
         <MenuDivider />
         <MenuSection>
