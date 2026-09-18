@@ -34,12 +34,12 @@ export const roleDefinitions = {
   },
   iao: {
     definition:
-      "An Approved Researcher who owns a Study and is responsible for the data within it. Also referenced as IAO",
+      "An Approved Researcher who owns a Study and is responsible for the data within it. Also referenced as IAO. They are responsible for ensuring that confidential information associated with the study is managed securely and in accordance with UCL information governance policies.",
     label: "Information Asset Owner",
   },
   iaa: {
     definition:
-      "An Approved Researcher who is responsible for managing access to a Study and its data. Also referenced as IAA",
+      "An Approved Researcher who is responsible for managing access to a Study and its data. Also referenced as IAA. They are appointed by the IAO to manage the day-to-day handling of information within a study.",
     label: "Information Asset Administrator",
   },
 };
