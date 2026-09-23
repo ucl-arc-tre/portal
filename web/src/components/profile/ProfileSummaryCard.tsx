@@ -4,6 +4,14 @@ import styles from "./ProfileSummaryCard.module.css";
 import EditIcon from "../ui/EditIcon";
 import InfoTooltip from "../ui/InfoTooltip";
 import { Profile as ProfileData } from "@/openapi";
+import HelperBlock from "../ui/HelperBlock";
+
+const helperText = `View and manage your profile information, including your name, email address, and role within the project. You can also view and upload your training certificate and view its expiry date to ensure your training records remain current and up to date.
+
+All members of UCL including external collaborators who manage highly confidential research information must undertake annual NHS Data Security & Awareness training on handling sensitive information. Anyone with an '.ac.uk' or NHS email address can self-register for NHS Digital Data Security Awareness Level 1 course provided by e-Learning for Health. When prompted, select "Further Education and Higher Education Researcher (Education)" as your role to gain access to the course. Information Governance training completed through UCLH and another university is also accepted. Please contact the Information Governance Advisory Service for further information (email – infogov@ucl.ac.uk ).
+
+To upload a new training certificate, select Verify Another Certificate, choose the relevant certificate, and then select Submit.
+`;
 
 type Props = {
   profileData?: ProfileData;
@@ -26,6 +34,8 @@ export default function ProfileSummaryCard(props: Props) {
       <div className={styles.header}>
         <h2>Profile Information</h2>
       </div>
+
+      <HelperBlock text={helperText} />
 
       <div className={styles.content}>
         <div className={styles.row}>

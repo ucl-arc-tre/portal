@@ -8,6 +8,21 @@ import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, InfoIcon } from "@/components/ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { ContractDefinition } from "../shared/entityDefinitions";
+import HelperBlock from "../ui/HelperBlock";
+
+const helperText = `Contract Management records and manages all contracts called Data Processing Agreements associated with your study, particularly when working with third parties or external organisations/researchers. These agreements help ensure that legal, contractual, and data protection obligations are met and should be arranged through UCL Procurement Services.
+
+Each contract record includes:
+Contract title
+UCL signatory/signatories
+Third-party organisation
+Status
+Start and end dates
+Linked to assets (where applicable)
+Uploaded copy of the contract documentation
+
+To add a new contract, select Add Contract. You can upload the signed agreement and link it to one or more information assets within the study, where appropriate.
+`;
 
 type ContractManagementProps = {
   study: Study;
@@ -40,6 +55,8 @@ export default function ContractManagement(props: ContractManagementProps) {
 
   return (
     <Box>
+      <HelperBlock text={helperText} />
+
       {canModify ? (
         <>
           <div className={styles.header}>

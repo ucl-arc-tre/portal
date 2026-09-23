@@ -12,6 +12,40 @@ import { InfoIcon } from "../ui/uikitExports";
 import Box from "../ui/Box";
 import ErrorMessage from "../ui/Error";
 import { AssetDefinition } from "../shared/entityDefinitions";
+import HelperBlock from "../ui/HelperBlock";
+
+const helperText = `Asset Management enables you to record and manage the information assets associated with your study. Maintaining an accurate information asset register supports data security, risk management, and compliance with data protection and information governance requirements, including GDPR.
+
+An information asset is any data, document, or information owned or used by a study. Examples include:
+
+Datasets
+Third-party data
+Databases
+Consent forms
+Interviews
+Questionnaires and surveys
+Other project-related information
+
+Each registered asset includes key information, such as:
+
+Asset name
+Description
+Date created
+Data source
+Classification
+Data types
+Retention dates
+Risk rating
+Risk mitigation measures
+Storage location(s)
+Associated contracts (where applicable)
+
+
+The total number of registered assets is displayed at the top of the page.
+
+
+To register a new information asset, select Add Asset. Each asset is displayed in its own information box, providing a summary of the asset and its details.
+`;
 
 type AssetsProps = {
   study: Study;
@@ -58,6 +92,8 @@ export default function Assets(props: AssetsProps) {
 
   return (
     <Box>
+      <HelperBlock text={helperText} />
+
       <section data-cy="study-assets">
         <div className={styles.header}>
           <h3>

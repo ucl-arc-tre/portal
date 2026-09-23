@@ -8,6 +8,12 @@ import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
+const helperText = `
+A list of your studies is displayed on this page. Each study appears in a separate box showing the study title, caseref, study description, and status. The status indicates whether any action is required.
+
+Select the study title to view its details. The study details page provides a summary of the study, including the study overview, information asset register i.e., data, and list of contracts.
+`;
+
 export default function Studies() {
   const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
 
@@ -56,7 +62,7 @@ export default function Studies() {
       <div className={styles.line}></div>
 
       {infoCalloutExpanded && <StudyDefinition />}
-      <HelperText>All Studies you have access to</HelperText>
+      <HelperText>{helperText}</HelperText>
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />
