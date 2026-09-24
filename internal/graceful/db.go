@@ -66,7 +66,6 @@ func InitDB() {
 	mustExec(db, `CREATE SEQUENCE IF NOT EXISTS study_caseref_seq START 10000`)
 
 	migrateNotifications(db)
-	migrateStudyFeedback(db)
 
 	if err := db.AutoMigrate(models...); err != nil {
 		panic(err)
@@ -162,20 +161,5 @@ func migrateNotifications(db *gorm.DB) {
 	err := db.Where("read_at IS NOT NULL AND read_at < ?", newestNotificationReadIsDeleted).Delete(&types.Notification{}).Error
 	if err != nil {
 		panic(err)
-	}
-}
-
-// Study.Feedback has been replaced by the StudyFeedback table
-// no production studies had a value in this column so we can safely remove it
-// see issue ticket 906 for more details
-func migrateStudyFeedback(db *gorm.DB) {
-
-	migrator := db.Migrator()
-
-	if migrator.HasColumn(&types.Study{}, "feedback") {
-		err := migrator.DropColumn(&types.Study{}, "feedback")
-		if err != nil {
-			panic(err)
-		}
 	}
 }
