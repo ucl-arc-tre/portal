@@ -507,14 +507,6 @@ paths:
           description: Index of the first item to return
           schema:
             type: integer
-        - in: query
-          name: all
-          required: false
-          description: |
-            Bypass pagination and return every study the caller can see, ignoring limit/offset.
-            Ignored for admins who already search across all studies.
-          schema:
-            type: boolean
       responses:
         "200":
           content:

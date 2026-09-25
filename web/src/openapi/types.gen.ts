@@ -1665,12 +1665,6 @@ export type GetStudiesData = {
          * Index of the first item to return
          */
         offset?: number;
-        /**
-         * Bypass pagination and return every study the caller can see, ignoring limit/offset.
-         * Ignored for admins who already search across all studies.
-         *
-         */
-        all?: boolean;
     };
     url: '/studies';
 };

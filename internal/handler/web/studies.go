@@ -19,8 +19,8 @@ func studyQueryParams(params openapi.GetStudiesParams) (studies.QueryParams, err
 	if !params.Valid() {
 		return studies.QueryParams{}, types.NewErrClientInvalidObject("invalid query param")
 	}
-	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
-		return studies.QueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+	if params.Limit != nil && *params.Limit > config.MaxPageSize {
+		return studies.QueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
 		return studies.QueryParams{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
@@ -77,11 +77,6 @@ func (h *Handler) studiesStudyOwner(user types.User, params openapi.GetStudiesPa
 	queryParams, err := studyQueryParams(params)
 	if err != nil {
 		return []types.Study{}, err
-	}
-
-	// non-admin limit override: negative limit means return all studies the user has access to
-	if params.All != nil && *params.All {
-		queryParams.Limit = -1
 	}
 
 	studies, err := h.studies.StudiesByIdFiltered(queryParams, studyIds...)
