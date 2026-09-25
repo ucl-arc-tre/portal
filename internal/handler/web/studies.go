@@ -79,6 +79,11 @@ func (h *Handler) studiesStudyOwner(user types.User, params openapi.GetStudiesPa
 		return []types.Study{}, err
 	}
 
+	// non-admin limit override: negative limit means return all studies the user has access to
+	if params.All != nil && *params.All {
+		queryParams.Limit = -1
+	}
+
 	studies, err := h.studies.StudiesByIdFiltered(queryParams, studyIds...)
 	if err != nil {
 		return []types.Study{}, err

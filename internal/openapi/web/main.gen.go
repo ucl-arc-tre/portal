@@ -1854,6 +1854,10 @@ type GetStudiesParams struct {
 
 	// Offset Index of the first item to return
 	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// All Bypass pagination and return every study the caller can see, ignoring limit/offset.
+	// Ignored for admins who already search across all studies.
+	All *bool `form:"all,omitempty" json:"all,omitempty"`
 }
 
 // GetTokensEnvironmentParamsEnvironment defines parameters for GetTokensEnvironment.
@@ -2783,6 +2787,14 @@ func (siw *ServerInterfaceWrapper) GetStudies(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "all" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "all", c.Request.URL.Query(), &params.All, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter all: %w", err), http.StatusBadRequest)
 		return
 	}
 

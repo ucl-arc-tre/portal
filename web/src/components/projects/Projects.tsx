@@ -44,7 +44,10 @@ export default function Projects() {
     setIsLoading(true);
     setError(null);
     try {
-      const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
+      const [projectsResponse, studiesResponse] = await Promise.all([
+        getProjects(),
+        getStudies({ query: { all: true } }),
+      ]);
 
       if (responseIsError(projectsResponse) || !projectsResponse.data) {
         const errorMsg = extractErrorMessage(projectsResponse);
