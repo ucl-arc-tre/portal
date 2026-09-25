@@ -453,7 +453,7 @@ paths:
   # Study Management
   /studies:
     get:
-      description: Get all studies accessible to the current user. Filtering is admin only
+      description: Get all studies accessible to the current user, optionally filtered by the query params below
       parameters:
         - in: query
           name: status

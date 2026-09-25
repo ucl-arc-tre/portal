@@ -15,18 +15,18 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
+func studyQueryParams(params openapi.GetStudiesParams) (studies.QueryParams, error) {
 	if !params.Valid() {
-		return []types.Study{}, types.NewErrClientInvalidObject("invalid query param")
+		return studies.QueryParams{}, types.NewErrClientInvalidObject("invalid query param")
 	}
-	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
-		return []types.Study{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+	if params.Limit != nil && *params.Limit > config.MaxPageSize {
+		return studies.QueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
-		return []types.Study{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
+		return studies.QueryParams{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
 	}
 	if params.Offset != nil && *params.Offset < 0 {
-		return []types.Study{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
+		return studies.QueryParams{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
 	}
 	queryParams := studies.QueryParams{
 		ApprovalStatus: params.Status,
@@ -40,7 +40,7 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if params.QueryIsCaseref() {
 		caseref, err := strconv.Atoi(*params.Query)
 		if err != nil {
-			return []types.Study{}, types.NewErrInvalidObject("caseref was not int")
+			return studies.QueryParams{}, types.NewErrInvalidObject("caseref was not int")
 		}
 		queryParams.CaseRef = &caseref
 	} else if params.QueryIsOwnerUsername() {
@@ -54,18 +54,32 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 	if params.Offset != nil {
 		queryParams.Offset = *params.Offset
 	}
+	return queryParams, nil
+}
+
+func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, error) {
+	queryParams, err := studyQueryParams(params)
+	if err != nil {
+		return []types.Study{}, err
+	}
 	return h.studies.AllStudies(queryParams)
 }
 
-func (h *Handler) studiesStudyOwner(user types.User) ([]types.Study, error) {
-	// Non-admin users can only see studies they own
+func (h *Handler) studiesStudyOwner(user types.User, params openapi.GetStudiesParams) ([]types.Study, error) {
+	// Non-admin users can only see/search studies they own or are an administrator of
 
+	// Get study IDs where the user is a study owner/administrator
 	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
 	if err != nil {
 		return []types.Study{}, err
 	}
 
-	studies, err := h.studies.StudiesById(studyIds...)
+	queryParams, err := studyQueryParams(params)
+	if err != nil {
+		return []types.Study{}, err
+	}
+
+	studies, err := h.studies.StudiesByIdFiltered(queryParams, studyIds...)
 	if err != nil {
 		return []types.Study{}, err
 	}
@@ -86,7 +100,7 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 	if canSeeAllStudies {
 		studies, err = h.studiesAll(params)
 	} else {
-		studies, err = h.studiesStudyOwner(user)
+		studies, err = h.studiesStudyOwner(user, params)
 	}
 	if err != nil {
 		setError(ctx, err, "Failed to get studies")
