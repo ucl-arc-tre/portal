@@ -68,7 +68,7 @@ func (h *Handler) studiesAll(params openapi.GetStudiesParams) ([]types.Study, er
 func (h *Handler) studiesStudyOwner(user types.User, params openapi.GetStudiesParams) ([]types.Study, error) {
 	// Non-admin users can only see/search studies they own or are an administrator of
 
-	// Get study IDs where the user is a study owner/administrator. This is used to filter the studies returned by the query params
+	// Get study IDs where the user is a study owner/administrator
 	studyIds, err := rbac.StudyIDsWithRole(user, rbac.StudyOwner)
 	if err != nil {
 		return []types.Study{}, err
