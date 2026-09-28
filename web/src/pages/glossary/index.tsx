@@ -6,7 +6,6 @@ import EntityGlossaryDefinition, { roleDefinitions, RoleGlossaryDefinition } fro
 import { portalEntityDefinitions } from "@/components/shared/entityDefinitions";
 import TabCollection from "@/components/ui/TabCollection";
 import { useRouter } from "next/router";
-import { HelperText } from "@/components/ui/uikitExports";
 
 export default function GlossaryPage() {
   const router = useRouter();
