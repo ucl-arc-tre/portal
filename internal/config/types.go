@@ -13,6 +13,10 @@ type S3CredentialBundle struct {
 	SecretAccessKey string
 }
 
+func (s S3CredentialBundle) IsStatic() bool {
+	return s.AccessKeyId != "" && s.SecretAccessKey != ""
+}
+
 type MyservicesCredentialBundle struct {
 	Enabled        bool
 	URL            string
