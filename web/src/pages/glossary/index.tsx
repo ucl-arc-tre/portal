@@ -30,10 +30,6 @@ export default function GlossaryPage() {
 
       {tab === "entities" && (
         <div className={styles["glossary-section"]}>
-          <HelperText>
-            We have provided a diagram to help visualise the relationships between entities found on The Portal. Below
-            that are cards with definitions which also explain the differences on supported services.
-          </HelperText>
           <div className={styles["entity-section"]}>
             <img
               src={"/entity_diagram.drawio.svg"}
