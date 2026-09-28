@@ -1,6 +1,6 @@
 import Card from "@/components/ui/Card";
 import { portalEntityDefinitions } from "../../components/shared/entityDefinitions";
-import { MenuDivider } from "@/components/nav/Nav";
+import { MenuDivider } from "@/components/ui/uikitExports";
 
 const DSHEntityDefinitions = {
   project: "Projects are known as Shares",

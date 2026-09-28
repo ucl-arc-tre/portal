@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { ReactElement } from "react";
 import { client } from "@/openapi/client.gen";
 import { useAuth } from "@/hooks/useAuth";
-import { iconSizeSmall } from "../ui/uikitExports";
+import { iconSizeSmall, MenuDivider } from "../ui/uikitExports";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -40,9 +40,6 @@ const SecondaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) 
   ssr: false,
 });
 const PrimaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.PrimaryItem), {
-  ssr: false,
-});
-export const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
   ssr: false,
 });
 
