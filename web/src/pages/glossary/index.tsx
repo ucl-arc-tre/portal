@@ -28,7 +28,7 @@ export default function GlossaryPage() {
       <TabCollection tabs={[{ name: "entities" }, { name: "roles" }]} defaultTab="entities" />
 
       {tab === "entities" && (
-        <div className={styles["glossary-section"]}>
+        <div>
           <div className={styles["entity-section"]}>
             <img
               src={"/entity_diagram.drawio.svg"}
@@ -45,7 +45,7 @@ export default function GlossaryPage() {
       )}
 
       {tab === "roles" && (
-        <div className={styles["glossary-section"]}>
+        <div>
           {Object.entries(roleDefinitions).map(([word]) => (
             <RoleGlossaryDefinition key={word} word={word as keyof typeof roleDefinitions} />
           ))}
