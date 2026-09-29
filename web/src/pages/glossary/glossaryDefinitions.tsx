@@ -25,6 +25,19 @@ export const roleDefinitions = {
       "An Approved Researcher who is responsible for managing access to a Study and its data. They are appointed by the IAO to manage the day-to-day handling of information within a study.",
     label: "Information Asset Administrator (IAA)",
   },
+  tre_ops: {
+    definition: "A UCL staff member who is part of the TRE team and handles TRE project requests",
+    label: "TRE Operations Staff",
+  },
+  dsh_ops: {
+    definition: "A UCL staff member who is part of the DSH team and handles DSH project requests",
+    label: "DSH Operations Staff",
+  },
+  ig_ops: {
+    definition:
+      "A UCL staff member who is part of the Information Governance team and handles Study requests and user training queries",
+    label: "Information Governance Staff",
+  },
 };
 
 export default function EntityGlossaryDefinition({ word }: { word: keyof typeof portalEntityDefinitions }) {
