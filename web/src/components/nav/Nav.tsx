@@ -103,7 +103,7 @@ export default function Nav() {
           <>
             <MenuDivider />
             <MenuSection>
-              <MenuHeading className={styles["ig-heading"]}>Information Governance</MenuHeading>
+              <MenuHeading className={styles["ig-heading"]}>Info Governance</MenuHeading>
               <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />
               <NavItem href="/assets" icon={<PackageIcon />} title="Assets" />
               <NavItem href="/contracts" icon={<PaperclipIcon />} title="Contracts" />
