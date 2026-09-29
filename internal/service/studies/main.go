@@ -154,8 +154,7 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 	return nil
 }
 
-func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
-	db := s.db.Model(&types.Study{})
+func applyStudyQueryFilters(db *gorm.DB, query QueryParams) (*gorm.DB, error) {
 	if query.CaseRef != nil {
 		db = db.Where("caseref = ?", *query.CaseRef)
 	}
@@ -163,7 +162,7 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 		db = db.Where("approval_status = ?", *query.ApprovalStatus)
 	}
 	if query.Owner != nil && query.Administrator != nil {
-		return []types.Study{}, types.NewErrClientInvalidObjectF("cannot query by admin and owner")
+		return nil, types.NewErrClientInvalidObjectF("cannot query by admin and owner simultaneously")
 	}
 	if query.Owner != nil {
 		ownerLike := "%" + *query.Owner + "%"
@@ -180,8 +179,16 @@ func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
 	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
 		db = db.Where("title % ? OR title ILIKE ?", *query.FuzzyTitle, "%"+*query.FuzzyTitle+"%")
 	}
+	return db, nil
+}
+
+func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
+	db, err := applyStudyQueryFilters(s.db.Model(&types.Study{}), query)
+	if err != nil {
+		return []types.Study{}, err
+	}
 	studies := []types.Study{}
-	err := db.Preload("StudyAdmins.User").Preload("Owner").Order("last_signoff DESC, updated_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&studies).Error
+	err = db.Preload("StudyAdmins.User").Preload("Owner").Order("last_signoff DESC, updated_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 
@@ -211,6 +218,18 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelogs").Preload("OwnerChangelogs.ToUser").Where("id IN (?)", ids).Find(&studies).Error
+	return studies, types.NewErrFromGorm(err)
+}
+
+// retrieves studies from a list of ids and pagineted
+func (s *Service) StudiesByIdFiltered(query QueryParams, ids ...uuid.UUID) ([]types.Study, error) {
+	db, err := applyStudyQueryFilters(s.db.Model(&types.Study{}).Where("studies.id IN (?)", ids), query)
+	if err != nil {
+		return []types.Study{}, err
+	}
+	studies := []types.Study{}
+	err = db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelogs").Preload("OwnerChangelogs.ToUser").
+		Order("last_signoff DESC, updated_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&studies).Error
 	return studies, types.NewErrFromGorm(err)
 }
 

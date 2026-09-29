@@ -14,6 +14,7 @@ import { ProjectDefinition } from "../shared/entityDefinitions";
 import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/router";
+import { MAX_PAGE_SIZE } from "@/hooks/usePagination";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -44,7 +45,11 @@ export default function Projects() {
     setIsLoading(true);
     setError(null);
     try {
-      const [projectsResponse, studiesResponse] = await Promise.all([getProjects(), getStudies()]);
+      const [projectsResponse, studiesResponse] = await Promise.all([
+        getProjects(),
+        // Fetch all studies the user can see, assumes an upper limit of MAX_PAGE_SIZE is sufficient to get all studies for the user
+        getStudies({ query: { limit: MAX_PAGE_SIZE } }),
+      ]);
 
       if (responseIsError(projectsResponse) || !projectsResponse.data) {
         const errorMsg = extractErrorMessage(projectsResponse);
