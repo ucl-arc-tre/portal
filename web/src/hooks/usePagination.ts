@@ -1,6 +1,8 @@
 import { useState } from "react";
 
+// corresponds to the limits defined in internal/config/main.go
 export const DEFAULT_PAGE_SIZE = 12;
+export const MAX_PAGE_SIZE = 100;
 
 type Props<T> = {
   pageSize?: number;
