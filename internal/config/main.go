@@ -39,7 +39,8 @@ const (
 
 	ProjectAccessReviewValidity = 3 * Month
 
-	DefaultPageSize = 12 // // number of items returned for pagination
+	DefaultPageSize = 12  // number of items returned for pagination when no limit is given
+	MaxPageSize     = 100 // largest limit a user is allowed to request (e.g. studies)
 )
 
 var k = koanf.New(".")
