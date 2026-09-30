@@ -14,11 +14,11 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.EnvironmentName) ([]projects.GenericProject, error) {
+func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs []types.EnvironmentName, ids ...uuid.UUID) ([]projects.GenericProject, error) {
 	if !params.Valid() {
 		return []projects.GenericProject{}, types.NewErrClientInvalidObject("invalid query param")
 	}
-	if params.Limit != nil && *params.Limit > config.DefaultPageSize {
+	if params.Limit != nil && *params.Limit > config.MaxPageSize {
 		return []projects.GenericProject{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
@@ -44,14 +44,11 @@ func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs ...types.En
 	if params.Offset != nil {
 		queryParams.Offset = *params.Offset
 	}
-	return h.projects.AllProjects(queryParams, envs...)
+	return h.projects.Projects(queryParams, envs, ids...)
 }
 
 func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams) {
 	user := middleware.GetUser(ctx)
-
-	var projects []projects.GenericProject
-	var err error
 
 	isDshOpsStaff, err := rbac.HasRole(user, rbac.DSHOpsStaff)
 	if err != nil {
@@ -70,18 +67,23 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 		setError(ctx, err, "Failed to check user roles")
 		return
 	}
-
+	envs := []types.EnvironmentName{}
 	if canSeeAllEnvironments {
-		projects, err = h.projectsAll(params)
-	} else if isTreOpsStaff {
-		projects, err = h.projectsAll(params, environments.TRE)
-	} else if isDshOpsStaff {
-		projects, err = h.projectsAll(params, environments.DSH)
-	} else {
-		// Regular user: fetch only projects they own
-		projects, err = h.projectsProjectOwner(user)
+		envs = append(envs, environments.DSH, environments.TRE)
+	}
+	if isTreOpsStaff && !canSeeAllEnvironments {
+		envs = append(envs, environments.TRE)
+	}
+	if isDshOpsStaff && !canSeeAllEnvironments {
+		envs = append(envs, environments.DSH)
+	}
+	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
+	if err != nil {
+		setError(ctx, err, "Failed to get project IDs")
+		return
 	}
 
+	projects, err := h.projectsAll(params, envs, projectIds...)
 	if err != nil {
 		setError(ctx, err, "Failed to get projects")
 		return
@@ -104,21 +106,6 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 	}
 
 	ctx.JSON(http.StatusOK, response)
-}
-
-func (h *Handler) projectsProjectOwner(user types.User) ([]projects.GenericProject, error) {
-	// Get project IDs where user has owner role (includes inherited via study ownership)
-	projectIds, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
-	if err != nil {
-		return []projects.GenericProject{}, err
-	}
-
-	genericProjects, err := h.projects.ProjectsById(projectIds...)
-	if err != nil {
-		return []projects.GenericProject{}, err
-	}
-
-	return genericProjects, nil
 }
 
 func (h *Handler) GetProjectsTre(ctx *gin.Context) {
