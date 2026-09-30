@@ -8,7 +8,8 @@ const DSHEntityDefinitions = {
 
 export const roleDefinitions = {
   approved_researcher: {
-    definition: "A user who has provided sufficient certification of security training",
+    definition:
+      "A “safe” person. Defined by contracts, attestations and competency (training). Must complete training and sign an Approved Researcher Agreement which sets out responsibilities.",
     label: "Approved Researcher",
   },
   approved_staff_researcher: {
