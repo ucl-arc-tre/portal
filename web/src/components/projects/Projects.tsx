@@ -1,5 +1,6 @@
 import { useState, useEffect, useReducer } from "react";
-import { Project, Study, getProjects, getStudies } from "@/openapi";
+import { Project, Study, getStudies } from "@/openapi";
+import { getAllProjects } from "@/lib/projects";
 import Button from "@/components/ui/Button";
 import Loading from "@/components/ui/Loading";
 import ProjectForm from "./ProjectForm";
@@ -46,7 +47,7 @@ export default function Projects() {
     setError(null);
     try {
       const [projectsResponse, studiesResponse] = await Promise.all([
-        getProjects(),
+        getAllProjects(),
         // Fetch all studies the user can see, assumes an upper limit of MAX_PAGE_SIZE is sufficient to get all studies for the user
         getStudies({ query: { limit: MAX_PAGE_SIZE } }),
       ]);
