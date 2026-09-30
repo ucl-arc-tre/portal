@@ -342,12 +342,19 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 }
 
 // retrieves all projects (for admins and TRE/DSH ops staff), optionally filtered by search query params
-func (s *Service) AllProjects(query QueryParams, envs ...types.EnvironmentName) ([]GenericProject, error) {
-	var projects []GenericProject
+func (s *Service) Projects(query QueryParams, envs []types.EnvironmentName, ids ...uuid.UUID) ([]GenericProject, error) {
+	projects := []GenericProject{}
+	if len(envs) == 0 && len(ids) == 0 {
+		return projects, nil
+	}
 	db := s.genericProjectsQuery().
 		Where("projects.deleted_at IS NULL")
-	if len(envs) > 0 {
+	if len(envs) > 0 && len(ids) > 0 {
+		db = db.Where("environments.name IN ? OR projects.id IN ?", envs, ids)
+	} else if len(envs) > 0 {
 		db = db.Where("environments.name IN ?", envs)
+	} else if len(ids) > 0 {
+		db = db.Where("projects.id IN ?", ids)
 	}
 	if query.FuzzyName != nil && *query.FuzzyName != "" {
 		nameLike := "%" + *query.FuzzyName + "%"
