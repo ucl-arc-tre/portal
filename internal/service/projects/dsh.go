@@ -29,6 +29,9 @@ func (s *Service) ProjectDSHById(projectId uuid.UUID) (*types.ProjectDSH, error)
 }
 
 func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
+	if len(csvContent) == 0 {
+		return types.NewErrInvalidObject("empty csv content")
+	}
 	records, err := dshMemberCSVRecords(csvContent)
 	if err != nil {
 		return err
