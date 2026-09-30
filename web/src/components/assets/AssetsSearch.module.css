@@ -1,3 +1,8 @@
+.container {
+  width: 40vw;
+  margin-top: 1rem;
+}
+
 .results {
   margin-top: 1.5rem;
 }

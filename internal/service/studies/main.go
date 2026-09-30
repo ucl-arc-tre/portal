@@ -154,7 +154,7 @@ func (s *Service) CreateStudy(ctx context.Context, owner types.User, studyData o
 	return nil
 }
 
-func applyStudyQueryFilters(db *gorm.DB, query QueryParams) (*gorm.DB, error) {
+func applyStudyQueryFilters(db *gorm.DB, query StudyQueryParams) (*gorm.DB, error) {
 	if query.CaseRef != nil {
 		db = db.Where("caseref = ?", *query.CaseRef)
 	}
@@ -182,7 +182,7 @@ func applyStudyQueryFilters(db *gorm.DB, query QueryParams) (*gorm.DB, error) {
 	return db, nil
 }
 
-func (s *Service) AllStudies(query QueryParams) ([]types.Study, error) {
+func (s *Service) AllStudies(query StudyQueryParams) ([]types.Study, error) {
 	db, err := applyStudyQueryFilters(s.db.Model(&types.Study{}), query)
 	if err != nil {
 		return []types.Study{}, err
@@ -222,7 +222,7 @@ func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 }
 
 // retrieves studies from a list of ids and pagineted
-func (s *Service) StudiesByIdFiltered(query QueryParams, ids ...uuid.UUID) ([]types.Study, error) {
+func (s *Service) StudiesByIdFiltered(query StudyQueryParams, ids ...uuid.UUID) ([]types.Study, error) {
 	db, err := applyStudyQueryFilters(s.db.Model(&types.Study{}).Where("studies.id IN (?)", ids), query)
 	if err != nil {
 		return []types.Study{}, err

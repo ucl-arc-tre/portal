@@ -10,8 +10,8 @@ type Props = {
   children: React.ReactNode;
 };
 
-// Controls access to pages that only make sense once a user has made at least one study
-// IG/admin skip these checks as they can already see everything
+// Controls access to pages that require a user to have at least one study
+// IG/admin skip these checks since they can already see everything
 export default function RequireStudyAccess({ children }: Props) {
   const { authInProgress, isApprovedResearcher, isAdmin, isIGStaff, isTreOpsStaff, isDshOpsStaff } = useAuth();
   const canSeeAll = isAdmin || isIGStaff || isTreOpsStaff || isDshOpsStaff;

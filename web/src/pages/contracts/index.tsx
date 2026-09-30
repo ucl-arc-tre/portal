@@ -3,8 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
-import RequireStudyAccess from "@/components/shared/RequireStudyAccess";
-import ContractsSearch from "@/components/contracts/ContractsSearch";
+import Callout from "@/components/ui/Callout";
 
 export default function ContractsPage() {
   const { authInProgress, isAuthed } = useAuth();
@@ -18,9 +17,7 @@ export default function ContractsPage() {
 
       <Title text={"Contracts"} centered description={"Search contracts you have access to across all studies"} />
 
-      <RequireStudyAccess>
-        <ContractsSearch />
-      </RequireStudyAccess>
+      <Callout construction />
     </>
   );
 }
