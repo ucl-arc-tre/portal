@@ -118,7 +118,7 @@ export default function Notifications() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.headerText}>
+        <div className={styles["header-text"]}>
           <h2>Your Notifications</h2>
           {notifications && notifications.length > 0 && !needToCompleteProfile && (
             <p className={styles.summary} aria-live="polite">
@@ -140,7 +140,7 @@ export default function Notifications() {
           <div className={styles["setup-prompt-header"]}>
             <h3>Complete Your Profile Setup</h3>
             <IconButton
-              className={styles.iconButton}
+              className={styles["icon-button"]}
               aria-label={`Dismiss “${completeProfileNotification.title}”`}
               title="Dismiss"
               onClick={() => dismissNotification(completeProfileNotification)}
@@ -176,11 +176,11 @@ export default function Notifications() {
 
               return (
                 <li className={`${styles.notification} ${stateClass}`} key={notification.id}>
-                  <span className={styles.stateIndicator} aria-hidden="true" />
-                  <div className={styles.notificationContent}>
-                    {!notification.read && <span className={styles.status}>Unread</span>}
+                  <span className={styles["state-indicator"]} aria-hidden="true" />
+                  <div className={styles["notification-content"]}>
+                    {!notification.read && <span className={styles["status"]}>Unread</span>}
                     <button
-                      className={styles.notificationLink}
+                      className={styles["notification-link"]}
                       type="button"
                       onClick={() => {
                         if (notification.href) {
@@ -189,14 +189,14 @@ export default function Notifications() {
                         readNotification(notification);
                       }}
                     >
-                      <span className={styles.notificationTitle}>{notification.title}</span>
-                      {notification.body && <span className={styles.notificationBody}>{notification.body}</span>}
+                      <span className={styles["notification-title"]}>{notification.title}</span>
+                      {notification.body && <span className={styles["notification-body"]}>{notification.body}</span>}
                     </button>
                   </div>
-                  <div className={styles.notificationActions}>
+                  <div className={styles["notification-actions"]}>
                     {!notification.read && (
                       <IconButton
-                        className={styles.iconButton}
+                        className={styles["icon-button"]}
                         aria-label={`Mark “${notification.title}” as read`}
                         title="Mark as read"
                         onClick={() => readNotification(notification)}
@@ -205,7 +205,7 @@ export default function Notifications() {
                       </IconButton>
                     )}
                     <IconButton
-                      className={styles.iconButton}
+                      className={styles["icon-button"]}
                       aria-label={`Dismiss “${notification.title}”`}
                       title="Dismiss"
                       onClick={() => dismissNotification(notification)}
