@@ -19,7 +19,7 @@ func (h *Handler) projectsAll(params openapi.GetProjectsParams, envs []types.Env
 		return []projects.GenericProject{}, types.NewErrClientInvalidObject("invalid query param")
 	}
 	if params.Limit != nil && *params.Limit > config.MaxPageSize {
-		return []projects.GenericProject{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.DefaultPageSize)
+		return []projects.GenericProject{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
 		return []projects.GenericProject{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
