@@ -1,4 +1,3 @@
-import router from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./ManageProjectDSH.module.css";
 import Title from "@/components/ui/Title";
@@ -13,6 +12,7 @@ import ProjectMember from "../ProjectMember";
 import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
 import ProjectAccessReview from "../ProjectAccessReview";
+import { useRouter } from "next/router";
 
 type Props = {
   project: ProjectDsh;
@@ -32,6 +32,7 @@ export default function ManageProjectDSH(props: Props) {
     project?.status === "active" &&
     (project?.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));
 
+  const router = useRouter();
   const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
 
   if (authInProgress) return <Loading />;
