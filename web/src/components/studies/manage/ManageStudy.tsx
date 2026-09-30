@@ -4,7 +4,6 @@ import {
   Asset,
   Contract,
   Project,
-  getProjects,
   getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdContracts,
@@ -13,6 +12,7 @@ import {
   StudyAgreements,
   StudyFeedbackEntry,
 } from "@/openapi";
+import { getAllProjects } from "@/lib/projects";
 import StudyOverview from "./StudyOverview";
 import StudySetupSteps from "./StudySetupSteps";
 import StudyTabs from "./StudyTabs";
@@ -76,7 +76,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
           getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
           getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
-          getProjects(),
+          getAllProjects(),
           getStudiesByStudyIdFeedback({ path: { studyId: study.id } }),
         ]);
 
