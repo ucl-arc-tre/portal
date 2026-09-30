@@ -1,5 +1,5 @@
 import { useState } from "react";
-import router from "next/router";
+import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import {
   postProjectsTreAdminByProjectIdApprove,
@@ -162,6 +162,7 @@ export default function ManageProjectTRE(props: Props) {
     isApprovedOrLater &&
     (project.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));
 
+  const router = useRouter();
   const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
 
   if (authInProgress) return <Loading />;
