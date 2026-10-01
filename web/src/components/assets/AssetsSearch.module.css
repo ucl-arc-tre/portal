@@ -1,6 +1,7 @@
 .container {
-  width: 40vw;
+  width: 55vw;
   margin-top: 1rem;
+  margin-inline: 8vw;
 }
 
 .results {
