@@ -2551,6 +2551,47 @@ export type PostProjectsDshByProjectIdAccessReviewSignoffResponses = {
     200: unknown;
 };
 
+export type GetAssetsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Fuzzy asset title to search by
+         */
+        query?: string;
+        /**
+         * Maximum number of items to return
+         */
+        limit?: number;
+        /**
+         * Index of the first item to return
+         */
+        offset?: number;
+    };
+    url: '/assets';
+};
+
+export type GetAssetsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetAssetsResponses = {
+    200: Array<Asset>;
+};
+
+export type GetAssetsResponse = GetAssetsResponses[keyof GetAssetsResponses];
+
 export type GetStudiesByStudyIdAssetsData = {
     body?: never;
     path: {
