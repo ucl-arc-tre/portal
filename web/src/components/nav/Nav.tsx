@@ -89,7 +89,7 @@ export default function Nav() {
 
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
   const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff || isIGStaff;
-  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
+  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff || isDshOpsStaff;
   const canSeeMetrics = isAdmin || isIGStaff;
 
   return (
