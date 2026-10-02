@@ -15,20 +15,20 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func studyQueryParams(params openapi.GetStudiesParams) (studies.QueryParams, error) {
+func studyQueryParams(params openapi.GetStudiesParams) (studies.StudyQueryParams, error) {
 	if !params.Valid() {
-		return studies.QueryParams{}, types.NewErrClientInvalidObject("invalid query param")
+		return studies.StudyQueryParams{}, types.NewErrClientInvalidObject("invalid query param")
 	}
 	if params.Limit != nil && *params.Limit > config.MaxPageSize {
-		return studies.QueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
+		return studies.StudyQueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
 	}
 	if params.Limit != nil && *params.Limit <= 0 {
-		return studies.QueryParams{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
+		return studies.StudyQueryParams{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
 	}
 	if params.Offset != nil && *params.Offset < 0 {
-		return studies.QueryParams{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
+		return studies.StudyQueryParams{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
 	}
-	queryParams := studies.QueryParams{
+	queryParams := studies.StudyQueryParams{
 		ApprovalStatus: params.Status,
 		CaseRef:        params.Caseref,
 		FuzzyTitle:     params.FuzzyTitle,
@@ -40,7 +40,7 @@ func studyQueryParams(params openapi.GetStudiesParams) (studies.QueryParams, err
 	if params.QueryIsCaseref() {
 		caseref, err := strconv.Atoi(*params.Query)
 		if err != nil {
-			return studies.QueryParams{}, types.NewErrInvalidObject("caseref was not int")
+			return studies.StudyQueryParams{}, types.NewErrInvalidObject("caseref was not int")
 		}
 		queryParams.CaseRef = &caseref
 	} else if params.QueryIsOwnerUsername() {
