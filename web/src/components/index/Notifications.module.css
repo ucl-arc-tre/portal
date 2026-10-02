@@ -4,7 +4,8 @@
   border-radius: var(--default-border-radius);
   padding: clamp(1rem, 3vw, 1.5rem);
   margin: 2rem auto;
-  width: min(100%, 500px);
+  width: min(100%, 600px);
+
   justify-self: center;
 }
 
@@ -26,7 +27,7 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.headerText {
+.header-text {
   display: grid;
   gap: 0.25rem;
 }
@@ -103,7 +104,12 @@
   font-weight: 500;
 }
 
-.notificationsList {
+.notifications-list-container {
+  height: 60vh;
+  overflow: scroll;
+}
+
+.notifications-list {
   display: grid;
   gap: 0.75rem;
   margin-top: 1.25rem;
@@ -138,15 +144,15 @@
   color: var(--text--secondary);
 }
 
-.stateIndicator {
+.state-indicator {
   background: #b8bdc7;
 }
 
-.unread .stateIndicator {
+.unread .state-indicator {
   background: var(--ucl-accent);
 }
 
-.notificationContent {
+.notification-content {
   display: grid;
   align-content: center;
   justify-items: start;
@@ -174,7 +180,7 @@
   background: #f3e7ff;
 }
 
-.notificationLink {
+.notification-link {
   display: grid;
   gap: 0.25rem;
   width: 100%;
@@ -187,36 +193,36 @@
   cursor: pointer;
 }
 
-.notificationLink:hover .notificationTitle {
+.notification-link:hover .notification-title {
   color: var(--ucl-mid);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
 
-.notificationLink:focus-visible {
+.notification-link:focus-visible {
   border-radius: 2px;
   outline: 3px solid var(--ucl-accent);
   outline-offset: 3px;
 }
 
-.notificationTitle {
+.notification-title {
   color: var(--foreground);
   font-weight: 500;
   line-height: 1.35;
 }
 
-.unread .notificationTitle {
+.unread .notification-title {
   color: var(--ucl-dark);
   font-weight: 600;
 }
 
-.notificationBody {
+.notification-body {
   color: var(--text--secondary);
   font-size: 0.875rem;
   line-height: 1.45;
 }
 
-.notificationActions {
+.notification-actions {
   display: flex;
   align-items: center;
   align-self: stretch;
@@ -225,7 +231,7 @@
   border-left: 1px solid rgb(206 209 215 / 70%);
 }
 
-.iconButton {
+.icon-button {
   display: grid !important;
   width: 2.25rem;
   height: 2.25rem;
@@ -233,7 +239,7 @@
   place-items: center;
 }
 
-.iconButton:hover {
+.icon-button:hover {
   background: rgb(80 7 120 / 8%) !important;
 }
 
