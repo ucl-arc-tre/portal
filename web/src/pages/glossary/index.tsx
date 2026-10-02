@@ -17,8 +17,6 @@ export default function GlossaryPage() {
         description="Definitions and diagrams for terminology used in the ARC Services Portal"
       />
 
-      <Callout construction />
-
       <Title
         text={"Glossary"}
         centered
