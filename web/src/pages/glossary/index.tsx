@@ -1,7 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import Title from "@/components/ui/Title";
 import styles from "./GlossaryPage.module.css";
-import Callout from "@/components/ui/Callout";
 import EntityGlossaryDefinition, { roleDefinitions, RoleGlossaryDefinition } from "./glossaryDefinitions";
 import { portalEntityDefinitions } from "@/components/shared/entityDefinitions";
 import TabCollection from "@/components/ui/TabCollection";
