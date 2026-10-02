@@ -18,6 +18,12 @@ const FolderIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const FileIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.File), {
   ssr: false,
 });
+const PackageIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Package), {
+  ssr: false,
+});
+const PaperclipIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Paperclip), {
+  ssr: false,
+});
 const UsersIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Users), {
   ssr: false,
 });
@@ -91,16 +97,22 @@ export default function Nav() {
       <nav aria-label="Main navigation">
         <MenuSection>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
+        </MenuSection>
 
-          {canSeeStudies && (
-            <NavItem
-              href="/studies"
-              additionalPaths={["/assets", "/contracts"]}
-              icon={<FolderIcon />}
-              title="Studies"
-            />
-          )}
+        {canSeeStudies && (
+          <>
+            <MenuDivider />
+            <MenuSection>
+              <MenuHeading className={styles["ig-heading"]}>Info Governance</MenuHeading>
+              <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />
+              <NavItem href="/assets" icon={<PackageIcon />} title="Assets" />
+              <NavItem href="/contracts" icon={<PaperclipIcon />} title="Contracts" />
+            </MenuSection>
+          </>
+        )}
 
+        <MenuDivider />
+        <MenuSection>
           {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
 
           {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}

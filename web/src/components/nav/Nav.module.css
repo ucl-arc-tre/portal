@@ -11,3 +11,12 @@
     white-space: nowrap;
   }
 }
+
+.ig-heading {
+  margin: 0.5rem 0 0.25rem !important;
+  padding: 0 0.5rem !important;
+
+  h3 {
+    font-size: 14px !important;
+  }
+}
