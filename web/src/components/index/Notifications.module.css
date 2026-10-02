@@ -105,7 +105,7 @@
 }
 
 .notifications-list-container {
-  height: min(60vh, 70vh);
+  height: 60vh;
   overflow: scroll;
 }
 
