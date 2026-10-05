@@ -2,7 +2,7 @@ import MetaHead from "@/components/meta/Head";
 import ApprovedResearcherImport from "@/components/people/ApprovedResearcherImport";
 import ExternalInvite from "@/components/people/ExternalInvite";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Line from "@/components/ui/Line";
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
 import { Alert, AlertMessage, HelperText } from "@/components/ui/uikitExports";
@@ -41,11 +41,7 @@ export default function PeoplePage() {
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
 
-      <div className={styles.header}>
-        <h2>People</h2>
-        {(isAdmin || isIAO || isIGStaff) && <ExternalInvite />}
-      </div>
-      <Line />
+      <PageHeader title="People">{(isAdmin || isIAO || isIGStaff) && <ExternalInvite />}</PageHeader>
 
       <HelperText>
         {isAdmin

@@ -1,5 +1,5 @@
 import MetaHead from "@/components/meta/Head";
-import Line from "@/components/ui/Line";
+import PageHeader from "@/components/ui/PageHeader";
 import { HelperText } from "@/components/ui/uikitExports";
 import styles from "./GlossaryPage.module.css";
 import EntityGlossaryDefinition, { roleDefinitions, RoleGlossaryDefinition } from "./glossaryDefinitions";
@@ -17,10 +17,7 @@ export default function GlossaryPage() {
         description="Definitions and diagrams for terminology used in the ARC Services Portal"
       />
 
-      <div className={styles.header}>
-        <h2>Glossary</h2>
-      </div>
-      <Line />
+      <PageHeader title="Glossary" />
       <HelperText>Explore definitions for terms used in the ARC Services Portal, organised by category.</HelperText>
 
       <TabCollection tabs={[{ name: "entities" }, { name: "roles" }]} defaultTab="entities" />

@@ -1,6 +1,6 @@
 import MetaHead from "@/components/meta/Head";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Line from "@/components/ui/Line";
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertMessage, HelperText } from "@/components/ui/uikitExports";
 import Metrics from "@/components/metrics/Metrics";
@@ -28,10 +28,7 @@ export default function MetricsPage() {
         title="Metrics | ARC Services Portal"
         description="View metrics for users/studies/people in the ARC Services Portal"
       />
-      <div className={styles.header}>
-        <h2>Metrics</h2>
-      </div>
-      <Line />
+      <PageHeader title="Metrics" />
       <HelperText>View metrics for users, studies and people in the ARC Services Portal</HelperText>
 
       <Metrics />

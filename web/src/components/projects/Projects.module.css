@@ -3,27 +3,6 @@
   margin-inline: 8vw;
 }
 
-.header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 1rem;
-
-  h2 {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding-top: 0.5rem;
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #333;
-
-    button svg {
-      display: block;
-    }
-  }
-}
-
 .no-projects-message {
   display: flex;
   flex-direction: column;

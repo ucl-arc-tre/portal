@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Asset, GetAssetsData, getAssets } from "@/openapi";
 import Search from "@/components/ui/Search";
-import Button from "@/components/ui/Button";
-import Line from "@/components/ui/Line";
-import { HelperText, InfoIcon } from "@/components/ui/uikitExports";
+import PageHeader from "@/components/ui/PageHeader";
+import { HelperText } from "@/components/ui/uikitExports";
 import { AssetDefinition } from "@/components/shared/entityDefinitions";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
@@ -77,21 +76,14 @@ export default function AssetsSearch() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>
-          {canSeeAllStudies ? "All Assets " : "Your Assets "}
-          <Button
-            onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-            variant="tertiary"
-            size="small"
-            inline
-            aria-label="Toggle asset definition"
-          >
-            <InfoIcon />
-          </Button>
-        </h2>
-      </div>
-      <Line />
+      <PageHeader
+        title={canSeeAllStudies ? "All Assets" : "Your Assets"}
+        info={{
+          label: "Toggle asset definition",
+          expanded: infoCalloutExpanded,
+          onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
+        }}
+      />
 
       {infoCalloutExpanded && <AssetDefinition />}
 

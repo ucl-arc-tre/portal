@@ -1,10 +1,9 @@
-import Line from "@/components/ui/Line";
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
@@ -20,20 +19,14 @@ export default function Studies() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>
-          {canSeeAllStudies ? "All Studies" : "Your Studies"}{" "}
-          <Button
-            onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-            variant="tertiary"
-            size="small"
-            inline
-            aria-label="Toggle study definition"
-          >
-            <InfoIcon />
-          </Button>
-        </h2>
-
+      <PageHeader
+        title={canSeeAllStudies ? "All Studies" : "Your Studies"}
+        info={{
+          label: "Toggle study definition",
+          expanded: infoCalloutExpanded,
+          onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
+        }}
+      >
         {isApprovedStaffResearcher && isFormOpen && (
           <StudyForm
             username={userData.username}
@@ -52,8 +45,7 @@ export default function Studies() {
             </Button>
           </div>
         )}
-      </div>
-      <Line />
+      </PageHeader>
 
       {infoCalloutExpanded && <StudyDefinition />}
 

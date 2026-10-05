@@ -4,9 +4,8 @@ import MetaHead from "@/components/meta/Head";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Callout from "@/components/ui/Callout";
 import { useState } from "react";
-import Button from "@/components/ui/Button";
-import Line from "@/components/ui/Line";
-import { HelperText, InfoIcon } from "@/components/ui/uikitExports";
+import PageHeader from "@/components/ui/PageHeader";
+import { HelperText } from "@/components/ui/uikitExports";
 import { ContractDefinition } from "@/components/shared/entityDefinitions";
 import styles from "./ContractsPage.module.css";
 
@@ -22,21 +21,14 @@ export default function ContractsPage() {
       <MetaHead title="Contracts | ARC Services Portal" description="Search contracts in the ARC Services Portal" />
 
       <div className={styles.container}>
-        <div className={styles.header}>
-          <h2>
-            {canSeeAllStudies ? "All Contracts " : "Your Contracts "}
-            <Button
-              onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-              variant="tertiary"
-              size="small"
-              inline
-              aria-label="Toggle contract definition"
-            >
-              <InfoIcon />
-            </Button>
-          </h2>
-        </div>
-        <Line />
+        <PageHeader
+          title={canSeeAllStudies ? "All Contracts" : "Your Contracts"}
+          info={{
+            label: "Toggle contract definition",
+            expanded: infoCalloutExpanded,
+            onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
+          }}
+        />
 
         {infoCalloutExpanded && <ContractDefinition />}
         <Callout construction />
