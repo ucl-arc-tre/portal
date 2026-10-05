@@ -58,6 +58,15 @@ export default function ManageProjectDSH(props: Props) {
 
       <div className={styles.header}>
         <h2>{project.name}</h2>
+        <Button
+          href="https://myservices.ucl.ac.uk/self-service/requests/new/select_template?from=wizard&service_id=1473&service_instance_id=3892"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="secondary"
+          size="medium"
+        >
+          Edit Project
+        </Button>
       </div>
 
       <TabCollection
