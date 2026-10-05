@@ -1,5 +1,6 @@
 import MetaHead from "@/components/meta/Head";
-import Title from "@/components/ui/Title";
+import Line from "@/components/ui/Line";
+import { HelperText } from "@/components/ui/uikitExports";
 import styles from "./GlossaryPage.module.css";
 import EntityGlossaryDefinition, { roleDefinitions, RoleGlossaryDefinition } from "./glossaryDefinitions";
 import { portalEntityDefinitions } from "@/components/shared/entityDefinitions";
@@ -10,17 +11,17 @@ export default function GlossaryPage() {
   const router = useRouter();
   const tab = (router.query.tab as "entities" | "roles") ?? "entities";
   return (
-    <>
+    <div className={styles.container}>
       <MetaHead
         title="Glossary | ARC Services Portal"
         description="Definitions and diagrams for terminology used in the ARC Services Portal"
       />
 
-      <Title
-        text={"Glossary"}
-        centered
-        description={"Explore definitions for terms used in the ARC Services Portal, organised by category."}
-      />
+      <div className={styles.header}>
+        <h2>Glossary</h2>
+      </div>
+      <Line />
+      <HelperText>Explore definitions for terms used in the ARC Services Portal, organised by category.</HelperText>
 
       <TabCollection tabs={[{ name: "entities" }, { name: "roles" }]} defaultTab="entities" />
 
@@ -48,6 +49,6 @@ export default function GlossaryPage() {
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }
