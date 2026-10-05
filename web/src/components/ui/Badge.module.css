@@ -1,4 +1,9 @@
 .badge {
+  display: inline-flex;
+  box-sizing: border-box;
+  max-width: 100%;
+  vertical-align: middle;
+  min-width: 0;
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
@@ -10,4 +15,15 @@
   border-style: solid;
   border-width: 1px;
   height: 1.5rem;
+}
+
+.label {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suffix {
+  flex-shrink: 0;
 }
