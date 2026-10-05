@@ -1,3 +1,4 @@
+import Line from "@/components/ui/Line";
 import { useState, useEffect, useReducer } from "react";
 import { Project, Study, getStudies } from "@/openapi";
 import { getAllProjects } from "@/lib/projects";
@@ -151,7 +152,7 @@ export default function Projects() {
               </Button>
             )}
           </div>
-          <div className={styles.line}></div>
+          <Line />
         </>
       )}
       {infoCalloutExpanded && <ProjectDefinition />} <HelperText>All Projects you have access to</HelperText>

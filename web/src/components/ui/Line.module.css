@@ -1,0 +1,10 @@
+.line {
+  content: "";
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--form-purple--light), var(--ucl-accent));
+  margin-left: 0.4rem;
+  margin-bottom: 2rem;
+}

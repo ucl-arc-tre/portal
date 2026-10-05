@@ -1,9 +1,10 @@
+import Line from "@/components/ui/Line";
 import { useAuth } from "@/hooks/useAuth";
 import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { HelperText, InfoIcon } from "../ui/uikitExports";
+import { InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
@@ -53,7 +54,7 @@ export default function Studies() {
           </div>
         )}
       </div>
-      <div className={styles.line}></div>
+      <Line />
 
       {infoCalloutExpanded && <StudyDefinition />}
 
