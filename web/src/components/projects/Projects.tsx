@@ -17,6 +17,7 @@ import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/router";
 import { MAX_PAGE_SIZE } from "@/hooks/usePagination";
+import Callout from "../ui/Callout";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -155,6 +156,12 @@ export default function Projects() {
           <Line />
         </>
       )}
+      <Callout
+        construction
+        text={
+          "Only ARC TRE and Data Safe Haven projects are currently viewable here. We're working to onboard other environments and enable creation."
+        }
+      />
       {infoCalloutExpanded && <ProjectDefinition />} <HelperText>All Projects you have access to</HelperText>
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">

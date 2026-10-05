@@ -49,7 +49,7 @@ export default function PeoplePage() {
             : isTreOpsStaff || isDSHOpsStaff || isIGStaff
               ? "View approved researchers"
               : isIAO
-                ? "View users in your projects or invite a collaborator"
+                ? "Invite a collaborator"
                 : "You do not have permission to view this page"
         }
       />
