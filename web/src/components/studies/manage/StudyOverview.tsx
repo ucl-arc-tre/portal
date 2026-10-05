@@ -48,8 +48,7 @@ export default function StudyOverview({
   const isStudyOwnerOrAdmin = isStudyOwner || isStudyAdmin;
 
   const studyOwnerPendingChange = study.pending_new_owner_username !== undefined;
-  const canEditStudyOwner =
-    (isStudyOwner || isIGStaff) && !studyOwnerPendingChange && study.approval_status !== "Incomplete";
+  const canEditStudyOwner = (isStudyOwner || isIGStaff) && !studyOwnerPendingChange;
   const canRequestReview =
     study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwnerOrAdmin;
   const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
