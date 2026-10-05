@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Asset, GetAssetsData, getAssets } from "@/openapi";
 import Search from "@/components/ui/Search";
+import Button from "@/components/ui/Button";
+import Line from "@/components/ui/Line";
+import { HelperText, InfoIcon } from "@/components/ui/uikitExports";
+import { AssetDefinition } from "@/components/shared/entityDefinitions";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import NoObjects from "@/components/ui/NoObjects";
@@ -9,8 +13,12 @@ import AssetResultsList from "./AssetResultsList";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { usePagination, DEFAULT_PAGE_SIZE } from "@/hooks/usePagination";
 import styles from "./AssetsSearch.module.css";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AssetsSearch() {
+  const { canSeeAllStudies } = useAuth();
+
+  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [query, setQuery] = useState("");
@@ -69,13 +77,26 @@ export default function AssetsSearch() {
 
   return (
     <div className={styles.container}>
-      <Search
-        placeholder="Search assets by name..."
-        onSearch={handleSearch}
-        id="assets-search"
-        onClear={handleClearSearch}
-      />
+      <div className={styles.header}>
+        <h2>
+          {canSeeAllStudies ? "All Assets " : "Your Assets "}
+          <Button
+            onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+            variant="tertiary"
+            size="small"
+            inline
+            aria-label="Toggle asset definition"
+          >
+            <InfoIcon />
+          </Button>
+        </h2>
+      </div>
+      <Line />
 
+      {infoCalloutExpanded && <AssetDefinition />}
+
+      <HelperText>Search assets you have access to across all studies.</HelperText>
+      <Search placeholder="Search Assets" onSearch={handleSearch} id="assets-search" onClear={handleClearSearch} />
       <div className={styles.results}>
         {isLoading && <Loading message="Loading assets..." />}
 

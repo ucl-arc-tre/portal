@@ -10,12 +10,11 @@ import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
 export default function Studies() {
-  const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
+  const { userData, isApprovedStaffResearcher, canSeeAllStudies } = useAuth();
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
-  const canSeeAllStudies = isIGStaff || isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   if (!userData) return null;
 

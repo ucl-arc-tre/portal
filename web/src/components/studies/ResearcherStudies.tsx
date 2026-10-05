@@ -84,7 +84,7 @@ export default function ResearcherStudies(props: Props) {
 
   return (
     <>
-      <HelperText>All Studies you have access to.</HelperText>
+      <HelperText>Search all Studies you have access to.</HelperText>
 
       {hasAnyStudies && (
         <Search placeholder="Search Studies" onSearch={handleSearch} id="study-search" onClear={handleClearSearch} />
