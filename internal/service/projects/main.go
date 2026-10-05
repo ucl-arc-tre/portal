@@ -426,6 +426,7 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("Project.CreatorUser").
 		Preload("Project.Environment").
 		Preload("Project.Study").
+		Preload("Project.Study.Owner").
 		Preload("Project.ProjectAssets.Asset").
 		Preload("TRERoleBindings.User").
 		Preload("UserConfigs.User").

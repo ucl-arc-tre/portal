@@ -22,6 +22,7 @@ func (s *Service) ProjectDSHById(projectId uuid.UUID) (*types.ProjectDSH, error)
 	err := s.db.
 		Preload("Project").
 		Preload("Project.Study").
+		Preload("Project.Study.Owner").
 		Preload("RoleBindings.User").
 		Where("project_id = ?", projectId).
 		First(&projectDSH).Error

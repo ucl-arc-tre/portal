@@ -1280,6 +1280,7 @@ type ProjectDSH struct {
 	Name       string             `json:"name"`
 	Status     ProjectDSHStatus   `json:"status"`
 	StudyId    string             `json:"study_id"`
+	StudyOwner *UserDataSummary   `json:"study_owner,omitempty"`
 	StudyTitle string             `json:"study_title"`
 }
 
@@ -1339,7 +1340,8 @@ type ProjectTRE struct {
 	Status                     ProjectTREStatus `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
-	StudyId string `json:"study_id"`
+	StudyId    string           `json:"study_id"`
+	StudyOwner *UserDataSummary `json:"study_owner,omitempty"`
 
 	// StudyTitle Title of the study to which the project belongs
 	StudyTitle string `json:"study_title"`
@@ -1762,6 +1764,12 @@ type UserDataLookup struct {
 	ChosenName                *string `json:"chosen_name,omitempty"`
 	IsValidApprovedResearcher bool    `json:"is_valid_approved_researcher"`
 	Username                  string  `json:"username"`
+}
+
+// UserDataSummary defines model for UserDataSummary.
+type UserDataSummary struct {
+	Name     *string `json:"name,omitempty"`
+	Username string  `json:"username"`
 }
 
 // UserMetrics defines model for UserMetrics.

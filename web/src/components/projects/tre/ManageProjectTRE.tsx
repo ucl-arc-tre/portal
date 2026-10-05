@@ -263,6 +263,14 @@ export default function ManageProjectTRE(props: Props) {
           <DetailsField label="Created by" value={project.creator_username} />
           <DetailsField label="Created" value={new Date(project.created_at).toLocaleDateString()} />
           <DetailsField label="Study" value={project.study_title} />
+          {project.study_owner && (
+            <DetailsField label="Study Owner">
+              {project.study_owner.name
+                ? `${project.study_owner.name} (${project.study_owner.username})`
+                : project.study_owner.username}
+            </DetailsField>
+          )}
+
           <DetailsField
             label="Number of approvals required for egress"
             value={`${project.num_required_egress_approvals}`}

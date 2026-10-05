@@ -155,6 +155,11 @@ export type UserDataLookup = {
     is_valid_approved_researcher: boolean;
 };
 
+export type UserDataSummary = {
+    username: string;
+    name?: string;
+};
+
 export type UserTrainingUpdate = {
     training_kind: TrainingKind;
     /**
@@ -622,6 +627,7 @@ export type ProjectDsh = {
     id: string;
     study_id: string;
     study_title: string;
+    study_owner?: UserDataSummary;
     status: ProjectDshStatus;
     /**
      * List of assets associated with this project
@@ -706,6 +712,7 @@ export type ProjectTre = ProjectTreBase & {
      * Title of the study to which the project belongs
      */
     study_title: string;
+    study_owner?: UserDataSummary;
     /**
      * Username of the user who created the project
      */

@@ -69,6 +69,13 @@ export default function ManageProjectDSH(props: Props) {
         <Box>
           <DetailsField label="Environment" value={project.environment_name} />
           <DetailsField label="Study" value={project.study_title} />
+          {project.study_owner && (
+            <DetailsField label="Study Owner">
+              {project.study_owner.name
+                ? `${project.study_owner.name} (${project.study_owner.username})`
+                : project.study_owner.username}
+            </DetailsField>
+          )}
           <DetailsField label="Status" value={`${project.status}`} />
         </Box>
       )}
