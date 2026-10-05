@@ -1,10 +1,24 @@
-.button-container {
-  justify-self: center;
-  align-items: center;
-  justify-content: center;
-  height: 4rem;
+.container {
+  width: 55vw;
+  margin-top: 1rem;
+  margin-inline: 8vw;
+}
+
+.header {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-block: 0.8rem;
+  gap: 1rem;
+
+  h2 {
+    padding-top: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+  }
+}
+
+.import-actions {
+  margin-block: 1rem;
 }
