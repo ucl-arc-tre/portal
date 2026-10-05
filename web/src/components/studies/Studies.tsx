@@ -56,7 +56,6 @@ export default function Studies() {
       <div className={styles.line}></div>
 
       {infoCalloutExpanded && <StudyDefinition />}
-      <HelperText>All Studies you have access to</HelperText>
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />

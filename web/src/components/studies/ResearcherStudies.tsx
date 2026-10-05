@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePagination, DEFAULT_PAGE_SIZE } from "@/hooks/usePagination";
 
 import styles from "./ResearcherStudies.module.css";
+import { HelperText } from "../ui/uikitExports";
 
 type Props = {
   refreshToken: number;
@@ -83,6 +84,8 @@ export default function ResearcherStudies(props: Props) {
 
   return (
     <>
+      <HelperText>All Studies you have access to.</HelperText>
+
       {hasAnyStudies && (
         <Search placeholder="Search Studies" onSearch={handleSearch} id="study-search" onClear={handleClearSearch} />
       )}
