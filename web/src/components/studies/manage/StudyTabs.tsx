@@ -3,11 +3,12 @@ import { calculateExpiryUrgency } from "../../shared/exports";
 import TabCollection from "@/components/ui/TabCollection";
 
 type StudyTabsProps = {
+  tab: "study" | "assets" | "contracts" | "projects";
   assets: Asset[];
   contracts: Contract[];
 };
 
-export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
+export default function StudyTabs({ assets, contracts, tab }: StudyTabsProps) {
   const assetsNeedAttention = assets.some((asset) => {
     if (asset.requires_contract && asset.contract_ids.length === 0) return true;
     if (asset.status === "active" && asset.expires_at) {
@@ -33,7 +34,7 @@ export default function StudyTabs({ assets, contracts }: StudyTabsProps) {
         { name: "contracts", needsAttention: contractsNeedAttention },
         { name: "projects" },
       ]}
-      defaultTab="study"
+      defaultTab={tab}
     />
   );
 }
