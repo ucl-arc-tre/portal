@@ -1,12 +1,18 @@
 import { useAuth } from "@/hooks/useAuth";
 
 import MetaHead from "@/components/meta/Head";
-import Title from "@/components/ui/Title";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Callout from "@/components/ui/Callout";
+import { useState } from "react";
+import Button from "@/components/ui/Button";
+import Line from "@/components/ui/Line";
+import { HelperText, InfoIcon } from "@/components/ui/uikitExports";
+import { ContractDefinition } from "@/components/shared/entityDefinitions";
+import styles from "./ContractsPage.module.css";
 
 export default function ContractsPage() {
-  const { authInProgress, isAuthed } = useAuth();
+  const { authInProgress, isAuthed, canSeeAllStudies } = useAuth();
+  const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -15,9 +21,28 @@ export default function ContractsPage() {
     <>
       <MetaHead title="Contracts | ARC Services Portal" description="Search contracts in the ARC Services Portal" />
 
-      <Title text={"Contracts"} centered description={"Search contracts you have access to across all studies"} />
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2>
+            {canSeeAllStudies ? "All Contracts " : "Your Contracts "}
+            <Button
+              onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+              variant="tertiary"
+              size="small"
+              inline
+              aria-label="Toggle contract definition"
+            >
+              <InfoIcon />
+            </Button>
+          </h2>
+        </div>
+        <Line />
 
-      <Callout construction />
+        {infoCalloutExpanded && <ContractDefinition />}
+        <Callout construction />
+
+        <HelperText>Search contracts you have access to across all studies.</HelperText>
+      </div>
     </>
   );
 }
