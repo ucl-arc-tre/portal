@@ -1824,6 +1824,16 @@ components:
         is_valid_approved_researcher:
           type: boolean
 
+    UserDataSummary:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+
     UserTrainingUpdate:
       type: object
       required:
@@ -2517,6 +2527,8 @@ components:
           type: string
         study_title:
           type: string
+        study_owner:
+          $ref: "#/components/schemas/UserDataSummary"
         status:
           $ref: "#/components/schemas/ProjectDSHStatus"
         assets:
@@ -2639,6 +2651,9 @@ components:
             study_title:
               type: string
               description: Title of the study to which the project belongs
+            study_owner:
+              $ref: "#/components/schemas/UserDataSummary"
+              description: Identity of the study owner
             creator_username:
               type: string
               description: Username of the user who created the project

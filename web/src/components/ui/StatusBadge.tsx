@@ -59,8 +59,12 @@ function getProjectTREDescription(
         case "deleted":
           return "This project has been deleted.";
       }
+    case "Data Safe Haven":
+      switch (status) {
+        case "active":
+          return "This project has been approved and deployed.";
+      }
   }
-
   return "Status information not available.";
 }
 

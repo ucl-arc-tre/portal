@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -152,13 +153,11 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	}
 
 	projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	if projectTRE == nil {
+		err = types.NewNotFoundError("failed to find project")
+	}
 	if err != nil {
 		setError(ctx, err, "Failed to get tre project")
-		return
-	}
-
-	if projectTRE == nil {
-		ctx.Status(http.StatusNotFound)
 		return
 	}
 
@@ -167,7 +166,6 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	for _, projectAsset := range projectTRE.Project.ProjectAssets {
 		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
 	}
-
 	response := openapi.ProjectTRE{
 		Id:                         projectTRE.Project.ID.String(),
 		Name:                       projectTRE.Project.Name,
@@ -186,6 +184,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		Members:                    extractProjectMembers(projectTRE),
 		AssetIds:                   nil,
 		LastAccessReview:           openapi.FormatOptionalTime(projectTRE.Project.LastAccessReview),
+		StudyOwner:                 h.optionalStudyOwnerSummary(&projectTRE.Project.Study),
 	}
 	if projectTRE.DeployedVersionUpdatedAt != nil &&
 		projectTRE.RequestedVersionUpdatedAt != nil &&
@@ -349,6 +348,7 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 		Status:           openapi.ProjectDSHStatus(projectDSH.Status),
 		LastAccessReview: openapi.FormatOptionalTime(projectDSH.Project.LastAccessReview),
 		Members:          []openapi.ProjectDSHMember{},
+		StudyOwner:       h.optionalStudyOwnerSummary(&projectDSH.Project.Study),
 	}
 	for username, member := range members {
 		response.Members = append(response.Members, openapi.ProjectDSHMember{
@@ -376,6 +376,21 @@ func (h *Handler) postProjectsProjectIdAccessReviewSignoff(ctx *gin.Context, pro
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *Handler) optionalStudyOwnerSummary(study *types.Study) *openapi.UserDataSummary {
+	if study == nil {
+		return nil
+	}
+	studyOwner := &openapi.UserDataSummary{
+		Username: string(study.Owner.Username),
+	}
+	if chosenName, err := h.users.CachedUserChosenName(study.Owner.Username); err != nil {
+		log.Err(err).Msg("Failed to get cached chosen name")
+	} else if chosenName != nil {
+		studyOwner.Name = new(string(*chosenName))
+	}
+	return studyOwner
 }
 
 func optionalInt(i *uint) *int {
