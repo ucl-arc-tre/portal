@@ -13,6 +13,7 @@ import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
 import ProjectAccessReview from "../ProjectAccessReview";
 import { useRouter } from "next/router";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 type Props = {
   project: ProjectDsh;
@@ -58,6 +59,14 @@ export default function ManageProjectDSH(props: Props) {
 
       <div className={styles.header}>
         <h2>{project.name}</h2>
+        <Button
+          href="https://myservices.ucl.ac.uk/self-service/requests/new/select_template?from=wizard&service_id=1473&service_instance_id=3892"
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="secondary"
+        >
+          Edit Project
+        </Button>
       </div>
 
       <TabCollection
@@ -69,7 +78,16 @@ export default function ManageProjectDSH(props: Props) {
         <Box>
           <DetailsField label="Environment" value={project.environment_name} />
           <DetailsField label="Study" value={project.study_title} />
-          <DetailsField label="Status" value={`${project.status}`} />
+          {project.study_owner && (
+            <DetailsField label="Study Owner">
+              {project.study_owner.name
+                ? `${project.study_owner.name} (${project.study_owner.username})`
+                : project.study_owner.username}
+            </DetailsField>
+          )}
+          <DetailsField label="Status">
+            <StatusBadge status={project.status} type="project" environment="Data Safe Haven" />
+          </DetailsField>
         </Box>
       )}
 
