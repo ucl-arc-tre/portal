@@ -77,7 +77,7 @@ export default function ExternalInvite() {
         </Dialog>
       )}
 
-      <Button onClick={openDialog} variant="primary" cy="show-invite-input" type="button" size="medium">
+      <Button onClick={openDialog} variant="primary" cy="show-invite-input" type="button">
         Invite external researcher
       </Button>
     </>

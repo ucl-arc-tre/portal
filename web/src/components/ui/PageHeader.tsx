@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Button from "./Button";
-import Line from "./Line";
+import Line from "./PageHeaderLine";
 import { InfoIcon } from "./uikitExports";
 import styles from "./PageHeader.module.css";
 
