@@ -1,19 +1,25 @@
 .studies-list {
   display: grid;
   gap: 2rem;
-  margin-top: 0;
+  margin-top: 1rem;
   padding-top: 0.2rem;
 }
 
 .status-indicator {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
   justify-self: flex-end;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .signoff-warning-tag {
   background: #fff3cd;
   color: #856404;
   border-color: #ffc107;
-  margin-left: 0.5rem;
 }
 
 .study-info {

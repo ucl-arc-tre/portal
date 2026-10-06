@@ -15,6 +15,7 @@ type AuthCtxValue = {
   isAdmin: boolean;
   isIAO: boolean;
   isDshOpsStaff: boolean;
+  canSeeAllStudies: boolean;
 };
 
 const AuthCtx = createContext<AuthCtxValue>({
@@ -29,6 +30,7 @@ const AuthCtx = createContext<AuthCtxValue>({
   isIAO: false,
   isAdmin: false,
   isDshOpsStaff: false,
+  canSeeAllStudies: false,
   refreshAuth: () => Promise.resolve(),
 });
 
@@ -44,10 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isIGStaff = (userData?.roles.includes("ig-admin") || userData?.roles.includes("ig-ops-staff")) ?? false;
   const isIGAdmin = userData?.roles.includes("ig-admin") ?? false;
   const isTreOpsStaff = userData?.roles.includes("tre-ops-staff") ?? false;
-  const isDSHOpsStaff = userData?.roles.includes("dsh-ops-staff") ?? false;
+  const isDshOpsStaff = userData?.roles.includes("dsh-ops-staff") ?? false;
   const isApprovedResearcher = userData?.roles.includes("approved-researcher") ?? false;
   const isApprovedStaffResearcher = userData?.roles.includes("approved-staff-researcher") ?? false;
   const isIAO = userData?.roles.includes("information-asset-owner") ?? false;
+  const canSeeAllStudies = isIGStaff || isIGAdmin || isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   const refreshAuth = async () => {
     try {
@@ -91,7 +94,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isTreOpsStaff,
         isApprovedStaffResearcher,
         isIAO,
-        isDshOpsStaff: isDSHOpsStaff,
+        isDshOpsStaff,
+        canSeeAllStudies,
       }}
     >
       {children}

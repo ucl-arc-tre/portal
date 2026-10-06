@@ -4,7 +4,7 @@
   border-radius: var(--default-border-radius);
   padding: clamp(1rem, 3vw, 1.5rem);
   margin: 2rem auto;
-  width: min(100%, 600px);
+  width: min(100%, 500px);
 
   justify-self: center;
 }

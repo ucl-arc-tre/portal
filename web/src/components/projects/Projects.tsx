@@ -1,3 +1,4 @@
+import PageHeader from "@/components/ui/PageHeader";
 import { useState, useEffect, useReducer } from "react";
 import { Project, Study, getStudies } from "@/openapi";
 import { getAllProjects } from "@/lib/projects";
@@ -12,10 +13,11 @@ import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
 import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
-import { HelperText, InfoIcon } from "../ui/uikitExports";
+import { HelperText } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/router";
 import { MAX_PAGE_SIZE } from "@/hooks/usePagination";
+import Callout from "../ui/Callout";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -132,28 +134,28 @@ export default function Projects() {
     <div className={styles.container}>
       {(canSeeAllProjects || projects.length > 0) && (
         <>
-          <div className={styles.header}>
-            <h2>
-              {canSeeAllProjects ? "All Projects" : "Your Projects"}{" "}
-              <Button
-                onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-                variant="tertiary"
-                size="small"
-                inline
-                aria-label="Toggle project definition"
-              >
-                <InfoIcon />
-              </Button>
-            </h2>
+          <PageHeader
+            title={canSeeAllProjects ? "All Projects" : "Your Projects"}
+            info={{
+              label: "Toggle project definition",
+              expanded: infoCalloutExpanded,
+              onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
+            }}
+          >
             {isApprovedStaffResearcher && creationEnabled && (
               <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
                 Create Project
               </Button>
             )}
-          </div>
-          <div className={styles.line}></div>
+          </PageHeader>
         </>
       )}
+      <Callout
+        construction
+        text={
+          "Only ARC TRE and Data Safe Haven projects are currently viewable here. We're working to onboard other environments and enable creation."
+        }
+      />
       {infoCalloutExpanded && <ProjectDefinition />} <HelperText>All Projects you have access to</HelperText>
       {showUclStaffModal && (
         <Dialog setDialogOpen={setShowUclStaffModal} cy="ucl-staff-restriction-modal">

@@ -104,11 +104,16 @@ export default function StatusBadge(props: BadgeProps) {
 
   const description = getDescription(type, status, environment, isIGStaff);
   return (
-    <Badge className={getStatusClassName(status)} cy="status-badge">
+    <Badge
+      className={getStatusClassName(status)}
+      cy="status-badge"
+      suffix={
+        <span className={styles["tooltip-wrapper"]}>
+          <InfoTooltip text={description} />
+        </span>
+      }
+    >
       {type === "study" ? getStudyBadgeText(status) : status}
-      <span className={styles["tooltip-wrapper"]}>
-        <InfoTooltip text={description} />
-      </span>
     </Badge>
   );
 }
