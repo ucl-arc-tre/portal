@@ -167,7 +167,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           </Alert>
         )}
 
-      {isIGStaff && !isOwnStudy && !isStudyAdmin && study.approval_status !== "Incomplete" && (
+      {isIGStaff && !isOwnStudy && !isStudyAdmin && (
         <AdminReview
           study={study}
           unagreedAdminUsernames={unagreedAdminUsernames}
@@ -176,7 +176,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
-      <StudyTabs assets={assets} contracts={contracts} />
+      <StudyTabs assets={assets} contracts={contracts} tab={tab} />
 
       {tab === "study" && (
         <StudyOverview
