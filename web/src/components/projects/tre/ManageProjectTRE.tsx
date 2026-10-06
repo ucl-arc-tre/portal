@@ -22,6 +22,7 @@ import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
 import DetailsField from "@/components/ui/DetailsField";
+import StatusBadge from "@/components/ui/StatusBadge";
 import ProjectMember from "../ProjectMember";
 import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
@@ -256,10 +257,10 @@ export default function ManageProjectTRE(props: Props) {
       {tab === "project" && (
         <Box>
           <DetailsField label="Environment" value={project.environment_name} />
-          <DetailsField
-            label="Status"
-            value={`${project.status}${project.is_pending_deployment_update ? " pending update" : ""}`}
-          />
+          <DetailsField label="Status">
+            <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+            {project.is_pending_deployment_update ? " pending update" : ""}
+          </DetailsField>
           <DetailsField label="Created by" value={project.creator_username} />
           <DetailsField label="Created" value={new Date(project.created_at).toLocaleDateString()} />
           <DetailsField label="Study" value={project.study_title} />

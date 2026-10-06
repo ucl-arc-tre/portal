@@ -13,6 +13,7 @@ import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
 import ProjectAccessReview from "../ProjectAccessReview";
 import { useRouter } from "next/router";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 type Props = {
   project: ProjectDsh;
@@ -63,7 +64,6 @@ export default function ManageProjectDSH(props: Props) {
           target="_blank"
           rel="noopener noreferrer"
           variant="secondary"
-          size="medium"
         >
           Edit Project
         </Button>
@@ -85,7 +85,9 @@ export default function ManageProjectDSH(props: Props) {
                 : project.study_owner.username}
             </DetailsField>
           )}
-          <DetailsField label="Status" value={`${project.status}`} />
+          <DetailsField label="Status">
+            <StatusBadge status={project.status} type="project" environment="Data Safe Haven" />
+          </DetailsField>
         </Box>
       )}
 
