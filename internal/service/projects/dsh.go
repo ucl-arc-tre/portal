@@ -173,10 +173,10 @@ func (s *Service) ImportDSHShareMembers(csvContent []byte) error {
 			return p.Project.Name == existingDSHProject.Project.Name
 		}
 		if !slices.ContainsFunc(importedDshProjects, nameMatches) {
-			if err := tx.Delete(existingDSHProject).Error; err != nil {
+			if err := tx.Delete(&existingDSHProject).Error; err != nil {
 				log.Err(err).Msg("Failed to delete old DSH project")
 			}
-			if err := tx.Delete(existingDSHProject.Project).Error; err != nil {
+			if err := tx.Delete(&existingDSHProject.Project).Error; err != nil {
 				log.Err(err).Msg("Failed to delete old DSH project")
 			}
 		}
