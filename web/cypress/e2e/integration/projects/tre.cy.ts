@@ -166,6 +166,6 @@ describe("TRE project creation end-to-end", () => {
     cy.visit("/projects");
 
     cy.contains(projectTitle).click();
-    cy.contains("deployed").should("be.visible");
+    cy.get('[data-cy="status-badge"]').contains("deployed").should("exist");
   });
 });
