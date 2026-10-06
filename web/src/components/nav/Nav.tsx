@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { ReactElement } from "react";
 import { client } from "@/openapi/client.gen";
 import { useAuth } from "@/hooks/useAuth";
-import { iconSizeSmall } from "../ui/uikitExports";
+import { iconSizeSmall, MenuDivider } from "../ui/uikitExports";
 
 const HomeIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Home), {
   ssr: false,
@@ -18,6 +18,12 @@ const FolderIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const FileIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.File), {
   ssr: false,
 });
+const PackageIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Package), {
+  ssr: false,
+});
+const PaperclipIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Paperclip), {
+  ssr: false,
+});
 const UsersIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Users), {
   ssr: false,
 });
@@ -27,16 +33,19 @@ const LogoutIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.
 const MetricsIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Disc), {
   ssr: false,
 });
+const GlossaryIcon = dynamic(() => import("uikit-react-public").then((mod) => mod.Icon.Type), {
+  ssr: false,
+});
 const MenuSection = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Section), {
+  ssr: false,
+});
+const MenuHeading = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Heading), {
   ssr: false,
 });
 const SecondaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.SecondaryItem), {
   ssr: false,
 });
 const PrimaryMenuItem = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.PrimaryItem), {
-  ssr: false,
-});
-const MenuDivider = dynamic(() => import("uikit-react-public").then((mod) => mod.MenuNew.Divider), {
   ssr: false,
 });
 
@@ -80,24 +89,32 @@ export default function Nav() {
 
   const canSeeStudies = isApprovedStaffResearcher || isAdmin || isIGStaff;
   const canSeeProjects = isApprovedResearcher || isAdmin || isTreOpsStaff || isDshOpsStaff || isIGStaff;
-  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff;
+  const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff || isDshOpsStaff;
   const canSeeMetrics = isAdmin || isIGStaff;
+
+  const contractsEnabled = process.env.NEXT_PUBLIC_ENABLE_CONTRACT_PAGE === "true";
 
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
         <MenuSection>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
+        </MenuSection>
 
-          {canSeeStudies && (
-            <NavItem
-              href="/studies"
-              additionalPaths={["/assets", "/contracts"]}
-              icon={<FolderIcon />}
-              title="Studies"
-            />
-          )}
+        {canSeeStudies && (
+          <>
+            <MenuDivider />
+            <MenuSection>
+              <MenuHeading className={styles["ig-heading"]}>Info Governance</MenuHeading>
+              <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />
+              <NavItem href="/assets" icon={<PackageIcon />} title="Assets" />
+              {contractsEnabled && <NavItem href="/contracts" icon={<PaperclipIcon />} title="Contracts" />}
+            </MenuSection>
+          </>
+        )}
 
+        <MenuDivider />
+        <MenuSection>
           {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
 
           {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
@@ -105,6 +122,11 @@ export default function Nav() {
           {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
 
           <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
+        </MenuSection>
+        <MenuDivider />
+        <MenuSection>
+          <MenuHeading>Help</MenuHeading>
+          <NavItem href="/glossary" icon={<GlossaryIcon />} title="Glossary" />
         </MenuSection>
         <MenuDivider />
         <MenuSection>

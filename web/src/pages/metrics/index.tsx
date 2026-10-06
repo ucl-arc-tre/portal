@@ -1,11 +1,12 @@
 import MetaHead from "@/components/meta/Head";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Title from "@/components/ui/Title";
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
-import { Alert, AlertMessage } from "@/components/ui/uikitExports";
+import { Alert, AlertMessage, HelperText } from "@/components/ui/uikitExports";
 import Metrics from "@/components/metrics/Metrics";
+import styles from "./MetricsPage.module.css";
 
-export default function PeoplePage() {
+export default function MetricsPage() {
   const { authInProgress, isAuthed, isIGStaff, isAdmin } = useAuth();
 
   if (authInProgress) return null;
@@ -22,18 +23,15 @@ export default function PeoplePage() {
     );
 
   return (
-    <>
+    <div className={styles.container}>
       <MetaHead
         title="Metrics | ARC Services Portal"
         description="View metrics for users/studies/people in the ARC Services Portal"
       />
-      <Title
-        text={"Metrics"}
-        centered
-        description={"View metrics for users, studies and people in the ARC Services Portal"}
-      />
+      <PageHeader title="Metrics" />
+      <HelperText>View metrics for users, studies and people in the ARC Services Portal</HelperText>
 
       <Metrics />
-    </>
+    </div>
   );
 }

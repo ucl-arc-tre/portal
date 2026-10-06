@@ -1,39 +1,32 @@
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 
 export default function Studies() {
-  const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
+  const { userData, isApprovedStaffResearcher, canSeeAllStudies } = useAuth();
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
-  const canSeeAllStudies = isIGStaff || isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   if (!userData) return null;
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>
-          {canSeeAllStudies ? "All Studies" : "Your Studies"}{" "}
-          <Button
-            onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-            variant="tertiary"
-            size="small"
-            inline
-            aria-label="Toggle study definition"
-          >
-            <InfoIcon />
-          </Button>
-        </h2>
-
+      <PageHeader
+        title={canSeeAllStudies ? "All Studies" : "Your Studies"}
+        info={{
+          label: "Toggle study definition",
+          expanded: infoCalloutExpanded,
+          onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
+        }}
+      >
         {isApprovedStaffResearcher && isFormOpen && (
           <StudyForm
             username={userData.username}
@@ -52,11 +45,9 @@ export default function Studies() {
             </Button>
           </div>
         )}
-      </div>
-      <div className={styles.line}></div>
+      </PageHeader>
 
       {infoCalloutExpanded && <StudyDefinition />}
-      <HelperText>All Studies you have access to</HelperText>
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />

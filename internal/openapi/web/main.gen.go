@@ -1280,6 +1280,7 @@ type ProjectDSH struct {
 	Name       string             `json:"name"`
 	Status     ProjectDSHStatus   `json:"status"`
 	StudyId    string             `json:"study_id"`
+	StudyOwner *UserDataSummary   `json:"study_owner,omitempty"`
 	StudyTitle string             `json:"study_title"`
 }
 
@@ -1339,7 +1340,8 @@ type ProjectTRE struct {
 	Status                     ProjectTREStatus `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
-	StudyId string `json:"study_id"`
+	StudyId    string           `json:"study_id"`
+	StudyOwner *UserDataSummary `json:"study_owner,omitempty"`
 
 	// StudyTitle Title of the study to which the project belongs
 	StudyTitle string `json:"study_title"`
@@ -1764,6 +1766,12 @@ type UserDataLookup struct {
 	Username                  string  `json:"username"`
 }
 
+// UserDataSummary defines model for UserDataSummary.
+type UserDataSummary struct {
+	Name     *string `json:"name,omitempty"`
+	Username string  `json:"username"`
+}
+
 // UserMetrics defines model for UserMetrics.
 type UserMetrics struct {
 	NumApprovedResearchersExpiredTraining int `json:"num_approved_researchers_expired_training"`
@@ -1810,6 +1818,18 @@ type UserFindParam = string
 
 // UserIdParam defines model for UserIdParam.
 type UserIdParam = string
+
+// GetAssetsParams defines parameters for GetAssets.
+type GetAssetsParams struct {
+	// Query Fuzzy asset title to search by
+	Query *string `form:"query,omitempty" json:"query,omitempty"`
+
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Offset Index of the first item to return
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+}
 
 // GetProjectsParams defines parameters for GetProjects.
 type GetProjectsParams struct {
@@ -1980,6 +2000,9 @@ type ServerInterface interface {
 
 	// (GET /agreements/{agreementType})
 	GetAgreementsAgreementType(c *gin.Context, agreementType AgreementType)
+
+	// (GET /assets)
+	GetAssets(c *gin.Context, params GetAssetsParams)
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
@@ -2215,6 +2238,49 @@ func (siw *ServerInterfaceWrapper) GetAgreementsAgreementType(c *gin.Context) {
 	}
 
 	siw.Handler.GetAgreementsAgreementType(c, agreementType)
+}
+
+// GetAssets operation middleware
+func (siw *ServerInterfaceWrapper) GetAssets(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetAssetsParams
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", c.Request.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter query: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetAssets(c, params)
 }
 
 // GetAuth operation middleware
@@ -3934,6 +4000,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
 	router.POST(options.BaseURL+"/projects/dsh/:projectId/access-review-signoff", wrapper.PostProjectsDshProjectIdAccessReviewSignoff)
+	router.GET(options.BaseURL+"/assets", wrapper.GetAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)
 	router.DELETE(options.BaseURL+"/studies/:studyId/assets/:assetId", wrapper.DeleteStudiesStudyIdAssetsAssetId)

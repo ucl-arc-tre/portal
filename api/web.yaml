@@ -1043,6 +1043,44 @@ paths:
         default:
           description: Unexpected error
 
+  # Asset Management
+  /assets:
+    get:
+      description: Get all assets accessible to the current user, optionally filtered by the query params below
+      parameters:
+        - in: query
+          name: query
+          required: false
+          description: Fuzzy asset title to search by
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          description: Index of the first item to return
+          schema:
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Asset"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Study Asset Management
   /studies/{studyId}/assets:
     get:
@@ -1786,6 +1824,16 @@ components:
         is_valid_approved_researcher:
           type: boolean
 
+    UserDataSummary:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+
     UserTrainingUpdate:
       type: object
       required:
@@ -2479,6 +2527,8 @@ components:
           type: string
         study_title:
           type: string
+        study_owner:
+          $ref: "#/components/schemas/UserDataSummary"
         status:
           $ref: "#/components/schemas/ProjectDSHStatus"
         assets:
@@ -2601,6 +2651,9 @@ components:
             study_title:
               type: string
               description: Title of the study to which the project belongs
+            study_owner:
+              $ref: "#/components/schemas/UserDataSummary"
+              description: Identity of the study owner
             creator_username:
               type: string
               description: Username of the user who created the project

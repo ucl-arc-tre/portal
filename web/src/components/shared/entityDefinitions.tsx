@@ -2,7 +2,7 @@ import Link from "next/link";
 import Callout from "../ui/Callout";
 import InfoTooltip from "../ui/InfoTooltip";
 
-const entityDefinitions = {
+export const portalEntityDefinitions = {
   study: "Studies are a top level entity that can contain Assets and Contracts and own Projects",
   project: "Projects are owned by a Study and contain people with roles. They are associated with an Environment",
   asset:
@@ -10,17 +10,17 @@ const entityDefinitions = {
   contract:
     "Contracts can be uploaded as PDFs and can be linked to Assets, Projects and Users. If you collaborate with an external researcher you must associate them with a contract",
   environment:
-    "Environments are secure virtual spaces where data analysis can be performed. They can be associated with Projects. Presently, we support the TRE",
+    "Environments are secure virtual spaces where data analysis can be performed. They can be associated with Projects. Presently, we support the TRE and DSH",
 };
 
-const EntityTooltip = ({ entity, isPlural }: { entity: keyof typeof entityDefinitions; isPlural?: boolean }) => {
+const EntityTooltip = ({ entity, isPlural }: { entity: keyof typeof portalEntityDefinitions; isPlural?: boolean }) => {
   return (
     <>
       <strong>
         {entity.charAt(0).toUpperCase() + entity.slice(1)}
         {isPlural ? "s" : ""}
       </strong>
-      <InfoTooltip text={entityDefinitions[entity]} />
+      <InfoTooltip text={portalEntityDefinitions[entity]} />
     </>
   );
 };
