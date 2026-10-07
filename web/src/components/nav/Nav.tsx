@@ -92,8 +92,6 @@ export default function Nav() {
   const canSeePeople = isIAO || isTreOpsStaff || isAdmin || isIGStaff || isDshOpsStaff;
   const canSeeMetrics = isAdmin || isIGStaff;
 
-  const contractsEnabled = process.env.NEXT_PUBLIC_ENABLE_CONTRACT_PAGE === "true";
-
   return (
     <aside className={styles.sidebar}>
       <nav aria-label="Main navigation">
@@ -108,7 +106,7 @@ export default function Nav() {
               <MenuHeading className={styles["ig-heading"]}>Info Governance</MenuHeading>
               <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />
               <NavItem href="/assets" icon={<PackageIcon />} title="Assets" />
-              {contractsEnabled && <NavItem href="/contracts" icon={<PaperclipIcon />} title="Contracts" />}
+              <NavItem href="/contracts" icon={<PaperclipIcon />} title="Contracts" />
             </MenuSection>
           </>
         )}
