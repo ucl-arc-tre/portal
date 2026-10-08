@@ -19,7 +19,7 @@ type Interface interface {
 	NotifyIaaRemoval(ctx context.Context, removedAdmin types.User, study types.Study) error
 	NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error
 	NotifyAssetExpiry(ctx context.Context, assets []types.Asset, study types.Study) error
-	NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error
+	NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User, igAdmin []types.User) error
 	NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error
 	NotifyProjectDeployed(project types.Project, user types.User) error
 	NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error

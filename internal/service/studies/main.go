@@ -570,7 +570,11 @@ func (s *Service) notifyOwnerChange(ctx context.Context, study *types.Study) err
 	if err != nil {
 		return err
 	}
-	return s.notifications.NotifyOwnerChange(ctx, *study, igOpsStaff)
+	igAdmin, err := s.users.UsersWithConfigRole(rbac.IGAdmin)
+	if err != nil {
+		return err
+	}
+	return s.notifications.NotifyOwnerChange(ctx, *study, igOpsStaff, igAdmin)
 }
 
 func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
