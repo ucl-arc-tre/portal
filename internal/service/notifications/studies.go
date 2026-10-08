@@ -57,7 +57,7 @@ func (s *Service) NotifyStudyReview(ctx context.Context, study types.Study, igOp
 	return nil
 }
 
-func (s *Service) NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User) error {
+func (s *Service) NotifyOwnerChange(ctx context.Context, study types.Study, igOpsStaff []types.User, igAdmin []types.User) error {
 	log.Debug().Any("oldOwner", study.Owner.Username).Msg("Notifying Study owner change")
 	notification := types.Notification{
 		Title:     fmt.Sprintf("Study '%s' is awaiting an owner change approval from '%s'", study.Title, study.Owner.Username),
@@ -65,7 +65,7 @@ func (s *Service) NotifyOwnerChange(ctx context.Context, study types.Study, igOp
 		Kind:      new(types.NotificationKindStudyOwnerChange),
 		ExpiresAt: new(study.UpdatedAt.Add(1 * time.Hour)),
 	}
-	return s.createForAll(notification, igOpsStaff)
+	return s.createForAll(notification, append(igOpsStaff, igAdmin...))
 }
 
 func (s *Service) NotifyContractExpiry(ctx context.Context, contract types.Contract, study types.Study) error {
