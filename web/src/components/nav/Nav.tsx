@@ -99,6 +99,7 @@ export default function Nav() {
       <nav aria-label="Main navigation">
         <MenuSection>
           <NavItem href="/" icon={<HomeIcon />} title="Home" />
+          <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
         </MenuSection>
 
         {canSeeStudies && (
@@ -109,20 +110,15 @@ export default function Nav() {
               <NavItem href="/studies" icon={<FolderIcon />} title="Studies" />
               <NavItem href="/assets" icon={<PackageIcon />} title="Assets" />
               {contractsEnabled && <NavItem href="/contracts" icon={<PaperclipIcon />} title="Contracts" />}
+              {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
+
+              {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
             </MenuSection>
           </>
         )}
 
         <MenuDivider />
-        <MenuSection>
-          {canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}
-
-          {canSeePeople && <NavItem href="/people" icon={<UsersIcon />} title="People" />}
-
-          {canSeeMetrics && <NavItem href="/metrics" icon={<MetricsIcon />} title="Metrics" />}
-
-          <NavItem href="/profile" icon={<AvatarIcon />} title="Profile" />
-        </MenuSection>
+        <MenuSection>{canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}</MenuSection>
         <MenuDivider />
         <MenuSection>
           <MenuHeading>Help</MenuHeading>
