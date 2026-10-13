@@ -16,7 +16,7 @@ func Init() {
 
 func mustAddUsersWithRoleName(roleName rbac.ConfigRolename) {
 	service := New()
-	usersWithRole := must(service.UsersWithConfigRole(roleName))
+	usersWithRole := must(service.usersWithConfigRole(roleName))
 	for _, user := range usersWithRole {
 		_ = must(rbac.AddRole(user, roleName))
 	}

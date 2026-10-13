@@ -432,7 +432,7 @@ func (s *Service) UpdateStudyReview(ctx context.Context, id uuid.UUID, review op
 		return types.NewErrFromGorm(err, "failed to get study after update")
 	}
 
-	igOpsStaff, err := s.users.UsersWithConfigRole(rbac.IGOpsStaff)
+	igOpsStaff, err := s.users.IgStaff()
 	if err != nil {
 		return err
 	}
@@ -566,15 +566,11 @@ func (s *Service) notifyOwnerChange(ctx context.Context, study *types.Study) err
 	if study == nil {
 		return types.NewErrInvalidObject("nil study - cannot notify owner change")
 	}
-	igOpsStaff, err := s.users.UsersWithConfigRole(rbac.IGOpsStaff)
+	igStaff, err := s.users.IgStaff()
 	if err != nil {
 		return err
 	}
-	igAdmin, err := s.users.UsersWithConfigRole(rbac.IGAdmin)
-	if err != nil {
-		return err
-	}
-	return s.notifications.NotifyOwnerChange(ctx, *study, igOpsStaff, igAdmin)
+	return s.notifications.NotifyOwnerChange(ctx, *study, igStaff)
 }
 
 func (s *Service) ApproveStudyOwner(studyUUID uuid.UUID, user types.User, data openapi.StudyOwnerUpdate) error {
