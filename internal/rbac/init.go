@@ -115,8 +115,6 @@ func addIgAdminPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: IGAdmin, Resource: "/assets", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: WriteAction},
-		Policy{RoleName: IGAdmin, Resource: "/studies/admin/*", Action: ReadAction},
-		Policy{RoleName: IGAdmin, Resource: "/studies/admin/*", Action: WriteAction},
 		Policy{RoleName: IGAdmin, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/projects/dsh/*", Action: ReadAction},
 	)
