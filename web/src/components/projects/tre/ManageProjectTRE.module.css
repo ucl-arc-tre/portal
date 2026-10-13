@@ -55,6 +55,10 @@
   margin-bottom: 0;
 }
 
+.desktop-configuration {
+  width: 100%;
+}
+
 .field-list {
   list-style: none;
   padding: 0;

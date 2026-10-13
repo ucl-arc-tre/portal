@@ -2416,11 +2416,11 @@ components:
       type: object
       description: A project member with their assigned roles
       required:
-        - username
+        - user
         - roles
       properties:
-        username:
-          type: string
+        user:
+          $ref: "#/components/schemas/UserDataSummary"
         desktop_config:
           $ref: "#/components/schemas/ProjectTREUserDesktopConfig"
         uid:
@@ -2553,11 +2553,11 @@ components:
     ProjectDSHMember:
       type: object
       required:
-        - username
+        - user
         - roles
       properties:
-        username:
-          type: string
+        user:
+          $ref: "#/components/schemas/UserDataSummary"
         roles:
           type: array
           items:

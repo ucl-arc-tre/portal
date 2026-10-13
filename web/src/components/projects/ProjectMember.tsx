@@ -9,11 +9,13 @@ type Props = {
 
 export default function ProjectMember(props: Props) {
   const { member, children } = props;
+  const name = member.user.name;
+  const username = member.user.username;
 
   return (
     <ul>
-      <li key={member.username} className={styles["member-item"]}>
-        <span className={styles["member-username"]}>{member.username}</span>
+      <li key={username} className={styles["member-item"]}>
+        <span className={styles["member-username"]}>{name ? `${name} (${username})` : username}</span>
         <div className={styles["member-roles"]}>
           {member.roles.map((role, roleIndex) => (
             <span key={roleIndex} className={styles["role-badge"]}>

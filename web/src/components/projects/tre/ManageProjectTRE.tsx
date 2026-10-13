@@ -251,7 +251,7 @@ export default function ManageProjectTRE(props: Props) {
 
       <TabCollection
         tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
-        defaultTab="project"
+        defaultTab={tab}
       />
 
       {tab === "project" && (
@@ -339,6 +339,7 @@ export default function ManageProjectTRE(props: Props) {
           </div>
         </Box>
       )}
+
       {tab === "assets" && (
         <Box>
           {project.assets && project.assets.length > 0 ? (
