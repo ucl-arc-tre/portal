@@ -15,6 +15,6 @@ management of user training and Study details will be done using the Portal.​
 
 ​
 
-KR​
+Kind Regards,
 
-Portal Team​
+ARC Services Portal Team​
