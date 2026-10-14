@@ -15,7 +15,15 @@ export default function ProjectMember(props: Props) {
   return (
     <ul>
       <li key={username} className={styles["member-item"]}>
-        <span className={styles["member-username"]}>{name ? `${name} (${username})` : username}</span>
+        <span className={styles["member-name"]}>
+          {name ? (
+            <>
+              <strong>{name}</strong> ({username})
+            </>
+          ) : (
+            username
+          )}
+        </span>
         <div className={styles["member-roles"]}>
           {member.roles.map((role, roleIndex) => (
             <span key={roleIndex} className={styles["role-badge"]}>
