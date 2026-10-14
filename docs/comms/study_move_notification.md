@@ -13,7 +13,7 @@ management tools in the ARC Services Portal. ​We'll send an email once this ha
 Please note that if your Study is:
 
 - more than 1 year old
-- has any associated Projects and Environments without any data
+- has any associated Projects and Environments (i.e TRE/DSH) without any data
 
 it will be automatically closed. If your Study is active, please ensure any associated Projects and Environments have data.
 

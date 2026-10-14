@@ -6,7 +6,7 @@ The records pertaining to your Study <study name> have been moved to the [ARC Se
 
 Please log into the [Portal](https://portal.arc.ucl.ac.uk/​) to complete your profile and check the details of your Study are correct. You can reply to this email to confirm the details are correct.
 
-Note that if your training has expired you will need to renew it in order to retain access to any Environments you use. You can upload the new certificate in the Portal.
+Note that if your training has expired you will need to renew it in order to retain access to any Environments (i.e TRE/DSH) you use. You can upload the new certificate in the Portal.
 
 ​
 
