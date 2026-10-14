@@ -1,4 +1,4 @@
-## Email sent to IAO/IAA once Study has been moved
+## Email sent to IAO/IAA once Study/Project has been moved
 
 Dear <IAO/IAA name>, ​
 
