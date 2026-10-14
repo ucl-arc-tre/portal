@@ -31,7 +31,7 @@
   margin: 0;
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #333;
+  color: var(--off-black);
   white-space: pre-line;
 }
 
@@ -55,7 +55,7 @@
 .footer p {
   margin: 0;
   font-size: 0.95rem;
-  color: #333;
+  color: var(--off-black);
 }
 
 .footer a {

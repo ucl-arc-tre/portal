@@ -15,7 +15,7 @@
     padding-top: 0.5rem;
     font-size: 1.75rem;
     font-weight: 700;
-    color: #333;
+    color: var(--off-black);
   }
 }
 
@@ -40,7 +40,7 @@
 
 .section h3 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--off-black);
   font-size: 1.2rem;
 }
 

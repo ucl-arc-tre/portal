@@ -16,8 +16,8 @@
   margin-bottom: 0;
 }
 
-.member-username {
-  color: #333;
+.member-name {
+  color: var(--off-black);
   font-size: 1rem;
 }
 
