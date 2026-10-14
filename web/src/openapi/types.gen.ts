@@ -572,7 +572,7 @@ export type ProjectTreUpdate = ProjectTreBase;
  * A project member with their assigned roles
  */
 export type ProjectTreMember = {
-    username: string;
+    user: UserDataSummary;
     desktop_config?: ProjectTreUserDesktopConfig;
     uid?: number;
     /**
@@ -646,7 +646,7 @@ export type ProjectDsh = {
 };
 
 export type ProjectDshMember = {
-    username: string;
+    user: UserDataSummary;
     roles: Array<ProjectDshRole>;
 };
 

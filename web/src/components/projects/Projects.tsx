@@ -153,7 +153,7 @@ export default function Projects() {
       <Callout
         construction
         text={
-          "Only ARC TRE and Data Safe Haven projects are currently viewable here. We're working to onboard other environments and enable creation."
+          "Only some ARC TRE and Data Safe Haven projects are currently viewable here. We're working to onboard other environments and enable creation."
         }
       />
       {infoCalloutExpanded && <ProjectDefinition />} <HelperText>All Projects you have access to</HelperText>

@@ -181,7 +181,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		AirlockSshWhitelist:        projectTRE.AirlockSSHWhitelist,
 		Status:                     openapi.ProjectTREStatus(projectTRE.Status),
 		Assets:                     assets,
-		Members:                    extractProjectMembers(projectTRE),
+		Members:                    h.extractProjectMembers(projectTRE),
 		AssetIds:                   nil,
 		LastAccessReview:           openapi.FormatOptionalTime(projectTRE.Project.LastAccessReview),
 		StudyOwner:                 h.optionalStudyOwnerSummary(&projectTRE.Project.Study),
@@ -235,7 +235,7 @@ func (h *Handler) DeleteProjectsTreProjectId(ctx *gin.Context, projectId string)
 	ctx.Status(http.StatusNoContent)
 }
 
-func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
+func (h *Handler) extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMember {
 	rolesMap := map[types.Username][]openapi.ProjectTRERoleName{}
 
 	for _, binding := range projectTRE.TRERoleBindings {
@@ -245,13 +245,13 @@ func extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.ProjectTREMem
 	members := []openapi.ProjectTREMember{}
 	for username, roles := range rolesMap {
 		members = append(members, openapi.ProjectTREMember{
-			Username: string(username),
-			Roles:    roles,
+			User:  h.userDataSummary(username),
+			Roles: roles,
 		})
 	}
 	for i, member := range members {
 		for _, userConfig := range projectTRE.UserConfigs {
-			if userConfig.User.Username == types.Username(member.Username) {
+			if userConfig.User.Username == types.Username(member.User.Username) {
 				members[i].DesktopConfig = &openapi.ProjectTREUserDesktopConfig{
 					HpcInstanceType: userConfig.DesktopHPCInstanceType,
 					RootVolumeGb:    optionalInt(userConfig.DesktopRootVolumeSize),
@@ -352,8 +352,8 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 	}
 	for username, member := range members {
 		response.Members = append(response.Members, openapi.ProjectDSHMember{
-			Username: string(username),
-			Roles:    member.Roles,
+			User:  h.userDataSummary(username),
+			Roles: member.Roles,
 		})
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -382,15 +382,19 @@ func (h *Handler) optionalStudyOwnerSummary(study *types.Study) *openapi.UserDat
 	if study == nil {
 		return nil
 	}
-	studyOwner := &openapi.UserDataSummary{
-		Username: string(study.Owner.Username),
+	return new(h.userDataSummary(study.Owner.Username))
+}
+
+func (h *Handler) userDataSummary(username types.Username) openapi.UserDataSummary {
+	summary := openapi.UserDataSummary{
+		Username: string(username),
 	}
-	if chosenName, err := h.users.CachedUserChosenName(study.Owner.Username); err != nil {
+	if chosenName, err := h.users.CachedUserChosenName(username); err != nil {
 		log.Err(err).Msg("Failed to get cached chosen name")
 	} else if chosenName != nil {
-		studyOwner.Name = new(string(*chosenName))
+		summary.Name = new(string(*chosenName))
 	}
-	return studyOwner
+	return summary
 }
 
 func optionalInt(i *uint) *int {

@@ -45,7 +45,9 @@ export default function ManageProjectTRE(props: Props) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const editingEnabled = project.status === "incomplete" || project.status === "deployed";
+  const editingEnabled =
+    project.status === "incomplete" ||
+    (project.status === "deployed" && process.env.NEXT_PUBLIC_ENABLE_DEPLOYED_TRE_PROJECT_EDIT === "true");
   const projectId = project.id;
   const canApprove = (isAdmin || isTreOpsStaff) && project?.creator_username !== userData?.username;
   const canEdit =
@@ -240,7 +242,7 @@ export default function ManageProjectTRE(props: Props) {
 
       <div className={styles.header}>
         <h2>{project.name}</h2>
-        {canEdit && project.status !== "incomplete" && (
+        {editingEnabled && canEdit && project.status !== "incomplete" && (
           <div>
             <Button onClick={() => setShowEditForm(true)} size="medium" variant="secondary" disabled={!editingEnabled}>
               Edit Project
@@ -251,7 +253,7 @@ export default function ManageProjectTRE(props: Props) {
 
       <TabCollection
         tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
-        defaultTab="project"
+        defaultTab={tab}
       />
 
       {tab === "project" && (
@@ -339,6 +341,7 @@ export default function ManageProjectTRE(props: Props) {
           </div>
         </Box>
       )}
+
       {tab === "assets" && (
         <Box>
           {project.assets && project.assets.length > 0 ? (

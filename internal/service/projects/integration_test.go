@@ -178,13 +178,13 @@ func TestIntegration_TestCreateProjectTRE(t *testing.T) {
 		NumRequiredEgressApprovals: 2,
 		Members: []openapi.ProjectTREMember{
 			{
-				Username: string(creator.Username),
+				User: openapi.UserDataSummary{Username: string(creator.Username)},
 				Roles: []openapi.ProjectTRERoleName{
 					openapi.TrustedEgresser,
 				},
 			},
 			{
-				Username: string(user1.Username),
+				User: openapi.UserDataSummary{Username: string(user1.Username)},
 				Roles: []openapi.ProjectTRERoleName{
 					openapi.DesktopUser,
 					openapi.Ingresser,
