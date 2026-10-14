@@ -10,7 +10,7 @@ User training records will be moved to the new Portal as well, so should not nee
 although users will be prompted to review their responsibilities when logging in for the first time.​ We will also be contacting any external researchers associated with your Studies/Projects to notify them of the move to the Portal and to handle their documents there.
 
 The Portal team will be in touch closer to the time of the move of your Studies and Shares (now called
-"Projects" in the Portal). Please note that once migrated, the SharePoint site will be archived, and all
+"Projects" in the Portal). Please note that once moved, the SharePoint site will be archived, and all
 management of user training and Study details will be done using the Portal.​
 
 ​
