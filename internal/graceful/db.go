@@ -69,6 +69,8 @@ func InitDB() {
 		panic(err)
 	}
 
+	migrateTREProject(db)
+
 	log.Debug().Msg("Initialised database")
 }
 
