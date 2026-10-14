@@ -34,7 +34,7 @@
 .info-text p {
   margin: 0;
   font-size: 0.875rem;
-  color: #333;
+  color: var(--off-black);
   line-height: 1.4;
 }
 
@@ -81,7 +81,7 @@
 .third-party-text {
   margin: 0 0 1rem 0;
   font-size: 0.875rem;
-  color: #333;
+  color: var(--off-black);
   line-height: 1.4;
 }
 
