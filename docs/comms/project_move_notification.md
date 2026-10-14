@@ -2,9 +2,8 @@
 
 Dear <IAO/IAA name>, ​
 
-The records pertaining to your Projects within the Study <study name> are scheduled to
-be moved to the [ARC Services Portal](linky) on the <date>. This will
-result in your access to the records being revoked on SharePoint.
+The records pertaining to your Projects (a.k.a Shares within DSH) within the Study (a.k.a CaseRef) <study name> are scheduled to
+be moved to the [ARC Services Portal](linky) on the <date>. Once moved, the records in SharePoint will become read-only and editable in the Portal.
 
 ​
 
