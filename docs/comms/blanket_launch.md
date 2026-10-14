@@ -2,7 +2,7 @@
 
 Dear <IAO/IAA name>,​
 
-Over the next few months we will be moving all the data in the Information Governance Advisory Service SharePoint to the ARC Services Portal. We will be moving the data in batches.​
+Over the next few months we will be moving all the data in the Information Governance Advisory Service SharePoint, in batches, to the new ARC Services Portal. This is happening because SharePoint is being deprecated due to the unsuitability of the software for the purposes it was trying to fit and this has become untenable. The ARC Services Portal is a new, purpose-built platform that will make the management of IG documents and ARC Services provisions simpler and more user-friendly.
 ​
 This will include the records that make up Studies (you may know Studies as having a unique “CaseRef”), including Information Assets and Contracts, which are currently stored on the SharePoint site. Records of which users have access to which Shares will also be viewable on the ARC Services Portal.​
 
