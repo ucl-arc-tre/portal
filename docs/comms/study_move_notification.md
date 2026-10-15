@@ -15,7 +15,7 @@ Please note that if your Study is:
 - more than 1 year old
 - has any associated Projects and Environments (i.e TRE/DSH) without any data
 
-it will be automatically closed. If your Study is active, please ensure any associated Projects and Environments have data.
+it will be automatically marked as Closed - i.e. assumed there is no ongoing research, nor is there any outstanding data retention requirement. If your Study is Active, please ensure any associated Projects and Environments have data.
 
 ​
 
