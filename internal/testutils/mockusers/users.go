@@ -117,3 +117,7 @@ func (m *MockUsers) AllApprovedResearchers() ([]users.ApprovedResearcherExportRe
 func (m *MockUsers) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error) {
 	panic("not implemented")
 }
+
+func (m *MockUsers) IgStaff() ([]types.User, error) {
+	panic("not implemented")
+}

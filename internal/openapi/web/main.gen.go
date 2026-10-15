@@ -1286,8 +1286,8 @@ type ProjectDSH struct {
 
 // ProjectDSHMember defines model for ProjectDSHMember.
 type ProjectDSHMember struct {
-	Roles    []ProjectDSHRole `json:"roles"`
-	Username string           `json:"username"`
+	Roles []ProjectDSHRole `json:"roles"`
+	User  UserDataSummary  `json:"user"`
 }
 
 // ProjectDSHRole defines model for ProjectDSHRole.
@@ -1390,9 +1390,9 @@ type ProjectTREMember struct {
 	DesktopConfig *ProjectTREUserDesktopConfig `json:"desktop_config,omitempty"`
 
 	// Roles List of roles to assign to this user (e.g., ["desktop_user", "ingresser"])
-	Roles    []ProjectTRERoleName `json:"roles"`
-	Uid      *int                 `json:"uid,omitempty"`
-	Username string               `json:"username"`
+	Roles []ProjectTRERoleName `json:"roles"`
+	Uid   *int                 `json:"uid,omitempty"`
+	User  UserDataSummary      `json:"user"`
 }
 
 // ProjectTRERequest Request payload for creating a new TRE project
