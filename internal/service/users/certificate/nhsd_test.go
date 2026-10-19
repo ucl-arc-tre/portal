@@ -18,7 +18,7 @@ func TestValidNHSDCertificateParse(t *testing.T) {
 	assert.NotNil(t, certificate)
 	assert.True(t, certificate.IsValid)
 	assert.Equal(t, "Tom Young", certificate.Name)
-	expectedExpiry, err := time.Parse(config.DateFormat, "2025-10-16")
+	expectedExpiry, err := time.Parse(config.DateFormat, "2026-09-16")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExpiry, certificate.IssuedAt)
 }
