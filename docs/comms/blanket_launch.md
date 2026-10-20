@@ -6,8 +6,7 @@ Over the next few months we will be moving all the data in the Information Gover
 ​
 This will include the records that make up Studies (you may know Studies as having a unique “CaseRef”), including Information Assets and Contracts, which are currently stored on the SharePoint site. Records of which users have access to which Shares will also be viewable on the ARC Services Portal, as well as TRE Projects.
 
-User training records will be moved to the new Portal as well, so should not need to be reuploaded,
-although users will be prompted to review their responsibilities when logging in for the first time.​ We will also be contacting any external researchers associated with your Studies/Projects to notify them of the move to the Portal and to handle their documents there.
+User training records will be moved to the new Portal as well, so should not need to be reuploaded.​ We will also be contacting any external researchers associated with your Studies/Projects to notify them of the move to the Portal and to handle their documents there.
 
 The Portal team will be in touch closer to the time of the move of your Studies and Shares (now called
 "Projects" in the Portal). Please note that once moved, the SharePoint site will be archived, and all
