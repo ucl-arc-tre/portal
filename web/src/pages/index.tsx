@@ -3,12 +3,7 @@ import MetaHead from "@/components/meta/Head";
 import Notifications from "@/components/index/Notifications";
 import Title from "@/components/ui/Title";
 
-const description = `Use this portal to register studies, manage data assets and contracts,\nand administer access to UCL research services. You can:\n
-  • Register and manage your studies
-  • Maintain information asset registers for research data
-  • Upload agreements and training records
-  • Manage study team members and access rights
-  • Request access to research systems and services
+const description = `Use the ARC Services Portal to manage Studies, Study teams, governance records and access to UCL Research Data Services.
 `;
 
 export default function Index() {
