@@ -135,6 +135,7 @@ export default function Projects() {
                 size="small"
                 inline
                 aria-label="Toggle project definition"
+                aria-expanded={infoCalloutExpanded}
               >
                 <InfoIcon />
               </Button>

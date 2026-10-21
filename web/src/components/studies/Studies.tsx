@@ -35,6 +35,7 @@ export default function Studies() {
             size="small"
             inline
             aria-label="Toggle study definition"
+            aria-expanded={infoCalloutExpanded}
           >
             <InfoIcon />
           </Button>

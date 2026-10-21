@@ -104,6 +104,7 @@ export default function Assets(props: AssetsProps) {
               size="small"
               inline
               aria-label="Toggle asset definition"
+              aria-expanded={infoCalloutExpanded}
             >
               <InfoIcon />
             </Button>
