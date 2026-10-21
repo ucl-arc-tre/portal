@@ -10,7 +10,7 @@ Note that if your training has expired you will need to renew it in order to ret
 
 ​
 
-Please get in touch with the Portal team via MyServices if you need any help logging in to the Portal at https://portal.arc.ucl.ac.uk/​.
+Please get in touch with the Portal team via [MyServices](https://myservices.ucl.ac.uk/self-service/requests/new/select_template?from=wizard&service_id=2616&service_instance_id=6065) if you need any help logging in to the Portal or if something is does not look right once you've log in.
 
 ​
 
