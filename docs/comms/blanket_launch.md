@@ -1,6 +1,6 @@
 ## Email sent to all IAOs & IAAs prior to launch about the launch
 
-Dear <IAO/IAA name>,​
+Dear user,​
 
 Over the next few months we will be moving all the data in the Information Governance Advisory Service SharePoint, in batches, to the new ARC Services Portal. This is happening because SharePoint is being deprecated due to the unsuitability of the software for the purposes it was trying to fit and this has become untenable. The ARC Services Portal is a new, purpose-built platform that will make the management of IG documents and ARC Services provisions simpler and more user-friendly.
 ​
