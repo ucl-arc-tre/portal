@@ -3,7 +3,7 @@ import MetaHead from "@/components/meta/Head";
 import Notifications from "@/components/index/Notifications";
 import Title from "@/components/ui/Title";
 
-const description = `Use the ARC Services Portal to manage Studies, Study teams, governance records and access to UCL Research Data Services.
+const description = `Use the ARC Services Portal to manage Studies, Study teams, governance records and access to UCL Research Data services.
 `;
 
 export default function Index() {
