@@ -326,8 +326,6 @@ export default function ProjectForm({
           ))}
         </div>
 
-        {error && <ErrorMessage message={error} />}
-
         <FormProvider {...methods}>
           <form className="form" onSubmit={(e) => e.preventDefault()}>
             {currentStep === 1 && (
@@ -342,6 +340,8 @@ export default function ProjectForm({
             )}
 
             {currentStep === 2 && isTREProject && <ProjectTREStep fieldsDisabled={fieldsDisabled} />}
+
+            {error && <ErrorMessage message={error} />}
 
             <div className={styles.actions}>
               {currentStep > 1 && (
