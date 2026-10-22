@@ -5,7 +5,7 @@ import TabCollection from "@/components/ui/TabCollection";
 type StudyTabsProps = {
   assets: Asset[];
   contracts: Contract[];
-  projects?: Project[];
+  projects: Project[];
 };
 
 export default function StudyTabs({ assets, contracts, projects }: StudyTabsProps) {
@@ -32,7 +32,7 @@ export default function StudyTabs({ assets, contracts, projects }: StudyTabsProp
         { name: "study", label: "Study Overview" },
         { name: "assets", needsAttention: assetsNeedAttention, count: assets.length },
         { name: "contracts", needsAttention: contractsNeedAttention, count: contracts.length },
-        { name: "projects", count: projects?.length ?? 0 },
+        { name: "projects", count: projects.length },
       ]}
       defaultTab="study"
     />
