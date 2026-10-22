@@ -241,3 +241,18 @@ func TestMakeValidUnixUsername(t *testing.T) {
 		})
 	}
 }
+
+func TestRequestedStorageValidation(t *testing.T) {
+	svc := &Service{}
+	for _, amount := range []int{-1, 0, 1, 100, 500} {
+		request := validProjectTRERequest()
+		request.RequestedStorageGb = &amount
+		err := svc.validateProjectTREBase(request.Base())
+		if amount < 1 {
+			require.ErrorContains(t, err, "requested storage must be at least 1 GB")
+		} else {
+			require.NoError(t, err)
+		}
+	}
+	require.NoError(t, svc.validateProjectTREBase(validProjectTRERequest().Base()))
+}

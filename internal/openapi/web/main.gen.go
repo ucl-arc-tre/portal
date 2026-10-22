@@ -1336,8 +1336,11 @@ type ProjectTRE struct {
 	Name string `json:"name"`
 
 	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
-	NumRequiredEgressApprovals int              `json:"num_required_egress_approvals"`
-	Status                     ProjectTREStatus `json:"status"`
+	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+
+	// RequestedStorageGb Requested project storage in GB
+	RequestedStorageGb *int             `json:"requested_storage_gb,omitempty"`
+	Status             ProjectTREStatus `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId    string           `json:"study_id"`
@@ -1369,6 +1372,9 @@ type ProjectTREBase struct {
 
 	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
 	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+
+	// RequestedStorageGb Requested project storage in GB
+	RequestedStorageGb *int `json:"requested_storage_gb,omitempty"`
 }
 
 // ProjectTREImport defines model for ProjectTREImport.
@@ -1417,6 +1423,9 @@ type ProjectTRERequest struct {
 
 	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
 	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+
+	// RequestedStorageGb Requested project storage in GB
+	RequestedStorageGb *int `json:"requested_storage_gb,omitempty"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`

@@ -167,6 +167,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 		assets = append(assets, assetToOpenApiAsset(projectAsset.Asset))
 	}
 	response := openapi.ProjectTRE{
+		RequestedStorageGb:         optionalInt(projectTRE.RequestedStorageGB),
 		Id:                         projectTRE.Project.ID.String(),
 		Name:                       projectTRE.Project.Name,
 		StudyId:                    projectTRE.Project.StudyID.String(),

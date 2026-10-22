@@ -268,6 +268,8 @@ export default function ManageProjectTRE(props: Props) {
             </DetailsField>
           )}
 
+          <DetailsField label="Requested storage (GB)" value={project.requested_storage_gb ?? 100} />
+
           <DetailsField label="Number of members" value={project.members ? project.members.length : 0} />
           <DetailsField label="Number of Assets" value={project.assets ? project.assets.length : 0} />
 

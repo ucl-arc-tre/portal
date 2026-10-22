@@ -60,7 +60,7 @@ export default function ProjectForm({
       environmentId: "",
       assetIds: [],
       members: [],
-      tre: undefined,
+      tre: { requestedStorageGb: 100 },
     },
   });
   const {
@@ -127,6 +127,7 @@ export default function ProjectForm({
 
       if (isTREProject) {
         const editingTREProject = editingProject as ProjectTre;
+        setValue("tre.requestedStorageGb", editingTREProject.requested_storage_gb ?? 100);
         setValue("tre.numRequiredEgressApprovals", `${editingTREProject.num_required_egress_approvals}`);
         setValue("tre.externalEncryptionEnabled", editingTREProject.external_encryption_enabled ? "true" : "false");
 
@@ -263,6 +264,7 @@ export default function ProjectForm({
               body: {
                 asset_ids: assetIds,
                 members: treMembers,
+                requested_storage_gb: data.tre.requestedStorageGb,
                 num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
                 external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
                 airlock_outbound_whitelist: airlockOutboundWhitelist,
@@ -276,6 +278,7 @@ export default function ProjectForm({
               study_id: data.studyId,
               asset_ids: assetIds,
               members: treMembers,
+              requested_storage_gb: data.tre.requestedStorageGb,
               num_required_egress_approvals: Number(data.tre.numRequiredEgressApprovals),
               external_encryption_enabled: data.tre.externalEncryptionEnabled === "true",
               airlock_outbound_whitelist: airlockOutboundWhitelist,
