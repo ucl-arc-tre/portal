@@ -248,7 +248,11 @@ export default function ManageProjectTRE(props: Props) {
       </div>
 
       <TabCollection
-        tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
+        tabs={[
+          { name: "project", label: "Project Overview" },
+          { name: "members", count: project.members?.length ?? 0 },
+          { name: "assets", count: project.assets?.length ?? 0 },
+        ]}
         defaultTab="project"
       />
 

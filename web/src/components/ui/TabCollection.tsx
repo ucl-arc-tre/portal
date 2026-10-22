@@ -2,15 +2,17 @@ import { useRouter } from "next/router";
 import { AlertCircleIcon, iconSizeSmall } from "./uikitExports";
 import styles from "./TabCollection.module.css";
 import dynamic from "next/dist/shared/lib/dynamic";
+import Badge from "./Badge";
 
-type TabDefinition = {
+type TabItem = {
   name: string;
   label?: string;
   needsAttention?: boolean;
+  count?: number;
 };
 
 type TabCollectionProps = {
-  tabs: TabDefinition[];
+  tabs: TabItem[];
   defaultTab: string;
 };
 
@@ -28,12 +30,15 @@ export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) 
 
   return (
     <Tabs defaultValue={defaultTab} onValueChange={setTab} className={styles["tab-collection"]}>
-      {tabs.map((tabDefinition) => (
-        <Tab key={tabDefinition.name} value={tabDefinition.name} data-cy={tabDefinition.name} className={styles.tab}>
-          {tabDefinition.label ? tabDefinition.label : tabDefinition.name}
-          {tabDefinition.needsAttention && (
-            <AlertCircleIcon className={styles["needs-attention"]} size={iconSizeSmall} />
+      {tabs.map((tabItem) => (
+        <Tab key={tabItem.name} value={tabItem.name} data-cy={tabItem.name} className={styles.tab}>
+          {tabItem.label ? tabItem.label : tabItem.name}
+          {tabItem.count !== undefined && (
+            <Badge cy="tab-count" className={styles.count}>
+              {tabItem.count}
+            </Badge>
           )}
+          {tabItem.needsAttention && <AlertCircleIcon className={styles["needs-attention"]} size={iconSizeSmall} />}
         </Tab>
       ))}
     </Tabs>

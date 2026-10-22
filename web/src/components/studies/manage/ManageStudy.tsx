@@ -192,7 +192,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
-      <StudyTabs assets={assets} contracts={contracts} />
+      <StudyTabs assets={assets} contracts={contracts} projects={projects} />
 
       {tab === "study" && (
         <StudyOverview

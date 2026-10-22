@@ -162,13 +162,6 @@ export default function StudyOverview({
         </div>
       </div>
 
-      <StudyDetails
-        study={study}
-        riskInfo={riskInfo}
-        canEditOwner={canEditStudyOwner}
-        setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
-      />
-
       <div className={styles["pre-description"]} data-cy="study-summary-counts">
         <span className={styles["detail-item"]}>
           Projects: <span className={styles["grey-value"]}>{projects?.length ?? 0}</span>
@@ -180,6 +173,13 @@ export default function StudyOverview({
           Contracts: <span className={styles["grey-value"]}>{contracts?.length ?? 0}</span>
         </span>
       </div>
+
+      <StudyDetails
+        study={study}
+        riskInfo={riskInfo}
+        canEditOwner={canEditStudyOwner}
+        setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
+      />
 
       {studyOwnerEditModalOpen && (
         <StudyOwnerEdit
