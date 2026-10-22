@@ -16,25 +16,6 @@ import StudyOwnerEdit from "./StudyOwnerEdit";
 import StudyFeedback from "./StudyFeedback";
 import StudyFeedbackHistory from "./StudyFeedbackHistory";
 import { getStudyRiskInfo } from "../../../lib/riskScoreCalculations";
-import HelperBlock from "@/components/ui/HelperBlock";
-
-const helperText = `This page provides detailed information about your study, including:
-
-Study description
-Project risk rating
-Information Asset Owner (IAO)
-Information Asset Administrator (IAA)
-Sponsorship and approvals
-NHS information (where applicable)
-Data i.e., Third-party data, External users, data protection registration
-
-If any study information requires updating, the relevant fields will be highlighted.
-To update the study details, select Edit Study.
-
-IAO is responsible for ensuring that confidential information associated with the study is managed securely and in accordance with UCL information governance policies.
-
-IAA is a UCL employee appointed by the IAO to manage the day-to-day handling of information within a study.
- `;
 
 type StudyOverviewProps = {
   study: Study;
@@ -102,7 +83,6 @@ export default function StudyOverview({
 
   return (
     <Box>
-      <HelperBlock text={helperText} />
       <StudyFeedback feedbackHistory={feedbackHistory} approvalStatus={study.approval_status} />
 
       {isFormOpen && userData && (

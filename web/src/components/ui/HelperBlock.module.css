@@ -1,4 +1,12 @@
-.helperText {
+.block {
   white-space: pre-line;
   padding-bottom: 1rem;
+
+  &.tell-more {
+    white-space: unset;
+
+    button {
+      font-size: 0.875rem;
+    }
+  }
 }

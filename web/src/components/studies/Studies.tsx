@@ -3,18 +3,13 @@ import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { HelperText, InfoIcon } from "../ui/uikitExports";
+import { InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
+import HelperBlock from "../ui/HelperBlock";
 
-const helperText = (
-  <>
-    Use this page to register and manage research studies and view studies that you have access to. <br></br>Select a
-    study to view its details, manage governance records, data Assets, Contracts, Projects and Study team access, or
-    complete outstanding actions.
-  </>
-);
+const helperText = `Use this page to register and manage research studies and view studies that you have access to.\n Select a study to view its details, manage governance records, data Assets, Contracts, Projects and Study team access, or complete outstanding actions.`;
 
 export default function Studies() {
   const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
@@ -65,7 +60,7 @@ export default function Studies() {
       <div className={styles.line}></div>
 
       {infoCalloutExpanded && <StudyDefinition />}
-      <HelperText>{helperText}</HelperText>
+      <HelperBlock text={helperText} />
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />
