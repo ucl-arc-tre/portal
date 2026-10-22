@@ -198,8 +198,6 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         <StudyOverview
           study={study}
           assets={assets}
-          contracts={contracts}
-          projects={projects}
           fetchStudy={fetchStudy}
           unagreedAdminUsernames={unagreedAdminUsernames}
           feedbackHistory={feedbackHistory}
