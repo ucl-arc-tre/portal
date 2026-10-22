@@ -301,9 +301,6 @@ export default function ManageProjectTRE(props: Props) {
               <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
             )}
           </DetailsField>
-
-          <DetailsField label="Number of members" value={project.members ? project.members.length : 0} />
-          <DetailsField label="Number of Assets" value={project.assets ? project.assets.length : 0} />
         </Box>
       )}
 
