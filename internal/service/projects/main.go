@@ -50,6 +50,9 @@ func New() *Service {
 }
 
 func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
+	if data.RequestedStorageGb != nil && *data.RequestedStorageGb < 1 {
+		return types.NewErrClientInvalidObjectF("requested storage must be at least 1 GB")
+	}
 	if data.NumRequiredEgressApprovals < 1 {
 		return types.NewErrClientInvalidObjectF("cannot have fewer than 1 egress approver for a project")
 	}
@@ -254,6 +257,10 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create project")
 	}
+	var requestedStorageGb *types.GB
+	if data.RequestedStorageGb != nil {
+		requestedStorageGb = new(types.GB(*data.RequestedStorageGb))
+	}
 
 	// Create ProjectTRE record
 	projectTRE := types.ProjectTRE{
@@ -266,6 +273,7 @@ func (s *Service) CreateProjectTRE(ctx context.Context, creator types.User, stud
 		Status:                        types.ProjectTREStatusIncomplete,
 		Platform:                      types.ProjectTREPlatformAWS,
 		Project:                       project,
+		RequestedStorageGB:            requestedStorageGb,
 	}
 
 	if err := tx.Create(&projectTRE).Error; err != nil {
@@ -664,6 +672,9 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 
 	if projectTRE.Status != types.ProjectTREStatusDeployed {
 		projectTRE.Status = types.ProjectTREStatusIncomplete
+	}
+	if data.RequestedStorageGb != nil {
+		projectTRE.RequestedStorageGB = new(types.GB(*data.RequestedStorageGb))
 	}
 	projectTRE.EgressNumberRequiredApprovals = data.NumRequiredEgressApprovals
 	projectTRE.ExternalEncryptionEnabled = data.ExternalEncryptionEnabled

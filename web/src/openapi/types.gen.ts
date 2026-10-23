@@ -743,6 +743,10 @@ export type ProjectTre = ProjectTreBase & {
 
 export type ProjectTreBase = {
     /**
+     * Requested project storage in GB
+     */
+    requested_storage_gb?: number;
+    /**
      * List of asset identifiers to link to this project (can be empty)
      */
     asset_ids: Array<string>;
