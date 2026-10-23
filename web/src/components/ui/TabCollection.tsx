@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { AlertCircleIcon, iconSizeSmall } from "./uikitExports";
 import styles from "./TabCollection.module.css";
 import dynamic from "next/dist/shared/lib/dynamic";
-import Badge from "./Badge";
 
 type TabItem = {
   name: string;
@@ -33,11 +32,7 @@ export default function TabCollection({ tabs, defaultTab }: TabCollectionProps) 
       {tabs.map((tabItem) => (
         <Tab key={tabItem.name} value={tabItem.name} data-cy={tabItem.name} className={styles.tab}>
           {tabItem.label ? tabItem.label : tabItem.name}
-          {tabItem.count !== undefined && (
-            <Badge cy="tab-count" className={styles.count}>
-              {tabItem.count}
-            </Badge>
-          )}
+          {tabItem.count !== undefined && <span className={styles.count}>{tabItem.count}</span>}
           {tabItem.needsAttention && <AlertCircleIcon className={styles["needs-attention"]} size={iconSizeSmall} />}
         </Tab>
       ))}
