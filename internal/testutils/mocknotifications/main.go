@@ -67,3 +67,7 @@ func (s *MockNotifications) NotifyProjectDeployed(project types.Project, user ty
 func (s *MockNotifications) NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error {
 	panic("not-implemented")
 }
+
+func (s *MockNotifications) NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error {
+	panic("not-implemented")
+}
