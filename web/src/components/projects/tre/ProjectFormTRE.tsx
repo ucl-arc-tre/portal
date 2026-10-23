@@ -196,11 +196,34 @@ export default function ProjectFormTREStep(props: Props) {
         <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
       </div>
 
+      <div className="field">
+        <Label htmlFor="requested-storage-gb">Requested storage amount (GB) *</Label>
+        <input
+          id="requested-storage-gb"
+          type="number"
+          min={1}
+          step={1}
+          disabled={fieldsDisabled}
+          data-cy="tre-requested-storage-gb"
+          {...register("tre.requestedStorageGb", {
+            valueAsNumber: true,
+            required: "Requested storage is required",
+            min: { value: 1, message: "Requested storage must be at least 1 GB" },
+            validate: (value) => Number.isSafeInteger(value) || "Requested storage must be a whole number of GB",
+          })}
+        />
+        <HelperText>
+          This is the average amount of storage that will be consumed by the project. Large storage requests may incur a
+          cost. See the <a href="https://docs.tre.arc.ucl.ac.uk/pricing">documentation</a> for more information.
+        </HelperText>
+        {errors.tre?.requestedStorageGb && <Error message={errors.tre.requestedStorageGb.message} />}
+      </div>
+
       {desktopUsers.length > 0 && (
         <>
           <RadioOptions
             name="tre.requiresHPCDesktops"
-            label="Will any desktop users run compute intenstive workloads? *"
+            label="Will any desktop users run compute intensive workloads? *"
             options={[
               { name: "Yes", value: "true" },
               { name: "No", value: "false" },

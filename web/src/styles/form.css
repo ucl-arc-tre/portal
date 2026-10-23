@@ -110,4 +110,9 @@
     min-height: 100px;
     font-family: inherit;
   }
+
+  a {
+    color: -webkit-link;
+    text-decoration: underline;
+  }
 }

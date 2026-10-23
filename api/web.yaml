@@ -2689,6 +2689,10 @@ components:
         - airlock_outbound_whitelist
         - airlock_ssh_whitelist
       properties:
+        requested_storage_gb:
+          type: integer
+          minimum: 1
+          description: Requested project storage in GB
         asset_ids:
           type: array
           description: List of asset identifiers to link to this project (can be empty)

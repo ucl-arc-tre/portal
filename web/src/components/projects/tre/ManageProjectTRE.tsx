@@ -19,6 +19,7 @@ import styles from "./ManageProjectTRE.module.css";
 import Box from "@/components/ui/Box";
 import Error from "@/components/ui/Error";
 import Dialog from "@/components/ui/Dialog";
+import { Alert, AlertMessage } from "@/components/ui/uikitExports";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
 import DetailsField from "@/components/ui/DetailsField";
@@ -201,32 +202,6 @@ export default function ManageProjectTRE(props: Props) {
         <ProjectAccessReview projectId={project.id} environment="tre" successCallback={async () => fetchData()} />
       )}
 
-      {!canApprove && canEdit && project.status === "incomplete" && (
-        <div className={styles["approval-section"]}>
-          <p className={styles["approval-info"]}>
-            Please review your project details below. Once you are satisfied with the information provided, submit your
-            project and an administrator will review it.
-          </p>
-          <div className={styles["approval-actions"]}>
-            <Button onClick={() => setShowEditForm(true)} size="small" variant="secondary" disabled={!editingEnabled}>
-              Edit
-            </Button>
-            <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
-              {deleting ? "Deleting..." : "Delete"}
-            </Button>
-
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              size="small"
-              cy="mark-project-ready-for-review-button"
-            >
-              {isSubmitting ? "Submitting..." : "Mark Ready for Review"}
-            </Button>
-          </div>
-        </div>
-      )}
-
       {canApprove && project.status === "pending-approval" && (
         <div className={styles["approval-section"]}>
           <p className={styles["approval-info"]}>
@@ -240,17 +215,6 @@ export default function ManageProjectTRE(props: Props) {
         </div>
       )}
 
-      <div className={styles.header}>
-        <h2>{project.name}</h2>
-        {editingEnabled && canEdit && project.status !== "incomplete" && (
-          <div>
-            <Button onClick={() => setShowEditForm(true)} size="medium" variant="secondary" disabled={!editingEnabled}>
-              Edit Project
-            </Button>
-          </div>
-        )}
-      </div>
-
       <TabCollection
         tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }, { name: "assets" }]}
         defaultTab={tab}
@@ -258,6 +222,36 @@ export default function ManageProjectTRE(props: Props) {
 
       {tab === "project" && (
         <Box>
+          {!canApprove && canEdit && project.status === "incomplete" && (
+            <Alert type="info" className={styles["review-hint"]}>
+              <AlertMessage>
+                Please review your project details below. Once you are satisfied with the information provided, submit
+                your project and a member of the TRE team will review it.
+              </AlertMessage>
+            </Alert>
+          )}
+
+          <div className={styles.header}>
+            <h2>{project.name}</h2>
+            <div className={styles.buttons}>
+              {editingEnabled && canEdit && (project.status !== "incomplete" || !canApprove) && (
+                <Button onClick={() => setShowEditForm(true)} size="small" variant="secondary">
+                  Edit Project
+                </Button>
+              )}
+              {!canApprove && canEdit && project.status === "incomplete" && (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  size="small"
+                  cy="mark-project-ready-for-review-button"
+                >
+                  {isSubmitting ? "Submitting..." : "Mark Ready for Review"}
+                </Button>
+              )}
+            </div>
+          </div>
+
           <DetailsField label="Environment" value={project.environment_name} />
           <DetailsField label="Status">
             <StatusBadge status={project.status} type="project" environment={project.environment_name} />
@@ -273,6 +267,8 @@ export default function ManageProjectTRE(props: Props) {
                 : project.study_owner.username}
             </DetailsField>
           )}
+
+          <DetailsField label="Requested storage (GB)" value={project.requested_storage_gb ?? 100} />
 
           <DetailsField label="Number of members" value={project.members ? project.members.length : 0} />
           <DetailsField label="Number of Assets" value={project.assets ? project.assets.length : 0} />
@@ -312,6 +308,25 @@ export default function ManageProjectTRE(props: Props) {
               <p className={styles["empty-message"]}>No IPs or FQDNs have been whitelisted for this project.</p>
             )}
           </DetailsField>
+        </Box>
+      )}
+
+      {tab === "project" && !canApprove && canEdit && project.status === "incomplete" && (
+        <Box>
+          <section aria-labelledby="delete-project-heading">
+            <div className={styles["delete-section-header"]}>
+              <h2 id="delete-project-heading">Deletion</h2>
+              <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
+                {deleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+            <Alert type="warning">
+              <AlertMessage>
+                This is a destructive operation. <strong>All project data will be lost.</strong> Deleting this project
+                also removes its links to members, assets, and configuration.
+              </AlertMessage>
+            </Alert>
+          </section>
         </Box>
       )}
 
