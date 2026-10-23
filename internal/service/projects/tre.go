@@ -24,6 +24,10 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const (
+	storageThresholdRequiringApproval = types.GB(100)
+)
+
 func (s *Service) validateProjectTREBase(data openapi.ProjectTREBase) error {
 	if data.RequestedStorageGb != nil && *data.RequestedStorageGb < 1 {
 		return types.NewErrClientInvalidObjectF("requested storage must be at least 1 GB")
@@ -433,6 +437,14 @@ func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
 		return types.NewErrInvalidObjectF("project must be in Incomplete status to be submitted")
 	}
 
+	if project, err := s.ProjectTreById(projectId); err != nil {
+		log.Err(err).Msg("Failed to get TRE project")
+	} else {
+		if err := s.notifyProjectTRERequiresApproval(project); err != nil {
+			log.Err(err).Msg("Failed to notify project requires approval")
+		}
+	}
+
 	return nil
 }
 
@@ -448,10 +460,17 @@ func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
+	var newStatus types.ProjectTREStatus
+	if projectTRE.DeployedVersionUpdatedAt == nil {
+		newStatus = types.ProjectTREStatusPendingCreation
+	} else {
+		newStatus = types.ProjectTREStatusDeployed // pending update
+	}
+
 	result := tx.Model(&types.ProjectTRE{}).
 		Where("project_id = ?", projectId).
 		Where("status = ?", types.ProjectTREStatusPendingApproval).
-		Update("status", types.ProjectTREStatusPendingCreation)
+		Update("status", newStatus)
 	if result.Error != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(result.Error, "failed to approve project")
@@ -462,9 +481,11 @@ func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error
 	}
 
 	// initialise the access review timestamp
-	if err := tx.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
-		tx.Rollback()
-		return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
+	if newStatus == types.ProjectTREStatusPendingCreation {
+		if err := tx.Model(&types.Project{}).Where("id = ?", projectId).Update("last_access_review", time.Now()).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to initialise project access review timestamp")
+		}
 	}
 
 	if err := audit.LogProjectTREApproval(tx, approver, projectTRE.Project); err != nil {
@@ -637,6 +658,46 @@ func latestTREDesktopImage(tx *gorm.DB, platform types.ProjectTREPlatform) (*typ
 	return &image, types.NewErrFromGorm(err, "failed to get latest desktop image")
 }
 
+func updateRequiresApproval(old *types.ProjectTRE, new openapi.ProjectTREUpdate) bool {
+	if new.RequestedStorageGb != nil &&
+		old.RequestedStorageGB == nil &&
+		types.GB(*new.RequestedStorageGb) > storageThresholdRequiringApproval {
+		return true
+	}
+	if new.RequestedStorageGb != nil &&
+		old.RequestedStorageGB != nil &&
+		types.GB(*new.RequestedStorageGb) > *old.RequestedStorageGB &&
+		types.GB(*new.RequestedStorageGb) > storageThresholdRequiringApproval {
+		return true
+	}
+
+	for _, member := range new.Members {
+		if member.DesktopConfig == nil || member.DesktopConfig.HpcInstanceType == nil || *member.DesktopConfig.HpcInstanceType == "" {
+			continue
+		}
+		hasExistingHPCDesktop := slices.ContainsFunc(old.UserConfigs, func(config types.ProjectTREUserConfig) bool {
+			return config.User.Username == types.Username(member.User.Username) &&
+				config.DesktopHPCInstanceType != nil && *config.DesktopHPCInstanceType != ""
+		})
+		if !hasExistingHPCDesktop {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (s *Service) notifyProjectTRERequiresApproval(projectTRE *types.ProjectTRE) error {
+	if projectTRE == nil {
+		return nil
+	}
+	treOpsStaff, err := s.users.TreOpsStaff()
+	if err != nil {
+		return err
+	}
+	return s.notifications.NotifyProjectTrePendingApproval(projectTRE.Project, treOpsStaff)
+}
+
 func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.ProjectTREUpdate, updater types.User) error {
 	if err := s.validateProjectTREUpdate(data, projectTRE); err != nil {
 		return err
@@ -645,7 +706,9 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 	tx := s.db.Begin()
 	defer graceful.RollbackTransactionOnPanic(tx)
 
-	if projectTRE.Status != types.ProjectTREStatusDeployed {
+	if projectTRE.Status == types.ProjectTREStatusDeployed && updateRequiresApproval(projectTRE, data) {
+		projectTRE.Status = types.ProjectTREStatusPendingApproval
+	} else if projectTRE.Status != types.ProjectTREStatusDeployed {
 		projectTRE.Status = types.ProjectTREStatusIncomplete
 	}
 	if data.RequestedStorageGb != nil {
@@ -683,7 +746,17 @@ func (s *Service) UpdateProjectTRE(projectTRE *types.ProjectTRE, data openapi.Pr
 		return err
 	}
 
-	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit update project transaction")
+	if err := tx.Commit().Error; err != nil {
+		return types.NewErrFromGorm(err, "failed to commit update project transaction")
+	}
+
+	if projectTRE.Status == types.ProjectTREStatusPendingApproval {
+		if err := s.notifyProjectTRERequiresApproval(projectTRE); err != nil {
+			log.Err(err).Msg("Failed to notify tre ops of required approval")
+		}
+	}
+
+	return nil
 }
 
 func (s *Service) DeleteProjectTRE(projectId uuid.UUID, deleter types.User) error {
@@ -805,6 +878,11 @@ func (s *Service) UpdateProjectTREDeployed(projectName string, data treopenapi.P
 		return types.NewErrFromGorm(err, "failed to update TRE project: TRE project get error")
 	}
 	currentStatus := projectTRE.Status
+	if status == types.ProjectTREStatusDeployed && currentStatus == types.ProjectTREStatusPendingApproval {
+		// If there is an approval pending then we can't update the status to deployed,
+		// so leave the approval pending status but update the deployedVersionUpdatedAt
+		status = types.ProjectTREStatusPendingApproval
+	}
 
 	result = s.db.Model(projectTRE).
 		Where("id = ?", projectTRE.ID).

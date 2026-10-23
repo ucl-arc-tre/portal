@@ -121,3 +121,7 @@ func (m *MockUsers) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User,
 func (m *MockUsers) IgStaff() ([]types.User, error) {
 	panic("not implemented")
 }
+
+func (m *MockUsers) TreOpsStaff() ([]types.User, error) {
+	panic("not implemented")
+}
