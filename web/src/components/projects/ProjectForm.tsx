@@ -339,7 +339,9 @@ export default function ProjectForm({
               />
             )}
 
-            {currentStep === 2 && isTREProject && <ProjectTREStep fieldsDisabled={fieldsDisabled} />}
+            {currentStep === 2 && isTREProject && (
+              <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject as ProjectTre} />
+            )}
 
             {error && <ErrorMessage message={error} />}
 
