@@ -1452,6 +1452,9 @@ type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
+	// AdditionalStudyAdmins Summaries of the additional study administrators
+	AdditionalStudyAdmins *[]UserDataSummary `json:"additional_study_admins,omitempty"`
+
 	// ApprovalStatus Current approval status
 	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
 
@@ -1522,7 +1525,8 @@ type Study struct {
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`
+	Owner               *UserDataSummary `json:"owner,omitempty"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`

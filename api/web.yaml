@@ -2150,6 +2150,14 @@ components:
             - approval_status
             - caseref
           properties:
+            owner:
+              $ref: "#/components/schemas/UserDataSummary"
+              description: Summary of the study owner
+            additional_study_admins:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserDataSummary"
+              description: Summaries of the additional study administrators
             id:
               type: string
               description: Unique identifier for the study

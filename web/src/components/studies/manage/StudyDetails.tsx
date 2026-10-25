@@ -1,4 +1,4 @@
-import { Study } from "@/openapi";
+import { Study, UserDataSummary } from "@/openapi";
 import StatusBadge from "../../ui/StatusBadge";
 import styles from "./StudyDetails.module.css";
 import InfoTooltip from "../../ui/InfoTooltip";
@@ -7,6 +7,8 @@ import EditIcon from "@/components/ui/EditIcon";
 import { RiskInfo } from "@/lib/riskScoreCalculations";
 import { useAuth } from "@/hooks/useAuth";
 import RiskLevelBadge from "@/components/ui/RiskLevelBadge";
+
+const userLabel = (user: UserDataSummary) => (user.name ? `${user.name} (${user.username})` : user.username);
 
 type StudyDetailsProps = {
   study: Study;
@@ -18,6 +20,8 @@ type StudyDetailsProps = {
 export default function StudyDetails(props: StudyDetailsProps) {
   const { study, riskInfo, setOwnerEditModal, canEditOwner } = props;
   const { isIGStaff } = useAuth();
+  const admins =
+    study.additional_study_admins ?? study.additional_study_admin_usernames.map((username) => ({ username }));
 
   return (
     <>
@@ -56,7 +60,8 @@ export default function StudyDetails(props: StudyDetailsProps) {
       <div>
         <dl className={styles.ownership}>
           <dd>
-            Owner: <span className={styles["grey-value"]}>{study.owner_username}</span>
+            Owner:{" "}
+            <span className={styles["grey-value"]}>{study.owner ? userLabel(study.owner) : study.owner_username}</span>
             {canEditOwner && setOwnerEditModal && (
               <EditIcon onClick={() => setOwnerEditModal(true)} label="Edit study owner" cy="study-owner-edit-icon" />
             )}
@@ -71,10 +76,10 @@ export default function StudyDetails(props: StudyDetailsProps) {
 
           <dd className={styles["detail-item"]}>
             Admins:
-            {study.additional_study_admin_usernames.length === 0 && <span className={styles["grey-value"]}>None</span>}
-            {study.additional_study_admin_usernames.map((username) => (
-              <li key={username}>
-                <span className={styles["grey-value"]}>{username}</span>
+            {admins.length === 0 && <span className={styles["grey-value"]}>None</span>}
+            {admins.map((admin) => (
+              <li key={admin.username}>
+                <span className={styles["grey-value"]}>{userLabel(admin)}</span>
               </li>
             ))}
           </dd>

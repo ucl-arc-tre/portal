@@ -409,6 +409,11 @@ export type StudyRequest = StudyBase;
  * A research study
  */
 export type Study = StudyBase & {
+    owner?: UserDataSummary;
+    /**
+     * Summaries of the additional study administrators
+     */
+    additional_study_admins?: Array<UserDataSummary>;
     /**
      * Unique identifier for the study
      */
