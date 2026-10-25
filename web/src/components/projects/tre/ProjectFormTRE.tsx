@@ -73,6 +73,7 @@ export default function ProjectFormTREStep(props: Props) {
 
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
+  const requestedStorageGb = useWatch({ control, name: "tre.requestedStorageGb" });
   const numRequiredEgressApprovals = useWatch({ control, name: "tre.numRequiredEgressApprovals" });
   const members = useWatch({ control, name: "members" });
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
@@ -91,6 +92,15 @@ export default function ProjectFormTREStep(props: Props) {
   const isDesktopUser = (username: string): boolean => {
     return members.some((member) => member.username == username && member.roles.includes("desktop_user"));
   };
+  const storageIncreased = (requestedStorageGb ?? 0) > (editingProject?.requested_storage_gb ?? 0);
+  const hpcDesktopsChanged =
+    JSON.stringify(userConfig?.toSorted((a, b) => (a.username > b.username ? 1 : -1))) !=
+    JSON.stringify(
+      editingProject?.members
+        .map((member) => ({ username: member.user.username, hpcInstance: member.desktop_config?.hpc_instance_type }))
+        .sort((a, b) => (a.username > b.username ? 1 : -1))
+    );
+  const mayRequireReapproval = editingProject?.status !== "incomplete" && (storageIncreased || hpcDesktopsChanged);
 
   return (
     <>
@@ -507,6 +517,12 @@ export default function ProjectFormTREStep(props: Props) {
             Updating this project will remove desktop access for {removedDesktopUsernames.join(", ")}. All data in their
             desktops’ root and home directories will be irrevocably deleted.
           </AlertMessage>
+        </Alert>
+      )}
+
+      {mayRequireReapproval && (
+        <Alert type="warning">
+          <AlertMessage>This project update may require approval from the TRE team.</AlertMessage>
         </Alert>
       )}
     </>
