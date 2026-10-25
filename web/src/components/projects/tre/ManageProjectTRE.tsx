@@ -254,8 +254,11 @@ export default function ManageProjectTRE(props: Props) {
 
           <DetailsField label="Environment" value={project.environment_name} />
           <DetailsField label="Status">
-            <StatusBadge status={project.status} type="project" environment={project.environment_name} />
-            {project.is_pending_deployment_update ? " pending update" : ""}
+            <StatusBadge
+              status={`${project.status}${project.is_pending_deployment_update ? " & pending update" : ""}`}
+              type="project"
+              environment={project.environment_name}
+            />
           </DetailsField>
           <DetailsField label="Created by" value={project.creator_username} />
           <DetailsField label="Created" value={new Date(project.created_at).toLocaleDateString()} />
