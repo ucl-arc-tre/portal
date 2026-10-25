@@ -2596,7 +2596,7 @@ components:
         - id
         - name
         - study_id
-        - creator_username
+        - creator
         - status
         - created_at
         - updated_at
@@ -2613,9 +2613,6 @@ components:
           description: Unique identifier of the study to which the project belongs
         creator:
           $ref: "#/components/schemas/UserDataSummary"
-        creator_username:
-          type: string
-          description: Username of the user who created the project
         status:
           type: string
         created_at:

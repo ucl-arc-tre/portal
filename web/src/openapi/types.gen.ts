@@ -677,11 +677,7 @@ export type Project = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
-    creator?: UserDataSummary;
-    /**
-     * Username of the user who created the project
-     */
-    creator_username: string;
+    creator: UserDataSummary;
     status: string;
     /**
      * Time in RFC3339 format when the project was created
