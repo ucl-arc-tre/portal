@@ -672,14 +672,17 @@ func updateRequiresApproval(old *types.ProjectTRE, new openapi.ProjectTREUpdate)
 	}
 
 	for _, member := range new.Members {
-		if member.DesktopConfig == nil || member.DesktopConfig.HpcInstanceType == nil || *member.DesktopConfig.HpcInstanceType == "" {
+		if member.DesktopConfig == nil ||
+			member.DesktopConfig.HpcInstanceType == nil ||
+			*member.DesktopConfig.HpcInstanceType == "" {
 			continue
 		}
-		hasExistingHPCDesktop := slices.ContainsFunc(old.UserConfigs, func(config types.ProjectTREUserConfig) bool {
+		hasMatchingHPCDesktop := slices.ContainsFunc(old.UserConfigs, func(config types.ProjectTREUserConfig) bool {
 			return config.User.Username == types.Username(member.User.Username) &&
-				config.DesktopHPCInstanceType != nil && *config.DesktopHPCInstanceType != ""
+				config.DesktopHPCInstanceType != nil &&
+				string(*config.DesktopHPCInstanceType) == *member.DesktopConfig.HpcInstanceType
 		})
-		if !hasExistingHPCDesktop {
+		if !hasMatchingHPCDesktop {
 			return true
 		}
 	}
