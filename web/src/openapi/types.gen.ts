@@ -67,6 +67,10 @@ export type AgreementConfirmation = {
 
 export type ConfirmedAgreement = {
     /**
+     * UUID of the agreement version that was confirmed
+     */
+    agreement_id: string;
+    /**
      * Time in RFC3339 format at which the agreement was confirmed
      */
     confirmed_at: string;
@@ -1192,6 +1196,35 @@ export type PostProfileAgreementsResponses = {
 };
 
 export type PostProfileAgreementsResponse = PostProfileAgreementsResponses[keyof PostProfileAgreementsResponses];
+
+export type GetProfileAgreementsByAgreementIdData = {
+    body?: never;
+    path: {
+        agreementId: string;
+    };
+    query?: never;
+    url: '/profile/agreements/{agreementId}';
+};
+
+export type GetProfileAgreementsByAgreementIdErrors = {
+    /**
+     * No signed agreement found
+     */
+    404: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProfileAgreementsByAgreementIdResponses = {
+    /**
+     * Signed agreement
+     */
+    200: Agreement;
+};
+
+export type GetProfileAgreementsByAgreementIdResponse = GetProfileAgreementsByAgreementIdResponses[keyof GetProfileAgreementsByAgreementIdResponses];
 
 export type GetProfileTrainingData = {
     body?: never;

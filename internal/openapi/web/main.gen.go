@@ -1031,6 +1031,8 @@ type AuthRoles string
 
 // ConfirmedAgreement defines model for ConfirmedAgreement.
 type ConfirmedAgreement struct {
+	// AgreementId UUID of the agreement version that was confirmed
+	AgreementId   string        `json:"agreement_id"`
 	AgreementType AgreementType `json:"agreement_type"`
 
 	// ConfirmedAt Time in RFC3339 format at which the agreement was confirmed
@@ -2049,6 +2051,9 @@ type ServerInterface interface {
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
 
+	// (GET /profile/agreements/{agreementId})
+	GetProfileAgreementsAgreementId(c *gin.Context, agreementId string)
+
 	// (GET /profile/training)
 	GetProfileTraining(c *gin.Context)
 
@@ -2470,6 +2475,31 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfileAgreements(c)
+}
+
+// GetProfileAgreementsAgreementId operation middleware
+func (siw *ServerInterfaceWrapper) GetProfileAgreementsAgreementId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "agreementId" -------------
+	var agreementId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "agreementId", c.Param("agreementId"), &agreementId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter agreementId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProfileAgreementsAgreementId(c, agreementId)
 }
 
 // GetProfileTraining operation middleware
@@ -3969,6 +3999,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.GET(options.BaseURL+"/profile/agreements/:agreementId", wrapper.GetProfileAgreementsAgreementId)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/tokens/:environment", wrapper.GetTokensEnvironment)
