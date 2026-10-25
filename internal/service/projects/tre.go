@@ -175,7 +175,7 @@ func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) err
 		}
 	}
 	if errorMessage != "" {
-		return types.NewErrClientInvalidObjectF("invalid project members: %s", errorMessage)
+		return types.NewErrClientInvalidObjectF("invalid project members:\n\n%s", errorMessage)
 	}
 	return nil
 }

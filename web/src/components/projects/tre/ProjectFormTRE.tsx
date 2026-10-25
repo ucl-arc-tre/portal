@@ -3,7 +3,7 @@ import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../ui/uikitExports";
 import Error from "../../ui/Error";
 import { ProjectFormData } from "@/types/projects";
-import { ProjectTreRoleName } from "@/openapi";
+import { ProjectTre, ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
@@ -26,10 +26,11 @@ function isIPv4(value: string): boolean {
 
 type Props = {
   fieldsDisabled: boolean;
+  editingProject?: ProjectTre | null;
 };
 
 export default function ProjectFormTREStep(props: Props) {
-  const { fieldsDisabled } = props;
+  const { fieldsDisabled, editingProject } = props;
   const {
     control,
     getValues,
@@ -78,9 +79,15 @@ export default function ProjectFormTREStep(props: Props) {
   const airlockExternalDataEnabled = useWatch({ control, name: "tre.airlockExternalDataEnabled" });
   const airlockSSHWhitelistEnabled = useWatch({ control, name: "tre.airlockSSHWhitelistEnabled" });
   const userConfig = useWatch({ control, name: "tre.userConfig" });
-  const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
   const requiresHPCDesktops = useWatch({ control, name: "tre.requiresHPCDesktops" }) === "true";
-
+  const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
+  const existingDesktopUsernames =
+    editingProject?.members
+      ?.filter((member) => member.roles.some((role) => role === "desktop_user"))
+      .map((member) => member.user.username) ?? [];
+  const removedDesktopUsernames = existingDesktopUsernames.filter(
+    (username) => !desktopUsers.some((member) => member.username === username)
+  );
   const isDesktopUser = (username: string): boolean => {
     return members.some((member) => member.username == username && member.roles.includes("desktop_user"));
   };
@@ -493,6 +500,14 @@ export default function ProjectFormTREStep(props: Props) {
             Optionally add IPs (e.g. 1.2.3.4) to whitelist for SSH access to the TRE airlock for this project.
           </HelperText>
         </div>
+      )}
+      {removedDesktopUsernames.length > 0 && editingProject?.status !== "incomplete" && (
+        <Alert type="warning">
+          <AlertMessage>
+            Updating this project will remove desktop access for {removedDesktopUsernames.join(", ")}. All data in their
+            desktops’ root and home directories will be irrevocably deleted.
+          </AlertMessage>
+        </Alert>
       )}
     </>
   );
