@@ -42,7 +42,12 @@ export default function ProjectCardsList(props: Props) {
             >
               <div className={styles["project-info"]}>
                 <p className={styles["project-environment"]}>Environment: {project.environment_name}</p>
-                <p className={styles["project-creator"]}>Created by: {project.creator_username}</p>
+                <p className={styles["project-creator"]}>
+                  Created by:{" "}
+                  {project.creator?.name
+                    ? `${project.creator.name} (${project.creator.username})`
+                    : (project.creator?.username ?? project.creator_username)}
+                </p>
               </div>
             </Card>
           ))}

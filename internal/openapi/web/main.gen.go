@@ -1242,7 +1242,8 @@ type ProfileUpdateResponse struct {
 // Project A project with base details (environment-agnostic)
 type Project struct {
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt string `json:"created_at"`
+	CreatedAt string           `json:"created_at"`
+	Creator   *UserDataSummary `json:"creator,omitempty"`
 
 	// CreatorUsername Username of the user who created the project
 	CreatorUsername string          `json:"creator_username"`
@@ -1311,10 +1312,8 @@ type ProjectTRE struct {
 	Assets []Asset `json:"assets"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt string `json:"created_at"`
-
-	// CreatorUsername Username of the user who created the project
-	CreatorUsername string          `json:"creator_username"`
+	CreatedAt       string          `json:"created_at"`
+	Creator         UserDataSummary `json:"creator"`
 	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// ExternalEncryptionEnabled Is external encryption enabled for this project?

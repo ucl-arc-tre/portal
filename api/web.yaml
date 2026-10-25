@@ -2611,6 +2611,8 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
+        creator:
+          $ref: "#/components/schemas/UserDataSummary"
         creator_username:
           type: string
           description: Username of the user who created the project
@@ -2639,7 +2641,7 @@ components:
             - name
             - study_id
             - study_title
-            - creator_username
+            - creator
             - status
             - created_at
             - updated_at
@@ -2662,9 +2664,8 @@ components:
             study_owner:
               $ref: "#/components/schemas/UserDataSummary"
               description: Identity of the study owner
-            creator_username:
-              type: string
-              description: Username of the user who created the project
+            creator:
+              $ref: "#/components/schemas/UserDataSummary"
             status:
               $ref: "#/components/schemas/ProjectTREStatus"
             created_at:
