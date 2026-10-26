@@ -1244,10 +1244,8 @@ type ProfileUpdateResponse struct {
 // Project A project with base details (environment-agnostic)
 type Project struct {
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt string `json:"created_at"`
-
-	// CreatorUsername Username of the user who created the project
-	CreatorUsername string          `json:"creator_username"`
+	CreatedAt       string          `json:"created_at"`
+	Creator         UserDataSummary `json:"creator"`
 	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// Id Unique identifier for the project
@@ -1313,10 +1311,8 @@ type ProjectTRE struct {
 	Assets []Asset `json:"assets"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt string `json:"created_at"`
-
-	// CreatorUsername Username of the user who created the project
-	CreatorUsername string          `json:"creator_username"`
+	CreatedAt       string          `json:"created_at"`
+	Creator         UserDataSummary `json:"creator"`
 	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// ExternalEncryptionEnabled Is external encryption enabled for this project?
@@ -1454,6 +1450,9 @@ type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
 
+	// AdditionalStudyAdmins Summaries of the additional study administrators
+	AdditionalStudyAdmins *[]UserDataSummary `json:"additional_study_admins,omitempty"`
+
 	// ApprovalStatus Current approval status
 	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
 
@@ -1524,7 +1523,8 @@ type Study struct {
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`
+	Owner               *UserDataSummary `json:"owner,omitempty"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`

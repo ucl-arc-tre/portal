@@ -413,6 +413,11 @@ export type StudyRequest = StudyBase;
  * A research study
  */
 export type Study = StudyBase & {
+    owner?: UserDataSummary;
+    /**
+     * Summaries of the additional study administrators
+     */
+    additional_study_admins?: Array<UserDataSummary>;
     /**
      * Unique identifier for the study
      */
@@ -676,10 +681,7 @@ export type Project = {
      * Unique identifier of the study to which the project belongs
      */
     study_id: string;
-    /**
-     * Username of the user who created the project
-     */
-    creator_username: string;
+    creator: UserDataSummary;
     status: string;
     /**
      * Time in RFC3339 format when the project was created
@@ -717,10 +719,7 @@ export type ProjectTre = ProjectTreBase & {
      */
     study_title: string;
     study_owner?: UserDataSummary;
-    /**
-     * Username of the user who created the project
-     */
-    creator_username: string;
+    creator: UserDataSummary;
     status: ProjectTreStatus;
     /**
      * Time in RFC3339 format when the project was created
