@@ -59,6 +59,7 @@ func registerHTMLRoutes(router *gin.Engine, dir string) {
 			c.Header("content-security-policy", middleware.DefaultCSPHeader+inlineScriptCSP(filePath))
 			c.File(filePath)
 		})
+		log.Info().Str("route", route).Msg("Registered route")
 	}
 }
 
@@ -82,7 +83,7 @@ func mustReadDir(dir string) []os.DirEntry {
 }
 
 func inlineScriptCSP(filePath string) string {
-	file, err := os.Open(filePath)
+	file, err := os.OpenInRoot(".", filePath)
 	if err != nil {
 		panic(fmt.Sprintf("failed to open HTML [%v]: %v", filePath, err))
 	}
