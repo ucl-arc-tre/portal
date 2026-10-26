@@ -66,7 +66,7 @@ export const ContractDefinition = () => {
   return (
     <Callout definition>
       Contracts can be uploaded as PDFs and can be linked to <EntityTooltip entity="asset" isPlural />,{" "}
-      <EntityTooltip entity="project" isPlural /> and users. If you collaborate with an external researcher you must
+      <EntityTooltip entity="project" isPlural /> and users. If you collaborate with an external researcher, you must
       associate them with a contract. For more detailed information and an entity relationship diagram, look at our{" "}
       <Link href="/glossary">Glossary</Link>.
     </Callout>
