@@ -163,6 +163,27 @@ paths:
         default:
           description: Unexpected error
 
+  /profile/agreements/{agreementId}:
+    get:
+      description: Get the agreement version signed by the current user
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Signed agreement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agreement"
+        "404":
+          description: No signed agreement found
+        default:
+          description: Unexpected error
+
   /profile/training:
     get:
       description: Get the training record status for a user
@@ -1680,7 +1701,11 @@ components:
       required:
         - confirmed_at
         - agreement_type
+        - agreement_id
       properties:
+        agreement_id:
+          type: string
+          description: UUID of the agreement version that was confirmed
         confirmed_at:
           type: string
           description: Time in RFC3339 format at which the agreement was confirmed

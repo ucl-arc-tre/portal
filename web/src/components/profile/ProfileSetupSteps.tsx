@@ -12,9 +12,16 @@ type Props = {
   agreementsData: UserAgreements;
   trainingData: ProfileTraining;
   onStepsComplete: (chosenName: string) => void;
+  onAgreementAccepted: () => Promise<void>;
 };
 
-export default function ProfileSetupSteps({ profileData, agreementsData, trainingData, onStepsComplete }: Props) {
+export default function ProfileSetupSteps({
+  profileData,
+  agreementsData,
+  trainingData,
+  onStepsComplete,
+  onAgreementAccepted,
+}: Props) {
   const stepsPromptRef = useRef<HTMLDivElement>(null);
 
   const scrollToSteps = () => {
@@ -91,6 +98,7 @@ export default function ProfileSetupSteps({ profileData, agreementsData, trainin
             setAgreementCompleted={setAgreementCompleted}
             agreementCompleted={agreementCompleted}
             onAgreementAccepted={() => {
+              void onAgreementAccepted();
               if (!trainingCertificateCompleted) scrollToSteps();
             }}
           />
