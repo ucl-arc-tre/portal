@@ -109,7 +109,7 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 
 	response := []openapi.Study{}
 	for _, study := range studies {
-		response = append(response, studyToOpenApiStudy(study))
+		response = append(response, h.studyToOpenApiStudy(study))
 	}
 
 	ctx.JSON(http.StatusOK, response)
@@ -131,7 +131,7 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, studyToOpenApiStudy(studies[0]))
+	ctx.JSON(http.StatusOK, h.studyToOpenApiStudy(studies[0]))
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
@@ -332,7 +332,7 @@ func (h *Handler) PostStudiesAdminImport(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study))
+	ctx.JSON(http.StatusOK, h.studyToOpenApiStudy(*study))
 }
 
 func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId string) {
@@ -413,7 +413,7 @@ func (h *Handler) PostStudiesAdminStudyIdOwnerApprove(ctx *gin.Context, studyId 
 
 // Helper functions
 
-func studyToOpenApiStudy(data types.Study) openapi.Study {
+func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 	study := openapi.Study{
 		Id:                               data.ID.String(),
 		Title:                            data.Title,
@@ -447,6 +447,12 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 		LastSignoff:                      openapi.FormatOptionalTime(data.LastSignoff),
 		Caseref:                          data.Caseref,
 	}
+	study.Owner = new(h.userDataSummary(data.Owner.Username))
+	admins := []openapi.UserDataSummary{}
+	for _, username := range data.AdminUsernames() {
+		admins = append(admins, h.userDataSummary(types.Username(username)))
+	}
+	study.AdditionalStudyAdmins = &admins
 	latestOwnerChange := data.LatestOwnerChange()
 	if latestOwnerChange != nil && latestOwnerChange.ToUser.Username != data.Owner.Username {
 		study.PendingNewOwnerUsername = new(string(latestOwnerChange.ToUser.Username))
