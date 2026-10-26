@@ -11,6 +11,7 @@ import (
 )
 
 type Interface interface {
+	ConfirmedAgreement(user types.User, agreementID uuid.UUID) (*openapi.Agreement, error)
 	ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 	ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgreement, error)
 	Attributes(user types.User) (types.UserAttributes, error)
@@ -38,4 +39,5 @@ type Interface interface {
 	Find(ctx context.Context, query string) ([]openapi.UserData, error)
 	AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error)
 	IgStaff() ([]types.User, error)
+	TreOpsStaff() ([]types.User, error)
 }
