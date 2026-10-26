@@ -39,4 +39,5 @@ type Interface interface {
 	Find(ctx context.Context, query string) ([]openapi.UserData, error)
 	AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error)
 	IgStaff() ([]types.User, error)
+	TreOpsStaff() ([]types.User, error)
 }

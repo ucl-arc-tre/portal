@@ -23,4 +23,5 @@ type Interface interface {
 	NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error
 	NotifyProjectDeployed(project types.Project, user types.User) error
 	NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error
+	NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error
 }

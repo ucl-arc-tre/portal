@@ -55,3 +55,11 @@ func (s *Service) NotifyProjectAccessReviewExpiry(ctx context.Context, project t
 	}
 	return s.createForAll(notification, recipients)
 }
+
+func (s *Service) NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error {
+	notification := types.Notification{
+		Title: fmt.Sprintf("Project '%s' is pending approval", project.Name),
+		Href:  new(fmt.Sprintf("/projects/manage?projectId=%s&environment=%s", project.ID.String(), url.QueryEscape(string(project.Environment.Name)))),
+	}
+	return s.createForAll(notification, treOpsStaff)
+}
