@@ -50,10 +50,10 @@ export default function ManageProjectTRE(props: Props) {
     project.status === "incomplete" ||
     (project.status === "deployed" && process.env.NEXT_PUBLIC_ENABLE_DEPLOYED_TRE_PROJECT_EDIT === "true");
   const projectId = project.id;
-  const canApprove = (isAdmin || isTreOpsStaff) && project?.creator_username !== userData?.username;
+  const canApprove = (isAdmin || isTreOpsStaff) && project.creator.username !== userData?.username;
   const canEdit =
     isAdmin ||
-    project?.creator_username == userData?.username ||
+    project.creator.username == userData?.username ||
     (userData?.roles as string[]).includes(`project_${project.id}_owner`);
 
   // prepare the approved study for edit form
@@ -260,7 +260,12 @@ export default function ManageProjectTRE(props: Props) {
               environment={project.environment_name}
             />
           </DetailsField>
-          <DetailsField label="Created by" value={project.creator_username} />
+          <DetailsField
+            label="Created by"
+            value={
+              project.creator.name ? `${project.creator.name} (${project.creator.username})` : project.creator.username
+            }
+          />
           <DetailsField label="Created" value={new Date(project.created_at).toLocaleDateString()} />
           <DetailsField label="Study" value={project.study_title} />
           {project.study_owner && (

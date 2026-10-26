@@ -163,6 +163,27 @@ paths:
         default:
           description: Unexpected error
 
+  /profile/agreements/{agreementId}:
+    get:
+      description: Get the agreement version signed by the current user
+      parameters:
+        - name: agreementId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Signed agreement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Agreement"
+        "404":
+          description: No signed agreement found
+        default:
+          description: Unexpected error
+
   /profile/training:
     get:
       description: Get the training record status for a user
@@ -1680,7 +1701,11 @@ components:
       required:
         - confirmed_at
         - agreement_type
+        - agreement_id
       properties:
+        agreement_id:
+          type: string
+          description: UUID of the agreement version that was confirmed
         confirmed_at:
           type: string
           description: Time in RFC3339 format at which the agreement was confirmed
@@ -2150,6 +2175,14 @@ components:
             - approval_status
             - caseref
           properties:
+            owner:
+              $ref: "#/components/schemas/UserDataSummary"
+              description: Summary of the study owner
+            additional_study_admins:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserDataSummary"
+              description: Summaries of the additional study administrators
             id:
               type: string
               description: Unique identifier for the study
@@ -2588,7 +2621,7 @@ components:
         - id
         - name
         - study_id
-        - creator_username
+        - creator
         - status
         - created_at
         - updated_at
@@ -2603,9 +2636,8 @@ components:
         study_id:
           type: string
           description: Unique identifier of the study to which the project belongs
-        creator_username:
-          type: string
-          description: Username of the user who created the project
+        creator:
+          $ref: "#/components/schemas/UserDataSummary"
         status:
           type: string
         created_at:
@@ -2631,7 +2663,7 @@ components:
             - name
             - study_id
             - study_title
-            - creator_username
+            - creator
             - status
             - created_at
             - updated_at
@@ -2654,9 +2686,8 @@ components:
             study_owner:
               $ref: "#/components/schemas/UserDataSummary"
               description: Identity of the study owner
-            creator_username:
-              type: string
-              description: Username of the user who created the project
+            creator:
+              $ref: "#/components/schemas/UserDataSummary"
             status:
               $ref: "#/components/schemas/ProjectTREStatus"
             created_at:

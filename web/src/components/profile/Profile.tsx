@@ -13,6 +13,7 @@ import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Error from "../ui/Error";
 import ProfileSetupSteps from "./ProfileSetupSteps";
 import ProfileSummaryCard from "./ProfileSummaryCard";
+import Agreements from "./Agreements";
 import CertificateReupload from "./CertificateReupload";
 import Loading from "../ui/Loading";
 
@@ -102,12 +103,27 @@ export default function Profile({ userData, refreshAuth }: Props) {
 
   if (!profileComplete) {
     return (
-      <ProfileSetupSteps
-        profileData={profileData!}
-        agreementsData={agreementsData!}
-        trainingData={trainingData!}
-        onStepsComplete={handleStepsComplete}
-      />
+      <>
+        <ProfileSetupSteps
+          profileData={profileData!}
+          agreementsData={agreementsData!}
+          trainingData={trainingData!}
+          onStepsComplete={handleStepsComplete}
+          onAgreementAccepted={async () => {
+            try {
+              const response = await getProfileAgreements();
+              if (responseIsError(response) || !response.data) {
+                setError(`Failed to load agreements: ${extractErrorMessage(response)}`);
+                return;
+              }
+              setAgreementsData(response.data);
+            } catch {
+              setError("Failed to load agreements. Please try again.");
+            }
+          }}
+        />
+        <Agreements agreementsData={agreementsData} />
+      </>
     );
   }
 
@@ -119,6 +135,7 @@ export default function Profile({ userData, refreshAuth }: Props) {
         roles={userData?.roles}
         callback={() => fetchProfileData()}
       />
+      <Agreements agreementsData={agreementsData} />
       <CertificateReupload trainingData={trainingData} expiryUrgency={expiryUrgency} onReupload={fetchProfileData} />
     </div>
   );

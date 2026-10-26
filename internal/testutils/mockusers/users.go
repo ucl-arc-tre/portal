@@ -124,4 +124,12 @@ func (m *MockUsers) IgStaff() ([]types.User, error) {
 
 func (m *MockUsers) TreOpsStaff() ([]types.User, error) {
 	panic("not implemented")
+}  
+
+func (m *MockUsers) ConfirmedAgreement(user types.User, agreementID uuid.UUID) (*openapi.Agreement, error) {
+	args := m.Called(user, agreementID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*openapi.Agreement), args.Error(1)
 }
