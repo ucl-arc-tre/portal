@@ -19,12 +19,11 @@ const helperText = `Use this tab to register and manage the Assets for this Stud
 
 const tellMeMore = (
   <>
-    For each Asset, record its classification, storage arrangements and retention requirements and contract
-    requirements. Research data containing personal data or special category data should be classified as Highly
-    Confidential. Any outstanding actions are highlighted with a warning icon below. <br></br>
+    Each Asset&apos;s details, arrangements and requirements can be recorded using the form, and is valid across
+    multiple storage locations. They can be linked to specific Contracts and Projects within this Study. <br></br>
     Assets should be reviewed periodically to ensure they remain accurate and required. You may receive reminders when
-    asset reviews are due. As part of the review, consider whether the asset is still needed, whether it remains
-    appropriately classified and stored, and whether the legal basis for retaining it continues to apply. <br></br>
+    Asset reviews are due. As part of the review, consider whether the asset is still needed and if the details remain
+    correct. <br></br>
     Where an asset receives a Vulnerable (Amber) or Critical (Red) risk rating, the identified risks and mitigations
     should be carefully considered. Consider whether changes to storage arrangements, data flows, retention
     arrangements, or access permissions could further protect the information and reduce the likelihood or impact of an
