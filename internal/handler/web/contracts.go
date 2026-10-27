@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -19,11 +20,7 @@ var (
 )
 
 // Handler methods
-func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
-	studyUuid, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId uuid.UUID) {
 
 	var data openapi.ContractBase
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
@@ -31,7 +28,7 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 	}
 
 	creator := middleware.GetUser(ctx)
-	contract, err := h.studies.CreateContract(ctx, studyUuid, data, creator)
+	contract, err := h.studies.CreateContract(ctx, studyId, data, creator)
 	if err != nil {
 		setError(ctx, err, "Failed to create contract")
 		return
@@ -40,13 +37,8 @@ func (h *Handler) PostStudiesStudyIdContracts(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
-func (h *Handler) GetStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
-	if err != nil {
-		return
-	}
-
-	contract, err := h.studies.GetContract(uuids[0], uuids[1])
+func (h *Handler) GetStudiesStudyIdContractsContractId(ctx *gin.Context, studyId uuid.UUID, contractId uuid.UUID) {
+	contract, err := h.studies.GetContract(studyId, contractId)
 	if err != nil {
 		setError(ctx, err, "Failed to get contract")
 		return
@@ -54,12 +46,7 @@ func (h *Handler) GetStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
-func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context, studyId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context, studyId uuid.UUID, contractId uuid.UUID) {
 	fileHeader, err := ctx.FormFile("file")
 	if err != nil {
 		setError(ctx, types.NewErrInvalidObject(err), "Failed to get uploaded file")
@@ -97,11 +84,11 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 	contractObject := studies.ContractObject{
 		Meta: types.ContractObjectMetadata{
 			Filename:   fileHeader.Filename,
-			ContractID: uuids[1],
+			ContractID: contractId,
 		},
 		Object: types.S3Object{Content: file},
 	}
-	metadata, err := h.studies.CreateContractObject(ctx, uuids[0], contractObject)
+	metadata, err := h.studies.CreateContractObject(ctx, studyId, contractObject)
 	if err != nil {
 		setError(ctx, err, "Failed to store contract")
 		return
@@ -114,13 +101,8 @@ func (h *Handler) PostStudiesStudyIdContractsContractIdObjects(ctx *gin.Context,
 	})
 }
 
-func (h *Handler) DeleteStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
-	if err != nil {
-		return
-	}
-
-	if err := h.studies.DeleteContract(uuids[0], uuids[1]); err != nil {
+func (h *Handler) DeleteStudiesStudyIdContractsContractId(ctx *gin.Context, studyId uuid.UUID, contractId uuid.UUID) {
+	if err := h.studies.DeleteContract(studyId, contractId); err != nil {
 		setError(ctx, err, "Failed to delete contract")
 		return
 	}
@@ -128,18 +110,13 @@ func (h *Handler) DeleteStudiesStudyIdContractsContractId(ctx *gin.Context, stud
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId string, contractId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId uuid.UUID, contractId uuid.UUID) {
 	var data openapi.ContractBase
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
 
-	contract, err := h.studies.UpdateContract(ctx, uuids[0], uuids[1], data)
+	contract, err := h.studies.UpdateContract(ctx, studyId, contractId, data)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
@@ -148,13 +125,8 @@ func (h *Handler) PutStudiesStudyIdContractsContractId(ctx *gin.Context, studyId
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
-func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	contracts, err := h.studies.StudyContracts(uuids[0])
+func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId uuid.UUID) {
+	contracts, err := h.studies.StudyContracts(studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve contracts")
 		return
@@ -167,13 +139,8 @@ func (h *Handler) GetStudiesStudyIdContracts(ctx *gin.Context, studyId string) {
 	ctx.JSON(http.StatusOK, apiContracts)
 }
 
-func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
-	if err != nil {
-		return
-	}
-
-	contracts, err := h.studies.AssetContracts(uuids[0], uuids[1])
+func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, studyId uuid.UUID, assetId uuid.UUID) {
+	contracts, err := h.studies.AssetContracts(studyId, assetId)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve contracts")
 		return
@@ -188,15 +155,11 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetIdContracts(ctx *gin.Context, stud
 
 func (h *Handler) GetStudiesStudyIdContractsContractIdObjectsContractObjectId(
 	ctx *gin.Context,
-	studyId string,
-	contractId string,
-	contractObjectId string,
+	studyId uuid.UUID,
+	contractId uuid.UUID,
+	contractObjectId uuid.UUID,
 ) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId, contractObjectId)
-	if err != nil {
-		return
-	}
-	object, err := h.studies.GetContractObject(ctx, uuids[0], uuids[1], uuids[2])
+	object, err := h.studies.GetContractObject(ctx, studyId, contractId, contractObjectId)
 	if err != nil {
 		setError(ctx, err, "Failed get contract object")
 		return
@@ -215,16 +178,11 @@ func (h *Handler) GetStudiesStudyIdContractsContractIdObjectsContractObjectId(
 
 func (h *Handler) DeleteStudiesStudyIdContractsContractIdObjectsContractObjectId(
 	ctx *gin.Context,
-	studyId string,
-	contractId string,
-	contractObjectId string,
+	studyId uuid.UUID,
+	contractId uuid.UUID,
+	contractObjectId uuid.UUID,
 ) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, contractId, contractObjectId)
-	if err != nil {
-		return
-	}
-
-	err = h.studies.DeleteContractObject(ctx, uuids[0], uuids[1], uuids[2])
+	err := h.studies.DeleteContractObject(ctx, studyId, contractId, contractObjectId)
 	if err != nil {
 		setError(ctx, err, "Failed delete contract object")
 		return

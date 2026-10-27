@@ -1813,7 +1813,7 @@ export type PutStudiesByStudyIdData = {
     body: StudyRequest;
     path: {
         /**
-         * ID of the study
+         * Study UUID
          */
         studyId: string;
     };

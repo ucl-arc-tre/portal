@@ -25,12 +25,8 @@ func (h *Handler) GetUsers(ctx *gin.Context, params openapi.GetUsersParams) {
 	ctx.JSON(http.StatusOK, users)
 }
 
-func (h *Handler) GetUsersUserId(ctx *gin.Context, userId string) {
-	id, err := parseUUIDOrSetError(ctx, userId)
-	if err != nil {
-		return
-	}
-	userData, err := h.users.UserDataById(id)
+func (h *Handler) GetUsersUserId(ctx *gin.Context, userId uuid.UUID) {
+	userData, err := h.users.UserDataById(userId)
 	if err != nil {
 		setError(ctx, err, "Failed to find users")
 		return
@@ -55,7 +51,7 @@ func (h *Handler) GetUsersLookup(ctx *gin.Context, params openapi.GetUsersLookup
 	ctx.JSON(http.StatusOK, users)
 }
 
-func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
+func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId uuid.UUID) {
 	updater := middleware.GetUser(ctx)
 
 	var update openapi.UserTrainingUpdate
@@ -72,13 +68,7 @@ func (h *Handler) PostUsersUserIdTraining(ctx *gin.Context, userId string) {
 		setError(ctx, types.NewErrInvalidObject(err), "Failed to parse date")
 		return
 	}
-
-	uid, err := uuid.Parse(userId)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid uuid")
-		return
-	}
-	user, err := h.users.UserById(uid)
+	user, err := h.users.UserById(userId)
 	if err != nil {
 		setError(ctx, err, "Failed to get person")
 		return
@@ -160,19 +150,13 @@ func (h *Handler) PostUsersInvite(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId string) {
+func (h *Handler) PutUsersUserIdAttributes(ctx *gin.Context, userId uuid.UUID) {
 	var requestBody openapi.PutUsersUserIdAttributesJSONBody
 	if err := bindJSONOrSetError(ctx, &requestBody); err != nil {
 		return
 	}
 
-	userID, err := uuid.Parse(userId)
-	if err != nil {
-		setError(ctx, types.NewErrInvalidObject(err), "Invalid user ID")
-		return
-	}
-
-	targetUser, err := h.users.UserById(userID)
+	targetUser, err := h.users.UserById(userId)
 	if err != nil {
 		setError(ctx, err, "Failed to find user")
 		return

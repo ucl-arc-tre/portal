@@ -590,12 +590,7 @@ paths:
     put:
       description: Update a specific study
       parameters:
-        - in: path
-          name: studyId
-          required: true
-          description: ID of the study
-          schema:
-            type: string
+        - $ref: "#/components/parameters/StudyIdParam"
       requestBody:
         required: true
         content:
@@ -1514,6 +1509,7 @@ components:
       description: User UUID
       schema:
         type: string
+        format: uuid
     StudyIdParam:
       in: path
       name: studyId
@@ -1521,6 +1517,7 @@ components:
       description: Study UUID
       schema:
         type: string
+        format: uuid
     ProjectIdParam:
       in: path
       name: projectId
@@ -1528,6 +1525,7 @@ components:
       description: Project UUID
       schema:
         type: string
+        format: uuid
     AssetIdParam:
       in: path
       name: assetId
@@ -1535,6 +1533,7 @@ components:
       description: Asset UUID
       schema:
         type: string
+        format: uuid
     ContractIdParam:
       in: path
       name: contractId
@@ -1542,6 +1541,7 @@ components:
       description: Contract UUID
       schema:
         type: string
+        format: uuid
     ContractObjectIdParam:
       in: path
       name: contractObjectId
@@ -1549,6 +1549,7 @@ components:
       description: Contract object UUID
       schema:
         type: string
+        format: uuid
     NotificationIdParam:
       in: path
       name: notificationId
@@ -1556,6 +1557,7 @@ components:
       description: Notification UUID
       schema:
         type: string
+        format: uuid
     EnvironmentParam:
       in: path
       name: environment
@@ -1614,6 +1616,7 @@ components:
         id:
           type: string
           description: UUID of the notification
+          format: uuid
         title:
           type: string
         read:

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 )
@@ -22,7 +23,7 @@ func (h *Handler) GetNotifications(ctx *gin.Context) {
 			kind = new(openapi.NotificationKind(*notification.Kind))
 		}
 		data = append(data, openapi.Notification{
-			Id:    notification.ID.String(),
+			Id:    notification.ID,
 			Title: notification.Title,
 			Body:  notification.Body,
 			Href:  notification.Href,
@@ -33,13 +34,9 @@ func (h *Handler) GetNotifications(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, data)
 }
 
-func (h *Handler) PostNotificationsNotificationIdRead(ctx *gin.Context, notificationId string) {
-	id, err := parseUUIDOrSetError(ctx, notificationId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostNotificationsNotificationIdRead(ctx *gin.Context, notificationId uuid.UUID) {
 	user := middleware.GetUser(ctx)
-	if err := h.notifications.Read(id, user); err != nil {
+	if err := h.notifications.Read(notificationId, user); err != nil {
 		setError(ctx, err, "Failed to read notification")
 		return
 	}
@@ -59,13 +56,9 @@ func (h *Handler) PostNotificationsRead(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) DeleteNotificationsNotificationId(ctx *gin.Context, notificationId string) {
-	id, err := parseUUIDOrSetError(ctx, notificationId)
-	if err != nil {
-		return
-	}
+func (h *Handler) DeleteNotificationsNotificationId(ctx *gin.Context, notificationId uuid.UUID) {
 	user := middleware.GetUser(ctx)
-	if err := h.notifications.Delete(id, user); err != nil {
+	if err := h.notifications.Delete(notificationId, user); err != nil {
 		setError(ctx, err, "Failed to delete notification")
 		return
 	}
