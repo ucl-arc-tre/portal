@@ -90,6 +90,25 @@ jobs:
           fi
           test -s "$RUNNER_TEMP/security-review.md"
 
+      - name: Hide previous Claude security reviews
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("## Claude security review\n"))) | .node_id' \
+            > "$RUNNER_TEMP/previous-security-reviews.txt"
+          while IFS= read -r comment_id; do
+            gh api graphql -f id="$comment_id" -f query='
+              mutation($id: ID!) {
+                minimizeComment(input: {subjectId: $id, classifier: OUTDATED}) {
+                  minimizedComment { isMinimized }
+                }
+              }'
+          done < "$RUNNER_TEMP/previous-security-reviews.txt"
+
       - name: Publish security review
         shell: bash
         env:
