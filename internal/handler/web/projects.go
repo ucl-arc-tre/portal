@@ -146,13 +146,8 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
-func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
-
-	projectTRE, err := h.projects.ProjectTreById(projectUUID)
+func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId uuid.UUID) {
+	projectTRE, err := h.projects.ProjectTreById(projectId)
 	if projectTRE == nil {
 		err = types.NewNotFoundError("failed to find project")
 	}
@@ -196,18 +191,13 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId uuid.UUID) {
 	projectUpdateData := openapi.ProjectTREUpdate{}
 	if err := bindJSONOrSetError(ctx, &projectUpdateData); err != nil {
 		return
 	}
 
-	projectTRE, err := h.projects.ProjectTreById(projectUUID)
+	projectTRE, err := h.projects.ProjectTreById(projectId)
 	if err != nil {
 		setError(ctx, err, "Failed to get project")
 		return
@@ -221,13 +211,8 @@ func (h *Handler) PutProjectsTreProjectId(ctx *gin.Context, projectId string) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) DeleteProjectsTreProjectId(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
-
-	err = h.projects.DeleteProjectTRE(projectUUID, middleware.GetUser(ctx))
+func (h *Handler) DeleteProjectsTreProjectId(ctx *gin.Context, projectId uuid.UUID) {
+	err := h.projects.DeleteProjectTRE(projectId, middleware.GetUser(ctx))
 	if err != nil {
 		setError(ctx, err, "Failed to delete project")
 		return
@@ -264,17 +249,12 @@ func (h *Handler) extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.
 	return members
 }
 
-func (h *Handler) PostProjectsTreProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
+func (h *Handler) PostProjectsTreProjectIdAccessReviewSignoff(ctx *gin.Context, projectId uuid.UUID) {
 	h.postProjectsProjectIdAccessReviewSignoff(ctx, projectId)
 }
 
-func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
-
-	err = h.projects.SubmitProjectTre(projectUUID)
+func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId uuid.UUID) {
+	err := h.projects.SubmitProjectTre(projectId)
 	if err != nil {
 		setError(ctx, err, "Failed to submit project")
 		return
@@ -283,16 +263,12 @@ func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId s
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId uuid.UUID) {
 
 	// TODO: check that the project status is "Pending", otherwise return a 400??
 
 	user := middleware.GetUser(ctx)
-	err = h.projects.ApproveProject(projectUUID, user)
+	err := h.projects.ApproveProject(projectId, user)
 	if err != nil {
 		setError(ctx, err, "Failed to approve project")
 		return
@@ -315,13 +291,8 @@ func (h *Handler) PostProjectsTreAdminImport(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
-
-	projectDSH, err := h.projects.ProjectDSHById(projectUUID)
+func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId uuid.UUID) {
+	projectDSH, err := h.projects.ProjectDSHById(projectId)
 	if err != nil {
 		setError(ctx, err, "Failed to get project")
 		return
@@ -341,7 +312,7 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 
 	response := openapi.ProjectDSH{
 		Name:             projectDSH.Project.Name,
-		Id:               projectUUID.String(),
+		Id:               projectId.String(),
 		EnvironmentName:  string(environments.DSH),
 		StudyId:          projectDSH.Project.Study.ID.String(),
 		StudyTitle:       projectDSH.Project.Study.Title,
@@ -360,18 +331,14 @@ func (h *Handler) GetProjectsDshProjectId(ctx *gin.Context, projectId string) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) PostProjectsDshProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
+func (h *Handler) PostProjectsDshProjectIdAccessReviewSignoff(ctx *gin.Context, projectId uuid.UUID) {
 	h.postProjectsProjectIdAccessReviewSignoff(ctx, projectId)
 }
 
 // Called by an IAO/IAA to confirm access rights for this project have been reviewed, resetting the review timestamp
-func (h *Handler) postProjectsProjectIdAccessReviewSignoff(ctx *gin.Context, projectId string) {
-	projectUUID, err := parseUUIDOrSetError(ctx, projectId)
-	if err != nil {
-		return
-	}
+func (h *Handler) postProjectsProjectIdAccessReviewSignoff(ctx *gin.Context, projectId uuid.UUID) {
 
-	if err := h.projects.RecordProjectAccessReviewSignoff(projectUUID, middleware.GetUser(ctx)); err != nil {
+	if err := h.projects.RecordProjectAccessReviewSignoff(projectId, middleware.GetUser(ctx)); err != nil {
 		setError(ctx, err, "Failed to record project access review signoff")
 		return
 	}

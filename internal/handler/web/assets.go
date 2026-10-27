@@ -77,13 +77,8 @@ func (h *Handler) GetAssets(ctx *gin.Context, params openapi.GetAssetsParams) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	assets, err := h.studies.Assets(studyUUID)
+func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId uuid.UUID) {
+	assets, err := h.studies.Assets(studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve assets")
 		return
@@ -97,19 +92,14 @@ func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId uuid.UUID) {
 	assetData := openapi.AssetBase{}
 	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
 		return
 	}
 
 	user := middleware.GetUser(ctx)
-	err = h.studies.CreateAsset(user, assetData, studyUUID)
+	err := h.studies.CreateAsset(user, assetData, studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to create asset")
 		return
@@ -118,13 +108,8 @@ func (h *Handler) PostStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	ctx.Status(http.StatusCreated)
 }
 
-func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
-	if err != nil {
-		return
-	}
-
-	asset, err := h.studies.AssetById(uuids[0], uuids[1])
+func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId uuid.UUID, assetId uuid.UUID) {
+	asset, err := h.studies.AssetById(studyId, assetId)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve asset")
 		return
@@ -133,18 +118,13 @@ func (h *Handler) GetStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(asset))
 }
 
-func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId string, assetId string) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId uuid.UUID, assetId uuid.UUID) {
 	var assetData openapi.AssetBase
 	if err := bindJSONOrSetError(ctx, &assetData); err != nil {
 		return
 	}
 
-	asset, err := h.studies.UpdateAsset(assetData, uuids[0], uuids[1])
+	asset, err := h.studies.UpdateAsset(assetData, studyId, assetId)
 	if err != nil {
 		setError(ctx, err, "Failed to update asset")
 		return
@@ -155,15 +135,10 @@ func (h *Handler) PutStudiesStudyIdAssetsAssetId(ctx *gin.Context, studyId strin
 
 func (h *Handler) DeleteStudiesStudyIdAssetsAssetId(
 	ctx *gin.Context,
-	studyId string,
-	assetId string,
+	studyId uuid.UUID,
+	assetId uuid.UUID,
 ) {
-	uuids, err := parseUUIDsOrSetError(ctx, studyId, assetId)
-	if err != nil {
-		return
-	}
-
-	err = h.studies.DeleteAsset(uuids[0], uuids[1])
+	err := h.studies.DeleteAsset(studyId, assetId)
 	if err != nil {
 		setError(ctx, err, "Failed to delete asset")
 		return
