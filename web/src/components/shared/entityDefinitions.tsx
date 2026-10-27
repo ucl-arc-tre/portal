@@ -10,7 +10,7 @@ const entityDefinitions = {
   contract:
     "Contracts can be uploaded as PDFs and can be linked to Assets, Projects and Users. If you collaborate with an external researcher you must associate them with a contract",
   environment:
-    "Environments are secure virtual spaces where data analysis can be performed. They can be associated with Projects. Presently, we support the TRE",
+    "Environments are secure virtual spaces where research activities can be performed. They can be associated with Projects. Presently, we support the TRE",
 };
 
 const EntityTooltip = ({ entity, isPlural }: { entity: keyof typeof entityDefinitions; isPlural?: boolean }) => {
@@ -55,9 +55,9 @@ export const AssetDefinition = () => {
 export const ProjectDefinition = () => {
   return (
     <Callout definition>
-      Projects are owned by a <EntityTooltip entity="study" /> and can contain <EntityTooltip entity="asset" isPlural />{" "}
-      . They are associated with an <EntityTooltip entity="environment" />. For more detailed information and an entity
-      relationship diagram, look at our <Link href="/glossary">Glossary</Link>.
+      Projects are owned by a <EntityTooltip entity="study" /> and can contain <EntityTooltip entity="asset" isPlural />
+      . They are associated with an <EntityTooltip entity="environment" /> and manage member access to them. For more
+      detailed information and an entity relationship diagram, look at our <Link href="/glossary">Glossary</Link>.
     </Callout>
   );
 };
