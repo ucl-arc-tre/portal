@@ -59,7 +59,6 @@ func addTRE(router gin.IRouter) {
 		middleware.LimitBodySize,
 		middleware.NewDefaultRateLimit(),
 	}
-
 	basicAuthAccounts := config.TREUserAccounts()
 	if useBasicAuth := len(basicAuthAccounts) > 0; useBasicAuth {
 		router.Use(gin.BasicAuth(basicAuthAccounts))
