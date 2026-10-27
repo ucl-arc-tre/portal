@@ -83,6 +83,11 @@ jobs:
             --max-turns 50 \
             --output-format text \
             < "$RUNNER_TEMP/pr.diff" > "$RUNNER_TEMP/security-review.md"
+          if grep -qiF 'API Error' "$RUNNER_TEMP/security-review.md"; then
+            cat "$RUNNER_TEMP/security-review.md"
+            echo "::error::Claude returned an API error"
+            exit 1
+          fi
           test -s "$RUNNER_TEMP/security-review.md"
 
       - name: Publish security review
