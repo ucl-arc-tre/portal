@@ -26,6 +26,7 @@ import ProjectMember from "../ProjectMember";
 import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
 import ProjectAccessReview from "../ProjectAccessReview";
+import { HelperText } from "@/components/ui/uikitExports";
 
 type Props = {
   project: ProjectTre;
@@ -246,6 +247,12 @@ export default function ManageProjectTRE(props: Props) {
           </div>
         )}
       </div>
+
+      <HelperText>
+        Use this page to view your TRE Project members, configuration and request updates. Please note some of these
+        changes may result in a cost change and/or a review from the TRE team. Updates do not take effect immediately
+        and will become effective on the next deployment.{" "}
+      </HelperText>
 
       <TabCollection
         tabs={[
