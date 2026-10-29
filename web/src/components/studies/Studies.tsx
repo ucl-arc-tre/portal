@@ -9,7 +9,7 @@ import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
 import HelperBlock from "../ui/HelperBlock";
 
-const helperText = `Use this page to register and manage research studies and view studies that you have access to.\n Select a study to view its details, manage governance records, data Assets, Contracts, Projects and Study team access, or complete outstanding actions.`;
+const helperText = `Use this page to view, register and manage research Studies that you have access to.\n Select a Study to view its details, manage governance records, Assets, Contracts, Projects and Study team access, or complete outstanding actions.`;
 
 export default function Studies() {
   const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
