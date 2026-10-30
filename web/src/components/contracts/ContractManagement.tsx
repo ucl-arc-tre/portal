@@ -37,13 +37,6 @@ export default function ContractManagement(props: ContractManagementProps) {
     fetchStudyContents();
   };
 
-  const ContractSummary = (
-    <div className={styles["contracts-summary"]}>
-      <span>Number of associated Contracts:</span>
-      <span className={styles["contracts-count-badge"]}>{contracts.length}</span>
-    </div>
-  );
-
   return (
     <Box>
       <HelperBlock text={helperText} />
@@ -62,12 +55,10 @@ export default function ContractManagement(props: ContractManagementProps) {
             </Button>
           </div>
           {calloutExpanded && <ContractDefinition />}
-          {ContractSummary}
         </>
       ) : (
         <div className={styles.header}>
           <h3>Contracts</h3>
-          {ContractSummary}
         </div>
       )}
 
