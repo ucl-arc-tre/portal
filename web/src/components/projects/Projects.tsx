@@ -142,16 +142,6 @@ export default function Projects() {
               onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
             }}
           >
-            <Button
-              onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-              variant="tertiary"
-              size="small"
-              inline
-              aria-label="Toggle project definition"
-              aria-expanded={infoCalloutExpanded}
-            >
-              <InfoIcon />
-            </Button>
             {isApprovedStaffResearcher && creationEnabled && (
               <Button onClick={handleCreateProjectClick} size="medium" cy="create-project-button">
                 Create Project
