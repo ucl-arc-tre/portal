@@ -13,7 +13,7 @@ import styles from "./Projects.module.css";
 import Dialog from "../ui/Dialog";
 import Error from "../ui/Error";
 import { ProjectDefinition } from "../shared/entityDefinitions";
-import { HelperText } from "../ui/uikitExports";
+import { HelperText, InfoIcon } from "../ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/router";
 import { MAX_PAGE_SIZE } from "@/hooks/usePagination";

@@ -28,11 +28,25 @@ import { studySignoffWarningRequired } from "../../shared/exports";
 import StudyAffirmation from "./StudyAffirmation";
 import TextLink from "@/components/ui/TextLink";
 import { Alert, AlertMessage, HelperText } from "../../ui/uikitExports";
+import HelperBlock from "@/components/ui/HelperBlock";
 
 type ManageStudyProps = {
   study: Study;
   fetchStudy: (id: string) => Promise<void>;
 };
+
+const helperText = `Use this page to manage the Study's details and related Assets, Contracts and Projects.
+`;
+const tellMeMore = (
+  <>
+    Any actions requiring your attention are shown below and are highlighted with a warning icon in the relevant tabs
+    below. <br></br>
+    When registering a new Study, mark the Study as Ready for Review once all required information has been provided.
+    The Information Governance team will then review and provide feedback. <br></br>
+    Studies are reviewed and reaffirmed annually, and should be updated whenever significant changes occur, such as
+    changes to Assets, Contracts, or research activities in Projects.
+  </>
+);
 
 export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
   const { userData, isIGStaff, isIAO } = useAuth();
@@ -152,6 +166,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
   return (
     <>
+      <HelperBlock text={helperText} tellMeMore={tellMeMore} />
+
       {showSignoffWarning && (
         <StudyAffirmation studyId={study.id} successCallback={() => fetchStudy(study.id)} isReaffirmation />
       )}
@@ -176,14 +192,12 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
-      <StudyTabs assets={assets} contracts={contracts} tab={tab} />
+      <StudyTabs assets={assets} contracts={contracts} tab={tab} projects={projects} />
 
       {tab === "study" && (
         <StudyOverview
           study={study}
           assets={assets}
-          contracts={contracts}
-          projects={projects}
           fetchStudy={fetchStudy}
           unagreedAdminUsernames={unagreedAdminUsernames}
           feedbackHistory={feedbackHistory}

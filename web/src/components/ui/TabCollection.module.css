@@ -5,12 +5,22 @@
 
 .tab {
   text-transform: capitalize !important;
-
-  svg {
-    margin-inline: 0.25rem;
-  }
 }
 
 .needs-attention {
   color: var(--expiry-urgency--medium);
+}
+
+.count {
+  margin-inline: 0.25rem;
+  background: var(--form-purple--light);
+  border-color: var(--form-purple--light);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  min-width: 1.5rem;
+  text-align: center;
+  font-weight: 700;
+  align-items: center;
 }

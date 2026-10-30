@@ -8,7 +8,12 @@ import styles from "./TrainingCertificate.module.css";
 import TrainingCertificateError from "./TrainingCertificateError";
 import { AlertType } from "uikit-react-public/dist/components/Alert/Alert";
 import Box from "@/components/ui/Box";
-import { Alert, AlertMessage, Input } from "@/components/ui/uikitExports";
+import { Alert, AlertMessage } from "@/components/ui/uikitExports";
+import dynamic from "next/dist/shared/lib/dynamic";
+
+const FileInput = dynamic(() => import("uikit-react-public").then((mod) => mod.FileInput), {
+  ssr: false,
+});
 
 interface SubmitEvent extends React.SubmitEvent<HTMLFormElement> {
   target: HTMLFormElement & {
@@ -163,16 +168,18 @@ export default function TrainingCertificate(props: TrainingCertificateProps) {
         </p>
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          <Input
+          <FileInput
             type="file"
             name="certificate"
             aria-label="certificate-upload"
             accept="application/pdf"
             required
             onChange={checkIsPDF}
-          />
+          >
+            Select PDF to Upload
+          </FileInput>
           <Button size="large" type="submit" cy="training-certificate-submit" disabled={!isPDF || isSubmitting}>
-            Submit
+            Validate Certificate
           </Button>
         </form>
 
