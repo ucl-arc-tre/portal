@@ -3,7 +3,7 @@
   flex-direction: row;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: 2rem;
 
   h2 {
     padding-top: 0.5rem;
@@ -11,6 +11,19 @@
     font-weight: 700;
     color: var(--off-black);
   }
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+
+  button {
+    height: auto;
+  }
+}
+
+.review-hint {
+  margin-bottom: 1rem;
 }
 
 .not-approved-section {
@@ -101,6 +114,18 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
+}
+
+.delete-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+  }
 }
 
 .delete-dialog {

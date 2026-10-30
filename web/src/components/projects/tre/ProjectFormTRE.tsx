@@ -3,7 +3,7 @@ import InfoTooltip from "../../ui/InfoTooltip";
 import { HelperText, Alert, AlertMessage, Label } from "../../ui/uikitExports";
 import Error from "../../ui/Error";
 import { ProjectFormData } from "@/types/projects";
-import { ProjectTreRoleName } from "@/openapi";
+import { ProjectTre, ProjectTreRoleName } from "@/openapi";
 import styles from "./ProjectFormTRE.module.css";
 import RadioOptions from "@/components/ui/form/RadioOptions";
 import { Role, roles } from "./roles";
@@ -26,10 +26,11 @@ function isIPv4(value: string): boolean {
 
 type Props = {
   fieldsDisabled: boolean;
+  editingProject?: ProjectTre | null;
 };
 
 export default function ProjectFormTREStep(props: Props) {
-  const { fieldsDisabled } = props;
+  const { fieldsDisabled, editingProject } = props;
   const {
     control,
     getValues,
@@ -72,18 +73,34 @@ export default function ProjectFormTREStep(props: Props) {
 
   const rolesMap = Object.entries(roles) as [ProjectTreRoleName, Role][];
 
+  const requestedStorageGb = useWatch({ control, name: "tre.requestedStorageGb" });
   const numRequiredEgressApprovals = useWatch({ control, name: "tre.numRequiredEgressApprovals" });
   const members = useWatch({ control, name: "members" });
   const numEgressCheckers = members.filter((member) => member.roles.includes("egress_checker")).length;
   const airlockExternalDataEnabled = useWatch({ control, name: "tre.airlockExternalDataEnabled" });
   const airlockSSHWhitelistEnabled = useWatch({ control, name: "tre.airlockSSHWhitelistEnabled" });
   const userConfig = useWatch({ control, name: "tre.userConfig" });
-  const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
   const requiresHPCDesktops = useWatch({ control, name: "tre.requiresHPCDesktops" }) === "true";
-
+  const desktopUsers = members.filter((member) => member.roles.includes("desktop_user"));
+  const existingDesktopUsernames =
+    editingProject?.members
+      ?.filter((member) => member.roles.some((role) => role === "desktop_user"))
+      .map((member) => member.user.username) ?? [];
+  const removedDesktopUsernames = existingDesktopUsernames.filter(
+    (username) => !desktopUsers.some((member) => member.username === username)
+  );
   const isDesktopUser = (username: string): boolean => {
     return members.some((member) => member.username == username && member.roles.includes("desktop_user"));
   };
+  const storageIncreased = (requestedStorageGb ?? 0) > (editingProject?.requested_storage_gb ?? 0);
+  const hpcDesktopsChanged =
+    JSON.stringify(userConfig?.toSorted((a, b) => (a.username > b.username ? 1 : -1))) !=
+    JSON.stringify(
+      editingProject?.members
+        .map((member) => ({ username: member.user.username, hpcInstance: member.desktop_config?.hpc_instance_type }))
+        .sort((a, b) => (a.username > b.username ? 1 : -1))
+    );
+  const mayRequireReapproval = editingProject?.status !== "incomplete" && (storageIncreased || hpcDesktopsChanged);
 
   return (
     <>
@@ -196,11 +213,34 @@ export default function ProjectFormTREStep(props: Props) {
         <HelperText>Optionally add additional researchers with their roles to this project</HelperText>
       </div>
 
+      <div className="field">
+        <Label htmlFor="requested-storage-gb">Requested storage amount (GB) *</Label>
+        <input
+          id="requested-storage-gb"
+          type="number"
+          min={1}
+          step={1}
+          disabled={fieldsDisabled}
+          data-cy="tre-requested-storage-gb"
+          {...register("tre.requestedStorageGb", {
+            valueAsNumber: true,
+            required: "Requested storage is required",
+            min: { value: 1, message: "Requested storage must be at least 1 GB" },
+            validate: (value) => Number.isSafeInteger(value) || "Requested storage must be a whole number of GB",
+          })}
+        />
+        <HelperText>
+          This is the average amount of storage that will be consumed by the project. Large storage requests may incur a
+          cost. See the <a href="https://docs.tre.arc.ucl.ac.uk/pricing">documentation</a> for more information.
+        </HelperText>
+        {errors.tre?.requestedStorageGb && <Error message={errors.tre.requestedStorageGb.message} />}
+      </div>
+
       {desktopUsers.length > 0 && (
         <>
           <RadioOptions
             name="tre.requiresHPCDesktops"
-            label="Will any desktop users run compute intenstive workloads? *"
+            label="Will any desktop users run compute intensive workloads? *"
             options={[
               { name: "Yes", value: "true" },
               { name: "No", value: "false" },
@@ -470,6 +510,20 @@ export default function ProjectFormTREStep(props: Props) {
             Optionally add IPs (e.g. 1.2.3.4) to whitelist for SSH access to the TRE airlock for this project.
           </HelperText>
         </div>
+      )}
+      {removedDesktopUsernames.length > 0 && editingProject?.status !== "incomplete" && (
+        <Alert type="warning">
+          <AlertMessage>
+            Updating this project will remove desktop access for {removedDesktopUsernames.join(", ")}. All data in their
+            desktops’ root and home directories will be irrevocably deleted.
+          </AlertMessage>
+        </Alert>
+      )}
+
+      {mayRequireReapproval && (
+        <Alert type="warning">
+          <AlertMessage>This project update may require approval from the TRE team.</AlertMessage>
+        </Alert>
       )}
     </>
   );

@@ -100,3 +100,7 @@ func (s *Service) IgStaff() ([]types.User, error) {
 	}
 	return unique, nil
 }
+
+func (s *Service) TreOpsStaff() ([]types.User, error) {
+	return s.usersWithConfigRole(rbac.TreOpsStaff)
+}

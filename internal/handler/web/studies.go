@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -109,29 +110,24 @@ func (h *Handler) GetStudies(ctx *gin.Context, params openapi.GetStudiesParams) 
 
 	response := []openapi.Study{}
 	for _, study := range studies {
-		response = append(response, studyToOpenApiStudy(study))
+		response = append(response, h.studyToOpenApiStudy(study))
 	}
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	studies, err := h.studies.StudiesById(studyUUID)
+func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId uuid.UUID) {
+	studies, err := h.studies.StudiesById(studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to retrieve study")
 		return
 	}
 	if len(studies) == 0 {
-		setError(ctx, types.NewNotFoundError(fmt.Errorf("study [%v] not found", studyUUID)), "Not found")
+		setError(ctx, types.NewNotFoundError(fmt.Errorf("study [%v] not found", studyId)), "Not found")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, studyToOpenApiStudy(studies[0]))
+	ctx.JSON(http.StatusOK, h.studyToOpenApiStudy(studies[0]))
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
@@ -151,12 +147,7 @@ func (h *Handler) PostStudies(ctx *gin.Context) {
 }
 
 // confirms a study agreement for the study ID and user
-func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId uuid.UUID) {
 	confirmation := openapi.AgreementConfirmation{}
 	if err := bindJSONOrSetError(ctx, &confirmation); err != nil {
 		return
@@ -168,7 +159,7 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 	}
 
 	user := middleware.GetUser(ctx)
-	studies, err := h.studies.StudiesById(studyUUID)
+	studies, err := h.studies.StudiesById(studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to get study")
 		return
@@ -188,7 +179,7 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 		return
 	}
 
-	if err := h.studies.ConfirmStudyAgreement(user, studyUUID, agreementId); err != nil {
+	if err := h.studies.ConfirmStudyAgreement(user, studyId, agreementId); err != nil {
 		setError(ctx, err, "Failed to confirm study agreement")
 		return
 	}
@@ -204,13 +195,8 @@ func (h *Handler) PostStudiesStudyIdAgreements(ctx *gin.Context, studyId string)
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	usernames, err := h.studies.GetStudyAgreementSignatureUsernames(studyUUID)
+func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId uuid.UUID) {
+	usernames, err := h.studies.GetStudyAgreementSignatureUsernames(studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to get study agreements")
 		return
@@ -223,13 +209,8 @@ func (h *Handler) GetStudiesStudyIdAgreements(ctx *gin.Context, studyId string) 
 	ctx.JSON(http.StatusOK, studyAgreements)
 }
 
-func (h *Handler) GetStudiesStudyIdFeedback(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	history, err := h.studies.StudyFeedbackHistory(studyUUID)
+func (h *Handler) GetStudiesStudyIdFeedback(ctx *gin.Context, studyId uuid.UUID) {
+	history, err := h.studies.StudyFeedbackHistory(studyId)
 	if err != nil {
 		setError(ctx, err, "Failed to get study feedback history")
 		return
@@ -244,19 +225,14 @@ func (h *Handler) GetStudiesStudyIdFeedback(ctx *gin.Context, studyId string) {
 }
 
 // Called by IG Ops staff to approve or reject a study, optionally with feedback
-func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId uuid.UUID) {
 	review := openapi.StudyReview{}
 	if err := bindJSONOrSetError(ctx, &review); err != nil {
 		return
 	}
 
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
 	user := middleware.GetUser(ctx)
-	err = h.studies.UpdateStudyReview(ctx, studyUUID, review, user)
+	err := h.studies.UpdateStudyReview(ctx, studyId, review, user)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return
@@ -266,13 +242,8 @@ func (h *Handler) PostStudiesAdminStudyIdReview(ctx *gin.Context, studyId string
 }
 
 // Called by the IAO to affirm that study details are up to date, resetting the signoff timestamp
-func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
-	if err := h.studies.RecordStudySignoff(studyUUID, middleware.GetUser(ctx)); err != nil {
+func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId uuid.UUID) {
+	if err := h.studies.RecordStudySignoff(studyId, middleware.GetUser(ctx)); err != nil {
 		setError(ctx, err, "Failed to record study signoff")
 		return
 	}
@@ -281,18 +252,13 @@ func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId string) {
 }
 
 // Called by the study owner/researcher to submit their study for IG Ops review
-func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
+func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId uuid.UUID) {
 	review := openapi.StudyReview{
 		Status: openapi.StudyApprovalStatusPending,
 	}
 
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
 	user := middleware.GetUser(ctx)
-	err = h.studies.UpdateStudyReview(ctx, studyUUID, review, user)
+	err := h.studies.UpdateStudyReview(ctx, studyId, review, user)
 	if err != nil {
 		setError(ctx, err, "Failed to update study feedback")
 		return
@@ -301,18 +267,13 @@ func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId string) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
-
+func (h *Handler) PutStudiesStudyId(ctx *gin.Context, studyId uuid.UUID) {
 	studyData := openapi.StudyRequest{}
 	if err := bindJSONOrSetError(ctx, &studyData); err != nil {
 		return
 	}
 
-	err = h.studies.UpdateStudy(ctx, studyUUID, studyData, middleware.GetUser(ctx))
+	err := h.studies.UpdateStudy(ctx, studyId, studyData, middleware.GetUser(ctx))
 	if err != nil {
 		setError(ctx, err, "Failed to update study")
 		return
@@ -332,19 +293,15 @@ func (h *Handler) PostStudiesAdminImport(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, studyToOpenApiStudy(*study))
+	ctx.JSON(http.StatusOK, h.studyToOpenApiStudy(*study))
 }
 
-func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId uuid.UUID) {
 	data := openapi.AssetImport{}
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
-	asset, err := h.studies.ImportAsset(studyUUID, data)
+	asset, err := h.studies.ImportAsset(studyId, data)
 	if err != nil {
 		setError(ctx, err, "Failed to update asset")
 		return
@@ -353,16 +310,13 @@ func (h *Handler) PostStudiesAdminStudyIdAssetsImport(ctx *gin.Context, studyId 
 	ctx.JSON(http.StatusOK, assetToOpenApiAsset(*asset))
 }
 
-func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, studyId uuid.UUID) {
+
 	data := openapi.ContractImport{}
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
-	contract, err := h.studies.ImportContract(studyUUID, data)
+	contract, err := h.studies.ImportContract(studyId, data)
 	if err != nil {
 		setError(ctx, err, "Failed to update contract")
 		return
@@ -371,40 +325,34 @@ func (h *Handler) PostStudiesAdminStudyIdContractsImport(ctx *gin.Context, study
 	ctx.JSON(http.StatusOK, contractToOpenApiContract(*contract))
 }
 
-func (h *Handler) PostStudiesStudyIdOwnerRequest(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostStudiesStudyIdOwnerRequest(ctx *gin.Context, studyId uuid.UUID) {
+
 	data := openapi.StudyOwnerUpdate{}
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
 
 	user := middleware.GetUser(ctx)
-	if err := h.studies.UpdateStudyOwner(ctx, studyUUID, user, data); err != nil {
+	if err := h.studies.UpdateStudyOwner(ctx, studyId, user, data); err != nil {
 		setError(ctx, err, "Failed to update study owner")
 		return
 	}
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Handler) PostStudiesAdminStudyIdOwnerRequest(ctx *gin.Context, studyId string) {
+func (h *Handler) PostStudiesAdminStudyIdOwnerRequest(ctx *gin.Context, studyId uuid.UUID) {
 	h.PostStudiesStudyIdOwnerRequest(ctx, studyId)
 }
 
-func (h *Handler) PostStudiesAdminStudyIdOwnerApprove(ctx *gin.Context, studyId string) {
-	studyUUID, err := parseUUIDOrSetError(ctx, studyId)
-	if err != nil {
-		return
-	}
+func (h *Handler) PostStudiesAdminStudyIdOwnerApprove(ctx *gin.Context, studyId uuid.UUID) {
+
 	data := openapi.StudyOwnerUpdate{}
 	if err := bindJSONOrSetError(ctx, &data); err != nil {
 		return
 	}
 
 	user := middleware.GetUser(ctx)
-	if err := h.studies.ApproveStudyOwner(studyUUID, user, data); err != nil {
+	if err := h.studies.ApproveStudyOwner(studyId, user, data); err != nil {
 		setError(ctx, err, "Failed to update study owner")
 		return
 	}
@@ -413,7 +361,7 @@ func (h *Handler) PostStudiesAdminStudyIdOwnerApprove(ctx *gin.Context, studyId 
 
 // Helper functions
 
-func studyToOpenApiStudy(data types.Study) openapi.Study {
+func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 	study := openapi.Study{
 		Id:                               data.ID.String(),
 		Title:                            data.Title,
@@ -447,6 +395,12 @@ func studyToOpenApiStudy(data types.Study) openapi.Study {
 		LastSignoff:                      openapi.FormatOptionalTime(data.LastSignoff),
 		Caseref:                          data.Caseref,
 	}
+	study.Owner = new(h.userDataSummary(data.Owner.Username))
+	admins := []openapi.UserDataSummary{}
+	for _, username := range data.AdminUsernames() {
+		admins = append(admins, h.userDataSummary(types.Username(username)))
+	}
+	study.AdditionalStudyAdmins = &admins
 	latestOwnerChange := data.LatestOwnerChange()
 	if latestOwnerChange != nil && latestOwnerChange.ToUser.Username != data.Owner.Username {
 		study.PendingNewOwnerUsername = new(string(latestOwnerChange.ToUser.Username))

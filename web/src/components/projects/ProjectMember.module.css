@@ -12,10 +12,6 @@
   transition: all 0.2s ease;
 }
 
-.member-item:last-child {
-  margin-bottom: 0;
-}
-
 .member-name {
   color: var(--off-black);
   font-size: 1rem;

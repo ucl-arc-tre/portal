@@ -19,6 +19,7 @@ type ProjectNameValidation = {
 };
 
 type ProjectFormDataTRE = {
+  requestedStorageGb: number;
   numRequiredEgressApprovals: string;
   externalEncryptionEnabled: "false" | "true";
   airlockExternalDataEnabled?: "false" | "true";

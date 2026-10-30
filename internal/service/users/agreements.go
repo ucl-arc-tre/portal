@@ -25,10 +25,11 @@ func (s *Service) ConfirmAgreement(user types.User, agreementId uuid.UUID) error
 
 func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgreement, error) {
 	data := []struct {
-		Type      string
-		CreatedAt time.Time
+		Type        string
+		AgreementID uuid.UUID
+		CreatedAt   time.Time
 	}{}
-	result := s.db.Select("agreements.type", "user_agreement_confirmations.created_at").
+	result := s.db.Select("agreements.type", "user_agreement_confirmations.agreement_id", "user_agreement_confirmations.created_at").
 		Table("user_agreement_confirmations").
 		Joins("left join agreements on agreements.id = user_agreement_confirmations.agreement_id").
 		Where(types.UserAgreementConfirmation{UserID: user.ID}).
@@ -41,6 +42,7 @@ func (s *Service) ConfirmedAgreements(user types.User) ([]openapi.ConfirmedAgree
 	for _, item := range data {
 		agreements = append(agreements, openapi.ConfirmedAgreement{
 			AgreementType: openapi.AgreementType(item.Type),
+			AgreementId:   item.AgreementID.String(),
 			ConfirmedAt:   item.CreatedAt.Format(config.TimeFormat),
 		})
 	}
@@ -62,4 +64,15 @@ func confirmedAgreementsIncludeApprovedResearcher(agreements []openapi.Confirmed
 		}
 	}
 	return false
+}
+
+func (s *Service) ConfirmedAgreement(user types.User, agreementID uuid.UUID) (*openapi.Agreement, error) {
+	var confirmation types.UserAgreementConfirmation
+	err := s.db.Preload("Agreement").
+		Where("user_id = ? AND agreement_id = ?", user.ID, agreementID).
+		First(&confirmation).Error
+	if err != nil {
+		return nil, types.NewErrFromGorm(err, "failed to get signed agreement")
+	}
+	return &openapi.Agreement{Id: confirmation.Agreement.ID.String(), Text: confirmation.Agreement.Text}, nil
 }

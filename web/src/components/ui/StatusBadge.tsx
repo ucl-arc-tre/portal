@@ -113,7 +113,7 @@ export default function StatusBadge(props: BadgeProps) {
         </span>
       }
     >
-      {type === "study" ? getStudyBadgeText(status) : status}
+      {type === "study" ? getStudyBadgeText(status) : status?.replace("-", " ")}
     </Badge>
   );
 }

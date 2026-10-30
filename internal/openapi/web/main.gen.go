@@ -1031,6 +1031,8 @@ type AuthRoles string
 
 // ConfirmedAgreement defines model for ConfirmedAgreement.
 type ConfirmedAgreement struct {
+	// AgreementId UUID of the agreement version that was confirmed
+	AgreementId   string        `json:"agreement_id"`
 	AgreementType AgreementType `json:"agreement_type"`
 
 	// ConfirmedAt Time in RFC3339 format at which the agreement was confirmed
@@ -1183,10 +1185,10 @@ type Notification struct {
 	Href *string `json:"href,omitempty"`
 
 	// Id UUID of the notification
-	Id    string            `json:"id"`
-	Kind  *NotificationKind `json:"kind,omitempty"`
-	Read  bool              `json:"read"`
-	Title string            `json:"title"`
+	Id    openapi_types.UUID `json:"id"`
+	Kind  *NotificationKind  `json:"kind,omitempty"`
+	Read  bool               `json:"read"`
+	Title string             `json:"title"`
 }
 
 // NotificationKind defines model for NotificationKind.
@@ -1242,10 +1244,8 @@ type ProfileUpdateResponse struct {
 // Project A project with base details (environment-agnostic)
 type Project struct {
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt string `json:"created_at"`
-
-	// CreatorUsername Username of the user who created the project
-	CreatorUsername string          `json:"creator_username"`
+	CreatedAt       string          `json:"created_at"`
+	Creator         UserDataSummary `json:"creator"`
 	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// Id Unique identifier for the project
@@ -1311,10 +1311,8 @@ type ProjectTRE struct {
 	Assets []Asset `json:"assets"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt string `json:"created_at"`
-
-	// CreatorUsername Username of the user who created the project
-	CreatorUsername string          `json:"creator_username"`
+	CreatedAt       string          `json:"created_at"`
+	Creator         UserDataSummary `json:"creator"`
 	EnvironmentName EnvironmentName `json:"environment_name"`
 
 	// ExternalEncryptionEnabled Is external encryption enabled for this project?
@@ -1336,8 +1334,11 @@ type ProjectTRE struct {
 	Name string `json:"name"`
 
 	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
-	NumRequiredEgressApprovals int              `json:"num_required_egress_approvals"`
-	Status                     ProjectTREStatus `json:"status"`
+	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+
+	// RequestedStorageGb Requested project storage in GB
+	RequestedStorageGb *int             `json:"requested_storage_gb,omitempty"`
+	Status             ProjectTREStatus `json:"status"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId    string           `json:"study_id"`
@@ -1369,6 +1370,9 @@ type ProjectTREBase struct {
 
 	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
 	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
+
+	// RequestedStorageGb Requested project storage in GB
+	RequestedStorageGb *int `json:"requested_storage_gb,omitempty"`
 }
 
 // ProjectTREImport defines model for ProjectTREImport.
@@ -1418,6 +1422,9 @@ type ProjectTRERequest struct {
 	// NumRequiredEgressApprovals Number of approvals required to egress data from the TRE
 	NumRequiredEgressApprovals int `json:"num_required_egress_approvals"`
 
+	// RequestedStorageGb Requested project storage in GB
+	RequestedStorageGb *int `json:"requested_storage_gb,omitempty"`
+
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`
 }
@@ -1442,6 +1449,9 @@ type ProjectTREUserDesktopConfig struct {
 type Study struct {
 	// AdditionalStudyAdminUsernames List of additional study administrator usernames (empty array if none)
 	AdditionalStudyAdminUsernames []string `json:"additional_study_admin_usernames"`
+
+	// AdditionalStudyAdmins Summaries of the additional study administrators
+	AdditionalStudyAdmins *[]UserDataSummary `json:"additional_study_admins,omitempty"`
 
 	// ApprovalStatus Current approval status
 	ApprovalStatus StudyApprovalStatus `json:"approval_status"`
@@ -1513,7 +1523,8 @@ type Study struct {
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
 	// NhsEnglandReference NHS England DARS NIC number
-	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
+	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`
+	Owner               *UserDataSummary `json:"owner,omitempty"`
 
 	// OwnerUserId ID of the user who owns the study
 	OwnerUserId *string `json:"owner_user_id,omitempty"`
@@ -1793,31 +1804,31 @@ type ValidationError struct {
 }
 
 // AssetIdParam defines model for AssetIdParam.
-type AssetIdParam = string
+type AssetIdParam = openapi_types.UUID
 
 // ContractIdParam defines model for ContractIdParam.
-type ContractIdParam = string
+type ContractIdParam = openapi_types.UUID
 
 // ContractObjectIdParam defines model for ContractObjectIdParam.
-type ContractObjectIdParam = string
+type ContractObjectIdParam = openapi_types.UUID
 
 // EnvironmentParam defines model for EnvironmentParam.
 type EnvironmentParam string
 
 // NotificationIdParam defines model for NotificationIdParam.
-type NotificationIdParam = string
+type NotificationIdParam = openapi_types.UUID
 
 // ProjectIdParam defines model for ProjectIdParam.
-type ProjectIdParam = string
+type ProjectIdParam = openapi_types.UUID
 
 // StudyIdParam defines model for StudyIdParam.
-type StudyIdParam = string
+type StudyIdParam = openapi_types.UUID
 
 // UserFindParam defines model for UserFindParam.
 type UserFindParam = string
 
 // UserIdParam defines model for UserIdParam.
-type UserIdParam = string
+type UserIdParam = openapi_types.UUID
 
 // GetAssetsParams defines parameters for GetAssets.
 type GetAssetsParams struct {
@@ -2040,6 +2051,9 @@ type ServerInterface interface {
 	// (POST /profile/agreements)
 	PostProfileAgreements(c *gin.Context)
 
+	// (GET /profile/agreements/{agreementId})
+	GetProfileAgreementsAgreementId(c *gin.Context, agreementId string)
+
 	// (GET /profile/training)
 	GetProfileTraining(c *gin.Context)
 
@@ -2110,7 +2124,7 @@ type ServerInterface interface {
 	GetStudiesStudyId(c *gin.Context, studyId StudyIdParam)
 
 	// (PUT /studies/{studyId})
-	PutStudiesStudyId(c *gin.Context, studyId string)
+	PutStudiesStudyId(c *gin.Context, studyId StudyIdParam)
 
 	// (GET /studies/{studyId}/agreements)
 	GetStudiesStudyIdAgreements(c *gin.Context, studyId StudyIdParam)
@@ -2370,7 +2384,7 @@ func (siw *ServerInterfaceWrapper) DeleteNotificationsNotificationId(c *gin.Cont
 	// ------------- Path parameter "notificationId" -------------
 	var notificationId NotificationIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter notificationId: %w", err), http.StatusBadRequest)
 		return
@@ -2395,7 +2409,7 @@ func (siw *ServerInterfaceWrapper) PostNotificationsNotificationIdRead(c *gin.Co
 	// ------------- Path parameter "notificationId" -------------
 	var notificationId NotificationIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "notificationId", c.Param("notificationId"), &notificationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter notificationId: %w", err), http.StatusBadRequest)
 		return
@@ -2461,6 +2475,31 @@ func (siw *ServerInterfaceWrapper) PostProfileAgreements(c *gin.Context) {
 	}
 
 	siw.Handler.PostProfileAgreements(c)
+}
+
+// GetProfileAgreementsAgreementId operation middleware
+func (siw *ServerInterfaceWrapper) GetProfileAgreementsAgreementId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "agreementId" -------------
+	var agreementId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "agreementId", c.Param("agreementId"), &agreementId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter agreementId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProfileAgreementsAgreementId(c, agreementId)
 }
 
 // GetProfileTraining operation middleware
@@ -2549,7 +2588,7 @@ func (siw *ServerInterfaceWrapper) GetProjectsDshProjectId(c *gin.Context) {
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2574,7 +2613,7 @@ func (siw *ServerInterfaceWrapper) PostProjectsDshProjectIdAccessReviewSignoff(c
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2638,7 +2677,7 @@ func (siw *ServerInterfaceWrapper) PostProjectsTreAdminProjectIdApprove(c *gin.C
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2663,7 +2702,7 @@ func (siw *ServerInterfaceWrapper) DeleteProjectsTreProjectId(c *gin.Context) {
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2688,7 +2727,7 @@ func (siw *ServerInterfaceWrapper) GetProjectsTreProjectId(c *gin.Context) {
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2713,7 +2752,7 @@ func (siw *ServerInterfaceWrapper) PutProjectsTreProjectId(c *gin.Context) {
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2738,7 +2777,7 @@ func (siw *ServerInterfaceWrapper) PostProjectsTreProjectIdAccessReviewSignoff(c
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2763,7 +2802,7 @@ func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPending(c *gin.Conte
 	// ------------- Path parameter "projectId" -------------
 	var projectId ProjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
 		return
@@ -2897,7 +2936,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdAssetsImport(c *gin.Co
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -2922,7 +2961,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdContractsImport(c *gin
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -2947,7 +2986,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdOwnerApprove(c *gin.Co
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -2972,7 +3011,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdOwnerRequest(c *gin.Co
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -2997,7 +3036,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesAdminStudyIdReview(c *gin.Context)
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3022,7 +3061,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyId(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3045,9 +3084,9 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyId(c *gin.Context) {
 	_ = err
 
 	// ------------- Path parameter "studyId" -------------
-	var studyId string
+	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3072,7 +3111,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAgreements(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3097,7 +3136,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAgreements(c *gin.Context) 
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3122,7 +3161,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssets(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3147,7 +3186,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdAssets(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3172,7 +3211,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdAssetsAssetId(c *gin.Cont
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3181,7 +3220,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdAssetsAssetId(c *gin.Cont
 	// ------------- Path parameter "assetId" -------------
 	var assetId AssetIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
 		return
@@ -3206,7 +3245,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3215,7 +3254,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetId(c *gin.Context
 	// ------------- Path parameter "assetId" -------------
 	var assetId AssetIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
 		return
@@ -3240,7 +3279,7 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetId(c *gin.Context
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3249,7 +3288,7 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdAssetsAssetId(c *gin.Context
 	// ------------- Path parameter "assetId" -------------
 	var assetId AssetIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
 		return
@@ -3274,7 +3313,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gi
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3283,7 +3322,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gi
 	// ------------- Path parameter "assetId" -------------
 	var assetId AssetIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "assetId", c.Param("assetId"), &assetId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter assetId: %w", err), http.StatusBadRequest)
 		return
@@ -3308,7 +3347,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContracts(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3333,7 +3372,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContracts(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3358,7 +3397,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdContractsContractId(c *gi
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3367,7 +3406,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdContractsContractId(c *gi
 	// ------------- Path parameter "contractId" -------------
 	var contractId ContractIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
 		return
@@ -3392,7 +3431,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractId(c *gin.C
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3401,7 +3440,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractId(c *gin.C
 	// ------------- Path parameter "contractId" -------------
 	var contractId ContractIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
 		return
@@ -3426,7 +3465,7 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.C
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3435,7 +3474,7 @@ func (siw *ServerInterfaceWrapper) PutStudiesStudyIdContractsContractId(c *gin.C
 	// ------------- Path parameter "contractId" -------------
 	var contractId ContractIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
 		return
@@ -3460,7 +3499,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdObjects(
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3469,7 +3508,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdContractsContractIdObjects(
 	// ------------- Path parameter "contractId" -------------
 	var contractId ContractIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
 		return
@@ -3494,7 +3533,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdContractsContractIdObject
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3503,7 +3542,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdContractsContractIdObject
 	// ------------- Path parameter "contractId" -------------
 	var contractId ContractIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
 		return
@@ -3512,7 +3551,7 @@ func (siw *ServerInterfaceWrapper) DeleteStudiesStudyIdContractsContractIdObject
 	// ------------- Path parameter "contractObjectId" -------------
 	var contractObjectId ContractObjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractObjectId", c.Param("contractObjectId"), &contractObjectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractObjectId", c.Param("contractObjectId"), &contractObjectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractObjectId: %w", err), http.StatusBadRequest)
 		return
@@ -3537,7 +3576,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdObjectsCo
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3546,7 +3585,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdObjectsCo
 	// ------------- Path parameter "contractId" -------------
 	var contractId ContractIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractId", c.Param("contractId"), &contractId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractId: %w", err), http.StatusBadRequest)
 		return
@@ -3555,7 +3594,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContractsContractIdObjectsCo
 	// ------------- Path parameter "contractObjectId" -------------
 	var contractObjectId ContractObjectIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "contractObjectId", c.Param("contractObjectId"), &contractObjectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "contractObjectId", c.Param("contractObjectId"), &contractObjectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter contractObjectId: %w", err), http.StatusBadRequest)
 		return
@@ -3580,7 +3619,7 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdFeedback(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3605,7 +3644,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdOwnerRequest(c *gin.Context
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3630,7 +3669,7 @@ func (siw *ServerInterfaceWrapper) PatchStudiesStudyIdPending(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3655,7 +3694,7 @@ func (siw *ServerInterfaceWrapper) PostStudiesStudyIdSignoff(c *gin.Context) {
 	// ------------- Path parameter "studyId" -------------
 	var studyId StudyIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
 		return
@@ -3857,7 +3896,7 @@ func (siw *ServerInterfaceWrapper) GetUsersUserId(c *gin.Context) {
 	// ------------- Path parameter "userId" -------------
 	var userId UserIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
 		return
@@ -3882,7 +3921,7 @@ func (siw *ServerInterfaceWrapper) PutUsersUserIdAttributes(c *gin.Context) {
 	// ------------- Path parameter "userId" -------------
 	var userId UserIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
 		return
@@ -3907,7 +3946,7 @@ func (siw *ServerInterfaceWrapper) PostUsersUserIdTraining(c *gin.Context) {
 	// ------------- Path parameter "userId" -------------
 	var userId UserIdParam
 
-	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
 		return
@@ -3960,6 +3999,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/profile", wrapper.PostProfile)
 	router.GET(options.BaseURL+"/profile/agreements", wrapper.GetProfileAgreements)
 	router.POST(options.BaseURL+"/profile/agreements", wrapper.PostProfileAgreements)
+	router.GET(options.BaseURL+"/profile/agreements/:agreementId", wrapper.GetProfileAgreementsAgreementId)
 	router.GET(options.BaseURL+"/profile/training", wrapper.GetProfileTraining)
 	router.POST(options.BaseURL+"/profile/training", wrapper.PostProfileTraining)
 	router.GET(options.BaseURL+"/tokens/:environment", wrapper.GetTokensEnvironment)

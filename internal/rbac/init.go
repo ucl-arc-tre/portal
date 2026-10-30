@@ -36,6 +36,7 @@ func addBasePolicies(enforcer *casbin.SyncedEnforcer) {
 		{RoleName: Base, Resource: "/profile", Action: WriteAction},
 		{RoleName: Base, Resource: "/agreements/approved-researcher", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile/agreements", Action: ReadAction},
+		{RoleName: Base, Resource: "/profile/agreements/:agreementId", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile/agreements", Action: WriteAction},
 		{RoleName: Base, Resource: "/profile/training", Action: ReadAction},
 		{RoleName: Base, Resource: "/profile/training", Action: WriteAction},

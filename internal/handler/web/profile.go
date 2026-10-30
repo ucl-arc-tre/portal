@@ -94,3 +94,16 @@ func (h *Handler) PostProfileTraining(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, result)
 }
+
+func (h *Handler) GetProfileAgreementsAgreementId(ctx *gin.Context, agreementId string) {
+	agreementUUID, err := parseUUIDOrSetError(ctx, agreementId)
+	if err != nil {
+		return
+	}
+	agreement, err := h.users.ConfirmedAgreement(middleware.GetUser(ctx), agreementUUID)
+	if err != nil {
+		setError(ctx, err, "Failed to get signed agreement")
+		return
+	}
+	ctx.JSON(http.StatusOK, agreement)
+}
