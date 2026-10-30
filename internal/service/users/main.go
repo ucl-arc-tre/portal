@@ -12,21 +12,26 @@ import (
 	"gorm.io/gorm"
 )
 
-const roleCacheTTL = 24 * time.Hour // only deploy time roles, so can have a long TTL
+const (
+	roleCacheTTL       = 24 * time.Hour // only deploy time roles, so can have a long TTL
+	chosenNameCacheTTL = 12 * time.Hour
+)
 
 type Service struct {
-	db            *gorm.DB
-	entra         entra.Interface
-	notifications notifications.Interface
-	roleCache     *expirable.LRU[rbac.ConfigRolename, []types.User]
+	db              *gorm.DB
+	entra           entra.Interface
+	notifications   notifications.Interface
+	roleCache       *expirable.LRU[rbac.ConfigRolename, []types.User]
+	chosenNameCache *expirable.LRU[types.Username, types.ChosenName]
 }
 
 func New() *Service {
 	service := Service{
-		db:            graceful.NewDB(),
-		entra:         entra.New(),
-		notifications: notifications.New(),
-		roleCache:     expirable.NewLRU[rbac.RoleName, []types.User](100, nil, roleCacheTTL),
+		db:              graceful.NewDB(),
+		entra:           entra.New(),
+		notifications:   notifications.New(),
+		roleCache:       expirable.NewLRU[rbac.RoleName, []types.User](100, nil, roleCacheTTL),
+		chosenNameCache: expirable.NewLRU[types.Username, types.ChosenName](1000, nil, chosenNameCacheTTL),
 	}
 	return &service
 }

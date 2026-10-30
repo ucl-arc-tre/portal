@@ -59,8 +59,12 @@ function getProjectTREDescription(
         case "deleted":
           return "This project has been deleted.";
       }
+    case "Data Safe Haven":
+      switch (status) {
+        case "active":
+          return "This project has been approved and deployed.";
+      }
   }
-
   return "Status information not available.";
 }
 
@@ -100,11 +104,16 @@ export default function StatusBadge(props: BadgeProps) {
 
   const description = getDescription(type, status, environment, isIGStaff);
   return (
-    <Badge className={getStatusClassName(status)} cy="status-badge">
+    <Badge
+      className={getStatusClassName(status)}
+      cy="status-badge"
+      suffix={
+        <span className={styles["tooltip-wrapper"]}>
+          <InfoTooltip text={description} />
+        </span>
+      }
+    >
       {type === "study" ? getStudyBadgeText(status) : status}
-      <span className={styles["tooltip-wrapper"]}>
-        <InfoTooltip text={description} />
-      </span>
     </Badge>
   );
 }

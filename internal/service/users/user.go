@@ -70,6 +70,23 @@ func (s *Service) usersData(users []types.User) ([]openapi.UserData, error) {
 	return usersData, nil
 }
 
+func (s *Service) CachedUserChosenName(username types.Username) (*types.ChosenName, error) {
+	if value, exists := s.chosenNameCache.Get(username); exists {
+		return &value, nil
+	}
+	user, err := s.UserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	attributes, err := s.Attributes(*user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get attributes for user: %w", err)
+	}
+	chosenName := attributes.ChosenName
+	s.chosenNameCache.Add(username, chosenName)
+	return &chosenName, nil
+}
+
 // Get or create a user for a unique username. Returns the user, whether
 // they were created or not and an error
 func (s *Service) PersistedUser(username types.Username) (types.User, error) {

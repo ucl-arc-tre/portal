@@ -2,11 +2,12 @@ import MetaHead from "@/components/meta/Head";
 import ApprovedResearcherImport from "@/components/people/ApprovedResearcherImport";
 import ExternalInvite from "@/components/people/ExternalInvite";
 import LoginFallback from "@/components/ui/LoginFallback";
-import Title from "@/components/ui/Title";
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./PeoplePage.module.css";
-import { Alert, AlertMessage } from "@/components/ui/uikitExports";
+import { Alert, AlertMessage, HelperText } from "@/components/ui/uikitExports";
 import PeopleSearch from "@/components/people/Search";
+import Callout from "@/components/ui/Callout";
 
 export default function PeoplePage() {
   const {
@@ -34,29 +35,32 @@ export default function PeoplePage() {
   }
 
   return (
-    <div className="content">
+    <div className={styles.container}>
       <MetaHead
         title="People | ARC Services Portal"
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
 
-      <Title
-        text={"People"}
-        centered
-        description={
-          isAdmin
-            ? "View and manage portal users, including adding via invitation or upload"
-            : isTreOpsStaff || isDSHOpsStaff || isIGStaff
-              ? "View approved researchers"
-              : isIAO
-                ? "View users in your projects or invite a collaborator"
-                : "You do not have permission to view this page"
-        }
-      />
-      {(isAdmin || isIAO || isIGStaff) && (
-        <div className={styles["button-container"]}>
-          {isAdmin && <ApprovedResearcherImport />}
-          <ExternalInvite />
+      <PageHeader title="People">{(isAdmin || isIAO || isIGStaff) && <ExternalInvite />}</PageHeader>
+
+      <HelperText>
+        {isAdmin
+          ? "View and manage portal users, including adding via invitation or upload"
+          : canSearch && "View approved researchers"}
+      </HelperText>
+
+      {!canSearch && (
+        <Callout
+          construction
+          text={
+            "This page is still being built. You'll be able to see people across all the studies and projects you own."
+          }
+        />
+      )}
+
+      {isAdmin && (
+        <div className={styles["import-actions"]}>
+          <ApprovedResearcherImport />
         </div>
       )}
 

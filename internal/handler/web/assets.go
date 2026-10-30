@@ -4,10 +4,78 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
+	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
+
+func assetQueryParams(params openapi.GetAssetsParams) (studies.AssetQueryParams, error) {
+	if params.Limit != nil && *params.Limit > config.MaxPageSize {
+		return studies.AssetQueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
+	}
+	if params.Limit != nil && *params.Limit <= 0 {
+		return studies.AssetQueryParams{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
+	}
+	if params.Offset != nil && *params.Offset < 0 {
+		return studies.AssetQueryParams{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
+	}
+	queryParams := studies.AssetQueryParams{
+		FuzzyTitle: params.Query,
+		Limit:      config.DefaultPageSize,
+		Offset:     0,
+	}
+	if params.Limit != nil {
+		queryParams.Limit = *params.Limit
+	}
+	if params.Offset != nil {
+		queryParams.Offset = *params.Offset
+	}
+	return queryParams, nil
+}
+
+func (h *Handler) GetAssets(ctx *gin.Context, params openapi.GetAssetsParams) {
+	user := middleware.GetUser(ctx)
+
+	canSeeAllAssets, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin, rbac.TreOpsStaff, rbac.DSHOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	queryParams, err := assetQueryParams(params)
+	if err != nil {
+		setError(ctx, err, "Failed to get assets")
+		return
+	}
+
+	var assets []types.Asset
+	if canSeeAllAssets {
+		assets, err = h.studies.AllAssets(queryParams)
+	} else {
+		var studyIds []uuid.UUID
+		studyIds, err = rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+		if err != nil {
+			setError(ctx, err, "Failed to get accessible studies")
+			return
+		}
+		assets, err = h.studies.AssetsByStudyIdsFiltered(queryParams, studyIds...)
+	}
+	if err != nil {
+		setError(ctx, err, "Failed to get assets")
+		return
+	}
+
+	response := []openapi.Asset{}
+	for _, asset := range assets {
+		response = append(response, assetToOpenApiAsset(asset))
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
 
 func (h *Handler) GetStudiesStudyIdAssets(ctx *gin.Context, studyId string) {
 	studyUUID, err := parseUUIDOrSetError(ctx, studyId)

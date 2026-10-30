@@ -739,7 +739,7 @@ Cypress.Commands.add("waitForProfileData", () => {
 
 // Studies fixture commands
 Cypress.Commands.add("mockStudiesEmpty", () => {
-  cy.intercept("GET", "/web/api/v0/studies", {
+  cy.intercept("GET", "/web/api/v0/studies*", {
     fixture: "studies-empty.json",
   }).as("getStudiesEmpty");
 });
@@ -952,13 +952,13 @@ Cypress.Commands.add("mockContractEdit", () => {
 
 // Project fixture commands
 Cypress.Commands.add("mockProjectsEmpty", () => {
-  cy.intercept("GET", "/web/api/v0/projects", {
+  cy.intercept("GET", "/web/api/v0/projects?limit=100&offset=0", {
     fixture: "projects-empty.json",
   }).as("getProjectsEmpty");
 });
 
 Cypress.Commands.add("mockStudiesWithApprovedStudy", () => {
-  cy.intercept("GET", "/web/api/v0/studies", {
+  cy.intercept("GET", "/web/api/v0/studies*", {
     fixture: "studies-with-approved-study.json",
   }).as("getStudiesWithApproved");
 });

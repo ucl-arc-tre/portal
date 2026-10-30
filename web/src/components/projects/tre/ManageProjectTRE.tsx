@@ -1,5 +1,5 @@
 import { useState } from "react";
-import router from "next/router";
+import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import {
   postProjectsTreAdminByProjectIdApprove,
@@ -22,6 +22,7 @@ import Dialog from "@/components/ui/Dialog";
 import { defaultDesktopInstance, hpcDesktopInstances } from "@/components/projects/tre/desktops";
 import AssetCard from "@/components/assets/AssetCard";
 import DetailsField from "@/components/ui/DetailsField";
+import StatusBadge from "@/components/ui/StatusBadge";
 import ProjectMember from "../ProjectMember";
 import TabCollection from "@/components/ui/TabCollection";
 import { projectAccessReviewWarningRequired } from "@/components/shared/exports";
@@ -45,7 +46,9 @@ export default function ManageProjectTRE(props: Props) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const editingEnabled = project.status === "incomplete" || project.status === "deployed";
+  const editingEnabled =
+    project.status === "incomplete" ||
+    (project.status === "deployed" && process.env.NEXT_PUBLIC_ENABLE_DEPLOYED_TRE_PROJECT_EDIT === "true");
   const projectId = project.id;
   const canApprove = (isAdmin || isTreOpsStaff) && project?.creator_username !== userData?.username;
   const canEdit =
@@ -163,6 +166,7 @@ export default function ManageProjectTRE(props: Props) {
     isApprovedOrLater &&
     (project.last_access_review == null || projectAccessReviewWarningRequired(project.last_access_review));
 
+  const router = useRouter();
   const tab = (router.query.tab as "project" | "members" | "assets") ?? "project";
 
   if (authInProgress) return <Loading />;
@@ -239,7 +243,7 @@ export default function ManageProjectTRE(props: Props) {
 
       <div className={styles.header}>
         <h2>{project.name}</h2>
-        {canEdit && project.status !== "incomplete" && (
+        {editingEnabled && canEdit && project.status !== "incomplete" && (
           <div>
             <Button onClick={() => setShowEditForm(true)} size="medium" variant="secondary" disabled={!editingEnabled}>
               Edit Project
@@ -260,19 +264,30 @@ export default function ManageProjectTRE(props: Props) {
           { name: "members", count: project.members?.length ?? 0 },
           { name: "assets", count: project.assets?.length ?? 0 },
         ]}
-        defaultTab="project"
+        defaultTab={tab}
       />
 
       {tab === "project" && (
         <Box>
           <DetailsField label="Environment" value={project.environment_name} />
-          <DetailsField
-            label="Status"
-            value={`${project.status}${project.is_pending_deployment_update ? " pending update" : ""}`}
-          />
+          <DetailsField label="Status">
+            <StatusBadge status={project.status} type="project" environment={project.environment_name} />
+            {project.is_pending_deployment_update ? " pending update" : ""}
+          </DetailsField>
           <DetailsField label="Created by" value={project.creator_username} />
           <DetailsField label="Created" value={new Date(project.created_at).toLocaleDateString()} />
           <DetailsField label="Study" value={project.study_title} />
+          {project.study_owner && (
+            <DetailsField label="Study Owner">
+              {project.study_owner.name
+                ? `${project.study_owner.name} (${project.study_owner.username})`
+                : project.study_owner.username}
+            </DetailsField>
+          )}
+
+          <DetailsField label="Number of members" value={project.members ? project.members.length : 0} />
+          <DetailsField label="Number of Assets" value={project.assets ? project.assets.length : 0} />
+
           <DetailsField
             label="Number of approvals required for egress"
             value={`${project.num_required_egress_approvals}`}
@@ -337,6 +352,7 @@ export default function ManageProjectTRE(props: Props) {
           </div>
         </Box>
       )}
+
       {tab === "assets" && (
         <Box>
           {project.assets && project.assets.length > 0 ? (

@@ -9,7 +9,7 @@
   }
 
   span {
-    color: #333;
+    color: var(--off-black);
   }
 
   small {

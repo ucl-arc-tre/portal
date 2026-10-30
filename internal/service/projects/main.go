@@ -165,14 +165,14 @@ func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) err
 	errorMessage := ""
 	for _, member := range members {
 		if len(member.Roles) == 0 {
-			errorMessage += fmt.Sprintf("• User '%s' must have at least one role assigned\n\n", member.Username)
+			errorMessage += fmt.Sprintf("• User '%s' must have at least one role assigned\n\n", member.User.Username)
 			continue
 		}
 
-		user, err := s.users.UserByUsername(types.Username(member.Username))
+		user, err := s.users.UserByUsername(types.Username(member.User.Username))
 		if err != nil {
 			if errors.Is(err, types.ErrNotFound) {
-				errorMessage += fmt.Sprintf("• User '%s' not found. They must become an approved researcher before being added to a project\n\n", member.Username)
+				errorMessage += fmt.Sprintf("• User '%s' not found. They must become an approved researcher before being added to a project\n\n", member.User.Username)
 				continue
 			}
 			return err
@@ -183,12 +183,12 @@ func (s *Service) validateProjectMembers(members []openapi.ProjectTREMember) err
 			return err
 		}
 		if !isApprovedResearcher {
-			errorMessage += fmt.Sprintf("• User '%s' does not have the approved researcher role\n\n", member.Username)
+			errorMessage += fmt.Sprintf("• User '%s' does not have the approved researcher role\n\n", member.User.Username)
 		}
 
 		for _, role := range member.Roles {
 			if !isValidProjectTRERole(role) {
-				errorMessage += fmt.Sprintf("• User '%s' has invalid role '%s'\n\n", member.Username, role)
+				errorMessage += fmt.Sprintf("• User '%s' has invalid role '%s'\n\n", member.User.Username, role)
 			}
 		}
 	}
@@ -342,12 +342,19 @@ func (s *Service) ProjectsById(projectIds ...uuid.UUID) ([]GenericProject, error
 }
 
 // retrieves all projects (for admins and TRE/DSH ops staff), optionally filtered by search query params
-func (s *Service) AllProjects(query QueryParams, envs ...types.EnvironmentName) ([]GenericProject, error) {
-	var projects []GenericProject
+func (s *Service) Projects(query QueryParams, envs []types.EnvironmentName, ids ...uuid.UUID) ([]GenericProject, error) {
+	projects := []GenericProject{}
+	if len(envs) == 0 && len(ids) == 0 {
+		return projects, nil
+	}
 	db := s.genericProjectsQuery().
 		Where("projects.deleted_at IS NULL")
-	if len(envs) > 0 {
+	if len(envs) > 0 && len(ids) > 0 {
+		db = db.Where("environments.name IN ? OR projects.id IN ?", envs, ids)
+	} else if len(envs) > 0 {
 		db = db.Where("environments.name IN ?", envs)
+	} else if len(ids) > 0 {
+		db = db.Where("projects.id IN ?", ids)
 	}
 	if query.FuzzyName != nil && *query.FuzzyName != "" {
 		nameLike := "%" + *query.FuzzyName + "%"
@@ -419,6 +426,7 @@ func (s *Service) ProjectTreById(projectId uuid.UUID) (*types.ProjectTRE, error)
 		Preload("Project.CreatorUser").
 		Preload("Project.Environment").
 		Preload("Project.Study").
+		Preload("Project.Study.Owner").
 		Preload("Project.ProjectAssets.Asset").
 		Preload("TRERoleBindings.User").
 		Preload("UserConfigs.User").
@@ -521,7 +529,7 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, updater type
 
 	requestedBindings := []types.ProjectTRERoleBinding{}
 	for _, member := range members {
-		userId := userIds[types.Username(member.Username)]
+		userId := userIds[types.Username(member.User.Username)]
 		for _, role := range member.Roles {
 			roleBinding := types.ProjectTRERoleBinding{
 				ProjectTREID: projectTRE.ID,
@@ -529,7 +537,7 @@ func (s *Service) createOrUpdateProjectTRERoleBindings(tx *gorm.DB, updater type
 				Role:         types.ProjectTRERoleName(role),
 				User: types.User{
 					Model:    types.Model{ID: userId},
-					Username: types.Username(member.Username),
+					Username: types.Username(member.User.Username),
 				},
 			}
 			requestedBindings = append(requestedBindings, roleBinding)
@@ -566,11 +574,11 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 			return types.NewErrInvalidObject("uid is not settable")
 		}
 		existingIdx := slices.IndexFunc(existing, func(u types.ProjectTREUserConfig) bool {
-			return u.User.Username == types.Username(member.Username)
+			return u.User.Username == types.Username(member.User.Username)
 		})
 		userConfig := types.ProjectTREUserConfig{
 			ProjectTREID:           projectTRE.ID,
-			UserID:                 userIds[types.Username(member.Username)],
+			UserID:                 userIds[types.Username(member.User.Username)],
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
 			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
 		}
@@ -585,7 +593,7 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 				return err
 			}
 
-			unixUsername, err := makeValidUnixUsername(member.Username)
+			unixUsername, err := makeValidUnixUsername(member.User.Username)
 			if err != nil {
 				return types.NewErrInvalidObject("unable to derive Unix username from email")
 			}
@@ -891,7 +899,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 	users := map[types.Username]types.User{}
 	roleBindings := []types.ProjectTRERoleBinding{}
 	for _, member := range data.Members {
-		user, err := s.users.PersistedUser(types.Username(member.Username))
+		user, err := s.users.PersistedUser(types.Username(member.User.Username))
 		if err != nil {
 			tx.Rollback()
 			return types.NewErrFromGorm(err, "failed to get tre user")
@@ -917,9 +925,9 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 	}
 
 	for _, member := range data.Members {
-		user, exists := users[types.Username(member.Username)]
+		user, exists := users[types.Username(member.User.Username)]
 		if !exists {
-			log.Error().Any("username", member.Username).Msg("User did not have any rold bindings - skipping user config")
+			log.Error().Any("username", member.User.Username).Msg("User did not have any rold bindings - skipping user config")
 			continue
 		}
 		if member.Uid == nil || member.DesktopConfig == nil || member.DesktopConfig.ImageId == nil {
@@ -977,7 +985,7 @@ func (s *Service) ImportProjectTRE(data openapi.ProjectTREImport) error {
 func treProjectMemberUsernames(members []openapi.ProjectTREMember) []types.Username {
 	usernames := []types.Username{}
 	for _, member := range members {
-		usernames = append(usernames, types.Username(member.Username))
+		usernames = append(usernames, types.Username(member.User.Username))
 	}
 	return usernames
 }

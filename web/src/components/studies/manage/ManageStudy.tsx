@@ -4,7 +4,6 @@ import {
   Asset,
   Contract,
   Project,
-  getProjects,
   getStudiesByStudyIdAgreements,
   getStudiesByStudyIdAssets,
   getStudiesByStudyIdContracts,
@@ -13,6 +12,7 @@ import {
   StudyAgreements,
   StudyFeedbackEntry,
 } from "@/openapi";
+import { getAllProjects } from "@/lib/projects";
 import StudyOverview from "./StudyOverview";
 import StudySetupSteps from "./StudySetupSteps";
 import StudyTabs from "./StudyTabs";
@@ -90,7 +90,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           getStudiesByStudyIdAssets({ path: { studyId: study.id } }),
           getStudiesByStudyIdContracts({ path: { studyId: study.id } }),
           getStudiesByStudyIdAgreements({ path: { studyId: study.id } }),
-          getProjects(),
+          getAllProjects(),
           getStudiesByStudyIdFeedback({ path: { studyId: study.id } }),
         ]);
 
@@ -183,7 +183,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
           </Alert>
         )}
 
-      {isIGStaff && !isOwnStudy && !isStudyAdmin && study.approval_status !== "Incomplete" && (
+      {isIGStaff && !isOwnStudy && !isStudyAdmin && (
         <AdminReview
           study={study}
           unagreedAdminUsernames={unagreedAdminUsernames}
@@ -192,7 +192,7 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
         />
       )}
 
-      <StudyTabs assets={assets} contracts={contracts} projects={projects} />
+      <StudyTabs assets={assets} contracts={contracts} tab={tab} projects={projects} />
 
       {tab === "study" && (
         <StudyOverview

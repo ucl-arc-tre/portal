@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type QueryParams struct {
+type StudyQueryParams struct {
 	CaseRef        *int
 	ApprovalStatus *openapi.StudyApprovalStatus
 	FuzzyTitle     *string
@@ -17,6 +17,12 @@ type QueryParams struct {
 	Administrator  *string // username, email, name
 	Limit          int
 	Offset         int
+}
+
+type AssetQueryParams struct {
+	FuzzyTitle *string
+	Limit      int
+	Offset     int
 }
 
 type ContractObject struct {

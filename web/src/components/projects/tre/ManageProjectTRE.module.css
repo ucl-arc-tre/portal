@@ -9,7 +9,7 @@
     padding-top: 0.5rem;
     font-size: 1.75rem;
     font-weight: 700;
-    color: #333;
+    color: var(--off-black);
   }
 }
 
@@ -24,7 +24,7 @@
 }
 
 .not-approved-section h2 {
-  color: #333;
+  color: var(--off-black);
   font-size: 1.25rem;
   margin-bottom: 1.5rem;
 }
@@ -53,6 +53,10 @@
 
 .field-item:last-child {
   margin-bottom: 0;
+}
+
+.desktop-configuration {
+  width: 100%;
 }
 
 .field-list {

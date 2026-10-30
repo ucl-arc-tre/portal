@@ -27,7 +27,7 @@ func New() *Service {
 
 func (s *Service) Find(user types.User) ([]types.Notification, error) {
 	notifications := []types.Notification{}
-	err := s.db.Where("recipient_user_id = ?", user.ID).Find(&notifications).Error
+	err := s.db.Where("recipient_user_id = ?", user.ID).Order("created_at DESC").Find(&notifications).Error
 	return notifications, types.NewErrFromGorm(err, "failed to find user notifications")
 }
 

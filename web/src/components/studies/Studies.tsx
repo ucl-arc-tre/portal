@@ -1,3 +1,4 @@
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
@@ -12,32 +13,34 @@ import HelperBlock from "../ui/HelperBlock";
 const helperText = `Use this page to view, register and manage research Studies that you have access to.\n Select a Study to view its details, manage governance records, Assets, Contracts, Projects and Study team access, or complete outstanding actions.`;
 
 export default function Studies() {
-  const { userData, isIGStaff, isApprovedStaffResearcher, isTreOpsStaff, isDshOpsStaff, isAdmin } = useAuth();
+  const { userData, isApprovedStaffResearcher, canSeeAllStudies } = useAuth();
 
   const [infoCalloutExpanded, setInfoCalloutExpanded] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [refreshToken, refreshStudies] = useReducer((x) => x + 1, 0);
-  const canSeeAllStudies = isIGStaff || isTreOpsStaff || isDshOpsStaff || isAdmin;
 
   if (!userData) return null;
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>
-          {canSeeAllStudies ? "All Studies" : "Your Studies"}{" "}
-          <Button
-            onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-            variant="tertiary"
-            size="small"
-            inline
-            aria-label="Toggle study definition"
-            aria-expanded={infoCalloutExpanded}
-          >
-            <InfoIcon />
-          </Button>
-        </h2>
-
+      <PageHeader
+        title={canSeeAllStudies ? "All Studies" : "Your Studies"}
+        info={{
+          label: "Toggle study definition",
+          expanded: infoCalloutExpanded,
+          onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
+        }}
+      >
+        <Button
+          onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
+          variant="tertiary"
+          size="small"
+          inline
+          aria-label="Toggle study definition"
+          aria-expanded={infoCalloutExpanded}
+        >
+          <InfoIcon />
+        </Button>
         {isApprovedStaffResearcher && isFormOpen && (
           <StudyForm
             username={userData.username}
@@ -56,8 +59,7 @@ export default function Studies() {
             </Button>
           </div>
         )}
-      </div>
-      <div className={styles.line}></div>
+      </PageHeader>
 
       {infoCalloutExpanded && <StudyDefinition />}
       <HelperBlock text={helperText} />

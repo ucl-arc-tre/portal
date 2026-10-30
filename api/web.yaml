@@ -453,7 +453,7 @@ paths:
   # Study Management
   /studies:
     get:
-      description: Get all studies accessible to the current user. Filtering is admin only
+      description: Get all studies accessible to the current user, optionally filtered by the query params below
       parameters:
         - in: query
           name: status
@@ -1038,6 +1038,44 @@ paths:
           description: Forbidden
         "404":
           description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  # Asset Management
+  /assets:
+    get:
+      description: Get all assets accessible to the current user, optionally filtered by the query params below
+      parameters:
+        - in: query
+          name: query
+          required: false
+          description: Fuzzy asset title to search by
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          description: Index of the first item to return
+          schema:
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Asset"
+        "403":
+          description: Forbidden
         "500":
           description: Internal server error
         default:
@@ -1786,6 +1824,16 @@ components:
         is_valid_approved_researcher:
           type: boolean
 
+    UserDataSummary:
+      type: object
+      required:
+        - username
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+
     UserTrainingUpdate:
       type: object
       required:
@@ -2368,11 +2416,11 @@ components:
       type: object
       description: A project member with their assigned roles
       required:
-        - username
+        - user
         - roles
       properties:
-        username:
-          type: string
+        user:
+          $ref: "#/components/schemas/UserDataSummary"
         desktop_config:
           $ref: "#/components/schemas/ProjectTREUserDesktopConfig"
         uid:
@@ -2479,6 +2527,8 @@ components:
           type: string
         study_title:
           type: string
+        study_owner:
+          $ref: "#/components/schemas/UserDataSummary"
         status:
           $ref: "#/components/schemas/ProjectDSHStatus"
         assets:
@@ -2503,11 +2553,11 @@ components:
     ProjectDSHMember:
       type: object
       required:
-        - username
+        - user
         - roles
       properties:
-        username:
-          type: string
+        user:
+          $ref: "#/components/schemas/UserDataSummary"
         roles:
           type: array
           items:
@@ -2601,6 +2651,9 @@ components:
             study_title:
               type: string
               description: Title of the study to which the project belongs
+            study_owner:
+              $ref: "#/components/schemas/UserDataSummary"
+              description: Identity of the study owner
             creator_username:
               type: string
               description: Username of the user who created the project

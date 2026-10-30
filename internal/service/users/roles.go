@@ -45,7 +45,7 @@ func (s *Service) updateApprovedResearcherStatus(user types.User) error {
 	return nil
 }
 
-func (s *Service) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error) {
+func (s *Service) usersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error) {
 	if users, exists := s.roleCache.Get(role); exists {
 		return users, nil
 	}
@@ -74,4 +74,29 @@ func (s *Service) UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, e
 	}
 	s.roleCache.Add(role, users)
 	return users, nil
+}
+
+func (s *Service) IgStaff() ([]types.User, error) {
+	igStaff := []types.User{}
+	if users, err := s.usersWithConfigRole(rbac.IGOpsStaff); err != nil {
+		return users, err
+	} else {
+		igStaff = append(igStaff, users...)
+	}
+	if users, err := s.usersWithConfigRole(rbac.IGAdmin); err != nil {
+		return users, err
+	} else {
+		igStaff = append(igStaff, users...)
+	}
+
+	seen := make(map[types.Username]struct{}, len(igStaff))
+	unique := igStaff[:0]
+	for _, user := range igStaff {
+		if _, exists := seen[user.Username]; exists {
+			continue
+		}
+		seen[user.Username] = struct{}{}
+		unique = append(unique, user)
+	}
+	return unique, nil
 }

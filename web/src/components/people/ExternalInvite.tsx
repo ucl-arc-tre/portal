@@ -84,7 +84,7 @@ export default function ExternalInvite() {
 
       <HelperBlock text={helperText} />
 
-      <Button onClick={openDialog} variant="secondary" cy="show-invite-input" type="button" size="small">
+      <Button onClick={openDialog} variant="primary" cy="show-invite-input" type="button">
         Invite external researcher
       </Button>
     </>

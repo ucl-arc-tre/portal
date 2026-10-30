@@ -120,7 +120,7 @@ export default function ProjectForm({
 
       const projectMembers =
         editingProject.members?.map((member) => ({
-          username: member.username,
+          username: member.user.username,
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
       setValue("members", projectMembers);
@@ -148,7 +148,7 @@ export default function ProjectForm({
         setValue("tre.requiresHPCDesktops", hasHPCDesktops ? "true" : "false");
 
         const userConfig = editingTREProject.members.map((member) => ({
-          username: member.username,
+          username: member.user.username,
           hpcInstance: member.desktop_config?.hpc_instance_type,
         }));
         setValue("tre.userConfig", userConfig);
@@ -243,7 +243,7 @@ export default function ProjectForm({
           const treMembers: Array<ProjectTreMember> = data.members
             .filter((researcher) => researcher.username.trim() !== "")
             .map((researcher) => ({
-              username: researcher.username,
+              user: { username: researcher.username },
               roles: researcher.roles,
               desktop_config: usersConfig?.find((config) => config.username == researcher.username)?.desktop_config,
             }));

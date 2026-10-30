@@ -1,10 +1,9 @@
-.button-container {
-  justify-self: center;
-  align-items: center;
-  justify-content: center;
-  height: 4rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-block: 0.8rem;
+.container {
+  width: 55vw;
+  margin-top: 1rem;
+  margin-inline: 8vw;
+}
+
+.import-actions {
+  margin-block: 1rem;
 }

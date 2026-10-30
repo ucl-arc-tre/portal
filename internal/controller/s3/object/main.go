@@ -34,18 +34,21 @@ type Controller struct {
 }
 
 func New() *Controller {
-	credentials := config.S3ObjectCredentials()
-	config, err := awsConfig.LoadDefaultConfig(
-		context.Background(),
-		awsConfig.WithCredentialsProvider(awsCredentials.StaticCredentialsProvider{
-			Value: aws.Credentials{
-				AccessKeyID:     credentials.AccessKeyId,
-				SecretAccessKey: credentials.SecretAccessKey,
-			},
-		}),
-
+	optFuncs := []func(*awsConfig.LoadOptions) error{
 		awsConfig.WithRegion(config.S3ObjectRegion()),
-	)
+	}
+	if bundle := config.S3ObjectCredentials(); bundle.IsStatic() {
+		credProvider := awsConfig.WithCredentialsProvider(
+			awsCredentials.StaticCredentialsProvider{
+				Value: aws.Credentials{
+					AccessKeyID:     bundle.AccessKeyId,
+					SecretAccessKey: bundle.SecretAccessKey,
+				},
+			},
+		)
+		optFuncs = append(optFuncs, credProvider)
+	}
+	config, err := awsConfig.LoadDefaultConfig(context.Background(), optFuncs...)
 	if err != nil {
 		log.Err(err).Msg("Failed to load AWS config. Returning a nil controller")
 		return nil

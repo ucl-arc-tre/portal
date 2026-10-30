@@ -143,10 +143,10 @@ export default function AllStudies(props: Props) {
       )}
 
       {tab === "pending" ? (
-        <p>Studies submitted for review. Approve or request changes for each study.</p>
+        <HelperText>Studies submitted for review. Approve or request changes for each study.</HelperText>
       ) : (
         <>
-          <p>All studies in the Portal, grouped by status.</p>
+          <HelperText>All studies in the Portal, grouped by status.</HelperText>
           <div>
             <Search
               placeholder="Search Studies"

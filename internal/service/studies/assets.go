@@ -13,6 +13,7 @@ import (
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
+	"gorm.io/gorm"
 )
 
 func (s *Service) validateAssetData(data openapi.AssetBase) error {
@@ -297,6 +298,31 @@ func (s *Service) DeleteAsset(studyID uuid.UUID, assetID uuid.UUID) error {
 func (s *Service) Assets(studyID uuid.UUID) ([]types.Asset, error) {
 	assets := []types.Asset{}
 	err := s.db.Preload("Locations").Preload("DataTypes").Preload("Contracts.Assets").Where("study_id = ?", studyID).Find(&assets).Error
+	return assets, types.NewErrFromGorm(err, "failed to get assets")
+}
+
+func applyAssetQueryFilters(db *gorm.DB, query AssetQueryParams) *gorm.DB {
+	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
+		db = db.Where("title % ? OR title ILIKE ?", *query.FuzzyTitle, "%"+*query.FuzzyTitle+"%")
+	}
+	return db
+}
+
+// retrieves all assets across all studies (for admin/IG-ops-type users) filtered by query
+func (s *Service) AllAssets(query AssetQueryParams) ([]types.Asset, error) {
+	db := applyAssetQueryFilters(s.db.Model(&types.Asset{}), query)
+	assets := []types.Asset{}
+	err := db.Preload("Locations").Preload("DataTypes").Preload("Contracts.Assets").
+		Order("created_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&assets).Error
+	return assets, types.NewErrFromGorm(err, "failed to get assets")
+}
+
+// retrieves assets belonging to a study id (filtered by query)
+func (s *Service) AssetsByStudyIdsFiltered(query AssetQueryParams, studyIDs ...uuid.UUID) ([]types.Asset, error) {
+	db := applyAssetQueryFilters(s.db.Model(&types.Asset{}).Where("study_id IN (?)", studyIDs), query)
+	assets := []types.Asset{}
+	err := db.Preload("Locations").Preload("DataTypes").Preload("Contracts.Assets").
+		Order("created_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&assets).Error
 	return assets, types.NewErrFromGorm(err, "failed to get assets")
 }
 

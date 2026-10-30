@@ -4,7 +4,6 @@ import MetaHead from "@/components/meta/Head";
 import Projects from "@/components/projects/Projects";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Button from "@/components/ui/Button";
-import Callout from "@/components/ui/Callout";
 
 import styles from "./ProjectsPage.module.css";
 
@@ -39,13 +38,6 @@ export default function ProjectsPage() {
       <MetaHead
         title="Projects | ARC Services Portal"
         description="View and modify projects in the ARC Services Portal"
-      />
-
-      <Callout
-        construction
-        text={
-          "Only ARC TRE and Data Safe Haven projects are currently viewable here. We're working to onboard other environments and enable creation."
-        }
       />
 
       <Projects />

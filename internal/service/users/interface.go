@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/controller/entra"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
@@ -38,5 +37,5 @@ type Interface interface {
 	UserIds(usernames ...types.Username) (map[types.Username]uuid.UUID, error)
 	Find(ctx context.Context, query string) ([]openapi.UserData, error)
 	AllApprovedResearchers() ([]ApprovedResearcherExportRecord, error)
-	UsersWithConfigRole(role rbac.ConfigRolename) ([]types.User, error)
+	IgStaff() ([]types.User, error)
 }

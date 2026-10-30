@@ -6,7 +6,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
-	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/users/strutil"
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
@@ -71,7 +70,7 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 }
 
 func (s *Service) notifyUserNameChange(attrs types.UserAttributes) error {
-	recipients, err := s.UsersWithConfigRole(rbac.IGOpsStaff)
+	recipients, err := s.IgStaff()
 	if err != nil {
 		return err
 	}

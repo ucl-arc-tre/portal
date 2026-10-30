@@ -92,7 +92,7 @@ func AddStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	return AddRole(user, roleName)
 }
 
-// Study IDs where a user has a role
+// Get Study IDs from RBAC where a user has a role
 func StudyIDsWithRole(user types.User, studyRoleName StudyRoleName) ([]uuid.UUID, error) {
 	roles, err := Roles(user)
 	if err != nil {
