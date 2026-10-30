@@ -4,7 +4,6 @@ import AllStudies from "./AllStudies";
 import ResearcherStudies from "./ResearcherStudies";
 import styles from "./Studies.module.css";
 import Button from "../ui/Button";
-import { InfoIcon } from "../ui/uikitExports";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
@@ -31,16 +30,6 @@ export default function Studies() {
           onToggle: () => setInfoCalloutExpanded(!infoCalloutExpanded),
         }}
       >
-        <Button
-          onClick={() => setInfoCalloutExpanded(!infoCalloutExpanded)}
-          variant="tertiary"
-          size="small"
-          inline
-          aria-label="Toggle study definition"
-          aria-expanded={infoCalloutExpanded}
-        >
-          <InfoIcon />
-        </Button>
         {isApprovedStaffResearcher && isFormOpen && (
           <StudyForm
             username={userData.username}
