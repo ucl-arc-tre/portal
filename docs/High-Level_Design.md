@@ -201,7 +201,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
   - Can't: as IG Ops
 - **TRE Ops**
   - Who gets it: UCL TRE service member
-  - Can: view all users, studies, projects. Approve TRE projects (not their own), issue/revoke access keys the TRE uses to connect to the Portal
+  - Can: view all users, studies, TRE projects. Approve TRE projects (not their own), issue/revoke access keys the TRE uses to connect to the Portal
   - Can't: review/approve studies or edit studies/projects they don't own
 - **DSH Ops**
   - Who gets it: UCL DSH service member
