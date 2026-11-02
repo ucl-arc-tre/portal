@@ -73,6 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Auth state is updated from the request result or its error/finally handlers.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshAuth();
 
     return () => {

@@ -105,6 +105,8 @@ export default function ManageContractPage() {
 
   useEffect(() => {
     if (studyId && contractId && typeof studyId === "string" && typeof contractId === "string") {
+      // Route changes start a new request and must reset the loading state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchData(studyId, contractId);
     }
   }, [studyId, contractId]);

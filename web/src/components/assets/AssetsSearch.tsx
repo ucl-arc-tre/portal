@@ -56,6 +56,8 @@ export default function AssetsSearch() {
   };
 
   useEffect(() => {
+    // Reuse the search loader on mount; its synchronous resets match the initial state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadFirstPage("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

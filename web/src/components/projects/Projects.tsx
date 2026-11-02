@@ -77,6 +77,8 @@ export default function Projects() {
   };
 
   useEffect(() => {
+    // Reuse the retry loader on mount; loading and error already have their initial values.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, []);
 

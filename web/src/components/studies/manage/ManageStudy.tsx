@@ -139,6 +139,8 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
 
   useEffect(() => {
     if (study.id) {
+      // A different study starts a new request, clearing errors and showing loading immediately.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchStudyContents();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
