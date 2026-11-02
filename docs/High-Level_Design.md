@@ -158,10 +158,10 @@ See also [Metadata Store conceptual model](https://github.com/UCL-ARC/metadata-s
 The portal superimposes additional roles to the roles defined in the [Research Data ISMS](https://isms.arc.ucl.ac.uk/rism02-roles_and_responsibilities/). The following roles may be assigned to qualifying authenticated users of the portal.
 
 **How it works**
-- People get roles; roles carry permissions
-- Backend enforces (default deny); frontend just shows/hides pages to match (to avoid showing users things they aren't allowed to use)
+- People get roles, roles carry permissions
+- Backend enforces (default deny). Frontend shows/hides pages to match (to avoid showing users things they aren't allowed to use)
 - Roles stack, there is no inheritance
-- Creating studies/projects needs **Approved Staff Researcher**. An Ops/IG role alone doesn't grant it; staff who also hold it can create/edit their own studies and projects
+- Creating studies/projects needs **Approved Staff Researcher**. An Ops/IG role alone doesn't grant it, staff can create/edit their own studies and projects if they are Approved Staff Researcher.
 
 **User roles**
 - **Base**
@@ -249,7 +249,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
 
 **Setup**
 - PostgreSQL run by CloudNativePG
-- 3 synced copies, for availability; not a backup
+- 3 synced copies for availability
 
 **Frequency**
 - Full backup daily, 04:51
@@ -258,7 +258,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
 **Storage**
 - AWS S3 bucket, same region as the Portal, "postgres" folder
 - Access via dedicated cloud role or backup-only access keys
-- DB network locked down: outbound only to backup storage + essential internal services; inbound only from the Portal app
+- DB network locked down: outbound only to backup storage + essential internal services, inbound only from the Portal app
 - Encrypted 
 
 **Retention**
