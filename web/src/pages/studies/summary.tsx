@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { Study, getStudiesByStudyId } from "@/openapi";
@@ -18,8 +18,8 @@ export default function SummaryStudyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStudy = async (id: string) => {
-    if (!study) setIsLoading(true);
+  const fetchStudy = useCallback(async (id: string, showLoading: boolean) => {
+    if (showLoading) setIsLoading(true);
     setError(null);
 
     try {
@@ -35,13 +35,15 @@ export default function SummaryStudyPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (studyId) {
-      fetchStudy(studyId as string);
+      // Route changes start a request; show loading while it completes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchStudy(studyId as string, true);
     }
-  }, [studyId]);
+  }, [studyId, fetchStudy]);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -65,7 +67,7 @@ export default function SummaryStudyPage() {
       <div className="content">
         {error && <Error message={error} />}
         {isLoading && <Loading message="Loading study..." />}
-        {study && <StudyOverview study={study} fetchStudy={fetchStudy} />}
+        {study && <StudyOverview study={study} fetchStudy={(id) => fetchStudy(id, !study)} />}
       </div>
     </>
   );

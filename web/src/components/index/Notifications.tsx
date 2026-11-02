@@ -49,6 +49,8 @@ export default function Notifications() {
 
   useEffect(() => {
     if (isAuthed) {
+      // Authentication changes start a new request and must show its loading state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchNotifications();
     }
   }, [isAuthed]);

@@ -139,6 +139,8 @@ export default function ManageAssetPage() {
 
   useEffect(() => {
     if (studyId && assetId && typeof studyId === "string" && typeof assetId === "string") {
+      // Route changes start a new request and must reset the loading state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchData(studyId, assetId);
     }
   }, [studyId, assetId]);

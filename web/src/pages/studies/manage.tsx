@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { Study, getStudiesByStudyId } from "@/openapi";
@@ -26,8 +26,8 @@ export default function ManageStudyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStudy = async (id: string) => {
-    if (!study) setIsLoading(true);
+  const fetchStudy = useCallback(async (id: string, showLoading: boolean) => {
+    if (showLoading) setIsLoading(true);
     setError(null);
 
     try {
@@ -43,12 +43,14 @@ export default function ManageStudyPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (studyId == undefined || !isApprovedResearcher) return;
-    fetchStudy(studyId as string);
-  }, [studyId, isApprovedResearcher]);
+    // Route/auth changes start a request; show loading while it completes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchStudy(studyId as string, true);
+  }, [studyId, isApprovedResearcher, fetchStudy]);
 
   if (authInProgress) return null;
   if (!isAuthed) return <LoginFallback />;
@@ -106,7 +108,7 @@ export default function ManageStudyPage() {
             <Button onClick={() => router.push("/studies")} variant="secondary">
               Back to Studies
             </Button>
-            <Button onClick={() => fetchStudy(studyId as string)}>Try Again</Button>
+            <Button onClick={() => fetchStudy(studyId as string, !study)}>Try Again</Button>
           </div>
         </div>
       </>
@@ -148,7 +150,7 @@ export default function ManageStudyPage() {
       />
 
       <div className="content">
-        <ManageStudy study={study} fetchStudy={fetchStudy} />
+        <ManageStudy study={study} fetchStudy={(id) => fetchStudy(id, !study)} />
       </div>
     </>
   );

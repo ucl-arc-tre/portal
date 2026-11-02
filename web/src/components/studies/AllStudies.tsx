@@ -121,10 +121,9 @@ export default function AllStudies(props: Props) {
   };
 
   useEffect(() => {
-    searchQueryRef.current = "";
-    setIsLoading(true);
-    reset();
-    fetchStudies().finally(() => setIsLoading(false));
+    // Tab changes and refreshes reset the search and pagination before fetching studies.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    handleClearSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, refreshToken]);
 
