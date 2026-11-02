@@ -173,16 +173,16 @@ The portal superimposes additional roles to the roles defined in the [Research D
   - Can: no access alone comes from this, but it unlocks Approved Staff Researcher
 - **Approved Researcher**
   - Who gets it: when you have signed the agreement & have valid training
-  - Can: view studies, projects, assets, contracts you're part of; be added as a member of a TRE project
-  - Can't: search all studies/projects; create or review them
+  - Can: view studies, projects, assets, contracts you're part of, can be added as a member of a TRE project
+  - Can't: search all studies/projects or create or review them
 - **Approved Staff Researcher**
   - Who gets it: staff who have become Approved Researchers
   - Can: create studies and TRE projects (under an approved study they own), edit and submit their own for review, and look up users
-  - Can't: search all studies/projects; review/approve
+  - Can't: search all studies/projects or review/approve
 - **Information Asset Owner**
   - Who gets it: when you've signed the Study agreement for a study you own
   - Can: invite users (incl. external collaborators), manage your own studies (people, assets, contracts)
-  - Can't: search all studies/projects; review/approve
+  - Can't: search all studies/projects, review/approve
 - **Information Asset Administrator**
   - Who gets it: when you're added to a study as an Admin by its owner
   - Can: manage that study
@@ -195,7 +195,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
 - **IG Ops**
   - Who gets it: ARC Info Gov Advisory Team member
   - Can: view all users, studies, projects (TRE + DSH). Manage training records & invites, study admin tasks (incl. review/approve studies), and the metrics page
-  - Can't: review/approve projects; review/approve a study they own or administer
+  - Can't: review/approve projects or review/approve a study they own or administer
 - **IG Admin**
   - Who gets it: senior ARC Info Gov Advisory Team member
   - Can: IG Ops & edit any study
@@ -203,14 +203,14 @@ The portal superimposes additional roles to the roles defined in the [Research D
 - **TRE Ops**
   - Who gets it: UCL TRE service member
   - Can: view all users, studies, projects. Approve TRE projects (not their own), issue/revoke access keys the TRE uses to connect to the Portal
-  - Can't: review/approve studies; edit studies/projects they don't own
+  - Can't: review/approve studies or edit studies/projects they don't own
 - **DSH Ops**
   - Who gets it: UCL DSH service member
   - Can: view all users, studies, DSH projects, issue/revoke access keys the DSH uses to connect to the Portal
-  - Can't: review/approve studies; create, edit or review DSH projects (view only)
+  - Can't: review/approve studies or create, edit or review DSH projects (view only, updates only via API)
 - **Administrator**
   - Who gets it: ARC Services Portal Admin
-  - Can: everything, incl. creating studies/projects without Approved Staff Researcher (backend allows it; the frontend button still checks for it)
+  - Can: everything, incl. creating studies/projects
   - Can't: review/approve studies through the UI (backend allows it, but no frontend action exists yet)
 
 ## Audit logging
