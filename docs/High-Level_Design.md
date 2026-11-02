@@ -152,23 +152,123 @@ The **Project** entity type is expected to be subtyped for specific Environments
 
 See also [Metadata Store conceptual model](https://github.com/UCL-ARC/metadata-store/blob/main/doc/specification.md#7-entity-relationship-er-logical-models)
 
-## Roles
+## Roles & permissions
 
-The portal superimposes additional roles to the roles defined in the [Research Data ISMS](https://isms.arc.ucl.ac.uk/rism02-roles_and_responsibilities/). The following roles and their corresponding permissions may be assigned to qualifying authenticated users of the portal:
 
-| Role                      | Description                                                                                   | Permissions                                                                            | Can                                                                                                                                                             | Can not                                                                                               | Prerequisites                                                      |
-| ------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Base                      | Standard user with limited access                                                             | - Access to basic services                                                             | -                                                                                                                                                               | - Search, create, edit or review Studies<br>- Search, create, edit or review Projects                 | Exists in UCL Entra tenant                                         |
-| Approved Researcher       | Accesses Projects in TREs (i.e. projects with sensitive data)                                 | - Access to specific Projects<br>                                                      | - Be added as a member of a Project                                                                                                                             | - Search, create, edit or review Studies<br>- Search, create, edit or review Projects                 | Is an Approved Researcher                                          |
-| Approved Staff Researcher | Approved Researcher who is eligible to create Studies                                         | - Access to specific Projects<br>- Access to Study creation                            | - Create Studies<br>- Create Projects (under an approved Study they own)<br>- Edit their own Studies/Projects<br>- Submit their own Studies/Projects for review | - Search all Studies/Projects (own only, no search UI)<br>- Review/approve Studies or Projects        | Is an Approved Researcher and UCL Staff                            |
-| Information Asset Owner   | Creates and manages Studies and Projects                                                      | - Access to specific Projects<br>- Access to Study creation <br>- Can invite externals | - Everything an Approved Staff Researcher can<br>- Invite external collaborators                                                                                | - Search all Studies/Projects (own only, no search UI)<br>- Review/approve Studies or Projects        | Is an Approved Staff Researcher and has signed one Study Agreement |
-| IG Ops staff              | Manage Information Governance via Study reviews and approvals, training certification reviews | - Write training data<br>- Write Study status                                          | - Search all Studies<br>- Search all Projects (TRE + DSH)<br>- Review/approve Studies they don't own<br>- Create/edit their own Studies/Projects¹               | - Review/approve Projects<br>- Review/approve a Study they own themselves                             | Is an ARC Info Gov Advisory Team member                            |
-| IG admin                  | IG Ops staff and Study edit                                                                   | - Write Study data<br>- Write Study status                                             | - Everything IG Ops staff can<br>- Edit any Study, not just their own                                                                                           | - Review/approve Projects<br>- Review/approve a Study they own themselves                             | Is a senior ARC Info Gov Advisory Team member                      |
-| TRE Ops staff             | TRE service member, view TRE Project, and role data                                           | - Read Project and Role data<br>- Write Project status                                 | - Search all Studies<br>- Search TRE Projects<br>- Review/approve TRE Projects<br>- Create/edit their own Studies/Projects¹                                     | - Review/approve Studies<br>- Edit Studies/Projects they don't own                                    | Is a UCL TRE service member                                        |
-| DSH Ops staff             | DSH service member, view DSH Project, and role data                                           | - Read DSH Project and Role data<br>- Write DSH Project status                         | - Search all Studies<br>- Search DSH Projects<br>- Create/edit their own Studies¹                                                                               | - Review/approve Studies<br>- Create, edit or review DSH Projects (not yet built in the portal)       | Is a UCL DSH service member                                        |
-| Global Admin              | Full control over portal                                                                      | - Assign roles<br>- Read/write everything                                              | - Search and edit any Study or Project<br>- Review/approve Projects<br>- Create Studies/Projects¹                                                               | - Review/approve Studies through the UI (backend RBAC allows it, but no frontend control exists yet)³ | Is an ARC Services Portal Admin                                    |
+The portal superimposes additional roles to the roles defined in the [Research Data ISMS](https://isms.arc.ucl.ac.uk/rism02-roles_and_responsibilities/). The following roles may be assigned to qualifying authenticated users of the portal.
 
-¹ Study/Project creation also requires the user to have **Approved Staff Researcher** status. So an Ops/IG/Admin role by itself does not grant them permissions without the additional **Approved Staff Researcher** status.
+**How it works**
+- People get roles; roles carry permissions
+- Backend enforces (default deny); frontend just shows/hides pages to match (to avoid showing users things they aren't allowed to use)
+- Roles stack, there is no inheritance
+- Creating studies/projects needs **Approved Staff Researcher**. An Ops/IG role alone doesn't grant it; staff who also hold it can create/edit their own studies and projects
+
+**User roles**
+- **Base**
+  - Who gets it: everyone in the UCL Entra tenant (incl. invited externals)
+  - Can: view their own profile, training, agreements, notifications
+  - Can't: search, create, edit or review studies or projects
+- **Staff**
+  - Who gets it: confirmed staff (not external users or students)
+  - Can: no access alone comes from this, but it unlocks Approved Staff Researcher
+- **Approved Researcher**
+  - Who gets it: when you have signed the agreement & have valid training
+  - Can: view studies, projects, assets, contracts you're part of; be added as a member of a TRE project
+  - Can't: search all studies/projects; create or review them
+- **Approved Staff Researcher**
+  - Who gets it: staff who have become Approved Researchers
+  - Can: create studies and TRE projects (under an approved study they own), edit and submit their own for review, and look up users
+  - Can't: search all studies/projects; review/approve
+- **Information Asset Owner**
+  - Who gets it: when you've signed the Study agreement for a study you own
+  - Can: invite users (incl. external collaborators), manage your own studies (people, assets, contracts)
+  - Can't: search all studies/projects; review/approve
+- **Information Asset Administrator**
+  - Who gets it: when you're added to a study as an Admin by its owner
+  - Can: manage that study
+
+**Per-study / per-project**
+- **Study owner & study admins**: full control of that study and its projects
+- **Project owner**: full control of that project
+
+**Staff roles** (set in system config)
+- **IG Ops**
+  - Who gets it: ARC Info Gov Advisory Team member
+  - Can: view all users, studies, projects (TRE + DSH). Manage training records & invites, study admin tasks (incl. review/approve studies), and the metrics page
+  - Can't: review/approve projects; review/approve a study they own or administer
+- **IG Admin**
+  - Who gets it: senior ARC Info Gov Advisory Team member
+  - Can: IG Ops & edit any study
+  - Can't: as IG Ops
+- **TRE Ops**
+  - Who gets it: UCL TRE service member
+  - Can: view all users, studies, projects. Approve TRE projects (not their own), issue/revoke access keys the TRE uses to connect to the Portal
+  - Can't: review/approve studies; edit studies/projects they don't own
+- **DSH Ops**
+  - Who gets it: UCL DSH service member
+  - Can: view all users, studies, DSH projects, issue/revoke access keys the DSH uses to connect to the Portal
+  - Can't: review/approve studies; create, edit or review DSH projects (view only)
+- **Administrator**
+  - Who gets it: ARC Services Portal Admin
+  - Can: everything, incl. creating studies/projects without Approved Staff Researcher (backend allows it; the frontend button still checks for it)
+  - Can't: review/approve studies through the UI (backend allows it, but no frontend action exists yet)
+
+## Audit logging
+
+*Sources: portal/internal/service/audit, portal/internal/types (audit record definition)*
+
+**Logged actions**
+- Study: created, review status changed (+ reviewer feedback), signed off
+- Study admins: assigned, removed
+- Study owner change: requested, approved
+- Project: created, approved, members' roles set, deleted
+- Project access review signed off
+- User training record updated
+
+**Each entry records**
+- Who (user, linked to username)
+- Change type: create / update / delete
+- What: item type (study / project / training record), ID, name if available
+- Short description, e.g. titles, usernames, new status
+- When (timestamp)
+- "Uploaded" yes/no flag
+
+**Mechanics**
+- Written to Portal database in the same operation as the change
+- Errors if the record can't be saved
+
+**Not logged here**
+- Logins/logouts
+- Viewing data
+- Refused access attempts
+- Role changes
+
+## Database backups
+
+*Source: TREu/deploy/modules/system/portal (postgres.tf)*
+
+**Setup**
+- PostgreSQL run by CloudNativePG
+- 3 synced copies, for availability; not a backup
+
+**Frequency**
+- Full backup daily, 04:51
+- Continuous change-log archiving, so point-in-time restore is possible
+
+**Storage**
+- AWS S3 bucket, same region as the Portal, "postgres" folder
+- Access via dedicated cloud role or backup-only access keys
+- DB network locked down: outbound only to backup storage + essential internal services; inbound only from the Portal app
+- Encrypted 
+
+**Retention**
+- 
+
+**Restore**
+- Manual, done by an engineer
+- Switch config to "recovery" mode → redeploy → new DB built from S3 backups
+- Restores to latest state, or a chosen point in time
+- Restored DB must back up to a different folder so the source backups aren't overwritten
 
 ## Application, database and integration design
 
