@@ -60,12 +60,6 @@ export default function ResearcherStudies(props: Props) {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    setQuery("");
-    loadFirstPage("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshToken]);
-
   const handleSearch = (searchQuery: string) => {
     setQuery(searchQuery);
     loadFirstPage(searchQuery);
@@ -75,6 +69,13 @@ export default function ResearcherStudies(props: Props) {
     setQuery("");
     loadFirstPage("");
   };
+
+  useEffect(() => {
+    // A refresh resets the search and pagination before fetching updated studies.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    handleClearSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshToken]);
 
   if (!userData) return null;
 

@@ -78,6 +78,8 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
   });
 
   useEffect(() => {
+    // Synchronize the editable contract and React Hook Form when the selected contract changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentContract(editingContract ?? null);
 
     // populate form with existing data when editing
@@ -301,7 +303,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
           : "Add contract details and files below."}
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="form">
+      <form onSubmit={(event) => handleSubmit(onSubmit)(event)} className="form">
         <div className={styles["form-section"]}>
           <div className={"field"}>
             <Label htmlFor="title">Title *</Label>

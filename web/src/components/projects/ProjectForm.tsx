@@ -65,7 +65,6 @@ export default function ProjectForm({
   });
   const {
     handleSubmit,
-    watch,
     setValue,
     trigger,
     control,
@@ -116,7 +115,6 @@ export default function ProjectForm({
 
       const projectAssetIds = editingProject.assets?.map((asset) => ({ value: asset.id })) || [];
       setValue("assetIds", projectAssetIds);
-      setAssets(editingProject.assets || []);
 
       const projectMembers =
         editingProject.members?.map((member) => ({
@@ -233,7 +231,7 @@ export default function ProjectForm({
             return;
           }
 
-          const hasHPCDesktops = watch("tre.requiresHPCDesktops");
+          const hasHPCDesktops = data.tre.requiresHPCDesktops;
           const usersConfig = data.tre?.userConfig?.map((config) => ({
             username: config.username,
             desktop_config: {

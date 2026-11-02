@@ -73,12 +73,9 @@ export default function AllProjects(props: Props) {
   };
 
   useEffect(() => {
-    searchQueryRef.current = "";
-    setIsLoading(true);
-    reset();
-    fetchPage(0).then((items) => {
-      if (items !== undefined) setProjects(items);
-    });
+    // A refresh resets the search and pagination before fetching updated projects.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    runSearch("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken]);
 

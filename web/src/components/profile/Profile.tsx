@@ -86,6 +86,8 @@ export default function Profile({ userData, refreshAuth }: Props) {
   };
 
   useEffect(() => {
+    // Reuse the refresh loader on mount; loading and error already have their initial values.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProfileData();
   }, []);
 

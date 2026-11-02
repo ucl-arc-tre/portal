@@ -76,6 +76,8 @@ export default function ManageProjectPage() {
 
   useEffect(() => {
     if (projectId && typeof projectId === "string" && environment && typeof environment === "string") {
+      // Route changes start a new request and must reset the loading state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchData(projectId, environment);
     }
   }, [projectId, environment]);

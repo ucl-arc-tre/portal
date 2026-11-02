@@ -58,7 +58,7 @@ export default function AssetCard(props: AssetCardProps) {
       }
     };
     isAssetCompleted();
-  }, [asset.id, asset.requires_contract, asset.contract_ids, studyId]);
+  }, [asset, studyId]);
 
   const riskScore = calculateAssetRiskScore(asset);
 
