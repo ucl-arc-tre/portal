@@ -210,7 +210,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
 - **Administrator**
   - Who gets it: ARC Services Portal Admin
   - Can: everything, incl. creating studies/projects
-  - Can't: review/approve studies through the UI (backend allows it, but no frontend action exists yet)
+  - Can't: review/approve studies through the UI (backend allows it, but no frontend action exists)
 
 ## Audit logging
 
