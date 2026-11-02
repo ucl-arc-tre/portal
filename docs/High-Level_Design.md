@@ -217,7 +217,7 @@ The portal superimposes additional roles to the roles defined in the [Research D
 *Sources: portal/internal/service/audit, portal/internal/types (audit record definition)*
 
 **Logged actions**
-- Study: created, review status changed (+ reviewer feedback), signed off
+- Study: created, review status changed (incl. reviewer feedback), signed off
 - Study admins: assigned, removed
 - Study owner change: requested, approved
 - Project: created, approved, members' roles set, deleted
@@ -257,11 +257,11 @@ The portal superimposes additional roles to the roles defined in the [Research D
 **Storage**
 - AWS S3 bucket, same region as the Portal, "postgres" folder
 - Access via dedicated cloud role or backup-only access keys
-- DB network locked down: outbound only to backup storage + essential internal services, inbound only from the Portal app
-- Encrypted 
+- DB network locked down: outbound only to backup storage and essential internal services, inbound only from the Portal app
+- Encrypted using AES256
 
 **Retention**
-- 
+- Backups retained for 30 days
 
 **Restore**
 - Manual, done by an engineer
