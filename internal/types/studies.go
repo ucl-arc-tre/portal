@@ -75,6 +75,13 @@ const (
 	StudyApprovalStatusRejected   = "Rejected"
 )
 
+type StudyLifecycleStatus = string
+
+const (
+	StudyLifecycleStatusActive   = "Active"
+	StudyLifecycleStatusInactive = "Inactive"
+)
+
 type StudyOwnerChangelogAction string
 
 const (

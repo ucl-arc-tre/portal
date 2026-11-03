@@ -37,6 +37,9 @@ const (
 
 	StudySignoffValidity = 365 * Day
 
+	// a study's lifecycle status goes Inactive once its affirmation is overdue by 6 months
+	StudyLifecycleAffirmationValidity = StudySignoffValidity + 6*Month
+
 	ProjectAccessReviewValidity = 3 * Month
 
 	DefaultPageSize = 12  // number of items returned for pagination when no limit is given

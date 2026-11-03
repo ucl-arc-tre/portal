@@ -5,6 +5,7 @@ import { studySignoffWarningRequired } from "../shared/exports";
 import styles from "./StudyCardsList.module.css";
 import Card from "../ui/Card";
 import Badge from "../ui/Badge";
+import StudyLifecycleBadge from "./StudyLifecycleBadge";
 import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
@@ -46,6 +47,7 @@ export default function StudyCardsList(props: Props) {
               headerContent={
                 <div className={styles["status-indicator"]}>
                   <StatusBadge status={study.approval_status} type="study" />
+                  {isIGStaff && study.lifecycle_status && <StudyLifecycleBadge status={study.lifecycle_status} />}
                   {study.approval_status === "Approved" &&
                     study.last_signoff != null &&
                     studySignoffWarningRequired(study.last_signoff) && (
