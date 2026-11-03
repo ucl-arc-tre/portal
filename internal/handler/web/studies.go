@@ -369,7 +369,7 @@ func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 		OwnerUserId:                      new(data.OwnerUserID.String()),
 		OwnerUsername:                    new(string(data.Owner.Username)),
 		ApprovalStatus:                   openapi.StudyApprovalStatus(data.ApprovalStatus),
-		LifecycleStatus:                  new(openapi.StudyLifecycleStatus(h.studies.DetermineStudyLifecycle(data))),
+		LifecycleStatus:                  openapi.StudyLifecycleStatus(h.studies.DetermineStudyLifecycle(data)),
 		AdditionalStudyAdminUsernames:    data.AdminUsernames(),
 		DataControllerOrganisation:       data.DataControllerOrganisation,
 		InvolvesUclSponsorship:           data.InvolvesUclSponsorship,

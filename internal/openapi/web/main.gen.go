@@ -1540,8 +1540,8 @@ type Study struct {
 	// LastSignoff Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
-	// LifecycleStatus Derived study status visible to IG staff only.
-	LifecycleStatus *StudyLifecycleStatus `json:"lifecycle_status,omitempty"`
+	// LifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only.
+	LifecycleStatus StudyLifecycleStatus `json:"lifecycle_status"`
 
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`

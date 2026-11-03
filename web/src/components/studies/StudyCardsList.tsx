@@ -47,7 +47,7 @@ export default function StudyCardsList(props: Props) {
               headerContent={
                 <div className={styles["status-indicator"]}>
                   <StatusBadge status={study.approval_status} type="study" />
-                  {isIGStaff && study.lifecycle_status && <StudyLifecycleBadge status={study.lifecycle_status} />}
+                  {isIGStaff && <StudyLifecycleBadge status={study.lifecycle_status} />}
                   {study.approval_status === "Approved" &&
                     study.last_signoff != null &&
                     studySignoffWarningRequired(study.last_signoff) && (
