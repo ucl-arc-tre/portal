@@ -7,6 +7,9 @@ import Button from "../ui/Button";
 import { StudyDefinition } from "@/components/shared/entityDefinitions";
 import { useReducer, useState } from "react";
 import StudyForm from "./study-form/StudyForm";
+import HelperBlock from "../ui/HelperBlock";
+
+const helperText = `Use this page to view, register and manage research Studies that you have access to.\n Select a Study to view its details, manage governance records, Assets, Contracts, Projects and Study team access, or complete outstanding actions.`;
 
 export default function Studies() {
   const { userData, isApprovedStaffResearcher, canSeeAllStudies } = useAuth();
@@ -48,6 +51,7 @@ export default function Studies() {
       </PageHeader>
 
       {infoCalloutExpanded && <StudyDefinition />}
+      <HelperBlock text={helperText} />
 
       {canSeeAllStudies ? (
         <AllStudies refreshToken={refreshToken} />

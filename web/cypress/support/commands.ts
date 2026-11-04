@@ -985,7 +985,7 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
     cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
     cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
     cy.get("[data-cy='agreement-agree']").click();
-    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
+    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf", { force: true });
     cy.get("[data-cy='training-certificate-submit']").click();
   });
 
