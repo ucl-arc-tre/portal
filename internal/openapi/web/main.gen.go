@@ -704,8 +704,8 @@ func (e StudyApprovalStatus) Valid() bool {
 
 // Defines values for StudyLifecycleStatus.
 const (
-	StudyLifecycleStatusActive   StudyLifecycleStatus = "Active"
-	StudyLifecycleStatusInactive StudyLifecycleStatus = "Inactive"
+	StudyLifecycleStatusActive   StudyLifecycleStatus = "active"
+	StudyLifecycleStatusInactive StudyLifecycleStatus = "inactive"
 )
 
 // Valid indicates whether the value is a known member of the StudyLifecycleStatus enum.

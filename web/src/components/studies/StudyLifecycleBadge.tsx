@@ -6,7 +6,7 @@ export default function StudyLifecycleBadge(props: { status: StudyLifecycleStatu
   const { status } = props;
 
   return (
-    <Badge className={styles[`status-${status.toLowerCase()}`]} cy="study-lifecycle-badge">
+    <Badge className={styles[`status-${status}`]} cy="study-lifecycle-badge">
       {status}
     </Badge>
   );

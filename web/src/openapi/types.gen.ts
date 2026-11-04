@@ -534,7 +534,7 @@ export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejec
 /**
  * Derived lifecycle status for a study, intended for display to IG staff only.
  */
-export type StudyLifecycleStatus = 'Active' | 'Inactive';
+export type StudyLifecycleStatus = 'active' | 'inactive';
 
 export type StudyFeedbackEntry = {
     id: string;

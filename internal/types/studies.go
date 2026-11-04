@@ -78,8 +78,8 @@ const (
 type StudyLifecycleStatus = string
 
 const (
-	StudyLifecycleStatusActive   = "Active"
-	StudyLifecycleStatusInactive = "Inactive"
+	StudyLifecycleStatusActive   = "active"
+	StudyLifecycleStatusInactive = "inactive"
 )
 
 type StudyOwnerChangelogAction string

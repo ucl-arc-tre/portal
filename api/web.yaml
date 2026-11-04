@@ -2381,8 +2381,8 @@ components:
     StudyLifecycleStatus:
       type: string
       enum:
-        - Active
-        - Inactive
+        - active
+        - inactive
       description: Derived lifecycle status for a study, intended for display to IG staff only.
 
     StudyFeedbackEntry:
