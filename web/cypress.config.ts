@@ -5,7 +5,7 @@ module.exports = defineConfig({
     allowCypressEnv: false,
     baseUrl: process.env.CYPRESS_baseUrl || "http://localhost:8000",
     supportFile: "cypress/support/e2e.ts",
-    specPattern: "cypress/e2e/integration/dsh/tokens.cy.ts", // TODO: revert to "cypress/e2e/**/*.cy.ts" before merging
+    specPattern: "cypress/e2e/**/*.cy.ts",
     video: false,
     screenshotOnRunFailure: true,
     experimentalModifyObstructiveThirdPartyCode: true,
