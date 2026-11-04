@@ -114,7 +114,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("[data-cy='training-certificate']").should("be.visible");
 
     // Upload invalid certificate
-    cy.get("input[type=file]").selectFile("cypress/fixtures/invalid_nhsd_certificate.pdf");
+    cy.get("input[type=file]").selectFile("cypress/fixtures/invalid_nhsd_certificate.pdf", { force: true });
     cy.get("[data-cy='training-certificate-submit']").click();
 
     // Should show error message
@@ -136,7 +136,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.waitForAgreements();
     cy.waitForTraining();
 
-    cy.clearChosenName();
+    cy.mockProfileChosenName(); // No chosen name
     cy.visit("/profile");
 
     // Step 1: Set chosen name to match certificate (Tom Young)
@@ -147,7 +147,7 @@ describe(`Profile Page Step Workflow UI`, () => {
     cy.get("[data-cy='training-certificate']").should("be.visible");
 
     // Upload valid certificate (matches "Tom Young")
-    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
+    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf", { force: true });
     cy.get("[data-cy='training-certificate-submit']").click();
 
     // Should show error message
