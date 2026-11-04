@@ -54,12 +54,6 @@ declare global {
        */
       loginAsDSHOps(): Chainable<JQuery<HTMLElement>>;
 
-      /**
-       * Clears the chosen name
-       * @example cy.clearChosenName()
-       */
-      clearChosenName(chosenName?: string): Chainable<any>;
-
       // Auth fixture commands
       /**
        * Mock auth response to return base user role only
@@ -564,16 +558,6 @@ Cypress.Commands.add("loginAsDSHOps", () => {
   });
 });
 
-Cypress.Commands.add("clearChosenName", () => {
-  cy.request({
-    method: "POST",
-    url: "/web/api/v0/profile",
-    body: {
-      chosen_name: "",
-    },
-  });
-});
-
 // Auth fixture commands
 Cypress.Commands.add("mockAuthAsBaseUser", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
@@ -996,7 +980,7 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
 
   cy.get("body").then(($body) => {
     if ($body.find("[data-cy='training-certificate']").length > 0) {
-      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
+      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf", { force: true });
       cy.get("[data-cy='training-certificate-submit']").click();
     }
   });
