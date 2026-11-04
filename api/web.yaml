@@ -2177,6 +2177,7 @@ components:
             - updated_at
             - approval_status
             - caseref
+            - lifecycle_status
           properties:
             owner:
               $ref: "#/components/schemas/UserDataSummary"
@@ -2207,6 +2208,8 @@ components:
             pending_new_owner_username:
               type: string
               description: Username of the owner who has been requested to be assigned for this study, which is pending approval
+            lifecycle_status:
+              $ref: "#/components/schemas/StudyLifecycleStatus"
       description: A research study
 
     StudyOwnerUpdate:
@@ -2374,6 +2377,13 @@ components:
         - Approved
         - Rejected
       description: Current approval status
+
+    StudyLifecycleStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+      description: Derived lifecycle status for a study, intended for display to IG staff only.
 
     StudyFeedbackEntry:
       type: object

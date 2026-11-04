@@ -59,7 +59,9 @@ export default function CertificateReupload({ trainingData, expiryUrgency, onReu
         {!showCertReupload ? "Verify another certificate" : "Cancel"}
       </Button>
 
-      {showCertReupload && <TrainingCertificate setTrainingCertificateCompleted={onReupload} />}
+      {showCertReupload && (
+        <TrainingCertificate trainingCertificateCompleted={false} setTrainingCertificateCompleted={onReupload} />
+      )}
     </div>
   );
 }

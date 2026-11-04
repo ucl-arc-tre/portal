@@ -103,6 +103,7 @@ export default function ProfileSetupSteps({
             }}
           />
           <TrainingCertificate
+            trainingCertificateCompleted={trainingCertificateCompleted}
             setTrainingCertificateCompleted={(completed) => {
               if (completed && !agreementCompleted) scrollToSteps();
               setTrainingCertificateCompleted(completed);

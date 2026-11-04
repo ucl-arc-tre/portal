@@ -702,6 +702,24 @@ func (e StudyApprovalStatus) Valid() bool {
 	}
 }
 
+// Defines values for StudyLifecycleStatus.
+const (
+	StudyLifecycleStatusActive   StudyLifecycleStatus = "active"
+	StudyLifecycleStatusInactive StudyLifecycleStatus = "inactive"
+)
+
+// Valid indicates whether the value is a known member of the StudyLifecycleStatus enum.
+func (e StudyLifecycleStatus) Valid() bool {
+	switch e {
+	case StudyLifecycleStatusActive:
+		return true
+	case StudyLifecycleStatusInactive:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TrainingKind.
 const (
 	TrainingKindNhsd   TrainingKind = "training_kind_nhsd"
@@ -1522,6 +1540,9 @@ type Study struct {
 	// LastSignoff Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
+	// LifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only.
+	LifecycleStatus StudyLifecycleStatus `json:"lifecycle_status"`
+
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`
 	Owner               *UserDataSummary `json:"owner,omitempty"`
@@ -1690,6 +1711,9 @@ type StudyImport struct {
 	// UpdatedAt Time in RFC3339 format when the study was last updated
 	UpdatedAt string `json:"updated_at"`
 }
+
+// StudyLifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only.
+type StudyLifecycleStatus string
 
 // StudyOwnerUpdate defines model for StudyOwnerUpdate.
 type StudyOwnerUpdate struct {

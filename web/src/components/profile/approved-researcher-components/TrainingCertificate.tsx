@@ -18,13 +18,14 @@ interface SubmitEvent extends React.SubmitEvent<HTMLFormElement> {
 
 type TrainingCertificateProps = {
   setTrainingCertificateCompleted: (completed: boolean) => void;
+  trainingCertificateCompleted: boolean;
 };
 
 export default function TrainingCertificate(props: TrainingCertificateProps) {
-  const { setTrainingCertificateCompleted } = props;
+  const { setTrainingCertificateCompleted, trainingCertificateCompleted } = props;
 
   const { authInProgress, isAuthed } = useAuth();
-  const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
+  const [isValid, setIsValid] = useState<boolean | undefined>(trainingCertificateCompleted || undefined);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [errorType, setErrorType] = useState<AlertType>("warning");
   const [isPDF, setIsPDF] = useState<boolean>(false);
