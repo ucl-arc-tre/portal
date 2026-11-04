@@ -300,6 +300,11 @@ describe("Study creation end-to-end", () => {
     cy.get('[data-testid="ucl-uikit-search"]').type(`title:${studyTitle}`);
     cy.get('[data-testid="ucl-uikit-search-search-btn"]').click();
     cy.contains("article", studyTitle).should("exist");
+
+    // study was affirmed (marked ready for review) in an earlier test, so lifecycle status should be active
+    cy.contains("article", studyTitle).within(() => {
+      cy.get('[data-cy="study-lifecycle-badge"]').should("contain.text", "active");
+    });
   });
 
   it("ig ops should be able to give feedback", () => {
