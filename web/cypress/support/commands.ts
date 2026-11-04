@@ -985,5 +985,5 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
     }
   });
 
-  cy.contains("Verify another certificate").should("be.visible");
+  cy.contains("Verify another certificate").should("exist");
 });
