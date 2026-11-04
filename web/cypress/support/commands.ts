@@ -962,6 +962,13 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
 
   cy.contains("Loading your profile").should("not.exist");
 
+  // wait for the page to reach its final rendered state before running the rest of the tests
+  cy.get("body").should(($body) => {
+    const hasSteps = $body.find("[aria-label='Profile setup progress']").length > 0;
+    const alreadyComplete = $body.text().includes("Verify another certificate");
+    expect(hasSteps || alreadyComplete, "profile page to have finished rendering").to.be.true;
+  });
+
   // Each step is independently skipped if already done, rather than assuming the whole
   // flow is complete just because the name step is - e.g. a bot account's name/agreement
   // can already be set while its training certificate has since expired and needs redoing.
