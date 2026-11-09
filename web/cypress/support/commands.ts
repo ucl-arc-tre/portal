@@ -969,22 +969,26 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
     expect(hasSteps || alreadyComplete, "profile page to have finished rendering").to.be.true;
   });
 
-  // Each step is independently skipped if already done, rather than assuming the whole
-  // flow is complete just because the name step is - e.g. a bot account's name/agreement
-  // can already be set while its training certificate has since expired and needs redoing.
+  // user fills in the chosen name form if it is present, and submits it
   cy.get("body").then(($body) => {
     if ($body.find("[data-cy='chosen-name-form']").length > 0) {
       cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
       cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
+      cy.get("[data-cy='chosen-name-form']").should("not.exist");
     }
   });
 
-  cy.get("body").then(($body) => {
-    if ($body.find("[data-cy='agreement-agree']").length > 0) {
+  cy.wait("@getAgreements").then((interception) => {
+    const alreadyAgreed = interception.response?.body?.confirmed_agreements?.some(
+      (agreement: { agreement_type: string }) => agreement.agreement_type === "approved-researcher"
+    );
+    if (!alreadyAgreed) {
       cy.get("[data-cy='agreement-agree']").click();
+      cy.get("[data-cy='agreement-agree']").should("not.exist");
     }
   });
 
+  // user uploads the training certificate if it is present, and submits it
   cy.get("body").then(($body) => {
     if ($body.find("[data-cy='training-certificate']").length > 0) {
       cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf", { force: true });
@@ -992,5 +996,5 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
     }
   });
 
-  cy.contains("Verify another certificate").should("exist");
+  cy.contains("Verify another certificate", { timeout: 15000 }).should("exist");
 });
