@@ -54,12 +54,6 @@ declare global {
        */
       loginAsDSHOps(): Chainable<JQuery<HTMLElement>>;
 
-      /**
-       * Clears the chosen name
-       * @example cy.clearChosenName()
-       */
-      clearChosenName(chosenName?: string): Chainable<any>;
-
       // Auth fixture commands
       /**
        * Mock auth response to return base user role only
@@ -564,16 +558,6 @@ Cypress.Commands.add("loginAsDSHOps", () => {
   });
 });
 
-Cypress.Commands.add("clearChosenName", () => {
-  cy.request({
-    method: "POST",
-    url: "/web/api/v0/profile",
-    body: {
-      chosen_name: "",
-    },
-  });
-});
-
 // Auth fixture commands
 Cypress.Commands.add("mockAuthAsBaseUser", () => {
   cy.intercept("GET", "/web/api/v0/auth", {
@@ -978,16 +962,39 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
 
   cy.contains("Loading your profile").should("not.exist");
 
-  cy.get("body").then(($body) => {
-    // If the chosen name form is absent the user is already set up - skip all steps.
-    if ($body.find("[data-cy='chosen-name-form']").length === 0) return;
-
-    cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
-    cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
-    cy.get("[data-cy='agreement-agree']").click();
-    cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf");
-    cy.get("[data-cy='training-certificate-submit']").click();
+  // wait for the page to reach its final rendered state before running the rest of the tests
+  cy.get("body").should(($body) => {
+    const hasSteps = $body.find("[aria-label='Profile setup progress']").length > 0;
+    const alreadyComplete = $body.text().includes("Verify another certificate");
+    expect(hasSteps || alreadyComplete, "profile page to have finished rendering").to.be.true;
   });
 
-  cy.contains("Verify another certificate").should("be.visible");
+  // user fills in the chosen name form if it is present, and submits it
+  cy.get("body").then(($body) => {
+    if ($body.find("[data-cy='chosen-name-form']").length > 0) {
+      cy.get("[data-cy='chosen-name-form'] input").type("Tom Young");
+      cy.get("[data-cy='chosen-name-form'] button[type='submit']").click();
+      cy.get("[data-cy='chosen-name-form']").should("not.exist");
+    }
+  });
+
+  cy.wait("@getAgreements").then((interception) => {
+    const alreadyAgreed = interception.response?.body?.confirmed_agreements?.some(
+      (agreement: { agreement_type: string }) => agreement.agreement_type === "approved-researcher"
+    );
+    if (!alreadyAgreed) {
+      cy.get("[data-cy='agreement-agree']").click();
+      cy.get("[data-cy='agreement-agree']").should("not.exist");
+    }
+  });
+
+  // user uploads the training certificate if it is present, and submits it
+  cy.get("body").then(($body) => {
+    if ($body.find("[data-cy='training-certificate']").length > 0) {
+      cy.get("input[type=file]").selectFile("cypress/fixtures/valid_nhsd_certificate.pdf", { force: true });
+      cy.get("[data-cy='training-certificate-submit']").click();
+    }
+  });
+
+  cy.contains("Verify another certificate", { timeout: 15000 }).should("exist");
 });

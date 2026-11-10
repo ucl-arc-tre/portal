@@ -443,6 +443,7 @@ export type Study = StudyBase & {
      * Username of the owner who has been requested to be assigned for this study, which is pending approval
      */
     pending_new_owner_username?: string;
+    lifecycle_status: StudyLifecycleStatus;
 };
 
 export type StudyOwnerUpdate = {
@@ -529,6 +530,11 @@ export type ContractImport = {
  * Current approval status
  */
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
+
+/**
+ * Derived lifecycle status for a study, intended for display to IG staff only.
+ */
+export type StudyLifecycleStatus = 'active' | 'inactive';
 
 export type StudyFeedbackEntry = {
     id: string;
