@@ -9,18 +9,19 @@ import (
 type NotificationKind string
 
 const (
-	NotificationKindCompleteProfile     = NotificationKind("complete-profile")
-	NotificationKindContractExpiry      = NotificationKind("contract-expiry")
-	NotificationKindAssetExpiry         = NotificationKind("asset-expiry")
-	NotificationKindTrainingExpiry      = NotificationKind("training-expiry")
-	NotificationKindIaaAssignment       = NotificationKind("iaa-assignment")
-	NotificationKindIaaRemoval          = NotificationKind("iaa-removal")
-	NotificationKindStdyAffirmation     = NotificationKind("study-affirmation")
-	NotificationKindStudyReview         = NotificationKind("study-review")
-	NotificationKindStudyOwnerChange    = NotificationKind("study-owner-change")
-	NotificationKindUserNameChange      = NotificationKind("user-name-change")
-	NotificationKindProjectDeployed     = NotificationKind("project-deployed")
-	NotificationKindProjectAccessReview = NotificationKind("project-access-review")
+	NotificationKindCompleteProfile        = NotificationKind("complete-profile")
+	NotificationKindContractExpiry         = NotificationKind("contract-expiry")
+	NotificationKindAssetExpiry            = NotificationKind("asset-expiry")
+	NotificationKindTrainingExpiry         = NotificationKind("training-expiry")
+	NotificationKindIaaAssignment          = NotificationKind("iaa-assignment")
+	NotificationKindIaaRemoval             = NotificationKind("iaa-removal")
+	NotificationKindStdyAffirmation        = NotificationKind("study-affirmation")
+	NotificationKindStudyReview            = NotificationKind("study-review")
+	NotificationKindStudyOwnerChange       = NotificationKind("study-owner-change")
+	NotificationKindUserNameChangeRequest  = NotificationKind("user-name-change-request")
+	NotificationKindUserNameChangeApproval = NotificationKind("user-name-change-approval")
+	NotificationKindProjectDeployed        = NotificationKind("project-deployed")
+	NotificationKindProjectAccessReview    = NotificationKind("project-access-review")
 )
 
 type Notification struct {

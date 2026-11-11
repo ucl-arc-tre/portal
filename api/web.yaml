@@ -1646,7 +1646,8 @@ components:
         - study-affirmation
         - study-review
         - study-owner-change
-        - user-name-change
+        - user-name-change-request
+        - user-name-change-approval
         - project-deployed
 
     Profile:

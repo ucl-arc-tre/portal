@@ -536,16 +536,17 @@ func (e EnvironmentName) Valid() bool {
 
 // Defines values for NotificationKind.
 const (
-	NotificationKindAssetExpiry      NotificationKind = "asset-expiry"
-	NotificationKindCompleteProfile  NotificationKind = "complete-profile"
-	NotificationKindContractExpiry   NotificationKind = "contract-expiry"
-	NotificationKindIaaAssignment    NotificationKind = "iaa-assignment"
-	NotificationKindProjectDeployed  NotificationKind = "project-deployed"
-	NotificationKindStudyAffirmation NotificationKind = "study-affirmation"
-	NotificationKindStudyOwnerChange NotificationKind = "study-owner-change"
-	NotificationKindStudyReview      NotificationKind = "study-review"
-	NotificationKindTrainingExpiry   NotificationKind = "training-expiry"
-	NotificationKindUserNameChange   NotificationKind = "user-name-change"
+	NotificationKindAssetExpiry            NotificationKind = "asset-expiry"
+	NotificationKindCompleteProfile        NotificationKind = "complete-profile"
+	NotificationKindContractExpiry         NotificationKind = "contract-expiry"
+	NotificationKindIaaAssignment          NotificationKind = "iaa-assignment"
+	NotificationKindProjectDeployed        NotificationKind = "project-deployed"
+	NotificationKindStudyAffirmation       NotificationKind = "study-affirmation"
+	NotificationKindStudyOwnerChange       NotificationKind = "study-owner-change"
+	NotificationKindStudyReview            NotificationKind = "study-review"
+	NotificationKindTrainingExpiry         NotificationKind = "training-expiry"
+	NotificationKindUserNameChangeApproval NotificationKind = "user-name-change-approval"
+	NotificationKindUserNameChangeRequest  NotificationKind = "user-name-change-request"
 )
 
 // Valid indicates whether the value is a known member of the NotificationKind enum.
@@ -569,7 +570,9 @@ func (e NotificationKind) Valid() bool {
 		return true
 	case NotificationKindTrainingExpiry:
 		return true
-	case NotificationKindUserNameChange:
+	case NotificationKindUserNameChangeApproval:
+		return true
+	case NotificationKindUserNameChangeRequest:
 		return true
 	default:
 		return false
