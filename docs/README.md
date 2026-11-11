@@ -100,4 +100,4 @@ Data Safe Haven is defined [api/dsh.yaml](../api/dsh.yaml) and uses JWT bearer t
 ### RBAC
 
 Role base access control is implemented with [casbin](https://casbin.org/) using deploy-time
-set global administrators, and runtime set roles and policies. See the [HLD](./High-Level_Design.md#roles) for a description of the roles.
+set global administrators, and runtime set roles and policies. See the [HLD](./High-Level_Design.md##roles--permissions) for a description of the roles.

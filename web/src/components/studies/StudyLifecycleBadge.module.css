@@ -1,0 +1,9 @@
+.status-active {
+  background: var(--green-badge-bg);
+  color: var(--green-badge-text);
+}
+
+.status-inactive {
+  background: var(--grey-badge-bg);
+  color: var(--grey-badge-text);
+}

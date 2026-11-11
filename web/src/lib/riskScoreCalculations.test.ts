@@ -72,6 +72,16 @@ describe("getStudyRiskInfo", () => {
 });
 
 describe("calculateAssetRiskScore", () => {
+  it("uses the default likelihood score for an unrecognized storage location", () => {
+    const asset = makeAsset({
+      classification_impact: "confidential",
+      locations: ["unrecognized_storage_location"],
+      stored_outside_uk_eea: true,
+    });
+
+    assert.strictEqual(calculateAssetRiskScore(asset), 3);
+  });
+
   it("scores a highly confidential, pseudonymised asset sent by email as 4", () => {
     const asset = makeAsset({
       classification_impact: "highly_confidential",
