@@ -139,7 +139,11 @@ export default function ManageStudy({ study, fetchStudy }: ManageStudyProps) {
     return <Error message={error} />;
   }
 
-  if (studyStepsCompleted === false && (!isIGStaff || isOwnStudy || isStudyAdmin)) {
+  if (
+    study.approval_status === "Incomplete" &&
+    studyStepsCompleted === false &&
+    (!isIGStaff || isOwnStudy || isStudyAdmin)
+  ) {
     return (
       <StudySetupSteps
         study={study}
