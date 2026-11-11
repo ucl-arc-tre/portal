@@ -251,6 +251,15 @@ func (h *Handler) PostStudiesStudyIdSignoff(ctx *gin.Context, studyId uuid.UUID)
 	ctx.Status(http.StatusOK)
 }
 
+func (h *Handler) PostStudiesStudyIdClose(ctx *gin.Context, studyId uuid.UUID) {
+	if err := h.studies.CloseStudy(studyId, middleware.GetUser(ctx)); err != nil {
+		setError(ctx, err, "Failed to close study")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
 // Called by the study owner/researcher to submit their study for IG Ops review
 func (h *Handler) PatchStudiesStudyIdPending(ctx *gin.Context, studyId uuid.UUID) {
 	review := openapi.StudyReview{
