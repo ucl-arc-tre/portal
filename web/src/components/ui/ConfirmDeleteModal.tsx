@@ -10,6 +10,9 @@ type ConfirmDeleteModalProps = {
   onCancel: () => void;
   isDeleting?: boolean;
   error?: string | null;
+  confirmText?: string;
+  confirmingText?: string;
+  cy?: string;
 };
 
 export default function ConfirmDeleteModal({
@@ -19,6 +22,9 @@ export default function ConfirmDeleteModal({
   onCancel,
   isDeleting = false,
   error,
+  confirmText = "Delete",
+  confirmingText = "Deleting...",
+  cy = "confirm-delete",
 }: ConfirmDeleteModalProps) {
   return (
     <Dialog setDialogOpen={onCancel}>
@@ -33,8 +39,8 @@ export default function ConfirmDeleteModal({
             Cancel
           </Button>
 
-          <Button onClick={onConfirm} variant="primary-destructive" disabled={isDeleting} cy="confirm-delete">
-            {isDeleting ? "Deleting..." : "Delete"}
+          <Button onClick={onConfirm} variant="primary-destructive" disabled={isDeleting} cy={cy}>
+            {isDeleting ? confirmingText : confirmText}
           </Button>
         </div>
       </div>
