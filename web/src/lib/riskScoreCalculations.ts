@@ -14,15 +14,17 @@ const maxAssetLikelihoodScore = Math.max(...storageLocationDefinitions.map((def)
 const maxAssetImpactScore = 7;
 const maxImpactScore = 4; // to align with UCL risk framework
 
+const defaultLikelihoodScore = 5;
+
 export const riskScoreMax = maxImpactScore * maxLikelihoodScore;
 
 const calculateAssetLikelihoodScore = (asset: Asset) => {
   let likelihoodScore = 0;
   asset.locations.forEach((assetLocation) => {
-    const location = storageLocationDefinitions.find((def) => def.value === assetLocation);
-    if (!location) return;
-    if (location.likelihoodScore > likelihoodScore) {
-      likelihoodScore = location.likelihoodScore;
+    const locationLikelihoodScore =
+      storageLocationDefinitions.find((def) => def.value === assetLocation)?.likelihoodScore ?? defaultLikelihoodScore;
+    if (locationLikelihoodScore > likelihoodScore) {
+      likelihoodScore = locationLikelihoodScore;
     }
   });
 
