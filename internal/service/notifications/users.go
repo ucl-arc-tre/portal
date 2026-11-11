@@ -7,7 +7,7 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
-func (s *Service) NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error {
+func (s *Service) NotifyUserNameChangeRequest(attrs types.UserAttributes, igOpsStaff []types.User) error {
 	if attrs.User.CreatedAt.IsZero() {
 		return types.NewErrInvalidObject("user was nil valued - cannot notify")
 	}

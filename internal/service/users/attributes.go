@@ -53,7 +53,7 @@ func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*o
 	}
 
 	if response.RequiresApproval {
-		if err := s.notifyUserNameChange(attrs); err != nil {
+		if err := s.notifyUserNameChangeRequest(attrs); err != nil {
 			log.Err(err).Msg("Failed to notify user name change") // not fatal
 		}
 	}
@@ -69,12 +69,12 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	return types.NewErrFromGorm(err, "failed to set chosen name")
 }
 
-func (s *Service) notifyUserNameChange(attrs types.UserAttributes) error {
+func (s *Service) notifyUserNameChangeRequest(attrs types.UserAttributes) error {
 	recipients, err := s.IgStaff()
 	if err != nil {
 		return err
 	}
-	return s.notifications.NotifyUserNameChange(attrs, recipients)
+	return s.notifications.NotifyUserNameChangeRequest(attrs, recipients)
 }
 
 func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {

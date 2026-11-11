@@ -20,7 +20,7 @@ type Interface interface {
 	NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error
 	NotifyAssetExpiry(ctx context.Context, assets []types.Asset, study types.Study) error
 	NotifyOwnerChange(ctx context.Context, study types.Study, igStaff []types.User) error
-	NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error
+	NotifyUserNameChangeRequest(attrs types.UserAttributes, igOpsStaff []types.User) error
 	NotifyProjectDeployed(project types.Project, user types.User) error
 	NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error
 	NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error
