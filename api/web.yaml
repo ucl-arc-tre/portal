@@ -761,6 +761,23 @@ paths:
         "500":
           description: Internal server error
 
+  /studies/{studyId}/close:
+    post:
+      description: Close a study. Fails if the study has any assets, contracts, or projects attached - these must be removed first.
+      parameters:
+        - $ref: "#/components/parameters/StudyIdParam"
+      responses:
+        "200":
+          description: Study closed successfully
+        "400":
+          description: Study cannot be closed while it has assets, contracts, or projects attached
+        "403":
+          description: Forbidden
+        "404":
+          description: Study not found
+        "500":
+          description: Internal server error
+
   /studies/{studyId}/owner-request:
     post:
       description: Request an owner change
@@ -2383,6 +2400,7 @@ components:
       enum:
         - active
         - inactive
+        - closed
       description: Derived lifecycle status for a study, intended for display to IG staff only.
 
     StudyFeedbackEntry:

@@ -705,6 +705,7 @@ func (e StudyApprovalStatus) Valid() bool {
 // Defines values for StudyLifecycleStatus.
 const (
 	StudyLifecycleStatusActive   StudyLifecycleStatus = "active"
+	StudyLifecycleStatusClosed   StudyLifecycleStatus = "closed"
 	StudyLifecycleStatusInactive StudyLifecycleStatus = "inactive"
 )
 
@@ -712,6 +713,8 @@ const (
 func (e StudyLifecycleStatus) Valid() bool {
 	switch e {
 	case StudyLifecycleStatusActive:
+		return true
+	case StudyLifecycleStatusClosed:
 		return true
 	case StudyLifecycleStatusInactive:
 		return true
@@ -2174,6 +2177,9 @@ type ServerInterface interface {
 	// (GET /studies/{studyId}/assets/{assetId}/contracts)
 	GetStudiesStudyIdAssetsAssetIdContracts(c *gin.Context, studyId StudyIdParam, assetId AssetIdParam)
 
+	// (POST /studies/{studyId}/close)
+	PostStudiesStudyIdClose(c *gin.Context, studyId StudyIdParam)
+
 	// (GET /studies/{studyId}/contracts)
 	GetStudiesStudyIdContracts(c *gin.Context, studyId StudyIdParam)
 
@@ -3362,6 +3368,31 @@ func (siw *ServerInterfaceWrapper) GetStudiesStudyIdAssetsAssetIdContracts(c *gi
 	siw.Handler.GetStudiesStudyIdAssetsAssetIdContracts(c, studyId, assetId)
 }
 
+// PostStudiesStudyIdClose operation middleware
+func (siw *ServerInterfaceWrapper) PostStudiesStudyIdClose(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "studyId" -------------
+	var studyId StudyIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "studyId", c.Param("studyId"), &studyId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter studyId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostStudiesStudyIdClose(c, studyId)
+}
+
 // GetStudiesStudyIdContracts operation middleware
 func (siw *ServerInterfaceWrapper) GetStudiesStudyIdContracts(c *gin.Context) {
 
@@ -4050,6 +4081,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/studies/admin/:studyId/contracts/import", wrapper.PostStudiesAdminStudyIdContractsImport)
 	router.PATCH(options.BaseURL+"/studies/:studyId/pending", wrapper.PatchStudiesStudyIdPending)
 	router.POST(options.BaseURL+"/studies/:studyId/signoff", wrapper.PostStudiesStudyIdSignoff)
+	router.POST(options.BaseURL+"/studies/:studyId/close", wrapper.PostStudiesStudyIdClose)
 	router.POST(options.BaseURL+"/studies/:studyId/owner-request", wrapper.PostStudiesStudyIdOwnerRequest)
 	router.GET(options.BaseURL+"/environments", wrapper.GetEnvironments)
 	router.GET(options.BaseURL+"/projects", wrapper.GetProjects)

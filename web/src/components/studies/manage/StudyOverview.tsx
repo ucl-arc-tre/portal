@@ -1,4 +1,12 @@
-import { patchStudiesByStudyIdPending, Study, Asset, Contract, Project, StudyFeedbackEntry } from "@/openapi";
+import {
+  patchStudiesByStudyIdPending,
+  postStudiesByStudyIdClose,
+  Study,
+  Asset,
+  Contract,
+  Project,
+  StudyFeedbackEntry,
+} from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import Error from "../../ui/Error";
@@ -15,6 +23,7 @@ import StudyAffirmation from "./StudyAffirmation";
 import StudyOwnerEdit from "./StudyOwnerEdit";
 import StudyFeedback from "./StudyFeedback";
 import StudyFeedbackHistory from "./StudyFeedbackHistory";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal";
 import { getStudyRiskInfo } from "../../../lib/riskScoreCalculations";
 
 type StudyOverviewProps = {
@@ -41,6 +50,9 @@ export default function StudyOverview({
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [affirmationDialogOpen, setAffirmationDialogOpen] = useState(false);
   const [studyOwnerEditModalOpen, setStudyOwnerEditModalOpen] = useState(false);
+  const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [closeError, setCloseError] = useState<string | null>(null);
 
   const { userData, isIGStaff, isIGAdmin, isIAO, isAdmin } = useAuth();
   const isStudyOwner = (isIAO && study.owner_username === userData?.username) || false;
@@ -53,6 +65,7 @@ export default function StudyOverview({
     study.approval_status !== "Approved" && study.approval_status !== "Pending" && isStudyOwnerOrAdmin;
   const hasUnagreedAdmins = unagreedAdminUsernames && unagreedAdminUsernames.length > 0;
   const canEditStudy = isStudyOwnerOrAdmin || isIGAdmin || isAdmin;
+  const canCloseStudy = canEditStudy && study.lifecycle_status !== "closed";
   const requiresDPORegistration = assets?.some(
     (asset) => asset.data_types?.includes("personal") || asset.data_types?.includes("special_category_personal")
   );
@@ -75,6 +88,20 @@ export default function StudyOverview({
     }
     setIsSubmittingReview(false);
     setAffirmationDialogOpen(false);
+  };
+
+  const handleCloseStudy = async () => {
+    setCloseError(null);
+    setIsClosing(true);
+    const response = await postStudiesByStudyIdClose({ path: { studyId: study.id } });
+    if (responseIsError(response)) {
+      setCloseError(extractErrorMessage(response));
+      setIsClosing(false);
+      return;
+    }
+    await fetchStudy(study.id);
+    setIsClosing(false);
+    setCloseDialogOpen(false);
   };
 
   const assetsRequiringContracts =
@@ -139,6 +166,17 @@ export default function StudyOverview({
           {canEditStudy && (
             <Button variant="secondary" size="small" onClick={() => setIsFormOpen(true)} data-cy="edit-study-button">
               Edit Study
+            </Button>
+          )}
+
+          {canCloseStudy && (
+            <Button
+              variant="secondary-destructive"
+              size="small"
+              onClick={() => setCloseDialogOpen(true)}
+              data-cy="close-study-button"
+            >
+              Close Study
             </Button>
           )}
 
@@ -208,6 +246,20 @@ export default function StudyOverview({
 
           <StudyAffirmation studyId={study.id} successCallback={handleMarkReadyForReview} />
         </Dialog>
+      )}
+
+      {closeDialogOpen && (
+        <ConfirmDeleteModal
+          title="Close Study"
+          message="Are you sure you want to close this study? This cannot be undone."
+          onConfirm={handleCloseStudy}
+          onCancel={() => setCloseDialogOpen(false)}
+          isDeleting={isClosing}
+          error={closeError}
+          confirmText="Close Study"
+          confirmingText="Closing..."
+          cy="confirm-close-study"
+        />
       )}
     </Box>
   );
