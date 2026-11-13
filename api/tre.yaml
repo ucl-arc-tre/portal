@@ -152,7 +152,12 @@ components:
           description: Is the user an approved researcher?
         nhsd_training_expires_at:
           type: string
-          description: Instant at which the user's training expires in RFC3339 format
+          description: Instant at which the user's NHSD training expires in RFC3339 format
+        latest_training_expires_at:
+          type: string
+          description: |
+            Instant at which the most recent user's training expires in RFC3339 format
+            Could be any accepted training to gain approved researcher status
 
     VMImage:
       type: object
