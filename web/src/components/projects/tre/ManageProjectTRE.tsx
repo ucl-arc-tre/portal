@@ -225,11 +225,7 @@ export default function ManageProjectTRE(props: Props) {
         )}
       </PageHeader>
 
-      <HelperText>
-        Use this page to view your TRE Project members, configuration and request updates. Please note some of these
-        changes may result in a cost change and/or a review from the TRE team. Updates do not take effect immediately
-        and will become effective on the next deployment.{" "}
-      </HelperText>
+      <HelperText>Use this page to view your TRE Project members, configuration and request updates. </HelperText>
 
       <TabCollection
         tabs={[

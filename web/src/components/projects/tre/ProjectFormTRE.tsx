@@ -522,7 +522,13 @@ export default function ProjectFormTREStep(props: Props) {
 
       {mayRequireReapproval && (
         <Alert type="warning">
-          <AlertMessage>This project update may require approval from the TRE team.</AlertMessage>
+          <AlertMessage>
+            This project update may require approval from the TRE team. <br></br>
+            <HelperText>
+              Please note some of these changes may result in a cost change and/or a review from the TRE team. Updates
+              do not take effect immediately and will become effective on the next deployment.
+            </HelperText>
+          </AlertMessage>
         </Alert>
       )}
     </>
