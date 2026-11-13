@@ -118,8 +118,15 @@ export default function Nav() {
         )}
 
         <MenuDivider />
-        <MenuSection>{canSeeProjects && <NavItem href="/projects" icon={<FileIcon />} title="Projects" />}</MenuSection>
-        <MenuDivider />
+        <MenuSection>
+          {canSeeProjects && (
+            <>
+              <NavItem href="/projects" icon={<FileIcon />} title="Projects" />
+              <MenuDivider />
+            </>
+          )}
+        </MenuSection>
+
         <MenuSection>
           <MenuHeading>Help</MenuHeading>
           <NavItem href="/glossary" icon={<GlossaryIcon />} title="Glossary" />
