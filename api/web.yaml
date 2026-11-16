@@ -2486,6 +2486,8 @@ components:
           type: string
         root_volume_gb:
           type: integer
+        home_volume_gb:
+          type: integer
 
     ProjectTRERoleName:
       type: string

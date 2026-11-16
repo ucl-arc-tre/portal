@@ -241,6 +241,7 @@ func (h *Handler) extractProjectMembers(projectTRE *types.ProjectTRE) []openapi.
 				members[i].DesktopConfig = &openapi.ProjectTREUserDesktopConfig{
 					HpcInstanceType: userConfig.DesktopHPCInstanceType,
 					RootVolumeGb:    optionalInt(userConfig.DesktopRootVolumeSize),
+					HomeVolumeGb:    optionalInt(userConfig.DesktopHomeVolumeSize),
 				}
 			}
 		}
