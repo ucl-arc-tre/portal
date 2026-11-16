@@ -6,6 +6,7 @@ import { FieldPath, FieldError, FieldValues, UseFormRegister } from "react-hook-
 export type Option = {
   name: string;
   value: string;
+  disabled?: boolean;
 };
 
 type Props<T extends FieldValues> = {
@@ -36,6 +37,7 @@ export default function RadioOptions<T extends FieldValues>(props: Props<T>) {
                   required: "Please select an option",
                 })}
                 className={styles.option}
+                disabled={option.disabled}
               />
               {option.name}
             </Label>
