@@ -584,8 +584,6 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 			ProjectTREID:           projectTRE.ID,
 			UserID:                 userIds[types.Username(member.User.Username)],
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
-			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
-			DesktopHomeVolumeSize:  optionalUint(member.DesktopConfig.HomeVolumeGb),
 		}
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]
@@ -600,7 +598,15 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 			userConfig.UID = existingConfig.UID
 			userConfig.UnixUsername = existingConfig.UnixUsername
 			userConfig.DesktopImageID = existingConfig.DesktopImageID
-		} else {
+		} else { // does not exist
+			userConfig.DesktopRootVolumeSize, err = desktopVolumeSize(nil, member.DesktopConfig.RootVolumeGb)
+			if err != nil {
+				return types.NewErrClientInvalidObjectF("desktop root volume: %s", err)
+			}
+			userConfig.DesktopHomeVolumeSize, err = desktopVolumeSize(nil, member.DesktopConfig.HomeVolumeGb)
+			if err != nil {
+				return types.NewErrClientInvalidObjectF("desktop home volume: %s", err)
+			}
 			userConfig.UID, err = projectTRENextUid(append(existing, requested...))
 			if err != nil {
 				return err
