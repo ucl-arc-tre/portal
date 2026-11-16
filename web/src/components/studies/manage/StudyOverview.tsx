@@ -1,4 +1,4 @@
-import { patchStudiesByStudyIdPending, Study, Asset, Contract, Project, StudyFeedbackEntry } from "@/openapi";
+import { patchStudiesByStudyIdPending, Study, Asset, StudyFeedbackEntry } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import { useAuth } from "@/hooks/useAuth";
 import Error from "../../ui/Error";
@@ -20,8 +20,6 @@ import { getStudyRiskInfo } from "../../../lib/riskScoreCalculations";
 type StudyOverviewProps = {
   study: Study;
   assets?: Asset[];
-  contracts?: Contract[];
-  projects?: Project[];
   fetchStudy: (id: string) => Promise<void>;
   unagreedAdminUsernames?: string[];
   feedbackHistory?: StudyFeedbackEntry[];
@@ -30,8 +28,6 @@ type StudyOverviewProps = {
 export default function StudyOverview({
   study,
   assets,
-  projects,
-  contracts,
   fetchStudy,
   unagreedAdminUsernames,
   feedbackHistory = [],
@@ -131,9 +127,9 @@ export default function StudyOverview({
         </Alert>
       )}
 
-      <div className={styles["header"]}>
+      <div className={styles.header}>
         <h2>{study.title}</h2>
-        <div className={styles["buttons"]}>
+        <div className={styles.buttons}>
           <StudyFeedbackHistory feedbackHistory={feedbackHistory} />
 
           {canEditStudy && (
@@ -167,18 +163,6 @@ export default function StudyOverview({
         canEditOwner={canEditStudyOwner}
         setOwnerEditModal={canEditStudyOwner ? setStudyOwnerEditModalOpen : undefined}
       />
-
-      <div className={styles["pre-description"]} data-cy="study-summary-counts">
-        <span className={styles["detail-item"]}>
-          Projects: <span className={styles["grey-value"]}>{projects?.length ?? 0}</span>
-        </span>
-        <span className={styles["detail-item"]}>
-          Assets: <span className={styles["grey-value"]}>{assets?.length ?? 0}</span>
-        </span>
-        <span className={styles["detail-item"]}>
-          Contracts: <span className={styles["grey-value"]}>{contracts?.length ?? 0}</span>
-        </span>
-      </div>
 
       {studyOwnerEditModalOpen && (
         <StudyOwnerEdit

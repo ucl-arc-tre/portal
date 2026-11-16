@@ -2,3 +2,10 @@
   justify-items: center;
   padding: 2rem;
 }
+
+.helper-text {
+  padding-top: 0.5rem;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
