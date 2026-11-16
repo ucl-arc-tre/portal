@@ -585,6 +585,7 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 			UserID:                 userIds[types.Username(member.User.Username)],
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
 			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
+			DesktopHomeVolumeSize:  optionalUint(member.DesktopConfig.HomeVolumeGb),
 		}
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]

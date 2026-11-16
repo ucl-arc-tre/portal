@@ -1458,6 +1458,7 @@ type ProjectTREUpdate = ProjectTREBase
 
 // ProjectTREUserDesktopConfig defines model for ProjectTREUserDesktopConfig.
 type ProjectTREUserDesktopConfig struct {
+	HomeVolumeGb    *int    `json:"home_volume_gb,omitempty"`
 	HpcInstanceType *string `json:"hpc_instance_type,omitempty"`
 	ImageId         *string `json:"image_id,omitempty"`
 	RootVolumeGb    *int    `json:"root_volume_gb,omitempty"`
