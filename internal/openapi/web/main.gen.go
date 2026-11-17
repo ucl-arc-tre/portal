@@ -1548,9 +1548,6 @@ type Study struct {
 	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`
 	Owner               *UserDataSummary `json:"owner,omitempty"`
 
-	// OwnerUserId ID of the user who owns the study
-	OwnerUserId *string `json:"owner_user_id,omitempty"`
-
 	// OwnerUsername Username of the user who owns the study
 	OwnerUsername *string `json:"owner_username,omitempty"`
 
@@ -1640,9 +1637,6 @@ type StudyBase struct {
 
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
-
-	// OwnerUserId ID of the user who owns the study
-	OwnerUserId *string `json:"owner_user_id,omitempty"`
 
 	// OwnerUsername Username of the user who owns the study
 	OwnerUsername *string `json:"owner_username,omitempty"`

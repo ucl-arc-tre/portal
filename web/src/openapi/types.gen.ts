@@ -395,10 +395,6 @@ export type StudyBase = {
      */
     involves_data_processing_outside_eea?: boolean | null;
     /**
-     * ID of the user who owns the study
-     */
-    owner_user_id?: string;
-    /**
      * Username of the user who owns the study
      */
     owner_username?: string;
