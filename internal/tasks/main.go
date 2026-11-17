@@ -49,6 +49,7 @@ func (m *Manager) Start() {
 	if config.S3AuditEnabled() {
 		m.scheduleDailyAt(gocron.NewAtTime(4, 0, 0), m.uploadAuditLog, "uploadAuditLog")
 	}
+	m.scheduleDailyAt(gocron.NewAtTime(4, 1, 0), m.checkStudiesIAOAreStaff, "checkStudiesIAOAreStaff")
 
 	m.scheduler.Start()
 }
