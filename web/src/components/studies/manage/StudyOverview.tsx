@@ -82,6 +82,15 @@ export default function StudyOverview({
 
   return (
     <Box>
+      {study.owner?.is_staff === false && (
+        <Alert type="warning" data-cy="study-owner-not-staff-warning" className={styles["study-warning"]}>
+          <AlertMessage>
+            The study owner is not a UCL staff member. Please arrange for ownership to be transferred to a UCL staff
+            member. Please contact the Information Governance (IG) team.
+          </AlertMessage>
+        </Alert>
+      )}
+
       <StudyFeedback feedbackHistory={feedbackHistory} approvalStatus={study.approval_status} />
 
       {isFormOpen && userData && (
@@ -96,7 +105,7 @@ export default function StudyOverview({
       {error && <Error message={error} />}
 
       {hasUnagreedAdmins && isStudyOwnerOrAdmin && (
-        <Alert type="warning" className={styles["sutdy-admin-review"]}>
+        <Alert type="warning" className={styles["study-warning"]}>
           <AlertMessage>
             The following administrators have not yet agreed to the study agreement:{" "}
             {unagreedAdminUsernames.map((username, index) => (
@@ -112,7 +121,7 @@ export default function StudyOverview({
       )}
 
       {requiresDPORegistration && !study.is_data_protection_office_registered && (
-        <Alert type="warning" className={styles["dpo-registration-warning"]}>
+        <Alert type="warning" className={styles["study-warning"]}>
           <AlertMessage>
             At least one of the assets in this study contains personal data but the study does not have a Data
             Protection Office (DPO) number registered. Please register with the DPO and add the registration number to

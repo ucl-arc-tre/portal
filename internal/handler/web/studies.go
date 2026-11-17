@@ -403,6 +403,7 @@ func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 	} else {
 		study.Owner.IsStaff = new(isStaff)
 	}
+	study.Owner.IsStaff = new(false) // todo
 	admins := []openapi.UserDataSummary{}
 	for _, username := range data.AdminUsernames() {
 		admins = append(admins, h.userDataSummary(types.Username(username)))
