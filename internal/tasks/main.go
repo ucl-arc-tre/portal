@@ -45,7 +45,7 @@ func (m *Manager) Start() {
 	if config.ProjectAccessReviewEnabled() {
 		m.scheduleDailyAt(gocron.NewAtTime(3, 4, 0), m.checkProjectsAccessReviewExpiry, "checkProjectAccessReviewExpiry")
 	}
-	m.scheduleDailyAt(gocron.NewAtTime(3, 5, 0), m.updateUserEmails, "updateUserEmails")
+	m.scheduleDailyAt(gocron.NewAtTime(3, 5, 0), m.updateUserAttributes, "updateUserAttributes")
 	if config.S3AuditEnabled() {
 		m.scheduleDailyAt(gocron.NewAtTime(4, 0, 0), m.uploadAuditLog, "uploadAuditLog")
 	}

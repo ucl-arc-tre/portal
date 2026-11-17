@@ -13,7 +13,7 @@ const (
 	entraMaxErrors   = 100
 )
 
-func (m *Manager) updateUserEmails() error {
+func (m *Manager) updateUserAttributes() error {
 	users, err := m.users.All() // NOTE: need pagination if there is _many_ users
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func (m *Manager) updateUserEmails() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		if err := m.users.AssignEmailAddress(ctx, user); err != nil {
+		if err := m.users.AssignEntraAttributes(ctx, user); err != nil {
 			errs = append(errs, err)
 		}
 		select {
