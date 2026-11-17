@@ -7,3 +7,4 @@ For example "Resolves #42" if this PR resolves issue 42
 ### Checklist
 
 - [ ] Documentation has been updated
+- [ ] UI screenshots have been included
