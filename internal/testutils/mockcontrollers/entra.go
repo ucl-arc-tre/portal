@@ -27,7 +27,7 @@ func (m *MockEntra) SendInvite(ctx context.Context, invite entra.Invite) (*entra
 	panic("not implemented")
 }
 
-func (m *MockEntra) AddtoInvitedUserGroup(ctx context.Context, user entra.InvitedUserData) error {
+func (m *MockEntra) AddToInvitedUserGroup(ctx context.Context, user entra.InvitedUserData) error {
 	panic("not implemented")
 }
 

@@ -276,7 +276,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, invite Invite) 
 }
 
 // Idempotent add user to Entra invited users security group
-func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
+func (c *Controller) AddToInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
 	log.Debug().Str("objectId", user.Id.String()).Msg("Adding invited user to invited user group")
 
 	groupId := config.EntraInvitedUserGroup()
