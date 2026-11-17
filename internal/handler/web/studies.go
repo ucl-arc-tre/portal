@@ -1,12 +1,14 @@
 package web
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -396,6 +398,11 @@ func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 		Caseref:                          data.Caseref,
 	}
 	study.Owner = new(h.userDataSummary(data.Owner.Username))
+	if isStaff, err := h.users.IsStaff(context.TODO(), data.Owner); err != nil {
+		log.Err(err).Msg("Failed to check is staff") // non fatal
+	} else {
+		study.Owner.IsStaff = new(isStaff)
+	}
 	admins := []openapi.UserDataSummary{}
 	for _, username := range data.AdminUsernames() {
 		admins = append(admins, h.userDataSummary(types.Username(username)))

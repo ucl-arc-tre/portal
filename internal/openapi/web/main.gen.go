@@ -1798,6 +1798,7 @@ type UserDataLookup struct {
 
 // UserDataSummary defines model for UserDataSummary.
 type UserDataSummary struct {
+	IsStaff  *bool   `json:"is_staff,omitempty"`
 	Name     *string `json:"name,omitempty"`
 	Username string  `json:"username"`
 }

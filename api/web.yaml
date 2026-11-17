@@ -1861,6 +1861,8 @@ components:
           type: string
         name:
           type: string
+        is_staff:
+          type: boolean
 
     UserTrainingUpdate:
       type: object

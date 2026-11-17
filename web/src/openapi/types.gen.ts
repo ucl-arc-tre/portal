@@ -162,6 +162,7 @@ export type UserDataLookup = {
 export type UserDataSummary = {
     username: string;
     name?: string;
+    is_staff?: boolean;
 };
 
 export type UserTrainingUpdate = {
