@@ -1,7 +1,7 @@
 package web
 
 import (
-	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -129,7 +129,16 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId uuid.UUID) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, h.studyToOpenApiStudy(studies[0]))
+	data := h.studyToOpenApiStudy(studies[0])
+
+	if isStaff, err := h.users.IsStaff(ctx, studies[0].Owner); errors.Is(err, types.ErrNotFound) {
+		data.Owner.IsStaff = new(false)
+	} else if err != nil {
+		log.Err(err).Msg("Failed to check is staff") // non fatal
+	} else {
+		data.Owner.IsStaff = new(isStaff)
+	}
+	ctx.JSON(http.StatusOK, data)
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
@@ -398,11 +407,6 @@ func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 		Caseref:                          data.Caseref,
 	}
 	study.Owner = new(h.userDataSummary(data.Owner.Username))
-	if isStaff, err := h.users.IsStaff(context.TODO(), data.Owner); err != nil {
-		log.Err(err).Msg("Failed to check is staff") // non fatal
-	} else {
-		study.Owner.IsStaff = new(isStaff)
-	}
 	admins := []openapi.UserDataSummary{}
 	for _, username := range data.AdminUsernames() {
 		admins = append(admins, h.userDataSummary(types.Username(username)))
