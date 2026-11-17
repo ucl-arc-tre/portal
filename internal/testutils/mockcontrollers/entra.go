@@ -44,6 +44,6 @@ func (m *MockEntra) SendCustomInviteNotification(ctx context.Context, invite ent
 	panic("not implemented")
 }
 
-func (m *MockEntra) UserEmail(ctx context.Context, username types.Username) (string, error) {
+func (m *MockEntra) UserData(ctx context.Context, username types.Username) (*entra.UserData, error) {
 	panic("not implemented")
 }

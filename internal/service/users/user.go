@@ -307,15 +307,17 @@ func (s *Service) AssignEmailAddress(ctx context.Context, user types.User) error
 	if entra.IsExternalUsername(user.Username) {
 		return nil // externals already have a set email address
 	}
-	email, err := s.entra.UserEmail(ctx, user.Username)
+	data, err := s.entra.UserData(ctx, user.Username)
 	if err != nil {
 		return err
+	} else if data.Email == nil {
+		return types.NewNotFoundErrorF("email not found for [%v]", user.Username)
 	}
 	attrs := types.UserAttributes{UserID: user.ID}
 	err = s.db.
 		Where(&attrs).
 		Assign(types.UserAttributes{
-			Email: email,
+			Email: *data.Email,
 		}).
 		FirstOrCreate(&attrs).Error
 	return types.NewErrFromGorm(err, "failed to assign email")

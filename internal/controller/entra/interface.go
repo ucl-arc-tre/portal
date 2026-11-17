@@ -10,7 +10,7 @@ import (
 type Interface interface {
 	IsStaffMember(ctx context.Context, username types.Username) (bool, error)
 	UserExists(ctx context.Context, username types.Username) (bool, error)
-	UserEmail(ctx context.Context, username types.Username) (Email, error)
+	UserData(ctx context.Context, username types.Username) (*UserData, error)
 	SendInvite(ctx context.Context, invite Invite) (*InvitedUserData, error)
 	AddToInvitedUserGroup(ctx context.Context, user InvitedUserData) error
 	FindUsernames(ctx context.Context, query string) ([]types.Username, error)

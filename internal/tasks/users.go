@@ -10,6 +10,7 @@ import (
 
 const (
 	entraLookupDelay = 100 * time.Millisecond
+	entraMaxErrors   = 100
 )
 
 func (m *Manager) updateUserEmails() error {
@@ -31,6 +32,10 @@ func (m *Manager) updateUserEmails() error {
 			return types.NewErrServerError("timed out waiting for entra email lookup")
 		default:
 			time.Sleep(entraLookupDelay) // prevent entra rate limiting
+		}
+
+		if len(errs) > entraMaxErrors {
+			return types.NewErrServerErrorF("reached entra max err limit: %w", errors.Join(errs...))
 		}
 	}
 	return errors.Join(errs...)
