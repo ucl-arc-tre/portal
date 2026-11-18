@@ -231,7 +231,7 @@ export default function ProjectForm({
             return;
           }
 
-          const hasHPCDesktops = data.tre.requiresHPCDesktops;
+          const hasHPCDesktops = data.tre.requiresHPCDesktops === "true";
           const usersConfig = data.tre?.userConfig?.map((config) => ({
             username: config.username,
             desktop_config: {

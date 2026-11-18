@@ -63,6 +63,12 @@ func NewNotFoundError(err any) error {
 	return newErrorWithType(err, ErrNotFound)
 }
 
+// New not found error wrapping an internal error
+// e.g. NewNotFoundError(err)
+func NewNotFoundErrorF(format string, objs ...any) error {
+	return newErrorWithType(fmt.Errorf(format, objs...), ErrNotFound)
+}
+
 // New error from a gorm error see: https://gorm.io/docs/error_handling.html
 // e.g. NewErrFromGorm(result.Error)
 func NewErrFromGorm(err error, messages ...string) error {

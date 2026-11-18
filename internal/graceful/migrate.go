@@ -15,3 +15,12 @@ func migrateTREProject(db *gorm.DB) {
 		}
 	}
 }
+
+func migrateContracts(db *gorm.DB) {
+	migrator := db.Migrator()
+	if migrator.HasColumn(&types.Contract{}, "filename") {
+		if err := migrator.DropColumn(&types.Contract{}, "filename"); err != nil {
+			panic(fmt.Errorf("failed to drop filename from Contract: %w", err))
+		}
+	}
+}

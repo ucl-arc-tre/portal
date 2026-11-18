@@ -1,12 +1,14 @@
 package web
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
@@ -127,7 +129,16 @@ func (h *Handler) GetStudiesStudyId(ctx *gin.Context, studyId uuid.UUID) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, h.studyToOpenApiStudy(studies[0]))
+	data := h.studyToOpenApiStudy(studies[0])
+
+	if isStaff, err := h.users.IsStaff(ctx, studies[0].Owner); errors.Is(err, types.ErrNotFound) {
+		data.Owner.IsStaff = new(false)
+	} else if err != nil {
+		log.Err(err).Msg("Failed to check is staff") // non fatal
+	} else {
+		data.Owner.IsStaff = new(isStaff)
+	}
+	ctx.JSON(http.StatusOK, data)
 }
 
 func (h *Handler) PostStudies(ctx *gin.Context) {
@@ -375,7 +386,6 @@ func (h *Handler) studyToOpenApiStudy(data types.Study) openapi.Study {
 		Id:                               data.ID.String(),
 		Title:                            data.Title,
 		Description:                      data.Description,
-		OwnerUserId:                      new(data.OwnerUserID.String()),
 		OwnerUsername:                    new(string(data.Owner.Username)),
 		ApprovalStatus:                   openapi.StudyApprovalStatus(data.ApprovalStatus),
 		LifecycleStatus:                  openapi.StudyLifecycleStatus(h.studies.DetermineStudyLifecycle(data)),
