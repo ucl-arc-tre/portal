@@ -480,17 +480,30 @@ func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
 	return nil
 }
 
+const arcTreAssetLocation = "arc_tre"
+
 func (s *Service) projectHasAssetsWithActiveRetention(projectId uuid.UUID) (bool, error) {
 	var projectAssets []types.ProjectAsset
-	err := s.db.Preload("Asset").Where("project_id = ?", projectId).Find(&projectAssets).Error
+	err := s.db.Preload("Asset.Locations").Where("project_id = ?", projectId).Find(&projectAssets).Error
 	if err != nil {
 		return false, types.NewErrFromGorm(err, "failed to load project assets")
 	}
 
 	now := time.Now()
 	for _, projectAsset := range projectAssets {
-		expiresAt := projectAsset.Asset.ExpiresAt
-		if expiresAt != nil && expiresAt.After(now) {
+		asset := projectAsset.Asset
+
+		// A destroyed asset can never block deletion, regardless of its expiry or locations.
+		if asset.Status == types.AssetStatusDestroyed {
+			continue
+		}
+
+		hasFutureExpiry := asset.ExpiresAt != nil && asset.ExpiresAt.After(now)
+		isInArcTre := slices.ContainsFunc(asset.Locations, func(location types.AssetLocation) bool {
+			return location.Location == arcTreAssetLocation
+		})
+
+		if hasFutureExpiry || isInArcTre {
 			return true, nil
 		}
 	}
