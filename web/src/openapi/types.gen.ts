@@ -2374,19 +2374,27 @@ export type PutProjectsTreByProjectIdResponses = {
     200: unknown;
 };
 
-export type PatchProjectsTreByProjectIdPendingData = {
+export type PatchProjectsTreByProjectIdByStatusData = {
     body?: never;
     path: {
         /**
          * Project UUID
          */
         projectId: string;
+        /**
+         * Target status to transition the project to
+         */
+        status: 'pending' | 'pending-deletion';
     };
     query?: never;
-    url: '/projects/tre/{projectId}/pending';
+    url: '/projects/tre/{projectId}/{status}';
 };
 
-export type PatchProjectsTreByProjectIdPendingErrors = {
+export type PatchProjectsTreByProjectIdByStatusErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
     /**
      * Forbidden
      */
@@ -2395,6 +2403,10 @@ export type PatchProjectsTreByProjectIdPendingErrors = {
      * Project not found
      */
     404: unknown;
+    /**
+     * Project is not in a status that allows this transition
+     */
+    406: unknown;
     /**
      * Internal server error
      */
@@ -2405,58 +2417,16 @@ export type PatchProjectsTreByProjectIdPendingErrors = {
     default: unknown;
 };
 
-export type PatchProjectsTreByProjectIdPendingResponses = {
+export type PatchProjectsTreByProjectIdByStatusError = PatchProjectsTreByProjectIdByStatusErrors[keyof PatchProjectsTreByProjectIdByStatusErrors];
+
+export type PatchProjectsTreByProjectIdByStatusResponses = {
     /**
-     * Project submitted successfully
+     * Project status updated successfully
      */
     204: void;
 };
 
-export type PatchProjectsTreByProjectIdPendingResponse = PatchProjectsTreByProjectIdPendingResponses[keyof PatchProjectsTreByProjectIdPendingResponses];
-
-export type PatchProjectsTreByProjectIdPendingDeletionData = {
-    body?: never;
-    path: {
-        /**
-         * Project UUID
-         */
-        projectId: string;
-    };
-    query?: never;
-    url: '/projects/tre/{projectId}/pending-deletion';
-};
-
-export type PatchProjectsTreByProjectIdPendingDeletionErrors = {
-    /**
-     * Project is not in a status that can be requested for deletion, or has linked assets with active retention
-     */
-    400: unknown;
-    /**
-     * Forbidden
-     */
-    403: unknown;
-    /**
-     * Project not found
-     */
-    404: unknown;
-    /**
-     * Internal server error
-     */
-    500: unknown;
-    /**
-     * Unexpected error
-     */
-    default: unknown;
-};
-
-export type PatchProjectsTreByProjectIdPendingDeletionResponses = {
-    /**
-     * Project deletion requested successfully
-     */
-    204: void;
-};
-
-export type PatchProjectsTreByProjectIdPendingDeletionResponse = PatchProjectsTreByProjectIdPendingDeletionResponses[keyof PatchProjectsTreByProjectIdPendingDeletionResponses];
+export type PatchProjectsTreByProjectIdByStatusResponse = PatchProjectsTreByProjectIdByStatusResponses[keyof PatchProjectsTreByProjectIdByStatusResponses];
 
 export type PostProjectsTreByProjectIdAccessReviewSignoffData = {
     body?: never;

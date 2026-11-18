@@ -951,33 +951,31 @@ paths:
         default:
           description: Unexpected error
 
-  /projects/tre/{projectId}/pending:
+  /projects/tre/{projectId}/{status}:
     patch:
-      description: Submit a TRE project for review (changes status from Incomplete to Pending)
+      description: Transition a TRE project's status
       parameters:
         - $ref: "#/components/parameters/ProjectIdParam"
+        - in: path
+          name: status
+          required: true
+          description: Target status to transition the project to
+          schema:
+            type: string
+            enum:
+              - pending
+              - pending-deletion
       responses:
         "204":
-          description: Project submitted successfully
-        "403":
-          description: Forbidden
-        "404":
-          description: Project not found
-        "500":
-          description: Internal server error
-        default:
-          description: Unexpected error
-
-  /projects/tre/{projectId}/pending-deletion:
-    patch:
-      description: Request deletion of a deployed TRE project (changes status from Deployed to Pending Deletion)
-      parameters:
-        - $ref: "#/components/parameters/ProjectIdParam"
-      responses:
-        "204":
-          description: Project deletion requested successfully
+          description: Project status updated successfully
         "400":
-          description: Project is not in a status that can be requested for deletion, or has linked assets with active retention
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "406":
+          description: Project is not in a status that allows this transition
         "403":
           description: Forbidden
         "404":

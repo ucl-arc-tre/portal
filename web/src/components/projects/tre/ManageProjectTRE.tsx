@@ -3,8 +3,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import {
   postProjectsTreAdminByProjectIdApprove,
-  patchProjectsTreByProjectIdPending,
-  patchProjectsTreByProjectIdPendingDeletion,
+  patchProjectsTreByProjectIdByStatus,
   Study,
   deleteProjectsTreByProjectId,
   ProjectTre,
@@ -77,8 +76,8 @@ export default function ManageProjectTRE(props: Props) {
     setError(null);
 
     try {
-      const response = await patchProjectsTreByProjectIdPending({
-        path: { projectId },
+      const response = await patchProjectsTreByProjectIdByStatus({
+        path: { projectId, status: "pending" },
       });
 
       if (responseIsError(response)) {
@@ -185,8 +184,8 @@ export default function ManageProjectTRE(props: Props) {
     setRequestDeletionError(null);
 
     try {
-      const response = await patchProjectsTreByProjectIdPendingDeletion({
-        path: { projectId: projectId as string },
+      const response = await patchProjectsTreByProjectIdByStatus({
+        path: { projectId: projectId as string, status: "pending-deletion" },
       });
 
       if (responseIsError(response)) {
