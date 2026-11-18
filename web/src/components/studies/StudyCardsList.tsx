@@ -24,15 +24,17 @@ export default function StudyCardsList(props: Props) {
   const { studies } = props;
   const username = userData?.username;
 
+  const isStudyOwnerOrAdmin = (study: Study): boolean =>
+    username !== undefined &&
+    (study.owner_username === username || study.additional_study_admin_usernames.includes(username));
+
   const canManageStudy = (study: Study): boolean => {
-    return (
-      username !== undefined &&
-      (isAdmin ||
-        isIGStaff ||
-        study.owner_username === username ||
-        study.additional_study_admin_usernames.includes(username))
-    );
+    return isAdmin || isIGStaff || isStudyOwnerOrAdmin(study);
   };
+
+  // Lifecycle status is IG-only, except "closed" which is also shown to the study's own owner/admins
+  const showLifecycleBadge = (study: Study): boolean =>
+    isIGStaff || (study.lifecycle_status === "closed" && isStudyOwnerOrAdmin(study));
 
   return (
     <div className={styles["study-selection"]}>
@@ -47,7 +49,7 @@ export default function StudyCardsList(props: Props) {
               headerContent={
                 <div className={styles["status-indicator"]}>
                   <StatusBadge status={study.approval_status} type="study" />
-                  {isIGStaff && <StudyLifecycleBadge status={study.lifecycle_status} />}
+                  {showLifecycleBadge(study) && <StudyLifecycleBadge status={study.lifecycle_status} />}
                   {study.approval_status === "Approved" &&
                     study.last_signoff != null &&
                     studySignoffWarningRequired(study.last_signoff) && (

@@ -100,6 +100,16 @@ func LogStudySignoff(tx *gorm.DB, signer types.User, study types.Study) error {
 	return createOrError(tx, &event, "failed to record study signoff audit event")
 }
 
+func LogStudyClosure(tx *gorm.DB, closer types.User, study types.Study) error {
+	event := types.AuditEvent{
+		UserID:    closer.ID,
+		Operation: types.AuditOperationUpdate,
+		Object:    study.EventObject(),
+		Body:      fmt.Sprintf("Study '%s' closed.", study.Title),
+	}
+	return createOrError(tx, &event, "failed to record study closure audit event")
+}
+
 func LogProjectCreation(tx *gorm.DB, creator types.User, project types.Project) error {
 	event := types.AuditEvent{
 		UserID:    creator.ID,

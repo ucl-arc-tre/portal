@@ -471,6 +471,51 @@ func (s *Service) RecordStudySignoff(id uuid.UUID, signer types.User) error {
 	return commitTransaction(tx)
 }
 
+func (s *Service) CloseStudy(id uuid.UUID, closer types.User) error {
+	tx := s.db.Begin()
+	defer graceful.RollbackTransactionOnPanic(tx)
+
+	var study types.Study
+	if err := tx.Where("id = ?", id).First(&study).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to find study")
+	}
+
+	var assetCount, contractCount, projectCount int64
+	if err := tx.Model(&types.Asset{}).Where("study_id = ?", id).Count(&assetCount).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to count study assets")
+	}
+	if err := tx.Model(&types.Contract{}).Where("study_id = ?", id).Count(&contractCount).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to count study contracts")
+	}
+	if err := tx.Model(&types.Project{}).Where("study_id = ?", id).Count(&projectCount).Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to count study projects")
+	}
+	if assetCount > 0 || contractCount > 0 || projectCount > 0 {
+		tx.Rollback()
+		return types.NewErrClientInvalidObjectF(
+			"cannot close study: it still has %d asset(s), %d contract(s) and %d project(s) attached - remove them first",
+			assetCount, contractCount, projectCount,
+		)
+	}
+
+	db := tx.Model(&study).Where("id = ?", id).Update("closed_at", time.Now())
+	if err := db.Error; err != nil {
+		tx.Rollback()
+		return types.NewErrFromGorm(err, "failed to close study")
+	}
+
+	if err := audit.LogStudyClosure(tx, closer, study); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return commitTransaction(tx)
+}
+
 func (s *Service) UpdateStudy(ctx context.Context, id uuid.UUID, studyData openapi.StudyRequest, updater types.User) error {
 	studies, err := s.StudiesById(id)
 	if err != nil {

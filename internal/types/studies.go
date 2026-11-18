@@ -35,6 +35,7 @@ type Study struct {
 	InvolvesDataProcessingOutsideEea *bool               `gorm:""`
 	ApprovalStatus                   StudyApprovalStatus `gorm:"not null"`
 	LastSignoff                      *time.Time
+	ClosedAt                         *time.Time
 	// caseref sequence starts at 10000 for portal studies while 0-9999 is reserved for legacy studies that will be migrated from sharepoint
 	// study_caseref_seq defined in internal/graceful/db.go
 	Caseref int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
@@ -80,6 +81,7 @@ type StudyLifecycleStatus = string
 const (
 	StudyLifecycleStatusActive   = "active"
 	StudyLifecycleStatusInactive = "inactive"
+	StudyLifecycleStatusClosed   = "closed"
 )
 
 type StudyOwnerChangelogAction string

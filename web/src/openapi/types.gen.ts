@@ -531,7 +531,7 @@ export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejec
 /**
  * Derived lifecycle status for a study, intended for display to IG staff only.
  */
-export type StudyLifecycleStatus = 'active' | 'inactive';
+export type StudyLifecycleStatus = 'active' | 'inactive' | 'closed';
 
 export type StudyFeedbackEntry = {
     id: string;
@@ -2081,6 +2081,44 @@ export type PostStudiesByStudyIdSignoffErrors = {
 export type PostStudiesByStudyIdSignoffResponses = {
     /**
      * Signoff recorded successfully
+     */
+    200: unknown;
+};
+
+export type PostStudiesByStudyIdCloseData = {
+    body?: never;
+    path: {
+        /**
+         * Study UUID
+         */
+        studyId: string;
+    };
+    query?: never;
+    url: '/studies/{studyId}/close';
+};
+
+export type PostStudiesByStudyIdCloseErrors = {
+    /**
+     * Study cannot be closed while it has assets, contracts, or projects attached
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Study not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostStudiesByStudyIdCloseResponses = {
+    /**
+     * Study closed successfully
      */
     200: unknown;
 };
