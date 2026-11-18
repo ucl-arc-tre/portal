@@ -1861,6 +1861,8 @@ components:
           type: string
         name:
           type: string
+        is_staff:
+          type: boolean
 
     UserTrainingUpdate:
       type: object
@@ -2155,9 +2157,6 @@ components:
           type: boolean
           nullable: true
           description: Whether data is processed outside UK/EEA
-        owner_user_id:
-          type: string
-          description: ID of the user who owns the study
         owner_username:
           type: string
           description: Username of the user who owns the study

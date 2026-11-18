@@ -162,6 +162,7 @@ export type UserDataLookup = {
 export type UserDataSummary = {
     username: string;
     name?: string;
+    is_staff?: boolean;
 };
 
 export type UserTrainingUpdate = {
@@ -394,10 +395,6 @@ export type StudyBase = {
      * Whether data is processed outside UK/EEA
      */
     involves_data_processing_outside_eea?: boolean | null;
-    /**
-     * ID of the user who owns the study
-     */
-    owner_user_id?: string;
     /**
      * Username of the user who owns the study
      */
