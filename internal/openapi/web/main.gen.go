@@ -545,7 +545,7 @@ const (
 	NotificationKindStudyOwnerChange       NotificationKind = "study-owner-change"
 	NotificationKindStudyReview            NotificationKind = "study-review"
 	NotificationKindTrainingExpiry         NotificationKind = "training-expiry"
-	NotificationKindUserNameChangeApproval NotificationKind = "user-name-change-approval"
+	NotificationKindUserNameChangeOccurred NotificationKind = "user-name-change-occurred"
 	NotificationKindUserNameChangeRequest  NotificationKind = "user-name-change-request"
 )
 
@@ -570,7 +570,7 @@ func (e NotificationKind) Valid() bool {
 		return true
 	case NotificationKindTrainingExpiry:
 		return true
-	case NotificationKindUserNameChangeApproval:
+	case NotificationKindUserNameChangeOccurred:
 		return true
 	case NotificationKindUserNameChangeRequest:
 		return true

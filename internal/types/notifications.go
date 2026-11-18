@@ -19,7 +19,7 @@ const (
 	NotificationKindStudyReview            = NotificationKind("study-review")
 	NotificationKindStudyOwnerChange       = NotificationKind("study-owner-change")
 	NotificationKindUserNameChangeRequest  = NotificationKind("user-name-change-request")
-	NotificationKindUserNameChangeApproval = NotificationKind("user-name-change-approval")
+	NotificationKindUserNameChangeOccurred = NotificationKind("user-name-change-occurred")
 	NotificationKindProjectDeployed        = NotificationKind("project-deployed")
 	NotificationKindProjectAccessReview    = NotificationKind("project-access-review")
 )

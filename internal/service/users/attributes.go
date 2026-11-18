@@ -65,7 +65,12 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", chosenName))
 	}
 	attrs := types.UserAttributes{UserID: user.ID}
-	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName}).FirstOrCreate(&attrs).Error
+	// This name change may be from the admin approving a name change request, or from the admin unilaterally changing their name.
+	// In either case, clear the RequestedChosenName, and notify the subject of the name change about the change.
+	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName, RequestedChosenName: new(types.ChosenName(""))}).FirstOrCreate(&attrs).Error
+	if err == nil {
+		s.notifications.NotifyUserNameChangeOccurred(user, chosenName)
+	}
 	return types.NewErrFromGorm(err, "failed to set chosen name")
 }
 
