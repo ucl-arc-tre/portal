@@ -264,6 +264,16 @@ func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId u
 	ctx.Status(http.StatusOK)
 }
 
+func (h *Handler) PatchProjectsTreProjectIdPendingDeletion(ctx *gin.Context, projectId uuid.UUID) {
+	err := h.projects.RequestProjectTREDeletion(projectId)
+	if err != nil {
+		setError(ctx, err, "Failed to request project deletion")
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
 func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId uuid.UUID) {
 
 	// TODO: check that the project status is "Pending", otherwise return a 400??

@@ -2412,6 +2412,48 @@ export type PatchProjectsTreByProjectIdPendingResponses = {
     200: unknown;
 };
 
+export type PatchProjectsTreByProjectIdPendingDeletionData = {
+    body?: never;
+    path: {
+        /**
+         * Project UUID
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/tre/{projectId}/pending-deletion';
+};
+
+export type PatchProjectsTreByProjectIdPendingDeletionErrors = {
+    /**
+     * Project is not in a status that can be requested for deletion, or has linked assets with active retention
+     */
+    400: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PatchProjectsTreByProjectIdPendingDeletionResponses = {
+    /**
+     * Project deletion requested successfully
+     */
+    200: unknown;
+};
+
 export type PostProjectsTreByProjectIdAccessReviewSignoffData = {
     body?: never;
     path: {

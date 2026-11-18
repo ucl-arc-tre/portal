@@ -448,6 +448,55 @@ func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
 	return nil
 }
 
+func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
+	hasActiveAssetRetention, err := s.projectHasAssetsWithActiveRetention(projectId)
+	if err != nil {
+		return err
+	}
+	if hasActiveAssetRetention {
+		return types.NewErrClientInvalidObject("cannot request deletion while linked assets have active retention")
+	}
+
+	deletionRequestableStatuses := []types.ProjectTREStatus{
+		types.ProjectTREStatusPendingApproval,
+		types.ProjectTREStatusPendingCreation,
+		types.ProjectTREStatusDeployed,
+	}
+
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("project_id = ?", projectId).
+		Where("status IN ?", deletionRequestableStatuses).
+		Update("status", types.ProjectTREStatusPendingDeletion)
+
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to request project deletion")
+	}
+
+	if result.RowsAffected == 0 {
+		return types.NewErrInvalidObjectF(
+			"project must be in Pending Approval, Pending Creation, or Deployed status to request deletion")
+	}
+
+	return nil
+}
+
+func (s *Service) projectHasAssetsWithActiveRetention(projectId uuid.UUID) (bool, error) {
+	var projectAssets []types.ProjectAsset
+	err := s.db.Preload("Asset").Where("project_id = ?", projectId).Find(&projectAssets).Error
+	if err != nil {
+		return false, types.NewErrFromGorm(err, "failed to load project assets")
+	}
+
+	now := time.Now()
+	for _, projectAsset := range projectAssets {
+		expiresAt := projectAsset.Asset.ExpiresAt
+		if expiresAt != nil && expiresAt.After(now) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error {
 	projectTRE, err := s.ProjectTreById(projectId)
 	if err != nil {

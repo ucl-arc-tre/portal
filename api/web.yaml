@@ -968,6 +968,25 @@ paths:
         default:
           description: Unexpected error
 
+  /projects/tre/{projectId}/pending-deletion:
+    patch:
+      description: Request deletion of a deployed TRE project (changes status from Deployed to Pending Deletion)
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          description: Project deletion requested successfully
+        "400":
+          description: Project is not in a status that can be requested for deletion, or has linked assets with active retention
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /projects/tre/{projectId}/access-review-signoff:
     post:
       description: Record that an IAO/IAA has reviewed access rights for this project, resetting the review timestamp

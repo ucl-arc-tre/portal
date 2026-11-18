@@ -2116,6 +2116,9 @@ type ServerInterface interface {
 	// (PATCH /projects/tre/{projectId}/pending)
 	PatchProjectsTreProjectIdPending(c *gin.Context, projectId ProjectIdParam)
 
+	// (PATCH /projects/tre/{projectId}/pending-deletion)
+	PatchProjectsTreProjectIdPendingDeletion(c *gin.Context, projectId ProjectIdParam)
+
 	// (GET /studies)
 	GetStudies(c *gin.Context, params GetStudiesParams)
 
@@ -2836,6 +2839,31 @@ func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPending(c *gin.Conte
 	}
 
 	siw.Handler.PatchProjectsTreProjectIdPending(c, projectId)
+}
+
+// PatchProjectsTreProjectIdPendingDeletion operation middleware
+func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPendingDeletion(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PatchProjectsTreProjectIdPendingDeletion(c, projectId)
 }
 
 // GetStudies operation middleware
@@ -4055,6 +4083,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)
 	router.PUT(options.BaseURL+"/projects/tre/:projectId", wrapper.PutProjectsTreProjectId)
 	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
+	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending-deletion", wrapper.PatchProjectsTreProjectIdPendingDeletion)
 	router.POST(options.BaseURL+"/projects/tre/:projectId/access-review-signoff", wrapper.PostProjectsTreProjectIdAccessReviewSignoff)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
