@@ -584,14 +584,29 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 			ProjectTREID:           projectTRE.ID,
 			UserID:                 userIds[types.Username(member.User.Username)],
 			DesktopHPCInstanceType: member.DesktopConfig.HpcInstanceType,
-			DesktopRootVolumeSize:  optionalUint(member.DesktopConfig.RootVolumeGb),
 		}
 		if exists := existingIdx >= 0; exists {
 			existingConfig := existing[existingIdx]
+			userConfig.DesktopRootVolumeSize, err = desktopVolumeSize(existingConfig.DesktopRootVolumeSize, member.DesktopConfig.RootVolumeGb)
+			if err != nil {
+				return types.NewErrClientInvalidObjectF("desktop root volume: %s", err)
+			}
+			userConfig.DesktopHomeVolumeSize, err = desktopVolumeSize(existingConfig.DesktopHomeVolumeSize, member.DesktopConfig.HomeVolumeGb)
+			if err != nil {
+				return types.NewErrClientInvalidObjectF("desktop home volume: %s", err)
+			}
 			userConfig.UID = existingConfig.UID
 			userConfig.UnixUsername = existingConfig.UnixUsername
 			userConfig.DesktopImageID = existingConfig.DesktopImageID
-		} else {
+		} else { // does not exist
+			userConfig.DesktopRootVolumeSize, err = desktopVolumeSize(nil, member.DesktopConfig.RootVolumeGb)
+			if err != nil {
+				return types.NewErrClientInvalidObjectF("desktop root volume: %s", err)
+			}
+			userConfig.DesktopHomeVolumeSize, err = desktopVolumeSize(nil, member.DesktopConfig.HomeVolumeGb)
+			if err != nil {
+				return types.NewErrClientInvalidObjectF("desktop home volume: %s", err)
+			}
 			userConfig.UID, err = projectTRENextUid(append(existing, requested...))
 			if err != nil {
 				return err
@@ -626,6 +641,7 @@ func (s *Service) createOrUpdateProjectTREUserConfigs(tx *gorm.DB, projectTRE ty
 			Assign(types.ProjectTREUserConfig{
 				DesktopHPCInstanceType: userConfig.DesktopHPCInstanceType,
 				DesktopRootVolumeSize:  userConfig.DesktopRootVolumeSize,
+				DesktopHomeVolumeSize:  userConfig.DesktopHomeVolumeSize,
 				DesktopImageID:         userConfig.DesktopImageID,
 			}).
 			Attrs(types.ProjectTREUserConfig{
@@ -656,6 +672,20 @@ func latestTREDesktopImage(tx *gorm.DB, platform types.ProjectTREPlatform) (*typ
 	}
 	err := tx.Where(&image).Order("created_at desc").First(&image).Error
 	return &image, types.NewErrFromGorm(err, "failed to get latest desktop image")
+}
+
+func desktopVolumeSize(existing *types.GB, requested *int) (*types.GB, error) {
+	if requested == nil {
+		return existing, nil
+	}
+	if *requested < 0 {
+		return nil, types.NewErrInvalidObject("size must not be negative")
+	}
+	size := types.GB(*requested)
+	if existing != nil && size < *existing {
+		return nil, types.NewErrClientInvalidObject("volume size cannot be reduced once set")
+	}
+	return &size, nil
 }
 
 func updateRequiresApproval(old *types.ProjectTRE, new openapi.ProjectTREUpdate) bool {

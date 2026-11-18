@@ -75,3 +75,7 @@ func (s *MockNotifications) NotifyProjectAccessReviewExpiry(ctx context.Context,
 func (s *MockNotifications) NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error {
 	panic("not-implemented")
 }
+
+func (s *MockNotifications) NotifyStudyIAONotStaff(ctx context.Context, study types.Study, igStaff []types.User) error {
+	panic("not-implemented")
+}

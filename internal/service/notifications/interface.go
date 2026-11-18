@@ -14,7 +14,7 @@ type Interface interface {
 	NotifyToCompleteProfile(user types.User) error
 	NotifyContractExpiry(ctx context.Context, contract types.Contract, study types.Study) error
 	NotifyTrainingExpiry(ctx context.Context, training types.UserTrainingRecord) error
-	NotifyStudyReview(ctx context.Context, study types.Study, igOpsStaff []types.User) error
+	NotifyStudyReview(ctx context.Context, study types.Study, igStaff []types.User) error
 	NotifyIaaAssignment(ctx context.Context, iaa types.User, study types.Study) error
 	NotifyIaaRemoval(ctx context.Context, removedAdmin types.User, study types.Study) error
 	NotifyStudySignoffExpiry(ctx context.Context, study types.Study) error
@@ -25,4 +25,5 @@ type Interface interface {
 	NotifyProjectDeployed(project types.Project, user types.User) error
 	NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error
 	NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error
+	NotifyStudyIAONotStaff(ctx context.Context, study types.Study, igStaff []types.User) error
 }

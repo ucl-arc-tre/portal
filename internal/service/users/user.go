@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -303,20 +304,24 @@ func (s *Service) dbApprovedResearcherJoins() *gorm.DB {
 		Where("agreements.type = ? AND (user_training_records.kind = ? OR user_training_records.kind = ?)", agreements.ApprovedResearcherType, types.TrainingKindNHSD, types.TrainingKindUCLHIg)
 }
 
-func (s *Service) AssignEmailAddress(ctx context.Context, user types.User) error {
-	if entra.IsExternalUsername(user.Username) {
-		return nil // externals already have a set email address
-	}
-	email, err := s.entra.UserEmail(ctx, user.Username)
-	if err != nil {
-		return err
-	}
+func (s *Service) AssignEntraAttributes(ctx context.Context, user types.User) error {
 	attrs := types.UserAttributes{UserID: user.ID}
+	data, err := s.entra.UserData(ctx, user.Username)
+	if errors.Is(err, types.ErrNotFound) {
+		attrs.IsStaff = new(false) // cannot be staff if not in entra
+	} else if err != nil {
+		return err
+	} else {
+		attrs.IsStaff = new(data.IsStaff())
+	}
+	if entra.IsExternalUsername(user.Username) {
+		// externals already have a set email address - do nothing
+	} else if data != nil && data.Email != nil {
+		attrs.Email = *data.Email
+	}
 	err = s.db.
-		Where(&attrs).
-		Assign(types.UserAttributes{
-			Email: email,
-		}).
+		Where("user_id = ?", attrs.UserID).
+		Assign(attrs).
 		FirstOrCreate(&attrs).Error
 	return types.NewErrFromGorm(err, "failed to assign email")
 }

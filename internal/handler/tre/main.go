@@ -43,14 +43,29 @@ func (h *Handler) GetUserStatus(ctx *gin.Context, params openapi.GetUserStatusPa
 	} else {
 		userStatus.IsApprovedResearcher = isApprovedResearcher
 	}
+	var latestTrainingExpiresAt *time.Time
 	if expiresAt, err := h.users.TrainingExpiresAt(*user, types.TrainingKindNHSD); errors.Is(err, types.ErrNotFound) {
 		log.Trace().Msg("User missing NHSD training date")
 	} else if err != nil {
-		log.Err(err).Any("username", user.Username).Msg("Failed to get training expiry for user")
+		log.Err(err).Any("username", user.Username).Msg("Failed to get NHSD training expiry for user")
 		ctx.Status(http.StatusInternalServerError)
 		return
 	} else {
+		latestTrainingExpiresAt = expiresAt
 		userStatus.NhsdTrainingExpiresAt = new(expiresAt.Format(config.TimeFormat))
+	}
+
+	if expiresAt, err := h.users.TrainingExpiresAt(*user, types.TrainingKindUCLHIg); errors.Is(err, types.ErrNotFound) {
+		log.Trace().Msg("User missing UCLH IG training date")
+	} else if err != nil {
+		log.Err(err).Any("username", user.Username).Msg("Failed to get UCLH IG training expiry for user")
+		ctx.Status(http.StatusInternalServerError)
+		return
+	} else if latestTrainingExpiresAt == nil || expiresAt.After(*latestTrainingExpiresAt) {
+		latestTrainingExpiresAt = expiresAt
+	}
+	if latestTrainingExpiresAt != nil {
+		userStatus.LatestTrainingExpiresAt = new(latestTrainingExpiresAt.Format(config.TimeFormat))
 	}
 	ctx.JSON(http.StatusOK, userStatus)
 }

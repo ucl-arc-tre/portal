@@ -21,10 +21,12 @@ func TestEntraUsernameForExternalEmail(t *testing.T) {
 
 func TestEmployeeTypeStaffRegex(t *testing.T) {
 	for _, valid := range []string{"Staff", "staff", "Staff, Alumnus", "Alumnus, Staff", "a,staff"} {
-		assert.True(t, employeeTypeIsStaff(valid), valid)
+		u := UserData{EmployeeType: new(valid)}
+		assert.True(t, u.IsStaff(), valid)
 	}
 	for _, invalid := range []string{"Staffandother", "astaffb", "student", "a, b", "otherstaff"} {
-		assert.False(t, employeeTypeIsStaff(invalid), invalid)
+		u := UserData{EmployeeType: new(invalid)}
+		assert.False(t, u.IsStaff(), invalid)
 	}
 }
 

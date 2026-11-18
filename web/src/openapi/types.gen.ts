@@ -162,6 +162,7 @@ export type UserDataLookup = {
 export type UserDataSummary = {
     username: string;
     name?: string;
+    is_staff?: boolean;
 };
 
 export type UserTrainingUpdate = {
@@ -395,10 +396,6 @@ export type StudyBase = {
      */
     involves_data_processing_outside_eea?: boolean | null;
     /**
-     * ID of the user who owns the study
-     */
-    owner_user_id?: string;
-    /**
      * Username of the user who owns the study
      */
     owner_username?: string;
@@ -600,6 +597,7 @@ export type ProjectTreUserDesktopConfig = {
     image_id?: string;
     hpc_instance_type?: string;
     root_volume_gb?: number;
+    home_volume_gb?: number;
 };
 
 /**

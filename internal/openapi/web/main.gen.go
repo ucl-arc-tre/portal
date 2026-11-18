@@ -1461,6 +1461,7 @@ type ProjectTREUpdate = ProjectTREBase
 
 // ProjectTREUserDesktopConfig defines model for ProjectTREUserDesktopConfig.
 type ProjectTREUserDesktopConfig struct {
+	HomeVolumeGb    *int    `json:"home_volume_gb,omitempty"`
 	HpcInstanceType *string `json:"hpc_instance_type,omitempty"`
 	ImageId         *string `json:"image_id,omitempty"`
 	RootVolumeGb    *int    `json:"root_volume_gb,omitempty"`
@@ -1549,9 +1550,6 @@ type Study struct {
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string          `json:"nhs_england_reference,omitempty"`
 	Owner               *UserDataSummary `json:"owner,omitempty"`
-
-	// OwnerUserId ID of the user who owns the study
-	OwnerUserId *string `json:"owner_user_id,omitempty"`
 
 	// OwnerUsername Username of the user who owns the study
 	OwnerUsername *string `json:"owner_username,omitempty"`
@@ -1642,9 +1640,6 @@ type StudyBase struct {
 
 	// NhsEnglandReference NHS England DARS NIC number
 	NhsEnglandReference *string `json:"nhs_england_reference,omitempty"`
-
-	// OwnerUserId ID of the user who owns the study
-	OwnerUserId *string `json:"owner_user_id,omitempty"`
 
 	// OwnerUsername Username of the user who owns the study
 	OwnerUsername *string `json:"owner_username,omitempty"`
@@ -1806,6 +1801,7 @@ type UserDataLookup struct {
 
 // UserDataSummary defines model for UserDataSummary.
 type UserDataSummary struct {
+	IsStaff  *bool   `json:"is_staff,omitempty"`
 	Name     *string `json:"name,omitempty"`
 	Username string  `json:"username"`
 }
