@@ -70,6 +70,7 @@ func InitDB() {
 	}
 
 	migrateTREProject(db)
+	migrateNotificationKind(db)
 
 	log.Debug().Msg("Initialised database")
 }

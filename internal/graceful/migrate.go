@@ -15,3 +15,13 @@ func migrateTREProject(db *gorm.DB) {
 		}
 	}
 }
+
+func migrateNotificationKind(db *gorm.DB) {
+	err := db.
+		Where(&types.Notification{Kind: new(types.NotificationKindUserNameChange_DEPRECATED)}).
+		Updates(&types.Notification{Kind: new(types.NotificationKindUserNameChangeRequest)}).
+		Error
+	if err != nil {
+		panic(fmt.Errorf("failed to update NotificationKind: %w", err))
+	}
+}
