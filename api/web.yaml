@@ -957,7 +957,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProjectIdParam"
       responses:
-        "200":
+        "204":
           description: Project submitted successfully
         "403":
           description: Forbidden
@@ -974,7 +974,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ProjectIdParam"
       responses:
-        "200":
+        "204":
           description: Project deletion requested successfully
         "400":
           description: Project is not in a status that can be requested for deletion, or has linked assets with active retention

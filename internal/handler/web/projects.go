@@ -261,7 +261,7 @@ func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId u
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 func (h *Handler) PatchProjectsTreProjectIdPendingDeletion(ctx *gin.Context, projectId uuid.UUID) {
@@ -271,7 +271,7 @@ func (h *Handler) PatchProjectsTreProjectIdPendingDeletion(ctx *gin.Context, pro
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId uuid.UUID) {

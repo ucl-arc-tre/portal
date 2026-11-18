@@ -2409,8 +2409,10 @@ export type PatchProjectsTreByProjectIdPendingResponses = {
     /**
      * Project submitted successfully
      */
-    200: unknown;
+    204: void;
 };
+
+export type PatchProjectsTreByProjectIdPendingResponse = PatchProjectsTreByProjectIdPendingResponses[keyof PatchProjectsTreByProjectIdPendingResponses];
 
 export type PatchProjectsTreByProjectIdPendingDeletionData = {
     body?: never;
@@ -2451,8 +2453,10 @@ export type PatchProjectsTreByProjectIdPendingDeletionResponses = {
     /**
      * Project deletion requested successfully
      */
-    200: unknown;
+    204: void;
 };
+
+export type PatchProjectsTreByProjectIdPendingDeletionResponse = PatchProjectsTreByProjectIdPendingDeletionResponses[keyof PatchProjectsTreByProjectIdPendingDeletionResponses];
 
 export type PostProjectsTreByProjectIdAccessReviewSignoffData = {
     body?: never;
