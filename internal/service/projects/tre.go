@@ -449,12 +449,8 @@ func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
 }
 
 func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
-	hasActiveAssetRetention, err := s.projectHasAssetsWithActiveRetention(projectId)
-	if err != nil {
+	if err := s.validateProjectAssetsForDeletion(projectId); err != nil {
 		return err
-	}
-	if hasActiveAssetRetention {
-		return types.NewErrClientInvalidObject("cannot request deletion while linked assets have active retention")
 	}
 
 	deletionRequestableStatuses := []types.ProjectTREStatus{
@@ -482,14 +478,15 @@ func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
 
 const arcTreAssetLocation = "arc_tre"
 
-func (s *Service) projectHasAssetsWithActiveRetention(projectId uuid.UUID) (bool, error) {
+func (s *Service) validateProjectAssetsForDeletion(projectId uuid.UUID) error {
 	var projectAssets []types.ProjectAsset
 	err := s.db.Preload("Asset.Locations").Where("project_id = ?", projectId).Find(&projectAssets).Error
 	if err != nil {
-		return false, types.NewErrFromGorm(err, "failed to load project assets")
+		return types.NewErrFromGorm(err, "failed to load project assets")
 	}
 
 	now := time.Now()
+	errorMessage := ""
 	for _, projectAsset := range projectAssets {
 		asset := projectAsset.Asset
 
@@ -498,16 +495,21 @@ func (s *Service) projectHasAssetsWithActiveRetention(projectId uuid.UUID) (bool
 			continue
 		}
 
-		hasFutureExpiry := asset.ExpiresAt != nil && asset.ExpiresAt.After(now)
 		isInArcTre := slices.ContainsFunc(asset.Locations, func(location types.AssetLocation) bool {
 			return location.Location == arcTreAssetLocation
 		})
+		if isInArcTre {
+			errorMessage += fmt.Sprintf("• Asset '%s' is still stored in the ARC TRE\n\n", asset.Title)
+		}
 
-		if hasFutureExpiry || isInArcTre {
-			return true, nil
+		if asset.ExpiresAt != nil && asset.ExpiresAt.After(now) {
+			errorMessage += fmt.Sprintf("• Asset '%s' has retention until %s\n\n", asset.Title, asset.ExpiresAt.Format(config.DateFormat))
 		}
 	}
-	return false, nil
+	if errorMessage != "" {
+		return types.NewErrClientInvalidObjectF("cannot request deletion: %s", errorMessage)
+	}
+	return nil
 }
 
 func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error {
