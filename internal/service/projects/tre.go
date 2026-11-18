@@ -448,20 +448,15 @@ func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
 	return nil
 }
 
+// Requests deletion of a Deployed project, transitioning it to Pending Deletion while the TRE team tears down the live environment
 func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
 	if err := s.validateProjectAssetsForDeletion(projectId); err != nil {
 		return err
 	}
 
-	deletionRequestableStatuses := []types.ProjectTREStatus{
-		types.ProjectTREStatusPendingApproval,
-		types.ProjectTREStatusPendingCreation,
-		types.ProjectTREStatusDeployed,
-	}
-
 	result := s.db.Model(&types.ProjectTRE{}).
 		Where("project_id = ?", projectId).
-		Where("status IN ?", deletionRequestableStatuses).
+		Where("status = ?", types.ProjectTREStatusDeployed).
 		Update("status", types.ProjectTREStatusPendingDeletion)
 
 	if result.Error != nil {
@@ -469,8 +464,7 @@ func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
 	}
 
 	if result.RowsAffected == 0 {
-		return types.NewErrInvalidObjectF(
-			"project must be in Pending Approval, Pending Creation, or Deployed status to request deletion")
+		return types.NewErrInvalidObjectF("project must be in Deployed status to request deletion")
 	}
 
 	return nil
@@ -868,9 +862,9 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID, deleter types.User) erro
 		return types.NewErrFromGorm(err, "failed to find project TRE")
 	}
 
-	if projectTRE.Status != types.ProjectTREStatusIncomplete {
+	if projectTRE.Status != types.ProjectTREStatusIncomplete && projectTRE.Status != types.ProjectTREStatusPendingApproval {
 		tx.Rollback()
-		return types.NewErrInvalidObjectF("deletion must have an incomplete status. was [%v]", projectTRE.Status)
+		return types.NewErrInvalidObjectF("deletion must have an incomplete or pending approval status. was [%v]", projectTRE.Status)
 	}
 
 	// Soft delete all ProjectTRERoleBindings for this project

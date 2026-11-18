@@ -59,12 +59,12 @@ export default function ManageProjectTRE(props: Props) {
     project.creator.username == userData?.username ||
     (userData?.roles as string[]).includes(`project_${project.id}_owner`);
 
-  const canDelete = canEdit || isIGAdmin;
+  const canRequestProjectDeletion = canEdit || isIGAdmin;
 
+  // Incomplete and Pending Approval projects have nothing in the TRE environment to tear down,
+  // so they use the immediate hard-delete section below instead of this request-and-wait flow.
   const deletionRequestEnabled = process.env.NEXT_PUBLIC_ENABLE_TRE_PROJECT_DELETION_REQUEST === "true";
-  const deletionRequestableStatuses = ["pending-approval", "pending-creation", "deployed"];
-  const canRequestDeletion =
-    deletionRequestEnabled && canDelete && deletionRequestableStatuses.includes(project.status);
+  const canRequestDeletion = deletionRequestEnabled && canRequestProjectDeletion && project.status === "deployed";
 
   // prepare the approved study for edit form
   const approvedStudy = project ? [{ id: project.study_id, title: project.study_title } as Study] : [];
@@ -366,24 +366,27 @@ export default function ManageProjectTRE(props: Props) {
         </Box>
       )}
 
-      {tab === "project" && !canApprove && canDelete && project.status === "incomplete" && (
-        <Box>
-          <section aria-labelledby="delete-project-heading">
-            <div className={styles["delete-section-header"]}>
-              <h2 id="delete-project-heading">Deletion</h2>
-              <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
-                {deleting ? "Deleting..." : "Delete"}
-              </Button>
-            </div>
-            <Alert type="warning">
-              <AlertMessage>
-                This is a destructive operation. <strong>All project data will be lost.</strong> Deleting this project
-                also removes its links to members, assets, and configuration.
-              </AlertMessage>
-            </Alert>
-          </section>
-        </Box>
-      )}
+      {tab === "project" &&
+        !canApprove &&
+        canEdit &&
+        (project.status === "incomplete" || project.status === "pending-approval") && (
+          <Box>
+            <section aria-labelledby="delete-project-heading">
+              <div className={styles["delete-section-header"]}>
+                <h2 id="delete-project-heading">Deletion</h2>
+                <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
+                  {deleting ? "Deleting..." : "Delete"}
+                </Button>
+              </div>
+              <Alert type="warning">
+                <AlertMessage>
+                  This is a destructive operation. <strong>All project data will be lost.</strong> Deleting this project
+                  also removes its links to members, assets, and configuration.
+                </AlertMessage>
+              </Alert>
+            </section>
+          </Box>
+        )}
 
       {tab === "project" && canRequestDeletion && (
         <Box>
