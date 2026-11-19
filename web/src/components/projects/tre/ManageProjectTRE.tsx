@@ -369,6 +369,7 @@ export default function ManageProjectTRE(props: Props) {
       {tab === "project" &&
         !canApprove &&
         canEdit &&
+        !project.deployed_version_updated_at &&
         (project.status === "incomplete" || project.status === "pending-approval") && (
           <Box>
             <section aria-labelledby="delete-project-heading">

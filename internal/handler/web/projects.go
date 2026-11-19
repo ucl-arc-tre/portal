@@ -180,6 +180,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId uuid.UUID)
 		Members:                    h.extractProjectMembers(projectTRE),
 		AssetIds:                   nil,
 		LastAccessReview:           openapi.FormatOptionalTime(projectTRE.Project.LastAccessReview),
+		DeployedVersionUpdatedAt:   openapi.FormatOptionalTime(projectTRE.DeployedVersionUpdatedAt),
 		StudyOwner:                 h.optionalStudyOwnerSummary(&projectTRE.Project.Study),
 	}
 	if projectTRE.DeployedVersionUpdatedAt != nil &&

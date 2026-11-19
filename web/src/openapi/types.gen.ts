@@ -739,6 +739,10 @@ export type ProjectTre = ProjectTreBase & {
      */
     is_pending_deployment_update: boolean;
     /**
+     * Time in RFC3339 format of the deployed version of this project. Null if the project has never been deployed
+     */
+    deployed_version_updated_at?: string | null;
+    /**
      * Time in RFC3339 format representing when an IAO/IAA last reviewed people access and role assignments for this project
      */
     last_access_review?: string | null;

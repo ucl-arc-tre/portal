@@ -1347,9 +1347,12 @@ type ProjectTRE struct {
 	Assets []Asset `json:"assets"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt       string          `json:"created_at"`
-	Creator         UserDataSummary `json:"creator"`
-	EnvironmentName EnvironmentName `json:"environment_name"`
+	CreatedAt string          `json:"created_at"`
+	Creator   UserDataSummary `json:"creator"`
+
+	// DeployedVersionUpdatedAt Time in RFC3339 format of the deployed version of this project. Null if the project has never been deployed
+	DeployedVersionUpdatedAt *string         `json:"deployed_version_updated_at,omitempty"`
+	EnvironmentName          EnvironmentName `json:"environment_name"`
 
 	// ExternalEncryptionEnabled Is external encryption enabled for this project?
 	ExternalEncryptionEnabled bool `json:"external_encryption_enabled"`

@@ -2732,6 +2732,10 @@ components:
             is_pending_deployment_update:
               type: boolean
               description: Is this project waiting on a deployment update (i.e. the requested state is newer than the current state)?
+            deployed_version_updated_at:
+              type: string
+              nullable: true
+              description: Time in RFC3339 format of the deployed version of this project. Null if the project has never been deployed
             last_access_review:
               type: string
               nullable: true
