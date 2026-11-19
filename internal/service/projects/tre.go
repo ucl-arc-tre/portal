@@ -470,6 +470,7 @@ func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
 	return nil
 }
 
+// Must match the "arc_tre" location value in web/src/components/ui/storageDefinitions.ts.
 const arcTreAssetLocation = "arc_tre"
 
 func (s *Service) validateProjectAssetsForDeletion(projectId uuid.UUID) error {
