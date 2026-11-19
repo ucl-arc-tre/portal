@@ -868,6 +868,13 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID, deleter types.User) erro
 		return types.NewErrInvalidObjectF("deletion must have an incomplete or pending approval status. was [%v]", projectTRE.Status)
 	}
 
+	// A previously deployed project returns to pending approval when an update is requested,
+	// so it still exists in the TRE environment and must not be deleted immediately.
+	if projectTRE.DeployedVersionUpdatedAt != nil {
+		tx.Rollback()
+		return types.NewErrInvalidObjectF("project has been deployed so cannot be deleted immediately")
+	}
+
 	// Soft delete all ProjectTRERoleBindings for this project
 	err = tx.Where("project_tre_id = ?", projectTRE.ID).Delete(&types.ProjectTRERoleBinding{}).Error
 	if err != nil {
