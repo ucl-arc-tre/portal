@@ -55,7 +55,7 @@ func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*o
 
 	if response.RequiresApproval {
 		if err := s.notifyUserNameChangeRequest(attrs); err != nil {
-			log.Err(err).Msg("Failed to notify user name change") // not fatal
+			log.Err(err).Msg("Failed to notify user name change request") // not fatal
 		}
 	}
 	return &response, nil
@@ -69,10 +69,14 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	// This name change may be from the admin approving a name change request, or from the admin unilaterally changing their name.
 	// In either case, clear the RequestedChosenName, and notify the subject of the name change about the change.
 	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName, RequestedChosenName: new(types.ChosenName(""))}).FirstOrCreate(&attrs).Error
-	if err == nil {
-		s.notifications.NotifyUserNameChangeOccurred(context.Background(), user, chosenName)
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to set chosen name")
 	}
-	return types.NewErrFromGorm(err, "failed to set chosen name")
+	err = s.notifications.NotifyUserNameChangeOccurred(context.Background(), user, chosenName)
+	if err != nil {
+		log.Err(err).Msg("Failed to notify user name change") // not fatal
+	}
+	return err
 }
 
 func (s *Service) notifyUserNameChangeRequest(attrs types.UserAttributes) error {
