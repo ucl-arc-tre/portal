@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 
@@ -69,7 +70,7 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	// In either case, clear the RequestedChosenName, and notify the subject of the name change about the change.
 	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName, RequestedChosenName: new(types.ChosenName(""))}).FirstOrCreate(&attrs).Error
 	if err == nil {
-		s.notifications.NotifyUserNameChangeOccurred(user, chosenName)
+		s.notifications.NotifyUserNameChangeOccurred(context.Background(), user, chosenName)
 	}
 	return types.NewErrFromGorm(err, "failed to set chosen name")
 }

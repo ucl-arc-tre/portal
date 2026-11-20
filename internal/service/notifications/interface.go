@@ -21,7 +21,7 @@ type Interface interface {
 	NotifyAssetExpiry(ctx context.Context, assets []types.Asset, study types.Study) error
 	NotifyOwnerChange(ctx context.Context, study types.Study, igStaff []types.User) error
 	NotifyUserNameChangeRequest(attrs types.UserAttributes, recipients []types.User) error
-	NotifyUserNameChangeOccurred(subject types.User, chosenName types.ChosenName) error
+	NotifyUserNameChangeOccurred(ctx context.Context, subject types.User, chosenName types.ChosenName) error
 	NotifyProjectDeployed(project types.Project, user types.User) error
 	NotifyProjectAccessReviewExpiry(ctx context.Context, project types.Project) error
 	NotifyProjectTrePendingApproval(project types.Project, treOpsStaff []types.User) error
