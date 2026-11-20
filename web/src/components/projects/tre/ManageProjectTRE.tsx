@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import {
   postProjectsTreAdminByProjectIdApprove,
-  patchProjectsTreByProjectIdPending,
+  patchProjectsTreByProjectIdByStatus,
   Study,
   deleteProjectsTreByProjectId,
   ProjectTre,
@@ -37,7 +37,7 @@ type Props = {
 export default function ManageProjectTRE(props: Props) {
   const { project, fetchData } = props;
 
-  const { authInProgress, isAuthed, userData, isAdmin, isTreOpsStaff } = useAuth();
+  const { authInProgress, isAuthed, userData, isAdmin, isTreOpsStaff, isIGAdmin } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isApproving, setIsApproving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,6 +45,9 @@ export default function ManageProjectTRE(props: Props) {
   const [deleting, setDeleting] = useState<boolean>(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [requestingDeletion, setRequestingDeletion] = useState<boolean>(false);
+  const [showRequestDeletionConfirm, setShowRequestDeletionConfirm] = useState(false);
+  const [requestDeletionError, setRequestDeletionError] = useState<string | null>(null);
 
   const editingEnabled =
     project.status === "incomplete" ||
@@ -56,6 +59,13 @@ export default function ManageProjectTRE(props: Props) {
     project.creator.username == userData?.username ||
     (userData?.roles as string[]).includes(`project_${project.id}_owner`);
 
+  const canRequestProjectDeletion = canEdit || isIGAdmin;
+
+  // Incomplete and Pending Approval projects have nothing in the TRE environment to tear down,
+  // so they use the immediate hard-delete section below instead of this request-and-wait flow.
+  const deletionRequestEnabled = process.env.NEXT_PUBLIC_ENABLE_TRE_PROJECT_DELETION_REQUEST === "true";
+  const canRequestDeletion = deletionRequestEnabled && canRequestProjectDeletion && project.status === "deployed";
+
   // prepare the approved study for edit form
   const approvedStudy = project ? [{ id: project.study_id, title: project.study_title } as Study] : [];
 
@@ -66,8 +76,8 @@ export default function ManageProjectTRE(props: Props) {
     setError(null);
 
     try {
-      const response = await patchProjectsTreByProjectIdPending({
-        path: { projectId },
+      const response = await patchProjectsTreByProjectIdByStatus({
+        path: { projectId, status: "pending" },
       });
 
       if (responseIsError(response)) {
@@ -155,6 +165,43 @@ export default function ManageProjectTRE(props: Props) {
   const handleDeleteClick = () => {
     setShowDeleteConfirm(true);
     setDeleteError(null);
+  };
+
+  const handleRequestDeletionClick = () => {
+    setShowRequestDeletionConfirm(true);
+    setRequestDeletionError(null);
+  };
+
+  const handleCancelRequestDeletion = () => {
+    setShowRequestDeletionConfirm(false);
+    setRequestDeletionError(null);
+  };
+
+  const handleConfirmRequestDeletion = async () => {
+    if (!projectId) return;
+
+    setRequestingDeletion(true);
+    setRequestDeletionError(null);
+
+    try {
+      const response = await patchProjectsTreByProjectIdByStatus({
+        path: { projectId: projectId as string, status: "pending-deletion" },
+      });
+
+      if (responseIsError(response)) {
+        const errorMsg = extractErrorMessage(response);
+        setRequestDeletionError(`Failed to request project deletion: ${errorMsg}`);
+        return;
+      }
+
+      setShowRequestDeletionConfirm(false);
+      fetchData();
+    } catch (err) {
+      console.error("Failed to request project deletion:", err);
+      setRequestDeletionError("Failed to request project deletion. Please try again.");
+    } finally {
+      setRequestingDeletion(false);
+    }
   };
 
   const accessReviewEnabled = process.env.NEXT_PUBLIC_ENABLE_PROJECT_ACCESS_REVIEW === "true";
@@ -319,19 +366,47 @@ export default function ManageProjectTRE(props: Props) {
         </Box>
       )}
 
-      {tab === "project" && !canApprove && canEdit && project.status === "incomplete" && (
+      {tab === "project" &&
+        !canApprove &&
+        canEdit &&
+        !project.deployed_version_updated_at &&
+        (project.status === "incomplete" || project.status === "pending-approval") && (
+          <Box>
+            <section aria-labelledby="delete-project-heading">
+              <div className={styles["delete-section-header"]}>
+                <h2 id="delete-project-heading">Deletion</h2>
+                <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
+                  {deleting ? "Deleting..." : "Delete"}
+                </Button>
+              </div>
+              <Alert type="warning">
+                <AlertMessage>
+                  This is a destructive operation. <strong>All project data will be lost.</strong> Deleting this project
+                  also removes its links to members, assets, and configuration.
+                </AlertMessage>
+              </Alert>
+            </section>
+          </Box>
+        )}
+
+      {tab === "project" && canRequestDeletion && (
         <Box>
-          <section aria-labelledby="delete-project-heading">
+          <section aria-labelledby="request-deletion-heading">
             <div className={styles["delete-section-header"]}>
-              <h2 id="delete-project-heading">Deletion</h2>
-              <Button onClick={handleDeleteClick} size="small" disabled={deleting} variant="secondary-destructive">
-                {deleting ? "Deleting..." : "Delete"}
+              <h2 id="request-deletion-heading">Deletion</h2>
+              <Button
+                onClick={handleRequestDeletionClick}
+                size="small"
+                disabled={requestingDeletion}
+                variant="secondary-destructive"
+              >
+                {requestingDeletion ? "Requesting..." : "Request Deletion"}
               </Button>
             </div>
             <Alert type="warning">
               <AlertMessage>
-                This is a destructive operation. <strong>All project data will be lost.</strong> Deleting this project
-                also removes its links to members, assets, and configuration.
+                Requesting deletion <strong>cannot be undone</strong>. Once approved, this project and its data will be
+                permanently removed.
               </AlertMessage>
             </Alert>
           </section>
@@ -410,6 +485,36 @@ export default function ManageProjectTRE(props: Props) {
               </Button>
               <Button onClick={handleConfirmDelete} variant="primary-destructive" disabled={!!deleting}>
                 {deleting ? "Deleting..." : "Delete Project"}
+              </Button>
+            </div>
+          </div>
+        </Dialog>
+      )}
+
+      {showRequestDeletionConfirm && (
+        <Dialog setDialogOpen={handleCancelRequestDeletion}>
+          <div className={styles["delete-dialog"]}>
+            <h2>Request Project Deletion</h2>
+            <p>
+              Are you sure you want to request deletion of project <strong>{project.name}</strong>?
+            </p>
+            <p>
+              This cannot be undone. The project will be marked as pending deletion, and the TRE team will process its
+              removal.
+            </p>
+
+            {requestDeletionError && <Error message={requestDeletionError} />}
+
+            <div className={styles["delete-actions"]}>
+              <Button onClick={handleCancelRequestDeletion} variant="secondary" disabled={!!requestingDeletion}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmRequestDeletion}
+                variant="primary-destructive"
+                disabled={!!requestingDeletion}
+              >
+                {requestingDeletion ? "Requesting..." : "Request Deletion"}
               </Button>
             </div>
           </div>
