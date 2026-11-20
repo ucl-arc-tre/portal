@@ -36,7 +36,7 @@ export default function ProfileSummaryCard(props: Props) {
                 chosenNamePendingApproval ? (
                   <>
                     {requestedChosenName}
-                    <InfoTooltip text="Name change pending approval" cy="name-change-pending"/>
+                    <InfoTooltip text="Name change pending approval" cy="name-change-pending" />
                   </>
                 ) : (
                   <>

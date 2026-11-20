@@ -623,10 +623,11 @@ Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
 });
 
 Cypress.Commands.add("fetchNotificationsMatching", (kind: string, titleIncludes: string) => {
-  return cy.request<Notification[]>("/web/api/v0/notifications").its("body")
+  return cy
+    .request<Notification[]>("/web/api/v0/notifications")
+    .its("body")
     .then((notifications) => {
-      const notifsMatching = notifications
-        .filter((n) => n.kind === kind && n.title.includes(titleIncludes));
+      const notifsMatching = notifications.filter((n) => n.kind === kind && n.title.includes(titleIncludes));
       return notifsMatching;
     });
 });

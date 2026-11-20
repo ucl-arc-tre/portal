@@ -25,17 +25,17 @@ describe("Make name edit requiring approval", () => {
     cy.becomeApprovedResearcher();
 
     // use the notifications API to find the user whose name change we want to approve
-    cy.fetchNotificationsMatching("user-name-change-request", "requested a name change to 'Jeremy Stein'")
-      .then((allRequests) => {
+    cy.fetchNotificationsMatching("user-name-change-request", "requested a name change to 'Jeremy Stein'").then(
+      (allRequests) => {
         const lastRequest = allRequests.at(-1);
         expect(lastRequest, "name change notification not found").to.exist;
         cy.visit(lastRequest!.href!);
-    });
+      }
+    );
 
     // approve button should exist, click it and it disappears
     cy.get('[data-cy="approve-name-change-button"]').click();
     cy.get('[data-cy="approve-name-change-button"]').should("not.exist");
-
   });
 
   it("can visit profile and see that name change has been approved", () => {
@@ -54,11 +54,9 @@ describe("Make name edit requiring approval", () => {
     cy.loginAsStaff();
     cy.becomeApprovedResearcher();
 
-    cy.fetchNotificationsMatching("user-name-change-occurred", "been changed to 'Jeremy Stein'")
-      .then((allRequests) => {
-        const lastRequest = allRequests.at(-1);
-        expect(lastRequest, "name change notification not found").to.exist;
-      });
+    cy.fetchNotificationsMatching("user-name-change-occurred", "been changed to 'Jeremy Stein'").then((allRequests) => {
+      const lastRequest = allRequests.at(-1);
+      expect(lastRequest, "name change notification not found").to.exist;
+    });
   });
-
 });
