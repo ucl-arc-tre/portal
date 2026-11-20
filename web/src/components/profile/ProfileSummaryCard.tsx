@@ -31,12 +31,12 @@ export default function ProfileSummaryCard(props: Props) {
         <div className={styles.row}>
           <div className={styles.field}>
             <span className={styles.label}>Chosen name:</span>
-            <span className={styles.value}>
+            <span className={styles.value} data-cy="chosen-name-value">
               {chosenName ? (
                 chosenNamePendingApproval ? (
                   <>
                     {requestedChosenName}
-                    <InfoTooltip text="Name change pending approval" />
+                    <InfoTooltip text="Name change pending approval" cy="name-change-pending"/>
                   </>
                 ) : (
                   <>

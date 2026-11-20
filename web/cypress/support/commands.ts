@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { login } from "./auth";
+import type { Notification } from "@/openapi";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -359,6 +360,12 @@ declare global {
       mockNotifications(notifications: Notification[]): Chainable<any>;
 
       /**
+       * Fetch the logged-in user's notifications with the specified kind/title
+       * @example cy.fetchNotificationsMatching("user-name-change-request", "requested a name change")
+       */
+      fetchNotificationsMatching(kind: string, titleIncludes: string): Chainable<Notification[]>;
+
+      /**
        * Mock finding and deleting a read complete-profile notification.
        * @example cy.mockClearCompleteProfileNotification()
        */
@@ -615,10 +622,14 @@ Cypress.Commands.add("mockProfileChosenName", (chosenName?: string) => {
   }).as("getChosenName");
 });
 
-export type Notification = {
-  title: string;
-  kind: string;
-};
+Cypress.Commands.add("fetchNotificationsMatching", (kind: string, titleIncludes: string) => {
+  return cy.request<Notification[]>("/web/api/v0/notifications").its("body")
+    .then((notifications) => {
+      const notifsMatching = notifications
+        .filter((n) => n.kind === kind && n.title.includes(titleIncludes));
+      return notifsMatching;
+    });
+});
 
 Cypress.Commands.add("mockNotifications", (notifications: Notification[]) => {
   cy.intercept("GET", "/web/api/v0/notifications", {
