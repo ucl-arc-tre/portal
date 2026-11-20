@@ -38,6 +38,7 @@ type UserAttributes struct {
 	ChosenName          ChosenName
 	RequestedChosenName *ChosenName // User has requested a change which is pending approval
 	Email               string      // Should be set for external users
+	IsStaff             *bool       // Is the user currently a staff member. Null implies not checked
 
 	// Relationships
 	User User `gorm:"foreignKey:UserID"`

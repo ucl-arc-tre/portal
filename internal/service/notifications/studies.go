@@ -234,6 +234,17 @@ func (s *Service) NotifyAssetExpiry(ctx context.Context, assets []types.Asset, s
 	return s.createForAll(notification, recipients)
 }
 
+func (s *Service) NotifyStudyIAONotStaff(ctx context.Context, study types.Study, igStaff []types.User) error {
+	log.Debug().Str("study", study.Title).Any("owner", study.Owner.Username).Msg("Notifying Study's owner/IAO is not a staff member anymore")
+	notification := types.Notification{
+		Title:     fmt.Sprintf("Owner of Study '%s' is no longer a staff member", study.Title),
+		Href:      new(fmt.Sprintf("/studies/manage?studyId=%s", study.ID.String())),
+		Kind:      new(types.NotificationKindStudyOwnerNotStaff),
+		ExpiresAt: new(study.UpdatedAt.Add(24 * time.Hour)),
+	}
+	return s.createForAll(notification, igStaff)
+}
+
 func emails(recipients ...types.User) []string {
 	recipientEmails := []string{}
 	for _, recipient := range recipients {

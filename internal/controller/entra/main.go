@@ -79,7 +79,7 @@ func New() *Controller {
 }
 
 // Get the cached user data for a user
-func (c *Controller) userData(ctx context.Context, username types.Username) (*UserData, error) {
+func (c *Controller) UserData(ctx context.Context, username types.Username) (*UserData, error) {
 	if userData, exists := c.userDataCache.Get(username); exists {
 		return &userData, nil
 	}
@@ -160,36 +160,19 @@ func (c *Controller) findUserExternal(ctx context.Context, email Email) (graphmo
 	return users[0], nil
 }
 
-func (c *Controller) UserEmail(ctx context.Context, username types.Username) (Email, error) {
-	user, err := c.findUser(ctx, username)
-	if err != nil {
-		return "", err
-	}
-	email := user.GetMail()
-	if email == nil {
-		return "", types.NewNotFoundError(fmt.Errorf("user [%v] had no entra email", username))
-	}
-	return *email, nil
-}
-
 // checks if the user (e.g. abc@ucl.ac.uk) is a staff member based on their employee type. Returns a cached response
 func (c *Controller) IsStaffMember(ctx context.Context, username types.Username) (bool, error) {
 	if username == "" {
 		return false, types.NewErrInvalidObject("username cannot be empty")
 	}
 
-	userData, err := c.userData(ctx, types.Username(username))
+	userData, err := c.UserData(ctx, types.Username(username))
 	if err != nil {
 		return false, err
 	}
 
 	log.Trace().Any("userData", userData).Any("username", username).Msg("Retrieved user data from Entra")
-
-	if userData.EmployeeType == nil || *userData.EmployeeType == "" {
-		return false, types.NewNotFoundError("employee type unset")
-	}
-
-	return employeeTypeIsStaff(*userData.EmployeeType), nil
+	return userData.IsStaff(), nil
 }
 
 func (c *Controller) UserExists(ctx context.Context, username types.Username) (bool, error) {
@@ -203,7 +186,7 @@ func (c *Controller) UserExists(ctx context.Context, username types.Username) (b
 }
 
 func (c *Controller) SendInvite(ctx context.Context, invite Invite) (*InvitedUserData, error) {
-	user, err := c.userData(ctx, types.Username(invite.Recipient))
+	user, err := c.UserData(ctx, types.Username(invite.Recipient))
 	if err == nil {
 		log.Debug().Any("userEmail", user.Email).Msg("User already exists in entra")
 		return c.sendInviteExistingEntraUser(ctx, invite)
@@ -217,7 +200,7 @@ func (c *Controller) SendInvite(ctx context.Context, invite Invite) (*InvitedUse
 func (c *Controller) sendInviteExistingEntraUser(ctx context.Context, invite Invite) (*InvitedUserData, error) {
 	log.Debug().Str("email", invite.Recipient).Msg("Inviting existing entra user to portal")
 
-	user, err := c.userData(ctx, types.Username(invite.Recipient))
+	user, err := c.UserData(ctx, types.Username(invite.Recipient))
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +227,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, invite Invite) 
 	messageInfo.SetCustomizedMessageBody(new(string(message)))
 	requestBody.SetInvitedUserMessageInfo(messageInfo)
 
-	sponsorUserData, err := c.userData(ctx, invite.Sponsor.Username)
+	sponsorUserData, err := c.UserData(ctx, invite.Sponsor.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +259,7 @@ func (c *Controller) sendInviteNewEntraUser(ctx context.Context, invite Invite) 
 }
 
 // Idempotent add user to Entra invited users security group
-func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
+func (c *Controller) AddToInvitedUserGroup(ctx context.Context, user InvitedUserData) error {
 	log.Debug().Str("objectId", user.Id.String()).Msg("Adding invited user to invited user group")
 
 	groupId := config.EntraInvitedUserGroup()
@@ -292,10 +275,6 @@ func (c *Controller) AddtoInvitedUserGroup(ctx context.Context, user InvitedUser
 		return types.NewErrServerError(fmt.Errorf("unknown entra error: %v", err))
 	}
 	return nil
-}
-
-func employeeTypeIsStaff(employeeType string) bool {
-	return employeeTypeStaffPattern.MatchString(employeeType)
 }
 
 // FindUsernames searches entra for usernames given a query of email, user principal

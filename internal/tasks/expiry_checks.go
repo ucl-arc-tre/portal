@@ -179,6 +179,47 @@ func (m *Manager) checkStudySignoffExpiry(study types.Study) error {
 	return m.notifications.NotifyStudySignoffExpiry(context.Background(), study)
 }
 
+func (m *Manager) checkStudiesIAOAreStaff() error {
+	if !config.NotificationsEnabled() {
+		return nil
+	}
+	igStaff, err := m.users.IgStaff()
+	if err != nil {
+		return err
+	}
+
+	studies := []types.Study{}
+	errs := []error{}
+	result := m.db.Model(&types.Study{}).
+		Where("approval_status = ?", openapi.StudyApprovalStatusApproved).
+		Preload("Owner").
+		FindInBatches(&studies, batchSize, func(_ *gorm.DB, _ int) error {
+			for _, study := range studies {
+				if err := m.checkStudyIAOIsStaff(study, igStaff); err != nil {
+					errs = append(errs, err)
+				}
+			}
+			return nil
+		})
+
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to get studies")
+	}
+
+	return errors.Join(errs...)
+}
+
+func (m *Manager) checkStudyIAOIsStaff(study types.Study, igStaff []types.User) error {
+	attrs, err := m.users.Attributes(study.Owner)
+	if err != nil {
+		return err
+	} else if attrs.IsStaff == nil || *attrs.IsStaff {
+		return nil
+	}
+	log.Info().Str("study", study.Title).Any("owner", study.Owner.Username).Msg("Notifying study IAO is not staff")
+	return m.notifications.NotifyStudyIAONotStaff(context.Background(), study, igStaff)
+}
+
 func (m *Manager) checkProjectsAccessReviewExpiry() error {
 	if !config.NotificationsEnabled() {
 		return nil
