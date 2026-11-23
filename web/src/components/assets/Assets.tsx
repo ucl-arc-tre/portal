@@ -19,15 +19,21 @@ const helperText = `Use this tab to register and manage the Assets for this Stud
 
 const tellMeMore = (
   <>
-    Each Asset&apos;s details, arrangements and requirements can be recorded using the form, and is valid across
-    multiple storage locations. They can be linked to specific Contracts and Projects within this Study. <br></br>
-    Assets should be reviewed periodically to ensure they remain accurate and required. You may receive reminders when
-    Asset reviews are due. As part of the review, consider whether the asset is still needed and if the details remain
-    correct. <br></br>
-    Where an asset receives a Vulnerable (Amber) or Critical (Red) risk rating, the identified risks and mitigations
-    should be carefully considered. Consider whether changes to storage arrangements, data flows, retention
-    arrangements, or access permissions could further protect the information and reduce the likelihood or impact of an
-    incident.
+    <p>
+      Each Asset&apos;s details, arrangements and requirements can be recorded using the form, and is valid across
+      multiple storage locations. They can be linked to specific Contracts and Projects within this Study.{" "}
+    </p>
+    <p>
+      Assets should be reviewed periodically to ensure they remain accurate and required. You may receive reminders when
+      Asset reviews are due. As part of the review, consider whether the asset is still needed and if the details remain
+      correct.
+    </p>{" "}
+    <p>
+      Where an asset receives a Vulnerable (Amber) or Critical (Red) risk rating, the identified risks and mitigations
+      should be carefully considered. Consider whether changes to storage arrangements, data flows, retention
+      arrangements, or access permissions could further protect the information and reduce the likelihood or impact of
+      an incident.
+    </p>
   </>
 );
 

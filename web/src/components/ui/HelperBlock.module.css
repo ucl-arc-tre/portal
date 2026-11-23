@@ -1,12 +1,27 @@
 .block {
-  white-space: pre-line;
   padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
 
-  &.tell-more {
+.helper {
+  white-space: pre-line;
+
+  &.tell-more-available {
     white-space: unset;
 
     button {
       font-size: 0.875rem;
+      height: min-content;
     }
+  }
+}
+
+.tell-me-more {
+  margin-top: 5rem;
+
+  p {
+    margin-bottom: 0.8rem;
   }
 }

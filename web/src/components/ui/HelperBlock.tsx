@@ -11,8 +11,8 @@ type Props = {
 export default function HelperBlock({ text, tellMeMore }: Props) {
   const [tellMeMoreExpanded, setTellMeMoreExpanded] = useState(false);
   return (
-    <div className={`${styles.block} ${tellMeMore ? styles["tell-more"] : ""}`}>
-      <HelperText>
+    <div className={styles.block}>
+      <HelperText className={`${styles.helper} ${tellMeMore ? styles["tell-more-available"] : ""}`}>
         {text}{" "}
         {tellMeMore && (
           <Button
@@ -28,12 +28,7 @@ export default function HelperBlock({ text, tellMeMore }: Props) {
         )}
       </HelperText>
 
-      {tellMeMoreExpanded && tellMeMore && (
-        <HelperText>
-          <br></br>
-          {tellMeMore}
-        </HelperText>
-      )}
+      {tellMeMoreExpanded && tellMeMore && <HelperText className={styles["tell-me-more"]}>{tellMeMore}</HelperText>}
     </div>
   );
 }
