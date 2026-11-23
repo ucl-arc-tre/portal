@@ -74,11 +74,9 @@ describe("Study owner change end-to-end", () => {
     cy.contains(studyTitle).click();
     cy.get('[data-cy="study-owner-edit-icon"]').click();
 
-    cy.env(["botStaff2Username"]).then(
-      ({ botStaff2Username }) => {
-        cy.get('input[name="email"]').type(botStaff2Username);
-      }
-    );
+    cy.env(["botStaff2Username"]).then(({ botStaff2Username }) => {
+      cy.get('input[name="email"]').type(botStaff2Username);
+    });
     cy.get('[data-cy="request-study-owner-edit-submit"]').click();
   });
 
