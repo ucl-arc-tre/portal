@@ -322,7 +322,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
           </div>
 
           <div className={"field"}>
-            <Label htmlFor="thirdPartyName">Third Party Name *</Label>
+            <Label htmlFor="thirdPartyName">Third Party Name(s) *</Label>
             <input
               id="thirdPartyName"
               type="text"
