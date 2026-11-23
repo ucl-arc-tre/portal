@@ -180,6 +180,7 @@ func (h *Handler) GetProjectsTreProjectId(ctx *gin.Context, projectId uuid.UUID)
 		Members:                    h.extractProjectMembers(projectTRE),
 		AssetIds:                   nil,
 		LastAccessReview:           openapi.FormatOptionalTime(projectTRE.Project.LastAccessReview),
+		DeployedVersionUpdatedAt:   openapi.FormatOptionalTime(projectTRE.DeployedVersionUpdatedAt),
 		StudyOwner:                 h.optionalStudyOwnerSummary(&projectTRE.Project.Study),
 	}
 	if projectTRE.DeployedVersionUpdatedAt != nil &&
@@ -254,14 +255,26 @@ func (h *Handler) PostProjectsTreProjectIdAccessReviewSignoff(ctx *gin.Context, 
 	h.postProjectsProjectIdAccessReviewSignoff(ctx, projectId)
 }
 
-func (h *Handler) PatchProjectsTreProjectIdPending(ctx *gin.Context, projectId uuid.UUID) {
-	err := h.projects.SubmitProjectTre(projectId)
-	if err != nil {
-		setError(ctx, err, "Failed to submit project")
+func (h *Handler) PatchProjectsTreProjectIdStatus(
+	ctx *gin.Context, projectId uuid.UUID, status openapi.PatchProjectsTreProjectIdStatusParamsStatus,
+) {
+	var err error
+	switch status {
+	case openapi.PatchProjectsTreProjectIdStatusParamsStatusPending:
+		err = h.projects.SubmitProjectTre(projectId)
+	case openapi.PatchProjectsTreProjectIdStatusParamsStatusPendingDeletion:
+		err = h.projects.RequestProjectTREDeletion(projectId)
+	default:
+		ctx.Status(http.StatusNotAcceptable)
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	if err != nil {
+		setError(ctx, err, "Failed to update project status")
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }
 
 func (h *Handler) PostProjectsTreAdminProjectIdApprove(ctx *gin.Context, projectId uuid.UUID) {

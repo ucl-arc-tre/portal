@@ -60,7 +60,7 @@ func (s *Service) inviteExternalUser(ctx context.Context, invite entra.Invite) (
 		return types.User{}, err
 	}
 
-	if err := s.entra.AddtoInvitedUserGroup(ctx, *entraUser); err != nil {
+	if err := s.entra.AddToInvitedUserGroup(ctx, *entraUser); err != nil {
 		return types.User{}, err
 	}
 

@@ -17,6 +17,13 @@ type UserData struct {
 	Id           ObjectId
 }
 
+func (u UserData) IsStaff() bool {
+	if u.EmployeeType == nil || *u.EmployeeType == "" {
+		return false
+	}
+	return employeeTypeStaffPattern.MatchString(*u.EmployeeType)
+}
+
 type ObjectId uuid.UUID
 
 func (o ObjectId) String() string {

@@ -7,9 +7,11 @@ type StudyTabsProps = {
   assets: Asset[];
   contracts: Contract[];
   projects: Project[];
+  ownerIsNotStaff: boolean;
 };
 
-export default function StudyTabs({ assets, contracts, tab, projects }: StudyTabsProps) {
+export default function StudyTabs(props: StudyTabsProps) {
+  const { tab, assets, contracts, projects, ownerIsNotStaff } = props;
   const assetsNeedAttention = assets.some((asset) => {
     if (asset.requires_contract && asset.contract_ids.length === 0) return true;
     if (asset.status === "active" && asset.expires_at) {
@@ -30,7 +32,7 @@ export default function StudyTabs({ assets, contracts, tab, projects }: StudyTab
   return (
     <TabCollection
       tabs={[
-        { name: "study", label: "Study Overview" },
+        { name: "study", label: "Study Overview", needsAttention: ownerIsNotStaff },
         { name: "assets", needsAttention: assetsNeedAttention, count: assets.length },
         { name: "contracts", needsAttention: contractsNeedAttention, count: contracts.length },
         { name: "projects", count: projects.length },
