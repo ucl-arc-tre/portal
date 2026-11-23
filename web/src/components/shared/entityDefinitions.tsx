@@ -10,7 +10,7 @@ export const portalEntityDefinitions = {
   contract:
     "Contracts can be uploaded as PDFs and can be linked to Assets, Projects and Users. If you collaborate with an external researcher you must associate them with a contract",
   environment:
-    "Environments are secure virtual spaces where research activities can be performed. They can be associated with Projects. Presently, we support the TRE",
+    "Environments are secure virtual spaces where research activities can be performed. They can be associated with Projects. Presently, we support the TRE with support for the DSH upcoming",
 };
 
 const EntityTooltip = ({ entity, isPlural }: { entity: keyof typeof portalEntityDefinitions; isPlural?: boolean }) => {
