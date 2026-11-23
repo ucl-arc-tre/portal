@@ -759,6 +759,24 @@ func (e EnvironmentParam) Valid() bool {
 	}
 }
 
+// Defines values for PatchProjectsTreProjectIdStatusParamsStatus.
+const (
+	PatchProjectsTreProjectIdStatusParamsStatusPending         PatchProjectsTreProjectIdStatusParamsStatus = "pending"
+	PatchProjectsTreProjectIdStatusParamsStatusPendingDeletion PatchProjectsTreProjectIdStatusParamsStatus = "pending-deletion"
+)
+
+// Valid indicates whether the value is a known member of the PatchProjectsTreProjectIdStatusParamsStatus enum.
+func (e PatchProjectsTreProjectIdStatusParamsStatus) Valid() bool {
+	switch e {
+	case PatchProjectsTreProjectIdStatusParamsStatusPending:
+		return true
+	case PatchProjectsTreProjectIdStatusParamsStatusPendingDeletion:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for GetTokensEnvironmentParamsEnvironment.
 const (
 	GetTokensEnvironmentParamsEnvironmentDsh GetTokensEnvironmentParamsEnvironment = "dsh"
@@ -1332,9 +1350,12 @@ type ProjectTRE struct {
 	Assets []Asset `json:"assets"`
 
 	// CreatedAt Time in RFC3339 format when the project was created
-	CreatedAt       string          `json:"created_at"`
-	Creator         UserDataSummary `json:"creator"`
-	EnvironmentName EnvironmentName `json:"environment_name"`
+	CreatedAt string          `json:"created_at"`
+	Creator   UserDataSummary `json:"creator"`
+
+	// DeployedVersionUpdatedAt Time in RFC3339 format of the deployed version of this project. Null if the project has never been deployed
+	DeployedVersionUpdatedAt *string         `json:"deployed_version_updated_at,omitempty"`
+	EnvironmentName          EnvironmentName `json:"environment_name"`
 
 	// ExternalEncryptionEnabled Is external encryption enabled for this project?
 	ExternalEncryptionEnabled bool `json:"external_encryption_enabled"`
@@ -1880,6 +1901,9 @@ type GetProjectsParams struct {
 	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
+// PatchProjectsTreProjectIdStatusParamsStatus defines parameters for PatchProjectsTreProjectIdStatus.
+type PatchProjectsTreProjectIdStatusParamsStatus string
+
 // GetStudiesParams defines parameters for GetStudies.
 type GetStudiesParams struct {
 	// Status get studies by status
@@ -2116,8 +2140,8 @@ type ServerInterface interface {
 	// (POST /projects/tre/{projectId}/access-review-signoff)
 	PostProjectsTreProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
 
-	// (PATCH /projects/tre/{projectId}/pending)
-	PatchProjectsTreProjectIdPending(c *gin.Context, projectId ProjectIdParam)
+	// (PATCH /projects/tre/{projectId}/{status})
+	PatchProjectsTreProjectIdStatus(c *gin.Context, projectId ProjectIdParam, status PatchProjectsTreProjectIdStatusParamsStatus)
 
 	// (GET /studies)
 	GetStudies(c *gin.Context, params GetStudiesParams)
@@ -2819,8 +2843,8 @@ func (siw *ServerInterfaceWrapper) PostProjectsTreProjectIdAccessReviewSignoff(c
 	siw.Handler.PostProjectsTreProjectIdAccessReviewSignoff(c, projectId)
 }
 
-// PatchProjectsTreProjectIdPending operation middleware
-func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPending(c *gin.Context) {
+// PatchProjectsTreProjectIdStatus operation middleware
+func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdStatus(c *gin.Context) {
 
 	var err error
 	_ = err
@@ -2834,6 +2858,15 @@ func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPending(c *gin.Conte
 		return
 	}
 
+	// ------------- Path parameter "status" -------------
+	var status PatchProjectsTreProjectIdStatusParamsStatus
+
+	err = runtime.BindStyledParameterWithOptions("simple", "status", c.Param("status"), &status, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -2841,7 +2874,7 @@ func (siw *ServerInterfaceWrapper) PatchProjectsTreProjectIdPending(c *gin.Conte
 		}
 	}
 
-	siw.Handler.PatchProjectsTreProjectIdPending(c, projectId)
+	siw.Handler.PatchProjectsTreProjectIdStatus(c, projectId, status)
 }
 
 // GetStudies operation middleware
@@ -4086,7 +4119,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/projects/tre/:projectId", wrapper.DeleteProjectsTreProjectId)
 	router.GET(options.BaseURL+"/projects/tre/:projectId", wrapper.GetProjectsTreProjectId)
 	router.PUT(options.BaseURL+"/projects/tre/:projectId", wrapper.PutProjectsTreProjectId)
-	router.PATCH(options.BaseURL+"/projects/tre/:projectId/pending", wrapper.PatchProjectsTreProjectIdPending)
+	router.PATCH(options.BaseURL+"/projects/tre/:projectId/:status", wrapper.PatchProjectsTreProjectIdStatus)
 	router.POST(options.BaseURL+"/projects/tre/:projectId/access-review-signoff", wrapper.PostProjectsTreProjectIdAccessReviewSignoff)
 	router.POST(options.BaseURL+"/projects/tre/admin/:projectId/approve", wrapper.PostProjectsTreAdminProjectIdApprove)
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)

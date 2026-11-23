@@ -448,6 +448,65 @@ func (s *Service) SubmitProjectTre(projectId uuid.UUID) error {
 	return nil
 }
 
+// Requests deletion of a Deployed project, transitioning it to Pending Deletion while the TRE team tears down the live environment
+func (s *Service) RequestProjectTREDeletion(projectId uuid.UUID) error {
+	if err := s.validateProjectAssetsForDeletion(projectId); err != nil {
+		return err
+	}
+
+	result := s.db.Model(&types.ProjectTRE{}).
+		Where("project_id = ?", projectId).
+		Where("status = ?", types.ProjectTREStatusDeployed).
+		Update("status", types.ProjectTREStatusPendingDeletion)
+
+	if result.Error != nil {
+		return types.NewErrFromGorm(result.Error, "failed to request project deletion")
+	}
+
+	if result.RowsAffected == 0 {
+		return types.NewErrInvalidObjectF("project must be in Deployed status to request deletion")
+	}
+
+	return nil
+}
+
+// Must match the "arc_tre" location value in web/src/components/ui/storageDefinitions.ts.
+const arcTreAssetLocation = "arc_tre"
+
+func (s *Service) validateProjectAssetsForDeletion(projectId uuid.UUID) error {
+	var projectAssets []types.ProjectAsset
+	err := s.db.Preload("Asset.Locations").Where("project_id = ?", projectId).Find(&projectAssets).Error
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to load project assets")
+	}
+
+	now := time.Now()
+	errorMessage := ""
+	for _, projectAsset := range projectAssets {
+		asset := projectAsset.Asset
+
+		// A destroyed asset can never block deletion, regardless of its expiry or locations.
+		if asset.Status == types.AssetStatusDestroyed {
+			continue
+		}
+
+		isInArcTre := slices.ContainsFunc(asset.Locations, func(location types.AssetLocation) bool {
+			return location.Location == arcTreAssetLocation
+		})
+		if isInArcTre {
+			errorMessage += fmt.Sprintf("• Asset '%s' is still stored in the ARC TRE\n\n", asset.Title)
+		}
+
+		if asset.ExpiresAt != nil && asset.ExpiresAt.After(now) {
+			errorMessage += fmt.Sprintf("• Asset '%s' has retention until %s\n\n", asset.Title, asset.ExpiresAt.Format(config.DateFormat))
+		}
+	}
+	if errorMessage != "" {
+		return types.NewErrClientInvalidObjectF("cannot request deletion: %s", errorMessage)
+	}
+	return nil
+}
+
 func (s *Service) ApproveProject(projectId uuid.UUID, approver types.User) error {
 	projectTRE, err := s.ProjectTreById(projectId)
 	if err != nil {
@@ -804,9 +863,16 @@ func (s *Service) DeleteProjectTRE(projectId uuid.UUID, deleter types.User) erro
 		return types.NewErrFromGorm(err, "failed to find project TRE")
 	}
 
-	if projectTRE.Status != types.ProjectTREStatusIncomplete {
+	if projectTRE.Status != types.ProjectTREStatusIncomplete && projectTRE.Status != types.ProjectTREStatusPendingApproval {
 		tx.Rollback()
-		return types.NewErrInvalidObjectF("deletion must have an incomplete status. was [%v]", projectTRE.Status)
+		return types.NewErrInvalidObjectF("deletion must have an incomplete or pending approval status. was [%v]", projectTRE.Status)
+	}
+
+	// A previously deployed project returns to pending approval when an update is requested,
+	// so it still exists in the TRE environment and must not be deleted immediately.
+	if projectTRE.DeployedVersionUpdatedAt != nil {
+		tx.Rollback()
+		return types.NewErrInvalidObjectF("project has been deployed so cannot be deleted immediately")
 	}
 
 	// Soft delete all ProjectTRERoleBindings for this project
