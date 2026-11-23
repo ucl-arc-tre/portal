@@ -20,7 +20,7 @@ export default function HelperBlock({ text, tellMeMore }: Props) {
             size="small"
             inline
             aria-label="Toggle tell me more popover"
-            aria-expanded={false}
+            aria-expanded={tellMeMoreExpanded}
             onClick={() => setTellMeMoreExpanded((prev) => !prev)}
           >
             Tell me more
