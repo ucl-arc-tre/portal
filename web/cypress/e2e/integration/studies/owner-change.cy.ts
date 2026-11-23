@@ -77,7 +77,9 @@ describe("Study owner change end-to-end", () => {
     cy.env(["botStaff2Username"]).then(({ botStaff2Username }) => {
       cy.get('input[name="email"]').type(botStaff2Username);
     });
-    cy.get('[data-cy="request-study-owner-edit-submit"]').click();
+    cy.get('[data-cy="request-study-owner-edit-submit"]').as("submit");
+    cy.get("@submit").click();
+    cy.get("@submit").should("not.exist");
   });
 
   it("ig should be able to approve the owner request change", () => {
