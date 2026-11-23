@@ -132,6 +132,7 @@ describe("IG staff as a study admin end-to-end", () => {
     cy.contains("Update Study").should("not.exist");
 
     cy.env(["botIGUsername"]).then(({ botIGUsername }) => {
+      cy.wait(2000);
       cy.visit("/");
       cy.contains(`${botIGUsername} has been removed as an administrator from '${studyTitle}'`).should("exist");
     });
