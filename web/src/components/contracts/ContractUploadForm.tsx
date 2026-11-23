@@ -334,6 +334,7 @@ export default function ContractUploadModal({ study, onClose, onSuccess, editing
               className={styles["form-input"]}
               placeholder="Enter the other party in the contract (e.g. an organisation or a person)"
             />
+            <HelperText>This field accepts a comma separated list of values</HelperText>
             {errors.thirdPartyName && <Error message={errors.thirdPartyName.message} />}
           </div>
 

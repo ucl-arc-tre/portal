@@ -2804,7 +2804,7 @@ components:
           description: Other signatories to the contract. Could be name(s) or email(s)
         third_party_name:
           type: string
-          description: Name of the third party organization
+          description: Name of the third party organization or person, can be comma separated
         status:
           type: string
           enum: [active, closed]
