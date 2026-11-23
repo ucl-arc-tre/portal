@@ -705,6 +705,7 @@ func (e StudyApprovalStatus) Valid() bool {
 // Defines values for StudyLifecycleStatus.
 const (
 	StudyLifecycleStatusActive   StudyLifecycleStatus = "active"
+	StudyLifecycleStatusClosed   StudyLifecycleStatus = "closed"
 	StudyLifecycleStatusInactive StudyLifecycleStatus = "inactive"
 )
 
@@ -712,6 +713,8 @@ const (
 func (e StudyLifecycleStatus) Valid() bool {
 	switch e {
 	case StudyLifecycleStatusActive:
+		return true
+	case StudyLifecycleStatusClosed:
 		return true
 	case StudyLifecycleStatusInactive:
 		return true
@@ -1562,7 +1565,7 @@ type Study struct {
 	// LastSignoff Time in RFC3339 format representing when the IAO last confirmed Study details and project access up to date
 	LastSignoff *string `json:"last_signoff,omitempty"`
 
-	// LifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only.
+	// LifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only, except closed which is also shown to the study's owner and admins.
 	LifecycleStatus StudyLifecycleStatus `json:"lifecycle_status"`
 
 	// NhsEnglandReference NHS England DARS NIC number
@@ -1728,7 +1731,7 @@ type StudyImport struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// StudyLifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only.
+// StudyLifecycleStatus Derived lifecycle status for a study, intended for display to IG staff only, except closed which is also shown to the study's owner and admins.
 type StudyLifecycleStatus string
 
 // StudyOwnerUpdate defines model for StudyOwnerUpdate.
