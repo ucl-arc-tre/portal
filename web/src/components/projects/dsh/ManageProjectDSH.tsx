@@ -70,7 +70,10 @@ export default function ManageProjectDSH(props: Props) {
       </div>
 
       <TabCollection
-        tabs={[{ name: "project", label: "Project Overview" }, { name: "members" }]}
+        tabs={[
+          { name: "project", label: "Project Overview" },
+          { name: "members", count: project.members?.length ?? 0 },
+        ]}
         defaultTab="project"
       />
 

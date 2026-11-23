@@ -8,6 +8,12 @@ import Box from "@/components/ui/Box";
 import { Alert, AlertMessage, InfoIcon } from "@/components/ui/uikitExports";
 import { useAuth } from "@/hooks/useAuth";
 import { ContractDefinition } from "../shared/entityDefinitions";
+import HelperBlock from "../ui/HelperBlock";
+
+const helperText = `Use this tab to record Contracts for this Study, including agreements with external organisations and third parties. Requests for new agreements, legal review, drafting and approval should be made through UCL’s Legal Services, Procurement Services, or Worktribe.
+
+As expiry dates approach, you will receive reminders to review the agreement.  Where appropriate, begin renewal activities in good time, or review any associated Assets and access permissions before the agreement expires.  Where an agreement is not being renewed, it can be marked as closed and any associated access should be removed. Data should be destroyed or otherwise managed in accordance with the contract and applicable retention requirements.
+`;
 
 type ContractManagementProps = {
   study: Study;
@@ -31,15 +37,10 @@ export default function ContractManagement(props: ContractManagementProps) {
     fetchStudyContents();
   };
 
-  const ContractSummary = (
-    <div className={styles["contracts-summary"]}>
-      <span>Number of associated Contracts:</span>
-      <span className={styles["contracts-count-badge"]}>{contracts.length}</span>
-    </div>
-  );
-
   return (
     <Box>
+      <HelperBlock text={helperText} />
+
       {canModify ? (
         <>
           <div className={styles.header}>
@@ -54,12 +55,10 @@ export default function ContractManagement(props: ContractManagementProps) {
             </Button>
           </div>
           {calloutExpanded && <ContractDefinition />}
-          {ContractSummary}
         </>
       ) : (
         <div className={styles.header}>
           <h3>Contracts</h3>
-          {ContractSummary}
         </div>
       )}
 

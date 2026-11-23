@@ -1,4 +1,4 @@
-import { Asset, Contract } from "@/openapi";
+import { Asset, Contract, Project } from "@/openapi";
 import { calculateExpiryUrgency } from "../../shared/exports";
 import TabCollection from "@/components/ui/TabCollection";
 
@@ -6,10 +6,12 @@ type StudyTabsProps = {
   tab: "study" | "assets" | "contracts" | "projects";
   assets: Asset[];
   contracts: Contract[];
+  projects: Project[];
   ownerIsNotStaff: boolean;
 };
 
-export default function StudyTabs({ assets, contracts, tab, ownerIsNotStaff }: StudyTabsProps) {
+export default function StudyTabs(props: StudyTabsProps) {
+  const { tab, assets, contracts, projects, ownerIsNotStaff } = props;
   const assetsNeedAttention = assets.some((asset) => {
     if (asset.requires_contract && asset.contract_ids.length === 0) return true;
     if (asset.status === "active" && asset.expires_at) {
@@ -31,9 +33,9 @@ export default function StudyTabs({ assets, contracts, tab, ownerIsNotStaff }: S
     <TabCollection
       tabs={[
         { name: "study", label: "Study Overview", needsAttention: ownerIsNotStaff },
-        { name: "assets", needsAttention: assetsNeedAttention },
-        { name: "contracts", needsAttention: contractsNeedAttention },
-        { name: "projects" },
+        { name: "assets", needsAttention: assetsNeedAttention, count: assets.length },
+        { name: "contracts", needsAttention: contractsNeedAttention, count: contracts.length },
+        { name: "projects", count: projects.length },
       ]}
       defaultTab={tab}
     />
