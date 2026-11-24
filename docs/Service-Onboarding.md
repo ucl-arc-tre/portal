@@ -8,9 +8,11 @@ See also the [High-Level Design](./High-Level_Design.md).
 
 ### What the Portal does
 
-The Portal runs the controlled processes of the [Research Data ISMS](https://isms.arc.ucl.ac.uk/): study registration and approval, user onboarding, training records and agreements. Platforms connect to it to find out which approved researchers may access which projects, and to report back what they have deployed.
+The ARC Services Portal aims to serve as a single entry point for researchers and other users to manage and engage with the various digital research services and platforms provided by UCL.
 
 The ARC Trusted Research Environment (TRE) and the Data Safe Haven (DSH) are connected today.
+
+The Portal runs the controlled processes of the [Research Data ISMS](https://isms.arc.ucl.ac.uk/): Study registration and approval, user onboarding, and information asset and contract management. The Portal acts as a data producer: users log in to it and, if eligible, create service requests (new projects or updates to existing projects). Services (like the ARC TRE) connect to it to find out what requests have been made, which users should have access to which projects, and to report back what has actually been deployed.
 
 ![C1-Portal-Context](./c4/C1-Portal-Context.svg)
 
@@ -20,23 +22,30 @@ The ARC Trusted Research Environment (TRE) and the Data Safe Haven (DSH) are con
 | ------------------- | --------------------------------------------------------------------------------------------------------- |
 | Study               | An IG boundary with an owner, admins, assets and contracts. Approved by the IG Advisory team.             |
 | Environment         | A platform where project work happens, with a tier setting the most sensitive data it may hold.           |
-| Project             | Work in one environment under one approved study, e.g. a TRE project or a DSH share.                      |
+| Project             | Work in one environment, optionally under an approved study, e.g. a TRE project or a DSH share.           |
 | Project type        | The environment-specific part of a project: member roles, lifecycle statuses and configuration.           |
-| Approved Researcher | A user who has signed the researcher agreement and has valid training. Only they can be project members.  |
+| Approved Researcher | A user who has signed the researcher agreement and has valid training. Required for study-linked projects. |
 
 ### What your service gets
 
-- A reliable answer to "is this user an Approved Researcher, and is their training valid?"
-- Every project tied to an approved study, with a case reference, owner and admins
+- A reliable answer to "is this user eligible to use my service?"
+- Projects can be tied to a Study, which means users must maintain a minimum set of metadata, plus projects have a named owner and optional admins
 - An audit trail of project creation, approval, membership changes and deletion
 - An Ops role for your team to view your projects and issue API tokens
-- Optionally, self-service project requests that your Ops team approves in the Portal
+- Self-service project requests that your Ops team, or a client you run, approves in the Portal
+- Additional integrations as required (for example to MyServices or other UCL Enterprise APIs)
 
 ### Decide: new project type or extension
 
-**New project type.** Your service becomes a new environment with its own project type, roles, statuses, API and Ops role. The TRE and DSH were onboarded this way. This is the usual route.
+**New project type.** Your service can become a new environment with its own project type, roles, statuses, API and Ops role. The TRE and DSH were onboarded this way. This is the usual route.
 
 **Extension of an existing project type.** Your service adds an option or fields to a project type that already exists, and reuses its roles, approval flow, API and Ops team. This only fits when your service is a variant of an existing environment rather than a separate one. The owner of that environment must agree to the change.
+
+### Decide: study-linked or project-only
+
+**Study-linked.** Each project sits under an approved Study, so it inherits an IG boundary, an owner and admins, and can be linked to the Study's assets and contracts. Choose this if your service handles data that needs information governance. The TRE and DSH work this way.
+
+**Project-only.** Projects stand alone with no Study. Choose this if your service doesn't need IG, so researchers aren't asked to register and maintain a asset registers or data sharing agreements or other contracts in order to get a project.
 
 ### Decide: pull or push
 
@@ -51,37 +60,35 @@ Both patterns are in use. Pick the one that matches where projects are created.
 
 Either way, your platform remains the source of truth for what is deployed. The Portal holds what was requested and approved, and what your platform reports.
 
-### Prerequisites
+### Other Prerequisites
 
-Before go-live you need:
+You will also need:
 
 - an environment tier under [RISM06](https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#4-environment-tiers-and-data-classification)
-- your service in the Research Data ISMS scope, or sign-off from the ARC IG Advisory team
 - named staff to hold your service's Ops role
-- a data protection review (DPIA or data flow review) covering the personal data the Portal shares with you: usernames, names, emails, Approved Researcher status and training dates
 
 The Portal holds metadata about studies, projects and people. It never holds research data, and your integration must not send any.
 
 ### Process
 
-1. Complete the prerequisites with the IG Advisory team and your data protection contacts.
-2. Agree with the Portal team the project type, integration pattern, roles, statuses and fields.
+1. Reach out to the Portal team.
+2. Agree with the Portal team the project type, whether projects are study-linked, the integration pattern, roles, statuses and fields.
 3. The Portal team drafts the OpenAPI specification as a pull request, and both teams review it.
 4. The Portal team builds the Portal side and releases it to staging.
 5. Your team builds its client against staging, using a token issued by your Ops staff.
-6. The Portal team releases to production and assigns your Ops role. Your Ops staff issue a production token.
-7. Your Ops staff rotate tokens before they expire, at most every 365 days.
+6. User acceptance testing and governance approvals must take place
+7. The Portal team releases to production and assigns your Ops role. Your Ops staff issue a production token.
 
 ## Part 2: Technical detail
 
 ### APIs
 
-The Portal is a Go API and a Next.js frontend backed by PostgreSQL, running on the ARC TRE's Amazon EKS clusters. Each platform has its own API path and OpenAPI specification.
+The Portal is a Go API and a Next.js frontend backed by PostgreSQL, running on the ARC TRE's Amazon EKS cluster. Each platform has its own API path and OpenAPI specification.
 
 | API             | Path            | Specification                   | Authentication                                    |
 | --------------- | --------------- | ------------------------------- | ------------------------------------------------- |
 | Web frontend    | `/web/api/v0`   | [api/web.yaml](../api/web.yaml) | Entra ID via OAuth2 Proxy                         |
-| ARC TRE         | `/tre/api/v0`   | [api/tre.yaml](../api/tre.yaml) | JWT (`tre:r`, `tre:w`) or HTTP Basic              |
+| ARC TRE         | `/tre/api/v0`   | [api/tre.yaml](../api/tre.yaml) | JWT (`tre:r`, `tre:w`)                            |
 | Data Safe Haven | `/dsh/api/v0`   | [api/dsh.yaml](../api/dsh.yaml) | JWT (`dsh:r`, `dsh:w`)                            |
 | Your service    | `/<svc>/api/v0` | `api/<svc>.yaml`                | JWT (`<svc>:r`, `<svc>:w`)                        |
 
@@ -106,12 +113,12 @@ Every API has `GET /ping` for checking connectivity and authentication.
 
 ### Data model
 
-Each project has a generic `Project` row linking it to a study and an environment, and a row in an environment-specific subtype table. See [internal/types](../internal/types/).
+Each project has a generic `Project` row linking it to an environment and, for study-linked project types, a study. It also has a row in an environment-specific subtype table. See [internal/types](../internal/types/).
 
 ```mermaid
 erDiagram
     Environment ||--o{ Project : hosts
-    Study ||--o{ Project : "IG boundary for"
+    Study |o--o{ Project : "IG boundary for (optional)"
     Project ||--o| ProjectTRE : subtype
     ProjectTRE ||--o{ ProjectTRERoleBinding : members
     Project ||--o| ProjectDSH : subtype
@@ -125,7 +132,7 @@ erDiagram
     }
     Project {
         string Name
-        uuid StudyID
+        uuid StudyID "empty for project-only"
         uuid EnvironmentID
     }
     ProjectNEW {
@@ -151,11 +158,11 @@ For the pull pattern, follow the TRE's approach: a status lifecycle (`incomplete
 
 ### Tokens and roles
 
-Platforms authenticate with Ed25519-signed JWTs issued by the Portal. Each token is bound to one environment and carries its `<svc>:r` and `<svc>:w` scopes. Your Ops staff issue and revoke tokens in the Portal, and each token lasts at most 365 days. HTTP Basic is only supported for the TRE.
+Platforms authenticate with Ed25519-signed JWTs issued by the Portal. Each token is bound to one environment and carries its `<svc>:r` and `<svc>:w` scopes. Your Ops staff issue and revoke tokens in the Portal, and each token lasts at most 365 days.
 
 A new project type adds a `<Service> Ops` role in [internal/rbac](../internal/rbac/). Based on the TRE Ops and DSH Ops roles, it lets your staff view all users and studies, view your projects, issue your tokens and, for pull, approve projects they don't own.
 
-Only Approved Staff Researchers can create projects, and only under approved studies they own. Only Approved Researchers can be members.
+For study-linked project types, only Approved Staff Researchers can create projects, under approved studies they own. Only Approved Researchers can be members. For project-only types, who can create projects and become members is agreed with the Portal team.
 
 ### Who builds what
 
@@ -168,6 +175,9 @@ Only Approved Staff Researchers can create projects, and only under approved stu
 | UI pages for your projects                     | Reporting status or membership to the Portal           |
 | Audit events and notifications                 | Token storage and rotation                             |
 | Tests and releases                             | Testing against staging                                |
-| HLD and C4 model updates                       | Runbooks for your Ops staff                            |
+| HLD and C4 model updates                       | SOPs for your Ops staff                                |
+|                                                | Service logic acting on eligibility changes            |
+
+The Portal provides eligibility data, such as the Approved Researcher list and training expiry, but takes no action on your platform. If an existing user becomes ineligible, your service must detect it and act, for example by suspending their access.
 
 Breaking changes to a platform's API need that platform owner's agreement. Platform APIs are rate limited, so poll on a schedule rather than per user action.
