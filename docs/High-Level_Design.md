@@ -55,8 +55,6 @@ The diagram below shows the **target** context of the ARC Services Portal: the p
 
 ## Physical View
 
-![Portal architecture](./media/architecture.png)
-
 ### Overview
 
 The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. A reverse proxy receives all incoming HTTPS requests, serving the web frontend at `/`, routing `/web/api` requests via an authentication proxy. TRE API requests are east-west to `/tre/api`.
