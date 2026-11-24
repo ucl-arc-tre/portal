@@ -53,9 +53,9 @@ The diagram below shows the **target** context of the ARC Services Portal: the p
 
 ![Architecture](./media/architecture_logical.png)
 
-![Portal architecture](./media/architecture.png)
-
 ## Physical View
+
+![Portal architecture](./media/architecture.png)
 
 ### Overview
 
