@@ -12,13 +12,25 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         user = person "Researcher" "Manages their profile, training, agreements, studies and project memberships through the Portal."
 
-        admin = person "Portal Staff" "Reviews studies and projects, manages training records and issues platform API tokens as IG Ops, IG Admin, TRE Ops, DSH Ops or Administrator."
+        igOps = person "IG Operations Staff" "Reviews and approves studies, manages training records and invitations, and views all users, studies and projects."
+
+        treOps = person "TRE Operations Staff" "Approves TRE projects, issues and revokes ARC TRE API tokens, and views all users, studies, assets and TRE projects."
+
+        dshOps = person "DSH Operations Staff" "Issues and revokes Data Safe Haven API tokens and views all users, studies, assets and DSH projects."
+
+        admin = person "Portal Administrator" "Develops and maintains the Portal; does not manage supported services' projects, users or tokens."
+
+        // IG Ops and IG Admin are separate roles in internal/rbac but are shown as one person because
+        // they are held by the same team. IG Admins can also edit any study and mark TRE projects for
+        // deletion. Ops staff cannot approve studies or projects they own.
+        // Portal Administrators hold the Admin role (full access) for support, but operating supported
+        // services is left to the IG, TRE and DSH Ops teams.
 
         // External systems
 
         entra = softwareSystem "Microsoft Entra ID" "Authenticates UCL and invited external users and provides directory lookups, guest invitations and email through Microsoft Graph." "External System"
 
-        myServices = softwareSystem "ISD MyServices" "Manages incidents, service requests and help requests for UCL services." "External System"
+        myServices = softwareSystem "MyServices" "Manages incidents, service requests and help requests for UCL services." "External System"
 
         tre = softwareSystem "ARC Trusted Research Environment" "Provides secure project workspaces for sensitive research data and deploys TRE projects requested through the Portal." "External System"
 
@@ -98,7 +110,7 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
                         entraClient = component "Microsoft Graph Client" "Looks up users and staff status, sends guest invitations and sends email." "Go; Microsoft Graph SDK"
 
-                        myServicesClient = component "MyServices Client" "Submits feedback and help requests as MyServices requests." "Go; oapi-codegen"
+                        myServicesClient = component "MyServices Client" "Creates feedback and help requests in MyServices." "Go; oapi-codegen"
 
                         s3Client = component "Object Storage Client" "Reads and writes contract documents and audit log batches." "Go; AWS SDK"
                     }
@@ -128,15 +140,15 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
             // Browser traffic
 
-            portal.nginx -> portal.webFrontend.pages "Routes / requests to" "HTTP"
+            portal.nginx -> portal.webFrontend.pages "Serves Portal pages from" "HTTP"
 
             portal.webFrontend.pages -> portal.webFrontend.apiClient "Calls the web API through"
 
-            portal.webFrontend.apiClient -> portal.nginx "Sends /web/api requests to" "HTTPS/REST and JSON"
+            // Browser API calls pass through the reverse proxy on their way to the authentication proxy;
+            // that hop is folded into this relationship to keep the user journey readable.
+            portal.webFrontend.apiClient -> portal.oauth2Proxy "Sends web API requests through" "HTTPS/REST and JSON, via the reverse proxy"
 
-            portal.nginx -> portal.oauth2Proxy "Routes /web/api requests through" "HTTP"
-
-            portal.oauth2Proxy -> portal.api.middleware "Forwards authenticated /web/api requests with user identity headers to" "HTTP"
+            portal.oauth2Proxy -> portal.api.middleware "Forwards authenticated web API requests to" "HTTP"
 
             // Platform traffic
 
@@ -230,11 +242,11 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         igSharePoint = softwareSystem "IG Advisory SharePoint Portal" "Collects study registrations, user onboarding and data asset information for the IG Advisory Service." "Existing System" {
 
-            igPowerApps = container "Case Management Apps" "Provides the forms researchers use to register studies, onboard users and update cases." "Microsoft PowerApps"
+            igPowerApps = container "Study Management Apps/Forms" "Provides the forms researchers use to register studies, onboard users and update cases." "Microsoft PowerApps"
 
-            igFlows = container "Case Workflows" "Routes approvals, sends notifications and writes case data to SharePoint lists." "Microsoft Power Automate"
+            igFlows = container "Power Automate Flows" "Routes approvals, sends notifications and writes case data to SharePoint lists." "Microsoft Power Automate"
 
-            igLists = container "Case Lists" "Stores cases, studies, researchers and data assets in several SharePoint lists." "Microsoft SharePoint Lists" "Data Store"
+            igLists = container "Cases List" "Stores cases, studies, researchers and data assets in several SharePoint lists." "Microsoft SharePoint Lists" "Data Store"
 
             igSharePoint.igPowerApps -> igSharePoint.igFlows "Triggers"
 
@@ -258,11 +270,19 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         user -> portal "Manages studies, projects, training and agreements using" "HTTPS"
 
-        admin -> portal "Reviews studies and projects and administers users and platform tokens using" "HTTPS"
+        igOps -> portal "Reviews studies and manages users' training and invitations using" "HTTPS"
+
+        treOps -> portal "Approves TRE projects and manages ARC TRE API tokens using" "HTTPS"
+
+        dshOps -> portal "Views DSH projects and manages Data Safe Haven API tokens using" "HTTPS"
+
+        admin -> portal "Develops and maintains, without managing supported services in," "HTTPS"
+
+        dshOps -> myServices "Executes requests made in" "HTTPS"
 
         portal -> entra "Authenticates users and looks up, invites and emails users through" "OpenID Connect; Microsoft Graph API"
 
-        portal -> myServices "Submits feedback and help requests to" "HTTPS/REST"
+        portal -> myServices "Creates requests in" "HTTPS/REST"
 
         tre -> portal "Fetches TRE projects and approved researcher status from and reports deployment status to" "HTTPS/REST and JSON"
 
@@ -276,6 +296,12 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         user -> treSharePoint "Requests ARC TRE services using" "HTTPS"
 
+        user -> myServices "Requests Data Safe Haven projects using" "HTTPS"
+
+        treOps -> treSharePoint "Executes requests made in" "HTTPS"
+
+        treOps -> tre "Implements ARC TRE requests in"
+
         igSharePoint -> m365Messaging "Sends notifications and approval requests through"
 
         m365Messaging -> igSharePoint "Returns approval responses to"
@@ -288,7 +314,13 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         user -> portal.webFrontend.pages "Manages studies, projects, training and agreements using" "HTTPS"
 
-        admin -> portal.webFrontend.pages "Reviews studies and projects and issues platform API tokens using" "HTTPS"
+        igOps -> portal.webFrontend.pages "Reviews studies and manages users' training and invitations using" "HTTPS"
+
+        treOps -> portal.webFrontend.pages "Approves TRE projects and manages ARC TRE API tokens using" "HTTPS"
+
+        dshOps -> portal.webFrontend.pages "Views DSH projects and manages Data Safe Haven API tokens using" "HTTPS"
+
+        admin -> portal.webFrontend.pages "Develops, tests and supports, without managing supported services in," "HTTPS"
 
         // Identity integrations
 
@@ -298,7 +330,7 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         // Service management integrations
 
-        portal.api.myServicesClient -> myServices "Submits feedback and help requests to" "HTTPS/REST and JSON"
+        portal.api.myServicesClient -> myServices "Creates requests in" "HTTPS/REST and JSON"
 
         // Platform integrations
 
@@ -327,9 +359,13 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         user -> treSharePoint.treForms "Requests ARC TRE services using" "HTTPS"
 
+        treOps -> treSharePoint.treList "Picks up ARC TRE requests from" "HTTPS"
+
         igSharePoint.igFlows -> m365Messaging "Sends notifications and approval requests through"
 
         m365Messaging -> igSharePoint.igFlows "Returns approval responses to"
+
+        igOps -> m365Messaging "Approves study and onboarding requests through"
 
         igSharePoint.igLists -> dsh "Provides group access data to"
 
@@ -341,6 +377,9 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         systemContext portal "C1-Portal-Context" {
             include user
+            include igOps
+            include treOps
+            include dshOps
             include admin
             include portal
             include entra
@@ -349,6 +388,8 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
             include dsh
             include uclSystem
             include aws
+            exclude "user -> myServices"
+            exclude "treOps -> tre"
             // autoLayout lr
             title "ARC Services Portal: System Context"
             description "Shows the people who use the ARC Services Portal and the systems it integrates with; the delivery pipeline's container registry is omitted."
@@ -357,7 +398,10 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
         container portal "C2-Portal-Containers" {
             include *
             exclude portal.deploy
+            exclude aws
             exclude ghcr
+            exclude "user -> myServices"
+            exclude "treOps -> tre"
             // autoLayout lr
             title "ARC Services Portal: Containers"
             description "Shows the containers that make up the ARC Services Portal at runtime, the people who use them and the systems they integrate with; the delivery pipeline is shown in its own view."
@@ -365,6 +409,8 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         container portal "C2-Portal-Platform-Integrations" {
             include user
+            include treOps
+            include dshOps
             include tre
             include dsh
             include uclSystem
@@ -373,6 +419,7 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
             include portal.webFrontend
             include portal.api
             include portal.postgres
+            exclude "treOps -> tre"
             // autoLayout lr
             title "ARC Services Portal: Platform Integrations"
             description "Shows how ARC platforms reach the Portal API alongside browser users; the ARC TRE and Data Safe Haven are current integrations and Other UCL System stands for a newly onboarded platform."
@@ -420,27 +467,34 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         container igSharePoint "C2-IG-SharePoint-Portal-Containers" {
             include *
+            include igOps
             // autoLayout lr
             title "IG Advisory SharePoint Portal: As-Is Containers"
-            description "Shows the PowerApps, Power Automate flows and SharePoint lists of the as-is IG Advisory portal that the ARC Services Portal replaces."
+            description "Shows the PowerApps, Power Automate flows and SharePoint lists of the as-is IG Advisory portal, and how IG Ops approve requests through Teams and Outlook."
         }
 
         container treSharePoint "C2-TRE-SharePoint-Site-Containers" {
             include *
+            include treOps
+            include tre
             // autoLayout lr
             title "TRE SharePoint Site: As-Is Containers"
-            description "Shows the forms, flows and list of the as-is ARC TRE request site that the ARC Services Portal replaces."
+            description "Shows the forms, flows and list of the as-is ARC TRE request site, and how TRE Ops pick up requests and implement them in the TRE."
         }
 
         systemLandscape "IG-Portals-As-Is-Landscape" {
             include user
+            include igOps
             include igSharePoint
             include treSharePoint
+            include treOps
+            include dshOps
+            include myServices
             include m365Messaging
             include dsh
             // autoLayout lr
             title "IG SharePoint Portals: As-Is Landscape"
-            description "Shows the as-is SharePoint-based IG and TRE portals and the systems they exchange data with; the ARC Services Portal is omitted."
+            description "Shows the as-is SharePoint-based IG and TRE portals, the MyServices route for DSH requests and the Ops teams who execute requests; the ARC Services Portal is omitted."
         }
 
         styles {
@@ -494,7 +548,6 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
             element "Group:Amazon EKS cluster" {
                 color #d86613
-                icon https://static.structurizr.com/themes/amazon-web-services-2020.04.30/amazon-elastic-kubernetes-service.png
             }
 
             relationship "Relationship" {

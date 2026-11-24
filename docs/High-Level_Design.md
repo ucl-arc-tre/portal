@@ -16,15 +16,22 @@ Some processes such as incident and service request will be managed through "MyS
 
 ## As-is IG Portal(s)
 
-<!-- TODO: export views IG-Portals-As-Is-Landscape, C2-IG-SharePoint-Portal-Containers and C2-TRE-SharePoint-Site-Containers from ./c4/workspace.dsl. These replace ./media/ARC_Portals_Current.drawio.svg. -->
+> [!IMPORTANT]
+> The diagrams in this section show the **as-is** SharePoint-based portals that the ARC Services Portal replaces. They are not the target architecture; see [To-be Portal](#to-be-portal).
 
-![IG-Portals-As-Is-Landscape](./media/IG-Portals-As-Is-Landscape.png)
+**As-is landscape:** the IG Advisory SharePoint portal, the TRE SharePoint site, MyServices for DSH requests, and the Ops teams who execute requests.
 
-![C2-IG-SharePoint-Portal-Containers](./media/C2-IG-SharePoint-Portal-Containers.png)
+![IG-Portals-As-Is-Landscape](./c4/IG-Portals-As-Is-Landscape.svg)
 
-![C2-TRE-SharePoint-Site-Containers](./media/C2-TRE-SharePoint-Site-Containers.png)
+**As-is IG Advisory SharePoint portal:** PowerApps, Power Automate flows and SharePoint lists, with IG Ops approving through Teams and Outlook.
 
-Current portal is hosted in SharePoint, the data related to cases and (AKA studies and projects) researchers etc. in several SharePoint lists. Users logon to the sharepoint portal with their UCL username and password and are able to see and update their existing studies, make requests for new studies and complete other compliance processes such as user onboarding and registering data assets.
+![C2-IG-SharePoint-Portal-Containers](./c4/C2-IG-SharePoint-Portal-Containers.svg)
+
+**As-is TRE SharePoint site:** forms, flows and a request list, with TRE Ops implementing requests in the TRE.
+
+![C2-TRE-SharePoint-Site-Containers](./c4/C2-TRE-SharePoint-Site-Containers.svg)
+
+The as-is portal is hosted in SharePoint, the data related to cases and (AKA studies and projects) researchers etc. in several SharePoint lists. Users logon to the sharepoint portal with their UCL username and password and are able to see and update their existing studies, make requests for new studies and complete other compliance processes such as user onboarding and registering data assets.
 
 ### Example forms and project list
 
@@ -36,9 +43,17 @@ Current portal is hosted in SharePoint, the data related to cases and (AKA studi
 
 The portal is comprised of a NextJS frontend that uses a web api to interact with a backend database. Further APIs for supported platforms (initially the ARC TRE) connect the to the data to provide or configure access to resources. The app will access UCL enterprise systems using one of the [UCL producer patterns](https://liveuclac.sharepoint.com/sites/it-architecture/SitePages/integration-patterns.aspx).
 
+### Target System Context
+
+The diagram below shows the **target** context of the ARC Services Portal: the people who use it and the systems it integrates with.
+
+![C1-Portal-Context](./c4/C1-Portal-Context.svg)
+
 ### Logical View
 
 ![Architecture](./media/architecture_logical.png)
+
+![Portal architecture](./media/architecture.png)
 
 ## Physical View
 
@@ -48,9 +63,7 @@ The portal is deployed as a set of Kubernetes resources onto the ARC TRE's produ
 
 As a target architecture, the diagram below shows how in the future, in addition to existing UCL TREs, other UCL systems and services will be able to access data in the portal database via api.
 
-<!-- TODO: export view C2-Portal-Containers from ./c4/workspace.dsl -->
-
-![C2-Portal-Containers](./c4/C2-Portal-Containers.png)
+![C2-Portal-Containers](./c4/C2-Portal-Containers.svg)
 
 > [!NOTE]
 > The `/tre/api` endpoint is not exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal (east-west) access.
@@ -67,9 +80,7 @@ As a target architecture, the diagram below shows how in the future, in addition
 
 The diagram below shows the workflow that deploys the portal into the AWS VPC it currently resides in. The two sets of GitHub actions that run to deploy the app are grouped into the "Portal App Respository" and the "Infrastructure Respository". At present, the Portal App Repository is this GitHub repo. The Infrastructure Repository is the UCL ARC TRE's monorepo, a private repo which belongs to the [ucl-arc-tre GitHub organisation](https://github.com/ucl-arc-tre).
 
-<!-- TODO: export view C3-Delivery-Pipeline-Components from ./c4/workspace.dsl -->
-
-![C3-Delivery-Pipeline-Components](./c4/C3-Delivery-Pipeline-Components.png)
+![C3-Delivery-Pipeline-Components](./c4/C3-Delivery-Pipeline-Components.svg)
 
 ## Design Principles
 
