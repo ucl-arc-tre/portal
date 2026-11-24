@@ -1114,7 +1114,7 @@ type Contract struct {
 	// StudyId Unique identifier of the study to which the contract belongs
 	StudyId string `json:"study_id"`
 
-	// ThirdPartyName Name of the third party organization
+	// ThirdPartyName Name of the third party organization or person, can be comma separated
 	ThirdPartyName *string `json:"third_party_name,omitempty"`
 
 	// Title Name of the contract
@@ -1156,7 +1156,7 @@ type ContractBase struct {
 	// Status Current status of the contract
 	Status ContractBaseStatus `json:"status"`
 
-	// ThirdPartyName Name of the third party organization
+	// ThirdPartyName Name of the third party organization or person, can be comma separated
 	ThirdPartyName *string `json:"third_party_name,omitempty"`
 
 	// Title Name of the contract
