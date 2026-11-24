@@ -132,9 +132,23 @@ describe("IG staff as a study admin end-to-end", () => {
     cy.contains("Update Study").should("not.exist");
 
     cy.env(["botIGUsername"]).then(({ botIGUsername }) => {
-      cy.wait(2000);
-      cy.visit("/");
-      cy.contains(`${botIGUsername} has been removed as an administrator from '${studyTitle}'`).should("exist");
+      const notifTitle = `${botIGUsername} has been removed as an administrator from '${studyTitle}'`;
+      const waitForNotifsAndTest = (retries: number) => {
+        if (retries === 0) {
+          throw new Error(`Notification not found: ${notifTitle}`);
+        }
+        cy.fetchNotificationsMatching("iaa-removal", notifTitle).then((notifs) => {
+          if (notifs.length > 0) {
+            cy.visit("/");
+            // test that it's on the page and not just in the notifs API!
+            cy.contains(notifTitle).should("exist");
+          } else {
+            cy.wait(500);
+            waitForNotifsAndTest(retries - 1);
+          }
+        });
+      };
+      waitForNotifsAndTest(20);
     });
   });
 
