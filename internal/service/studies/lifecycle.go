@@ -23,8 +23,10 @@ func (s *Service) populateLifecycleStatuses(studies []types.Study) error {
 	if len(approvedStudyIds) > 0 {
 		err := s.db.Model(&types.Project{}).
 			Joins("LEFT JOIN project_tres ON project_tres.project_id = projects.id AND project_tres.deleted_at IS NULL").
+			Joins("LEFT JOIN project_dshes ON project_dshes.project_id = projects.id AND project_dshes.deleted_at IS NULL").
 			Where("projects.study_id IN ?", approvedStudyIds).
-			Where("(project_tres.status IS NULL OR project_tres.status != ?)", types.ProjectTREStatusDeleted).
+			// DSH projects currently only have an active status
+			Where("(project_tres.status != ? OR project_dshes.status = ?)", types.ProjectTREStatusDeleted, types.ProjectDSHStatusActive).
 			Distinct().
 			Pluck("projects.study_id", &studyIdsWithActiveProjects).Error
 		if err != nil {
