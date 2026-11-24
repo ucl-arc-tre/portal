@@ -4,6 +4,8 @@
 
 The ARC services portal will support users creating and managing resources on ARC services such as TRE projects, RDSS shares, HPC access and Condenser projects. The initial use case laid out below is in support of the ARC TRE, Data Safe Haven and associated IG processes.
 
+Service owners who want to connect a new service to the portal should read the [Service Onboarding guide](./Service-Onboarding.md).
+
 ## The IG/TRE use case
 
 In order to run the [Research Data ISMS](https://isms.arc.ucl.ac.uk/), ARC needs to ensure processes such as study creation and user onboarding are managed and collect quality data.
@@ -14,7 +16,13 @@ Some processes such as incident and service request will be managed through "MyS
 
 ## As-is IG Portal(s)
 
-![As-is](./media/ARC_Portals_Current.drawio.svg)
+<!-- TODO: export views IG-Portals-As-Is-Landscape, C2-IG-SharePoint-Portal-Containers and C2-TRE-SharePoint-Site-Containers from ./c4/workspace.dsl. These replace ./media/ARC_Portals_Current.drawio.svg. -->
+
+![IG-Portals-As-Is-Landscape](./media/IG-Portals-As-Is-Landscape.png)
+
+![C2-IG-SharePoint-Portal-Containers](./media/C2-IG-SharePoint-Portal-Containers.png)
+
+![C2-TRE-SharePoint-Site-Containers](./media/C2-TRE-SharePoint-Site-Containers.png)
 
 Current portal is hosted in SharePoint, the data related to cases and (AKA studies and projects) researchers etc. in several SharePoint lists. Users logon to the sharepoint portal with their UCL username and password and are able to see and update their existing studies, make requests for new studies and complete other compliance processes such as user onboarding and registering data assets.
 
@@ -40,7 +48,9 @@ The portal is deployed as a set of Kubernetes resources onto the ARC TRE's produ
 
 As a target architecture, the diagram below shows how in the future, in addition to existing UCL TREs, other UCL systems and services will be able to access data in the portal database via api.
 
-![C2-Portal_Containers](./c4/C2-Portal_Containers.png)
+<!-- TODO: export view C2-Portal-Containers from ./c4/workspace.dsl -->
+
+![C2-Portal-Containers](./c4/C2-Portal-Containers.png)
 
 > [!NOTE]
 > The `/tre/api` endpoint is not exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal (east-west) access.
@@ -57,7 +67,9 @@ As a target architecture, the diagram below shows how in the future, in addition
 
 The diagram below shows the workflow that deploys the portal into the AWS VPC it currently resides in. The two sets of GitHub actions that run to deploy the app are grouped into the "Portal App Respository" and the "Infrastructure Respository". At present, the Portal App Repository is this GitHub repo. The Infrastructure Repository is the UCL ARC TRE's monorepo, a private repo which belongs to the [ucl-arc-tre GitHub organisation](https://github.com/ucl-arc-tre).
 
-![C3-Deployment_Workflow](./c4/C3-Deployment_Workflow.png)
+<!-- TODO: export view C3-Delivery-Pipeline-Components from ./c4/workspace.dsl -->
+
+![C3-Delivery-Pipeline-Components](./c4/C3-Delivery-Pipeline-Components.png)
 
 ## Design Principles
 
