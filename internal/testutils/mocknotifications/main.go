@@ -60,7 +60,7 @@ func (s *MockNotifications) NotifyUserNameChangeRequest(attrs types.UserAttribut
 	panic("not-implemented")
 }
 
-func (s *MockNotifications) NotifyUserNameChangeOccurred(subject types.User, chosenName types.ChosenName) error {
+func (s *MockNotifications) NotifyUserNameChangeOccurred(ctx context.Context, subject types.User, chosenName types.ChosenName) error {
 	panic("not-implemented")
 }
 
