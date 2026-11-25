@@ -41,7 +41,8 @@ export default function PeoplePage() {
         description="View and modify people you're permitted to manage in the ARC Services Portal"
       />
 
-      <PageHeader title="People">{(isAdmin || isIAO || isIGStaff) && <ExternalInvite />}</PageHeader>
+      <PageHeader title="People" />
+      {(isAdmin || isIAO || isIGStaff) && <ExternalInvite />}
 
       <HelperText>
         {isAdmin
@@ -53,7 +54,7 @@ export default function PeoplePage() {
         <Callout
           construction
           text={
-            "This page is still being built. You'll be able to see people across all the studies and projects you own."
+            "This page is still being built. You'll be able to see people across all the Studies and Projects you own."
           }
         />
       )}
