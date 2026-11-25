@@ -31,7 +31,7 @@ The Portal runs the controlled processes of the [Research Data ISMS](https://ism
 - A reliable answer to "is this user eligible to use my service?"
 - Projects can be tied to a Study, which means users must maintain a minimum set of metadata, plus projects have a named owner and optional admins
 - An audit trail of project creation, approval, membership changes and deletion
-- An Ops role for your team to view your projects and issue API tokens
+- An Ops role for your team to view your Projects and issue API tokens
 - Self-service project requests that your Ops team, or a client you run, approves in the Portal
 - Additional integrations as required (for example to MyServices or other UCL Enterprise APIs)
 
