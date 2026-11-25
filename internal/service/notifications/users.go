@@ -3,7 +3,6 @@ package notifications
 import (
 	"context"
 	"fmt"
-	"html"
 	"html/template"
 
 	"github.com/rs/zerolog/log"
@@ -43,7 +42,7 @@ func (s *Service) NotifyUserNameChangeOccurred(ctx context.Context, subject type
 
 	log.Debug().Any("username", subject.Username).Msg("Notifying user name change by email")
 	// and send by email
-	content := template.HTML(fmt.Sprintf("Your name has been changed to '%s'", html.EscapeString(string(chosenName))))
+	content := template.HTML(fmt.Sprintf("Your name has been changed to '%s'", template.HTMLEscapeString(string(chosenName)))) // #nosec G203 -- untrusted is escaped
 	subjectLine := "Notification: Your name has been changed"
 
 	return s.entra.SendEmail(ctx, subjectLine, emails(subject), content)
