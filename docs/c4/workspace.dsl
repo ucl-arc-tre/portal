@@ -55,7 +55,9 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
             group "Amazon EKS cluster" {
 
-                nginx = container "Reverse Proxy" "Routes browser requests to the web frontend and API requests to the authentication proxy or the API." "nginx"
+                // Identifier kept as nginx for layout stability. In production this is an HTTPRoute on the EKS
+                // cluster's shared Cilium Gateway; nginx stands in for it only in development and e2e tests.
+                nginx = container "Gateway Route" "Routes browser requests to the web frontend and API requests to the authentication proxy or the API." "Kubernetes Gateway API HTTPRoute; Cilium Gateway"
 
                 oauth2Proxy = container "Authentication Proxy" "Authenticates browser users and forwards their identity with /web/api requests." "OAuth2 Proxy"
 
@@ -144,16 +146,16 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
             portal.webFrontend.pages -> portal.webFrontend.apiClient "Calls the web API through"
 
-            // Browser API calls pass through the reverse proxy on their way to the authentication proxy;
+            // Browser API calls pass through the gateway route on their way to the authentication proxy;
             // that hop is folded into this relationship to keep the user journey readable.
-            portal.webFrontend.apiClient -> portal.oauth2Proxy "Sends web API requests through" "HTTPS/REST and JSON, via the reverse proxy"
+            portal.webFrontend.apiClient -> portal.oauth2Proxy "Sends web API requests through" "HTTPS/REST and JSON, via the gateway route"
 
             portal.oauth2Proxy -> portal.api.middleware "Forwards authenticated web API requests to" "HTTP"
 
             // Platform traffic
 
-            // Confirm whether ARC TRE calls reach the API through the reverse proxy or directly through
-            // the in-cluster service; the HLD describes them as east-west traffic.
+            // The ARC TRE orchestrator also calls the API service directly inside the cluster (east-west),
+            // bypassing the Gateway. That path is described in the HLD and not modelled here.
             portal.nginx -> portal.api.middleware "Routes /tre/api, /dsh/api and future platform API requests to" "HTTP"
 
             portal.api.middleware -> portal.api.webhttpHandlers "Passes authorised /web/api requests to"
@@ -334,7 +336,7 @@ workspace "ARC Services Portal" "Models the current-state architecture of the AR
 
         // Platform integrations
 
-        tre -> portal.nginx "Sends /tre/api requests to" "HTTPS/REST and JSON; HTTP Basic or JWT bearer token"
+        tre -> portal.nginx "Sends /tre/api requests to" "HTTPS/REST and JSON; JWT bearer token"
 
         dsh -> portal.nginx "Sends /dsh/api requests to" "HTTPS/REST and JSON; JWT bearer token"
 

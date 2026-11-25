@@ -57,22 +57,24 @@ The diagram below shows the **target** context of the ARC Services Portal: the p
 
 ### Overview
 
-The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. A reverse proxy receives all incoming HTTPS requests, serving the web frontend at `/`, routing `/web/api` requests via an authentication proxy. TRE API requests are east-west to `/tre/api`.
+The portal is deployed as a set of Kubernetes resources onto the ARC TRE's production/staging Amazon EKS clusters. Traffic reaches the API in two ways:
+
+- **External (north-south).** An HTTPRoute on the cluster's shared Cilium Gateway receives all incoming HTTPS requests. It serves the web frontend at `/`, routes `/web/api` and `/oauth2` through the authentication proxy, and routes `/tre/api` and `/dsh/api` straight to the API. Browsers, the Data Safe Haven and ARC TRE tooling outside the cluster use this path.
+- **East-west.** The ARC TRE orchestrator runs on the same cluster and calls the API's Kubernetes service directly at `/tre/api`, without passing through the Gateway. A Cilium network policy allows this.
+
+The API itself authenticates both paths with JWT bearer tokens; the Gateway only routes. Development and e2e environments use nginx in place of the Gateway and have no east-west path.
 
 As a target architecture, the diagram below shows how in the future, in addition to existing UCL TREs, other UCL systems and services will be able to access data in the portal database via api.
 
 ![C2-Portal-Containers](./c4/C2-Portal-Containers.svg)
 
-> [!NOTE]
-> The `/tre/api` endpoint is not exposed externally because the portal and the ARC TRE run within the same Kubernetes cluster, allowing internal (east-west) access.
-
-| Component            | Resource Type                 |
-| -------------------- | ----------------------------- |
-| Web Frontend         | Deployment using custom image |
-| API                  | Deployment using custom image |
-| Reverse Proxy        | Third party Helm Chart        |
-| Authentication Proxy | Third party Helm Chart        |
-| Postgres Database    | Third party Helm Chart        |
+| Component            | Resource Type                      |
+| -------------------- | ---------------------------------- |
+| Web Frontend         | Deployment using custom image      |
+| API                  | Deployment using custom image      |
+| Gateway Route        | HTTPRoute on shared Cilium Gateway |
+| Authentication Proxy | Third party Helm Chart             |
+| Postgres Database    | Third party Helm Chart             |
 
 ### Deployment Worflow
 
