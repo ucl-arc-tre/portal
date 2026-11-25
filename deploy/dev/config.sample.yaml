@@ -62,7 +62,9 @@ project_access_review:
 url: <CHANGE_ME> # eg. https://portal.arc.ucl.ac.uk
 tre:
   users: # Map of usernames to passwords for HTTP basic auth
-    username: password # pragma: allowlist secret
+    # example entry:
+    # my_username: <CHANGE_ME>
+    {}
 
 # Integration with UCL myservices a IT service management
 # Find the relevant IDs in the project slack channel and generate secrets in the Azure portal

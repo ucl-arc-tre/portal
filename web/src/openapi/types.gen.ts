@@ -797,7 +797,7 @@ export type ContractBase = {
      */
     other_signatories?: string;
     /**
-     * Name of the third party organization
+     * Name of the third party organization or person, can be comma separated
      */
     third_party_name?: string;
     /**

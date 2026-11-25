@@ -6,6 +6,11 @@ import { postUsersInvite } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 import Loading from "@/components/ui/Loading";
 import Dialog from "../ui/Dialog";
+import HelperBlock from "../ui/HelperBlock";
+
+const helperText = `You can invite external researchers to collaborate on the project.
+
+To do so, click the "Invite external researcher" button below and enter their email address. The researcher will receive an email with instructions on how to access and collaborate on the project. `;
 
 export default function ExternalInvite() {
   const [isDialogVisible, setDialogVisible] = useState(false);
@@ -76,6 +81,8 @@ export default function ExternalInvite() {
           </form>
         </Dialog>
       )}
+
+      <HelperBlock text={helperText} />
 
       <Button onClick={openDialog} variant="primary" cy="show-invite-input" type="button">
         Invite external researcher
