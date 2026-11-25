@@ -410,3 +410,28 @@ func commitTransaction(tx *gorm.DB) error {
 	}
 	return nil
 }
+
+func applyContractQueryFilters(db *gorm.DB, query ContractQueryParams) *gorm.DB {
+	if query.FuzzyTitle != nil && *query.FuzzyTitle != "" {
+		db = db.Where("title % ? OR title ILIKE ?", *query.FuzzyTitle, "%"+*query.FuzzyTitle+"%")
+	}
+	return db
+}
+
+// retrieves all contracts across all studies (for admin/IG-ops-type users) filtered by query
+func (s *Service) AllContracts(query ContractQueryParams) ([]types.Contract, error) {
+	db := applyContractQueryFilters(s.db.Model(&types.Contract{}), query)
+	contracts := []types.Contract{}
+	err := db.Preload("Assets").Preload("Objects").
+		Order("created_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&contracts).Error
+	return contracts, types.NewErrFromGorm(err, "failed to get contracts")
+}
+
+// retrieves contracts belonging to a study id (filtered by query)
+func (s *Service) ContractsByStudyIdsFiltered(query ContractQueryParams, studyIDs ...uuid.UUID) ([]types.Contract, error) {
+	db := applyContractQueryFilters(s.db.Model(&types.Contract{}).Where("study_id IN (?)", studyIDs), query)
+	contracts := []types.Contract{}
+	err := db.Preload("Assets").Preload("Objects").
+		Order("created_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&contracts).Error
+	return contracts, types.NewErrFromGorm(err, "failed to get contracts")
+}
