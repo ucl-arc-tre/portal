@@ -24,7 +24,7 @@ The Portal runs the controlled processes of the [Research Data ISMS](https://ism
 | Environment         | A platform where project work happens, with a tier setting the most sensitive data it may hold.           |
 | Project             | Work in one environment, optionally under an approved study, e.g. a TRE project or a DSH share.           |
 | Project type        | The environment-specific part of a project: member roles, lifecycle statuses and configuration.           |
-| Approved Researcher | A user who has signed the researcher agreement and has valid training. Required for study-linked projects. |
+| Approved Researcher | A user who has signed the researcher agreement and has valid training. Required for Study-linked projects. |
 
 ### What your service gets
 
