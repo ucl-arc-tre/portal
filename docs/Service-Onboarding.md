@@ -32,18 +32,18 @@ The Portal runs the controlled processes of the [Research Data ISMS](https://ism
 - Projects can be tied to a Study, which means users must maintain a minimum set of metadata, plus projects have a named owner and optional admins
 - An audit trail of project creation, approval, membership changes and deletion
 - An Ops role for your team to view your Projects and issue API tokens
-- Self-service project requests that your Ops team, or a client you run, approves in the Portal
+- Self-service Project requests that your Ops team, or a client you run, approves in the Portal
 - Additional integrations as required (for example to MyServices or other UCL Enterprise APIs)
 
-### Decide: new project type or extension
+### Decide: new Project type or extension
 
-**New project type.** Your service can become a new environment with its own project type, roles, statuses, API and Ops role. The TRE and DSH were onboarded this way. This is the usual route.
+**New Project type.** Your service can become a new Environment with its own Project type, member roles, statuses, API and Ops role. The TRE and DSH were onboarded this way. This is the usual route.
 
-**Extension of an existing project type.** Your service adds an option or fields to a project type that already exists, and reuses its roles, approval flow, API and Ops team. This only fits when your service is a variant of an existing environment rather than a separate one. The owner of that environment must agree to the change.
+**Extension of an existing Project type.** Your service adds an option or fields to a Project type that already exists, and reuses its member roles, approval flow, API and Ops team. This only fits when your service is a variant of an existing Environment rather than a separate one. The owner of that Environment must agree to the change.
 
-### Decide: study-linked or project-only
+### Decide: Study-linked or Project-only
 
-**Study-linked.** Each project sits under an approved Study, so it inherits an IG boundary, an owner and admins, and can be linked to the Study's assets and contracts. Choose this if your service handles data that needs information governance. The TRE and DSH work this way.
+**Study-linked.** Each project sits under an approved Study, so it inherits an IG boundary, an owner and admins, and can be linked to the Study's assets and contracts. Choose this if your service handles data that needs information governance (IG). The TRE and DSH work this way.
 
 **Project-only.** Projects stand alone with no Study. Choose this if your service doesn't need IG, so researchers aren't asked to register and maintain a asset registers or data sharing agreements or other contracts in order to get a project.
 
@@ -67,12 +67,12 @@ You will also need:
 - an environment tier under [RISM06](https://isms.arc.ucl.ac.uk/rism06-data_classification_and_environment_tiering_policy/#4-environment-tiers-and-data-classification)
 - named staff to hold your service's Ops role
 
-The Portal holds metadata about studies, projects and people. It never holds research data, and your integration must not send any.
+The Portal holds metadata about Studies, Projects and people. It never holds research data, and your integration must not send any.
 
 ### Process
 
 1. Reach out to the Portal team.
-2. Agree with the Portal team the project type, whether projects are study-linked, the integration pattern, roles, statuses and fields.
+2. Agree with the Portal team the Project type, whether projects are Study-linked, the integration pattern, member roles, statuses and fields.
 3. The Portal team drafts the OpenAPI specification as a pull request, and both teams review it.
 4. The Portal team builds the Portal side and releases it to staging.
 5. Your team builds its client against staging, using a token issued by your Ops staff.
@@ -103,9 +103,9 @@ Existing endpoints show what the two patterns look like:
 | Pattern | Endpoint                          | Purpose                                                         |
 | ------- | --------------------------------- | --------------------------------------------------------------- |
 | Pull    | `GET /projects`                   | Projects the TRE should have, with members and configuration    |
-| Pull    | `POST /projects/{projectName}`    | Report a project's status                                       |
+| Pull    | `POST /projects/{projectName}`    | Report a Project's status                                       |
 | Pull    | `GET /user-status`                | A user's Approved Researcher status and training expiry          |
-| Push    | `GET /approved-studies`           | Approved studies with case reference, owner and admins           |
+| Push    | `GET /approved-studies`           | Approved Studies with case reference (caseref), owner and admins           |
 | Push    | `GET /approved-researchers`       | Approved Researchers                                             |
 | Push    | `POST /import/share-members`      | Replace the DSH's project membership with the uploaded CSV       |
 
@@ -113,7 +113,7 @@ Every API has `GET /ping` for checking connectivity and authentication.
 
 ### Data model
 
-Each project has a generic `Project` row linking it to an environment and, for study-linked project types, a study. It also has a row in an environment-specific subtype table. See [internal/types](../internal/types/).
+Each Project has a generic `Project` row linking it to an Environment and, for Study-linked Project types, a Study. It also has a row in an Environment-specific subtype table. See [internal/types](../internal/types/).
 
 ```mermaid
 erDiagram
@@ -132,7 +132,7 @@ erDiagram
     }
     Project {
         string Name
-        uuid StudyID "empty for project-only"
+        uuid StudyID "empty for Project-only"
         uuid EnvironmentID
     }
     ProjectNEW {
@@ -160,9 +160,9 @@ For the pull pattern, follow the TRE's approach: a status lifecycle (`incomplete
 
 Platforms authenticate with Ed25519-signed JWTs issued by the Portal. Each token is bound to one environment and carries its `<svc>:r` and `<svc>:w` scopes. Your Ops staff issue and revoke tokens in the Portal, and each token lasts at most 365 days.
 
-A new project type adds a `<Service> Ops` role in [internal/rbac](../internal/rbac/). Based on the TRE Ops and DSH Ops roles, it lets your staff view all users and studies, view your projects, issue your tokens and, for pull, approve projects they don't own.
+A new Project type adds a `<Service> Ops` role in [internal/rbac](../internal/rbac/). Based on the TRE Ops and DSH Ops roles, it lets your staff view all users and Studies, view your projects, issue your tokens and, for pull, approve Projects they don't own.
 
-For study-linked project types, only Approved Staff Researchers can create projects, under approved studies they own. Only Approved Researchers can be members. For project-only types, who can create projects and become members is agreed with the Portal team.
+For Study-linked Project types, only Approved Staff Researchers can create Projects, under approved Studies they own. Only Approved Researchers can be members. For Project-only types, who can create Projects and become members is agreed with the Portal team.
 
 ### Who builds what
 
