@@ -8,9 +8,9 @@ import Loading from "@/components/ui/Loading";
 import Dialog from "../ui/Dialog";
 import HelperBlock from "../ui/HelperBlock";
 
-const helperText = `People tab will enable you to view researchers and collaborators associated with your project. You can also invite external researchers to collaborate on the project.
+const helperText = `You can invite external researchers to collaborate on the project.
 
-To invite an external researcher, select Invite External Researcher and enter their email address. The researcher will receive an email with instructions on how to access and collaborate on the project. `;
+To do so, click the "Invite external researcher" button below and enter their email address. The researcher will receive an email with instructions on how to access and collaborate on the project. `;
 
 export default function ExternalInvite() {
   const [isDialogVisible, setDialogVisible] = useState(false);
