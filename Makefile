@@ -66,10 +66,15 @@ test-e2e-cypress-dev: e2e-dependencies  ## Run Cypress locally against dockerise
 
 test-e2e-release: e2e-dependencies ## Run end-to-end tests against the release build
 	cd e2e && \
+	echo "JES0 " && date && \
 	docker compose -p $(E2E_PROJECT_NAME) build && \
+	echo "JES1 " && date && \
 	docker compose -p $(E2E_PROJECT_NAME) up nginx -d && \
+	echo "JES2 " && date && \
 	docker compose -p $(E2E_PROJECT_NAME) run --rm cypress && \
-	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans
+	echo "JES3 " && date && \
+	docker compose -p $(E2E_PROJECT_NAME) down --remove-orphans && \
+	echo "JES4 " && date
 
 e2e-dependencies:
 	$(call assert_file_exists, e2e/oauth2-proxy.cfg)
