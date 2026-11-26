@@ -25,11 +25,6 @@ func (s *Service) NotifyUserNameChangeRequest(attrs types.UserAttributes, recipi
 }
 
 func (s *Service) NotifyUserNameChangeOccurred(ctx context.Context, subject types.User, chosenName types.ChosenName) error {
-	// is this check good for anything?
-	if subject.CreatedAt.IsZero() {
-		return types.NewErrInvalidObject("user was nil valued - cannot notify")
-	}
-
 	log.Debug().Any("username", subject.Username).Msg("Notifying user name change within webapp")
 	notification := types.Notification{
 		Title: fmt.Sprintf("Your name has been changed to '%s'", chosenName),
