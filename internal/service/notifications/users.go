@@ -7,6 +7,8 @@ import (
 	"github.com/ucl-arc-tre/portal/internal/types"
 )
 
+func unusedLintTestHelper() {}
+
 func (s *Service) NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error {
 	if attrs.User.CreatedAt.IsZero() {
 		return types.NewErrInvalidObject("user was nil valued - cannot notify")
