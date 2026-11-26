@@ -667,7 +667,44 @@ export type ProjectDshRole = 'read' | 'write' | 'outbound';
 
 export type ProjectDshStatus = 'active';
 
-export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven';
+export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven' | 'REDCap Tier 3';
+
+/**
+ * Request payload for creating a new TRE project
+ */
+export type ProjectRedcapTier3Base = {
+    /**
+     * List of asset identifiers to link to this project (can be empty)
+     */
+    asset_ids: Array<string>;
+};
+
+/**
+ * Request payload for creating a new TRE project
+ */
+export type ProjectRedcapTier3Request = ProjectRedcapTier3Base & {
+    /**
+     * Name of the project
+     */
+    name: string;
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
+};
+
+export type ProjectRedcapTier3 = ProjectRedcapTier3Base & {
+    id: string;
+    study_id: string;
+    study_title: string;
+    study_owner?: UserDataSummary;
+    /**
+     * List of assets associated with this project
+     */
+    assets?: Array<Asset>;
+    environment_name: string;
+    name: string;
+};
 
 /**
  * A project with base details (environment-agnostic)
@@ -2617,6 +2654,108 @@ export type PostProjectsDshByProjectIdAccessReviewSignoffResponses = {
      */
     200: unknown;
 };
+
+export type GetProjectsRedcaptier3Data = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/projects/redcaptier3';
+};
+
+export type GetProjectsRedcaptier3Errors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsRedcaptier3Responses = {
+    200: Array<ProjectRedcapTier3>;
+};
+
+export type GetProjectsRedcaptier3Response = GetProjectsRedcaptier3Responses[keyof GetProjectsRedcaptier3Responses];
+
+export type PostProjectsRedcaptier3Data = {
+    body: ProjectRedcapTier3Request;
+    path?: never;
+    query?: never;
+    url: '/projects/redcaptier3';
+};
+
+export type PostProjectsRedcaptier3Errors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsRedcaptier3Error = PostProjectsRedcaptier3Errors[keyof PostProjectsRedcaptier3Errors];
+
+export type PostProjectsRedcaptier3Responses = {
+    /**
+     * TRE project created successfully
+     */
+    201: ProjectRedcapTier3;
+};
+
+export type PostProjectsRedcaptier3Response = PostProjectsRedcaptier3Responses[keyof PostProjectsRedcaptier3Responses];
+
+export type GetProjectsRedcaptier3ByProjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Project UUID
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/redcaptier3/{projectId}';
+};
+
+export type GetProjectsRedcaptier3ByProjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsRedcaptier3ByProjectIdResponses = {
+    200: ProjectRedcapTier3;
+};
+
+export type GetProjectsRedcaptier3ByProjectIdResponse = GetProjectsRedcaptier3ByProjectIdResponses[keyof GetProjectsRedcaptier3ByProjectIdResponses];
 
 export type GetAssetsData = {
     body?: never;

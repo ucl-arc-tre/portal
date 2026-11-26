@@ -14,6 +14,7 @@ var (
 	AssetTitlePattern             = regexp.MustCompile(`^\w[\w\s\-']{2,48}\w$`)       // 4-50 chars, starts/ends with alphanumeric, only letters/numbers/spaces/hyphens
 	AssetDescriptionPattern       = regexp.MustCompile(`^.{4,255}$`)                  // 4-255 characters, any content
 	ContractNamePattern           = regexp.MustCompile(`^.{2,100}$`)                  // 2-100 characters, any content
+	RedcapTier3ProjectNamePattern = regexp.MustCompile(`^[0-9a-z]{4,14}$`)            // 4-14 lowercase alphanumeric characters only
 	TREProjectNamePattern         = regexp.MustCompile(`^[0-9a-z]{4,14}$`)            // 4-14 lowercase alphanumeric characters only
 	TokenNamePattern              = regexp.MustCompile(`^.{1,50}$`)                   // 1-50 characters, any content
 	OtherSignatoriesStringPattern = regexp.MustCompile(`^.{0,255}$`)                  // 1-255 characters, any content

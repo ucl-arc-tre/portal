@@ -520,6 +520,7 @@ func (e ContractBaseStatus) Valid() bool {
 const (
 	ARCTrustedResearchEnvironment EnvironmentName = "ARC Trusted Research Environment"
 	DataSafeHaven                 EnvironmentName = "Data Safe Haven"
+	REDCapTier3                   EnvironmentName = "REDCap Tier 3"
 )
 
 // Valid indicates whether the value is a known member of the EnvironmentName enum.
@@ -528,6 +529,8 @@ func (e EnvironmentName) Valid() bool {
 	case ARCTrustedResearchEnvironment:
 		return true
 	case DataSafeHaven:
+		return true
+	case REDCapTier3:
 		return true
 	default:
 		return false
@@ -1332,6 +1335,39 @@ type ProjectDSHRole string
 // ProjectDSHStatus defines model for ProjectDSHStatus.
 type ProjectDSHStatus string
 
+// ProjectRedcapTier3 defines model for ProjectRedcapTier3.
+type ProjectRedcapTier3 struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Assets List of assets associated with this project
+	Assets          *[]Asset         `json:"assets,omitempty"`
+	EnvironmentName string           `json:"environment_name"`
+	Id              string           `json:"id"`
+	Name            string           `json:"name"`
+	StudyId         string           `json:"study_id"`
+	StudyOwner      *UserDataSummary `json:"study_owner,omitempty"`
+	StudyTitle      string           `json:"study_title"`
+}
+
+// ProjectRedcapTier3Base Request payload for creating a new TRE project
+type ProjectRedcapTier3Base struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+}
+
+// ProjectRedcapTier3Request Request payload for creating a new TRE project
+type ProjectRedcapTier3Request struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Name Name of the project
+	Name string `json:"name"`
+
+	// StudyId Unique identifier of the study to which the project belongs
+	StudyId string `json:"study_id"`
+}
+
 // ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
 	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
@@ -1996,6 +2032,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// PostProjectsRedcaptier3JSONRequestBody defines body for PostProjectsRedcaptier3 for application/json ContentType.
+type PostProjectsRedcaptier3JSONRequestBody = ProjectRedcapTier3Request
+
 // PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
 
@@ -2127,6 +2166,15 @@ type ServerInterface interface {
 
 	// (POST /projects/dsh/{projectId}/access-review-signoff)
 	PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
+
+	// (GET /projects/redcaptier3)
+	GetProjectsRedcaptier3(c *gin.Context)
+
+	// (POST /projects/redcaptier3)
+	PostProjectsRedcaptier3(c *gin.Context)
+
+	// (GET /projects/redcaptier3/{projectId})
+	GetProjectsRedcaptier3ProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
@@ -2729,6 +2777,57 @@ func (siw *ServerInterfaceWrapper) PostProjectsDshProjectIdAccessReviewSignoff(c
 	}
 
 	siw.Handler.PostProjectsDshProjectIdAccessReviewSignoff(c, projectId)
+}
+
+// GetProjectsRedcaptier3 operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsRedcaptier3(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsRedcaptier3(c)
+}
+
+// PostProjectsRedcaptier3 operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsRedcaptier3(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsRedcaptier3(c)
+}
+
+// GetProjectsRedcaptier3ProjectId operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsRedcaptier3ProjectId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsRedcaptier3ProjectId(c, projectId)
 }
 
 // GetProjectsTre operation middleware
@@ -4151,6 +4250,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
 	router.POST(options.BaseURL+"/projects/dsh/:projectId/access-review-signoff", wrapper.PostProjectsDshProjectIdAccessReviewSignoff)
+	router.GET(options.BaseURL+"/projects/redcaptier3", wrapper.GetProjectsRedcaptier3)
+	router.POST(options.BaseURL+"/projects/redcaptier3", wrapper.PostProjectsRedcaptier3)
+	router.GET(options.BaseURL+"/projects/redcaptier3/:projectId", wrapper.GetProjectsRedcaptier3ProjectId)
 	router.GET(options.BaseURL+"/assets", wrapper.GetAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)

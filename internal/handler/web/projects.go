@@ -70,7 +70,7 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 	}
 	envs := []types.EnvironmentName{}
 	if canSeeAllEnvironments {
-		envs = append(envs, environments.DSH, environments.TRE)
+		envs = append(envs, environments.DSH, environments.TRE, environments.RedCapTier3)
 	}
 	if isTreOpsStaff && !canSeeAllEnvironments {
 		envs = append(envs, environments.TRE)
@@ -129,8 +129,7 @@ func (h *Handler) PostProjectsTre(ctx *gin.Context) {
 
 	user := middleware.GetUser(ctx)
 	// Validate that user has owner role on the study
-	studyOwnerRole := rbac.StudyRole{StudyID: studyUUID, Name: rbac.StudyOwner}
-	if isStudyOwner, err := rbac.HasRole(user, studyOwnerRole.RoleName()); err != nil {
+	if isStudyOwner, err := rbac.IsStudyOwner(user, studyUUID); err != nil {
 		setError(ctx, err, "Failed to check study access")
 		return
 	} else if !isStudyOwner {
@@ -377,6 +376,88 @@ func (h *Handler) userDataSummary(username types.Username) openapi.UserDataSumma
 		summary.Name = new(string(*chosenName))
 	}
 	return summary
+}
+
+func (h *Handler) GetProjectsRedcaptier3(ctx *gin.Context) {
+	user := middleware.GetUser(ctx)
+	canSeeAll, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+	var projects []types.ProjectRedcapTier3
+	if canSeeAll {
+		projects, err = h.projects.AllProjectsRedcapTier3()
+	} else {
+		ids, roleErr := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
+		if roleErr != nil {
+			setError(ctx, roleErr, "Failed to get project IDs")
+			return
+		}
+		projects, err = h.projects.ProjectsRedcapTier3ByIds(ids...)
+	}
+	if err != nil {
+		setError(ctx, err, "Failed to get projects")
+		return
+	}
+	response := []openapi.ProjectRedcapTier3{}
+	for _, project := range projects {
+		response = append(response, h.redcapTier3ToOpenApi(project))
+	}
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *Handler) PostProjectsRedcaptier3(ctx *gin.Context) {
+	data := openapi.ProjectRedcapTier3Request{}
+	if err := bindJSONOrSetError(ctx, &data); err != nil {
+		return
+	}
+	studyID, err := uuid.Parse(data.StudyId)
+	if err != nil {
+		setError(ctx, types.NewErrInvalidObject(err), "Invalid study ID")
+		return
+	}
+	user := middleware.GetUser(ctx)
+	if owner, err := rbac.IsStudyOwner(user, studyID); err != nil {
+		setError(ctx, err, "Failed to check study access")
+		return
+	} else if !owner {
+		ctx.Status(http.StatusForbidden)
+		return
+	}
+	if err := h.projects.CreateProjectRedcapTier3(user, studyID, data); err != nil {
+		setError(ctx, err, "Failed to create project")
+		return
+	}
+	ctx.Status(http.StatusCreated)
+}
+
+func (h *Handler) GetProjectsRedcaptier3ProjectId(ctx *gin.Context, projectId openapi.ProjectIdParam) {
+	project, err := h.projects.ProjectRedcapTier3ById(projectId)
+	if err != nil {
+		setError(ctx, err, "Failed to get project")
+		return
+	}
+	ctx.JSON(http.StatusOK, h.redcapTier3ToOpenApi(*project))
+}
+
+func (h *Handler) redcapTier3ToOpenApi(project types.ProjectRedcapTier3) openapi.ProjectRedcapTier3 {
+	assets := []openapi.Asset{}
+	assetIDs := []string{}
+	for _, asset := range project.Project.ProjectAssets {
+		assets = append(assets, assetToOpenApiAsset(asset.Asset))
+		assetIDs = append(assetIDs, asset.AssetID.String())
+	}
+	return openapi.ProjectRedcapTier3{
+		Id:              project.ProjectID.String(),
+		Name:            project.Project.Name,
+		StudyId:         project.Project.StudyID.String(),
+		StudyTitle:      project.Project.Study.Title,
+		StudyOwner:      h.optionalStudyOwnerSummary(&project.Project.Study),
+		EnvironmentName: string(project.Project.Environment.Name),
+		Assets:          &assets,
+		AssetIds:        assetIDs,
+	}
 }
 
 func optionalInt(i *uint) *int {

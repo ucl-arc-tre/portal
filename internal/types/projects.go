@@ -224,3 +224,11 @@ type ProjectDSHStatus string
 const (
 	ProjectDSHStatusActive = "active"
 )
+
+type ProjectRedcapTier3 struct {
+	ModelAuditable
+	ProjectID uuid.UUID `gorm:"not null;index"`
+
+	// Relationships
+	Project Project `gorm:"foreignKey:ProjectID"`
+}

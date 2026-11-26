@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { AnyProject } from "@/types/projects";
-import { getProjectsDshByProjectId, getProjectsTreByProjectId, ProjectDsh, ProjectTre } from "@/openapi";
+import {
+  getProjectsDshByProjectId,
+  getProjectsTreByProjectId,
+  ProjectDsh,
+  ProjectTre,
+  ProjectRedcapTier3,
+  getProjectsRedcaptier3ByProjectId,
+} from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
@@ -15,6 +22,8 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import Error from "@/components/ui/Error";
 import ManageProjectTRE from "@/components/projects/tre/ManageProjectTRE";
 import ManageProjectDSH from "@/components/projects/dsh/ManageProjectDSH";
+
+import ManageProjectRedcapTier3 from "@/components/projects/redcap3/ManageProjectRedcapTier3";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -46,6 +55,11 @@ export default function ManageProjectPage() {
       switch (environmentParam) {
         case "ARC Trusted Research Environment":
           projectResponse = await getProjectsTreByProjectId({
+            path: { projectId: projectIdParam },
+          });
+          break;
+        case "REDCap Tier 3":
+          projectResponse = await getProjectsRedcaptier3ByProjectId({
             path: { projectId: projectIdParam },
           });
           break;
@@ -175,6 +189,7 @@ export default function ManageProjectPage() {
         {environment == "Data Safe Haven" && (
           <ManageProjectDSH project={project as ProjectDsh} fetchData={() => fetchData(projectId, environment)} />
         )}
+        {environment == "REDCap Tier 3" && <ManageProjectRedcapTier3 project={project as ProjectRedcapTier3} />}
       </div>
     </>
   );

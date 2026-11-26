@@ -17,6 +17,13 @@ const VALIDATION_CONFIG: Record<string, ProjectNameValidation> = {
     patternMessage: "Must be 4-14 characters long and contain only lowercase letters and numbers",
     helperText: "Use lowercase letters and numbers only (4-14 characters)",
   },
+  "REDCap Tier 3": {
+    pattern: /^[0-9a-z]{4,14}$/,
+    minLength: 4,
+    maxLength: 14,
+    patternMessage: "Must be 4-14 characters long and contain only lowercase letters and numbers",
+    helperText: "Use lowercase letters and numbers only (4-14 characters)",
+  },
 };
 
 export const getProjectNameValidation = (environmentName: string): ProjectNameValidation => {

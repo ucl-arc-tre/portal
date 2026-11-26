@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import {
   postProjectsTre,
+  postProjectsRedcaptier3,
   putProjectsTreByProjectId,
   ProjectTreRequest,
   Study,
@@ -20,6 +21,7 @@ import Dialog from "../ui/Dialog";
 import styles from "./ProjectForm.module.css";
 import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
+import ProjectFormRedcapTier3 from "./redcap3/ProjectFormRedcapTier3";
 import ErrorMessage from "../ui/Error";
 
 type Props = {
@@ -76,6 +78,7 @@ export default function ProjectForm({
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isTREProject = selectedEnvironment?.name == "ARC Trusted Research Environment";
   const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";
+  const isRedcapTier3Project = selectedEnvironment?.name == "REDCap Tier 3";
 
   const fieldsDisabled = isSubmitting;
   const editing = editingProject !== null && editingProject !== undefined;
@@ -117,7 +120,7 @@ export default function ProjectForm({
       setValue("assetIds", projectAssetIds);
 
       const projectMembers =
-        editingProject.members?.map((member) => ({
+        ("members" in editingProject ? editingProject.members : [])?.map((member) => ({
           username: member.user.username,
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
@@ -285,6 +288,15 @@ export default function ProjectForm({
             response = await postProjectsTre({ body: requestBody });
           }
           break;
+        case "REDCap Tier 3":
+          if (editingProject) {
+            setError("Editing REDCap Tier 3 projects is not yet supported.");
+            return;
+          }
+          response = await postProjectsRedcaptier3({
+            body: { name: data.name, study_id: data.studyId, asset_ids: [...new Set(assetIds)] },
+          });
+          break;
         case "Data Safe Haven":
           setEnvironmentsError(
             "DSH projects are not yet supported. Please use the Share Management Tool within the DSH or open a ticket on MyServices."
@@ -339,6 +351,10 @@ export default function ProjectForm({
 
             {currentStep === 2 && isTREProject && (
               <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject as ProjectTre} />
+            )}
+
+            {currentStep === 2 && isRedcapTier3Project && (
+              <ProjectFormRedcapTier3 approvedStudies={approvedStudies} assets={assets ?? []} />
             )}
 
             {error && <ErrorMessage message={error} />}

@@ -1076,6 +1076,72 @@ paths:
         default:
           description: Unexpected error
 
+  # Project Management - TRE Environment
+  /projects/redcaptier3:
+    get:
+      description: Get all REDCap (Tier 3) projects that a user has access to view
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectRedcapTier3"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a TRE project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectRedcapTier3Request"
+      responses:
+        "201":
+          description: TRE project created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectRedcapTier3"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /projects/redcaptier3/{projectId}:
+    get:
+      description: Get one REDCap (Tier 3) project with base project details joined in
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectRedcapTier3"
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Asset Management
   /assets:
     get:
@@ -2682,6 +2748,64 @@ components:
       enum:
         - "ARC Trusted Research Environment"
         - "Data Safe Haven"
+        - "REDCap Tier 3"
+
+    ProjectRedcapTier3Base:
+      type: object
+      description: Request payload for creating a new TRE project
+      required:
+        - asset_ids
+      properties:
+        asset_ids:
+          type: array
+          description: List of asset identifiers to link to this project (can be empty)
+          items:
+            type: string
+
+    ProjectRedcapTier3Request:
+      type: object
+      description: Request payload for creating a new TRE project
+      allOf:
+        - $ref: "#/components/schemas/ProjectRedcapTier3Base"
+        - required:
+            - name
+            - study_id
+          properties:
+            name:
+              type: string
+              description: Name of the project
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the project belongs
+
+    ProjectRedcapTier3:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/ProjectRedcapTier3Base"
+        - required:
+            - id
+            - study_id
+            - study_title
+            - environment_name
+            - name
+          properties:
+            id:
+              type: string
+            study_id:
+              type: string
+            study_title:
+              type: string
+            study_owner:
+              $ref: "#/components/schemas/UserDataSummary"
+            assets:
+              type: array
+              description: List of assets associated with this project
+              items:
+                $ref: "#/components/schemas/Asset"
+            environment_name:
+              type: string
+            name:
+              type: string
 
     Project:
       type: object
