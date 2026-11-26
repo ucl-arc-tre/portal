@@ -76,7 +76,8 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 	if err != nil {
 		log.Err(err).Msg("Failed to notify user name change") // not fatal
 	}
-	return err
+	// don't return a error that was only for the notifications
+	return nil
 }
 
 func (s *Service) notifyUserNameChangeRequest(attrs types.UserAttributes) error {
