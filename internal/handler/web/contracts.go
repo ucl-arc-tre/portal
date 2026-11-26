@@ -8,8 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"github.com/ucl-arc-tre/portal/internal/config"
 	"github.com/ucl-arc-tre/portal/internal/middleware"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
+	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/studies"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
@@ -220,4 +222,68 @@ func contractToOpenApiContract(contract types.Contract) openapi.Contract {
 		})
 	}
 	return data
+}
+
+func contractQueryParams(params openapi.GetContractsParams) (studies.ContractQueryParams, error) {
+	if params.Limit != nil && *params.Limit > config.MaxPageSize {
+		return studies.ContractQueryParams{}, types.NewErrClientInvalidObjectF("maxItems cannot be greater than %d", config.MaxPageSize)
+	}
+	if params.Limit != nil && *params.Limit <= 0 {
+		return studies.ContractQueryParams{}, types.NewErrClientInvalidObject("maxItems must be greater than 0")
+	}
+	if params.Offset != nil && *params.Offset < 0 {
+		return studies.ContractQueryParams{}, types.NewErrClientInvalidObject("startIndex cannot be negative")
+	}
+	queryParams := studies.ContractQueryParams{
+		FuzzyTitle: params.Query,
+		Limit:      config.DefaultPageSize,
+		Offset:     0,
+	}
+	if params.Limit != nil {
+		queryParams.Limit = *params.Limit
+	}
+	if params.Offset != nil {
+		queryParams.Offset = *params.Offset
+	}
+	return queryParams, nil
+}
+
+func (h *Handler) GetContracts(ctx *gin.Context, params openapi.GetContractsParams) {
+	user := middleware.GetUser(ctx)
+
+	canSeeAllContracts, err := rbac.HasAnyListedRole(user, rbac.Admin, rbac.IGOpsStaff, rbac.IGAdmin, rbac.TreOpsStaff, rbac.DSHOpsStaff)
+	if err != nil {
+		setError(ctx, err, "Failed to check user roles")
+		return
+	}
+
+	queryParams, err := contractQueryParams(params)
+	if err != nil {
+		setError(ctx, err, "Failed to get contracts")
+		return
+	}
+
+	var contracts []types.Contract
+	if canSeeAllContracts {
+		contracts, err = h.studies.AllContracts(queryParams)
+	} else {
+		var studyIds []uuid.UUID
+		studyIds, err = rbac.StudyIDsWithRole(user, rbac.StudyOwner)
+		if err != nil {
+			setError(ctx, err, "Failed to get accessible studies")
+			return
+		}
+		contracts, err = h.studies.ContractsByStudyIdsFiltered(queryParams, studyIds...)
+	}
+	if err != nil {
+		setError(ctx, err, "Failed to get contracts")
+		return
+	}
+
+	response := []openapi.Contract{}
+	for _, contract := range contracts {
+		response = append(response, contractToOpenApiContract(contract))
+	}
+
+	ctx.JSON(http.StatusOK, response)
 }
