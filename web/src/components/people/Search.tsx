@@ -31,7 +31,7 @@ export default function PeopleSearch() {
       if (query.length < 3) {
         setSearchErrorMessage("Not enough characters; there's a minimum of 3 characters required to perform search");
       } else {
-        setSearchErrorMessage("Invalid query, only alphanumeric characters, @ and - are allowed");
+        setSearchErrorMessage("Invalid query, only letters, numbers, spaces and the characters . + @ _ - are allowed");
       }
       return;
     }
