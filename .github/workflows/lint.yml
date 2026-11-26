@@ -36,12 +36,15 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Debug - show cache
-        run: find ~/.cache/ -ls
-
       - name: Install node dependencies
         working-directory: web
         run: npm ci
+
+      - name: Debug - show caches after npm ci
+        run: |
+          du -sm ~/.npm || echo "no ~/.npm"
+          du -sm ~/.cache/* || true
+          du -sh ~/.cache/Cypress || echo "no Cypress binary"
 
       # golangci-lint-full's analysis cache
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # version 6.1.0, See: https://github.com/actions/cache/releases
