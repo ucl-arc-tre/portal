@@ -38,6 +38,9 @@ jobs:
 
       - name: Install node dependencies
         working-directory: web
+        env:
+          # Lint doesn't need Cypress runner, so avoid downloading ~800MB
+          CYPRESS_INSTALL_BINARY: 0
         run: npm ci
 
       - name: Debug - show caches after npm ci
