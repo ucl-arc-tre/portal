@@ -32,6 +32,9 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # version 6.4.0, See: https://github.com/actions/setup-node/releases
         with:
           node-version: "26"
+          # Cache npm's download cache
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - name: Install node dependencies
         working-directory: web
