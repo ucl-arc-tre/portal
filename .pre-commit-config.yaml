@@ -10,9 +10,15 @@ repos:
   - repo: https://github.com/golangci/golangci-lint
     rev: v2.12.2
     hooks:
-      - id: golangci-lint
+      # Do not use golangci-lint as it only checks vs HEAD so will never find anything in CI.
+      # Instead lint everything changed on this branch vs main.
+      - id: golangci-lint-full
         args:
           - "--timeout=5m"
+          - "--new-from-merge-base=origin/main"
+          # web/node_modules contains some go code that we don't want to lint
+          - "./cmd/..."
+          - "./internal/..."
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
