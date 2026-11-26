@@ -1,0 +1,11 @@
+.contract-selection {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.contract-list {
+  display: grid;
+  gap: 2rem;
+  margin-top: 0;
+  padding-top: 0.2rem;
+}
