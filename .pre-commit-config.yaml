@@ -10,8 +10,8 @@ repos:
   - repo: https://github.com/golangci/golangci-lint
     rev: v2.12.2
     hooks:
-      # Do not use golangci-lint as it only checks vs HEAD so will never find anything in CI.
-      # Instead lint everything changed on this branch vs main.
+      # Do not use the golangci-lint hook as it only checks vs HEAD so
+      # will never find anything in CI.
       - id: golangci-lint-full
         args:
           - "--timeout=5m"
