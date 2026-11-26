@@ -1,24 +1,20 @@
 ## Email sent to IAO & IAAs about their Study moves
 
-Dear <IAO/IAA name>, ​
+Dear user,
 
-The records pertaining to your Study (a.k.a CaseRef) <study name> are scheduled to
-be moved to the [ARC Services Portal](link) on the <date>. Once moved, the records in SharePoint will become read-only.
+You are receiving this email because one or more studies for which you are responsible have Information Governance records scheduled for transfer to the ARC Services Portal on <transfer date>
 
-​
+UCL is replacing the current Information Governance SharePoint site with the ARC Services Portal. The Portal provides a single location for managing study records, governance activities, contracts, user access and training records, enabling Information Asset Owners and Information Asset Administrators to view study, team membership and training status in one place.
+All Information Governance records currently held in SharePoint will be transferred to the ARC Services Portal. No information will be lost as part of this move.
+From <transfer date>:
 
-You will then be able to find all your Study records and the various
-management tools in the ARC Services Portal. ​We'll send an email once this has been done so that you can log into the Portal and complete next steps.
+- The Information Governance SharePoint site will become read-only.
+- The ARC Services Portal will become the primary system for managing Studies that use UCL research data services.
+- Future Study administration and governance activities should be completed through the ARC Services Portal.
+- SharePoint notifications and reminders will cease, and future communications will be issued through the ARC Services Portal.
 
-Please note that if your Study is:
-
-- more than 1 year old
-- has any associated Projects and Environments (i.e TRE/DSH) without any data
-
-it will be automatically marked as Closed - i.e. assumed there is no ongoing research, nor is there any outstanding data retention requirement. If your Study is Active, please ensure any associated Projects and Environments have data.
-
-​
+Once this has been completed, we’ll send you an email so you can log into the Portal and complete next steps.
 
 Kind Regards,
 
-ARC Services Portal Team​
+ARC Services Portal Team
