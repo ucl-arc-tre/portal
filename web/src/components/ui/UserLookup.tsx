@@ -130,7 +130,7 @@ export default function UserLookup(props: UserLookupProps) {
 
     if (!isValid) {
       setSearchErrorMessage(
-        "Invalid query, only alphanumeric characters, @ and - are allowed and must start and end with a letter or number."
+        "Invalid query, only letters, numbers, spaces and the characters . + @ _ - are allowed, and it must start and end with a letter or number."
       );
       return;
     }
@@ -192,7 +192,7 @@ export default function UserLookup(props: UserLookupProps) {
     setInviteLoading(true);
     const isValid = new RegExp(regex).test(email);
     if (!isValid) {
-      setInviteErrorMessage("Invalid entry, only alphanumeric characters, @ and - are allowed");
+      setInviteErrorMessage("Invalid entry, only letters, numbers, spaces and the characters . + @ _ - are allowed");
       return;
     }
     try {

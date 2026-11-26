@@ -54,19 +54,17 @@ describe("IG staff as a study admin end-to-end", () => {
     cy.contains("Incomplete").should("be.visible");
 
     cy.env(["botIGUsername"]).then(({ botIGUsername }) => {
-      const additionalAdminUsername = botIGUsername.split("@")[0];
-
       cy.get('[data-cy="edit-study-button"]').click();
-      cy.get('[data-cy="user-lookup"]').type(additionalAdminUsername);
+      cy.get('[data-cy="user-lookup"]').type(botIGUsername);
       cy.get('button[data-cy="user-lookup-submit"]').click();
-      cy.get('[data-cy="add-user-to-selection"]').first().click();
+      cy.get(`[data-id="${botIGUsername}"] [data-cy="add-user-to-selection"]`).click();
       cy.get('[data-cy="next"]').click();
       cy.get('[data-cy="next"]').click();
       cy.get("button[type='submit']").contains("Update Study").click();
       cy.contains("Update Study").should("not.exist");
 
       cy.contains("The following administrators have not yet agreed to the study agreement:").should("be.visible");
-      cy.contains(additionalAdminUsername).should("be.visible");
+      cy.contains(botIGUsername).should("be.visible");
     });
   });
 
