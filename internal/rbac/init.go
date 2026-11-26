@@ -53,6 +53,7 @@ func addApprovedResearcherPolicies(enforcer *casbin.SyncedEnforcer) {
 	mustAddPolicies(enforcer,
 		Policy{RoleName: ApprovedResearcher, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: ApprovedResearcher, Resource: "/assets", Action: ReadAction},
+		Policy{RoleName: ApprovedResearcher, Resource: "/contracts", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/studies", Action: WriteAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-owner", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/agreements/study-administrator", Action: ReadAction},
@@ -82,6 +83,7 @@ func addTreOpsStaffPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: TreOpsStaff, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/studies/:id", Action: ReadAction},
 		Policy{RoleName: TreOpsStaff, Resource: "/assets", Action: ReadAction},
+		Policy{RoleName: TreOpsStaff, Resource: "/contracts", Action: ReadAction},
 	)
 }
 
@@ -96,6 +98,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.SyncedEnforcer) {
 
 		Policy{RoleName: IGOpsStaff, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/assets", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/contracts", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: WriteAction},
@@ -114,6 +117,7 @@ func addIgAdminPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: IGAdmin, Resource: "/users/invite", Action: WriteAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/assets", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/contracts", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/studies/*", Action: WriteAction},
 		Policy{RoleName: IGAdmin, Resource: "/projects/tre/*", Action: ReadAction},
@@ -133,6 +137,7 @@ func addDSHOpsStaffPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: DSHOpsStaff, Resource: "/studies", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/studies/:id", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/assets", Action: ReadAction},
+		Policy{RoleName: DSHOpsStaff, Resource: "/contracts", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/projects", Action: ReadAction},
 		Policy{RoleName: DSHOpsStaff, Resource: "/projects/dsh/*", Action: ReadAction},
 	)

@@ -1340,6 +1340,7 @@ paths:
         default:
           description: Unexpected error
 
+  # Contract Management
   /contracts:
     get:
       description: Get all contracts accessible to the current user, optionally filtered by the query params below
