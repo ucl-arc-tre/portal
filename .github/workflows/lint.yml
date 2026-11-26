@@ -37,6 +37,12 @@ jobs:
         working-directory: web
         run: npm ci
 
+      # golangci-lint-full's analysis cache
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # version 6.1.0, See: https://github.com/actions/cache/releases
+        with:
+          path: ~/.cache/golangci-lint
+          key: golangci-lint-${{ runner.os }}-${{ hashFiles('go.sum') }}
+
       - name: Run pre-commit
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # version 3.0.1, See: https://github.com/pre-commit/action/releases
         with:
