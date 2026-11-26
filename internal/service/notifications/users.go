@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 
@@ -15,6 +16,9 @@ func (s *Service) NotifyUserNameChangeRequest(attrs types.UserAttributes, recipi
 	}
 
 	log.Debug().Any("username", attrs.User.Username).Msg("Notifying user name change request")
+	if attrs.RequestedChosenName == nil {
+		return errors.New("nil requested name when requesting name change")
+	}
 	notification := types.Notification{
 		// what if new name is null? is that possible?
 		Title: fmt.Sprintf("'%s' requested a name change to '%s'", attrs.ChosenName, *attrs.RequestedChosenName),
