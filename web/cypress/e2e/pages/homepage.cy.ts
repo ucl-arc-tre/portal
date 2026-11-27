@@ -39,7 +39,14 @@ describe(`Homepage Tests`, () => {
     });
 
     it("prompts to complete notification profile is not complete", () => {
-      cy.mockNotifications([{ title: "complete your profile", kind: "complete-profile" }]);
+      cy.mockNotifications([
+        {
+          id: "00000000-0000-0000-0000-000000000001",
+          title: "complete your profile",
+          kind: "complete-profile",
+          read: false,
+        },
+      ]);
 
       // Mock auth as approved researcher (complete profile)
       cy.mockAuthAsBaseStaffApprovedResearcher();
@@ -65,7 +72,14 @@ describe(`Homepage Tests`, () => {
     });
 
     it("points to studies page for admin Approved Researcher", () => {
-      cy.mockNotifications([{ title: "complete your profile", kind: "complete-profile" }]);
+      cy.mockNotifications([
+        {
+          id: "00000000-0000-0000-0000-000000000001",
+          title: "complete your profile",
+          kind: "complete-profile",
+          read: false,
+        },
+      ]);
 
       cy.loginAsAdmin();
       cy.mockProfileChosenName("Tom Young");

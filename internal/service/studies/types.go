@@ -25,6 +25,12 @@ type AssetQueryParams struct {
 	Offset     int
 }
 
+type ContractQueryParams struct {
+	FuzzyTitle *string
+	Limit      int
+	Offset     int
+}
+
 type ContractObject struct {
 	Object types.S3Object
 	Meta   types.ContractObjectMetadata

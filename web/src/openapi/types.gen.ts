@@ -3060,6 +3060,47 @@ export type GetStudiesByStudyIdFeedbackResponses = {
 
 export type GetStudiesByStudyIdFeedbackResponse = GetStudiesByStudyIdFeedbackResponses[keyof GetStudiesByStudyIdFeedbackResponses];
 
+export type GetContractsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Fuzzy contract title to search by
+         */
+        query?: string;
+        /**
+         * Maximum number of items to return
+         */
+        limit?: number;
+        /**
+         * Index of the first item to return
+         */
+        offset?: number;
+    };
+    url: '/contracts';
+};
+
+export type GetContractsErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetContractsResponses = {
+    200: Array<Contract>;
+};
+
+export type GetContractsResponse = GetContractsResponses[keyof GetContractsResponses];
+
 export type GetStudiesByStudyIdContractsData = {
     body?: never;
     path: {

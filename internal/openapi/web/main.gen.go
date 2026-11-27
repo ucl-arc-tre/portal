@@ -1886,6 +1886,18 @@ type GetAssetsParams struct {
 	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 }
 
+// GetContractsParams defines parameters for GetContracts.
+type GetContractsParams struct {
+	// Query Fuzzy contract title to search by
+	Query *string `form:"query,omitempty" json:"query,omitempty"`
+
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Offset Index of the first item to return
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+}
+
 // GetProjectsParams defines parameters for GetProjects.
 type GetProjectsParams struct {
 	// Query Fuzzy search on project name
@@ -2064,6 +2076,9 @@ type ServerInterface interface {
 
 	// (GET /auth)
 	GetAuth(c *gin.Context)
+
+	// (GET /contracts)
+	GetContracts(c *gin.Context, params GetContractsParams)
 
 	// (GET /environments)
 	GetEnvironments(c *gin.Context)
@@ -2355,6 +2370,49 @@ func (siw *ServerInterfaceWrapper) GetAuth(c *gin.Context) {
 	}
 
 	siw.Handler.GetAuth(c)
+}
+
+// GetContracts operation middleware
+func (siw *ServerInterfaceWrapper) GetContracts(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetContractsParams
+
+	// ------------- Optional query parameter "query" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "query", c.Request.URL.Query(), &params.Query, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter query: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "offset", c.Request.URL.Query(), &params.Offset, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter offset: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetContracts(c, params)
 }
 
 // GetEnvironments operation middleware
@@ -4107,6 +4165,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/studies/:studyId/agreements", wrapper.GetStudiesStudyIdAgreements)
 	router.POST(options.BaseURL+"/studies/:studyId/agreements", wrapper.PostStudiesStudyIdAgreements)
 	router.GET(options.BaseURL+"/studies/:studyId/feedback", wrapper.GetStudiesStudyIdFeedback)
+	router.GET(options.BaseURL+"/contracts", wrapper.GetContracts)
 	router.GET(options.BaseURL+"/studies/:studyId/contracts", wrapper.GetStudiesStudyIdContracts)
 	router.POST(options.BaseURL+"/studies/:studyId/contracts", wrapper.PostStudiesStudyIdContracts)
 	router.DELETE(options.BaseURL+"/studies/:studyId/contracts/:contractId", wrapper.DeleteStudiesStudyIdContractsContractId)

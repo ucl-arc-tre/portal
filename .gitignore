@@ -9,3 +9,5 @@ dist
 *.dtmp
 config*.yaml
 !config*.sample.yaml
+.structurizr/
+workspace.json

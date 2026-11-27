@@ -54,19 +54,17 @@ describe("IG staff as a study admin end-to-end", () => {
     cy.contains("Incomplete").should("be.visible");
 
     cy.env(["botIGUsername"]).then(({ botIGUsername }) => {
-      const additionalAdminUsername = botIGUsername.split("@")[0];
-
       cy.get('[data-cy="edit-study-button"]').click();
-      cy.get('[data-cy="user-lookup"]').type(additionalAdminUsername);
+      cy.get('[data-cy="user-lookup"]').type(botIGUsername);
       cy.get('button[data-cy="user-lookup-submit"]').click();
-      cy.get('[data-cy="add-user-to-selection"]').first().click();
+      cy.get(`[data-id="${botIGUsername}"] [data-cy="add-user-to-selection"]`).click();
       cy.get('[data-cy="next"]').click();
       cy.get('[data-cy="next"]').click();
       cy.get("button[type='submit']").contains("Update Study").click();
       cy.contains("Update Study").should("not.exist");
 
       cy.contains("The following administrators have not yet agreed to the study agreement:").should("be.visible");
-      cy.contains(additionalAdminUsername).should("be.visible");
+      cy.contains(botIGUsername).should("be.visible");
     });
   });
 
@@ -132,8 +130,23 @@ describe("IG staff as a study admin end-to-end", () => {
     cy.contains("Update Study").should("not.exist");
 
     cy.env(["botIGUsername"]).then(({ botIGUsername }) => {
-      cy.visit("/");
-      cy.contains(`${botIGUsername} has been removed as an administrator from '${studyTitle}'`).should("exist");
+      const notifTitle = `${botIGUsername} has been removed as an administrator from '${studyTitle}'`;
+      const waitForNotifsAndTest = (retries: number) => {
+        if (retries === 0) {
+          throw new Error(`Notification not found: ${notifTitle}`);
+        }
+        cy.fetchNotificationsMatching("iaa-removal", notifTitle).then((notifs) => {
+          if (notifs.length > 0) {
+            cy.visit("/");
+            // test that it's on the page and not just in the notifs API!
+            cy.contains(notifTitle).should("exist");
+          } else {
+            cy.wait(500);
+            waitForNotifsAndTest(retries - 1);
+          }
+        });
+      };
+      waitForNotifsAndTest(20);
     });
   });
 

@@ -63,21 +63,19 @@ describe("Study creation end-to-end", () => {
     // setup complete — tabs now visible, edit study to add then remove an admin
     cy.contains("Incomplete").should("be.visible");
     cy.env(["botAdminUsername"]).then(({ botAdminUsername }) => {
-      const additionalAdminUsername = botAdminUsername.split("@")[0];
-
       cy.get('[data-cy="edit-study-button"]').click();
-      cy.get('[data-cy="user-lookup"]').type(additionalAdminUsername);
+      cy.get('[data-cy="user-lookup"]').type(botAdminUsername);
       cy.get('button[data-cy="user-lookup-submit"]').click();
-      cy.get('[data-cy="add-user-to-selection"]').first().click();
+      cy.get(`[data-id="${botAdminUsername}"] [data-cy="add-user-to-selection"]`).click();
       cy.get('[data-cy="next"]').click();
       cy.get('[data-cy="next"]').click();
       cy.get("button[type='submit']").contains("Update Study").click();
       cy.contains("Update Study").should("not.exist");
       cy.contains("Edit Study").should("exist");
-      cy.contains(additionalAdminUsername).should("exist");
+      cy.contains(botAdminUsername).should("exist");
 
       cy.contains("The following administrators have not yet agreed to the study agreement:").should("be.visible");
-      cy.contains(additionalAdminUsername).should("be.visible");
+      cy.contains(botAdminUsername).should("be.visible");
     });
   });
 

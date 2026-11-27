@@ -1340,6 +1340,44 @@ paths:
         default:
           description: Unexpected error
 
+  # Contract Management
+  /contracts:
+    get:
+      description: Get all contracts accessible to the current user, optionally filtered by the query params below
+      parameters:
+        - in: query
+          name: query
+          required: false
+          description: Fuzzy contract title to search by
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          description: Maximum number of items to return
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          description: Index of the first item to return
+          schema:
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contract"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   /studies/{studyId}/contracts:
     get:
       description: Get all contracts for a specific study
