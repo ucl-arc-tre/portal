@@ -55,7 +55,7 @@ func InitDB() {
 		&types.Token{},
 		&types.Notification{},
 		&types.AuditEvent{},
-		&types.ProjectRedcapTier3{},
+		&types.ProjectSensitiveRedcap{},
 	}
 	db := NewDB()
 	mustExec(db, `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)

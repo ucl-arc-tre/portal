@@ -272,5 +272,5 @@ m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && keyMatch(r.act, p.act)
 
 // AddProjectRedcapTier3OwnerRole lets study owners inherit project ownership.
 func AddProjectRedcapTier3OwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
-	return addProjectEnvOwnerRole("redcaptier3", studyId, projectId)
+	return addProjectEnvOwnerRole("sensitiveredcap", studyId, projectId)
 }

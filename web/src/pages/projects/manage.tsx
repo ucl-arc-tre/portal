@@ -7,8 +7,8 @@ import {
   getProjectsTreByProjectId,
   ProjectDsh,
   ProjectTre,
-  ProjectRedcapTier3,
-  getProjectsRedcaptier3ByProjectId,
+  ProjectSensitiveRedCap,
+  getProjectsSensitiveredcapByProjectId,
 } from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
@@ -59,7 +59,7 @@ export default function ManageProjectPage() {
           });
           break;
         case "Sensitive REDCap":
-          projectResponse = await getProjectsRedcaptier3ByProjectId({
+          projectResponse = await getProjectsSensitiveredcapByProjectId({
             path: { projectId: projectIdParam },
           });
           break;
@@ -189,7 +189,7 @@ export default function ManageProjectPage() {
         {environment == "Data Safe Haven" && (
           <ManageProjectDSH project={project as ProjectDsh} fetchData={() => fetchData(projectId, environment)} />
         )}
-        {environment == "Sensitive REDCap" && <ManageProjectRedcapTier3 project={project as ProjectRedcapTier3} />}
+        {environment == "Sensitive REDCap" && <ManageProjectRedcapTier3 project={project as ProjectSensitiveRedCap} />}
       </div>
     </>
   );

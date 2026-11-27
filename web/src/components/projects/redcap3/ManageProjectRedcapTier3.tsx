@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/router";
-import { ProjectRedcapTier3 } from "@/openapi";
+import { ProjectSensitiveRedCap } from "@/openapi";
 import LoginFallback from "@/components/ui/LoginFallback";
 import Loading from "@/components/ui/Loading";
 import Box from "@/components/ui/Box";
@@ -10,7 +10,7 @@ import AssetCard from "@/components/assets/AssetCard";
 import styles from "./ManageProjectRedcapTier3.module.css";
 
 type Props = {
-  project: ProjectRedcapTier3;
+  project: ProjectSensitiveRedCap;
 };
 
 export default function ManageProjectRedcapTier3({ project }: Props) {
@@ -35,6 +35,7 @@ export default function ManageProjectRedcapTier3({ project }: Props) {
       />
       {tab === "project" && (
         <Box>
+          <DetailsField label="Description" value={project.description} />
           <DetailsField label="Environment" value={project.environment_name} />
           <DetailsField label="Study" value={project.study_title} />
           {project.study_owner && (

@@ -672,7 +672,11 @@ export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Ha
 /**
  * Base REDCap (Tier 3) project properties
  */
-export type ProjectRedcapTier3Base = {
+export type ProjectSensitiveRedCapBase = {
+    /**
+     * Description of the project
+     */
+    description: string;
     /**
      * List of asset identifiers to link to this project (can be empty)
      */
@@ -682,7 +686,7 @@ export type ProjectRedcapTier3Base = {
 /**
  * Request payload for creating a new REDCap (Tier 3) project
  */
-export type ProjectRedcapTier3Request = ProjectRedcapTier3Base & {
+export type ProjectSensitiveRedCapRequest = ProjectSensitiveRedCapBase & {
     /**
      * Name of the project
      */
@@ -693,7 +697,7 @@ export type ProjectRedcapTier3Request = ProjectRedcapTier3Base & {
     study_id: string;
 };
 
-export type ProjectRedcapTier3 = ProjectRedcapTier3Base & {
+export type ProjectSensitiveRedCap = ProjectSensitiveRedCapBase & {
     id: string;
     study_id: string;
     study_title: string;
@@ -2655,14 +2659,14 @@ export type PostProjectsDshByProjectIdAccessReviewSignoffResponses = {
     200: unknown;
 };
 
-export type GetProjectsRedcaptier3Data = {
+export type GetProjectsSensitiveredcapData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/projects/redcaptier3';
+    url: '/projects/sensitiveredcap';
 };
 
-export type GetProjectsRedcaptier3Errors = {
+export type GetProjectsSensitiveredcapErrors = {
     /**
      * Forbidden
      */
@@ -2677,20 +2681,20 @@ export type GetProjectsRedcaptier3Errors = {
     default: unknown;
 };
 
-export type GetProjectsRedcaptier3Responses = {
-    200: Array<ProjectRedcapTier3>;
+export type GetProjectsSensitiveredcapResponses = {
+    200: Array<ProjectSensitiveRedCap>;
 };
 
-export type GetProjectsRedcaptier3Response = GetProjectsRedcaptier3Responses[keyof GetProjectsRedcaptier3Responses];
+export type GetProjectsSensitiveredcapResponse = GetProjectsSensitiveredcapResponses[keyof GetProjectsSensitiveredcapResponses];
 
-export type PostProjectsRedcaptier3Data = {
-    body: ProjectRedcapTier3Request;
+export type PostProjectsSensitiveredcapData = {
+    body: ProjectSensitiveRedCapRequest;
     path?: never;
     query?: never;
-    url: '/projects/redcaptier3';
+    url: '/projects/sensitiveredcap';
 };
 
-export type PostProjectsRedcaptier3Errors = {
+export type PostProjectsSensitiveredcapErrors = {
     /**
      * Validation error
      */
@@ -2709,18 +2713,18 @@ export type PostProjectsRedcaptier3Errors = {
     default: unknown;
 };
 
-export type PostProjectsRedcaptier3Error = PostProjectsRedcaptier3Errors[keyof PostProjectsRedcaptier3Errors];
+export type PostProjectsSensitiveredcapError = PostProjectsSensitiveredcapErrors[keyof PostProjectsSensitiveredcapErrors];
 
-export type PostProjectsRedcaptier3Responses = {
+export type PostProjectsSensitiveredcapResponses = {
     /**
      * TRE project created successfully
      */
-    201: ProjectRedcapTier3;
+    201: ProjectSensitiveRedCap;
 };
 
-export type PostProjectsRedcaptier3Response = PostProjectsRedcaptier3Responses[keyof PostProjectsRedcaptier3Responses];
+export type PostProjectsSensitiveredcapResponse = PostProjectsSensitiveredcapResponses[keyof PostProjectsSensitiveredcapResponses];
 
-export type GetProjectsRedcaptier3ByProjectIdData = {
+export type GetProjectsSensitiveredcapByProjectIdData = {
     body?: never;
     path: {
         /**
@@ -2729,10 +2733,10 @@ export type GetProjectsRedcaptier3ByProjectIdData = {
         projectId: string;
     };
     query?: never;
-    url: '/projects/redcaptier3/{projectId}';
+    url: '/projects/sensitiveredcap/{projectId}';
 };
 
-export type GetProjectsRedcaptier3ByProjectIdErrors = {
+export type GetProjectsSensitiveredcapByProjectIdErrors = {
     /**
      * Forbidden
      */
@@ -2751,11 +2755,11 @@ export type GetProjectsRedcaptier3ByProjectIdErrors = {
     default: unknown;
 };
 
-export type GetProjectsRedcaptier3ByProjectIdResponses = {
-    200: ProjectRedcapTier3;
+export type GetProjectsSensitiveredcapByProjectIdResponses = {
+    200: ProjectSensitiveRedCap;
 };
 
-export type GetProjectsRedcaptier3ByProjectIdResponse = GetProjectsRedcaptier3ByProjectIdResponses[keyof GetProjectsRedcaptier3ByProjectIdResponses];
+export type GetProjectsSensitiveredcapByProjectIdResponse = GetProjectsSensitiveredcapByProjectIdResponses[keyof GetProjectsSensitiveredcapByProjectIdResponses];
 
 export type GetAssetsData = {
     body?: never;

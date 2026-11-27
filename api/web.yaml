@@ -1077,7 +1077,7 @@ paths:
           description: Unexpected error
 
   # Project Management - TRE Environment
-  /projects/redcaptier3:
+  /projects/sensitiveredcap:
     get:
       description: Get all REDCap (Tier 3) projects that a user has access to view
       responses:
@@ -1087,7 +1087,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ProjectRedcapTier3"
+                  $ref: "#/components/schemas/ProjectSensitiveREDCap"
         "403":
           description: Forbidden
         "500":
@@ -1101,14 +1101,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectRedcapTier3Request"
+              $ref: "#/components/schemas/ProjectSensitiveREDCapRequest"
       responses:
         "201":
           description: TRE project created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectRedcapTier3"
+                $ref: "#/components/schemas/ProjectSensitiveREDCap"
         "400":
           description: Validation error
           content:
@@ -1122,7 +1122,7 @@ paths:
         default:
           description: Unexpected error
 
-  /projects/redcaptier3/{projectId}:
+  /projects/sensitiveredcap/{projectId}:
     get:
       description: Get one REDCap (Tier 3) project with base project details joined in
       parameters:
@@ -1132,7 +1132,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectRedcapTier3"
+                $ref: "#/components/schemas/ProjectSensitiveREDCap"
         "403":
           description: Forbidden
         "404":
@@ -2751,23 +2751,27 @@ components:
         - "Data Safe Haven"
         - "Sensitive REDCap"
 
-    ProjectRedcapTier3Base:
+    ProjectSensitiveREDCapBase:
       type: object
       description: Base REDCap (Tier 3) project properties
       required:
         - asset_ids
+        - description
       properties:
+        description:
+          type: string
+          description: Description of the project
         asset_ids:
           type: array
           description: List of asset identifiers to link to this project (can be empty)
           items:
             type: string
 
-    ProjectRedcapTier3Request:
+    ProjectSensitiveREDCapRequest:
       type: object
       description: Request payload for creating a new REDCap (Tier 3) project
       allOf:
-        - $ref: "#/components/schemas/ProjectRedcapTier3Base"
+        - $ref: "#/components/schemas/ProjectSensitiveREDCapBase"
         - required:
             - name
             - study_id
@@ -2779,10 +2783,10 @@ components:
               type: string
               description: Unique identifier of the study to which the project belongs
 
-    ProjectRedcapTier3:
+    ProjectSensitiveREDCap:
       type: object
       allOf:
-        - $ref: "#/components/schemas/ProjectRedcapTier3Base"
+        - $ref: "#/components/schemas/ProjectSensitiveREDCapBase"
         - required:
             - id
             - study_id

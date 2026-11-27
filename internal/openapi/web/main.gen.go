@@ -1338,13 +1338,16 @@ type ProjectDSHRole string
 // ProjectDSHStatus defines model for ProjectDSHStatus.
 type ProjectDSHStatus string
 
-// ProjectRedcapTier3 defines model for ProjectRedcapTier3.
-type ProjectRedcapTier3 struct {
+// ProjectSensitiveREDCap defines model for ProjectSensitiveREDCap.
+type ProjectSensitiveREDCap struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 
 	// Assets List of assets associated with this project
-	Assets          *[]Asset         `json:"assets,omitempty"`
+	Assets *[]Asset `json:"assets,omitempty"`
+
+	// Description Description of the project
+	Description     string           `json:"description"`
 	EnvironmentName string           `json:"environment_name"`
 	Id              string           `json:"id"`
 	Name            string           `json:"name"`
@@ -1353,16 +1356,22 @@ type ProjectRedcapTier3 struct {
 	StudyTitle      string           `json:"study_title"`
 }
 
-// ProjectRedcapTier3Base Base REDCap (Tier 3) project properties
-type ProjectRedcapTier3Base struct {
+// ProjectSensitiveREDCapBase Base REDCap (Tier 3) project properties
+type ProjectSensitiveREDCapBase struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
+
+	// Description Description of the project
+	Description string `json:"description"`
 }
 
-// ProjectRedcapTier3Request Request payload for creating a new REDCap (Tier 3) project
-type ProjectRedcapTier3Request struct {
+// ProjectSensitiveREDCapRequest Request payload for creating a new REDCap (Tier 3) project
+type ProjectSensitiveREDCapRequest struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
+
+	// Description Description of the project
+	Description string `json:"description"`
 
 	// Name Name of the project
 	Name string `json:"name"`
@@ -2035,8 +2044,8 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
-// PostProjectsRedcaptier3JSONRequestBody defines body for PostProjectsRedcaptier3 for application/json ContentType.
-type PostProjectsRedcaptier3JSONRequestBody = ProjectRedcapTier3Request
+// PostProjectsSensitiveredcapJSONRequestBody defines body for PostProjectsSensitiveredcap for application/json ContentType.
+type PostProjectsSensitiveredcapJSONRequestBody = ProjectSensitiveREDCapRequest
 
 // PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
@@ -2170,14 +2179,14 @@ type ServerInterface interface {
 	// (POST /projects/dsh/{projectId}/access-review-signoff)
 	PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
 
-	// (GET /projects/redcaptier3)
-	GetProjectsRedcaptier3(c *gin.Context)
+	// (GET /projects/sensitiveredcap)
+	GetProjectsSensitiveredcap(c *gin.Context)
 
-	// (POST /projects/redcaptier3)
-	PostProjectsRedcaptier3(c *gin.Context)
+	// (POST /projects/sensitiveredcap)
+	PostProjectsSensitiveredcap(c *gin.Context)
 
-	// (GET /projects/redcaptier3/{projectId})
-	GetProjectsRedcaptier3ProjectId(c *gin.Context, projectId ProjectIdParam)
+	// (GET /projects/sensitiveredcap/{projectId})
+	GetProjectsSensitiveredcapProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
@@ -2782,8 +2791,8 @@ func (siw *ServerInterfaceWrapper) PostProjectsDshProjectIdAccessReviewSignoff(c
 	siw.Handler.PostProjectsDshProjectIdAccessReviewSignoff(c, projectId)
 }
 
-// GetProjectsRedcaptier3 operation middleware
-func (siw *ServerInterfaceWrapper) GetProjectsRedcaptier3(c *gin.Context) {
+// GetProjectsSensitiveredcap operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsSensitiveredcap(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -2792,11 +2801,11 @@ func (siw *ServerInterfaceWrapper) GetProjectsRedcaptier3(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetProjectsRedcaptier3(c)
+	siw.Handler.GetProjectsSensitiveredcap(c)
 }
 
-// PostProjectsRedcaptier3 operation middleware
-func (siw *ServerInterfaceWrapper) PostProjectsRedcaptier3(c *gin.Context) {
+// PostProjectsSensitiveredcap operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsSensitiveredcap(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -2805,11 +2814,11 @@ func (siw *ServerInterfaceWrapper) PostProjectsRedcaptier3(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostProjectsRedcaptier3(c)
+	siw.Handler.PostProjectsSensitiveredcap(c)
 }
 
-// GetProjectsRedcaptier3ProjectId operation middleware
-func (siw *ServerInterfaceWrapper) GetProjectsRedcaptier3ProjectId(c *gin.Context) {
+// GetProjectsSensitiveredcapProjectId operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsSensitiveredcapProjectId(c *gin.Context) {
 
 	var err error
 	_ = err
@@ -2830,7 +2839,7 @@ func (siw *ServerInterfaceWrapper) GetProjectsRedcaptier3ProjectId(c *gin.Contex
 		}
 	}
 
-	siw.Handler.GetProjectsRedcaptier3ProjectId(c, projectId)
+	siw.Handler.GetProjectsSensitiveredcapProjectId(c, projectId)
 }
 
 // GetProjectsTre operation middleware
@@ -4253,9 +4262,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
 	router.POST(options.BaseURL+"/projects/dsh/:projectId/access-review-signoff", wrapper.PostProjectsDshProjectIdAccessReviewSignoff)
-	router.GET(options.BaseURL+"/projects/redcaptier3", wrapper.GetProjectsRedcaptier3)
-	router.POST(options.BaseURL+"/projects/redcaptier3", wrapper.PostProjectsRedcaptier3)
-	router.GET(options.BaseURL+"/projects/redcaptier3/:projectId", wrapper.GetProjectsRedcaptier3ProjectId)
+	router.GET(options.BaseURL+"/projects/sensitiveredcap", wrapper.GetProjectsSensitiveredcap)
+	router.POST(options.BaseURL+"/projects/sensitiveredcap", wrapper.PostProjectsSensitiveredcap)
+	router.GET(options.BaseURL+"/projects/sensitiveredcap/:projectId", wrapper.GetProjectsSensitiveredcapProjectId)
 	router.GET(options.BaseURL+"/assets", wrapper.GetAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)

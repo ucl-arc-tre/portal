@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import {
   postProjectsTre,
-  postProjectsRedcaptier3,
+  postProjectsSensitiveredcap,
   putProjectsTreByProjectId,
   ProjectTreRequest,
   Study,
@@ -58,6 +58,7 @@ export default function ProjectForm({
     mode: "onChange",
     defaultValues: {
       name: "",
+      description: "",
       studyId: "",
       environmentId: "",
       assetIds: [],
@@ -293,8 +294,13 @@ export default function ProjectForm({
             setError("Editing Sensitive REDCap projects is not yet supported.");
             return;
           }
-          response = await postProjectsRedcaptier3({
-            body: { name: data.name, study_id: data.studyId, asset_ids: [...new Set(assetIds)] },
+          response = await postProjectsSensitiveredcap({
+            body: {
+              name: data.name,
+              description: data.description,
+              study_id: data.studyId,
+              asset_ids: [...new Set(assetIds)],
+            },
           });
           break;
         case "Data Safe Haven":
