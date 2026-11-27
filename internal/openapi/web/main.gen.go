@@ -1350,13 +1350,13 @@ type ProjectRedcapTier3 struct {
 	StudyTitle      string           `json:"study_title"`
 }
 
-// ProjectRedcapTier3Base Request payload for creating a new TRE project
+// ProjectRedcapTier3Base Base REDCap (Tier 3) project properties
 type ProjectRedcapTier3Base struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`
 }
 
-// ProjectRedcapTier3Request Request payload for creating a new TRE project
+// ProjectRedcapTier3Request Request payload for creating a new REDCap (Tier 3) project
 type ProjectRedcapTier3Request struct {
 	// AssetIds List of asset identifiers to link to this project (can be empty)
 	AssetIds []string `json:"asset_ids"`

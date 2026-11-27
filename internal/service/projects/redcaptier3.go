@@ -18,7 +18,7 @@ func (s *Service) redcapTier3Query() *gorm.DB {
 }
 
 func (s *Service) ProjectRedcapTier3ById(projectId uuid.UUID) (*types.ProjectRedcapTier3, error) {
-	var project types.ProjectRedcapTier3
+	project := types.ProjectRedcapTier3{}
 	err := s.redcapTier3Query().Where("project_id = ?", projectId).First(&project).Error
 	return &project, types.NewErrFromGorm(err, "failed to retrieve REDCap tier 3 project")
 }
@@ -29,16 +29,16 @@ func (s *Service) AllProjectsRedcapTier3() ([]types.ProjectRedcapTier3, error) {
 	return projects, types.NewErrFromGorm(err, "failed to retrieve REDCap tier 3 projects")
 }
 
-func (s *Service) ProjectsRedcapTier3ByIds(ids ...uuid.UUID) ([]types.ProjectRedcapTier3, error) {
+func (s *Service) ProjectsRedcapTier3ByIds(projectIds ...uuid.UUID) ([]types.ProjectRedcapTier3, error) {
 	projects := []types.ProjectRedcapTier3{}
-	if len(ids) == 0 {
+	if len(projectIds) == 0 {
 		return projects, nil
 	}
-	err := s.redcapTier3Query().Where("project_id IN ?", ids).Order("created_at DESC").Find(&projects).Error
+	err := s.redcapTier3Query().Where("project_id IN ?", projectIds).Order("created_at DESC").Find(&projects).Error
 	return projects, types.NewErrFromGorm(err, "failed to retrieve REDCap tier 3 projects")
 }
 
-func (s *Service) CreateProjectRedcapTier3(creator types.User, studyUUID uuid.UUID, data openapi.ProjectRedcapTier3Request) error {
+func (s *Service) CreateProjectRedcapTier3(creator types.User, studyId uuid.UUID, data openapi.ProjectRedcapTier3Request) error {
 	if !validation.RedcapTier3ProjectNamePattern.MatchString(data.Name) {
 		return types.NewErrClientInvalidObject("Project name must be 4-14 characters long and contain only lowercase letters and numbers")
 	}
@@ -49,7 +49,7 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyUUID uuid.UU
 	if err != nil {
 		return err
 	}
-	if err := s.validateAssets(data.AssetIds, studyUUID, environment.Tier); err != nil {
+	if err := s.validateAssets(data.AssetIds, studyId, environment.Tier); err != nil {
 		return err
 	}
 	tx := s.db.Begin()
@@ -59,22 +59,22 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyUUID uuid.UU
 	}
 
 	var study types.Study
-	if err := tx.First(&study, "id = ?", studyUUID).Error; err != nil {
+	if err := tx.First(&study, "id = ?", studyId).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to fetch study")
 	}
 	project := types.Project{
 		Name:          data.Name,
 		CreatorUserID: creator.ID,
-		StudyID:       studyUUID,
+		StudyID:       study.ID,
 		EnvironmentID: environment.ID,
 	}
 	if err := tx.Create(&project).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create project")
 	}
-	redcap := types.ProjectRedcapTier3{ProjectID: project.ID}
-	if err := tx.Create(&redcap).Error; err != nil {
+	redcapProject := types.ProjectRedcapTier3{ProjectID: project.ID}
+	if err := tx.Create(&redcapProject).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create REDCap tier 3 project")
 	}
@@ -86,7 +86,7 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyUUID uuid.UU
 		tx.Rollback()
 		return err
 	}
-	if _, err := rbac.AddProjectRedcapTier3OwnerRole(studyUUID, project.ID); err != nil {
+	if _, err := rbac.AddProjectRedcapTier3OwnerRole(study.ID, project.ID); err != nil {
 		tx.Rollback()
 		return err
 	}

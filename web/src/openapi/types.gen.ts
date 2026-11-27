@@ -670,7 +670,7 @@ export type ProjectDshStatus = 'active';
 export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven' | 'REDCap Tier 3';
 
 /**
- * Request payload for creating a new TRE project
+ * Base REDCap (Tier 3) project properties
  */
 export type ProjectRedcapTier3Base = {
     /**
@@ -680,7 +680,7 @@ export type ProjectRedcapTier3Base = {
 };
 
 /**
- * Request payload for creating a new TRE project
+ * Request payload for creating a new REDCap (Tier 3) project
  */
 export type ProjectRedcapTier3Request = ProjectRedcapTier3Base & {
     /**

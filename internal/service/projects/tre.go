@@ -1223,10 +1223,3 @@ func makeValidUnixUsername(email string) (string, error) {
 	unixUsername := b.String()
 	return unixUsername[:min(maxUnixUsernameLength, len(unixUsername))], nil
 }
-
-func optionalUint(i *int) *uint {
-	if i == nil {
-		return nil
-	}
-	return new(uint(*i))
-}

@@ -1095,7 +1095,7 @@ paths:
         default:
           description: Unexpected error
     post:
-      description: Create a TRE project
+      description: Create a REDCap (Tier 3) project
       requestBody:
         required: true
         content:
@@ -2752,7 +2752,7 @@ components:
 
     ProjectRedcapTier3Base:
       type: object
-      description: Request payload for creating a new TRE project
+      description: Base REDCap (Tier 3) project properties
       required:
         - asset_ids
       properties:
@@ -2764,7 +2764,7 @@ components:
 
     ProjectRedcapTier3Request:
       type: object
-      description: Request payload for creating a new TRE project
+      description: Request payload for creating a new REDCap (Tier 3) project
       allOf:
         - $ref: "#/components/schemas/ProjectRedcapTier3Base"
         - required:

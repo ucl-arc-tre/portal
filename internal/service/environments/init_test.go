@@ -17,5 +17,5 @@ func TestNameEqualityOpenaopi(t *testing.T) {
 	// WARNING: these should not be modified
 	assert.Equal(t, string(TRE), string(openapi.ARCTrustedResearchEnvironment))
 	assert.Equal(t, string(DSH), string(openapi.DataSafeHaven))
-	// todo
+	assert.Equal(t, string(RedCapTier3), string(openapi.REDCapTier3))
 }

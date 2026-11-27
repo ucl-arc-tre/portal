@@ -432,7 +432,7 @@ export const postProjectsDshByProjectIdAccessReviewSignoff = <ThrowOnError exten
 export const getProjectsRedcaptier3 = <ThrowOnError extends boolean = false>(options?: Options<GetProjectsRedcaptier3Data, ThrowOnError>): RequestResult<GetProjectsRedcaptier3Responses, GetProjectsRedcaptier3Errors, ThrowOnError> => (options?.client ?? client).get<GetProjectsRedcaptier3Responses, GetProjectsRedcaptier3Errors, ThrowOnError>({ url: '/projects/redcaptier3', ...options });
 
 /**
- * Create a TRE project
+ * Create a REDCap (Tier 3) project
  */
 export const postProjectsRedcaptier3 = <ThrowOnError extends boolean = false>(options: Options<PostProjectsRedcaptier3Data, ThrowOnError>): RequestResult<PostProjectsRedcaptier3Responses, PostProjectsRedcaptier3Errors, ThrowOnError> => (options.client ?? client).post<PostProjectsRedcaptier3Responses, PostProjectsRedcaptier3Errors, ThrowOnError>({
     url: '/projects/redcaptier3',
