@@ -1,14 +1,8 @@
-import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { Label, Textarea } from "@/components/ui/uikitExports";
-import { Asset, Study } from "@/openapi";
 import { ProjectFormData } from "@/types/projects";
 
-type Props = {
-  approvedStudies: Study[];
-  assets: Asset[];
-};
-
-export default function ProjectFormRedcapTier3(props: Props) {
+export default function ProjectFormRedcapTier3() {
   const { control } = useFormContext<ProjectFormData>();
 
   return (

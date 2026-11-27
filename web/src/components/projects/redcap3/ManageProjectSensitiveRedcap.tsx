@@ -7,7 +7,7 @@ import Box from "@/components/ui/Box";
 import DetailsField from "@/components/ui/DetailsField";
 import TabCollection from "@/components/ui/TabCollection";
 import AssetCard from "@/components/assets/AssetCard";
-import styles from "./ManageProjectRedcapTier3.module.css";
+import styles from "./ManageProjectSensitiveRedcap.module.css";
 
 type Props = {
   project: ProjectSensitiveRedCap;

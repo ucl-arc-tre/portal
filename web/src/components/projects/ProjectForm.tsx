@@ -21,7 +21,7 @@ import Dialog from "../ui/Dialog";
 import styles from "./ProjectForm.module.css";
 import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
-import ProjectFormRedcapTier3 from "./redcap3/ProjectFormRedcapTier3";
+import ProjectFormRedcapTier3 from "./redcap3/ProjectFormSensitiveRedcap";
 import ErrorMessage from "../ui/Error";
 
 type Props = {
@@ -359,9 +359,7 @@ export default function ProjectForm({
               <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject as ProjectTre} />
             )}
 
-            {currentStep === 2 && isRedcapTier3Project && (
-              <ProjectFormRedcapTier3 approvedStudies={approvedStudies} assets={assets ?? []} />
-            )}
+            {currentStep === 2 && isRedcapTier3Project && <ProjectFormRedcapTier3 />}
 
             {error && <ErrorMessage message={error} />}
 
