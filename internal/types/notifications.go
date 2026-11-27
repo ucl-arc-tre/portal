@@ -9,20 +9,24 @@ import (
 type NotificationKind string
 
 const (
-	NotificationKindCompleteProfile     = NotificationKind("complete-profile")
-	NotificationKindContractExpiry      = NotificationKind("contract-expiry")
-	NotificationKindAssetExpiry         = NotificationKind("asset-expiry")
-	NotificationKindTrainingExpiry      = NotificationKind("training-expiry")
-	NotificationKindIaaAssignment       = NotificationKind("iaa-assignment")
-	NotificationKindIaaRemoval          = NotificationKind("iaa-removal")
-	NotificationKindStdyAffirmation     = NotificationKind("study-affirmation")
-	NotificationKindStudyReview         = NotificationKind("study-review")
-	NotificationKindStudyOwnerChange    = NotificationKind("study-owner-change")
-	NotificationKindStudyOwnerNotStaff  = NotificationKind("study-owner-not-staff")
-	NotificationKindUserNameChange      = NotificationKind("user-name-change")
-	NotificationKindProjectDeployed     = NotificationKind("project-deployed")
-	NotificationKindProjectAccessReview = NotificationKind("project-access-review")
+	NotificationKindCompleteProfile        = NotificationKind("complete-profile")
+	NotificationKindContractExpiry         = NotificationKind("contract-expiry")
+	NotificationKindAssetExpiry            = NotificationKind("asset-expiry")
+	NotificationKindTrainingExpiry         = NotificationKind("training-expiry")
+	NotificationKindIaaAssignment          = NotificationKind("iaa-assignment")
+	NotificationKindIaaRemoval             = NotificationKind("iaa-removal")
+	NotificationKindStdyAffirmation        = NotificationKind("study-affirmation")
+	NotificationKindStudyReview            = NotificationKind("study-review")
+	NotificationKindStudyOwnerChange       = NotificationKind("study-owner-change")
+	NotificationKindStudyOwnerNotStaff     = NotificationKind("study-owner-not-staff")
+	NotificationKindUserNameChangeRequest  = NotificationKind("user-name-change-request")
+	NotificationKindUserNameChangeOccurred = NotificationKind("user-name-change-occurred")
+	NotificationKindProjectDeployed        = NotificationKind("project-deployed")
+	NotificationKindProjectAccessReview    = NotificationKind("project-access-review")
 )
+
+// Deprecated: only to be used in migrations! Delete in due course.
+const NotificationKindUserNameChange_DEPRECATED = NotificationKind("user-name-change")
 
 type Notification struct {
 	Model

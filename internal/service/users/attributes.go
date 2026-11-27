@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 
@@ -53,8 +54,8 @@ func (s *Service) ProfileUpdate(user types.User, data openapi.ProfileUpdate) (*o
 	}
 
 	if response.RequiresApproval {
-		if err := s.notifyUserNameChange(attrs); err != nil {
-			log.Err(err).Msg("Failed to notify user name change") // not fatal
+		if err := s.notifyUserNameChangeRequest(attrs); err != nil {
+			log.Err(err).Msg("Failed to notify user name change request") // not fatal
 		}
 	}
 	return &response, nil
@@ -65,16 +66,26 @@ func (s *Service) SetUserChosenName(user types.User, chosenName types.ChosenName
 		return types.NewErrInvalidObject(fmt.Errorf("invalid chosen name [%v]", chosenName))
 	}
 	attrs := types.UserAttributes{UserID: user.ID}
-	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName}).FirstOrCreate(&attrs).Error
-	return types.NewErrFromGorm(err, "failed to set chosen name")
+	// This name change may be from the admin approving a name change request, or from the admin unilaterally changing their name.
+	// In either case, clear the RequestedChosenName, and notify the subject of the name change about the change.
+	err := s.db.Where(&attrs).Assign(types.UserAttributes{ChosenName: chosenName, RequestedChosenName: new(types.ChosenName(""))}).FirstOrCreate(&attrs).Error
+	if err != nil {
+		return types.NewErrFromGorm(err, "failed to set chosen name")
+	}
+	err = s.notifications.NotifyUserNameChangeOccurred(context.Background(), user, chosenName)
+	if err != nil {
+		log.Err(err).Msg("Failed to notify user name change") // not fatal
+	}
+	// don't return a error that was only for the notifications
+	return nil
 }
 
-func (s *Service) notifyUserNameChange(attrs types.UserAttributes) error {
+func (s *Service) notifyUserNameChangeRequest(attrs types.UserAttributes) error {
 	recipients, err := s.IgStaff()
 	if err != nil {
 		return err
 	}
-	return s.notifications.NotifyUserNameChange(attrs, recipients)
+	return s.notifications.NotifyUserNameChangeRequest(attrs, recipients)
 }
 
 func (s *Service) userChosenName(user types.User) (types.ChosenName, error) {

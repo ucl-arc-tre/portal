@@ -56,7 +56,11 @@ func (s *MockNotifications) NotifyOwnerChange(ctx context.Context, study types.S
 	panic("not-implemented")
 }
 
-func (s *MockNotifications) NotifyUserNameChange(attrs types.UserAttributes, igOpsStaff []types.User) error {
+func (s *MockNotifications) NotifyUserNameChangeRequest(attrs types.UserAttributes, recipients []types.User) error {
+	panic("not-implemented")
+}
+
+func (s *MockNotifications) NotifyUserNameChangeOccurred(ctx context.Context, subject types.User, chosenName types.ChosenName) error {
 	panic("not-implemented")
 }
 
