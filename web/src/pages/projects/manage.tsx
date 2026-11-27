@@ -27,10 +27,18 @@ import ManageProjectSensitiveRedcap from "@/components/projects/redcap3/ManagePr
 
 export default function ManageProjectPage() {
   const router = useRouter();
+  if (!router.isReady) return <Loading />;
+
+  // must rerender if the environment changes
+  return <ManageProjectContent key={JSON.stringify([router.query.projectId, router.query.environment])} />;
+}
+
+function ManageProjectContent() {
+  const router = useRouter();
   const { projectId, environment } = router.query;
   const { authInProgress, isAuthed, isApprovedResearcher } = useAuth();
   const [project, setProject] = useState<AnyProject | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async (
@@ -42,10 +50,12 @@ export default function ManageProjectPage() {
 
     if (!projectIdParam || typeof projectIdParam !== "string") {
       setError("Missing or invalid project ID");
+      setLoading(false);
       return;
     }
     if (!environmentParam || typeof environmentParam !== "string") {
       setError("Missing or invalid environment ID");
+      setLoading(false);
       return;
     }
 
@@ -89,11 +99,7 @@ export default function ManageProjectPage() {
   };
 
   useEffect(() => {
-    if (projectId && typeof projectId === "string" && environment && typeof environment === "string") {
-      // Route changes start a new request and must reset the loading state.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchData(projectId, environment);
-    }
+    fetchData(projectId, environment);
   }, [projectId, environment]);
 
   if (authInProgress) return <Loading />;

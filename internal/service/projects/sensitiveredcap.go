@@ -1,11 +1,15 @@
 package projects
 
 import (
+	"maps"
+	"slices"
+
 	"github.com/google/uuid"
 	"github.com/ucl-arc-tre/portal/internal/graceful"
 	openapi "github.com/ucl-arc-tre/portal/internal/openapi/web"
 	"github.com/ucl-arc-tre/portal/internal/rbac"
 	"github.com/ucl-arc-tre/portal/internal/service/audit"
+	"github.com/ucl-arc-tre/portal/internal/service/environments"
 	"github.com/ucl-arc-tre/portal/internal/types"
 	"github.com/ucl-arc-tre/portal/internal/validation"
 	"gorm.io/gorm"
@@ -14,7 +18,7 @@ import (
 func (s *Service) redcapTier3Query() *gorm.DB {
 	return s.db.Model(&types.ProjectSensitiveRedcap{}).
 		Where("project_id IN (?)", s.db.Model(&types.Project{}).Select("id")).
-		Preload("Project.Study.Owner").Preload("Project.Environment").Preload("Project.ProjectAssets.Asset")
+		Preload("ProjectsTRE").Preload("ProjectsDSH").Preload("Project.Study.Owner").Preload("Project.Environment").Preload("Project.ProjectAssets.Asset")
 }
 
 func (s *Service) ProjectRedcapTier3ById(projectId uuid.UUID) (*types.ProjectSensitiveRedcap, error) {
@@ -58,6 +62,40 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyId uuid.UUID
 		return types.NewErrFromGorm(err, "failed to begin create project transaction")
 	}
 
+	linkableProjects, err := s.accessibleRedcapLinkProjects(creator)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	treIDs, err := validateRedcapLinkIDs(data.ProjectTreIds, linkableProjects, environments.TRE)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	dshIDs, err := validateRedcapLinkIDs(data.ProjectDshIds, linkableProjects, environments.DSH)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	var treProjects []types.ProjectTRE
+	var dshProjects []types.ProjectDSH
+	if len(treIDs) > 0 {
+		if err := tx.Where("project_id IN ?", treIDs).Find(&treProjects).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to load linked TRE projects")
+		}
+	}
+	if len(dshIDs) > 0 {
+		if err := tx.Where("project_id IN ?", dshIDs).Find(&dshProjects).Error; err != nil {
+			tx.Rollback()
+			return types.NewErrFromGorm(err, "failed to load linked DSH projects")
+		}
+	}
+	if len(treProjects) != len(treIDs) || len(dshProjects) != len(dshIDs) {
+		tx.Rollback()
+		return types.NewErrClientInvalidObject("linked project is unavailable")
+	}
+
 	var study types.Study
 	if err := tx.First(&study, "id = ?", studyId).Error; err != nil {
 		tx.Rollback()
@@ -76,8 +114,10 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyId uuid.UUID
 	redcapProject := types.ProjectSensitiveRedcap{
 		ProjectID:   project.ID,
 		Description: data.Description,
+		ProjectsTRE: treProjects,
+		ProjectsDSH: dshProjects,
 	}
-	if err := tx.Create(&redcapProject).Error; err != nil {
+	if err := tx.Omit("ProjectsTRE.*", "ProjectsDSH.*").Create(&redcapProject).Error; err != nil {
 		tx.Rollback()
 		return types.NewErrFromGorm(err, "failed to create REDCap tier 3 project")
 	}
@@ -94,4 +134,31 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyId uuid.UUID
 		return err
 	}
 	return types.NewErrFromGorm(tx.Commit().Error, "failed to commit create project transaction")
+}
+
+func (s *Service) accessibleRedcapLinkProjects(user types.User) ([]GenericProject, error) {
+	ids, err := rbac.ProjectIDsWithRole(user, rbac.ProjectOwner)
+	if err != nil {
+		return nil, err
+	}
+	envs := []types.EnvironmentName{environments.DSH, environments.TRE}
+	return s.Projects(QueryParams{}, envs, ids...)
+}
+
+func validateRedcapLinkIDs(requested []string, accessible []GenericProject, environment types.EnvironmentName) ([]uuid.UUID, error) {
+	allowed := map[uuid.UUID]bool{}
+	for _, project := range accessible {
+		if project.EnvironmentName == string(environment) {
+			allowed[project.ID] = true
+		}
+	}
+	ids := map[uuid.UUID]bool{}
+	for _, value := range requested {
+		id, err := uuid.Parse(value)
+		if err != nil || !allowed[id] {
+			return nil, types.NewErrClientInvalidObject("linked project is unavailable or not accessible")
+		}
+		ids[id] = true
+	}
+	return slices.Collect(maps.Keys(ids)), nil
 }

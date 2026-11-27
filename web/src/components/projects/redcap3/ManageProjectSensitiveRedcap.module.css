@@ -17,3 +17,17 @@
   display: grid;
   gap: 1rem;
 }
+
+.linkedProjects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.linkedProjects a {
+  color: var(--ucl-accent);
+  text-decoration: underline;
+}

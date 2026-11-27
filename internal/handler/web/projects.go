@@ -448,7 +448,16 @@ func (h *Handler) sensitiveRedcapToOpenApi(project types.ProjectSensitiveRedcap)
 		assets = append(assets, assetToOpenApiAsset(asset.Asset))
 		assetIDs = append(assetIDs, asset.AssetID.String())
 	}
+	treIDs, dshIDs := []string{}, []string{}
+	for _, linked := range project.ProjectsTRE {
+		treIDs = append(treIDs, linked.ProjectID.String())
+	}
+	for _, linked := range project.ProjectsDSH {
+		dshIDs = append(dshIDs, linked.ProjectID.String())
+	}
 	return openapi.ProjectSensitiveREDCap{
+		ProjectTreIds:   treIDs,
+		ProjectDshIds:   dshIDs,
 		Id:              project.ProjectID.String(),
 		Name:            project.Project.Name,
 		Description:     project.Description,
