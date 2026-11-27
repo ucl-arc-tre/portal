@@ -429,7 +429,7 @@ func (h *Handler) PostProjectsSensitiveredcap(ctx *gin.Context) {
 		setError(ctx, err, "Failed to create project")
 		return
 	}
-	ctx.Status(http.StatusCreated)
+	ctx.Status(http.StatusNoContent)
 }
 
 func (h *Handler) GetProjectsSensitiveredcapProjectId(ctx *gin.Context, projectId openapi.ProjectIdParam) {

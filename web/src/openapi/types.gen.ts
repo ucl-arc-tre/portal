@@ -2725,9 +2725,9 @@ export type PostProjectsSensitiveredcapError = PostProjectsSensitiveredcapErrors
 
 export type PostProjectsSensitiveredcapResponses = {
     /**
-     * TRE project created successfully
+     * Sensitive REDCap project created successfully
      */
-    201: ProjectSensitiveRedCap;
+    204: void;
 };
 
 export type PostProjectsSensitiveredcapResponse = PostProjectsSensitiveredcapResponses[keyof PostProjectsSensitiveredcapResponses];

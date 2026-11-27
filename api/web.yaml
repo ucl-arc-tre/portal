@@ -1103,12 +1103,8 @@ paths:
             schema:
               $ref: "#/components/schemas/ProjectSensitiveREDCapRequest"
       responses:
-        "201":
-          description: TRE project created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProjectSensitiveREDCap"
+        "204":
+          description: Sensitive REDCap project created successfully
         "400":
           description: Validation error
           content:

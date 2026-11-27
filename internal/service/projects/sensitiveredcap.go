@@ -141,8 +141,7 @@ func (s *Service) accessibleRedcapLinkProjects(user types.User) ([]GenericProjec
 	if err != nil {
 		return nil, err
 	}
-	envs := []types.EnvironmentName{environments.DSH, environments.TRE}
-	return s.Projects(QueryParams{}, envs, ids...)
+	return s.Projects(QueryParams{}, []types.EnvironmentName{}, ids...)
 }
 
 func validateRedcapLinkIDs(requested []string, accessible []GenericProject, environment types.EnvironmentName) ([]uuid.UUID, error) {
