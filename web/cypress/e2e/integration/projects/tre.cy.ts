@@ -14,38 +14,7 @@ describe("TRE project creation end-to-end", () => {
   it("staff member should create a study", () => {
     cy.loginAsStaff();
     cy.becomeApprovedResearcher();
-    cy.visit("/studies");
-
-    // Create a study
-    cy.get('[data-cy="create-study-button"]').click();
-    cy.get('[name="title"]').type(studyTitle);
-    cy.get('[name="description"]').type("Test study");
-    cy.get('[name="dataControllerOrganisation"]').type("UCL");
-    cy.get('[data-cy="next"]').click();
-    cy.get('[data-cy="next"]').click();
-    cy.get("button[type='submit']").click();
-
-    cy.contains(studyTitle).click();
-    cy.get('[data-cy="agreement-agree"]').click();
-
-    // add an asset to complete setup
-    cy.get('[data-cy="add-asset-button"]').click({ force: true });
-    cy.get("input#title").type(assetTitle);
-    cy.get('[name="description"]').type("Unknown");
-    cy.get('[name="classification_impact"]').select("public");
-    cy.get('[name="format"]').select("electronic");
-    cy.get("input[name='has_expiry_date'][value='true']").check({ force: true });
-    cy.get('[name="expires_at"]').type("2022-01-01");
-    cy.get('[data-cy="create-asset-form"] input[value="arc_tre"]').check();
-    cy.get("input[name='requires_contract'][value='false']").check({ force: true });
-    cy.get("input[name='has_dspt'][value='false']").check({ force: true });
-    cy.get("input[name='stored_outside_uk_eea'][value='false']").check({ force: true });
-    cy.get('[name="status"]').select("active");
-    cy.get("button[type='submit']").click();
-
-    cy.get('[data-cy="study-ready-for-review-button"]').click();
-    cy.get('[data-cy="study-affirmation-confirm-checkbox"]').check();
-    cy.get('[data-cy="study-affirmation-confirm-button"]').click();
+    cy.createStudyForReview(studyTitle, assetTitle);
   });
 
   it("ig ops staff should approve the study", () => {
