@@ -13,7 +13,7 @@ type Props = {
   project: ProjectSensitiveRedCap;
 };
 
-export default function ManageProjectRedcapTier3({ project }: Props) {
+export default function ManageProjectSensitiveRedcap({ project }: Props) {
   const { authInProgress, isAuthed } = useAuth();
   const router = useRouter();
   const tab = router.query.tab === "assets" ? "assets" : "project";

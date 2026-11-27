@@ -23,7 +23,7 @@ import Error from "@/components/ui/Error";
 import ManageProjectTRE from "@/components/projects/tre/ManageProjectTRE";
 import ManageProjectDSH from "@/components/projects/dsh/ManageProjectDSH";
 
-import ManageProjectRedcapTier3 from "@/components/projects/redcap3/ManageProjectRedcapTier3";
+import ManageProjectSensitiveRedcap from "@/components/projects/redcap3/ManageProjectSensitiveRedcap";
 
 export default function ManageProjectPage() {
   const router = useRouter();
@@ -189,7 +189,9 @@ export default function ManageProjectPage() {
         {environment == "Data Safe Haven" && (
           <ManageProjectDSH project={project as ProjectDsh} fetchData={() => fetchData(projectId, environment)} />
         )}
-        {environment == "Sensitive REDCap" && <ManageProjectRedcapTier3 project={project as ProjectSensitiveRedCap} />}
+        {environment == "Sensitive REDCap" && (
+          <ManageProjectSensitiveRedcap project={project as ProjectSensitiveRedCap} />
+        )}
       </div>
     </>
   );
