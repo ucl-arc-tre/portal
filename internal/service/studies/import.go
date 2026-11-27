@@ -166,8 +166,16 @@ func (s *Service) ImportStudy(data openapi.StudyImport) (*types.Study, error) {
 		study.StudyAdmins = append(study.StudyAdmins, studyAdmin)
 	}
 
+	if err := commitTransaction(tx); err != nil {
+		return nil, err
+	}
 	log.Debug().Any("id", study.ID).Msg("Imported study")
-	return &study, commitTransaction(tx)
+
+	studies := []types.Study{study}
+	if err := s.populateLifecycleStatuses(studies); err != nil {
+		return nil, err
+	}
+	return &studies[0], nil
 }
 
 func (s *Service) ImportAsset(studyId uuid.UUID, data openapi.AssetImport) (*types.Asset, error) {

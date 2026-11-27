@@ -2503,7 +2503,8 @@ components:
       enum:
         - active
         - inactive
-      description: Derived lifecycle status for a study, intended for display to IG staff only.
+        - closed
+      description: Derived lifecycle status for a study, intended for display to IG staff only, except closed which is also shown to the study's owner and admins.
 
     StudyFeedbackEntry:
       type: object
