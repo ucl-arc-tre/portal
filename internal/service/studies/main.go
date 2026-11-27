@@ -189,7 +189,10 @@ func (s *Service) AllStudies(query StudyQueryParams) ([]types.Study, error) {
 	}
 	studies := []types.Study{}
 	err = db.Preload("StudyAdmins.User").Preload("Owner").Order("last_signoff DESC, updated_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&studies).Error
-	return studies, types.NewErrFromGorm(err)
+	if err != nil {
+		return studies, types.NewErrFromGorm(err)
+	}
+	return studies, s.populateLifecycleStatuses(studies)
 }
 
 func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
@@ -218,7 +221,10 @@ func (s *Service) ApprovedStudies() ([]types.DSHStudyExportRecord, error) {
 func (s *Service) StudiesById(ids ...uuid.UUID) ([]types.Study, error) {
 	studies := []types.Study{}
 	err := s.db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelogs").Preload("OwnerChangelogs.ToUser").Where("id IN (?)", ids).Find(&studies).Error
-	return studies, types.NewErrFromGorm(err)
+	if err != nil {
+		return studies, types.NewErrFromGorm(err)
+	}
+	return studies, s.populateLifecycleStatuses(studies)
 }
 
 // retrieves studies from a list of ids and pagineted
@@ -230,7 +236,10 @@ func (s *Service) StudiesByIdFiltered(query StudyQueryParams, ids ...uuid.UUID) 
 	studies := []types.Study{}
 	err = db.Preload("StudyAdmins.User").Preload("Owner").Preload("OwnerChangelogs").Preload("OwnerChangelogs.ToUser").
 		Order("last_signoff DESC, updated_at DESC").Limit(query.Limit).Offset(query.Offset).Find(&studies).Error
-	return studies, types.NewErrFromGorm(err)
+	if err != nil {
+		return studies, types.NewErrFromGorm(err)
+	}
+	return studies, s.populateLifecycleStatuses(studies)
 }
 
 // given a study and data from a request, line up the values

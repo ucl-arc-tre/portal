@@ -39,6 +39,9 @@ type Study struct {
 	// study_caseref_seq defined in internal/graceful/db.go
 	Caseref int `gorm:"uniqueIndex;default:nextval('study_caseref_seq')"` // auto inserts the next sequence on study submit
 
+	// Derived, not persisted. Populated by the studies service when studies are retrieved
+	LifecycleStatus StudyLifecycleStatus `gorm:"-"`
+
 	// Relationships
 	Owner           User                  `gorm:"foreignKey:OwnerUserID"`
 	Assets          []Asset               `gorm:"foreignKey:StudyID"`
@@ -80,6 +83,7 @@ type StudyLifecycleStatus = string
 const (
 	StudyLifecycleStatusActive   = "active"
 	StudyLifecycleStatusInactive = "inactive"
+	StudyLifecycleStatusClosed   = "closed"
 )
 
 type StudyOwnerChangelogAction string

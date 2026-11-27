@@ -7,3 +7,8 @@
   background: var(--grey-badge-bg);
   color: var(--grey-badge-text);
 }
+
+.status-closed {
+  background: var(--red-badge-bg);
+  color: #7f1d1d;
+}
