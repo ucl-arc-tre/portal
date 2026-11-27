@@ -529,9 +529,9 @@ export type ContractImport = {
 export type StudyApprovalStatus = 'Incomplete' | 'Pending' | 'Approved' | 'Rejected';
 
 /**
- * Derived lifecycle status for a study, intended for display to IG staff only.
+ * Derived lifecycle status for a study, intended for display to IG staff only, except closed which is also shown to the study's owner and admins.
  */
-export type StudyLifecycleStatus = 'active' | 'inactive';
+export type StudyLifecycleStatus = 'active' | 'inactive' | 'closed';
 
 export type StudyFeedbackEntry = {
     id: string;
