@@ -389,6 +389,9 @@ declare global {
 }
 
 const sessionOptions: Cypress.SessionOptions = {
+  // Cache post-login browser state across the whole run, rather than just within each spec,
+  // so we don't need to repeat Entra logins too much
+  cacheAcrossSpecs: true,
   // automatically re-run the full login if the session is not valid
   validate() {
     cy.request({ url: "/web/api/v0/auth", failOnStatusCode: false }).its("status").should("eq", 200);

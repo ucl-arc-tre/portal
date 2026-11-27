@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # version 7.0.1
         with:
           persist-credentials: false
+          # Full history so golangci-lint can compare against origin/main
+          fetch-depth: 0
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # version 6.3.0, See: https://github.com/actions/setup-python/releases
         with:
@@ -25,17 +27,28 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # version 6.5.0, See: https://github.com/actions/setup-go/releases
         with:
-          go-version: "1.26"
+          go-version-file: go.mod
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # version 6.4.0, See: https://github.com/actions/setup-node/releases
         with:
           node-version: "26"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - name: Install node dependencies
         working-directory: web
+        env:
+          # Lint doesn't need Cypress runner, so avoid downloading ~800MB
+          CYPRESS_INSTALL_BINARY: 0
         run: npm ci
+
+      # golangci-lint analysis cache
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # version 6.1.0, See: https://github.com/actions/cache/releases
+        with:
+          path: ~/.cache/golangci-lint
+          key: golangci-lint-${{ runner.os }}-${{ hashFiles('go.sum') }}
 
       - name: Run pre-commit
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # version 3.0.1, See: https://github.com/pre-commit/action/releases
         with:
-          extra_args: --all-files
+          extra_args: --all-files --verbose

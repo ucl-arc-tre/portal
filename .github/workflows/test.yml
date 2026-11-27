@@ -17,14 +17,19 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # version 6.5.0, See: https://github.com/actions/setup-go/releases
         with:
-          go-version: "1.26"
+          go-version-file: go.mod
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # version 6.4.0, See: https://github.com/actions/setup-node/releases
         with:
           node-version: "26"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - name: Install node dependencies
         working-directory: web
+        env:
+          # Unit tests use node's test runner, not Cypress, so avoid downloading ~800MB test runner
+          CYPRESS_INSTALL_BINARY: 0
         run: npm ci
 
       - name: Run unit tests
@@ -139,6 +144,49 @@ jobs:
             "botDSHPassword": "${{ secrets.CYPRESS_BOT_DSH_PASSWORD }}"
           }
           EOF
+
+      # Goal is to keep the Dockerfile's cache mounts (--mount=type=cache) from one CI run to the next.
+      #
+      # Two tools are needed:
+      # - actions/cache saves/restores ordinary directories on the runner between runs, but it
+      #   can't reach cache mounts, which live inside BuildKit's own storage.
+      # - buildkit-cache-dance copies those runner directories into the cache mounts before the
+      #   build, and back out to the directories at the end of the job, so actions/cache can save
+      #   them.
+      #
+      # Go and npm have separate actions/cache steps, because they are keyed on
+      # different lockfiles.
+      #
+      # Relies on buildkit-cache-dance and `docker compose build` both using Docker's "default"
+      # builder: adding docker/setup-buildx-action would switch builders and silently bypass this cache.
+      - name: Cache Go build cache mounts
+        id: go-cache-mounts
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # version 6.1.0, See: https://github.com/actions/cache/releases
+        with:
+          path: go-cache-mounts
+          key: docker-go-cache-mounts-${{ hashFiles('go.sum') }}
+
+      - name: Cache npm cache mount
+        id: npm-cache-mount
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # version 6.1.0, See: https://github.com/actions/cache/releases
+        with:
+          path: npm-cache-mount
+          key: docker-npm-cache-mount-${{ hashFiles('web/package-lock.json') }}
+
+      - name: Inject cache mounts into BuildKit
+        uses: reproducible-containers/buildkit-cache-dance@5422eac04292c961a382e0f584ea0f03ad9da723 # version 3.4.0, See: https://github.com/reproducible-containers/buildkit-cache-dance/releases
+        with:
+          # Runner directory -> cache mount target in the Dockerfile.
+          cache-map: |
+            {
+              "go-cache-mounts/go-build": "/root/.cache/go-build",
+              "go-cache-mounts/go-mod": "/go/pkg/mod",
+              "npm-cache-mount": "/root/.npm"
+            }
+          # For any given lock file, the buildkit cache contents barely change once created
+          # the first time, so no point extracting again from BuildKit back to the GHA runner directory.
+          # And cache wouldn't save it anyway, because caches are immutable once created.
+          skip-extraction: ${{ steps.go-cache-mounts.outputs.cache-hit == 'true' && steps.npm-cache-mount.outputs.cache-hit == 'true' }}
 
       - name: Run e2e tests
         run: make test-e2e-release
