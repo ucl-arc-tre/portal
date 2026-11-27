@@ -19,7 +19,6 @@ func (s *Service) NotifyUserNameChangeRequest(attrs types.UserAttributes, recipi
 		return types.NewErrInvalidObject("nil requested name when requesting name change")
 	}
 	notification := types.Notification{
-		// what if new name is null? is that possible?
 		Title: fmt.Sprintf("'%s' requested a name change to '%s'", attrs.ChosenName, *attrs.RequestedChosenName),
 		Href:  new(fmt.Sprintf("/people/manage?userId=%s", attrs.User.ID.String())),
 		Kind:  new(types.NotificationKindUserNameChangeRequest),
