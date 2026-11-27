@@ -49,3 +49,7 @@ func parseManyUUID(values []string) ([]uuid.UUID, error) {
 	}
 	return uuids, nil
 }
+
+func (p ProjectSensitiveREDCapRequest) AssetUUIDs() ([]uuid.UUID, error) {
+	return parseManyUUID(p.AssetIds)
+}

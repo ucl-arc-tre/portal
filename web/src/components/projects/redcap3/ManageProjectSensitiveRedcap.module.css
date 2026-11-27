@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+
+  h2 {
+    padding-top: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--off-black);
+  }
+}
+
+.assets {
+  display: grid;
+  gap: 1rem;
+}
+
+.linkedProjects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.linkedProjects a {
+  color: var(--ucl-accent);
+  text-decoration: underline;
+}

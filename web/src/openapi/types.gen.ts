@@ -667,7 +667,56 @@ export type ProjectDshRole = 'read' | 'write' | 'outbound';
 
 export type ProjectDshStatus = 'active';
 
-export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven';
+export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven' | 'Sensitive REDCap';
+
+/**
+ * Base REDCap (Tier 3) project properties
+ */
+export type ProjectSensitiveRedCapBase = {
+    /**
+     * Description of the project
+     */
+    description: string;
+    /**
+     * List of TRE project identifiers to link to this redcap project
+     */
+    project_tre_ids: Array<string>;
+    /**
+     * List of DSH project identifiers to link to this redcap project
+     */
+    project_dsh_ids: Array<string>;
+    /**
+     * List of asset identifiers to link to this project (can be empty)
+     */
+    asset_ids: Array<string>;
+};
+
+/**
+ * Request payload for creating a new REDCap (Tier 3) project
+ */
+export type ProjectSensitiveRedCapRequest = ProjectSensitiveRedCapBase & {
+    /**
+     * Name of the project
+     */
+    name: string;
+    /**
+     * Unique identifier of the study to which the project belongs
+     */
+    study_id: string;
+};
+
+export type ProjectSensitiveRedCap = ProjectSensitiveRedCapBase & {
+    id: string;
+    study_id: string;
+    study_title: string;
+    study_owner?: UserDataSummary;
+    /**
+     * List of assets associated with this project
+     */
+    assets?: Array<Asset>;
+    environment_name: string;
+    name: string;
+};
 
 /**
  * A project with base details (environment-agnostic)
@@ -2617,6 +2666,108 @@ export type PostProjectsDshByProjectIdAccessReviewSignoffResponses = {
      */
     200: unknown;
 };
+
+export type GetProjectsSensitiveredcapData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/projects/sensitiveredcap';
+};
+
+export type GetProjectsSensitiveredcapErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsSensitiveredcapResponses = {
+    200: Array<ProjectSensitiveRedCap>;
+};
+
+export type GetProjectsSensitiveredcapResponse = GetProjectsSensitiveredcapResponses[keyof GetProjectsSensitiveredcapResponses];
+
+export type PostProjectsSensitiveredcapData = {
+    body: ProjectSensitiveRedCapRequest;
+    path?: never;
+    query?: never;
+    url: '/projects/sensitiveredcap';
+};
+
+export type PostProjectsSensitiveredcapErrors = {
+    /**
+     * Validation error
+     */
+    400: ValidationError;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type PostProjectsSensitiveredcapError = PostProjectsSensitiveredcapErrors[keyof PostProjectsSensitiveredcapErrors];
+
+export type PostProjectsSensitiveredcapResponses = {
+    /**
+     * Sensitive REDCap project created successfully
+     */
+    204: void;
+};
+
+export type PostProjectsSensitiveredcapResponse = PostProjectsSensitiveredcapResponses[keyof PostProjectsSensitiveredcapResponses];
+
+export type GetProjectsSensitiveredcapByProjectIdData = {
+    body?: never;
+    path: {
+        /**
+         * Project UUID
+         */
+        projectId: string;
+    };
+    query?: never;
+    url: '/projects/sensitiveredcap/{projectId}';
+};
+
+export type GetProjectsSensitiveredcapByProjectIdErrors = {
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Project not found
+     */
+    404: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+    /**
+     * Unexpected error
+     */
+    default: unknown;
+};
+
+export type GetProjectsSensitiveredcapByProjectIdResponses = {
+    200: ProjectSensitiveRedCap;
+};
+
+export type GetProjectsSensitiveredcapByProjectIdResponse = GetProjectsSensitiveredcapByProjectIdResponses[keyof GetProjectsSensitiveredcapByProjectIdResponses];
 
 export type GetAssetsData = {
     body?: never;

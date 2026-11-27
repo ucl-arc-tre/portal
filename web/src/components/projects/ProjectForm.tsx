@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import {
   postProjectsTre,
+  postProjectsSensitiveredcap,
   putProjectsTreByProjectId,
   ProjectTreRequest,
   Study,
@@ -11,15 +12,18 @@ import {
   getEnvironments,
   ProjectTreMember,
   ProjectTre,
+  Project,
 } from "@/openapi";
 import { AnyProject, AnyProjectRoleName, ProjectFormData } from "@/types/projects";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
+import { getAllProjects } from "@/lib/projects";
 import Button from "../ui/Button";
 import Dialog from "../ui/Dialog";
 
 import styles from "./ProjectForm.module.css";
 import ProjectFormStep1 from "./ProjectFormStep1";
 import ProjectTREStep from "./tre/ProjectFormTRE";
+import ProjectFormRedcapTier3 from "./redcap3/ProjectFormSensitiveRedcap";
 import ErrorMessage from "../ui/Error";
 
 type Props = {
@@ -47,6 +51,8 @@ export default function ProjectForm({
   const [environments, setEnvironments] = useState<Environment[] | null>(null);
   const [environmentsError, setEnvironmentsError] = useState<string | null>(null);
   const [assets, setAssets] = useState<Asset[] | null>(null);
+  const [linkedProjects, setLinkedProjects] = useState<Project[] | null>(null);
+  const [linkedProjectsError, setLinkedProjectsError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,6 +62,9 @@ export default function ProjectForm({
     mode: "onChange",
     defaultValues: {
       name: "",
+      description: "",
+      projectTreIds: [],
+      projectDshIds: [],
       studyId: "",
       environmentId: "",
       assetIds: [],
@@ -76,6 +85,33 @@ export default function ProjectForm({
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isTREProject = selectedEnvironment?.name == "ARC Trusted Research Environment";
   const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";
+  const isRedcapTier3Project = selectedEnvironment?.name == "Sensitive REDCap";
+
+  useEffect(() => {
+    if (!isRedcapTier3Project) return;
+    let cancelled = false;
+
+    const fetchProjects = async () => {
+      setLinkedProjects(null);
+      setLinkedProjectsError(null);
+      try {
+        const response = await getAllProjects();
+        if (cancelled) return;
+        if (responseIsError(response) || !response.data) {
+          setLinkedProjectsError(`Failed to load linked projects: ${extractErrorMessage(response)}`);
+          return;
+        }
+        setLinkedProjects(response.data);
+      } catch {
+        if (!cancelled) setLinkedProjectsError("Failed to load linked projects. Please reopen the form to try again.");
+      }
+    };
+
+    void fetchProjects();
+    return () => {
+      cancelled = true;
+    };
+  }, [isRedcapTier3Project]);
 
   const fieldsDisabled = isSubmitting;
   const editing = editingProject !== null && editingProject !== undefined;
@@ -117,7 +153,7 @@ export default function ProjectForm({
       setValue("assetIds", projectAssetIds);
 
       const projectMembers =
-        editingProject.members?.map((member) => ({
+        ("members" in editingProject ? editingProject.members : [])?.map((member) => ({
           username: member.user.username,
           roles: member.roles as AnyProjectRoleName[],
         })) || [];
@@ -285,6 +321,22 @@ export default function ProjectForm({
             response = await postProjectsTre({ body: requestBody });
           }
           break;
+        case "Sensitive REDCap":
+          if (editingProject) {
+            setError("Editing Sensitive REDCap projects is not yet supported.");
+            return;
+          }
+          response = await postProjectsSensitiveredcap({
+            body: {
+              name: data.name,
+              description: data.description,
+              project_tre_ids: data.projectTreIds,
+              project_dsh_ids: data.projectDshIds,
+              study_id: data.studyId,
+              asset_ids: [...new Set(assetIds)],
+            },
+          });
+          break;
         case "Data Safe Haven":
           setEnvironmentsError(
             "DSH projects are not yet supported. Please use the Share Management Tool within the DSH or open a ticket on MyServices."
@@ -341,6 +393,14 @@ export default function ProjectForm({
               <ProjectTREStep fieldsDisabled={fieldsDisabled} editingProject={editingProject as ProjectTre} />
             )}
 
+            {currentStep === 2 && isRedcapTier3Project && (
+              <ProjectFormRedcapTier3
+                projects={linkedProjects}
+                projectsError={linkedProjectsError}
+                fieldsDisabled={fieldsDisabled}
+              />
+            )}
+
             {error && <ErrorMessage message={error} />}
 
             <div className={styles.actions}>
@@ -359,7 +419,11 @@ export default function ProjectForm({
               {currentStep === totalSteps && (
                 <Button
                   type="button"
-                  disabled={isSubmitting || !isValid}
+                  disabled={
+                    isSubmitting ||
+                    !isValid ||
+                    (isRedcapTier3Project && (linkedProjects === null || !!linkedProjectsError))
+                  }
                   onClick={handleSubmit((data) => submitProject(data))}
                   cy="submit-project-button"
                 >

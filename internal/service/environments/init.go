@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	TRE = types.EnvironmentName("ARC Trusted Research Environment")
-	DSH = types.EnvironmentName("Data Safe Haven")
+	TRE             = types.EnvironmentName("ARC Trusted Research Environment")
+	DSH             = types.EnvironmentName("Data Safe Haven")
+	SensitiveRedCap = types.EnvironmentName("Sensitive REDCap")
 )
 
 // Initialise the environments
@@ -18,6 +19,7 @@ func Init() {
 	environments := []types.Environment{
 		{Name: TRE, Tier: 3},
 		{Name: DSH, Tier: 3},
+		{Name: SensitiveRedCap, Tier: 3},
 	}
 
 	db := graceful.NewDB()

@@ -65,6 +65,11 @@ func AddChildRole(parentRole RoleName, childRole RoleName) (bool, error) {
 	return roleAdded, types.NewErrServerError(err)
 }
 
+// IsStudyOwner reports whether the user has the owner role for the study.
+func IsStudyOwner(user types.User, studyId uuid.UUID) (bool, error) {
+	return HasRole(user, makeStudyOwnerRole(studyId).RoleName())
+}
+
 func RemoveStudyOwnerRole(user types.User, studyId uuid.UUID) (bool, error) {
 	return RemoveRole(user, makeStudyOwnerRole(studyId).RoleName())
 }
@@ -264,3 +269,8 @@ e = some(where (p.eft == allow))
 [matchers]
 m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && keyMatch(r.act, p.act)
 `
+
+// AddProjectRedcapTier3OwnerRole lets study owners inherit project ownership.
+func AddProjectRedcapTier3OwnerRole(studyId uuid.UUID, projectId uuid.UUID) (bool, error) {
+	return addProjectEnvOwnerRole("sensitiveredcap", studyId, projectId)
+}

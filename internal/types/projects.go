@@ -224,3 +224,14 @@ type ProjectDSHStatus string
 const (
 	ProjectDSHStatusActive = "active"
 )
+
+type ProjectSensitiveRedcap struct {
+	ModelAuditable
+	ProjectID   uuid.UUID `gorm:"not null;index"`
+	Description string    `gorm:"not null;default:''"`
+
+	// Relationships
+	Project     Project      `gorm:"foreignKey:ProjectID"`
+	ProjectsTRE []ProjectTRE `gorm:"many2many:project_tres_project_sensitive_redcaps;"`
+	ProjectsDSH []ProjectDSH `gorm:"many2many:project_dshes_project_sensitive_redcaps;"`
+}

@@ -84,11 +84,18 @@ export default function ProjectFormStep1(props: Props) {
                 : "Select an environment..."}
           </option>
           {environments &&
-            environments.map((environment) => (
-              <option key={environment.id} value={environment.id}>
-                {environment.name} (Tier {environment.tier})
-              </option>
-            ))}
+            environments
+              .filter(
+                (environment) =>
+                  environment.name !== "Sensitive REDCap" ||
+                  process.env.NEXT_PUBLIC_ENABLE_REDCAP_PROJECTS === "true" ||
+                  (editing && environment.id === selectedEnvironmentId)
+              )
+              .map((environment) => (
+                <option key={environment.id} value={environment.id}>
+                  {environment.name} (Tier {environment.tier})
+                </option>
+              ))}
         </select>
         {environmentsError && <Error message={environmentsError} />}
         {errors.environmentId && <Error message={`${errors.environmentId.message}`} />}

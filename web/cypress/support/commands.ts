@@ -7,6 +7,9 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
+      /** Create a study with an asset and submit it for review as the current approved researcher. */
+      createStudyForReview(studyTitle: string, assetTitle: string): Chainable<JQuery<HTMLElement>>;
+
       /**
        * Custom command to login as an admin
        * @example cy.loginAsAdmin()
@@ -1009,4 +1012,39 @@ Cypress.Commands.add("becomeApprovedResearcher", () => {
   });
 
   cy.contains("Verify another certificate", { timeout: 15000 }).should("exist");
+});
+
+Cypress.Commands.add("createStudyForReview", (studyTitle: string, assetTitle: string) => {
+  cy.visit("/studies");
+
+  // Create a study
+  cy.get('[data-cy="create-study-button"]').click();
+  cy.get('[name="title"]').type(studyTitle);
+  cy.get('[name="description"]').type("Test study");
+  cy.get('[name="dataControllerOrganisation"]').type("UCL");
+  cy.get('[data-cy="next"]').click();
+  cy.get('[data-cy="next"]').click();
+  cy.get("button[type='submit']").click();
+
+  cy.contains(studyTitle).click();
+  cy.get('[data-cy="agreement-agree"]').click();
+
+  // add an asset to complete setup
+  cy.get('[data-cy="add-asset-button"]').click({ force: true });
+  cy.get("input#title").type(assetTitle);
+  cy.get('[name="description"]').type("Unknown");
+  cy.get('[name="classification_impact"]').select("public");
+  cy.get('[name="format"]').select("electronic");
+  cy.get("input[name='has_expiry_date'][value='true']").check({ force: true });
+  cy.get('[name="expires_at"]').type("2022-01-01");
+  cy.get('[data-cy="create-asset-form"] input[value="arc_tre"]').check();
+  cy.get("input[name='requires_contract'][value='false']").check({ force: true });
+  cy.get("input[name='has_dspt'][value='false']").check({ force: true });
+  cy.get("input[name='stored_outside_uk_eea'][value='false']").check({ force: true });
+  cy.get('[name="status"]').select("active");
+  cy.get("button[type='submit']").click();
+
+  cy.get('[data-cy="study-ready-for-review-button"]').click();
+  cy.get('[data-cy="study-affirmation-confirm-checkbox"]').check();
+  return cy.get('[data-cy="study-affirmation-confirm-button"]').click();
 });

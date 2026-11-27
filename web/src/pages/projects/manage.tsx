@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { AnyProject } from "@/types/projects";
-import { getProjectsDshByProjectId, getProjectsTreByProjectId, ProjectDsh, ProjectTre } from "@/openapi";
+import {
+  getProjectsDshByProjectId,
+  getProjectsTreByProjectId,
+  ProjectDsh,
+  ProjectTre,
+  ProjectSensitiveRedCap,
+  getProjectsSensitiveredcapByProjectId,
+} from "@/openapi";
 import { extractErrorMessage, responseIsError } from "@/lib/errorHandler";
 
 import MetaHead from "@/components/meta/Head";
@@ -16,12 +23,22 @@ import Error from "@/components/ui/Error";
 import ManageProjectTRE from "@/components/projects/tre/ManageProjectTRE";
 import ManageProjectDSH from "@/components/projects/dsh/ManageProjectDSH";
 
+import ManageProjectSensitiveRedcap from "@/components/projects/redcap3/ManageProjectSensitiveRedcap";
+
 export default function ManageProjectPage() {
+  const router = useRouter();
+  if (!router.isReady) return <Loading />;
+
+  // must rerender if the environment changes
+  return <ManageProjectContent key={JSON.stringify([router.query.projectId, router.query.environment])} />;
+}
+
+function ManageProjectContent() {
   const router = useRouter();
   const { projectId, environment } = router.query;
   const { authInProgress, isAuthed, isApprovedResearcher } = useAuth();
   const [project, setProject] = useState<AnyProject | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async (
@@ -33,10 +50,12 @@ export default function ManageProjectPage() {
 
     if (!projectIdParam || typeof projectIdParam !== "string") {
       setError("Missing or invalid project ID");
+      setLoading(false);
       return;
     }
     if (!environmentParam || typeof environmentParam !== "string") {
       setError("Missing or invalid environment ID");
+      setLoading(false);
       return;
     }
 
@@ -46,6 +65,11 @@ export default function ManageProjectPage() {
       switch (environmentParam) {
         case "ARC Trusted Research Environment":
           projectResponse = await getProjectsTreByProjectId({
+            path: { projectId: projectIdParam },
+          });
+          break;
+        case "Sensitive REDCap":
+          projectResponse = await getProjectsSensitiveredcapByProjectId({
             path: { projectId: projectIdParam },
           });
           break;
@@ -75,11 +99,8 @@ export default function ManageProjectPage() {
   };
 
   useEffect(() => {
-    if (projectId && typeof projectId === "string" && environment && typeof environment === "string") {
-      // Route changes start a new request and must reset the loading state.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchData(projectId, environment);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData(projectId, environment);
   }, [projectId, environment]);
 
   if (authInProgress) return <Loading />;
@@ -174,6 +195,9 @@ export default function ManageProjectPage() {
         )}
         {environment == "Data Safe Haven" && (
           <ManageProjectDSH project={project as ProjectDsh} fetchData={() => fetchData(projectId, environment)} />
+        )}
+        {environment == "Sensitive REDCap" && (
+          <ManageProjectSensitiveRedcap project={project as ProjectSensitiveRedCap} />
         )}
       </div>
     </>

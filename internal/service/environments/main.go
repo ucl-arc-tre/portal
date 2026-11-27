@@ -44,6 +44,10 @@ func (s *Service) DSH() (types.Environment, error) {
 	return s.environment(DSH)
 }
 
+func (s *Service) SensitiveRedcap() (types.Environment, error) {
+	return s.environment(SensitiveRedCap)
+}
+
 func (s *Service) EnvironmentId(name types.EnvironmentName) (uuid.UUID, error) {
 	environment, err := s.environment(name)
 	if err != nil {

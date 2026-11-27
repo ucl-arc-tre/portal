@@ -520,6 +520,7 @@ func (e ContractBaseStatus) Valid() bool {
 const (
 	ARCTrustedResearchEnvironment EnvironmentName = "ARC Trusted Research Environment"
 	DataSafeHaven                 EnvironmentName = "Data Safe Haven"
+	SensitiveREDCap               EnvironmentName = "Sensitive REDCap"
 )
 
 // Valid indicates whether the value is a known member of the EnvironmentName enum.
@@ -528,6 +529,8 @@ func (e EnvironmentName) Valid() bool {
 	case ARCTrustedResearchEnvironment:
 		return true
 	case DataSafeHaven:
+		return true
+	case SensitiveREDCap:
 		return true
 	default:
 		return false
@@ -1338,6 +1341,66 @@ type ProjectDSHRole string
 // ProjectDSHStatus defines model for ProjectDSHStatus.
 type ProjectDSHStatus string
 
+// ProjectSensitiveREDCap defines model for ProjectSensitiveREDCap.
+type ProjectSensitiveREDCap struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Assets List of assets associated with this project
+	Assets *[]Asset `json:"assets,omitempty"`
+
+	// Description Description of the project
+	Description     string `json:"description"`
+	EnvironmentName string `json:"environment_name"`
+	Id              string `json:"id"`
+	Name            string `json:"name"`
+
+	// ProjectDshIds List of DSH project identifiers to link to this redcap project
+	ProjectDshIds []string `json:"project_dsh_ids"`
+
+	// ProjectTreIds List of TRE project identifiers to link to this redcap project
+	ProjectTreIds []string         `json:"project_tre_ids"`
+	StudyId       string           `json:"study_id"`
+	StudyOwner    *UserDataSummary `json:"study_owner,omitempty"`
+	StudyTitle    string           `json:"study_title"`
+}
+
+// ProjectSensitiveREDCapBase Base REDCap (Tier 3) project properties
+type ProjectSensitiveREDCapBase struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Description Description of the project
+	Description string `json:"description"`
+
+	// ProjectDshIds List of DSH project identifiers to link to this redcap project
+	ProjectDshIds []string `json:"project_dsh_ids"`
+
+	// ProjectTreIds List of TRE project identifiers to link to this redcap project
+	ProjectTreIds []string `json:"project_tre_ids"`
+}
+
+// ProjectSensitiveREDCapRequest Request payload for creating a new REDCap (Tier 3) project
+type ProjectSensitiveREDCapRequest struct {
+	// AssetIds List of asset identifiers to link to this project (can be empty)
+	AssetIds []string `json:"asset_ids"`
+
+	// Description Description of the project
+	Description string `json:"description"`
+
+	// Name Name of the project
+	Name string `json:"name"`
+
+	// ProjectDshIds List of DSH project identifiers to link to this redcap project
+	ProjectDshIds []string `json:"project_dsh_ids"`
+
+	// ProjectTreIds List of TRE project identifiers to link to this redcap project
+	ProjectTreIds []string `json:"project_tre_ids"`
+
+	// StudyId Unique identifier of the study to which the project belongs
+	StudyId string `json:"study_id"`
+}
+
 // ProjectTRE A TRE project with base project details and environment-specific data
 type ProjectTRE struct {
 	// AirlockOutboundWhitelist List of IPs or FQDNs to whitelist for egress for this project (can be empty)
@@ -2002,6 +2065,9 @@ type PostProfileAgreementsJSONRequestBody = AgreementConfirmation
 // PostProfileTrainingJSONRequestBody defines body for PostProfileTraining for application/json ContentType.
 type PostProfileTrainingJSONRequestBody = ProfileTrainingUpdate
 
+// PostProjectsSensitiveredcapJSONRequestBody defines body for PostProjectsSensitiveredcap for application/json ContentType.
+type PostProjectsSensitiveredcapJSONRequestBody = ProjectSensitiveREDCapRequest
+
 // PostProjectsTreJSONRequestBody defines body for PostProjectsTre for application/json ContentType.
 type PostProjectsTreJSONRequestBody = ProjectTRERequest
 
@@ -2133,6 +2199,15 @@ type ServerInterface interface {
 
 	// (POST /projects/dsh/{projectId}/access-review-signoff)
 	PostProjectsDshProjectIdAccessReviewSignoff(c *gin.Context, projectId ProjectIdParam)
+
+	// (GET /projects/sensitiveredcap)
+	GetProjectsSensitiveredcap(c *gin.Context)
+
+	// (POST /projects/sensitiveredcap)
+	PostProjectsSensitiveredcap(c *gin.Context)
+
+	// (GET /projects/sensitiveredcap/{projectId})
+	GetProjectsSensitiveredcapProjectId(c *gin.Context, projectId ProjectIdParam)
 
 	// (GET /projects/tre)
 	GetProjectsTre(c *gin.Context)
@@ -2735,6 +2810,57 @@ func (siw *ServerInterfaceWrapper) PostProjectsDshProjectIdAccessReviewSignoff(c
 	}
 
 	siw.Handler.PostProjectsDshProjectIdAccessReviewSignoff(c, projectId)
+}
+
+// GetProjectsSensitiveredcap operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsSensitiveredcap(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsSensitiveredcap(c)
+}
+
+// PostProjectsSensitiveredcap operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsSensitiveredcap(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostProjectsSensitiveredcap(c)
+}
+
+// GetProjectsSensitiveredcapProjectId operation middleware
+func (siw *ServerInterfaceWrapper) GetProjectsSensitiveredcapProjectId(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "projectId" -------------
+	var projectId ProjectIdParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "projectId", c.Param("projectId"), &projectId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter projectId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetProjectsSensitiveredcapProjectId(c, projectId)
 }
 
 // GetProjectsTre operation middleware
@@ -4157,6 +4283,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/projects/tre/admin/import", wrapper.PostProjectsTreAdminImport)
 	router.GET(options.BaseURL+"/projects/dsh/:projectId", wrapper.GetProjectsDshProjectId)
 	router.POST(options.BaseURL+"/projects/dsh/:projectId/access-review-signoff", wrapper.PostProjectsDshProjectIdAccessReviewSignoff)
+	router.GET(options.BaseURL+"/projects/sensitiveredcap", wrapper.GetProjectsSensitiveredcap)
+	router.POST(options.BaseURL+"/projects/sensitiveredcap", wrapper.PostProjectsSensitiveredcap)
+	router.GET(options.BaseURL+"/projects/sensitiveredcap/:projectId", wrapper.GetProjectsSensitiveredcapProjectId)
 	router.GET(options.BaseURL+"/assets", wrapper.GetAssets)
 	router.GET(options.BaseURL+"/studies/:studyId/assets", wrapper.GetStudiesStudyIdAssets)
 	router.POST(options.BaseURL+"/studies/:studyId/assets", wrapper.PostStudiesStudyIdAssets)

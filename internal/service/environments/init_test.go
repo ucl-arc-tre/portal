@@ -10,10 +10,12 @@ import (
 func TestNames(t *testing.T) {
 	assert.Equal(t, "ARC Trusted Research Environment", string(TRE), "name is immutable")
 	assert.Equal(t, "Data Safe Haven", string(DSH), "name is immutable")
+	assert.Equal(t, "Sensitive REDCap", string(SensitiveRedCap), "name is immutable")
 }
 
 func TestNameEqualityOpenaopi(t *testing.T) {
 	// WARNING: these should not be modified
 	assert.Equal(t, string(TRE), string(openapi.ARCTrustedResearchEnvironment))
 	assert.Equal(t, string(DSH), string(openapi.DataSafeHaven))
+	assert.Equal(t, string(SensitiveRedCap), string(openapi.SensitiveREDCap))
 }

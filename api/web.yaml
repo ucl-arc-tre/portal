@@ -1076,6 +1076,68 @@ paths:
         default:
           description: Unexpected error
 
+  # Project Management - TRE Environment
+  /projects/sensitiveredcap:
+    get:
+      description: Get all REDCap (Tier 3) projects that a user has access to view
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectSensitiveREDCap"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+    post:
+      description: Create a REDCap (Tier 3) project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectSensitiveREDCapRequest"
+      responses:
+        "204":
+          description: Sensitive REDCap project created successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
+  /projects/sensitiveredcap/{projectId}:
+    get:
+      description: Get one REDCap (Tier 3) project with base project details joined in
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdParam"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectSensitiveREDCap"
+        "403":
+          description: Forbidden
+        "404":
+          description: Project not found
+        "500":
+          description: Internal server error
+        default:
+          description: Unexpected error
+
   # Asset Management
   /assets:
     get:
@@ -2684,6 +2746,80 @@ components:
       enum:
         - "ARC Trusted Research Environment"
         - "Data Safe Haven"
+        - "Sensitive REDCap"
+
+    ProjectSensitiveREDCapBase:
+      type: object
+      description: Base REDCap (Tier 3) project properties
+      required:
+        - asset_ids
+        - description
+        - project_tre_ids
+        - project_dsh_ids
+      properties:
+        description:
+          type: string
+          description: Description of the project
+        project_tre_ids:
+          type: array
+          description: List of TRE project identifiers to link to this redcap project
+          items:
+            type: string
+        project_dsh_ids:
+          type: array
+          description: List of DSH project identifiers to link to this redcap project
+          items:
+            type: string
+        asset_ids:
+          type: array
+          description: List of asset identifiers to link to this project (can be empty)
+          items:
+            type: string
+
+    ProjectSensitiveREDCapRequest:
+      type: object
+      description: Request payload for creating a new REDCap (Tier 3) project
+      allOf:
+        - $ref: "#/components/schemas/ProjectSensitiveREDCapBase"
+        - required:
+            - name
+            - study_id
+          properties:
+            name:
+              type: string
+              description: Name of the project
+            study_id:
+              type: string
+              description: Unique identifier of the study to which the project belongs
+
+    ProjectSensitiveREDCap:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/ProjectSensitiveREDCapBase"
+        - required:
+            - id
+            - study_id
+            - study_title
+            - environment_name
+            - name
+          properties:
+            id:
+              type: string
+            study_id:
+              type: string
+            study_title:
+              type: string
+            study_owner:
+              $ref: "#/components/schemas/UserDataSummary"
+            assets:
+              type: array
+              description: List of assets associated with this project
+              items:
+                $ref: "#/components/schemas/Asset"
+            environment_name:
+              type: string
+            name:
+              type: string
 
     Project:
       type: object

@@ -61,6 +61,8 @@ func addApprovedResearcherPolicies(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/users/lookup", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: ReadAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/tre", Action: WriteAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/sensitiveredcap", Action: ReadAction},
+		Policy{RoleName: ApprovedStaffResearcher, Resource: "/projects/sensitiveredcap", Action: WriteAction},
 		Policy{RoleName: ApprovedStaffResearcher, Resource: "/environments", Action: ReadAction},
 	)
 }
@@ -104,6 +106,7 @@ func addIgOpsStaffPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: IGOpsStaff, Resource: "/studies/admin/*", Action: WriteAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: IGOpsStaff, Resource: "/projects/dsh/*", Action: ReadAction},
+		Policy{RoleName: IGOpsStaff, Resource: "/projects/sensitiveredcap/*", Action: ReadAction},
 	)
 }
 
@@ -123,6 +126,7 @@ func addIgAdminPolicy(enforcer *casbin.SyncedEnforcer) {
 		Policy{RoleName: IGAdmin, Resource: "/projects/tre/*", Action: ReadAction},
 		Policy{RoleName: IGAdmin, Resource: "/projects/tre/:id/pending-deletion", Action: WriteAction},
 		Policy{RoleName: IGAdmin, Resource: "/projects/dsh/*", Action: ReadAction},
+		Policy{RoleName: IGAdmin, Resource: "/projects/sensitiveredcap/*", Action: ReadAction},
 	)
 }
 
