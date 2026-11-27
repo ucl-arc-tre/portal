@@ -58,6 +58,7 @@ services:
       POSTGRES_DB: dev
 
   cypress:
+    # Must match the cypress version in web/package-lock.json
     image: cypress/included:15.21.1
     depends_on:
       - nginx
