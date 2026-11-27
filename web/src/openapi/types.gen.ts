@@ -678,6 +678,14 @@ export type ProjectSensitiveRedCapBase = {
      */
     description: string;
     /**
+     * List of TRE project identifiers to link to this redcap project
+     */
+    project_tre_ids: Array<string>;
+    /**
+     * List of DSH project identifiers to link to this redcap project
+     */
+    project_dsh_ids: Array<string>;
+    /**
      * List of asset identifiers to link to this project (can be empty)
      */
     asset_ids: Array<string>;

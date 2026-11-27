@@ -1347,13 +1347,19 @@ type ProjectSensitiveREDCap struct {
 	Assets *[]Asset `json:"assets,omitempty"`
 
 	// Description Description of the project
-	Description     string           `json:"description"`
-	EnvironmentName string           `json:"environment_name"`
-	Id              string           `json:"id"`
-	Name            string           `json:"name"`
-	StudyId         string           `json:"study_id"`
-	StudyOwner      *UserDataSummary `json:"study_owner,omitempty"`
-	StudyTitle      string           `json:"study_title"`
+	Description     string `json:"description"`
+	EnvironmentName string `json:"environment_name"`
+	Id              string `json:"id"`
+	Name            string `json:"name"`
+
+	// ProjectDshIds List of DSH project identifiers to link to this redcap project
+	ProjectDshIds []string `json:"project_dsh_ids"`
+
+	// ProjectTreIds List of TRE project identifiers to link to this redcap project
+	ProjectTreIds []string         `json:"project_tre_ids"`
+	StudyId       string           `json:"study_id"`
+	StudyOwner    *UserDataSummary `json:"study_owner,omitempty"`
+	StudyTitle    string           `json:"study_title"`
 }
 
 // ProjectSensitiveREDCapBase Base REDCap (Tier 3) project properties
@@ -1363,6 +1369,12 @@ type ProjectSensitiveREDCapBase struct {
 
 	// Description Description of the project
 	Description string `json:"description"`
+
+	// ProjectDshIds List of DSH project identifiers to link to this redcap project
+	ProjectDshIds []string `json:"project_dsh_ids"`
+
+	// ProjectTreIds List of TRE project identifiers to link to this redcap project
+	ProjectTreIds []string `json:"project_tre_ids"`
 }
 
 // ProjectSensitiveREDCapRequest Request payload for creating a new REDCap (Tier 3) project
@@ -1375,6 +1387,12 @@ type ProjectSensitiveREDCapRequest struct {
 
 	// Name Name of the project
 	Name string `json:"name"`
+
+	// ProjectDshIds List of DSH project identifiers to link to this redcap project
+	ProjectDshIds []string `json:"project_dsh_ids"`
+
+	// ProjectTreIds List of TRE project identifiers to link to this redcap project
+	ProjectTreIds []string `json:"project_tre_ids"`
 
 	// StudyId Unique identifier of the study to which the project belongs
 	StudyId string `json:"study_id"`

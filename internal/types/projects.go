@@ -231,5 +231,7 @@ type ProjectSensitiveRedcap struct {
 	Description string    `gorm:"not null;default:''"`
 
 	// Relationships
-	Project Project `gorm:"foreignKey:ProjectID"`
+	Project     Project      `gorm:"foreignKey:ProjectID"`
+	ProjectsTRE []ProjectTRE `gorm:"many2many:project_tres_project_sensitive_redcaps;"`
+	ProjectsDSH []ProjectDSH `gorm:"many2many:project_dshes_project_sensitive_redcaps;"`
 }

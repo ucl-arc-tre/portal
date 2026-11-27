@@ -33,6 +33,8 @@ type ProjectFormDataTRE = {
 type ProjectFormData = {
   name: string;
   description: string;
+  projectTreIds: string[];
+  projectDshIds: string[];
   studyId: string;
   environmentId: string;
   assetIds: { value: string }[];
