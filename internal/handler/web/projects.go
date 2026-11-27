@@ -70,7 +70,7 @@ func (h *Handler) GetProjects(ctx *gin.Context, params openapi.GetProjectsParams
 	}
 	envs := []types.EnvironmentName{}
 	if canSeeAllEnvironments {
-		envs = append(envs, environments.DSH, environments.TRE, environments.RedCapTier3)
+		envs = append(envs, environments.DSH, environments.TRE, environments.SensitiveRedCap)
 	}
 	if isTreOpsStaff && !canSeeAllEnvironments {
 		envs = append(envs, environments.TRE)

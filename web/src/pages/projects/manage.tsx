@@ -58,7 +58,7 @@ export default function ManageProjectPage() {
             path: { projectId: projectIdParam },
           });
           break;
-        case "REDCap Tier 3":
+        case "Sensitive REDCap":
           projectResponse = await getProjectsRedcaptier3ByProjectId({
             path: { projectId: projectIdParam },
           });
@@ -189,7 +189,7 @@ export default function ManageProjectPage() {
         {environment == "Data Safe Haven" && (
           <ManageProjectDSH project={project as ProjectDsh} fetchData={() => fetchData(projectId, environment)} />
         )}
-        {environment == "REDCap Tier 3" && <ManageProjectRedcapTier3 project={project as ProjectRedcapTier3} />}
+        {environment == "Sensitive REDCap" && <ManageProjectRedcapTier3 project={project as ProjectRedcapTier3} />}
       </div>
     </>
   );

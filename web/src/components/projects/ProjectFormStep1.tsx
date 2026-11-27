@@ -87,7 +87,7 @@ export default function ProjectFormStep1(props: Props) {
             environments
               .filter(
                 (environment) =>
-                  environment.name !== "REDCap Tier 3" ||
+                  environment.name !== "Sensitive REDCap" ||
                   process.env.NEXT_PUBLIC_ENABLE_REDCAP_PROJECTS === "true" ||
                   (editing && environment.id === selectedEnvironmentId)
               )

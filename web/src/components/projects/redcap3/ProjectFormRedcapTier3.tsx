@@ -17,7 +17,7 @@ export default function ProjectFormRedcapTier3({ approvedStudies, assets }: Prop
 
   return (
     <section aria-labelledby="redcap-project-review">
-      <h3 id="redcap-project-review">Review REDCap Tier 3 project</h3>
+      <h3 id="redcap-project-review">Review Sensitive REDCap project</h3>
       <p>Check your project details, then select Save Project to create the project.</p>
       <dl>
         <dt>Project name</dt>
@@ -25,7 +25,7 @@ export default function ProjectFormRedcapTier3({ approvedStudies, assets }: Prop
         <dt>Study</dt>
         <dd>{study?.title ?? studyId}</dd>
         <dt>Environment</dt>
-        <dd>REDCap Tier 3</dd>
+        <dd>Sensitive REDCap</dd>
         <dt>Assets</dt>
         <dd>
           {selectedAssetIds.length > 0 ? (

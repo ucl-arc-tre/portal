@@ -667,7 +667,7 @@ export type ProjectDshRole = 'read' | 'write' | 'outbound';
 
 export type ProjectDshStatus = 'active';
 
-export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven' | 'REDCap Tier 3';
+export type EnvironmentName = 'ARC Trusted Research Environment' | 'Data Safe Haven' | 'Sensitive REDCap';
 
 /**
  * Base REDCap (Tier 3) project properties

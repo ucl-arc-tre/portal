@@ -520,7 +520,7 @@ func (e ContractBaseStatus) Valid() bool {
 const (
 	ARCTrustedResearchEnvironment EnvironmentName = "ARC Trusted Research Environment"
 	DataSafeHaven                 EnvironmentName = "Data Safe Haven"
-	REDCapTier3                   EnvironmentName = "REDCap Tier 3"
+	SensitiveREDCap               EnvironmentName = "Sensitive REDCap"
 )
 
 // Valid indicates whether the value is a known member of the EnvironmentName enum.
@@ -530,7 +530,7 @@ func (e EnvironmentName) Valid() bool {
 		return true
 	case DataSafeHaven:
 		return true
-	case REDCapTier3:
+	case SensitiveREDCap:
 		return true
 	default:
 		return false

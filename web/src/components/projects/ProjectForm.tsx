@@ -78,7 +78,7 @@ export default function ProjectForm({
   const selectedEnvironment = environments?.find((env) => env.id === selectedEnvironmentId);
   const isTREProject = selectedEnvironment?.name == "ARC Trusted Research Environment";
   const isDSHProject = selectedEnvironment?.name == "Data Safe Haven";
-  const isRedcapTier3Project = selectedEnvironment?.name == "REDCap Tier 3";
+  const isRedcapTier3Project = selectedEnvironment?.name == "Sensitive REDCap";
 
   const fieldsDisabled = isSubmitting;
   const editing = editingProject !== null && editingProject !== undefined;
@@ -288,9 +288,9 @@ export default function ProjectForm({
             response = await postProjectsTre({ body: requestBody });
           }
           break;
-        case "REDCap Tier 3":
+        case "Sensitive REDCap":
           if (editingProject) {
-            setError("Editing REDCap Tier 3 projects is not yet supported.");
+            setError("Editing Sensitive REDCap projects is not yet supported.");
             return;
           }
           response = await postProjectsRedcaptier3({

@@ -2749,7 +2749,7 @@ components:
       enum:
         - "ARC Trusted Research Environment"
         - "Data Safe Haven"
-        - "REDCap Tier 3"
+        - "Sensitive REDCap"
 
     ProjectRedcapTier3Base:
       type: object

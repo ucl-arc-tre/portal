@@ -45,7 +45,7 @@ func (s *Service) CreateProjectRedcapTier3(creator types.User, studyId uuid.UUID
 	if err := s.validateProjectNameUniqueness(data.Name); err != nil {
 		return err
 	}
-	environment, err := s.environments.RedcapTier3()
+	environment, err := s.environments.SensitiveRedcap()
 	if err != nil {
 		return err
 	}
