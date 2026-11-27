@@ -49,7 +49,9 @@ ARG NODE_ENV=production
 ENV NODE_ENV=$NODE_ENV
 
 # Will use .env.$(NODE_ENV)
-RUN --mount=type=cache,target=/app/node_modules \
+# Cache npm's download cache, not node_modules: npm ci always deletes node_modules before
+# installing, so a node_modules cache would never be reused.
+RUN --mount=type=cache,target=/root/.npm \
   npm ci --ignore-scripts && \
   npm run build
 
